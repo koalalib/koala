@@ -9,36 +9,6 @@ Zadania proste:
 
 - wszystkie metody postaci get_No uzupelnic o wersje szablonowe z ostatnim parametrem chooser, a bez arg. domyslnych. Implementacja moze wykorzystywac wersje istniejace bez chooserow (banalne). W zasadzie wszystkie grupy metod get_, get_Last, get_Prev, get_Next te¿ mog¹ byæ podwojone o wersje z chooserami.
 
-- Poprawiæ nieefektywne implementacje metod (mo¿na skorzystaæ z lokalnych tablic na stosie zamiast setów): getNeighb, getNeighNo, getClNeighb, getClNeighNo. Generalnie nie u¿ywamy setów tam, gdzie sygnatura tego nie wymaga. A nawet metody zwracaj¹ce sety (get_Set) mo¿na wykonaæ szybciej na tablicy, któr¹ finalnie sortujemy i inicjujemy seta.
-
-
-- oprocz istniejacego
-int getEdgeNo(Vertex*, EdgeDirection=EdAll) wprowadzamy podobn¹ metodê
-int deg(Vertex*, EdgeDirection=EdAll) wyliczajac¹ getEdgeNo przy wierzcholku, ale z ew. (patrz maska) 2-krotnym zliczaniem petli (jak definiuje siê stopien w teorii grafow). Wersja szablonowa z chooserem po krawêdziach.
-Ponadto metody getVertInfo(Vertex*), chVertInfo(Vertex*,VInfoType&), getEdgeInfo(Edge*), chEdgeInfo(Edge*,EInfoType&) Ale pól info w klasach Vertex/Edge nie prywatyzujemy!
-Ponadto int delta(EdgeDirection=EdAll), int Delta(EdgeDirection=EdAll) - min. i max. stopien. (w rozumieniu metody deg) oraz wersje szablonowe z drugim arg. chooser i bez wartosci domyslnej. Byæ mo¿e równie¿ minVertDeg(EdgeDirection=EdAll) i maxVertDeg(EdgeDirection=EdAll) – podobne, ale z typem wyniku std::pair<int,Vertex*> - ¿eby za jednym szukaniem zwraca³y jakiœ wierzcho³ek realizuj¹cy to ekstremum.
-
-- szablony metod grupowego usuwania lub zmieniania wierzcho³ków i krawêdzi, jako wynik zwracaj¹ liczbê udanych operacji odpowiedniego typu 
-template..
-int delVerts(Set<Vertex*>)
-int delVerts(inputiter beg,inputiter zaend) 
-int delVerts() – wszystkie, alias dla clear
-int delEdges(Set<Edge*>, EdgeType=EdAll)
-int delEdges(inputiter beg,inputiter zaend, EdgeType=EdAll) 
-int delEdges(EdgeType=EdAll) – wszystkie, tak jak clearEdges, ale z podanym typem
-int delEdges(Vertex*,Set<Edge*>, EdgeType=EdAll) – przy zadanym wierzcho³ku
-int delEdges(Vertex*,inputiter beg,inputiter zaend, EdgeType=EdAll) 
-int delEdges(Vertex*,EdgeType=EdAll) 
-int delEdges(Vertex*, Vertex*,Set<Edge*>, EdgeType=EdAll) – i miêdzy wierzcho³kami
-int delEdges(Vertex*, Vertex*,inputiter beg,inputiter zaend, EdgeType=EdAll) 
-int delEdges(Vertex*, Vertex*,EdgeType=EdAll)
-
-bool areParall(Edge*,Edge*,EdgeType) – czy s¹ równoleg³e w znaczeniu podanym przez maskê.
-
-Edge* ch2Archs(Edge*) – zamienia krawêdŸ nieskierowan¹ na 2 przeciwrównoleg³e ³uki z tym samym info. Jedn¹ krawêdŸ zmienia, drug¹ tworzy i j¹ zwraca. 
-int ch2Archs (Set<Edge*>)
-int ch2Archs (inputiter beg,inputiter zaend) 
-int ch2Archs () – wszystkie, 
 
 - Trudniejsze: przezroczysta dla u¿ytkownika macierz s¹siedztwa – wystarczy u¿yæ w klasie grafu domyœlnie wynulowanego wskaŸnika na 2-wymiarow¹ tablicê asocjacyjn¹. Tablica tworzona dynamicznie. Jedyne potrzebne metody w interfejsie klasy, to:
 void adjMatrix(bool on=true) // stwórz lub skasuj
@@ -47,24 +17,6 @@ void defragAdjMatrix();
 
 - Potrzebne metody grafu:
 
-Podstawienia grafu za wierzcholek - analogiczne jak copy, ale nowe wierzcholki lacza sie z sasiadami tego, ktorego zastapily
-Vertex* subst(Vertex*, KoalaGraph &);
-template<class VertInfoExt,class EdgeInfoExt>
-Vertex* subst(Vertex*, KoalaGraph<VertInfoExt,EdgeInfoExt> &);
-template<class VertInfoExt,class EdgeInfoExt,class Chooser>
-Vertex* subst(Vertex*, KoalaGraph<VertInfoExt,EdgeInfoExt> &, Chooser);
-template<class VertInfoExt,class EdgeInfoExt,class Chooser,class Caster>
-Vertex* subst(Vertex*, KoalaGraph<VertInfoExt,EdgeInfoExt> &, Chooser, Caster);
-template<class VertInfoExt,class EdgeInfoExt,class Chooser,class Caster, class Linker>
-Vertex* subst(Vertex*, KoalaGraph<VertInfoExt,EdgeInfoExt> &, Chooser, Caster, Linker);
-
-Vertex* glue(Vertex*, Vertex*, bool makeloops=false)
-Vertex* glue(SetVector<Vertex*>&, bool makeloops=false, Vertex* res=NULL)
-template...
-Vertex* glue(inputiter beg, inputiter zaend, bool makeloops=false, Vertex* res=NULL) - skleja podane wierzcholki w jeden, laczace je krawedzie staja sie petlami lub znikaja, mozna wybrac element ze sklejanego zbioru, ktory "staje sie" wierzcholkiem wynikowym, w przeciwnym razie metoda wybiera sama jeden z zakresu.
-
-Vertex* putVert(Edge*); - wstawia wierzcholek na podana krawedz (a ona sama znika)
-Edge* takeVert(Vert*); - odwrotnie, zastepuje wierzcholek o 2 sasiadach (tylko dla takich dziala) nowa krawedzia (orientacja do dogadania, powinna byc jakos dziedziczona po znikajacych krawedziach). 
 
 B. Uwaga: Ogólny format algorytmów jak w Dijkstrze tj. procedury z tej samej rodziny zamykamy jako metody szablonowe statyczne w klasie o charakterystycznej nazwie. Wszystkie struktury IO potrzebne tym procedurom definiujemy w klasie, równie¿ struktury potrzebne nam do dzia³ania (protected). Dane wierzcho³ków/krawêdzi w tablicach asocjacyjnych indeksowanych tymi wierzcho³kami/krawêdziami. Ci¹gi jakichkolwiek elementów zwracamy przez szablonowy iterator-wstawiacz (jak w metodzie getVerts), zaœ pobieramy z zakresu pocz¹tek-zakoniec wyznaczony dwoma podanymi iteratorami (bêdzie dzia³a³o tak ze zwyk³¹ tablic¹, jak i dowolnym kontenerem zachowuj¹cym kolejnoœæ, jak vector.assign). Póki co implementujemy tylko „sprytne” procedury wielomianowe, ¿adnych wyk³adniczych heurystyk Dyskusyjne: jak traktowaæ krawêdzie typów niedozwolonych lub bezsensownych w konkretnych zagadnieniach (np. algorytm dla grafów prostych a mamy te¿ skierowane): ignorowaæ, rzucaæ b³¹d, traktowaæ jak zwyk³e krawêdzie?
 

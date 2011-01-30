@@ -383,7 +383,7 @@ class VertDegValChooser {
     VertDegValChooser(int adeg, Koala::EdgeDirection atype): deg(adeg), type(atype) {}
     template <class Graph>
     bool operator()(typename Graph::PVertex v, Graph& g)
-    { return g.getEdgeNo(v,type)==deg; }
+    { return g.deg(v,type)==deg; }
 };
 
 VertDegValChooser vertDegChoose(int adeg, Koala::EdgeDirection atype=Koala::EdAll)
@@ -400,7 +400,7 @@ template <class Int> class VertDegSetChooser {
                                             set(aset), type(atype) {}
     template <class Graph>
     bool operator()(typename Graph::PVertex v, Graph& g)
-    { return set.isElement(g.getEdgeNo(v,type)); }
+    { return set.isElement(g.deg(v,type)); }
 };
 
 template <class Int>
@@ -417,7 +417,7 @@ template <class Iter> class VertDegContainerChooser {
                                             begin(abeg), end(aend), typ(atype) {}
     template <class Graph>
     bool operator()(typename Graph::PVertex v, Graph& g)
-    { return std::find(begin,end,g.getEdgeNo(v,typ))!=end; }
+    { return std::find(begin,end,g.deg(v,typ))!=end; }
 };
 
 template <class Iter>
@@ -434,7 +434,7 @@ template <class Obj> class VertDegFunctorChooser {
                                             funktor(afun), typ(atype) {}
     template <class Graph>
     bool operator()(typename Graph::PVertex v, Graph& g)
-    { return (bool)funktor(g.getEdgeNo(v,typ)); }
+    { return (bool)funktor(g.deg(v,typ)); }
 };
 
 template <class Obj>

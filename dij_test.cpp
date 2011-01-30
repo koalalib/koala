@@ -26,9 +26,9 @@ Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,V,U,tabV[10];
 Koala::Graph<OpisV,OpisE>::PEdge tabE[10];
 
 
-Koala::AssocTabWrapper<std::map<Koala::Graph<OpisV,OpisE>::PVertex,
+Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex,
             Koala::Dijkstra::VertLabs<int, Koala::Graph<OpisV,OpisE> > > > vertCont;
-Koala::AssocTabWrapper<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Dijkstra::EdgeLabs<int> > > edgeCont;
+Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Dijkstra::EdgeLabs<int> > > edgeCont;
 
 
 void dijTest()

@@ -100,7 +100,7 @@ int main() {
 	for(int i=0; i<len_wer; i++)
 		printf("%d %d\n",i,wierzcholki[i]);
 
-	graph.getNeighbSet(v1);
+	graph.getNeighSet(v1);
     return 0;
 }
 

@@ -91,6 +91,8 @@ int main() {
     t(m);
 //    m1.defrag();
     t(m1);
+    AssocTable<std::map<std::string,int> > atab;
+    AssocTabInterface< AssocTable<std::map<std::string,int> > > iatab=atab,tatab2=iatab;
 
 }
 

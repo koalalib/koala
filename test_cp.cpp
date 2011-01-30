@@ -23,9 +23,19 @@ struct InfoV2 {
     InfoV2(){}
 };
 
+InfoV2 vtrans(InfoV1);
 InfoV2 vtrans(InfoV1 arg) { return InfoV2(0,arg.name); }
 
 InfoV2 (*vt)(InfoV1)=vtrans;
+typedef InfoV2 (*FPoint)(InfoV1);
+FPoint vt2=vt;
+
+class VFunktor {
+    public:
+
+    int a;
+    InfoV2 operator() (InfoV1 arg) { return vtrans(arg); }
+} vFunktor;
 
 struct InfoE1 {
     int a;
@@ -43,9 +53,12 @@ struct InfoE2 {
     InfoE2(){}
 };
 
-InfoE2 vtrans(InfoE1 arg) { return InfoE2(0,arg.name); }
+
+
 
 int main() {
+
+
 
     Graph<InfoV1,InfoE1> g1;
     Graph<InfoV2,InfoE2> g2,g2p;
@@ -60,27 +73,39 @@ int main() {
     map<Edge<InfoV2,InfoE2>*,Edge<InfoV1,InfoE1>* > n21;
     AssocTabInterface< map<Edge<InfoV2,InfoE2>*,Edge<InfoV1,InfoE1>* > > an21=n21;
 
+
+
     Vertex<InfoV1,InfoE1> *A=g1.addVert(InfoV1(0,"A"));
     Vertex<InfoV1,InfoE1> *B=g1.addVert(InfoV1(1,"B"));
     Vertex<InfoV1,InfoE1> *C=g1.addVert(InfoV1(2,"C"));
-    Edge<InfoV1,InfoE1> *e=g1.addEdge(C,B,InfoE1(0,"BC"));
-    g2.copy(g1,make_pair(fieldChoose(&InfoV1::a),stdChoose(true)),make_pair(stdCast(vt),stdCast(false))
+    Vertex<InfoV1,InfoE1> *D=g1.addVert(InfoV1(2,"D"));
+    Edge<InfoV1,InfoE1> *e=g1.addEdge(B,C,InfoE1(0,"BC"));
+    Edge<InfoV1,InfoE1> *f=g1.addArch(B,D,InfoE1(0,"BD"));
+    Edge<InfoV1,InfoE1> *h=g1.addArch(A,D,InfoE1(0,"BC"));
+    Edge<InfoV1,InfoE1> *k=g1.addEdge(A,B,InfoE1(0,"BC"));
+
+    Vertex<InfoV2,InfoE2>* A2=g2.addVert(),*B2=g2.addVert();
+    g2.addArch(A2,B2);
+    g2.substitute(B2,g1,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(false),stdCast(false))
             , make_pair(stdLink(am21,am12),stdLink(an21,an12)));
 
+    std::cout << "copy\n";
 
     for(Vertex<InfoV2,InfoE2>* p=g2.getVert();p;p=g2.getVertNext(p))
-        cout << ((void*)p) << "  " << p->info.napis << "  " << m21[p]->info.name<<  endl;
-
-    for(Vertex<InfoV1,InfoE1>* p=g1.getVert();p;p=g1.getVertNext(p))
-        cout <<  ((m12[p]) ? m12[p]->info.napis : " null" )<<  endl;
-
-    cout << n21[g2.getEdge()]->info.name;
+        cout << ((void*)p) << "  " << p->info.napis << "  " << (void*)m21[p]<<  endl;
     cout << n12.size();
-    g2p=g2;
-    cout << endl << g2p.getVertNo();
-    g1.copy(g1);
-    cout << endl << g1.getVertNo();
 
+    cout << endl << g2.getVertNo() << endl << g2.getEdgeNo(A2,EdDirIn);
+
+
+        Vertex<InfoV1,InfoE1>* tab[6]={C,D,C,B,0,B};
+
+//    Edge<InfoV1,InfoE1>* tabe[3]={g1.getEdge(),0,g1.getEdge()};
+    cout << endl << g1.glue(tab,tab+6)->info.name;
+//        cout << endl << g1.glue(C,C)->info.name;
+
+
+    cout << endl << g1.getVertNo() << " " << g1.getEdgeNo() << " " << g1.getEdgeNo(A,EdUndir) << " " << g1.getEdgeNo(A,EdDirOut);
 
 }
 
