@@ -1354,7 +1354,7 @@ Graph<VertInfo,EdgeInfo>::areParallel(PEdge e1,PEdge e2,EdgeDirection reltype)
                         ends1=getEdgeEnds(e1),ends2=getEdgeEnds(e2);
     if (e1==e2) return true;
     else if (e1->type==Loop) return e2->type==Loop && ends1.first==ends2.first;
-    else if (e2->type==Loop) return e1->type==Loop && ends1.first==ends2.first;
+    else if (e2->type==Loop) return false;
     else if (   (e1->type==Undirected && e2->type==Undirected)  ||
                 (e1->type!=e2->type && reltype==EdUndir)    ||
                 (e1->type==Directed && e2->type==Directed && (reltype==EdUndir||reltype==EdDirIn))
@@ -1425,7 +1425,7 @@ Graph<VertInfo,EdgeInfo>::glue(Iterator begin,Iterator end,bool makeloops,PVerte
     bool present=false;
     for(Iterator iter=begin;iter!=end;iter++)
     {   if (!res && *iter!=0) { res=*iter; present=true; }
-        if (res && res==*iter) present=true;
+        if (!present && res && res==*iter) present=true;
         size++;
     }
     if (!present) return 0;
@@ -1447,7 +1447,7 @@ Graph<VertInfo,EdgeInfo>::glue(Iterator begin,Iterator end,bool makeloops,PVerte
             if (ends.first==buf[i]) ends.first=res;
             if (ends.second==buf[i]) ends.second=res;
             if (ends.first==ends.second)
-                if (makeloops) moveEdge(e,res,res,Loop);
+                if (makeloops) moveEdge(e,res,res,EdLoop);
                 else del(e);
             else moveEdge(e,ends.first,ends.second,e->type==Undirected ? EdUndir : EdDirOut);
         }
