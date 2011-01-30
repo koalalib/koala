@@ -29,13 +29,8 @@ class Dijkstra {
         template <class A, class B> class AssocCont {
             public:
             typedef AssocArray<A,B> Type;
-            //AssocTabWrapper<std::map<A,B> > Type; //oczywiscie docelowo nie beda to mapy :-)
         };
 
-        template <class A> class ArrayCont {
-            public:
-            typedef std::vector<A> Type;
-        };
     };
 
     public:
@@ -75,7 +70,9 @@ class Dijkstra {
         // w ramach swiatecznego pojednania postanowilem zaprzyjaznic sie z pamiecia dynamiczna,
         // uzywanie tylko stosu byloby mordega, ale zakladam, ze na poczatku alokujemy w kontenerach
         // raz i tyle, by pozniejsze realokacje byly zbedne.
-        typename DefaultStructs::ArrayCont<typename GraphType::PVertex>::Type Q(n);
+        // typename DefaultStructs::ArrayCont<typename GraphType::PVertex>::Type Q(n); - ale jednak tu zbedne :-)
+        // dla prostych tablic wystarczy stos
+        typename GraphType::PVertex Q[n];
         typename GraphType::PVertex U=g.getVert(),V;
 
         for(int i=0;U;U=g.getVertNext(U))
@@ -149,8 +146,8 @@ class Dijkstra {
 
         typename GraphType::PVertex u,v=vertTab[end].vPrev;
         typename GraphType::PEdge  e=vertTab[end].ePrev;
-        typename DefaultStructs::ArrayCont<typename GraphType::PVertex>::Type tabV(g.getVertNo());
-        typename DefaultStructs::ArrayCont<typename GraphType::PEdge>::Type tabE(g.getVertNo());
+        typename GraphType::PVertex tabV[g.getVertNo()];
+        typename GraphType::PEdge tabE[g.getVertNo()];
         int len;
 
         for(len=0;v;len++)

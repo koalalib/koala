@@ -45,7 +45,11 @@ public:
 	PVertex addVert();
 	PVertex addVert(const VertInfo &);
 	void del(PVertex,bool=true);
-	void delVert(PVertex,bool=true);
+	void delVert(PVertex,bool=true); // alias poprzedniej
+
+	VertInfoType getVertInfo(PVertex);
+	void setVertInfo(PVertex,const VertInfo &);
+
 	//vertex motion
 	PVertex getVert();
 	PVertex getVertLast();
@@ -69,8 +73,11 @@ public:
 	PEdge addLoop(PVertex);
 	PEdge addLoop(PVertex, const EdgeInfo&);
 
+	EdgeInfoType getEdgeInfo(PEdge);
+	void setEdgeInfo(PEdge,const EdgeInfo &);
+
 	void del(PEdge);
-	void delEdge(PEdge);
+	void delEdge(PEdge); // alias poprzedniej
 	//edge motion
 	PEdge getEdge(EdgeDirection=EdAll);
 	PEdge getEdgeLast(EdgeDirection=EdAll);
@@ -87,7 +94,7 @@ public:
 			Chooser);
 	//edge properity
 	EdgeType getEdgeType(PEdge);
-	EdgeType getType(PEdge);
+	EdgeType getType(PEdge); // alias poprzedniej
 	int getEdgeNo(EdgeDirection=EdAll);
 
 	//----------vertices and edges connection--------------
@@ -133,42 +140,81 @@ public:
 	int getEdgeNo(PVertex, PVertex,
 			EdgeDirection=EdAll);
 	//------------neighbourhood-----------------------------------
-	Set<PVertex> getNeighbSet(PVertex, EdgeDirection=EdAll);
-	template<class Chooser> Set<PVertex> getNeighbSet(PVertex,
+	Set<PVertex> getNeighSet(PVertex, EdgeDirection=EdAll);
+	template<class Chooser> Set<PVertex> getNeighSet(PVertex,
 			EdgeDirection, Chooser);
 	template<class OutputIterator>
-			int getNeighb(OutputIterator, PVertex,
+			int getNeigh(OutputIterator, PVertex,
 			EdgeDirection=EdAll);
 	template<class OutputIterator, class Chooser>
-			int getNeighb(OutputIterator, PVertex,
+			int getNeigh(OutputIterator, PVertex,
 			EdgeDirection, Chooser);
 	int getNeighNo(PVertex, EdgeDirection=EdAll);
 
-	Set<PVertex> getClNeighbSet(PVertex, EdgeDirection=EdAll);
-	template<class Chooser> Set<PVertex> getClNeighbSet(PVertex,
+	Set<PVertex> getClNeighSet(PVertex, EdgeDirection=EdAll);
+	template<class Chooser> Set<PVertex> getClNeighSet(PVertex,
 			EdgeDirection, Chooser);
 	template<class OutputIterator>
-			int getClNeighb(OutputIterator, PVertex,
+			int getClNeigh(OutputIterator, PVertex,
 			EdgeDirection=EdAll);
 	template<class OutputIterator, class Chooser>
-			int getClNeighb(OutputIterator, PVertex,
+			int getClNeigh(OutputIterator, PVertex,
 			EdgeDirection, Chooser);
 	int getClNeighNo(PVertex, EdgeDirection=EdAll);
 	//-------------------vertices from edge---------------------------
 	std::pair<PVertex,PVertex> getEdgeEnds(PEdge);
+	std::pair<PVertex,PVertex> getEnds(PEdge); // alias poprzedniej
 	bool isEdgeEnd(PEdge, PVertex);
+	bool isEnd(PEdge, PVertex); // alias poprzedniej
 	PVertex getEdgeEnd(PEdge, PVertex);
+	PVertex getEnd(PEdge, PVertex); // alias poprzedniej
 	//-------------------edge modifiers---------------------------
 	/** Changes the type of the edge. For now possible changes are: directed<->undirected.*/
 	bool chEdgeType(PEdge, EdgeType);
 	bool revertEdge(PEdge);
 	PEdge moveEdge(PEdge, PVertex, PVertex,
 			EdgeDirection=EdUndir);
+
 	//-------------------vertices and edges vs numbers-------------
 	PVertex vertByNo(int);
 	PEdge edgeByNo(int);
 	int vertPos(PVertex);
 	int edgePos(PEdge);
+	//-------------------graph and element's parameters------------
+	int deg(PVertex, EdgeDirection=EdAll);
+	std::pair<PVertex,int> minDeg(EdgeDirection=EdAll);
+	std::pair<PVertex,int> maxDeg(EdgeDirection=EdAll);
+	int Delta(EdgeDirection=EdAll);
+	int delta(EdgeDirection=EdAll);
+	//-------------------group modifications----------------------------
+	int delVerts();
+	template <class Iterator>
+        int delVerts(Iterator begin,Iterator end);
+    //TODO: int delVerts(Set<PVertex>)
+    int delEdges(EdgeDirection=EdAll);
+    int delEdges(PVertex,EdgeDirection=EdAll);
+    int delEdges(PVertex,PVertex,EdgeDirection=EdAll);
+    template <class Iterator>
+        int delEdges(Iterator begin,Iterator end,EdgeDirection=EdAll);
+    template <class Iterator>
+        int delEdges(PVertex,Iterator begin,Iterator end,EdgeDirection=EdAll);
+    template <class Iterator>
+        int delEdges(PVertex,PVertex,Iterator begin,Iterator end,EdgeDirection=EdAll);
+    //TODO: int delEdges(Set<PEdge>,EdgeDirection),delEdges(PVertex,Set<PEdge>,EdgeDirection),delEdges(PVertex,PVertex,Set<PEdge>,EdgeDirection)
+    PEdge ch2Archs(PEdge);
+    int ch2Archs();
+    template <class Iterator>
+        int ch2Archs(Iterator begin,Iterator end);
+    //TODO: int ch2Archs(Set<PEdge>)
+    bool areParallel(PEdge,PEdge,EdgeDirection=EdUndir);
+    PVertex putVert(PEdge,const VertInfo &);
+    PVertex putVert(PEdge);
+    PEdge pickVert(PVertex,const EdgeInfo &);
+    PEdge pickVert(PVertex);
+    PVertex glue(PVertex,PVertex, bool makeloops=false);
+    template <class Iterator>
+        PVertex glue(Iterator,Iterator,bool makeloops=false,PVertex=0);
+    //TODO: PVertex glue(Set<PVertex>,bool makeloops=false,PVertex=0);
 
 	//-----------------clear graph-------------------------
 	/** Removes all vertices and edges from the graph. */
@@ -191,7 +237,6 @@ public:
 		@arg Graph from which vertices and edges are copied.
 		@arg Function object which take vertex and edge pointer and return copy information.
 	*/
-	//TODO: Check if next copy methods can be joined.
 	template<class VertInfoExt,class EdgeInfoExt>
 		PVertex copy(Graph<VertInfoExt,EdgeInfoExt> &);
 	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser>
@@ -201,7 +246,17 @@ public:
 	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser,class VCaster, class ECaster, class VLinker, class ELinker>
 		PVertex copy(Graph<VertInfoExt,EdgeInfoExt> &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>, std::pair<VLinker,ELinker>);
 
+	template<class VertInfoExt,class EdgeInfoExt>
+		PVertex substitute(PVertex,Graph<VertInfoExt,EdgeInfoExt> &);
+	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser>
+		PVertex substitute(PVertex,Graph<VertInfoExt,EdgeInfoExt> &, std::pair<VChooser,EChooser>);
+	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser,class VCaster, class ECaster>
+		PVertex substitute(PVertex,Graph<VertInfoExt,EdgeInfoExt> &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>);
+	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser,class VCaster, class ECaster, class VLinker, class ELinker>
+		PVertex substitute(PVertex,Graph<VertInfoExt,EdgeInfoExt> &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>, std::pair<VLinker,ELinker>);
+
     Graph<VertInfo,EdgeInfo>& operator=(Graph<VertInfo,EdgeInfo>&);
+    Graph<VertInfo,EdgeInfo>& operator+=(Graph<VertInfo,EdgeInfo>&);
 
 	//----------TEST METHODS------------
 	bool testGraph(); //may throw an exception

@@ -90,21 +90,21 @@ template <class T>
 AssocTabInterface<T> assocTabInterf(T& cont) { return AssocTabInterface<T>(cont); }
 
 
-template <class T> class AssocTabWrapper {
+template <class T> class AssocTable {
     AssocTabInterface<T> inter;
     public:
     T cont;
 
-    AssocTabWrapper() : cont(), inter(cont) {}
-    AssocTabWrapper(const T& acont) : cont(acont), inter(cont) {}
-    AssocTabWrapper(const AssocTabWrapper<T>& X)
+    AssocTable() : cont(), inter(cont) {}
+    AssocTable(const T& acont) : cont(acont), inter(cont) {}
+    AssocTable(const AssocTable<T>& X)
         : cont(X.cont), inter(cont) {}
-    AssocTabWrapper<T>& operator=(AssocTabWrapper<T> &X )
+    AssocTable<T>& operator=(AssocTable<T> &X )
     {   if (this==&X) return *this;
         cont=X.cont;
         return *this;
     }
-    AssocTabWrapper<T>& operator=(T& X)
+    AssocTable<T>& operator=(T& X)
     {   if (&cont==&X) return *this;
         cont=X;
         return *this;
@@ -126,8 +126,26 @@ template <class T> class AssocTabWrapper {
 };
 
 template <class T>
-AssocTabWrapper<T> assocTabWrap(T& cont) { return AssocTabWrapper<T>(cont); }
+AssocTable<T> assocTab(T& cont) { return AssocTable<T>(cont); }
 
+template <class T> class AssocTabInterface<AssocTable<T> > {
+    AssocTable<T>& cont;
+    public:
+    AssocTabInterface(AssocTable<T>& acont) : cont(acont) {}
+
+    typedef typename AssocTable<T>::KeyType KeyType;
+    typedef typename AssocTable<T>::ValType ValType;
+
+    bool hasKey(KeyType arg) { return cont.hasKey(arg); }
+    bool delKey(KeyType arg) {   return cont.delKey(arg); }
+    KeyType firstKey() { return cont.firstKey(); }
+    KeyType lastKey()  { return cont.lastKey(); }
+    KeyType prevKey(KeyType  arg) {return cont.prevKey(arg); }
+    KeyType nextKey(KeyType  arg) {return cont.nextKey(arg); }
+    ValType& operator[] (KeyType  arg) { return cont[arg]; };
+    unsigned size() { return cont.size(); }
+    template <class Iterator> void getKeys(Iterator iter) { cont.getKeys(iter); }
+};
 
 //TODO: to tylko prototypy na szybko, wiec prosze o uwagi i uwazny audyt kodu.
 //Cel: 1- i 2-wymiarowe tablice asocjacyjne, ktorych kluczami sa wierzcholki lub krawedzie. Ma dzialac
