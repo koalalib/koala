@@ -2,9 +2,6 @@
 #define KOALA_VERTEX_H
 
 #include "../base/def_struct.h"
-#include "../container/assoctab.h"
-#include "graph.h"
-#include "edge.h"
 
 namespace Koala {
 
@@ -25,11 +22,12 @@ public:
 	VertInfo info; ///< Additional user information in the vertex.
     AssocKeyContReg assocReg;
 private:
-	struct VertLink {
-		Edge<VertInfo,EdgeInfo> *first, *last;
-		int degree;
-		VertLink(): first(NULL), last(NULL), degree(-1) {}
-	};
+    struct VertLink {
+            Edge<VertInfo,EdgeInfo> *first, *last;
+            int degree;
+            VertLink(): first(NULL), last(NULL), degree(-1) {}
+        };
+
 	/** Standard constructor*/
 	Vertex();
 	/** Constructor sets info variable */

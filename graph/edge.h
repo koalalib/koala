@@ -2,9 +2,6 @@
 #define KOALA_EDGE_H
 
 #include "../base/def_struct.h"
-#include "../container/assoctab.h"
-#include "graph.h"
-#include "vertex.h"
 
 namespace Koala {
 
@@ -22,6 +19,7 @@ protected:
 template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo>
 class Edge : public EdgeConst {
 	friend class Graph<VertInfo, EdgeInfo>;
+	friend class Vertex<VertInfo, EdgeInfo>;
 //	friend class Vertex;
 public:
 //	/** Reference to public info variable. */
@@ -42,7 +40,7 @@ private:
 	/** Constructor sets info variable. */
 	Edge(const EdgeInfo &);
 
-	Edge *next, *prev;
+	Edge *next, *prev, *nParal, *pParal;
 	EdgeLink vert[2]; //0==U==out; 1==V==in;
 	enum EdgeType type;
 };
