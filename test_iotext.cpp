@@ -25,7 +25,7 @@ int main() {
 	bool rv;
 	char buf[65536];
 	string buf2;
-	Graph<int, int> g;
+	Graph<int, int> g; g.makeAdjMatrix();
 	Graph<int, int>::Vertex *v, *verts2[32], *verts[2] = {NULL, NULL};
 
 	rv = true;
@@ -76,7 +76,7 @@ int main() {
 		   "3(3)\n");
 
 
-	Graph<string, string> g2;
+	Graph<string, string> g2; g2.makeAdjMatrix();
 	readGraphText(g2, "0(v0) 2 1(e01) 2(e02)\n"
 			 "1(v1) 1 2(e12)\n"
 			 "3(v2) 0\n"

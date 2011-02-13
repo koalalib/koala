@@ -1,12 +1,13 @@
 #ifndef DEF_STRUCT_H
 #define DEF_STRUCT_H
 
-
-#include "../container/set.h"
 #include <algorithm>
 #include <limits>
 #include <cassert>
 #include <iostream>
+#include "../container/assoctab.h"
+#include "../container/set.h"
+
 
 namespace Koala {
 
@@ -49,6 +50,8 @@ template <class T> class EmptyStruct {
 template <class T>
 EmptyStruct<T> emptyStruct(T) { EmptyStruct<T>(); }
 
+static char __blackhole;
+
 //Jesli metoda chce iterator do zapisu ciagu, a nas sam ciag nie interesuje, tylko inne efekty uboczne procedury
 template <class A> struct BlackHole {
     template <class T>
@@ -59,14 +62,14 @@ template <class A> struct BlackHole {
 
     // rowniez moze sluzyc jako zaslepka dla nie interesujacego nas kontenera asocjacyjnego wymaganego w procedurze
     template <class T>
-        A& operator[](T) { return *((A*)0); }
+        A& operator[](T) { assert(0); return *((A*)(&__blackhole)); }
     template <class T, class R>
-        A& operator()(T,R) { return *((A*)0); }
+        A& operator()(T,R) { assert(0); return *((A*)(&__blackhole)); }
 
 };
 
-BlackHole<char>& blackHole() { return *((BlackHole<char>*)0); }
-template <class A> BlackHole<A>& blackHole() { return *((BlackHole<A>*)0); }
+BlackHole<char>& blackHole() { return *((BlackHole<char>*)(&__blackhole)); }
+template <class A> BlackHole<A>& blackHole() { return *((BlackHole<A>*)(&__blackhole)); }
 template <class A> BlackHole<A>& blackHole(A) { return blackHole<A>(); }
 template <class T> bool isBlackHole(const T&) { return false; }
 template <class T> bool isBlackHole(const BlackHole<T>& ) { return true; }
@@ -224,7 +227,8 @@ template<class Cont> class AssocHasChooser {
 };
 
 template <class Cont>
-AssocHasChooser<Cont> assocKeyChoose(Cont arg) { return AssocHasChooser<Cont>(arg); }
+AssocHasChooser<Cont> assocKeyChoose(Cont arg)
+{ return AssocHasChooser<Cont>(arg); }
 
 
 template<class Cont> class AssocBoolChooser {

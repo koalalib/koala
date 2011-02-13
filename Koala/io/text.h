@@ -156,8 +156,8 @@ bool readGraphText(Graph &g, const char *desc, RG_Format format,
 
 template<class Graph>
 bool readGraphText(Graph &g, istream &s, RG_Format format) {
-	EmptyMap<typename Graph::Vertex *> tv;
-	EmptyMap<typename Graph::Edge *> te;
+	EmptyMap<typename Graph::PVertex> tv;
+	EmptyMap<typename Graph::PEdge> te;
 	return readGraphText(g, s, format, tv, te);
 	};
 
@@ -180,7 +180,7 @@ bool readGraphText(Graph &g, const char *desc, RG_Format format) {
 
 template<class Graph, class DESC, class VMap>
 bool readGraphText(Graph &g, DESC desc, RG_Format format, VMap &vertexMap) {
-	EmptyMap<typename Graph::Edge *> te;
+	EmptyMap<typename Graph::PEdge> te;
 	return readGraphText(g, desc, format, vertexMap, te);
 	};
 

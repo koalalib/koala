@@ -99,12 +99,12 @@ template <class T> class AssocTable {
     AssocTable(const T& acont) : cont(acont), inter(cont) {}
     AssocTable(const AssocTable<T>& X)
         : cont(X.cont), inter(cont) {}
-    AssocTable<T>& operator=(AssocTable<T> &X )
+    AssocTable<T>& operator=(const AssocTable<T> &X )
     {   if (this==&X) return *this;
         cont=X.cont;
         return *this;
     }
-    AssocTable<T>& operator=(T& X)
+    AssocTable<T>& operator=(const T& X)
     {   if (&cont==&X) return *this;
         cont=X;
         return *this;
@@ -126,7 +126,7 @@ template <class T> class AssocTable {
 };
 
 template <class T>
-AssocTable<T> assocTab(T& cont) { return AssocTable<T>(cont); }
+AssocTable<T> assocTab(const T& cont) { return AssocTable<T>(cont); }
 
 template <class T> class AssocTabInterface<AssocTable<T> > {
     AssocTable<T>& cont;
@@ -182,9 +182,9 @@ class BlockList {
 
     BlockList(int asize=0) :  siz(0), first(-1), last(-1), ffree(-1)
     {   cont.clear(); cont.reserve(asize); }
-    BlockList(BlockList<Element,Container>& X) :  siz(X.siz), first(X.first),
+    BlockList(const BlockList<Element,Container>& X) :  siz(X.siz), first(X.first),
                                 last(X.last), ffree(X.ffree), cont(X.cont) {}
-    BlockList<Element,Container>& operator=(BlockList<Element,Container>& X)
+    BlockList<Element,Container>& operator=(const BlockList<Element,Container>& X)
     {   if (&X==this) return *this;
         siz=X.siz; first=X.first; last=X.last; ffree=X.ffree; cont=X.cont;
         return *this;
@@ -270,7 +270,7 @@ class AssocKeyContReg : public AssocContReg {
 
     AssocKeyContReg() { next=0; }
     AssocKeyContReg(const AssocKeyContReg&) { next=0; };
-    AssocKeyContReg& operator=(const AssocKeyContReg& X) { if (&X!=this) next=0; }
+    AssocKeyContReg& operator=(const AssocKeyContReg& X) { if (&X!=this) next=0; return *this; }
 
     // znajdz na liscie rekord opisujacy polozenie tego klucza w kontenerze kont
     AssocContReg* find(AssocContBase* cont)
@@ -331,14 +331,14 @@ class AssocArray : public AssocContBase, public KluczTest<Klucz> {
 
     AssocArray(int asize=0) : tab(asize) {}
 
-    AssocArray(AssocArray<Klucz,Elem,Container>& X) : tab(X.tab)
+    AssocArray(const AssocArray<Klucz,Elem,Container>& X) : tab(X.tab)
     {   for(int i=tab.firstPos();i!=-1;i=tab.nextPos(i))
         {   tab[i].assocReg=tab[i].key->assocReg;
             tab[i].key->assocReg.next=this; tab[i].key->assocReg.nextPos=i;
         }
     }
 
-    AssocArray<Klucz,Elem,Container>& operator= (AssocArray<Klucz,Elem,Container>& X)
+    AssocArray<Klucz,Elem,Container>& operator= (const AssocArray<Klucz,Elem,Container>& X)
     {   if (&X==this) return *this;
         clear(); tab=X.tab;
         for(int i=tab.firstPos();i!=-1;i=tab.nextPos(i))
@@ -421,6 +421,27 @@ class AssocArray : public AssocContBase, public KluczTest<Klucz> {
     ~AssocArray() { clear(); }
 
 } ;
+
+
+template <class K, class V, class C> class AssocTabInterface<AssocArray<K,V,C> > {
+    AssocArray<K,V,C>& cont;
+    public:
+    AssocTabInterface(AssocArray<K,V,C>& acont) : cont(acont) {}
+
+    typedef K KeyType;
+    typedef V ValType;
+
+    bool hasKey(KeyType arg) { return cont.hasKey(arg); }
+    bool delKey(KeyType arg) {   return cont.delKey(arg); }
+    KeyType firstKey() { return cont.firstKey(); }
+    KeyType lastKey()  { return cont.lastKey(); }
+    KeyType prevKey(KeyType  arg) {return cont.prevKey(arg); }
+    KeyType nextKey(KeyType  arg) {return cont.nextKey(arg); }
+    ValType& operator[] (KeyType  arg) { return cont[arg]; };
+    unsigned size() { return cont.size(); }
+    template <class Iterator> void getKeys(Iterator iter) { cont.getKeys(iter); }
+
+};
 
 
 // Taka tablica moze od biedy rowniez pelnic funkcje zbioru (kluczy) z dostepem do elementu w czasie O(1) i liniowych
@@ -627,12 +648,12 @@ class AssocMatrix : public AssocMatrixAddr<aType> {
             : index(asize), siz(0), first(-1), last(-1)
     {   bufor.clear(); bufor.reserve(AssocMatrixAddr<aType>::bufLen(asize)); index.owner=this; }
 
-    AssocMatrix(AssocMatrix<Klucz,Elem,aType,Container,IndexContainer>& X) :
+    AssocMatrix(const AssocMatrix<Klucz,Elem,aType,Container,IndexContainer>& X) :
             index(X.index), bufor(X.bufor), siz(X.siz), first(X.first), last(X.last)
     {   index.owner=this;   }
 
     AssocMatrix<Klucz,Elem,aType,Container,IndexContainer>&
-        operator=(AssocMatrix<Klucz,Elem,aType,Container,IndexContainer>& X)
+        operator=(const AssocMatrix<Klucz,Elem,aType,Container,IndexContainer>& X)
     {   if (&X==this) return *this;
         index=X.index; bufor=X.bufor; siz=X.siz; first=X.first; last=X.last;
         index.owner=this;

@@ -15,15 +15,14 @@ class Edge;
 #include <algorithm>
 #include <cstdio>
 
+#include "../base/def_struct.h"
 #include "vertex.h"
 #include "edge.h"
 
 #include <utility>
-#include "../base/def_struct.h"
-#include "../base/except.h"
-#include "../container/set.h"
 
 namespace Koala {
+
 
 template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyVertInfo>
 class Graph {
@@ -168,6 +167,7 @@ public:
 	bool isEnd(PEdge, PVertex); // alias poprzedniej
 	PVertex getEdgeEnd(PEdge, PVertex);
 	PVertex getEnd(PEdge, PVertex); // alias poprzedniej
+	EdgeDirection getEdgeDir(PEdge,PVertex);
 	//-------------------edge modifiers---------------------------
 	/** Changes the type of the edge. For now possible changes are: directed<->undirected.*/
 	bool chEdgeType(PEdge, EdgeType);
@@ -190,22 +190,32 @@ public:
 	int delVerts();
 	template <class Iterator>
         int delVerts(Iterator begin,Iterator end);
-    //TODO: int delVerts(Set<PVertex>)
+    template <class Iterator>   // j.w. ale zaklada, ze elementy nie powtarzaja sie
+        int delVerts2(Iterator begin,Iterator end);
+    int delVerts(const Set<PVertex>&);
     int delEdges(EdgeDirection=EdAll);
     int delEdges(PVertex,EdgeDirection=EdAll);
     int delEdges(PVertex,PVertex,EdgeDirection=EdAll);
     template <class Iterator>
         int delEdges(Iterator begin,Iterator end,EdgeDirection=EdAll);
+    template <class Iterator>   // j.w. ale zaklada, ze elementy nie powtarzaja sie
+        int delEdges2(Iterator begin,Iterator end,EdgeDirection=EdAll);
+    int delEdges(const Set<PEdge>&,EdgeDirection=EdAll);
     template <class Iterator>
         int delEdges(PVertex,Iterator begin,Iterator end,EdgeDirection=EdAll);
+    template <class Iterator>   // j.w. ale zaklada, ze elementy nie powtarzaja sie
+        int delEdges2(PVertex,Iterator begin,Iterator end,EdgeDirection=EdAll);
+    int delEdges(PVertex,const Set<PEdge>&,EdgeDirection=EdAll);
     template <class Iterator>
         int delEdges(PVertex,PVertex,Iterator begin,Iterator end,EdgeDirection=EdAll);
-    //TODO: int delEdges(Set<PEdge>,EdgeDirection),delEdges(PVertex,Set<PEdge>,EdgeDirection),delEdges(PVertex,PVertex,Set<PEdge>,EdgeDirection)
+    template <class Iterator>   // j.w. ale zaklada, ze elementy nie powtarzaja sie
+        int delEdges2(PVertex,PVertex,Iterator begin,Iterator end,EdgeDirection=EdAll);
+    int delEdges(PVertex,PVertex,const Set<PEdge>&,EdgeDirection=EdAll);
     PEdge ch2Archs(PEdge);
     int ch2Archs();
     template <class Iterator>
         int ch2Archs(Iterator begin,Iterator end);
-    //TODO: int ch2Archs(Set<PEdge>)
+    int ch2Archs(const Set<PEdge>&);
     bool areParallel(PEdge,PEdge,EdgeDirection=EdUndir);
     PVertex putVert(PEdge,const VertInfo &);
     PVertex putVert(PEdge);
@@ -214,7 +224,9 @@ public:
     PVertex glue(PVertex,PVertex, bool makeloops=false);
     template <class Iterator>
         PVertex glue(Iterator,Iterator,bool makeloops=false,PVertex=0);
-    //TODO: PVertex glue(Set<PVertex>,bool makeloops=false,PVertex=0);
+    template <class Iterator> // j.w. ale zaklada, ze elementy nie powtarzaja sie
+        PVertex glue2(Iterator,Iterator,bool makeloops=false,PVertex=0);
+    PVertex glue(const Set<PVertex>&,bool makeloops=false,PVertex=0);
 
 	//-----------------clear graph-------------------------
 	/** Removes all vertices and edges from the graph. */
@@ -228,7 +240,6 @@ public:
 		@return &this???
 	*/
 	PVertex move(Graph<VertInfo,EdgeInfo> &);
-//	template <class Chooser> bool move(Graph *, Chooser);
 	/** All vertices and edges are copied to the graph.
 		@arg Graph from which vertices and edges are copied.
 		@return &this???
@@ -258,15 +269,65 @@ public:
     Graph<VertInfo,EdgeInfo>& operator=(Graph<VertInfo,EdgeInfo>&);
     Graph<VertInfo,EdgeInfo>& operator+=(Graph<VertInfo,EdgeInfo>&);
 
+    //----------Adjacency matrix--------
+
+    bool makeAdjMatrix();
+    bool delAdjMatrix();
+    bool hasAdjMatrix();
+    bool defragAdjMatrix();
+
 	//----------TEST METHODS------------
 	bool testGraph(); //may throw an exception
 
 private:
-	//TODO: move operetor= to public
-//	Graph& operator=(const Graph&);
 	PVertex first_vert, last_vert;
 	PEdge first_edge, last_edge;
 	int no_vert, no_loop_edge, no_dir_edge, no_undir_edge; //number of vertices, number of edges
+
+    struct Parals {
+            typename Koala::Edge<VertInfo,EdgeInfo> *first, *last;
+            int degree;
+            Parals(): first(NULL), last(NULL), degree(0) {}
+        };
+
+	struct AdjMatrix {
+        AssocMatrix<typename Koala::Vertex<VertInfo,EdgeInfo>*, Parals, AMatrNoDiag> dirs;
+        AssocMatrix<typename Koala::Vertex<VertInfo,EdgeInfo>*, Parals, AMatrTriangle> undirs;
+        AdjMatrix(int asize=0) : dirs(asize), undirs(asize) {}
+
+        void clear() { dirs.clear(); undirs.clear(); }
+        void defrag() { dirs.defrag(); undirs.defrag(); }
+        void add(PEdge edge)
+        {   if (!edge) return;
+            if (edge->type==Directed)
+            {   std::pair<typename Graph<VertInfo,EdgeInfo>::PVertex,typename Graph<VertInfo,EdgeInfo>::PVertex>
+                                ends(edge->vert[0].vert, edge->vert[1].vert);
+                edge->pParal = dirs(ends.first,ends.second).last;
+                edge->nParal = NULL;
+                if(edge->pParal)
+                    edge->pParal->nParal = edge;
+                else
+                    dirs(ends.first,ends.second).first = edge;
+                dirs(ends.first,ends.second).last = edge;
+                dirs(ends.first,ends.second).degree++;
+            }
+            else if (edge->type==Undirected)
+            {   std::pair<typename Graph<VertInfo,EdgeInfo>::PVertex,typename Graph<VertInfo,EdgeInfo>::PVertex>
+                                ends(edge->vert[0].vert, edge->vert[1].vert);
+                edge->pParal = undirs(ends.first,ends.second).last;
+                edge->nParal = NULL;
+                if(edge->pParal)
+                    edge->pParal->nParal = edge;
+                else
+                    undirs(ends.first,ends.second).first = edge;
+                undirs(ends.first,ends.second).last = edge;
+                undirs(ends.first,ends.second).degree++;
+            }
+        }
+	};
+
+	AdjMatrix* pAdj;
+
 	//------------------attach/detach methods--------------------
 	// ! are main methods for graph changes/adding/deleting/moving/
 	PVertex attach(PVertex);

@@ -75,9 +75,10 @@ int main() {
 
     std::map<VertexA*,VertexB*> a2b;
     std::map<VertexB*,VertexA*> b2a;
+    AssocTabInterface<std::map<VertexB*,VertexA*> > ib2a=b2a;
 
 
-    stdLink(&InfA::point,b2a)(AA,BB);
+    stdLink(&InfA::point,ib2a)(AA,BB);
 
 
     std::cout << AA->info.name << " pointing: " << ((void*)AA->info.point==(void*)BB) << " mapsize: "

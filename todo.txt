@@ -1,23 +1,3 @@
-A. Klasa grafu
-
-Zadania proste:
-
-
-- skoñczyæ testy szybkoœci i zdecydowaæ, na którym secie (stlowym czy vectorowym) bêdziemy pracowaæ.
-
-- nie jestem pewien, czy po poprawkach kod bêdzie przenoœny miêdzy kompilatorami (por. uwagi Krzysztofa O.) np. nadal widzê takie stwory: Edge::V_V.
-
-- wszystkie metody postaci get_No uzupelnic o wersje szablonowe z ostatnim parametrem chooser, a bez arg. domyslnych. Implementacja moze wykorzystywac wersje istniejace bez chooserow (banalne). W zasadzie wszystkie grupy metod get_, get_Last, get_Prev, get_Next te¿ mog¹ byæ podwojone o wersje z chooserami.
-
-
-- Trudniejsze: przezroczysta dla u¿ytkownika macierz s¹siedztwa – wystarczy u¿yæ w klasie grafu domyœlnie wynulowanego wskaŸnika na 2-wymiarow¹ tablicê asocjacyjn¹. Tablica tworzona dynamicznie. Jedyne potrzebne metody w interfejsie klasy, to:
-void adjMatrix(bool on=true) // stwórz lub skasuj
-bool hasAdjMatrix() // czy aktualnie klasa u¿ywa macierzy
-void defragAdjMatrix();
-
-- Potrzebne metody grafu:
-
-
 B. Uwaga: Ogólny format algorytmów jak w Dijkstrze tj. procedury z tej samej rodziny zamykamy jako metody szablonowe statyczne w klasie o charakterystycznej nazwie. Wszystkie struktury IO potrzebne tym procedurom definiujemy w klasie, równie¿ struktury potrzebne nam do dzia³ania (protected). Dane wierzcho³ków/krawêdzi w tablicach asocjacyjnych indeksowanych tymi wierzcho³kami/krawêdziami. Ci¹gi jakichkolwiek elementów zwracamy przez szablonowy iterator-wstawiacz (jak w metodzie getVerts), zaœ pobieramy z zakresu pocz¹tek-zakoniec wyznaczony dwoma podanymi iteratorami (bêdzie dzia³a³o tak ze zwyk³¹ tablic¹, jak i dowolnym kontenerem zachowuj¹cym kolejnoœæ, jak vector.assign). Póki co implementujemy tylko „sprytne” procedury wielomianowe, ¿adnych wyk³adniczych heurystyk Dyskusyjne: jak traktowaæ krawêdzie typów niedozwolonych lub bezsensownych w konkretnych zagadnieniach (np. algorytm dla grafów prostych a mamy te¿ skierowane): ignorowaæ, rzucaæ b³¹d, traktowaæ jak zwyk³e krawêdzie?
 
 C. Makery do grafów: szablony funkcji pobieraj¹ce ref. na graf wyjœciowy (którego nie kasuj¹, tylko dopisuj¹ na koñcu, podobnie jak copy) oraz parametry liczbowe tworzonego, grafu, byæ mo¿e jakieœ parametry dodatkowe. 

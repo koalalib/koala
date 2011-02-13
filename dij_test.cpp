@@ -1,8 +1,6 @@
 #include <iostream>
-#include "Koala/container/assoctab.h"
 #include "Koala/graph/graph.h"
-#include "Koala/base/def_struct.h"
-#include "Koala/algorithm/weights.h"
+#include "Koala/algorithm/dijkstra.h"
 
 
 //przyklad uzycia, w tej wersji zawartosc obu struktur jest dla Dijkstry nieistotna
@@ -48,6 +46,7 @@ void dijTest()
 
 int main() {
 
+//    g.makeAdjMatrix();
     dijTest();
 
     std::cout<< "Odleglosc: "<< Koala::Dijkstra::distances(g,vertCont,edgeCont,U,V)<<":";

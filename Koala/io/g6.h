@@ -62,7 +62,7 @@ void readG6(Graph &graph, const char *str_graph) {
 }
 
 template<class Graph>
-void readG6(Graph &graph, std::string &str_graph) {
+void readG6(Graph &graph, std::string str_graph) {
 	readG6(graph, str_graph.c_str());
 }
 
@@ -84,8 +84,8 @@ void writeG6(Graph &graph, std::string &str_graph) {
 		str_graph.push_back((order&0x3f)+LIMIT_LO);
 	}
 
-    std::map<Vertex*,int> ids;
-	Vertex *vert = graph.getVert();
+    std::map<typename Graph::PVertex,int> ids;
+	typename Graph::PVertex vert = graph.getVert();
 	int id=0;
 	while(vert) {
 		ids[vert] = id;
@@ -94,10 +94,10 @@ void writeG6(Graph &graph, std::string &str_graph) {
 	}
 
 	unsigned char *tab = (unsigned char*)calloc((order2>>3)+1,1);
-	Edge *edge = graph.getEdge(EdUndir);
+	typename Graph::PEdge edge = graph.getEdge(EdUndir);
 	unsigned char masks[] = {0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01};
 	while(edge) {
-		std::pair<Vertex*,Vertex*> verts = graph.getEdgeEnds(edge);
+		std::pair<typename Graph::PVertex,typename Graph::PVertex> verts = graph.getEdgeEnds(edge);
 		int id1 = ids[verts.first];
 		int id2 = ids[verts.second];
 		int nr = (id1>id2) ? ( (id1-1)*id1+id2 ) : ( (id2-1)*id2+id1 );
@@ -161,8 +161,8 @@ int writeG6(Graph &graph, char *str_graph, int len_str) {
 		str_graph++;
 	}
 
-    std::map<Vertex*,int> ids;
-	Vertex *vert = graph.getVert();
+    std::map<typename Graph::PVertex,int> ids;
+	typename Graph::PVertex vert = graph.getVert();
 	int id=0;
 	while(vert) {
 		ids[vert] = id;
@@ -171,10 +171,10 @@ int writeG6(Graph &graph, char *str_graph, int len_str) {
 	}
 
 	unsigned char *tab = (unsigned char*)calloc((order2>>3)+1,1);
-	Edge *edge = graph.getEdge(EdUndir);
+	typename Graph::PEdge edge = graph.getEdge(EdUndir);
 	unsigned char masks[] = {0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01};
 	while(edge) {
-		std::pair<Vertex*,Vertex*> verts = graph.getEdgeEnds(edge);
+		std::pair<typename Graph::PVertex,typename Graph::PVertex> verts = graph.getEdgeEnds(edge);
 		int id1 = ids[verts.first];
 		int id2 = ids[verts.second];
 		int nr = (id1>id2) ? ( (id1-1)*id1+id2 ) : ( (id2-1)*id2+id1 );

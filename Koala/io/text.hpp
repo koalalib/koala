@@ -74,10 +74,10 @@ bool readGraphVL(Graph &g, std::istream &strm, bool directed,
 	unsigned int i, id, m, iu, iv;
 	istringstream ostrm;
 	EdgeDirection dir;
-	typename Graph::Edge *e;
-	typename Graph::Vertex *u, *v;
-	map<unsigned int, typename Graph::Vertex *> idxToPtr;
-	typename map<unsigned int, typename Graph::Vertex *>::iterator it;
+	typename Graph::PEdge e;
+	typename Graph::PVertex u, v;
+	map<unsigned int, typename Graph::PVertex > idxToPtr;
+	typename map<unsigned int, typename Graph::PVertex >::iterator it;
 
 	while((strm >> iu)) {
 		it = idxToPtr.find(iu);
@@ -130,10 +130,10 @@ bool readGraphEL(Graph &g, std::istream &strm, bool directed,
 	istringstream ostrm;
 	EdgeDirection dir;
 	unsigned int id, iu, iv;
-	typename Graph::Edge *e;
-	typename Graph::Vertex *u, *v;
-	map<unsigned int, typename Graph::Vertex *> idxToPtr;
-	typename map<unsigned int, typename Graph::Vertex *>::iterator it;
+	typename Graph::PEdge e;
+	typename Graph::PVertex u, v;
+	map<unsigned int, typename Graph::PVertex> idxToPtr;
+	typename map<unsigned int, typename Graph::PVertex>::iterator it;
 
 	vertexMode = false;
 	while((strm >> iu)) {
@@ -206,11 +206,11 @@ template<class Graph>
 bool writeGraphVL(Graph &g, std::ostream &out, bool directed) {
 	unsigned int i;
 	EdgeDirection flags;
-	typename Graph::Edge *e;
-	typename Graph::Vertex *u, *v;
-	set<typename Graph::Edge *> used;
-	map<typename Graph::Vertex *, unsigned int> ptrToIdx;
-	pair<typename Graph::Vertex *, typename Graph::Vertex *> vs;
+	typename Graph::PEdge e;
+	typename Graph::PVertex u, v;
+	set<typename Graph::PEdge> used;
+	map<typename Graph::PVertex , unsigned int> ptrToIdx;
+	pair<typename Graph::PVertex , typename Graph::PVertex> vs;
 
 	for(u = g.getVert(), i = 0; u != NULL; u = g.getVertNext(u))
 		ptrToIdx[u] = i++;
@@ -259,10 +259,10 @@ bool writeGraphVL(Graph &g, std::ostream &out, bool directed) {
 template<class Graph>
 bool writeGraphEL(Graph &g, std::ostream &out, bool directed) {
 	unsigned int idx;
-	typename Graph::Edge *e;
-	typename Graph::Vertex *u;
-	pair<typename Graph::Vertex *, typename Graph::Vertex *> vs;
-	map<typename Graph::Vertex *, unsigned int> ptrToIdx;
+	typename Graph::PEdge e;
+	typename Graph::PVertex u;
+	pair<typename Graph::PVertex , typename Graph::PVertex > vs;
+	map<typename Graph::PVertex , unsigned int> ptrToIdx;
 
 	idx = 0;
 	for(e = g.getEdge(); e != NULL; e = g.getEdgeNext(e)) {

@@ -6,9 +6,8 @@
 using namespace Koala;
 
 void pri(Set<int> &a) {
-	for(int i=0; i<a.tab.size(); i++)
-		printf("%d ", a.tab[i]);
-	printf("\n");
+	std::cout << a << std::endl;
+
 }
 
 int main() {
