@@ -3,7 +3,7 @@
  * readGraphText(graph, text, format, [vertexmap, [edgemap]])
  *  read graph from text in a given format
  *  graph	- graph to read to (will not be cleared before reading)
- *  text	- descrioption of graph (const char *, string or istream)
+ *  text	- descrioption of graph (const char *, string or std::istream)
  *  format	- one of RG_* constants
  *  vertexmap	- place to store selected vertices (with output-id), usually
  *		  table or map (need to implement "writable" operator[](unsigned int)
@@ -13,7 +13,7 @@
  * writeGraphText(graph, text, format)
  *  write graph in a given format (RG_*) to text
  *  graph	- graph to write
- *  text	- output buffer (string or ostream)
+ *  text	- output buffer (string or std::ostream)
  *  format	- one of RG_* constants
  *
  * writeGraphText(graph, text, maxlength, format)
@@ -108,7 +108,6 @@
 #include<sstream>
 #include<iostream>
 
-using namespace std;
 
 
 namespace Koala {
@@ -132,14 +131,14 @@ public:
 
 
 template<class Graph, class VMap, class EMap>
-bool readGraphText(Graph &g, istream &s, RG_Format format,
+bool readGraphText(Graph &g, std::istream &s, RG_Format format,
 		   VMap &vertexMap, EMap &edgeMap);
 
 
 template<class Graph, class VMap, class EMap>
-bool readGraphText(Graph &g, const string &desc, RG_Format format,
+bool readGraphText(Graph &g, const std::string &desc, RG_Format format,
 		   VMap &vertexMap, EMap &edgeMap) {
-	istringstream s;
+	std::istringstream s;
 	s.str(desc);
 	return readGraphText(g, s, format, vertexMap, edgeMap);
 	};
@@ -148,14 +147,14 @@ bool readGraphText(Graph &g, const string &desc, RG_Format format,
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, const char *desc, RG_Format format,
 		   VMap &vertexMap, EMap &edgeMap) {
-	istringstream s;
-	s.str(string(desc));
+	std::istringstream s;
+	s.str(std::string(desc));
 	return readGraphText(g, s, format, vertexMap, edgeMap);
 	};
 
 
 template<class Graph>
-bool readGraphText(Graph &g, istream &s, RG_Format format) {
+bool readGraphText(Graph &g, std::istream &s, RG_Format format) {
 	EmptyMap<typename Graph::PVertex> tv;
 	EmptyMap<typename Graph::PEdge> te;
 	return readGraphText(g, s, format, tv, te);
@@ -163,8 +162,8 @@ bool readGraphText(Graph &g, istream &s, RG_Format format) {
 
 
 template<class Graph>
-bool readGraphText(Graph &g, const string &desc, RG_Format format) {
-	istringstream s;
+bool readGraphText(Graph &g, const std::string &desc, RG_Format format) {
+	std::istringstream s;
 	s.str(desc);
 	return readGraphText(g, s, format);
 	};
@@ -172,8 +171,8 @@ bool readGraphText(Graph &g, const string &desc, RG_Format format) {
 
 template<class Graph>
 bool readGraphText(Graph &g, const char *desc, RG_Format format) {
-	istringstream s;
-	s.str(string(desc));
+	std::istringstream s;
+	s.str(std::string(desc));
 	return readGraphText(g, s, format);
 	};
 
@@ -186,13 +185,13 @@ bool readGraphText(Graph &g, DESC desc, RG_Format format, VMap &vertexMap) {
 
 
 template<class Graph>
-bool writeGraphText(Graph &g, ostream &out, RG_Format format);
+bool writeGraphText(Graph &g, std::ostream &out, RG_Format format);
 
 
 template<class Graph>
-bool writeGraphText(Graph &g, string &out, RG_Format format) {
+bool writeGraphText(Graph &g, std::string &out, RG_Format format) {
 	bool rv;
-	ostringstream s;
+	std::ostringstream s;
 	rv = writeGraphText(g, s, format);
 	out = s.str();
 	return rv;
@@ -204,8 +203,8 @@ bool writeGraphText(Graph &g, char *out, unsigned int maxlength, RG_Format forma
 	bool rv;
 	const char *o;
 	unsigned int i;
-	string str;
-	ostringstream s;
+	std::string str;
+	std::ostringstream s;
 
 	if(out == NULL || maxlength == 0) return false;
 

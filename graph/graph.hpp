@@ -610,17 +610,27 @@ Graph<VertInfo,EdgeInfo>::getEdgeNext(PVertex vert1, PVertex vert2,
 	}
 
 	if (pAdj)
-	{   EdgeDirection type=getEdgeDir(edge,vert1),nexttype=(type==EdNone) ? EdLoop : type<<1;
+	{   Parals* p;
+	    EdgeDirection type=getEdgeDir(edge,vert1),nexttype=(type==EdNone) ? EdLoop : type<<1;
         typename Graph<VertInfo,EdgeInfo>::PEdge res;
         if (edge && (type&direct)) res=edge->nParal; else res=0;
         if (res) return res;
         switch (nexttype) {
             case EdLoop :
-            case EdUndir :   if (direct&EdUndir) res=pAdj->undirs(vert1,vert2).first;
+            case EdUndir :   if (direct&EdUndir)
+                            {   p=pAdj->undirs.presentValPtr(vert1,vert2);
+                                if (!p) res=0; else res=p->first;
+                            }
                             if (res) return res;
-            case EdDirIn :   if (direct&EdDirIn) res=pAdj->dirs(vert2,vert1).first;
+            case EdDirIn :   if (direct&EdDirIn)
+                            {   p=pAdj->dirs.presentValPtr(vert2,vert1);
+                                if (!p) res=0; else res=p->first;
+                            }
                             if (res) return res;
-            case EdDirOut :   if (direct&EdDirOut) res=pAdj->dirs(vert1,vert2).first;
+            case EdDirOut :   if (direct&EdDirOut)
+                            {   p=pAdj->dirs.presentValPtr(vert1,vert2);
+                                if (!p) res=0; else res=p->first;
+                            }
         }
         return res;
 
@@ -659,16 +669,26 @@ Graph<VertInfo,EdgeInfo>::getEdgePrev(PVertex vert1, PVertex vert2,
 	}
 
 	if (pAdj)
-	{   EdgeDirection type=getEdgeDir(edge,vert1),nexttype=(type==EdNone) ? EdDirOut : type>>1;
+	{   Parals* p;
+	    EdgeDirection type=getEdgeDir(edge,vert1),nexttype=(type==EdNone) ? EdDirOut : type>>1;
         typename Graph<VertInfo,EdgeInfo>::PEdge res;
         if (edge && (type&direct)) res=edge->pParal; else res=0;
         if (res) return res;
         switch (nexttype) {
-            case EdDirOut :   if (direct&EdDirOut) res=pAdj->dirs(vert1,vert2).last;
+            case EdDirOut :   if (direct&EdDirOut)
+                            { p=pAdj->dirs.presentValPtr(vert1,vert2);
+                                if (!p) res=0; else res = p->last;
+                            }
                             if (res) return res;
-            case EdDirIn :   if (direct&EdDirIn) res=pAdj->dirs(vert2,vert1).last;
+            case EdDirIn :   if (direct&EdDirIn)
+                            { p=pAdj->dirs.presentValPtr(vert2,vert1);
+                                if (!p) res=0; else res=p->last;
+                            }
                             if (res) return res;
-            case EdUndir :   if (direct&EdUndir) res=pAdj->undirs(vert1,vert2).last;
+            case EdUndir :   if (direct&EdUndir)
+                                { p=pAdj->undirs.presentValPtr(vert1,vert2);
+                                    if (!p) res=0; else res=p->last;
+                                }
                             if (res) return res;
             case EdLoop :   return res;
         }
@@ -2024,19 +2044,17 @@ Graph<VertInfo,EdgeInfo>::detach(PEdge edge) {
 
 			--edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_in].vert->edges[Graph<VertInfo,EdgeInfo>::Vertex::dir_in].degree;
 			--no_dir_edge;
-            if (pAdj) {
+            if (pAdj) { Parals& pole=pAdj->dirs(edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_out].vert,
+                               edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_in].vert);
                 if(edge->nParal)
                     edge->nParal->pParal = edge->pParal;
                 else
-                    pAdj->dirs(edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_out].vert,
-                               edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_in].vert).last = edge->pParal;
+                    pole.last = edge->pParal;
                 if(edge->pParal)
                     edge->pParal->nParal = edge->nParal;
                 else
-                    pAdj->dirs(edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_out].vert,
-                               edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_in].vert).first = edge->nParal;
-                pAdj->dirs(edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_out].vert,
-                               edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_in].vert).degree--;
+                    pole.first = edge->nParal;
+                pole.degree--;
             }
 			break;
 		case Undirected: {
@@ -2103,19 +2121,17 @@ Graph<VertInfo,EdgeInfo>::detach(PEdge edge) {
 
 			--vert->edges[Graph<VertInfo,EdgeInfo>::Vertex::undir].degree;
 			--no_undir_edge;
-                if (pAdj) {
+                if (pAdj) { Parals& pole=pAdj->undirs(edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_V].vert,
+                                   edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_U].vert);
                     if(edge->nParal)
                         edge->nParal->pParal = edge->pParal;
                     else
-                        pAdj->undirs(edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_V].vert,
-                                   edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_U].vert).last = edge->pParal;
+                        pole.last = edge->pParal;
                     if(edge->pParal)
                         edge->pParal->nParal = edge->nParal;
                     else
-                        pAdj->undirs(edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_V].vert,
-                                   edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_U].vert).first = edge->nParal;
-                    pAdj->undirs(edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_V].vert,
-                                   edge->vert[Graph<VertInfo,EdgeInfo>::Edge::V_U].vert).degree--;
+                        pole.first = edge->nParal;
+                    pole.degree--;
                 }
 			} break;
 		default:

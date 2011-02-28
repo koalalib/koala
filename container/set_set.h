@@ -36,6 +36,7 @@ template< typename Element >
 
 template< typename Element > class Set: public std::set< Element > {
     public:
+        typedef Element ElemType;
     // Konstruktory
         // Konstruktor tworzący zbiór pusty.
         Set(): std::set< Element >() { }
@@ -102,6 +103,32 @@ template< typename Element > class Set: public std::set< Element > {
 } ;
 
 #include "set_set.hpp"
+
+template <class Element>
+  class SetInserter;
+
+template <class Element>
+  class SetInserter<Set<Element> >
+{
+protected:
+  Set<Element>* container;
+
+public:
+  typedef Set<Element> container_type;
+  SetInserter (Set<Element>& x)
+    : container(&x) {}
+  SetInserter<Set<Element> >& operator= (const Element & value)
+    { (*container)+=value; return *this; }
+  SetInserter<Set<Element> >& operator* ()
+    { return *this; }
+  SetInserter<Set<Element> >& operator++ ()
+    { return *this; }
+  SetInserter<Set<Element> > operator++ (int)
+    { return *this; }
+};
+
+template <class Element>
+SetInserter<Set<Element> > setInserter(Set<Element>& x) { return SetInserter<Set<Element> >(x); }
 
 }
 

@@ -17,7 +17,7 @@ class Edge;
 
 #include "../base/def_struct.h"
 #include "vertex.h"
-#include "edge.h"
+//#include "edge.h"
 
 #include <utility>
 
@@ -192,7 +192,7 @@ public:
         int delVerts(Iterator begin,Iterator end);
     template <class Iterator>   // j.w. ale zaklada, ze elementy nie powtarzaja sie
         int delVerts2(Iterator begin,Iterator end);
-    int delVerts(const Set<PVertex>&);
+    int delVerts(const Set<typename Graph<VertInfo,EdgeInfo>::PVertex>&);
     int delEdges(EdgeDirection=EdAll);
     int delEdges(PVertex,EdgeDirection=EdAll);
     int delEdges(PVertex,PVertex,EdgeDirection=EdAll);
@@ -200,22 +200,22 @@ public:
         int delEdges(Iterator begin,Iterator end,EdgeDirection=EdAll);
     template <class Iterator>   // j.w. ale zaklada, ze elementy nie powtarzaja sie
         int delEdges2(Iterator begin,Iterator end,EdgeDirection=EdAll);
-    int delEdges(const Set<PEdge>&,EdgeDirection=EdAll);
+    int delEdges(const Set<typename Graph<VertInfo,EdgeInfo>::PEdge>&,EdgeDirection=EdAll);
     template <class Iterator>
         int delEdges(PVertex,Iterator begin,Iterator end,EdgeDirection=EdAll);
     template <class Iterator>   // j.w. ale zaklada, ze elementy nie powtarzaja sie
         int delEdges2(PVertex,Iterator begin,Iterator end,EdgeDirection=EdAll);
-    int delEdges(PVertex,const Set<PEdge>&,EdgeDirection=EdAll);
+    int delEdges(PVertex,const Set<typename Graph<VertInfo,EdgeInfo>::PEdge>&,EdgeDirection=EdAll);
     template <class Iterator>
         int delEdges(PVertex,PVertex,Iterator begin,Iterator end,EdgeDirection=EdAll);
     template <class Iterator>   // j.w. ale zaklada, ze elementy nie powtarzaja sie
         int delEdges2(PVertex,PVertex,Iterator begin,Iterator end,EdgeDirection=EdAll);
-    int delEdges(PVertex,PVertex,const Set<PEdge>&,EdgeDirection=EdAll);
+    int delEdges(PVertex,PVertex,const Set<typename Graph<VertInfo,EdgeInfo>::PEdge>&,EdgeDirection=EdAll);
     PEdge ch2Archs(PEdge);
     int ch2Archs();
     template <class Iterator>
         int ch2Archs(Iterator begin,Iterator end);
-    int ch2Archs(const Set<PEdge>&);
+    int ch2Archs(const Set<typename Graph<VertInfo,EdgeInfo>::PEdge>&);
     bool areParallel(PEdge,PEdge,EdgeDirection=EdUndir);
     PVertex putVert(PEdge,const VertInfo &);
     PVertex putVert(PEdge);
@@ -226,7 +226,7 @@ public:
         PVertex glue(Iterator,Iterator,bool makeloops=false,PVertex=0);
     template <class Iterator> // j.w. ale zaklada, ze elementy nie powtarzaja sie
         PVertex glue2(Iterator,Iterator,bool makeloops=false,PVertex=0);
-    PVertex glue(const Set<PVertex>&,bool makeloops=false,PVertex=0);
+    PVertex glue(const Set<typename Graph<VertInfo,EdgeInfo>::PVertex>&,bool makeloops=false,PVertex=0);
 
 	//-----------------clear graph-------------------------
 	/** Removes all vertices and edges from the graph. */
@@ -279,52 +279,29 @@ public:
 	//----------TEST METHODS------------
 	bool testGraph(); //may throw an exception
 
-private:
-	PVertex first_vert, last_vert;
-	PEdge first_edge, last_edge;
-	int no_vert, no_loop_edge, no_dir_edge, no_undir_edge; //number of vertices, number of edges
-
     struct Parals {
             typename Koala::Edge<VertInfo,EdgeInfo> *first, *last;
             int degree;
             Parals(): first(NULL), last(NULL), degree(0) {}
         };
 
-	struct AdjMatrix {
+	class AdjMatrix {
+	public:
         AssocMatrix<typename Koala::Vertex<VertInfo,EdgeInfo>*, Parals, AMatrNoDiag> dirs;
         AssocMatrix<typename Koala::Vertex<VertInfo,EdgeInfo>*, Parals, AMatrTriangle> undirs;
         AdjMatrix(int asize=0) : dirs(asize), undirs(asize) {}
 
-        void clear() { dirs.clear(); undirs.clear(); }
-        void defrag() { dirs.defrag(); undirs.defrag(); }
-        void add(PEdge edge)
-        {   if (!edge) return;
-            if (edge->type==Directed)
-            {   std::pair<typename Graph<VertInfo,EdgeInfo>::PVertex,typename Graph<VertInfo,EdgeInfo>::PVertex>
-                                ends(edge->vert[0].vert, edge->vert[1].vert);
-                edge->pParal = dirs(ends.first,ends.second).last;
-                edge->nParal = NULL;
-                if(edge->pParal)
-                    edge->pParal->nParal = edge;
-                else
-                    dirs(ends.first,ends.second).first = edge;
-                dirs(ends.first,ends.second).last = edge;
-                dirs(ends.first,ends.second).degree++;
-            }
-            else if (edge->type==Undirected)
-            {   std::pair<typename Graph<VertInfo,EdgeInfo>::PVertex,typename Graph<VertInfo,EdgeInfo>::PVertex>
-                                ends(edge->vert[0].vert, edge->vert[1].vert);
-                edge->pParal = undirs(ends.first,ends.second).last;
-                edge->nParal = NULL;
-                if(edge->pParal)
-                    edge->pParal->nParal = edge;
-                else
-                    undirs(ends.first,ends.second).first = edge;
-                undirs(ends.first,ends.second).last = edge;
-                undirs(ends.first,ends.second).degree++;
-            }
-        }
+        void clear() { dirs.clear(); undirs.clear(); };
+        void defrag() { dirs.defrag(); undirs.defrag(); };
+        void add(PEdge edge);
+
 	};
+
+private:
+
+	PVertex first_vert, last_vert;
+	PEdge first_edge, last_edge;
+	int no_vert, no_loop_edge, no_dir_edge, no_undir_edge; //number of vertices, number of edges
 
 	AdjMatrix* pAdj;
 
@@ -339,7 +316,12 @@ private:
 	PEdge detach(PEdge);
 
 };
+}
+#include "edge.h"
+
+namespace Koala {
 #include "graph.hpp"
+#include "adjmatrix.hpp"
 // test methods - to check if all internal assumptions are correct
 #include "graph_test.hpp"
 // iterators

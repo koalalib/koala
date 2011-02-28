@@ -74,6 +74,112 @@ template <class A> BlackHole<A>& blackHole(A) { return blackHole<A>(); }
 template <class T> bool isBlackHole(const T&) { return false; }
 template <class T> bool isBlackHole(const BlackHole<T>& ) { return true; }
 
+template <class Cont1, class Cont2> struct BlackHoleSwitch {
+    typedef Cont1 Type;
+    static Cont1& get(Cont1& a, Cont2& b) { return a; }
+};
+
+template <class A, class Cont2> struct BlackHoleSwitch<BlackHole<A>, Cont2 > {
+    typedef Cont2 Type;
+    static Cont2& get(BlackHole<A>& a, Cont2& b) { return b; }
+};
+
+
+template <class Container> class StackInterface;
+
+template <class T> class StackInterface<T*> {
+    T* buf;
+    int siz,maxsize;
+
+    public:
+        typedef T ElemType;
+
+        StackInterface(T* bufor, int max) : buf(bufor), maxsize(max), siz(0) {}
+        int size() { return siz; }
+        bool empty() { return siz==0; }
+        void push(const T& val) { assert(siz<maxsize); buf[siz++]=val; }
+        void pop() { assert(siz); siz--; }
+        T& top() { assert(siz); return buf[siz-1]; }
+};
+
+
+template <class Container> class QueueInterface;
+
+template <class T> class QueueInterface<T*> {
+    T* buf;
+    int beg,end,maxsize;
+
+    int prev(int x) { return (x) ? x-1 : maxsize; }
+    int next(int x) { return (x==maxsize) ? 0 : x+1; }
+    public:
+        typedef T ElemType;
+
+        // wymaga elementu nadmiarowego!
+        QueueInterface(T* bufor, int max) : buf(bufor), maxsize(max), beg(0), end(0) {}
+
+        int size() { return (beg<=end) ? end-beg : maxsize+1-(beg-end); }
+        bool empty() { return beg==end; }
+        void push(const T& val) { buf[end]=val; end=next(end); assert(end!=beg); }
+        void pop() { assert(beg!=end); beg=next(beg); }
+        T& front() { assert(!empty()); return buf[beg]; }
+        T& top() { assert(!empty()); return buf[beg]; }
+        T& back() { assert(!empty()); return buf[prev(end)]; }
+};
+
+
+template <class Container> class VectorInterface;
+
+template <class T> class VectorInterface<T*> {
+    T *start,*limit;
+    int siz;
+
+    public:
+    typedef T value_type;
+
+    VectorInterface(T* bufor, int max) : start(bufor), limit(bufor+max), siz(0) {}
+
+    T* begin() { return start ; }
+    T* end()   { return start+siz ; }
+    int size() { return siz ; }
+    int max_size() { return limit-start; }
+    int capacity() { return limit-start ; }
+    bool empty() { return siz==0 ; }
+    void reserve(int arg) { assert(arg<=max_size()); }
+    void resize(int arg) {   assert(arg<=max_size()); }
+
+    T& operator[] (int pos) { return at(pos); }
+    T& at(int pos) { assert(pos<capacity()); return start[pos]; }
+    T& front() { return at(0); }
+    T& back() { return at(siz-1); }
+
+    void push_back(const T& arg) { assert(siz<capacity()); start[siz++]=arg; }
+    void pop_back() { assert(siz); siz--; }
+    static void revert(T* f,T *l)
+    {   T z; l--; while(f<l) { z=*f;*f=*l;*l=z; f++;l--; }  }
+    template <class InputIterator>
+        void assign (InputIterator first, InputIterator last)
+    { clear(); for(;first!=last;first++) push_back(*first);  }
+    void insert (T* where, int n, const T& x )
+    {   assert(siz+n<=max_size());
+        for(int i=siz-1;i>=where-start;i--) start[i+n]=start[i];
+        for(int i=0;i<n;i++) where[i]=x;
+        siz+=n;
+    }
+    void insert (T* where,const T& x) { insert(where,1,x); }
+    template <class InputIterator>
+        void insert (T* where, InputIterator first, InputIterator last)
+    {   int ile=0;
+        for(;first!=last;first++) { push_back(*first); ile++; } if (!ile) return;
+        revert(where,start+siz); revert(where,where+ile); revert(where+ile,start+siz);
+    }
+    void erase(T* f, T* l)
+    {   int ile=l-f; for(;f+ile<start+siz;f++) *f=f[ile];
+        siz-=ile;
+    }
+    void erase(T* f) { erase(f,f+1); }
+    void clear() { siz=0; }
+};
+
 
 // Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych
 // w algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda
@@ -88,6 +194,64 @@ template <class T> class NumberTypeBounds {
     bool isZero(T arg) {return arg==zero(); }
 };
 
+struct ShorPathStructs {
+    // Do odczytu sciezki miedzy wierzcholkiem a korzeniem, gdy droga wyznaczona jest w postaci
+    // tablicy asocjacyjnej PVertex -> rekord z polami vPrev, ePrev (wierzcholek poprzedni i krawedz do niego).
+    // Przydatne w roznych algorytmach najkrotszej sciezki
+    // Uzytkownik podaje, gdzie wpisac wierzcholki i krawedzie najkrotszej sciezki
+    template <class VIter, class EIter> struct OutPath {
+            VIter vertIter;
+            EIter edgeIter;
+
+            OutPath(VIter av, EIter ei) : vertIter(av), edgeIter(ei) {}
+        };
+        // funkcja tworzaca, analogia make_pair
+    template <class VIter, class EIter>
+    static OutPath<VIter,EIter> outPath(VIter av, EIter ei) { return OutPath<VIter,EIter>(av,ei); }
+
+    template <class GraphType, class VertContainer, class VIter, class EIter>
+    static int
+        getOutPath(GraphType& g,
+            VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
+            OutPath<VIter,EIter> iters,
+            typename GraphType::PVertex end,
+            typename GraphType::PVertex start=0) // ew. wczesniejszy punkt koncowy sciezki
+        {   assert(end);
+            typename GraphType::PVertex u,v=vertTab[end].vPrev;
+            typename GraphType::PEdge  e=vertTab[end].ePrev;
+            typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
+            typename GraphType::PEdge LOCALARRAY(tabE,g.getVertNo());
+            int len=0;
+
+            if (end!=start) for(;v;len++)
+               { tabV[len]=v; tabE[len]=e; e=vertTab[v].ePrev; v=(v==start) ? 0 : vertTab[v].vPrev; }
+
+            for(int i=len-1;i>=0;i--)
+                { *iters.vertIter=tabV[i];*iters.edgeIter=tabE[i];++iters.vertIter;++iters.edgeIter; }
+            *iters.vertIter=end;++iters.vertIter;
+            return len;
+    }
+
+    template <class GraphType, class VertContainer,class Iter>
+    static int getUsedEdges(GraphType &g, VertContainer& vertTab,Iter iter)
+    {   int l=0;
+        if (vertTab.empty()) return 0;
+        for(typename VertContainer::KeyType v=vertTab.firstKey();;v=vertTab.nextKey(v))
+        {   typename GraphType::PEdge e;
+            if (v && (e=vertTab[v].ePrev)) {*iter=e; ++iter; l++; }
+            if (v==vertTab.lastKey()) break;
+        }
+        return l;
+    }
+
+    template <class GraphType, class VertContainer>
+    static Set<typename GraphType::PEdge> getUsedEdgesSet(GraphType &g, VertContainer& vertTab)
+    {   Set<typename GraphType::PEdge> res;
+        getUsedEdges(g,vertTab,setInserter(res));
+        return res;
+    }
+
+};
 
 // te choosery mozna stosowac dla wierzcholkow i krawedzi
 class BoolChooser {
