@@ -5,6 +5,7 @@
 
 namespace Koala {
 
+
 class EdgeConst {
 protected:
 	//do not change constans
@@ -20,6 +21,7 @@ template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo>
 class Edge : public EdgeConst {
 	friend class Graph<VertInfo, EdgeInfo>;
 	friend class Vertex<VertInfo, EdgeInfo>;
+	friend  class Graph<VertInfo, EdgeInfo>::AdjMatrix;
 //	friend class Vertex;
 public:
 //	/** Reference to public info variable. */

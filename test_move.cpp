@@ -74,7 +74,7 @@ int main() {
 //    g1.makeAdjMatrix(); e2=g1.getEdge(beg,end,mask);g1.delAdjMatrix();
     while(e)
     {   e2=e;
-        cout << endl << ((e)?e->info.name : "NULL") << " " << ((e2)?e2->info.name : "NULL");
+        cout << endl << ((e)?e->info.name : string("NULL")) << " " << ((e2)?e2->info.name : string("NULL"));
         en=g1.getEdgeNext(beg,e,mask2);
 //        g1.makeAdjMatrix(); en2=g1.getEdgeNext(beg,end,e,mask2);g1.delAdjMatrix();
         e=en;e2=en;
@@ -86,7 +86,7 @@ int main() {
 //    g1.makeAdjMatrix(); e2=g1.getEdgeLast(beg,end,mask);g1.delAdjMatrix();
     while(e)
     {   e2=e;
-        cout << endl << ((e)?e->info.name : "NULL") << " " << ((e2)?e2->info.name : "NULL");
+        cout << endl << ((e)?e->info.name : string("NULL")) << " " << ((e2)?e2->info.name : string("NULL"));
         en=g1.getEdgePrev(beg,e,mask2);
 //        g1.makeAdjMatrix(); en2=g1.getEdgePrev(beg,end,e,mask2);g1.delAdjMatrix();
         e=en;e2=en;
@@ -98,7 +98,7 @@ int main() {
     e=g1.getEdge(beg,end,mask);g1.makeAdjMatrix(); e2=g1.getEdge(beg,end,mask);g1.delAdjMatrix();
     while(e)
     {
-        cout << endl << ((e)?e->info.name : "NULL") << " " << ((e2)?e2->info.name : "NULL");
+        cout << endl << ((e)?e->info.name : string("NULL")) << " " << ((e2)?e2->info.name : string("NULL"));
         en=g1.getEdgeNext(beg,end,e,mask2);
         g1.makeAdjMatrix(); en2=g1.getEdgeNext(beg,end,e,mask2);g1.delAdjMatrix();
         e=en;e2=en2;
@@ -109,7 +109,7 @@ int main() {
     e=g1.getEdgeLast(beg,end,mask);g1.makeAdjMatrix(); e2=g1.getEdgeLast(beg,end,mask);g1.delAdjMatrix();
     while(e)
     {
-        cout << endl << ((e)?e->info.name : "NULL") << " " << ((e2)?e2->info.name : "NULL");
+        cout << endl << ((e)?e->info.name : string("NULL")) << " " << ((e2)?e2->info.name : string("NULL"));
         en=g1.getEdgePrev(beg,end,e,mask2);
         g1.makeAdjMatrix(); en2=g1.getEdgePrev(beg,end,e,mask2);g1.delAdjMatrix();
         e=en;e2=en2;
@@ -124,7 +124,7 @@ int main() {
     e=g1.getEdge(beg,end,mask);g1.makeAdjMatrix(); e2=g1.getEdge(beg,end,mask);g1.delAdjMatrix();
     while(e)
     {
-        cout << endl << ((e)?e->info.name : "NULL") << " " << ((e2)?e2->info.name : "NULL");
+        cout << endl << ((e)?e->info.name : string("NULL")) << " " << ((e2)?e2->info.name : string("NULL"));
         en=g1.getEdgeNext(beg,end,e,mask2);
         g1.makeAdjMatrix(); en2=g1.getEdgeNext(beg,end,e,mask2);g1.delAdjMatrix();
         e=en;e2=en2;
@@ -135,7 +135,7 @@ int main() {
     e=g1.getEdgeLast(beg,end,mask);g1.makeAdjMatrix(); e2=g1.getEdgeLast(beg,end,mask);g1.delAdjMatrix();
     while(e)
     {
-        cout << endl << ((e)?e->info.name : "NULL") << " " << ((e2)?e2->info.name : "NULL");
+        cout << endl << ((e)?e->info.name : string("NULL")) << " " << ((e2)?e2->info.name : string("NULL"));
         en=g1.getEdgePrev(beg,end,e,mask2);
         g1.makeAdjMatrix(); en2=g1.getEdgePrev(beg,end,e,mask2);g1.delAdjMatrix();
         e=en;e2=en2;

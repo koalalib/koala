@@ -56,7 +56,7 @@ int main() {
 
 
 
-    Graph<InfoV1,InfoE1> g1,g1p;
+    Graph<InfoV1,InfoE1> g1,g1p=g1;
     Graph<InfoV2,InfoE2> g2,g2p;
 
     AssocArray<Vertex<InfoV1,InfoE1>*,Vertex<InfoV2,InfoE2>* > m12;
@@ -85,6 +85,7 @@ int main() {
     g2.substitute(B2,g1,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(&vtrans),stdCast(false))
             , make_pair(stdLink(am21,am12),stdLink(an21,an12)));
 
+    g2p.copy(g1);
     std::cout << "copy\n";
 
     for(Vertex<InfoV2,InfoE2>* p=g2.getVert();p;p=g2.getVertNext(p))

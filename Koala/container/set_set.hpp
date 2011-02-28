@@ -109,7 +109,7 @@ template< typename Element >
 template< typename Element >
     std::ostream& operator<<(std::ostream& is,const Set<Element> &s)
     {   is << "{";
-        for(typename std::set<Element>::iterator i=s.begin();i!=s.end();i++)
+        for(typename std::set<Element>::const_iterator i=s.begin();i!=s.end();i++)
         {   if (i!=s.begin()) is<<",";
             is<<*i;
         }

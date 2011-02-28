@@ -1,6 +1,7 @@
 #include <iostream>
+#include <string>
 #include "Koala/graph/graph.h"
-#include "Koala/algorithm/dijkstra.h"
+#include "Koala/algorithm/weights.h"
 
 
 //przyklad uzycia, w tej wersji zawartosc obu struktur jest dla Dijkstry nieistotna
@@ -30,7 +31,8 @@ Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Dijkstra::Edg
 
 
 void dijTest()
-{   A=g.addVert(OpisV("A"));B=g.addVert(OpisV("B"));C=g.addVert(OpisV("C"));
+{   g.clear();vertCont.clear();
+    A=g.addVert(OpisV("A"));B=g.addVert(OpisV("B"));C=g.addVert(OpisV("C"));
     D=g.addVert(OpisV("D"));E=g.addVert(OpisV("E"));F=g.addVert(OpisV("F"));
 
     g.addEdge(A,B,OpisE(1));g.addEdge(B,D,OpisE(5));g.addEdge(A,C,OpisE(4));g.addEdge(D,C,OpisE(2));
@@ -59,7 +61,8 @@ int main() {
         int l;
 
         std::cout<< std::endl;
-        l=Koala::Dijkstra::getPath(g,vertCont,U,V,Koala::Dijkstra::outPath(tabV,tabE));
+        l=Koala::Dijkstra::getOutPath(g,vertCont,Koala::Dijkstra::outPath(tabV,tabE),V,F);
+        l=Koala::Dijkstra::getPath(g,vertCont,V,Koala::Dijkstra::outPath(tabV,tabE));
         std::cout<<"Liczba krawedzi: "<<l<<std::endl;
         for(int i=0;i<=l;i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;i<l;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
@@ -67,6 +70,7 @@ int main() {
         std::cout<< std::endl;
     }
 
+//    std::cout << Koala::Dijkstra::getUsedEdgesSet(g,vertCont);
 
     // ten sam graf raz jeszcze, szukamy sciezki od nowa
 
@@ -96,6 +100,10 @@ int main() {
         std::cout<< std::endl;
     }
 
+    // ... interesowala go tylko odleglosc, nie chcialo mu sie zakladac kontenera asoc. dla wierzcholkow
+    std::cout<< std::endl;
+    dijTest();
+    std::cout<< "Odleglosc: "<< Koala::Dijkstra::distances(g,Koala::blackHole(),edgeCont,U,V)<<":";
 
     return 0;
 }

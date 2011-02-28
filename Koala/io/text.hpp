@@ -1,7 +1,6 @@
 #include<set>
 #include<map>
-
-using namespace std;
+#include<utility>
 
 namespace Koala {
 namespace IO {
@@ -12,13 +11,13 @@ namespace IO {
  * @param[out] out string stream to put info to
  * @return true on success, false otherwise
  */
-static bool readObjectInfo(std::istream &strm, istringstream &out) {
+static bool readObjectInfo(std::istream &strm, std::istringstream &out) {
 	int parCount = 0;
 	char c;
 	bool escape;
-	string text;
+	std::string text;
 
-	if(!(strm >> c)) return false;
+	if(!(bool)(strm >> c)) return false;
 	if(c != '(') { strm.unget(); return false; };
 
 	c = strm.get();		// switch to unformated reading to keep spaces
@@ -51,9 +50,9 @@ static bool readObjectInfo(std::istream &strm, istringstream &out) {
  */
 bool readOutputId(std::istream &strm, unsigned int &id) {
 	char at;
-	if(!(strm >> at)) return false;
+	if(!(bool)(strm >> at)) return false;
 	if(at != '@') { strm.unget(); return false; };
-	if(!(strm >> id)) return false;
+	if(!(bool)(strm >> id)) return false;
 	return true;
 	};
 
@@ -72,24 +71,24 @@ bool readGraphVL(Graph &g, std::istream &strm, bool directed,
 		 VMap &vertexMap, EMap &edgeMap) {
 	char c;
 	unsigned int i, id, m, iu, iv;
-	istringstream ostrm;
+	std::istringstream ostrm;
 	EdgeDirection dir;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u, v;
-	map<unsigned int, typename Graph::PVertex > idxToPtr;
-	typename map<unsigned int, typename Graph::PVertex >::iterator it;
+	std::map<unsigned int, typename Graph::PVertex > idxToPtr;
+	typename std::map<unsigned int, typename Graph::PVertex >::iterator it;
 
 	while((strm >> iu)) {
 		it = idxToPtr.find(iu);
 		if(it == idxToPtr.end()) idxToPtr[iu] = u = g.addVert();
 		else u = it->second;
 
-		if(readObjectInfo(strm, ostrm) && !(ostrm >> (u->info))) return false;
+		if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (u->info))) return false;
 		if(readOutputId(strm, id)) vertexMap[id] = u;
 
-		if(!(strm >> m)) return false;
+		if(!(bool)(strm >> m)) return false;
 		for(i = 0; i < m; i++) {
-			if(!(strm >> c)) return false;
+			if(!(bool)(strm >> c)) return false;
 			if(c == 'u') dir = EdUndir;
 			else if(c == 'd') dir = EdDirOut;
 			else {
@@ -97,7 +96,7 @@ bool readGraphVL(Graph &g, std::istream &strm, bool directed,
 				dir = directed ? EdDirOut : EdUndir;
 				};
 
-			if(!(strm >> iv)) return false;
+			if(!(bool)(strm >> iv)) return false;
 			it = idxToPtr.find(iv);
 			if(it == idxToPtr.end()) idxToPtr[iv] = v = g.addVert();
 			else v = it->second;
@@ -105,7 +104,7 @@ bool readGraphVL(Graph &g, std::istream &strm, bool directed,
 			if(u == v) dir = EdLoop;
 			e = g.addEdge(u, v, dir);
 
-			if(readObjectInfo(strm, ostrm) && !(ostrm >> (e->info))) return false;
+			if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (e->info))) return false;
 			if(readOutputId(strm, id)) edgeMap[id] = e;
 			};
 		};
@@ -126,14 +125,14 @@ bool readGraphEL(Graph &g, std::istream &strm, bool directed,
 		 VMap &vertexMap, EMap &edgeMap) {
 	char c;
 	bool vertexMode;
-	string str;
-	istringstream ostrm;
+	std::string str;
+	std::istringstream ostrm;
 	EdgeDirection dir;
 	unsigned int id, iu, iv;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u, v;
-	map<unsigned int, typename Graph::PVertex> idxToPtr;
-	typename map<unsigned int, typename Graph::PVertex>::iterator it;
+	std::map<unsigned int, typename Graph::PVertex> idxToPtr;
+	typename std::map<unsigned int, typename Graph::PVertex>::iterator it;
 
 	vertexMode = false;
 	while((strm >> iu)) {
@@ -142,10 +141,10 @@ bool readGraphEL(Graph &g, std::istream &strm, bool directed,
 		else u = it->second;
 
 		if(vertexMode) {	// read vertex data
-			if(readObjectInfo(strm, ostrm) && !(ostrm >> (u->info))) return false;
+			if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (u->info))) return false;
 			if(readOutputId(strm, id)) vertexMap[id] = u;
 		} else {		// read edges with edge data
-			if(!(strm >> c)) return false;
+			if(!(bool)(strm >> c)) return false;
 			if(c == '<' || c == '-') {
 				strm >> str;
 				str = c + str;
@@ -166,7 +165,7 @@ bool readGraphEL(Graph &g, std::istream &strm, bool directed,
 			if(u == v) dir = EdLoop;
 			e = g.addEdge(u, v, dir);
 
-			if(readObjectInfo(strm, ostrm) && !(ostrm >> (e->info))) return false;
+			if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (e->info))) return false;
 			if(readOutputId(strm, id)) edgeMap[id] = e;
 			};
 		};
@@ -175,7 +174,7 @@ bool readGraphEL(Graph &g, std::istream &strm, bool directed,
 
 
 /** append a graph described by a stream
- * requires overloading >> operator for istream for VertexInfo and EdgeInfo
+ * requires overloading >> operator for std::istream for VertexInfo and EdgeInfo
  * @param[out] graph to read to (it will NOT be cleared)
  * @param[in] strm stream to read graph from
  * @param[in] format describes format of the stream (RG_* values)
@@ -208,9 +207,9 @@ bool writeGraphVL(Graph &g, std::ostream &out, bool directed) {
 	EdgeDirection flags;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u, v;
-	set<typename Graph::PEdge> used;
-	map<typename Graph::PVertex , unsigned int> ptrToIdx;
-	pair<typename Graph::PVertex , typename Graph::PVertex> vs;
+	std::set<typename Graph::PEdge> used;
+	std::map<typename Graph::PVertex , unsigned int> ptrToIdx;
+	std::pair<typename Graph::PVertex , typename Graph::PVertex> vs;
 
 	for(u = g.getVert(), i = 0; u != NULL; u = g.getVertNext(u))
 		ptrToIdx[u] = i++;
@@ -261,8 +260,8 @@ bool writeGraphEL(Graph &g, std::ostream &out, bool directed) {
 	unsigned int idx;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u;
-	pair<typename Graph::PVertex , typename Graph::PVertex > vs;
-	map<typename Graph::PVertex , unsigned int> ptrToIdx;
+	std::pair<typename Graph::PVertex , typename Graph::PVertex > vs;
+	std::map<typename Graph::PVertex , unsigned int> ptrToIdx;
 
 	idx = 0;
 	for(e = g.getEdge(); e != NULL; e = g.getEdgeNext(e)) {
@@ -286,14 +285,14 @@ bool writeGraphEL(Graph &g, std::ostream &out, bool directed) {
 
 
 /** output a graph to the given stream
- * requires overloading << operator for ostream for VertexInfo and EdgeInfo
+ * requires overloading << operator for std::ostream for VertexInfo and EdgeInfo
  * @param[out] graph to read to (it will NOT be cleared)
  * @param[in] strm stream to read graph from
  * @param[in] format describes format of the stream (RG_* values)
  * @return true on success, false otherwise
  */
 template<class Graph>
-bool writeGraphText(Graph &g, ostream &out, RG_Format format) {
+bool writeGraphText(Graph &g, std::ostream &out, RG_Format format) {
 	switch(format) {
 		case RG_DirectedVertexLists:	return writeGraphVL(g, out, true);
 		case RG_UndirectedVertexLists:	return writeGraphVL(g, out, false);

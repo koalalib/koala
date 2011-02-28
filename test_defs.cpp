@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include "Koala/container/assoctab.h"
 #include "Koala/base/def_struct.h"
 using namespace std;
@@ -82,12 +83,27 @@ int main() {
 
 
     std::cout << AA->info.name << " pointing: " << ((void*)AA->info.point==(void*)BB) << " mapsize: "
-            << a2b.size() << " " << (a2b.size() ? a2b[AA]->info.name : "") << std::endl;
+            << a2b.size() << " " << (a2b.size() ? a2b[AA]->info.name : string("")) << std::endl;
 
     std::cout << BB->info.name << " pointing: " << ((void*)BB->info.pointer==(void*)AA) << " mapsize: "
-            << b2a.size() << " " << (b2a.size() ? b2a[BB]->info.name : "") << std::endl;
+            << b2a.size() << " " << (b2a.size() ? b2a[BB]->info.name : string("")) << std::endl;
 
+    int tabi[4];
+    QueueInterface<int*> st(tabi,3);
 
+    std::cout << std::endl;
+    std::cout << st.size() << std::endl;
+    st.push(5);
+    std::cout << st.size() << " " << st.front() << " " << st.back() << std::endl;
+    st.push(7);
+    std::cout << st.size() << " " << st.front() << " " << st.back() << std::endl;
+    st.pop();
+    std::cout << st.size() << " " << st.front() << " " << st.back() << std::endl;
+    st.push(9); st.push(10);
+    std::cout << st.size() << " " << st.front() << " " << st.back() << std::endl;
+    st.pop(); st.push(14);
+    std::cout << st.size() << " " << st.front() << " " << st.back() << std::endl;
+//    st.push(14);
 
     return 0;
 }

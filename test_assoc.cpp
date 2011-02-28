@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include "Koala/container/assoctab.h"
 #include "Koala/base/def_struct.h"
 using namespace std;
@@ -48,8 +49,11 @@ int main() {
     std::map<int,std::string> mapa;
     AssocTabInterface<std::map<int,std::string> > amap=mapa;
 
+
     AssocArray<Vert*,std::string> a;
     Vert * tab[5];
+
+
 
     t(a);
     a[C]="Ca";
@@ -68,6 +72,7 @@ int main() {
     t(a);
     t(b);
 
+    AssocArray<Vert*,std::string> a2=a;
 
     AssocMatrix<Vert*,std::string,AMatrClTriangle> m,m1;
 
@@ -75,24 +80,18 @@ int main() {
     m(A,A)="Wpis pojedynczy";
     m(C,C)="Wpis";
     t(m);
-//    m.delKey(C,C);
+    m.delKey(C,C);
     m.defrag();
     m1=m;
-    t(m);
-    t(m1);
-    m1(A,D)="Costam";
-    m1(D,D)="Costam2";
-    t(m);
-    t(m1);
     m.defrag();
     t(m);
-    delete D;
-//    m.defrag();
+//    delete D;
+    m.defrag();
     t(m);
-//    m1.defrag();
+    m1.defrag();
     t(m1);
-    AssocTable<std::map<std::string,int> > atab;
-    AssocTabInterface< AssocTable<std::map<std::string,int> > > iatab=atab,tatab2=iatab;
+//    AssocTable<std::map<std::string,int> > atab;
+//    AssocTabInterface< AssocTable<std::map<std::string,int> > > iatab=atab,tatab2=iatab;
 
 }
 
