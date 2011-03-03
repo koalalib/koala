@@ -185,11 +185,11 @@ bool readGraphText(Graph &g, DESC desc, RG_Format format, VMap &vertexMap) {
 
 
 template<class Graph>
-bool writeGraphText(Graph &g, std::ostream &out, RG_Format format);
+bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format);
 
 
 template<class Graph>
-bool writeGraphText(Graph &g, std::string &out, RG_Format format) {
+bool writeGraphText(const Graph &g, std::string &out, RG_Format format) {
 	bool rv;
 	std::ostringstream s;
 	rv = writeGraphText(g, s, format);
@@ -199,7 +199,7 @@ bool writeGraphText(Graph &g, std::string &out, RG_Format format) {
 
 
 template<class Graph>
-bool writeGraphText(Graph &g, char *out, unsigned int maxlength, RG_Format format) {
+bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format format) {
 	bool rv;
 	const char *o;
 	unsigned int i;

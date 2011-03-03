@@ -10,10 +10,12 @@ class Vertex;
 
 template<class VertInfo, class EdgeInfo>
 class Edge;
+
 }
 
 #include <algorithm>
 #include <cstdio>
+#include <cassert>
 
 #include "../base/def_struct.h"
 #include "vertex.h"
@@ -24,21 +26,71 @@ class Edge;
 namespace Koala {
 
 
+class SubgraphBase {
+    public:
+
+    SubgraphBase() : parent(0), next(0), child(0) {}
+    ~SubgraphBase()
+    {   unlink();
+        SubgraphBase *ch, *chnext;
+        for (ch=child;ch;ch=chnext)
+            { ch->parent=0;chnext=ch->next; ch->next=0;}
+    }
+    SubgraphBase(const SubgraphBase& x) : child(0), parent(0), next(0)
+    {   link(x.parent); }
+
+    SubgraphBase& operator=(const SubgraphBase& x)
+    {   if (&x==this) return *this;
+        link(x.parent);
+        return *this;
+    }
+
+    protected:
+    SubgraphBase* parent, *next, *child;
+
+    bool unlink()
+    {   if (!parent) return false;
+        if (parent->child==this)
+            parent->child=next;
+        else
+        {   SubgraphBase *wsk;
+            for(wsk=parent->child;wsk->next!=this;wsk=wsk->next);
+            wsk->next=next;
+        }
+        parent=next=0;
+        return true;
+    }
+    bool link(SubgraphBase* wsk=0)
+    {   unlink();
+        if (!wsk) return false;
+        next=wsk->child;parent=wsk; wsk->child=this;
+        return true;
+    }
+
+};
+
+
 template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyVertInfo>
-class Graph {
+class Graph : public SubgraphBase {
+    friend class Edge<VertInfo,EdgeInfo>;
 public:
 	typedef Koala::Vertex<VertInfo,EdgeInfo> Vertex;
 	typedef Vertex* PVertex;
 	typedef Koala::Edge<VertInfo,EdgeInfo> Edge;
 	typedef Edge* PEdge;
-	typedef Graph<VertInfo,EdgeInfo>* PGraph;
+	typedef Graph<VertInfo,EdgeInfo> GraphType;
+	typedef Graph<VertInfo,EdgeInfo> RootGrType;
 	typedef VertInfo VertInfoType;
 	typedef EdgeInfo EdgeInfoType;
 	/** Create empty graph. */
 	Graph();
 	/** Create copy of graph.*/
-	Graph(Graph &);
+	Graph(const Graph<VertInfo,EdgeInfo> &);
 	~Graph();
+
+	Graph<VertInfo,EdgeInfo>* getRootPtr() { return this; }
+    bool good(PVertex v,bool=false) { return true; }
+    bool good(PEdge e,bool=false) { return true; }
 
 	//----------------vertices--------------------
 	PVertex addVert();
@@ -56,11 +108,8 @@ public:
 	PVertex getVertPrev(PVertex);
 	//sets
 	Set<PVertex> getVertSet();
-	template<class Chooser> Set<PVertex> getVertSet(Chooser);
 	template<class OutputIterator>
 			int getVerts(OutputIterator);
-	template<class OutputIterator, class Chooser>
-			int getVerts(OutputIterator, Chooser);
 	//other
 	int getVertNo(); ///< Vertex number (graph order)
 
@@ -84,13 +133,8 @@ public:
 	PEdge getEdgePrev(PEdge, EdgeDirection=EdAll);
 	//sets
 	Set<PEdge> getEdgeSet(EdgeDirection=EdAll);
-	template<class Chooser> Set<PEdge> getEdgeSet(
-			EdgeDirection, Chooser);
 	template<class OutputIterator>
 			int getEdges(OutputIterator, EdgeDirection=EdAll);
-	template<class OutputIterator, class Chooser>
-			int getEdges(OutputIterator, EdgeDirection,
-			Chooser);
 	//edge properity
 	EdgeType getEdgeType(PEdge);
 	EdgeType getType(PEdge); // alias poprzedniej
@@ -105,14 +149,9 @@ public:
 	PEdge getEdgePrev(PVertex, PEdge, EdgeDirection=EdAll);
 	//sets
 	Set<PEdge> getEdgeSet(PVertex, EdgeDirection=EdAll);
-	template<class Chooser> Set<PEdge> getEdgeSet(PVertex,
-			EdgeDirection, Chooser);
 	template<class OutputIterator>
 			int getEdges(OutputIterator, PVertex,
 			EdgeDirection=EdAll);
-	template<class OutputIterator, class Chooser>
-			int getEdges(OutputIterator, PVertex,
-			EdgeDirection, Chooser);
 	//other
 	int getEdgeNo(PVertex, EdgeDirection=EdAll);
 	//------------------edge between vertices-------------------------
@@ -127,38 +166,23 @@ public:
 			PEdge, EdgeDirection=EdAll);
 	//sets
 	Set<PEdge> getEdgeSet(PVertex, PVertex, EdgeDirection=EdAll);
-	template<class Chooser> Set<PEdge> getEdgeSet(PVertex, PVertex,
-			EdgeDirection, Chooser);
 	template<class OutputIterator>
 			int getEdges(OutputIterator, PVertex, PVertex,
 			EdgeDirection=EdAll);
-	template<class OutputIterator, class Chooser>
-			int getEdges(OutputIterator, PVertex, PVertex,
-			EdgeDirection, Chooser);
 	//other
 	int getEdgeNo(PVertex, PVertex,
 			EdgeDirection=EdAll);
 	//------------neighbourhood-----------------------------------
 	Set<PVertex> getNeighSet(PVertex, EdgeDirection=EdAll);
-	template<class Chooser> Set<PVertex> getNeighSet(PVertex,
-			EdgeDirection, Chooser);
 	template<class OutputIterator>
 			int getNeigh(OutputIterator, PVertex,
 			EdgeDirection=EdAll);
-	template<class OutputIterator, class Chooser>
-			int getNeigh(OutputIterator, PVertex,
-			EdgeDirection, Chooser);
 	int getNeighNo(PVertex, EdgeDirection=EdAll);
 
 	Set<PVertex> getClNeighSet(PVertex, EdgeDirection=EdAll);
-	template<class Chooser> Set<PVertex> getClNeighSet(PVertex,
-			EdgeDirection, Chooser);
 	template<class OutputIterator>
 			int getClNeigh(OutputIterator, PVertex,
 			EdgeDirection=EdAll);
-	template<class OutputIterator, class Chooser>
-			int getClNeigh(OutputIterator, PVertex,
-			EdgeDirection, Chooser);
 	int getClNeighNo(PVertex, EdgeDirection=EdAll);
 	//-------------------vertices from edge---------------------------
 	std::pair<PVertex,PVertex> getEdgeEnds(PEdge);
@@ -248,26 +272,26 @@ public:
 		@arg Graph from which vertices and edges are copied.
 		@arg Function object which take vertex and edge pointer and return copy information.
 	*/
-	template<class VertInfoExt,class EdgeInfoExt>
-		PVertex copy(Graph<VertInfoExt,EdgeInfoExt> &);
-	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser>
-		PVertex copy(Graph<VertInfoExt,EdgeInfoExt> &, std::pair<VChooser,EChooser>);
-	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser,class VCaster, class ECaster>
-		PVertex copy(Graph<VertInfoExt,EdgeInfoExt> &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>);
-	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser,class VCaster, class ECaster, class VLinker, class ELinker>
-		PVertex copy(Graph<VertInfoExt,EdgeInfoExt> &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>, std::pair<VLinker,ELinker>);
+	template<class ExtGraph>
+		PVertex copy(const ExtGraph &);
+	template<class ExtGraph,class VChooser, class EChooser>
+		PVertex copy(const ExtGraph &, std::pair<VChooser,EChooser>);
+	template<class ExtGraph,class VChooser, class EChooser,class VCaster, class ECaster>
+		PVertex copy(const ExtGraph &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>);
+	template<class ExtGraph,class VChooser, class EChooser,class VCaster, class ECaster, class VLinker, class ELinker>
+		PVertex copy(ExtGraph &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>, std::pair<VLinker,ELinker>);
 
-	template<class VertInfoExt,class EdgeInfoExt>
-		PVertex substitute(PVertex,Graph<VertInfoExt,EdgeInfoExt> &);
-	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser>
-		PVertex substitute(PVertex,Graph<VertInfoExt,EdgeInfoExt> &, std::pair<VChooser,EChooser>);
-	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser,class VCaster, class ECaster>
-		PVertex substitute(PVertex,Graph<VertInfoExt,EdgeInfoExt> &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>);
-	template<class VertInfoExt,class EdgeInfoExt,class VChooser, class EChooser,class VCaster, class ECaster, class VLinker, class ELinker>
-		PVertex substitute(PVertex,Graph<VertInfoExt,EdgeInfoExt> &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>, std::pair<VLinker,ELinker>);
+	template<class ExtGraph>
+		PVertex substitute(PVertex, ExtGraph &);
+	template<class ExtGraph,class VChooser, class EChooser>
+		PVertex substitute(PVertex, ExtGraph &, std::pair<VChooser,EChooser>);
+	template<class ExtGraph,class VChooser, class EChooser,class VCaster, class ECaster>
+		PVertex substitute(PVertex,ExtGraph &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>);
+	template<class ExtGraph,class VChooser, class EChooser,class VCaster, class ECaster, class VLinker, class ELinker>
+		PVertex substitute(PVertex,ExtGraph &, std::pair<VChooser,EChooser>, std::pair<VCaster,ECaster>, std::pair<VLinker,ELinker>);
 
-    Graph<VertInfo,EdgeInfo>& operator=(Graph<VertInfo,EdgeInfo>&);
-    Graph<VertInfo,EdgeInfo>& operator+=(Graph<VertInfo,EdgeInfo>&);
+    Graph<VertInfo,EdgeInfo>& operator=(const Graph<VertInfo,EdgeInfo>&);
+    Graph<VertInfo,EdgeInfo>& operator+=(const Graph<VertInfo,EdgeInfo>&);
 
     //----------Adjacency matrix--------
 
@@ -278,6 +302,8 @@ public:
 
 	//----------TEST METHODS------------
 	bool testGraph(); //may throw an exception
+
+private:
 
     struct Parals {
             typename Koala::Edge<VertInfo,EdgeInfo> *first, *last;
@@ -296,8 +322,6 @@ public:
         void add(PEdge edge);
 
 	};
-
-private:
 
 	PVertex first_vert, last_vert;
 	PEdge first_edge, last_edge;
@@ -328,5 +352,6 @@ namespace Koala {
 //#include "graph_iterator.hpp"
 // getters
 //#include "graph_get.hpp"
+
 }
 #endif

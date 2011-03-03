@@ -31,6 +31,11 @@ public:
 //	KoalaPEdge& edge_ptr();
 	EdgeInfo info; ///< Additional user information in the edge.
     AssocKeyContReg assocReg;
+    std::pair<Vertex<VertInfo,EdgeInfo>*, Vertex<VertInfo,EdgeInfo>*>
+        getEnds() { return std::make_pair(vert[0].vert, vert[1].vert); }
+    EdgeType getType() { return type; }
+    EdgeInfo getInfo() { return info; }
+    void setInfo(const EdgeInfo& info) { this->info=info; }
 private:
 	struct EdgeLink {
 		Vertex<VertInfo,EdgeInfo> *vert;

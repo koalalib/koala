@@ -1,14 +1,15 @@
+
 // Koala_Graph constructor and destructor
 template<class VertInfo, class EdgeInfo>
 Graph<VertInfo,EdgeInfo>::Graph(): first_vert(NULL), last_vert(NULL),
 		first_edge(NULL), last_edge(NULL),
-		no_vert(0), no_loop_edge(0), no_dir_edge(0), no_undir_edge(0), pAdj(NULL) {}
+		no_vert(0), no_loop_edge(0), no_dir_edge(0), no_undir_edge(0), pAdj(NULL), SubgraphBase() {}
 
 template<class VertInfo, class EdgeInfo>
-Graph<VertInfo,EdgeInfo>::Graph(Graph &graph)
+Graph<VertInfo,EdgeInfo>::Graph(const Graph<VertInfo,EdgeInfo> &graph)
 	:first_vert(NULL), last_vert(NULL),
 	first_edge(NULL), last_edge(NULL),
-	no_vert(0), no_loop_edge(0), no_dir_edge(0), no_undir_edge(0), pAdj(NULL)
+	no_vert(0), no_loop_edge(0), no_dir_edge(0), no_undir_edge(0), pAdj(NULL), SubgraphBase()
 {
 	this->copy(graph);
 }
@@ -108,20 +109,6 @@ Graph<VertInfo,EdgeInfo>::getVertSet() {
 	return ans;
 }
 
-template<class VertInfo, class EdgeInfo>
-template<class Chooser>
-Set<typename Graph<VertInfo,EdgeInfo>::PVertex >
-Graph<VertInfo,EdgeInfo>::getVertSet(Chooser chooser) {
-	Set< typename Graph<VertInfo,EdgeInfo>::PVertex > ans;
-	PVertex vert = this->first_vert;
-	while(vert) {
-		if( chooser(vert,*this) ) {
-			ans.add(vert);
-		}
-		vert = vert->next;
-	}
-	return ans;
-}
 
 template<class VertInfo, class EdgeInfo>
 template<class OutputIterator>
@@ -139,25 +126,6 @@ Graph<VertInfo,EdgeInfo>::getVerts(OutputIterator out)
 	return ans;
 }
 
-template<class VertInfo, class EdgeInfo>
-template<class OutputIterator, class Chooser>
-int
-Graph<VertInfo,EdgeInfo>::getVerts(OutputIterator out,
-		Chooser chooser)
-{
-	int ans = 0;
-	PVertex vert = this->first_vert;
-	while(vert) {
-		if( chooser(vert,*this) ) {
-			*out = vert;
-			++out;
-			++ans;
-		}
-		vert = vert->next;
-	}
-	return ans;
-}
-
 //other
 template<class VertInfo, class EdgeInfo>
 int
@@ -169,14 +137,14 @@ template<class VertInfo, class EdgeInfo>
 typename Graph<VertInfo,EdgeInfo>::VertInfoType
 Graph<VertInfo,EdgeInfo>::getVertInfo(PVertex vert)
 {
-    return vert->info;
+    return vert->getInfo();
 }
 
 template<class VertInfo, class EdgeInfo>
 void
 Graph<VertInfo,EdgeInfo>::setVertInfo(PVertex vert,const VertInfo& info)
 {
-    vert->info=info;
+    vert->setInfo(info);
 }
 
 //-----------------edges----------------------
@@ -258,14 +226,14 @@ template<class VertInfo, class EdgeInfo>
 typename Graph<VertInfo,EdgeInfo>::EdgeInfoType
 Graph<VertInfo,EdgeInfo>::getEdgeInfo(PEdge edge)
 {
-    return edge->info;
+    return edge->getInfo();
 }
 
 template<class VertInfo, class EdgeInfo>
 void
 Graph<VertInfo,EdgeInfo>::setEdgeInfo(PEdge edge,const EdgeInfo& info)
 {
-    edge->info=info;
+    edge->setInfo(info);
 }
 
 template<class VertInfo, class EdgeInfo>
@@ -330,13 +298,13 @@ Graph<VertInfo,EdgeInfo>::getEdgePrev(PEdge edge,
 template<class VertInfo, class EdgeInfo>
 EdgeType
 Graph<VertInfo,EdgeInfo>::getEdgeType(PEdge edge) {
-	return edge->type;
+	return edge->getType();
 }
 
 template<class VertInfo, class EdgeInfo>
 EdgeType
 Graph<VertInfo,EdgeInfo>::getType(PEdge edge) {
-	return edge->type;
+	return edge->getType();
 }
 
 //sets
@@ -344,20 +312,11 @@ template<class VertInfo, class EdgeInfo>
 Set< typename Graph<VertInfo,EdgeInfo>::PEdge >
 Graph<VertInfo,EdgeInfo>::getEdgeSet(EdgeDirection direct)
 {
-	return getEdgeSet(direct, stdChoose(true));
-}
-
-template<class VertInfo, class EdgeInfo>
-template<class Chooser>
-Set< typename Graph<VertInfo,EdgeInfo>::PEdge >
-Graph<VertInfo,EdgeInfo>::getEdgeSet(
-		EdgeDirection direct, Chooser chooser)
-{
-	Set< typename Graph<VertInfo,EdgeInfo>::PEdge > ans;
+    Set< typename Graph<VertInfo,EdgeInfo>::PEdge > ans;
 	PEdge edge = this->first_edge;
 	while(edge) {
 		if( (edge->type&direct)
-		&& chooser(edge,*this) )
+		&& true )       // tu bylem - chooser
 		{
 			ans.add(edge);
 		}
@@ -366,26 +325,18 @@ Graph<VertInfo,EdgeInfo>::getEdgeSet(
 	return ans;
 }
 
+
 template<class VertInfo, class EdgeInfo>
 template<class OutputIterator>
 int
 Graph<VertInfo,EdgeInfo>::getEdges(OutputIterator out,
 		EdgeDirection direct)
 {
-	return getEdges(out, direct, stdChoose(true));
-}
-
-template<class VertInfo, class EdgeInfo>
-template<class OutputIterator, class Chooser>
-int
-Graph<VertInfo,EdgeInfo>::getEdges(OutputIterator out,
-		EdgeDirection direct, Chooser chooser)
-{
 	int ans = 0;
 	PEdge edge = this->first_edge;
 	while(edge) {
 		if(  (edge->type&direct)
-		&& chooser(edge,*this) )
+		&& true )   // tu bylem - chooser
 		{
 			*out = edge;
 			++out;
@@ -394,7 +345,9 @@ Graph<VertInfo,EdgeInfo>::getEdges(OutputIterator out,
 		edge = edge->next;
 	}
 	return ans;
+
 }
+
 
 //other
 template<class VertInfo, class EdgeInfo>
@@ -493,26 +446,18 @@ Set< typename Graph<VertInfo,EdgeInfo>::PEdge >
 Graph<VertInfo,EdgeInfo>::getEdgeSet(PVertex vert,
 		EdgeDirection direct)
 {
-	return getEdgeSet(vert, direct, stdChoose(true));
-}
-
-//getIncidEdges
-template<class VertInfo, class EdgeInfo>
-template<class Chooser>
-Set< typename Graph<VertInfo,EdgeInfo>::PEdge >
-Graph<VertInfo,EdgeInfo>::getEdgeSet(PVertex vert,
-		EdgeDirection direct, Chooser chooser)
-{
 	Set< typename Graph<VertInfo,EdgeInfo>::PEdge > ans;
 	PEdge edge = this->getEdge(vert, direct);
 	while(edge) {
-		if( chooser(edge,*this) ) {
+		if( true ) {    // tu bylem - chooser
 			ans.add(edge);
 		}
 		edge = this->getEdgeNext(vert, edge, direct);
 	}
 	return ans;
+
 }
+
 
 //getIncidEdges
 template<class VertInfo, class EdgeInfo>
@@ -521,20 +466,10 @@ int
 Graph<VertInfo,EdgeInfo>::getEdges(OutputIterator out,
 		PVertex vert, EdgeDirection direct)
 {
-	return getEdges(out, vert, direct, stdChoose(true));
-}
-
-//getIncidEdges
-template<class VertInfo, class EdgeInfo>
-template<class OutputIterator, class Chooser>
-int
-Graph<VertInfo,EdgeInfo>::getEdges(OutputIterator out,
-		PVertex vert, EdgeDirection direct, Chooser chooser)
-{
 	int ans = 0;
 	PEdge edge = this->getEdge(vert, direct);
 	while(edge) {
-		if( chooser(edge,*this) ) {
+		if( true ) {    // tu bylem - chooser
 			*out = edge;
 			++out;
 			++ans;
@@ -542,7 +477,9 @@ Graph<VertInfo,EdgeInfo>::getEdges(OutputIterator out,
 		edge = this->getEdgeNext(vert, edge, direct);
 	}
 	return ans;
+
 }
+
 
 //other
 //getIncidEdgeNo
@@ -708,26 +645,18 @@ Set< typename Graph<VertInfo,EdgeInfo>::PEdge >
 Graph<VertInfo,EdgeInfo>::getEdgeSet(PVertex vert1, PVertex vert2,
 		EdgeDirection direct)
 {
-	return getEdgeSet(vert1, vert2, direct, stdChoose(true));
-}
-
-//getConnEdges
-template<class VertInfo, class EdgeInfo>
-template<class Chooser>
-Set< typename Graph<VertInfo,EdgeInfo>::PEdge >
-Graph<VertInfo,EdgeInfo>::getEdgeSet(PVertex vert1, PVertex vert2,
-		EdgeDirection direct, Chooser chooser)
-{
 	Set< typename Graph<VertInfo,EdgeInfo>::PEdge > ans;
 	PEdge edge = this->getEdge(vert1, vert2, direct);
 	while(edge) {
-		if( chooser(edge,*this) ) {
+		if( true ) {    // tu bylem - chooser
 			ans.add(edge);
 		}
 		edge = this->getEdgeNext(vert1, vert2, edge, direct);
 	}
 	return ans;
+
 }
+
 
 //getConnEdges
 template<class VertInfo, class EdgeInfo>
@@ -737,21 +666,10 @@ Graph<VertInfo,EdgeInfo>::getEdges(OutputIterator out,
 		PVertex vert1, PVertex vert2,
 		EdgeDirection direct)
 {
-	return getEdges(out, vert1, vert2, direct, stdChoose(true));
-}
-
-//getConnEdges
-template<class VertInfo, class EdgeInfo>
-template<class OutputIterator, class Chooser>
-int
-Graph<VertInfo,EdgeInfo>::getEdges(OutputIterator out,
-		PVertex vert1, PVertex vert2,
-		EdgeDirection direct, Chooser chooser)
-{
 	int ans = 0;
 	PEdge edge = this->getEdge(vert1, vert2, direct);
 	while(edge) {
-		if( chooser(edge,*this) ) {
+		if( true ) {    // tu bylem - chooser
 			*out = edge;
 			++out;
 			++ans;
@@ -759,7 +677,9 @@ Graph<VertInfo,EdgeInfo>::getEdges(OutputIterator out,
 		edge = this->getEdgeNext(vert1, vert2, edge, direct);
 	}
 	return ans;
+
 }
+
 
 //other
 //getConnEdgeNo
@@ -794,19 +714,10 @@ Set<typename Graph<VertInfo,EdgeInfo>::PVertex>
 Graph<VertInfo,EdgeInfo>::getNeighSet(PVertex vert,
 		EdgeDirection direct)
 {
-	return getNeighSet(vert, direct, stdChoose(true));
-}
-
-template<class VertInfo, class EdgeInfo>
-template<class Chooser>
-Set<typename Graph<VertInfo,EdgeInfo>::PVertex>
-Graph<VertInfo,EdgeInfo>::getNeighSet(PVertex vert,
-		EdgeDirection direct, Chooser choose)
-{
 	Set<PVertex> ans;
 	PEdge edge = getEdge(vert, direct);
 	while(edge) {
-		if( choose(edge,*this) ) {
+		if( true ) {    // tu bylem - chooser
 			ans.add( getEdgeEnd(edge,vert) );
 		}
 		edge = getEdgeNext(vert, edge, direct);
@@ -814,52 +725,6 @@ Graph<VertInfo,EdgeInfo>::getNeighSet(PVertex vert,
 	return ans;
 }
 
-template<class VertInfo, class EdgeInfo>
-template<class OutputIterator, class Chooser>
-int
-Graph<VertInfo,EdgeInfo>::getNeigh(OutputIterator out, PVertex vert,
-		EdgeDirection direct, Chooser choose)
-{   typename Graph<VertInfo,EdgeInfo>::PVertex ans[getEdgeNo(vert, direct)];
-    int size=0,res=0;
-	PEdge edge = getEdge(vert, direct);
-	while(edge) {
-		if( choose(edge,*this) ) {
-			ans[size++]=getEdgeEnd(edge,vert);
-		}
-		edge = getEdgeNext(vert, edge, direct);
-	}
-	make_heap(ans,ans+size); sort_heap(ans,ans+size);
-	for(int i=0;i<size;i++) if (i==0 || ans[i-1]!=ans[i])
-	{
-	    *out=ans[i];
-	    ++out; ++res;
-	}
-	return res;
-}
-
-template<class VertInfo, class EdgeInfo>
-template<class OutputIterator, class Chooser>
-int
-Graph<VertInfo,EdgeInfo>::getClNeigh(OutputIterator out, PVertex vert,
-		EdgeDirection direct, Chooser choose)
-{   typename Graph<VertInfo,EdgeInfo>::PVertex ans[getEdgeNo(vert, direct)+1];
-    ans[0]=vert;
-    int size=1,res=0;
-	PEdge edge = getEdge(vert, direct);
-	while(edge) {
-		if( choose(edge,*this) ) {
-			ans[size++]=getEdgeEnd(edge,vert);
-		}
-		edge = getEdgeNext(vert, edge, direct);
-	}
-	make_heap(ans,ans+size); sort_heap(ans,ans+size);
-	for(int i=0;i<size;i++) if (i==0 || ans[i-1]!=ans[i])
-	{
-	    *out=ans[i];
-	    ++out; ++res;
-	}
-	return res;
-}
 
 template<class VertInfo, class EdgeInfo>
 template<class OutputIterator>
@@ -867,7 +732,22 @@ int
 Graph<VertInfo,EdgeInfo>::getNeigh(OutputIterator out, PVertex vert,
 		EdgeDirection direct)
 {
-	return getNeigh(out, vert, direct, stdChoose(true));
+    typename Graph<VertInfo,EdgeInfo>::PVertex LOCALARRAY(ans,getEdgeNo(vert, direct));
+    int size=0,res=0;
+	PEdge edge = getEdge(vert, direct);
+	while(edge) {
+		if( true ) {    // tu bylem - chooser
+			ans[size++]=getEdgeEnd(edge,vert);
+		}
+		edge = getEdgeNext(vert, edge, direct);
+	}
+	std::make_heap(ans,ans+size); std::sort_heap(ans,ans+size);
+	for(int i=0;i<size;i++) if (i==0 || ans[i-1]!=ans[i])
+	{
+	    *out=ans[i];
+	    ++out; ++res;
+	}
+	return res;
 }
 
 
@@ -876,7 +756,7 @@ int
 Graph<VertInfo,EdgeInfo>::getNeighNo(PVertex vert,
 		EdgeDirection direct)
 {
-	return getNeigh(blackHole(),vert,direct,stdChoose(true));
+	return getNeigh(blackHole(),vert,direct);
 }
 
 template<class VertInfo, class EdgeInfo>
@@ -884,19 +764,12 @@ Set<typename Graph<VertInfo,EdgeInfo>::PVertex>
 Graph<VertInfo,EdgeInfo>::getClNeighSet(PVertex vert,
 		EdgeDirection direct)
 {
-	return getClNeighSet(vert, direct, stdChoose(true));
-}
-
-template<class VertInfo, class EdgeInfo>
-template<class Chooser>
-Set<typename Graph<VertInfo,EdgeInfo>::PVertex>
-Graph<VertInfo,EdgeInfo>::getClNeighSet(PVertex vert,
-		EdgeDirection direct, Chooser choose)
-{
-	Set<PVertex> ans = getNeighSet(vert, direct, choose);
+	Set<PVertex> ans = getNeighSet(vert, direct);
 	ans.add((PVertex)vert);
 	return ans;
+
 }
+
 
 template<class VertInfo, class EdgeInfo>
 template<class OutputIterator>
@@ -904,7 +777,23 @@ int
 Graph<VertInfo,EdgeInfo>::getClNeigh(OutputIterator out, PVertex vert,
 		EdgeDirection direct)
 {
-	return getClNeigh(out, vert, direct, stdChoose(true));
+  typename Graph<VertInfo,EdgeInfo>::PVertex LOCALARRAY(ans,getEdgeNo(vert, direct)+1);
+    ans[0]=vert;
+    int size=1,res=0;
+	PEdge edge = getEdge(vert, direct);
+	while(edge) {
+		if( true ) {    // tu bylem - chooser
+			ans[size++]=getEdgeEnd(edge,vert);
+		}
+		edge = getEdgeNext(vert, edge, direct);
+	}
+	std::make_heap(ans,ans+size); std::sort_heap(ans,ans+size);
+	for(int i=0;i<size;i++) if (i==0 || ans[i-1]!=ans[i])
+	{
+	    *out=ans[i];
+	    ++out; ++res;
+	}
+	return res;
 }
 
 template<class VertInfo, class EdgeInfo>
@@ -912,20 +801,20 @@ int
 Graph<VertInfo,EdgeInfo>::getClNeighNo(PVertex vert,
 		EdgeDirection direct)
 {
-	return getClNeigh(blackHole(),vert,direct,stdChoose(true));
+	return getClNeigh(blackHole(),vert,direct);
 }
 
 //-------------------vertices from edge---------------------------
 template<class VertInfo, class EdgeInfo>
 std::pair<typename Graph<VertInfo,EdgeInfo>::PVertex,typename Graph<VertInfo,EdgeInfo>::PVertex>
 Graph<VertInfo,EdgeInfo>::getEdgeEnds(PEdge edge) {
-	return std::make_pair(edge->vert[0].vert, edge->vert[1].vert);
+	return edge->getEnds();
 }
 
 template<class VertInfo, class EdgeInfo>
 std::pair<typename Graph<VertInfo,EdgeInfo>::PVertex,typename Graph<VertInfo,EdgeInfo>::PVertex>
 Graph<VertInfo,EdgeInfo>::getEnds(PEdge edge) {
-	return this->getEdgeEnds(edge);
+	return edge->getEnds();
 }
 
 template<class VertInfo, class EdgeInfo>
@@ -1114,14 +1003,14 @@ template<class VertInfo, class EdgeInfo>
 int
 Graph<VertInfo,EdgeInfo>::Delta(EdgeDirection direct)
 {
-    return max(0,maxDeg(direct).second);
+    return std::max(0,maxDeg(direct).second);
 }
 
 template<class VertInfo, class EdgeInfo>
 int
 Graph<VertInfo,EdgeInfo>::delta(EdgeDirection direct)
 {
-    return max(0,minDeg(direct).second);
+    return std::max(0,minDeg(direct).second);
 }
 
 //-------------------group modifications----------------------------
@@ -1137,10 +1026,10 @@ template <class Iterator>
 int Graph<VertInfo,EdgeInfo>::delVerts(Iterator begin,Iterator end)
 {   int size=0;
     for(Iterator iter=begin;iter!=end;iter++) size++;
-    typename Graph<VertInfo,EdgeInfo>::PVertex buf[size];
+    typename Graph<VertInfo,EdgeInfo>::PVertex LOCALARRAY(buf,size);
     size=0;
     for(Iterator iter=begin;iter!=end;iter++) buf[size++]=*iter;
-    make_heap(buf,buf+size); sort_heap(buf,buf+size);size=unique(buf,buf+size)-buf;
+    std::make_heap(buf,buf+size); std::sort_heap(buf,buf+size);size=std::unique(buf,buf+size)-buf;
     return delVerts2(buf,buf+size);
 }
 
@@ -1203,10 +1092,10 @@ template <class Iterator>
 int Graph<VertInfo,EdgeInfo>::delEdges(Iterator begin,Iterator end,EdgeDirection direct)
 {   int size=0;
     for(Iterator iter=begin;iter!=end;iter++) size++;
-    typename Graph<VertInfo,EdgeInfo>::PEdge buf[size];
+    typename Graph<VertInfo,EdgeInfo>::PEdge LOCALARRAY(buf,size);
     size=0;
     for(Iterator iter=begin;iter!=end;iter++) buf[size++]=*iter;
-    make_heap(buf,buf+size); sort_heap(buf,buf+size);size=unique(buf,buf+size)-buf;
+    std::make_heap(buf,buf+size); std::sort_heap(buf,buf+size);size=std::unique(buf,buf+size)-buf;
     return delEdges2(buf,buf+size,direct);
 }
 
@@ -1231,10 +1120,10 @@ template <class Iterator>
 int Graph<VertInfo,EdgeInfo>::delEdges(PVertex vert,Iterator begin,Iterator end,EdgeDirection direct)
 {   int size=0;
     for(Iterator iter=begin;iter!=end;iter++) size++;
-    typename Graph<VertInfo,EdgeInfo>::PEdge buf[size];
+    typename Graph<VertInfo,EdgeInfo>::PEdge LOCALARRAY(buf,size);
     size=0;
     for(Iterator iter=begin;iter!=end;iter++) buf[size++]=*iter;
-    make_heap(buf,buf+size); sort_heap(buf,buf+size);size=unique(buf,buf+size)-buf;
+    std::make_heap(buf,buf+size); std::sort_heap(buf,buf+size);size=std::unique(buf,buf+size)-buf;
     return delEdges2(vert,buf,buf+size);
 }
 
@@ -1268,10 +1157,10 @@ int
 Graph<VertInfo,EdgeInfo>::delEdges(PVertex vert1,PVertex vert2,Iterator begin,Iterator end,EdgeDirection direct)
 {   int size=0;
     for(Iterator iter=begin;iter!=end;iter++) size++;
-    typename Graph<VertInfo,EdgeInfo>::PEdge buf[size];
+    typename Graph<VertInfo,EdgeInfo>::PEdge LOCALARRAY(buf,size);
     size=0;
     for(Iterator iter=begin;iter!=end;iter++) buf[size++]=*iter;
-    make_heap(buf,buf+size); sort_heap(buf,buf+size);size=unique(buf,buf+size)-buf;
+    std::make_heap(buf,buf+size); std::sort_heap(buf,buf+size);size=std::unique(buf,buf+size)-buf;
     return delEdges2(vert1,vert2,buf,buf+size,direct);
 }
 
@@ -1393,7 +1282,7 @@ typename Graph<VertInfo,EdgeInfo>::PEdge
 Graph<VertInfo,EdgeInfo>::pickVert(PVertex vert,const EdgeInfo & info)
 {   if (!vert) return 0;
     int no;
-    typename Graph<VertInfo,EdgeInfo>::PVertex neig[getEdgeNo(vert,EdDirIn|EdDirOut|EdUndir)];
+    typename Graph<VertInfo,EdgeInfo>::PVertex LOCALARRAY(neig,getEdgeNo(vert,EdDirIn|EdDirOut|EdUndir));
     no=getNeigh(neig,vert,EdDirIn|EdDirOut|EdUndir);
     if (!(no==0 || no==1 || no==2)) return 0;
     if (no==0) { del(vert); return 0; }
@@ -1427,10 +1316,10 @@ typename Graph<VertInfo,EdgeInfo>::PVertex
 Graph<VertInfo,EdgeInfo>::glue(Iterator begin,Iterator end,bool makeloops,PVertex res)
 {   int size=0;
     for(Iterator iter=begin;iter!=end;iter++) size++;
-    typename Graph<VertInfo,EdgeInfo>::PVertex buf[size];
+    typename Graph<VertInfo,EdgeInfo>::PVertex LOCALARRAY(buf,size);
     size=0;
     for(Iterator iter=begin;iter!=end;iter++) buf[size++]=*iter;
-    make_heap(buf,buf+size); sort_heap(buf,buf+size);size=unique(buf,buf+size)-buf;
+    std::make_heap(buf,buf+size); std::sort_heap(buf,buf+size);size=std::unique(buf,buf+size)-buf;
     return glue2(buf,buf+size,makeloops,res);
 }
 
@@ -1569,38 +1458,38 @@ Graph<VertInfo,EdgeInfo>::move(Graph<VertInfo,EdgeInfo> &graph) {
 
 
 template<class VertInfo, class EdgeInfo>
-template<class VertInfoExt, class EdgeInfoExt>
+template<class ExtGraph>
 typename Graph<VertInfo,EdgeInfo>::PVertex
-Graph<VertInfo,EdgeInfo>::copy(Graph<VertInfoExt,EdgeInfoExt> &graph)
-{
+Graph<VertInfo,EdgeInfo>::copy(const ExtGraph &agraph)
+{   ExtGraph& graph=const_cast<ExtGraph&>(agraph);
 	return copy(graph, std::make_pair(stdChoose(true),stdChoose(true)),
              std::make_pair(stdCast(false),stdCast(false)),
              std::make_pair(stdLink(false,false),stdLink(false,false)));
 }
 
 template<class VertInfo, class EdgeInfo>
-template<class VertInfoExt, class EdgeInfoExt, class VChooser, class EChooser>
+template<class ExtGraph, class VChooser, class EChooser>
 typename Graph<VertInfo,EdgeInfo>::PVertex
-Graph<VertInfo,EdgeInfo>::copy(Graph<VertInfoExt,EdgeInfoExt> &graph,
+Graph<VertInfo,EdgeInfo>::copy(const ExtGraph &agraph,
 		std::pair<VChooser,EChooser> choosers)
-{
+{   ExtGraph& graph=const_cast<ExtGraph&>(agraph);
 	return copy(graph, choosers, std::make_pair(stdCast(false),stdCast(false)),
              std::make_pair(stdLink(false,false),stdLink(false,false)));
 }
 
 template<class VertInfo, class EdgeInfo>
-template<class VertInfoExt, class EdgeInfoExt, class VChooser, class EChooser, class VCaster, class ECaster>
+template<class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster>
 typename Graph<VertInfo,EdgeInfo>::PVertex
-Graph<VertInfo,EdgeInfo>::copy(Graph<VertInfoExt,EdgeInfoExt> &graph,
+Graph<VertInfo,EdgeInfo>::copy(const ExtGraph &agraph,
 		std::pair<VChooser,EChooser> choosers, std::pair<VCaster,ECaster> casters)
-{
+{   ExtGraph& graph=const_cast<ExtGraph&>(agraph);
 	return copy(graph, choosers, casters, std::make_pair(stdLink(false,false),stdLink(false,false)));
 }
 
 template<class VertInfo, class EdgeInfo>
-template<class VertInfoExt, class EdgeInfoExt, class VChooser, class EChooser, class VCaster, class ECaster, class VLinker, class ELinker>
+template<class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster, class VLinker, class ELinker>
 typename Graph<VertInfo,EdgeInfo>::PVertex
-Graph<VertInfo,EdgeInfo>::copy(Graph<VertInfoExt,EdgeInfoExt> &graph,
+Graph<VertInfo,EdgeInfo>::copy(ExtGraph &graph,
 		std::pair<VChooser,EChooser> choosers, std::pair<VCaster,ECaster> casters,
 		std::pair<VLinker,ELinker> linkers)
 {
@@ -1612,15 +1501,15 @@ Graph<VertInfo,EdgeInfo>::copy(Graph<VertInfoExt,EdgeInfoExt> &graph,
         return this->move(gr);
 	}
 
-	typedef typename Graph<VertInfoExt,EdgeInfoExt>::PVertex NPVertex;
-	typedef typename Graph<VertInfoExt,EdgeInfoExt>::PEdge NPEdge;
+	typedef typename ExtGraph::PVertex NPVertex;
+	typedef typename ExtGraph::PEdge NPEdge;
 	//create new vertices
 	AssocArray<NPVertex,PVertex> ptr(graph.getVertNo());
 	NPVertex vert = graph.getVert();
 	VertInfo vertI;
 	while(vert) {
 		if( choosers.first(vert,graph) ) {
-		    casters.first(vertI,vert->info);
+		    casters.first(vertI,graph.getVertInfo(vert));
 			ptr[vert]=addVert( vertI );
 //			vert->ptrVert() = tmp_vert;
 			linkers.first(ptr[vert],vert);
@@ -1639,7 +1528,7 @@ Graph<VertInfo,EdgeInfo>::copy(Graph<VertInfoExt,EdgeInfoExt> &graph,
 		if(ptr[verts.first]
 		&& ptr[verts.second]
 		&& choosers.second(edge,graph)
-		) { casters.second(edgeI,edge->info);
+		) { casters.second(edgeI,graph.getEdgeInfo(edge));
 			PEdge tmp_edge = this->addEdge(ptr[verts.first],
 					ptr[verts.second], edgeI, graph.getEdgeType(edge) );
 			linkers.second(tmp_edge,edge);
@@ -1653,9 +1542,9 @@ Graph<VertInfo,EdgeInfo>::copy(Graph<VertInfoExt,EdgeInfoExt> &graph,
 
 
 template<class VertInfo, class EdgeInfo>
-template<class VertInfoExt, class EdgeInfoExt>
+template<class ExtGraph>
 typename Graph<VertInfo,EdgeInfo>::PVertex
-Graph<VertInfo,EdgeInfo>::substitute(PVertex vert,Graph<VertInfoExt,EdgeInfoExt> &graph)
+Graph<VertInfo,EdgeInfo>::substitute(PVertex vert,ExtGraph &graph)
 {
 	return substitute(vert,graph, std::make_pair(stdChoose(true),stdChoose(true)),
              std::make_pair(stdCast(false),stdCast(false)),
@@ -1663,9 +1552,9 @@ Graph<VertInfo,EdgeInfo>::substitute(PVertex vert,Graph<VertInfoExt,EdgeInfoExt>
 }
 
 template<class VertInfo, class EdgeInfo>
-template<class VertInfoExt, class EdgeInfoExt, class VChooser, class EChooser>
+template<class ExtGraph, class VChooser, class EChooser>
 typename Graph<VertInfo,EdgeInfo>::PVertex
-Graph<VertInfo,EdgeInfo>::substitute(PVertex vert, Graph<VertInfoExt,EdgeInfoExt> &graph,
+Graph<VertInfo,EdgeInfo>::substitute(PVertex vert,ExtGraph &graph,
 		std::pair<VChooser,EChooser> choosers)
 {
 	return substitute(vert,graph, choosers, std::make_pair(stdCast(false),stdCast(false)),
@@ -1673,18 +1562,18 @@ Graph<VertInfo,EdgeInfo>::substitute(PVertex vert, Graph<VertInfoExt,EdgeInfoExt
 }
 
 template<class VertInfo, class EdgeInfo>
-template<class VertInfoExt, class EdgeInfoExt, class VChooser, class EChooser, class VCaster, class ECaster>
+template<class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster>
 typename Graph<VertInfo,EdgeInfo>::PVertex
-Graph<VertInfo,EdgeInfo>::substitute(PVertex vert,Graph<VertInfoExt,EdgeInfoExt> &graph,
+Graph<VertInfo,EdgeInfo>::substitute(PVertex vert,ExtGraph &graph,
 		std::pair<VChooser,EChooser> choosers, std::pair<VCaster,ECaster> casters)
 {
 	return substitute(vert,graph, choosers, casters, std::make_pair(stdLink(false,false),stdLink(false,false)));
 }
 
 template<class VertInfo, class EdgeInfo>
-template<class VertInfoExt, class EdgeInfoExt, class VChooser, class EChooser, class VCaster, class ECaster, class VLinker, class ELinker>
+template<class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster, class VLinker, class ELinker>
 typename Graph<VertInfo,EdgeInfo>::PVertex
-Graph<VertInfo,EdgeInfo>::substitute(typename Graph<VertInfo,EdgeInfo>::PVertex vert,Graph<VertInfoExt,EdgeInfoExt> &graph,
+Graph<VertInfo,EdgeInfo>::substitute(typename Graph<VertInfo,EdgeInfo>::PVertex vert,ExtGraph &graph,
 		std::pair<VChooser,EChooser> choosers, std::pair<VCaster,ECaster> casters,
 		std::pair<VLinker,ELinker> linkers)
 {   if (!vert || (void*)this==(void*)&graph) return 0; // TODO: throw
@@ -1703,7 +1592,7 @@ Graph<VertInfo,EdgeInfo>::substitute(typename Graph<VertInfo,EdgeInfo>::PVertex 
 
 template<class VertInfo, class EdgeInfo>
 Graph<VertInfo,EdgeInfo>&
-Graph<VertInfo,EdgeInfo>::operator=(Graph<VertInfo,EdgeInfo>& gr)
+Graph<VertInfo,EdgeInfo>::operator=(const Graph<VertInfo,EdgeInfo>& gr)
 {   if (&gr==this) return *this;
     clear(); copy(gr);
     return *this;
@@ -1712,7 +1601,7 @@ Graph<VertInfo,EdgeInfo>::operator=(Graph<VertInfo,EdgeInfo>& gr)
 
 template<class VertInfo, class EdgeInfo>
 Graph<VertInfo,EdgeInfo>&
-Graph<VertInfo,EdgeInfo>::operator+=(Graph<VertInfo,EdgeInfo>& gr)
+Graph<VertInfo,EdgeInfo>::operator+=(const Graph<VertInfo,EdgeInfo>& gr)
 {   copy(gr);
     return *this;
 }

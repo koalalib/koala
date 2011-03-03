@@ -202,7 +202,8 @@ bool readGraphText(Graph &g, std::istream &strm, RG_Format format,
  * @return true on success, false otherwise
  */
 template<class Graph>
-bool writeGraphVL(Graph &g, std::ostream &out, bool directed) {
+bool writeGraphVL(const Graph &ag, std::ostream &out, bool directed) {
+    Graph& g=const_cast<Graph&>(ag);
 	unsigned int i;
 	EdgeDirection flags;
 	typename Graph::PEdge e;
@@ -256,7 +257,8 @@ bool writeGraphVL(Graph &g, std::ostream &out, bool directed) {
  * @return true on success, false otherwise
  */
 template<class Graph>
-bool writeGraphEL(Graph &g, std::ostream &out, bool directed) {
+bool writeGraphEL(const Graph &ag, std::ostream &out, bool directed) {
+    Graph& g=const_cast<Graph&>(ag);
 	unsigned int idx;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u;
@@ -292,7 +294,7 @@ bool writeGraphEL(Graph &g, std::ostream &out, bool directed) {
  * @return true on success, false otherwise
  */
 template<class Graph>
-bool writeGraphText(Graph &g, std::ostream &out, RG_Format format) {
+bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format) {
 	switch(format) {
 		case RG_DirectedVertexLists:	return writeGraphVL(g, out, true);
 		case RG_UndirectedVertexLists:	return writeGraphVL(g, out, false);

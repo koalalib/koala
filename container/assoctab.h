@@ -678,7 +678,7 @@ class AssocMatrix : public AssocMatrixAddr<aType> {
 
     bool delInd(Klucz v)
     {   if (!hasInd(v)) return false;
-        Klucz tab[index.size()];
+        Klucz tab[index.size()];       // TODO: localarray
         int i=0;
         for(Klucz x=index.firstKey();x;x=index.nextKey(x)) tab[i++]=x;
         for (i--;i>=0;i--)

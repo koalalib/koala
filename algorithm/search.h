@@ -111,7 +111,7 @@ class SearchStructs {
                 if (v) { *state->vit=v; ++state->vit; }
                 if (rec.component!=state->comp)
                 {
-                    *state->cit=state->vpos-state->startpos; ++state->cit;
+                    *state->cit=state->vpos; ++state->cit;
                     state->comp++;state->startpos=state->vpos;
                 }
                 return true;
@@ -349,6 +349,7 @@ class GraphSearchBase : public ShorPathStructs, public SearchStructs {
             BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type >
                 ::get(avtab,localtab);
 
+        *iters.compIter=0;++iters.compIter;
         if (g.getVertNo()==0)
         {
             for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) vtab.delKey(v);

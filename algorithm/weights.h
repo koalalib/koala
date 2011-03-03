@@ -55,6 +55,8 @@ class Dijkstra : public ShorPathStructs {
         DType distance;
         typename GraphType::PVertex vPrev;
         typename GraphType::PEdge  ePrev;
+
+        VertLabs() : vPrev(0), ePrev(0), distance(NumberTypeBounds<DType>::plusInfty()) {}
     };
 
     // wlasciwa procedura: odleglosc miedzy para wierzcholkow
@@ -68,47 +70,36 @@ class Dijkstra : public ShorPathStructs {
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {   assert(start);
         typename DefaultStructs::AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab, Q;
         typename BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type & vertTab=
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
+                    vertTab=
                 BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
 
+        typename GraphType::PVertex U,V;
 
-        int n=g.getVertNo();
-        // w ramach swiatecznego pojednania postanowilem zaprzyjaznic sie z pamiecia dynamiczna,
-        // uzywanie tylko stosu byloby mordega, ale zakladam, ze na poczatku alokujemy w kontenerach
-        // raz i tyle, by pozniejsze realokacje byly zbedne.
-        // typename DefaultStructs::ArrayCont<typename GraphType::PVertex>::Type Q(n); - ale jednak tu zbedne :-)
-        // dla prostych tablic wystarczy stos
-        typename GraphType::PVertex LOCALARRAY(Q,n);
-        typename GraphType::PVertex U=g.getVert(),V;
+        for(U=g.getVert();U;U=g.getVertNext(U)) vertTab.delKey(U);
 
-        for(int i=0;U;U=g.getVertNext(U))
-        {   Q[i++]=U; vertTab[U].distance=
-                    NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
-            vertTab[U].vPrev=0;vertTab[U].ePrev=0;
-        }
-        vertTab[start].distance=
-                    NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
-        for(;n;n--){
-            int i=n-1;
-            typename EdgeContainer::ValType::DistType d=vertTab[Q[i]].distance,nd;
-            for(int j=n-2;j>=0;j--) if (vertTab[Q[j]].distance<d) d=vertTab[Q[i=j]].distance;
-            if (Q[i]==end) return vertTab[end].distance;
-            if (NumberTypeBounds<typename EdgeContainer::ValType::DistType>::isPlusInfty(d))
-                    return end ? d : NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        Q[start].vPrev=0;Q[start].ePrev=0;
+        Q[start].distance=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
 
-            U=Q[i];
-            for(int j=i;j<n-1;j++) Q[j]=Q[j+1];
+        while(!Q.empty()){
+            typename EdgeContainer::ValType::DistType
+                    d=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty(),nd;
+            for(V=Q.firstKey();V;V=Q.nextKey(V)) if (Q[V].distance<d) d=Q[U=V].distance;
+            vertTab[U]=Q[U]; Q.delKey(U);
+            if (U==end) return vertTab[end].distance;
+
             for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirOut|Koala::EdUndir);
                 E;E=g.getEdgeNext(U,E,Koala::EdDirOut|Koala::EdUndir))
-                    if ((nd=vertTab[U].distance+edgeTab[E].length)<
-                         vertTab[V=g.getEdgeEnd(E,U)].distance)
-                    { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
+                    if (!vertTab.hasKey(V=g.getEdgeEnd(E,U)))
+                        if ((nd=vertTab[U].distance+edgeTab[E].length)<Q[V].distance)
+                    { Q[V].distance=nd; Q[V].ePrev=E; Q[V].vPrev=U; }
         }
-        return NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
-        // jesli wyznaczamy odleglosc do wszystkich wierzcholkow, a nie konkretnego
+
+        return end ? NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty()
+                    : NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
     }
 
 
@@ -224,11 +215,14 @@ class Kruskal {
         int edgeNo=-1, //ujemne oznacza maksymalnie duzo
         EdgeDirection mask=EdUndir,
         bool minWeight=true)
-        {   JoinableSets<typename GraphType::PVertex, typename DefaultStructs::AssocCont<typename GraphType::PVertex, JSPartDesrc *>::Type > localSets;
+        {   JoinableSets<typename GraphType::PVertex, typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                JSPartDesrc<typename GraphType::PVertex> *>::Type > localSets;
             typename BlackHoleSwitch<VertCompContainer,JoinableSets<typename GraphType::PVertex,
-                typename DefaultStructs::AssocCont<typename GraphType::PVertex, JSPartDesrc *>::Type > >::Type &
-                    sets= BlackHoleSwitch<VertCompContainer,JoinableSets<typename GraphType::PVertex,
-                typename DefaultStructs::AssocCont<typename GraphType::PVertex, JSPartDesrc *>::Type > >
+                typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                    JSPartDesrc<typename GraphType::PVertex> *>::Type > >::Type &
+                        sets    = BlackHoleSwitch<VertCompContainer,JoinableSets<typename GraphType::PVertex,
+                typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                    JSPartDesrc<typename GraphType::PVertex> *>::Type > >
                     ::get(asets,localSets);
 
             Result<typename EdgeContainer::ValType::WeightType> res;
