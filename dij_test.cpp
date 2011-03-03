@@ -61,7 +61,7 @@ int main() {
         int l;
 
         std::cout<< std::endl;
-        l=Koala::Dijkstra::getOutPath(g,vertCont,Koala::Dijkstra::outPath(tabV,tabE),V,F);
+//        l=Koala::Dijkstra::getOutPath(g,vertCont,Koala::Dijkstra::outPath(tabV,tabE),V,F);
         l=Koala::Dijkstra::getPath(g,vertCont,V,Koala::Dijkstra::outPath(tabV,tabE));
         std::cout<<"Liczba krawedzi: "<<l<<std::endl;
         for(int i=0;i<=l;i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;

@@ -64,7 +64,6 @@ void bht()
 }
 
 
-
 int main() {
 
     bht();
@@ -88,22 +87,7 @@ int main() {
     std::cout << BB->info.name << " pointing: " << ((void*)BB->info.pointer==(void*)AA) << " mapsize: "
             << b2a.size() << " " << (b2a.size() ? b2a[BB]->info.name : string("")) << std::endl;
 
-    int tabi[4];
-    QueueInterface<int*> st(tabi,3);
-
-    std::cout << std::endl;
-    std::cout << st.size() << std::endl;
-    st.push(5);
-    std::cout << st.size() << " " << st.front() << " " << st.back() << std::endl;
-    st.push(7);
-    std::cout << st.size() << " " << st.front() << " " << st.back() << std::endl;
-    st.pop();
-    std::cout << st.size() << " " << st.front() << " " << st.back() << std::endl;
-    st.push(9); st.push(10);
-    std::cout << st.size() << " " << st.front() << " " << st.back() << std::endl;
-    st.pop(); st.push(14);
-    std::cout << st.size() << " " << st.front() << " " << st.back() << std::endl;
-//    st.push(14);
+    AssocValChooser<AssocTable<std::map<InfA*,int> > > b;
 
     return 0;
 }

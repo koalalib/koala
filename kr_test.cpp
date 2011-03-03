@@ -47,16 +47,19 @@ int main() {
 
 //    g.clear();g.addVert();
 
-    Koala::JoinableSets<Koala::Graph<OpisV,OpisE>::PVertex, Koala::AssocTable< std::map<Koala::Graph<OpisV,OpisE>::PVertex, Koala::JSPartDesrc *> > > sets;
+    Koala::JoinableSets<Koala::Graph<OpisV,OpisE>::PVertex,
+        Koala::AssocTable< std::map<Koala::Graph<OpisV,OpisE>::PVertex,
+            Koala::JSPartDesrc<Koala::Graph<OpisV,OpisE>::PVertex> *> > > sets;
 
     for(Koala::Graph<OpisV,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
         edgeCont[ePt].weight=ePt->info.dlugosc;
 
-    Koala::Kruskal::Result<int> res=Koala::Kruskal::getForest(g,edgeCont,tabE,Koala::blackHole(),3);
+//    Koala::Kruskal::Result<int> res=Koala::Kruskal::getForest(g,edgeCont,tabE,Koala::blackHole());
+    Koala::Kruskal::Result<int> res=Koala::Kruskal::getForest(g,edgeCont,tabE,sets);
 
     std::cout << "waga: " << res.weight << " krawedzi " << res.edgeNo << std::endl;
     for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << ":"<<tabE[i]->info.dlugosc << "}";
 
-    std::cout << "\n" << sets.size();
+    std::cout << "\n" << sets.size() << " " << sets.getSetNo();
 }

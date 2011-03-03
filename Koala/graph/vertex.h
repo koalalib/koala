@@ -21,6 +21,8 @@ class Vertex : public VertexConst {
 public:
 	VertInfo info; ///< Additional user information in the vertex.
     AssocKeyContReg assocReg;
+    VertInfo getInfo() { return info; }
+    void setInfo(const VertInfo& info) { this->info=info; }
 private:
     struct VertLink {
             Edge<VertInfo,EdgeInfo> *first, *last;

@@ -97,6 +97,16 @@ int main() {
     aa2=aa;
     assocKeyChoose(assocTabInterf(aa));
     stdChoose(Set<int>());
+
+    Graph<InfoV2,InfoE2> g2b=g2;
+    cout << endl << g2b.getVertNo() << endl;
+    g2b.copy(g2);
+    cout << g2b.getVertNo() << endl;
+    g2b=g2;
+    cout << g2b.getVertNo() << endl;
+    g2b+=g2b;
+    cout << g2b.getVertNo() << endl;
+
 //    cout << endl << g2.getVertNo() << endl << g2.getEdgeNo(A2,EdDirIn);
         //Vertex<InfoV1,InfoE1>* tab[6]={C,D,C,B,0,B};
 

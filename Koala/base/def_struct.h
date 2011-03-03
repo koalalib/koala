@@ -254,36 +254,32 @@ struct ShorPathStructs {
 };
 
 // te choosery mozna stosowac dla wierzcholkow i krawedzi
-class BoolChooser {
-    const bool val;
-    public:
+struct BoolChooser {
+    bool val;
     typedef BoolChooser ChoosersSelfType;
-    BoolChooser(bool arg) : val(arg) {}
+    BoolChooser(bool arg=false) : val(arg) {}
     template<class Elem, class Graph> bool operator()(Elem*,Graph&) { return val;}
 };
 
 BoolChooser stdChoose(bool arg) { return BoolChooser(arg); }
 
 
-template<class Elem> class SetChooser {
+template<class Elem> struct SetChooser {
     Koala::Set<Elem*> set;
-    public:
     typedef SetChooser<Elem> ChoosersSelfType;
-    SetChooser(Koala::Set<Elem*>  arg) : set(arg) {}
-// albo  SetChooser(Koala::Set<Elem*>& arg)
+    SetChooser(const Koala::Set<Elem*>&  arg=Koala::Set<Elem*>()) : set(arg) {}
     template<class Graph> bool operator()(Elem* elem,Graph&)
 	{ return set.isElement(elem); }
 };
 
 template <class Elem>
-SetChooser<Elem> stdChoose( Koala::Set<Elem*> arg) { return SetChooser<Elem>(arg); }
+SetChooser<Elem> stdChoose(const Koala::Set<Elem*>& arg) { return SetChooser<Elem>(arg); }
 
 
-template <class Iter> class ContainerChooser {
+template <class Iter> struct ContainerChooser {
     Iter begin, end;
-    public:
     typedef ContainerChooser<Iter> ChoosersSelfType;
-    ContainerChooser(Iter abegin, Iter aend) : begin(abegin), end(aend) {}
+    ContainerChooser(Iter abegin=Iter(), Iter aend=Iter()) : begin(abegin), end(aend) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph&)
 	{ return std::find(begin,end,elem)!=end; }
 };
@@ -293,11 +289,10 @@ ContainerChooser<Iter> stdChoose(Iter begin,Iter end)
     {return ContainerChooser<Iter>(begin,end); }
 
 // jesli ktos chce choosera na podstawie wlasnego obiektu lub zwyklej funkcji
-template <class Obj> class ObjChooser {
+template <class Obj> struct ObjChooser {
     Obj funktor;
-    public:
     typedef ObjChooser<Obj> ChoosersSelfType;
-    ObjChooser(Obj arg) : funktor(arg) {}
+    ObjChooser(Obj arg=Obj()) : funktor(arg) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return (bool)funktor(elem,graph); }
 };
@@ -306,12 +301,11 @@ template <class Obj>
 ObjChooser<Obj> stdChoose(Obj arg) { return ObjChooser<Obj>(arg); }
 
 // te choosery juz zagladaja do konkretnych pol rekordow info
-template <class Info, class T> class FieldValChooser {
+template <class Info, class T> struct FieldValChooser {
 	T Info::* wsk;
 	T val;
-    public:
     typedef FieldValChooser<Info,T> ChoosersSelfType;
-	FieldValChooser(T Info::* arg, T arg2) : wsk(arg), val(arg2) {}
+	FieldValChooser(T Info::* arg=0, T arg2=T()) : wsk(arg), val(arg2) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return elem->info.*wsk==val; }
 };
@@ -320,11 +314,10 @@ template <class Info, class T>
 FieldValChooser<Info,T> fieldChoose(T Info::* wsk,T arg)
     { return FieldValChooser<Info,T>(wsk,arg); }
 
-template <class Info, class T> class FielBoolChooser {
+template <class Info, class T> struct FielBoolChooser {
 	T Info::* wsk;
-    public:
     typedef FielBoolChooser<Info,T> ChoosersSelfType;
-	FielBoolChooser(T Info::* arg) : wsk(arg){}
+	FielBoolChooser(T Info::* arg=0) : wsk(arg){}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return bool(elem->info.*wsk); }
 };
@@ -333,12 +326,11 @@ template <class Info, class T>
 FielBoolChooser<Info,T> fieldChoose(T Info::* wsk) { return FielBoolChooser<Info,T>(wsk); }
 
 // wlasny obiekt lub funkcja, ktora ma sie wykonywac dla konkretnego pola z info
-template <class Info, class T, class Obj> class FieldObjChooser {
+template <class Info, class T, class Obj> struct FieldObjChooser {
 	T Info::* wsk;
 	Obj funktor;
-    public:
     typedef FieldObjChooser<Info,T,Obj> ChoosersSelfType;
-	FieldObjChooser(T Info::* awsk,Obj afun) : wsk(awsk), funktor(afun) {}
+	FieldObjChooser(T Info::* awsk=0,Obj afun=Obj()) : wsk(awsk), funktor(afun) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return (bool)funktor(elem->info.*wsk); }
 };
@@ -348,28 +340,25 @@ FieldObjChooser<Info,T,Obj> fieldChoose(T Info::*wsk, Obj obj)
     { return FieldObjChooser<Info,T,Obj>(wsk,obj); }
 
 
-template <class Info, class T, class Z> class FieldSetChooser {
+template <class Info, class T, class Z> struct FieldSetChooser {
 	T Info::* wsk;
 	Koala::Set<Z> set;
-    public:
     typedef FieldSetChooser<Info,T,Z> ChoosersSelfType;
-	FieldSetChooser(T Info::* awsk,Koala::Set<Z> aset) : wsk(awsk), set(aset) {}
-//albo FieldSetChooser(T Info::* awsk,Koala::Set<Z>& aset) : wsk(awsk), set(aset) {}
+	FieldSetChooser(T Info::* awsk=0,const Koala::Set<Z>& aset=Koala::Set<Z>()) : wsk(awsk), set(aset) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return set.isElement(elem->info.*wsk); }
 };
 
 template <class Info, class T, class Z>
-FieldSetChooser<Info,T,Z> fieldChoose(T Info::*wsk, Koala::Set<Z> set)
+FieldSetChooser<Info,T,Z> fieldChoose(T Info::*wsk,const Koala::Set<Z>& set)
     { return FieldSetChooser<Info,T,Z>(wsk,set); }
 
 
-template <class Info, class T, class Iter> class FieldContainerChooser {
+template <class Info, class T, class Iter> struct FieldContainerChooser {
 	T Info::* wsk;
 	Iter begin, end;
-    public:
     typedef FieldContainerChooser<Info,T,Iter> ChoosersSelfType;
-    FieldContainerChooser(T Info::* awsk, Iter a, Iter b): wsk(awsk), begin(a), end(b) {}
+    FieldContainerChooser(T Info::* awsk=0, Iter a=Iter(), Iter b=Iter()): wsk(awsk), begin(a), end(b) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return std::find(begin,end,elem->info.*wsk)!=end; }
 };
@@ -380,103 +369,95 @@ FieldContainerChooser<Info,T,Iter> fieldChoose(T Info::*wsk, Iter b, Iter e)
 
 
 // choosery decydujace na podstawie wartosci przypisanej elementowi w podanej tablicy asocjacyjnej
-template<class Cont> class AssocHasChooser {
+template<class Cont> struct AssocHasChooser {
     Cont cont;
-    public:
     typedef AssocHasChooser<Cont> ChoosersSelfType;
-    AssocHasChooser(Cont arg) : cont(arg) {}
-// albo  &
+    AssocHasChooser(const Cont& arg=Cont()) : cont(arg) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph&)
 	{ return cont.hasKey(elem); }
 };
 
 template <class Cont>
-AssocHasChooser<Cont> assocKeyChoose(Cont arg)
+AssocHasChooser<Cont> assocKeyChoose(const Cont& arg)
 { return AssocHasChooser<Cont>(arg); }
 
 
-template<class Cont> class AssocBoolChooser {
+template<class Cont> struct AssocBoolChooser {
     Cont cont;
-    public:
     typedef AssocBoolChooser<Cont> ChoosersSelfType;
-    AssocBoolChooser(Cont arg) : cont(arg) {}
-// albo  &
+    AssocBoolChooser(const Cont& arg=Cont()) : cont(arg) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph&)
 	{ return cont.hasKey(elem) && (bool)cont[elem]; }
 };
 
 template <class Cont>
-AssocBoolChooser<Cont> assocChoose(Cont arg) { return AssocBoolChooser<Cont>(arg); }
+AssocBoolChooser<Cont> assocChoose(const Cont& arg) { return AssocBoolChooser<Cont>(arg); }
 
 
-template<class Cont> class AssocValChooser {
+template<class Cont> struct AssocValChooser {
     Cont cont;
     typename Cont::ValType val;
-    public:
     typedef AssocValChooser<Cont> ChoosersSelfType;
-    AssocValChooser(Cont arg,typename Cont::ValType aval) : cont(arg), val(aval) {}
-// albo  &
+    AssocValChooser(const Cont& arg=Cont(),typename Cont::ValType aval=typename Cont::ValType()) : cont(arg), val(aval) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph&)
 	{ return cont.hasKey(elem) && cont[elem]==val; }
 };
 
 template <class Cont>
-AssocValChooser<Cont> assocChoose(Cont arg, typename Cont::ValType val)
+AssocValChooser<Cont> assocChoose(const Cont& arg, typename Cont::ValType val)
     { return AssocValChooser<Cont>(arg,val); }
 
 
-template<class Cont> class AssocSetChooser {
+template<class Cont> struct AssocSetChooser {
     Cont cont;
     Koala::Set<typename Cont::ValType> set;
-    public:
     typedef AssocSetChooser<Cont> ChoosersSelfType;
-    AssocSetChooser(Cont arg,Koala::Set<typename Cont::ValType> aset) : cont(arg), set(aset) {}
-// albo  &
+    AssocSetChooser(const Cont& arg=Cont(),
+                    const Koala::Set<typename Cont::ValType>& aset=Koala::Set<typename Cont::ValType>())
+                    : cont(arg), set(aset) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph&)
 	{ return cont.hasKey(elem) && set.isElement(cont[elem]); }
 };
 
 template <class Cont>
-AssocSetChooser<Cont> assocChoose(Cont arg, Koala::Set<typename Cont::ValType> set)
+AssocSetChooser<Cont> assocChoose(const Cont& arg,const Koala::Set<typename Cont::ValType>& set)
     { return AssocSetChooser<Cont>(arg,set); }
 
 
-template <class Cont, class Iter> class AssocContainerChooser {
+template <class Cont, class Iter> struct AssocContainerChooser {
     Iter begin, end;
     Cont cont;
-    public:
     typedef AssocContainerChooser<Cont,Iter> ChoosersSelfType;
-    AssocContainerChooser(Cont acont, Iter abegin, Iter aend) : cont(acont), begin(abegin), end(aend) {}
+    AssocContainerChooser(const Cont& acont=Cont(), Iter abegin=Iter(), Iter aend=Iter())
+            : cont(acont), begin(abegin), end(aend) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph&)
 	{ return cont.hasKey(elem) && std::find(begin,end,cont[elem])!=end; }
 };
 
 template <class Cont, class Iter>
-AssocContainerChooser<Cont,Iter> assocChoose(Cont cont, Iter begin,Iter end)
+AssocContainerChooser<Cont,Iter> assocChoose(const Cont& cont, Iter begin,Iter end)
     {return AssocContainerChooser<Cont,Iter>(cont,begin,end); }
 
 
-template <class Cont, class Obj> class AssocObjChooser {
+template <class Cont, class Obj> struct AssocObjChooser {
     Obj funktor;
     Cont cont;
-    public:
     typedef AssocObjChooser<Cont,Obj> ChoosersSelfType;
-    AssocObjChooser(Cont acont, Obj arg) : cont(acont), funktor(arg) {}
+    AssocObjChooser(const Cont& acont=Cont(), Obj arg=Obj()) : cont(acont), funktor(arg) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return cont.hasKey(elem) && (bool)funktor(cont[elem]); }
 };
 
 template <class Cont, class Obj>
-AssocObjChooser<Cont,Obj> assocChoose(Cont cont, Obj arg) { return AssocObjChooser<Cont,Obj>(cont,arg); }
+AssocObjChooser<Cont,Obj> assocChoose(const Cont& cont, Obj arg) { return AssocObjChooser<Cont,Obj>(cont,arg); }
 
 
 // choosery operacji logicznych na prostszych chooserach
-template <class Ch1, class Ch2> class OrChooser {
+template <class Ch1, class Ch2> struct OrChooser {
 	Ch1 ch1;
 	Ch2 ch2;
-    public:
     typedef OrChooser<Ch1,Ch2> ChoosersSelfType;
-	OrChooser(Ch1 a, Ch2 b) : ch1(a), ch2(b) {}
+	OrChooser(Ch1 a=Ch1(), Ch2 b=Ch2()) : ch1(a), ch2(b) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return (ch1(elem,graph) || ch2(elem,graph)); }
 };
@@ -489,12 +470,11 @@ OrChooser<typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType>
     operator||(Ch1 a, Ch2 b) { return OrChooser<Ch1,Ch2>(a,b); }
 
 
-template <class Ch1, class Ch2> class AndChooser {
+template <class Ch1, class Ch2> struct AndChooser {
 	Ch1 ch1;
 	Ch2 ch2;
-    public:
     typedef AndChooser<Ch1,Ch2> ChoosersSelfType;
-	AndChooser(Ch1 a, Ch2 b) : ch1(a), ch2(b) {}
+	AndChooser(Ch1 a=Ch1(), Ch2 b=Ch2()) : ch1(a), ch2(b) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return (ch1(elem,graph) && ch2(elem,graph)); }
 };
@@ -507,12 +487,11 @@ AndChooser<typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType>
     operator&&(Ch1 a, Ch2 b) { return AndChooser<Ch1,Ch2>(a,b); }
 
 
-template <class Ch1, class Ch2> class XorChooser {
+template <class Ch1, class Ch2> struct XorChooser {
 	Ch1 ch1;
 	Ch2 ch2;
-    public:
     typedef XorChooser<Ch1,Ch2> ChoosersSelfType;
-	XorChooser(Ch1 a, Ch2 b) : ch1(a), ch2(b) {}
+	XorChooser(Ch1 a=Ch1(), Ch2 b=Ch2()) : ch1(a), ch2(b) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return (ch1(elem,graph) != ch2(elem,graph)); }
 };
@@ -525,11 +504,10 @@ XorChooser<typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType>
     operator^(Ch1 a, Ch2 b) { return XorChooser<Ch1,Ch2>(a,b); }
 
 
-template <class Ch1> class NotChooser {
+template <class Ch1> struct NotChooser {
 	Ch1 ch1;
-    public:
     typedef NotChooser<Ch1> ChoosersSelfType;
-	NotChooser(Ch1 a) : ch1(a) {}
+	NotChooser(Ch1 a=Ch1()) : ch1(a) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,Graph& graph)
 	{ return !ch1(elem,graph); }
 };
@@ -543,12 +521,11 @@ NotChooser<typename Ch1::ChoosersSelfType>
 
 
 // choosery dla wierzcholkow
-class VertDegValChooser {
+struct VertDegValChooser {
     int deg;
     Koala::EdgeDirection type;
-    public:
     typedef VertDegValChooser ChoosersSelfType;
-    VertDegValChooser(int adeg, Koala::EdgeDirection atype): deg(adeg), type(atype) {}
+    VertDegValChooser(int adeg=0, Koala::EdgeDirection atype=Koala::EdAll): deg(adeg), type(atype) {}
     template <class Graph>
     bool operator()(typename Graph::PVertex v, Graph& g)
     { return g.deg(v,type)==deg; }
@@ -558,13 +535,11 @@ VertDegValChooser vertDegChoose(int adeg, Koala::EdgeDirection atype=Koala::EdAl
 { return VertDegValChooser(adeg,atype); }
 
 
-template <class Int> class VertDegSetChooser {
+template <class Int> struct VertDegSetChooser {
     Koala::Set<Int> set;
     Koala::EdgeDirection type;
-    public:
     typedef VertDegSetChooser<Int> ChoosersSelfType;
-    VertDegSetChooser(Koala::Set<Int> aset, Koala::EdgeDirection atype):
-// albo  VertDegSetChooser(Koala::Set<Int>& aset, Koala::EdgeDirection atype=Koala::EdAll):
+    VertDegSetChooser(const Koala::Set<Int>& aset=Koala::Set<Int>(), Koala::EdgeDirection atype=Koala::EdAll):
                                             set(aset), type(atype) {}
     template <class Graph>
     bool operator()(typename Graph::PVertex v, Graph& g)
@@ -572,16 +547,15 @@ template <class Int> class VertDegSetChooser {
 };
 
 template <class Int>
-VertDegSetChooser<Int> vertDegChoose(Koala::Set<Int> aset, Koala::EdgeDirection atype=Koala::EdAll)
+VertDegSetChooser<Int> vertDegChoose(const Koala::Set<Int>& aset, Koala::EdgeDirection atype=Koala::EdAll)
 { return VertDegSetChooser<Int>(aset,atype); }
 
 
-template <class Iter> class VertDegContainerChooser {
+template <class Iter> struct VertDegContainerChooser {
     Iter begin,end;
     Koala::EdgeDirection typ;
-    public:
     typedef VertDegContainerChooser<Iter> ChoosersSelfType;
-    VertDegContainerChooser(Iter abeg, Iter aend, Koala::EdgeDirection atype):
+    VertDegContainerChooser(Iter abeg=Iter(), Iter aend=Iter(), Koala::EdgeDirection atype=Koala::EdAll):
                                             begin(abeg), end(aend), typ(atype) {}
     template <class Graph>
     bool operator()(typename Graph::PVertex v, Graph& g)
@@ -593,12 +567,11 @@ VertDegContainerChooser<Iter> vertDegChoose(Iter begin, Iter end, Koala::EdgeDir
 { return VertDegContainerChooser<Iter>(begin,end,atype); }
 
 // decyzja podejmowana na podstawie wartosci funkcji lub obiektu funktora policzonego na stopniu wierzcholka
-template <class Obj> class VertDegFunctorChooser {
+template <class Obj> struct VertDegFunctorChooser {
     Obj funktor;
     Koala::EdgeDirection typ;
-    public:
     typedef VertDegFunctorChooser<Obj> ChoosersSelfType;
-    VertDegFunctorChooser(Obj afun, Koala::EdgeDirection atype):
+    VertDegFunctorChooser(Obj afun=Obj(), Koala::EdgeDirection atype=Koala::EdAll):
                                             funktor(afun), typ(atype) {}
     template <class Graph>
     bool operator()(typename Graph::PVertex v, Graph& g)
@@ -610,11 +583,10 @@ VertDegFunctorChooser<Obj> vertDegChoose(Obj afun, Koala::EdgeDirection atype=Ko
 { return VertDegFunctorChooser<Obj>(afun,atype); }
 
 // choosery dla krawedzi
-class EdgeTypeChooser {
+struct EdgeTypeChooser {
     Koala::EdgeDirection mask;
-    public:
     typedef EdgeTypeChooser ChoosersSelfType;
-    EdgeTypeChooser(Koala::EdgeDirection amask) : mask(amask) {}
+    EdgeTypeChooser(Koala::EdgeDirection amask=Koala::EdAll) : mask(amask) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, Graph& g)
     { return bool(g.getType(e) & mask); }
@@ -623,11 +595,10 @@ class EdgeTypeChooser {
 EdgeTypeChooser edgeTypeChoose(Koala::EdgeDirection mask) { return EdgeTypeChooser(mask); }
 
 // choosery dla krawedzi sprawdzajace warunki dla jej koncow
-template <class Ch> class EdgeFirstEndChooser {
+template <class Ch> struct EdgeFirstEndChooser {
     Ch ch;
-    public:
     typedef EdgeFirstEndChooser<Ch> ChoosersSelfType;
-    EdgeFirstEndChooser(Ch funktor) : ch(funktor) {}
+    EdgeFirstEndChooser(Ch funktor=Ch()) : ch(funktor) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, Graph& g)
     { return ch(g.getEdgeEnds(e).first,g); }
@@ -637,11 +608,10 @@ template <class Ch>
 EdgeFirstEndChooser<Ch> edgeFirstEndChoose(Ch ch) { return EdgeFirstEndChooser<Ch>(ch); }
 
 
-template <class Ch> class EdgeSecondEndChooser {
+template <class Ch> struct EdgeSecondEndChooser {
     Ch ch;
-    public:
     typedef EdgeSecondEndChooser<Ch> ChoosersSelfType;
-    EdgeSecondEndChooser(Ch funktor) : ch(funktor) {}
+    EdgeSecondEndChooser(Ch funktor=Ch()) : ch(funktor) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, Graph& g)
     { return ch(g.getEdgeEnds(e).second,g); }
@@ -651,11 +621,10 @@ template <class Ch>
 EdgeSecondEndChooser<Ch> edgeSecondEndChoose(Ch ch) { return EdgeSecondEndChooser<Ch>(ch); }
 
 // ... i na podstawie tego, ile sposrod koncow spelnia warunek
-template <class Ch> class Edge0EndChooser {
+template <class Ch> struct Edge0EndChooser {
     Ch ch;
-    public:
     typedef Edge0EndChooser<Ch> ChoosersSelfType;
-    Edge0EndChooser(Ch funktor) : ch(funktor) {}
+    Edge0EndChooser(Ch funktor=Ch()) : ch(funktor) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, Graph& g)
     { return !ch(g.getEdgeEnds(e).first,g) && !ch(g.getEdgeEnds(e).second,g); }
@@ -665,11 +634,10 @@ template <class Ch>
 Edge0EndChooser<Ch> edge0EndChoose(Ch ch) { return Edge0EndChooser<Ch>(ch); }
 
 
-template <class Ch> class Edge1EndChooser {
+template <class Ch> struct Edge1EndChooser {
     Ch ch;
-    public:
     typedef Edge1EndChooser<Ch> ChoosersSelfType;
-    Edge1EndChooser(Ch funktor) : ch(funktor) {}
+    Edge1EndChooser(Ch funktor=Ch()) : ch(funktor) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, Graph& g)
     { return ch(g.getEdgeEnds(e).first,g) != ch(g.getEdgeEnds(e).second,g); }
@@ -679,11 +647,10 @@ template <class Ch>
 Edge1EndChooser<Ch> edge1EndChoose(Ch ch) { return Edge1EndChooser<Ch>(ch); }
 
 
-template <class Ch> class Edge2EndChooser {
+template <class Ch> struct Edge2EndChooser {
     Ch ch;
-    public:
     typedef Edge2EndChooser<Ch> ChoosersSelfType;
-    Edge2EndChooser(Ch funktor) : ch(funktor) {}
+    Edge2EndChooser(Ch funktor=Ch()) : ch(funktor) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, Graph& g)
     { return ch(g.getEdgeEnds(e).first,g) && ch(g.getEdgeEnds(e).second,g); }
@@ -694,8 +661,7 @@ Edge2EndChooser<Ch> edge2EndChoose(Ch ch) { return Edge2EndChooser<Ch>(ch); }
 
 
 // caster zwyklego rzutowania miedzy dwoma strukturami info
-class StdCaster {
-    public:
+struct StdCaster {
     template <class InfoDest, class InfoSour>
 	void operator()(InfoDest& dest,InfoSour sour) { dest=(InfoDest)sour; }
 };
@@ -703,8 +669,7 @@ class StdCaster {
 StdCaster stdCast() {return StdCaster(); }
 
 // caster ustawiajacy wartosc domyslna i ignorujacy drugi parametr
-class NoCastCaster {
-    public:
+struct NoCastCaster {
     template <class InfoDest, class InfoSour>
 	void operator()(InfoDest& dest,InfoSour sour) { dest=InfoDest(); }
 };
@@ -712,10 +677,9 @@ class NoCastCaster {
 NoCastCaster stdCast(bool arg) { assert(!arg); return NoCastCaster(); }
 
 // wyliczenie wartosci nowego info poprzez wlasna funkcje lub funktor
-template <class Fun> class ObjCaster {
+template <class Fun> struct ObjCaster {
     Fun funktor;
-    public:
-    ObjCaster(Fun afun) : funktor(afun) {}
+    ObjCaster(Fun afun=Fun()) : funktor(afun) {}
     template <class InfoDest, class InfoSour>
 	void operator()(InfoDest& dest, InfoSour sour) { dest=(InfoDest)funktor(sour); }
 };
@@ -726,23 +690,20 @@ ObjCaster<Funktor> stdCast(Funktor f) { return ObjCaster<Funktor>(f); }
 // polowki pelnego linkera, dzialaja w jedna strone
 
 // tylko false jest dopuszczalne - brak polaczenia
-class pomNoLinker {
-    public:
-    pomNoLinker(bool arg) { assert(!arg);}
+struct pomNoLinker {
+    pomNoLinker(bool arg=false) { assert(!arg);}
     template <class Dest,class Sour>
         void operator()(Dest*,Sour*) {}
 };
 // ustawia wskaznik na dolaczany obiekt w srodku struktury info obiektu docelowego
-template <class Info, class T> class pomFieldLinker {
+template <class Info, class T> struct pomFieldLinker {
     T Info::* pt;
-    public:
-	pomFieldLinker(T Info::* awsk) : pt(awsk) {}
+	pomFieldLinker(T Info::* awsk=0) : pt(awsk) {}
 	template <class Dest, class Sour>
         void operator()(Dest* wsk, Sour* w) {  if (pt && wsk) wsk->info.*pt=(T) w; }
 };
 // dopisuje powiazania do zewnetrznej! tablicy asocjacyjnej podanej w funkcji tworzacej stdLink
-template <class Map> class pomAssocLinker{
-    public:
+template <class Map> struct pomAssocLinker{
     Map& map;
     pomAssocLinker(Map& amap) : map(amap) {}
 	template <class Dest, class Sour>
@@ -750,8 +711,7 @@ template <class Map> class pomAssocLinker{
 };
 
 // pelny linker, zawiera obiekty laczace nowy element ze starym i odwrotnie
-template <class Link1, class Link2> class Std2Linker {
-    public:
+template <class Link1, class Link2> struct Std2Linker {
         Link1 dest2sour;
         Link2 sour2dest;
         Std2Linker(Link1 al1, Link2 al2) : dest2sour(al1), sour2dest(al2) {}

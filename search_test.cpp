@@ -60,7 +60,7 @@ int main() {
 
     searchTest();
     int licz;
-    std::cout << (licz=Koala::BFS::scan(g,blackHole(),tabV,EdAll)) << std::endl;
+    std::cout << (licz=Koala::BFS::scan(g,vertCont,tabV,EdAll)) << std::endl;
     licz=g.getVertNo();
     for(W=g.getVert();W;W=g.getVertNext(W))
         std::cout << W->info.name << ":: dist:" << vertCont[W].distance << " pred:"
@@ -80,12 +80,12 @@ int main() {
     comptab[1][0]=0;
     vertCont.clear();
 
+//    g.del(I); g.del(G); g.del(H);
 
     std::cout<<std::endl;
     int compno=Koala::BFS::getComponents(g,blackHole(),Koala::SearchStructs::compStore(comptab[0],tabV),EdAll);
     std::cout << compno<<endl;
-    for(int i=1;i<compno;i++) comptab[1][i]=comptab[1][i-1]+comptab[0][i-1];
-    for(int i=0;i<compno;i++) cout << "(" << comptab[0][i] << " " << comptab[1][i] << ")";
+    for(int i=0;i<=compno;i++) cout << comptab[0][i] << ' '; cout << endl;
     cout << endl;
     for(int i=0;i<g.getVertNo();i++) cout << tabV[i]->info.name << " ";
     cout<< "\n" << vertCont.size();
