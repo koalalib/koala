@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 
+#define KOALA_SET_ON_VECTOR
 
 #include "Koala/container/set.h"
 #include "Koala/container/assoctab.h"
@@ -23,26 +24,24 @@ class Funktor {
 
 int main()
 {
-    int tab[]={3,0,3,4};
+    int tab[]={3,0,3,4,7,7};
     int tab2[5];
 
-    std::set<int> stdset;
+    PriQueueInterface<int*,std::less<int> > q(tab,4);
+
+    cout << q.size() << endl;
+    q.push(4);
+    q.push(4);
+    q.push(2);
+    q.push(5);
+    q.pop();q.pop();q.pop();q.pop();
+    q.push(5);
+    cout << q.top() << endl;
+    cout << q.size() << endl;
+    cout << endl << endl;
 
 
-    stdset.insert(5);
 
-
-   Koala::Set<int> s(tab,4);
-   Koala::SetInserter<Koala::Set<int> > iter=s;
-   Koala::SetInserter<Koala::Set<int> > iter2=iter;
-   iter=12; iter=-4;
-   iter++; ++iter; *iter;
-   iter2=110;
-   setInserter(s)=200;
-   iter2=setInserter(s);
-   iter2=300;
-
-   cout << s;
 
 
     std::map<int,float> mapa;

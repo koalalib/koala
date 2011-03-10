@@ -100,6 +100,7 @@ template <class T> class StackInterface<T*> {
         void push(const T& val) { assert(siz<maxsize); buf[siz++]=val; }
         void pop() { assert(siz); siz--; }
         T& top() { assert(siz); return buf[siz-1]; }
+        void clear() { siz=0; }
 };
 
 
@@ -124,6 +125,7 @@ template <class T> class QueueInterface<T*> {
         T& front() { assert(!empty()); return buf[beg]; }
         T& top() { assert(!empty()); return buf[beg]; }
         T& back() { assert(!empty()); return buf[prev(end)]; }
+        void clear() { beg=end=0; }
 };
 
 
@@ -178,6 +180,29 @@ template <class T> class VectorInterface<T*> {
     }
     void erase(T* f) { erase(f,f+1); }
     void clear() { siz=0; }
+};
+
+
+template <class Container, class Comp> class PriQueueInterface;
+
+template <class T, class Comp> class PriQueueInterface<T*,Comp> {
+    T* buf;
+    int siz,maxsize;
+    Comp comp;
+
+    public:
+        typedef T ElemType;
+
+        PriQueueInterface(T* bufor, int max, Comp acomp=Comp()) : buf(bufor), maxsize(max), siz(0), comp(acomp) {}
+        PriQueueInterface(T* bufor, T* end, int max, Comp acomp=Comp()) :
+            buf(bufor), maxsize(max), siz(end-bufor), comp(acomp)
+        { assert(siz>=0 && siz<=maxsize); std::make_heap(buf,end,comp); }
+        int size() { return siz; }
+        bool empty() { return siz==0; }
+        void push(const T& val) { assert(siz<maxsize); buf[siz++]=val; std::push_heap(buf,buf+siz,comp); }
+        void pop() { assert(siz); std::pop_heap(buf,buf+siz,comp); siz--; }
+        T top() { assert(siz); return buf[0]; }
+        void clear() { siz=0; }
 };
 
 

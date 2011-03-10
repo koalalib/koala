@@ -62,7 +62,8 @@ int main() {
 
 Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koala::Vertex<OpisV,OpisE> >,Koala::BoolChooser>
     sg1=std::make_pair(Koala::stdChoose(rset),Koala::stdChoose(true)),
-    sg2=makeSubgraph(g,std::make_pair(Koala::stdChoose(gset),Koala::stdChoose(true)));
+    sg2;
+   sg2.plug(g); sg2.setChoose (std::make_pair(Koala::stdChoose(gset),Koala::stdChoose(true)));
 
 Koala::Subgraph<Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koala::Vertex<OpisV,OpisE> >,Koala::BoolChooser>,
     Koala::SetChooser<Koala::Vertex<OpisV,OpisE> >,Koala::BoolChooser>
