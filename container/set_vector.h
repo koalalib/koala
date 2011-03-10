@@ -31,12 +31,16 @@ template< typename Element >
 template< typename Element >
     std::ostream& operator<<(std::ostream& ,const Set<Element> &);
 
-template< typename Element > class Set: public std::set< Element > {
+template< typename Element > class Set: protected std::vector< Element > {
     public:
+
+        typedef typename std::vector< Element >::const_iterator const_iterator;
+        const_iterator begin() const { return std::vector< Element >::begin(); }
+        const_iterator end() const { return std::vector< Element >::end(); }
         typedef Element ElemType;
     // Konstruktory
         // Konstruktor tworzący zbiór pusty.
-        Set(): std::set< Element >() { }
+        Set(): std::vector< Element >() { }
         // Konstruktory tworzące zbiór składający się z podanych elementów.
         Set( const Set<Element> & );
         Set( const std::set< Element > & );
@@ -49,12 +53,19 @@ template< typename Element > class Set: public std::set< Element > {
         void assign( const Element *, unsigned );
         template <class Iter>
             void assign(Iter, Iter );
+        template <class Iter>
+            void insert(Iter, Iter );
 
     // Operator przypisania.
         Set<Element> &operator=( const Element &e );
 
     // Informacje odnośnie zbioru.
         bool operator!() const;
+        bool empty() const;
+        unsigned size() const;
+        void clear();
+
+
         // Informacja o tym, czy jest podzbiorem podanego zbioru.
         bool subsetOf( const Set<Element> & ) const;
         // Informacja o tym, czy jest nadzbiorem podanego zbioru.
@@ -99,7 +110,7 @@ template< typename Element > class Set: public std::set< Element > {
 
 } ;
 
-#include "set_set.hpp"
+#include "set_vector.hpp"
 
 template <class Element>
   class SetInserter;

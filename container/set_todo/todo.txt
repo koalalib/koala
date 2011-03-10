@@ -1,1 +1,0 @@
-Obecnie nieuzywane, dostosowac do interfejsu set_set
