@@ -96,7 +96,7 @@ int main() {
     AssocArray<Vertex<InfoV1,InfoE1>*,Vertex<InfoV2,InfoE2>* > aa,aa2;
     aa2=aa;
     assocKeyChoose(assocTabInterf(aa));
-    stdChoose(Set<int>());
+    stdChoose(Set<int*>());
 
     Graph<InfoV2,InfoE2> g2b=g2;
     cout << endl << g2b.getVertNo() << endl;

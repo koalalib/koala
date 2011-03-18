@@ -1,5 +1,6 @@
 #include <iostream>
 #include <map>
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 
@@ -26,6 +27,8 @@ int main()
 {
     int tab[]={3,0,3,4,7,7};
     int tab2[5];
+
+
 
     PriQueueInterface<int*,std::less<int> > q(tab,4);
 
@@ -123,6 +126,15 @@ int main()
     cout << jset.getSetId(4) << endl;
     jset.makeSinglet(4);
     cout << jset.getSet(5,setInserter(sint));
+
+    cout << cout << endl;
+
+    int tab3[]={1,3,5,7}, tab4[4];
+    Set<int> iiset;
+
+    copy(tab3,tab3+4,blackHole());
+//    iiset.assign(tab4,4);
+    cout << iiset;
 
 
 }

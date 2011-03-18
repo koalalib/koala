@@ -53,7 +53,7 @@ EmptyStruct<T> emptyStruct(T) { EmptyStruct<T>(); }
 static char __blackhole;
 
 //Jesli metoda chce iterator do zapisu ciagu, a nas sam ciag nie interesuje, tylko inne efekty uboczne procedury
-template <class A> struct BlackHole {
+template <class A> struct BlackHole : public std::iterator<std::output_iterator_tag,void,void,void,void> {
     template <class T>
         BlackHole& operator=(T) { return *this; }
     BlackHole& operator* () { return *this; }
@@ -323,7 +323,7 @@ template <class Obj> struct ObjChooser {
 };
 
 template <class Obj>
-ObjChooser<Obj> stdChoose(Obj arg) { return ObjChooser<Obj>(arg); }
+ObjChooser<Obj> stdFChoose(Obj arg) { return ObjChooser<Obj>(arg); }
 
 // te choosery juz zagladaja do konkretnych pol rekordow info
 template <class Info, class T> struct FieldValChooser {
@@ -361,7 +361,7 @@ template <class Info, class T, class Obj> struct FieldObjChooser {
 };
 
 template <class Info, class T, class Obj>
-FieldObjChooser<Info,T,Obj> fieldChoose(T Info::*wsk, Obj obj)
+FieldObjChooser<Info,T,Obj> fieldFChoose(T Info::*wsk, Obj obj)
     { return FieldObjChooser<Info,T,Obj>(wsk,obj); }
 
 
@@ -474,7 +474,7 @@ template <class Cont, class Obj> struct AssocObjChooser {
 };
 
 template <class Cont, class Obj>
-AssocObjChooser<Cont,Obj> assocChoose(const Cont& cont, Obj arg) { return AssocObjChooser<Cont,Obj>(cont,arg); }
+AssocObjChooser<Cont,Obj> assocFChoose(const Cont& cont, Obj arg) { return AssocObjChooser<Cont,Obj>(cont,arg); }
 
 
 // choosery operacji logicznych na prostszych chooserach
@@ -604,7 +604,7 @@ template <class Obj> struct VertDegFunctorChooser {
 };
 
 template <class Obj>
-VertDegFunctorChooser<Obj> vertDegChoose(Obj afun, Koala::EdgeDirection atype=Koala::EdAll)
+VertDegFunctorChooser<Obj> vertDegFChoose(Obj afun, Koala::EdgeDirection atype=Koala::EdAll)
 { return VertDegFunctorChooser<Obj>(afun,atype); }
 
 // choosery dla krawedzi

@@ -851,7 +851,7 @@ class AssocMatrix : public AssocMatrixAddr<aType> {
 
 };
 
-template <class T> class AssocInserter
+template <class T> class AssocInserter : public std::iterator<std::output_iterator_tag,void,void,void,void>
 {
 protected:
     T* container;
@@ -878,7 +878,7 @@ public:
 template <class T>
 AssocInserter<T> assocInserter(T& x) { return AssocInserter<T>(x); }
 
-template <class T, class Fun> class AssocFunktorInserter
+template <class T, class Fun> class AssocFunktorInserter : public std::iterator<std::output_iterator_tag,void,void,void,void>
 {
 protected:
     T* container;

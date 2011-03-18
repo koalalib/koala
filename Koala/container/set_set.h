@@ -105,7 +105,7 @@ template <class Element>
   class SetInserter;
 
 template <class Element>
-  class SetInserter<Set<Element> >
+  class SetInserter<Set<Element> > : public std::iterator<std::output_iterator_tag,void,void,void,void>
 {
 protected:
   Set<Element>* container;
