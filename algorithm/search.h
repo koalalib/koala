@@ -253,7 +253,7 @@ class GraphSearchBase : public ShorPathStructs, public SearchStructs {
 
         component = 0;
         first = g.getVert();
-        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) vTab.delKey(v);
+//        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) vTab.delKey(v);
         while(first != NULL) {
             if (SearchImpl::visit(g, vTab, first, mask, visit, component)==-1) return -1;
             do {
@@ -274,31 +274,33 @@ class GraphSearchBase : public ShorPathStructs, public SearchStructs {
 
 	template<class GraphType,
 		 class VertContainer, class Iter>
-	static int scanAttainable(GraphType &g,
+	static int scanAttainable(const GraphType &ag,
                     VertContainer &atree,
                     Iter iter,
 				    typename GraphType::PVertex root,
 				    EdgeDirection mask=EdDirOut|EdUndir
 				    )
-        {   assert(root);
+        {   GraphType& g= const_cast<GraphType&>(ag);
+            assert(root);
             typename DefaultStructs::template AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type localtree;
             typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type >::Type &
                 tree=
                 BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type >
                     ::get(atree,localtree);
 
-            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) tree.delKey(v);
+//            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) tree.delKey(v);
             return SearchImpl::visit(g, tree, root, mask, StoreTargetToVIter<Iter>(iter), 0);
 		};
 
 	template<class GraphType,
 		 class VertContainer,class Iter>
-	static int scan(GraphType &g,
+	static int scan(const GraphType &ag,
                     VertContainer &atree,
                     Iter iter,
 				    EdgeDirection mask=EdDirOut|EdUndir|EdDirIn
 				    )
-        {   mask|=(mask & (EdDirIn|EdDirOut)) ? EdDirIn|EdDirOut : 0;
+        {   GraphType& g= const_cast<GraphType&>(ag);
+            mask|=(mask & (EdDirIn|EdDirOut)) ? EdDirIn|EdDirOut : 0;
             typename DefaultStructs::template AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type localtree;
             typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type >::Type &
                 tree=
@@ -311,7 +313,7 @@ class GraphSearchBase : public ShorPathStructs, public SearchStructs {
 
     template<class GraphType>
 	static  Set<typename GraphType::PVertex>
-            getAttainableSet(GraphType &g,
+            getAttainableSet(const GraphType &g,
 				    typename GraphType::PVertex root,
 				    EdgeDirection mask=EdDirOut|EdUndir)
     {   assert(root);
@@ -323,11 +325,12 @@ class GraphSearchBase : public ShorPathStructs, public SearchStructs {
 	template<class GraphType,
 		 class OutVIter,
 		 class OutEIter>
-	static int getPath(GraphType &g,OutPath<OutVIter, OutEIter> path,
+	static int getPath(const GraphType &ag,OutPath<OutVIter, OutEIter> path,
 				    typename GraphType::PVertex start,
 				    typename GraphType::PVertex end,
 				    EdgeDirection mask=EdUndir|EdDirOut)
     {   assert(start && end);
+        GraphType& g= const_cast<GraphType&>(ag);
 		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type tree;
 		if (SearchImpl::visit(g, tree, start, mask, EndVertVisitor(end), 0)!=-1) return -1;
 		int res=tree[end].distance;
@@ -339,11 +342,12 @@ class GraphSearchBase : public ShorPathStructs, public SearchStructs {
 
     template<class VertContainer, class GraphType, class CompIter, class VertIter>
     static int getComponents(
-		GraphType &g,
+		const GraphType &ag,
 		VertContainer &avtab,
 		CompStore<CompIter,VertIter> iters,
 		EdgeDirection mask=EdDirOut|EdUndir|EdDirIn)
-    {   typename DefaultStructs::template AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type localtab;
+    {   GraphType& g= const_cast<GraphType&>(ag);
+        typename DefaultStructs::template AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type localtab;
         typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template
                 AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type >::Type & vtab=
             BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex, VisitVertLabs<GraphType> >::Type >
@@ -352,7 +356,7 @@ class GraphSearchBase : public ShorPathStructs, public SearchStructs {
         *iters.compIter=0;++iters.compIter;
         if (g.getVertNo()==0)
         {
-            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) vtab.delKey(v);
+//            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) vtab.delKey(v);
             return 0;
         }
         typename StoreCompVisitor<VertIter,CompIter>::State st(iters);
