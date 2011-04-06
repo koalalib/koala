@@ -5,7 +5,6 @@
 #include <iostream>
 #include <iterator>
 
-
 namespace Koala {
 
 /* ------------------------------------------------------------------------- *
@@ -48,7 +47,7 @@ template< typename Element > class Set: public std::set< Element > {
     // Funkcje zastępujące zawartość zbioru podanym zakresem elementów.
         void assign( const Element *, unsigned );
         template <class Iter>
-            void assign(Iter, Iter );
+            void assign( Iter, Iter );
 
     // Operator przypisania.
         Set<Element> &operator=( const Element &e );
@@ -87,46 +86,35 @@ template< typename Element > class Set: public std::set< Element > {
         template <class Funktor>
             void truncate( Funktor );
         template <class Iter>
-            int getElements(Iter);
+            int getElements( Iter );
 
         Element first() const;
         Element last() const;
-        Element next(const Element&) const;
-        Element prev(const Element&) const;
-
-        //+ odziedziczone: clear, insert, empty, size, const_iterator, inserter()
-        //  tyle powinna miec kazda implementacja Seta
-
+        Element next( const Element & ) const;
+        Element prev( const Element & ) const;
 } ;
+
+template< class Element > class SetInserter;
+
+template< class Element >
+class SetInserter< Set< Element > >: public std::iterator< std::output_iterator_tag,void,void,void,void >
+{
+    protected:
+        Set< Element > *container;
+        
+    public:
+        typedef Set< Element > container_type;
+        SetInserter( Set< Element > &x ): container( &x ) { }
+        SetInserter< Set< Element > > &operator= (const Element & value)
+    { (*container)+=value; return *this; }
+        SetInserter< Set< Element > > &operator*() { return *this; }
+        SetInserter< Set< Element > > &operator++() { return *this; }
+        SetInserter< Set<Element> > operator++(int) { return *this; }
+} ;
+
+template< class Element >
+SetInserter< Set< Element > > setInserter( Set< Element > & );
 
 #include "set_set.hpp"
 
-template <class Element>
-  class SetInserter;
-
-template <class Element>
-  class SetInserter<Set<Element> > : public std::iterator<std::output_iterator_tag,void,void,void,void>
-{
-protected:
-  Set<Element>* container;
-
-public:
-  typedef Set<Element> container_type;
-  SetInserter (Set<Element>& x)
-    : container(&x) {}
-  SetInserter<Set<Element> >& operator= (const Element & value)
-    { (*container)+=value; return *this; }
-  SetInserter<Set<Element> >& operator* ()
-    { return *this; }
-  SetInserter<Set<Element> >& operator++ ()
-    { return *this; }
-  SetInserter<Set<Element> > operator++ (int)
-    { return *this; }
-};
-
-template <class Element>
-SetInserter<Set<Element> > setInserter(Set<Element>& x) { return SetInserter<Set<Element> >(x); }
-
 }
-
-

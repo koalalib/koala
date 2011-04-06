@@ -67,7 +67,7 @@ void readG6(Graph &graph, std::string str_graph) {
 }
 
 template<class Graph>
-void writeG6(Graph &graph, std::string &str_graph) {
+void writeG6(const Graph &graph, std::string &str_graph) {
 	typedef typename Graph::Vertex Vertex;
 	typedef typename Graph::Edge Edge;
 //	int mask = 0;
@@ -138,7 +138,7 @@ void writeG6(Graph &graph, std::string &str_graph) {
 }
 
 template<class Graph>
-int writeG6(Graph &graph, char *str_graph, int len_str) {
+int writeG6(const Graph &graph, char *str_graph, int len_str) {
 	if(len_str<4)
 		return 0;
 

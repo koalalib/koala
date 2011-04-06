@@ -5,7 +5,6 @@
 #include <iostream>
 #include <iterator>
 
-
 namespace Koala {
 
 /* ------------------------------------------------------------------------- *
@@ -29,11 +28,10 @@ template< typename Element >
 template< typename Element >
     Set< Element > operator^( const Set< Element > &, const Set< Element > & );
 template< typename Element >
-    std::ostream& operator<<(std::ostream& ,const Set<Element> &);
+    std::ostream& operator<<( std::ostream &, const Set< Element > & );
 
 template< typename Element > class Set: protected std::vector< Element > {
     public:
-
         typedef typename std::vector< Element >::const_iterator const_iterator;
         const_iterator begin() const { return std::vector< Element >::begin(); }
         const_iterator end() const { return std::vector< Element >::end(); }
@@ -45,16 +43,13 @@ template< typename Element > class Set: protected std::vector< Element > {
         Set( const Set<Element> & );
         Set( const std::set< Element > & );
         Set( const Element *, unsigned );
-        template <class Iter>
-            Set( Iter, Iter );
+        template <class Iter> Set( Iter, Iter );
         Set( const std::vector< Element > & );
 
     // Funkcje zastępujące zawartość zbioru podanym zakresem elementów.
         void assign( const Element *, unsigned );
-        template <class Iter>
-            void assign(Iter, Iter );
-        template <class Iter>
-            void insert(Iter, Iter );
+        template <class Iter> void assign( Iter, Iter );
+        template <class Iter> void insert( Iter, Iter );
 
     // Operator przypisania.
         Set<Element> &operator=( const Element &e );
@@ -67,77 +62,62 @@ template< typename Element > class Set: protected std::vector< Element > {
 
 
         // Informacja o tym, czy jest podzbiorem podanego zbioru.
-        bool subsetOf( const Set<Element> & ) const;
+        bool subsetOf( const Set< Element > & ) const;
         // Informacja o tym, czy jest nadzbiorem podanego zbioru.
-        bool supersetOf( const Set<Element> & ) const;
+        bool supersetOf( const Set< Element > & ) const;
         // Czy zbiory są identyczne/różne.
 
     // Operacje na pojedynczych elementach zbioru.
         // Dodajemy element do zbioru, zwracając status operacji.
         bool add( const Element & );
-        Set<Element> &operator+=( const Element & );
+        Set< Element > &operator+=( const Element & );
         // Usuwamy element ze zbioru, zwracając status operacji.
         bool del( const Element & );
-        Set<Element> &operator-=( const Element & );
+        Set< Element > &operator-=( const Element & );
         // Sprawdzamy, czy element należy do zbioru.
         bool isElement( const Element & ) const;
 
     // Operacje na całych zbiorach.
         // Suma zbiorów.
-        Set<Element> &operator+=( const Set<Element> & );
+        Set< Element > &operator+=( const Set< Element > & );
         // Część wspólna zbiorów.
-        Set<Element> &operator*=( const Set<Element> & );
+        Set< Element > &operator*=( const Set< Element > & );
         // Różnica zbiorów.
-        Set<Element> &operator-=( const Set<Element> & );
+        Set< Element > &operator-=( const Set< Element > & );
         // Różnica symetryczna zbiorów.
-        Set<Element> &operator^=( const Set<Element> & );
+        Set< Element > &operator^=( const Set< Element > & );
         // Podzbiór elementów/usunięcie elementów spełniających/nie spełniających podanego
         // predykatu.
-        template <class Funktor>
-            Set<Element> subset( Funktor );
-        template <class Funktor>
-            void truncate( Funktor );
-        template <class Iter>
-            int getElements(Iter);
+        template< class Funktor > Set< Element > subset( Funktor );
+        template< class Funktor > void truncate( Funktor );
+        template< class Iter > int getElements( Iter );
 
         Element first() const;
         Element last() const;
-        Element next(const Element&) const;
-        Element prev(const Element&) const;
-
-        //+ odziedziczone: clear, insert, empty, size, const_iterator, inserter()
-        //  tyle powinna miec kazda implementacja Seta
-
+        Element next( const Element & ) const;
+        Element prev( const Element & ) const;
 } ;
+
+template< class Element > class SetInserter;
+
+template< class Element >
+class SetInserter< Set< Element > >: public std::iterator< std::output_iterator_tag,void,void,void,void >
+{
+    protected:
+        Set< Element > *container;
+
+    public:
+        typedef Set< Element > container_type;
+        SetInserter( Set< Element > &x ): container( &x ) { }
+        SetInserter< Set< Element > > &operator=( const Element & value)
+        { (*container) += value; return *this; }
+        SetInserter< Set< Element > > &operator*() { return *this; }
+        SetInserter< Set< Element > > &operator++() { return *this; }
+        SetInserter< Set< Element > > operator++(int) { return *this; }
+} ;
+
+template< class Element > SetInserter< Set< Element > > setInserter( Set< Element > &);
 
 #include "set_vector.hpp"
 
-template <class Element>
-  class SetInserter;
-
-template <class Element>
-  class SetInserter<Set<Element> > : public std::iterator<std::output_iterator_tag,void,void,void,void>
-{
-protected:
-  Set<Element>* container;
-
-public:
-  typedef Set<Element> container_type;
-  SetInserter (Set<Element>& x)
-    : container(&x) {}
-  SetInserter<Set<Element> >& operator= (const Element & value)
-    { (*container)+=value; return *this; }
-  SetInserter<Set<Element> >& operator* ()
-    { return *this; }
-  SetInserter<Set<Element> >& operator++ ()
-    { return *this; }
-  SetInserter<Set<Element> > operator++ (int)
-    { return *this; }
-};
-
-template <class Element>
-SetInserter<Set<Element> > setInserter(Set<Element>& x) { return SetInserter<Set<Element> >(x); }
-
 }
-
-
