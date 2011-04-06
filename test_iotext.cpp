@@ -1,3 +1,4 @@
+
 #include<stdio.h>
 #include<string.h>
 
@@ -43,15 +44,15 @@ int main() {
 
 	writeGraphText(g, buf, 65536, RG_UndirectedVertexLists);
 	rv |= Test("UndirectedVertexLists", buf,
-		   "0(0) 2 u1(101) u2(102)\n"
-		   "1(1) 1 u2(112)\n"
+		   "0(0) 2 -1(101) -2(102)\n"
+		   "1(1) 1 -2(112)\n"
 		   "2(2) 0\n"
 		   "3(3) 0\n");
 
 	writeGraphText(g, buf, 65536, RG_DirectedVertexLists);
 	rv |= Test("DirectedVertexLists", buf,
-		   "0(0) 2 u1(101) u2(102)\n"
-		   "1(1) 1 u2(112)\n"
+		   "0(0) 2 -1(101) -2(102)\n"
+		   "1(1) 1 -2(112)\n"
 		   "2(2) 0\n"
 		   "3(3) 0\n");
 
@@ -84,15 +85,15 @@ int main() {
 
 	writeGraphText(g2, buf2, RG_UndirectedVertexLists);
 	rv |= Test("UndirectedVertexLists", buf2.c_str(),
-		   "0(v0) 2 d1(e01) d2(e02)\n"
-		   "1(v1) 1 d2(e12)\n"
+		   "0(v0) 2 >1(e01) >2(e02)\n"
+		   "1(v1) 1 >2(e12)\n"
 		   "2() 0\n"
 		   "3(v3) 0\n");
 
 	writeGraphText(g2, buf2, RG_DirectedVertexLists);
 	rv |= Test("DirectedVertexLists", buf2.c_str(),
-		   "0(v0) 2 d1(e01) d2(e02)\n"
-		   "1(v1) 1 d2(e12)\n"
+		   "0(v0) 2 >1(e01) >2(e02)\n"
+		   "1(v1) 1 >2(e12)\n"
 		   "2() 0\n"
 		   "3(v3) 0\n");
 

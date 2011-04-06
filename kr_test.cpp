@@ -40,10 +40,10 @@ int main() {
 
     g.addEdge(A,B,OpisE(1));
     g.addEdge(B,D,OpisE(4));
-    g.addEdge(C,D,OpisE(1));
+    g.addEdge(C,D,OpisE(100));
     g.addEdge(A,D,OpisE(2));
     g.addEdge(C,B,OpisE(1));
-//    g.addEdge(E,F,OpisE(101));
+    //g.addEdge(E,F,OpisE(101));
 
 //    g.clear();g.addVert();
 
@@ -55,7 +55,7 @@ int main() {
         edgeCont[ePt].weight=ePt->info.dlugosc;
 
 //    Koala::Kruskal::Result<int> res=Koala::Kruskal::getForest(g,edgeCont,tabE,Koala::blackHole());
-    Koala::Kruskal::Result<int> res=Koala::Kruskal::getForest(g,edgeCont,tabE,sets);
+    Koala::Kruskal::Result<int> res=Koala::Kruskal::getMaxForest(g,edgeCont,tabE,sets);
 
     std::cout << "waga: " << res.weight << " krawedzi " << res.edgeNo << std::endl;
     for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<

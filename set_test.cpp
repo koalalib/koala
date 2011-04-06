@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define KOALA_SET_ON_VECTOR
+//#define KOALA_SET_ON_VECTOR
 
 #include "Koala/container/set.h"
 #include "Koala/container/assoctab.h"

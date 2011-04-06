@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"  
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns 
+        ./graphml.xsd">
+  <key id="x" for="node" attr.type="int" attr.name="nn">
+    <default>100</default>
+  </key>
+  <key id="y" for="edge" attr.type="int" attr.name="ee">
+    <default>200</default>
+  </key>
+  <graph id="G" edgedefault="undirected">
+    <edge id="e0" source="n0" target="n2">
+      <data key="y">20</data>
+    </edge>
+    <node id="n0">
+      <data key="x">10</data>
+    </node>
+    <node id="n1">
+      <data key="x">11</data>
+    </node>
+    <node id="n2">
+      <data key="x">12</data>
+    </node>
+    <node id="n3">
+      <data key="x">13</data>
+    </node>
+    <node id="n4">
+      <data key="x">14</data>
+    </node>
+    <edge id="e4" source="n2" target="n4">
+      <data key="y">24</data>
+    </edge>
+    <node id="n5">
+      <data key="x">15</data>
+    </node>
+    <edge id="e1" source="n0" target="n1">
+      <data key="y">21</data>
+    </edge>
+    <edge id="e2" source="n1" target="n3">
+      <data key="y">22</data>
+    </edge>
+    <edge id="e3" source="n3" target="n2">
+      <data key="y">23</data>
+    </edge>
+    <edge id="e5" source="n3" target="n5">
+      <data key="y">25</data>
+    </edge>
+    <edge id="e6" source="n5" target="n4">
+      <data key="y">26</data>
+    </edge>
+  </graph>
+</graphml>

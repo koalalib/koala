@@ -43,7 +43,7 @@ class VertexB {
 
 template <class T> void bht2(T& arg)
 {
-    if (!isBlackHole(arg)) std::cout << arg[0] << "\n";
+    if (!isBlackHole(arg)) std::cout << (char)arg[0] << "\n";
     else std::cout << "Zakazane\n";
 }
 
@@ -51,16 +51,16 @@ template <class T> void bht2(T& arg)
 void bht()
 {   int i;
     std::string  s="a";
-    blackHole(i)="ala";
+    blackHole()="ala";
     (*blackHole())="ala";
-    (blackHole<std::string>())++;
+//    (blackHole<std::string>())++;
 //    blackHole()[i]='a';
 //    blackHole()(4,s)='b';
     std::cout << isBlackHole(i) <<"\n";
     std::cout << isBlackHole(blackHole()) <<"\n";
-    std::cout << isBlackHole(blackHole<std::string>()) <<"\n";
+//    std::cout << isBlackHole(blackHole<std::string>()) <<"\n";
 //    bht2(i);
-    bht2(blackHole(i));
+    bht2(blackHole());
 }
 
 

@@ -5,8 +5,10 @@
 #include <map>
 #include <algorithm>
 #include <cassert>
-#include "../graph/graph.h"
 #include "../base/def_struct.h"
+#include "../graph/graph.h"
+#include "../graph/subgraph.h"
+#include "search.h"
 #include "../container/joinsets.h"
 #include "../container/localarray.h"
 
@@ -21,7 +23,7 @@ namespace Koala {
 //A tak wyobrazam sobie wszystkie nasze algorytmy - spokrewnione procedury i uzywane struktury
 //zamykamy w jednej klasie. Same procedury sa szablonami jej metod statycznych.
 
-class Dijkstra : public ShorPathStructs {
+class Dijkstra : public ShortPathStructs {
 // namespace Dijkstra { - druga mozliwosc, wtedy mozna by pozbyc sie staticow
 
     // wszystkie rodzaje nietrywialnych struktur uzywanych wewnatrz procedur okreslamy tutaj, aby w razie
@@ -63,7 +65,7 @@ class Dijkstra : public ShorPathStructs {
     template <class GraphType, class VertContainer, class EdgeContainer>
     static typename EdgeContainer::ValType::DistType
     distances (
-        GraphType & g,
+        const GraphType & g,
         VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
         EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
@@ -78,8 +80,6 @@ class Dijkstra : public ShorPathStructs {
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
 
         typename GraphType::PVertex U,V;
-
-        for(U=g.getVert();U;U=g.getVertNext(U)) vertTab.delKey(U);
 
         Q[start].vPrev=0;Q[start].ePrev=0;
         Q[start].distance=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
@@ -126,15 +126,15 @@ class Dijkstra : public ShorPathStructs {
     template <class GraphType, class VertContainer, class VIter, class EIter>
     static int
         getPath(
-        GraphType& g,
+        const GraphType& g,
         VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
         typename GraphType::PVertex end,
-        ShorPathStructs::OutPath<VIter,EIter> iters)
+        ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(end);
         if (NumberTypeBounds<typename VertContainer::ValType::DistType>::isPlusInfty(vertTab[end].distance))
             return -1; // wierzcholek end jest nieosiagalny
 
-        return ShorPathStructs::getOutPath(g,vertTab,iters,end);
+        return ShortPathStructs::getOutPath(g,vertTab,iters,end);
     }
 
 
@@ -152,10 +152,10 @@ class Dijkstra : public ShorPathStructs {
     template <class GraphType, class EdgeContainer, class VIter, class EIter>
     static PathLengths<typename EdgeContainer::ValType::DistType>
         findPath(
-        GraphType& g,
+        const GraphType& g,
         EdgeContainer& edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
-        ShorPathStructs::OutPath<VIter,EIter> iters)
+        ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(start && end);
         typename EdgeContainer::ValType::DistType dist;
         typename DefaultStructs::AssocCont<typename GraphType::PVertex,
@@ -163,6 +163,136 @@ class Dijkstra : public ShorPathStructs {
 
         if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isPlusInfty(dist
                                                             =distances(g,vertTab,edgeTab,start,end)))
+            return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-1); // end nieosiagalny
+
+        int len=getPath(g,vertTab,end,iters);
+        return PathLengths<typename EdgeContainer::ValType::DistType>(dist,len);
+        // dlugosc najkr. siezki i jej liczba krawedzi
+    }
+
+};
+
+
+
+class DAGCritPath : public ShortPathStructs {
+
+    class DefaultStructs {
+        public:
+
+        template <class A, class B> class AssocCont {
+            public:
+            typedef AssocArray<A,B> Type;
+        };
+
+    };
+
+    public:
+
+    template <class DType> struct EdgeLabs {
+
+        typedef DType DistType;
+        DistType length;
+    };
+
+
+    template <class DType, class GraphType> struct VertLabs {
+
+        typedef DType DistType;
+        DType distance;
+        typename GraphType::PVertex vPrev;
+        typename GraphType::PEdge  ePrev;
+
+        VertLabs() : vPrev(0), ePrev(0), distance(NumberTypeBounds<DType>::minusInfty()) {}
+    };
+
+
+    template <class GraphType, class VertContainer, class EdgeContainer>
+    static typename EdgeContainer::ValType::DistType
+    critPathLength (
+        const GraphType & g,
+        VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
+        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        typename GraphType::PVertex start, typename GraphType::PVertex end=0)
+    // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
+    {   assert(start);
+        typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
+        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
+                    vertTab=
+                BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
+
+        typename GraphType::PVertex U,V;
+        typename EdgeContainer::ValType::DistType nd;
+
+        vertTab[start].vPrev=0;vertTab[start].ePrev=0;
+        vertTab[start].distance=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        if (start==end) return NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+
+        typename DefaultStructs::AssocCont<typename GraphType::PVertex, char >::Type followers;
+        typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
+        Koala::BFS::scanAttainable(g,start,assocInserter(followers,emptyStruct((char)0)),EdDirOut);
+        Koala::DAGAlgs::topOrd(makeSubgraph(const_cast<GraphType&>(g),std::make_pair(assocKeyChoose(followers),stdChoose(true))),tabV);
+
+        for(int i=1;i<followers.size();i++) {
+            U=tabV[i];
+            vertTab[U].vPrev=0;vertTab[U].ePrev=0;
+            vertTab[U].distance=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::minusInfty();
+
+            for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirIn);
+                E;E=g.getEdgeNext(U,E,Koala::EdDirIn))
+                    if (followers.hasKey(V=g.getEdgeEnd(E,U)))
+                        if ((nd=vertTab[V].distance+edgeTab[E].length)>vertTab[U].distance)
+                    { vertTab[U].distance=nd; vertTab[U].ePrev=E; vertTab[U].vPrev=V;  }
+            if (U==end) return vertTab[U].distance;
+        }
+
+        return end ? NumberTypeBounds<typename EdgeContainer::ValType::DistType>::minusInfty()
+                    : NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+    }
+
+
+    template <class GraphType, class VertContainer, class VIter, class EIter>
+    static int
+        const getPath(
+        GraphType& g,
+        VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
+        typename GraphType::PVertex end,
+        ShortPathStructs::OutPath<VIter,EIter> iters)
+    {   assert(end);
+        if (NumberTypeBounds<typename VertContainer::ValType::DistType>::isMinusInfty(vertTab[end].distance))
+            return -1; // wierzcholek end jest nieosiagalny
+
+        return ShortPathStructs::getOutPath(g,vertTab,iters,end);
+    }
+
+
+    // Rekord wyjsciowy zawierajacy od razu dlugosc najkr. sciezki i jej liczbe krawedzi
+    template <class DistType> struct PathLengths {
+        DistType length;
+        int edgeNo;
+
+        PathLengths(DistType alen, int ano) : length(alen), edgeNo(ano) {}
+        PathLengths() {}
+    };
+
+    // wlasciwa procedura: zapisuje od razu sciezke krytyczna (wierzcholki i krawedzie) pod pare podanych iteratorow
+    // Znajduje wszystko w jedym etapie
+    template <class GraphType, class EdgeContainer, class VIter, class EIter>
+    static PathLengths<typename EdgeContainer::ValType::DistType>
+        findPath(
+        const GraphType& g,
+        EdgeContainer& edgeTab,
+        typename GraphType::PVertex start, typename GraphType::PVertex end,
+        ShortPathStructs::OutPath<VIter,EIter> iters)
+    {   assert(start && end);
+        typename EdgeContainer::ValType::DistType dist;
+        typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
+
+        if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isMinusInfty(dist
+                                                            =critPathLength(g,vertTab,edgeTab,start,end)))
             return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-1); // end nieosiagalny
 
         int len=getPath(g,vertTab,end,iters);
@@ -205,16 +335,18 @@ class Kruskal {
     };
 
 
+    protected:
+
     template <class GraphType, class EdgeContainer, class Iter, class VertCompContainer>
     static Result<typename EdgeContainer::ValType::WeightType>
     getForest(
-        GraphType & g,
+        const GraphType & g,
         EdgeContainer& edgeTab,
         Iter out,
         VertCompContainer& asets,
-        int edgeNo=-1, //ujemne oznacza maksymalnie duzo
-        EdgeDirection mask=EdUndir,
-        bool minWeight=true)
+        int edgeNo, //ujemne oznacza maksymalnie duzo
+        EdgeDirection mask,
+        bool minWeight)
         {   JoinableSets<typename GraphType::PVertex, typename DefaultStructs::AssocCont<typename GraphType::PVertex,
                 JSPartDesrc<typename GraphType::PVertex> *>::Type > localSets;
             typename BlackHoleSwitch<VertCompContainer,JoinableSets<typename GraphType::PVertex,
@@ -261,12 +393,49 @@ class Kruskal {
             return res;
     }
 
+    public:
+
+    template <class GraphType, class EdgeContainer, class Iter, class VertCompContainer>
+    static Result<typename EdgeContainer::ValType::WeightType>
+    getMinForest(
+        const GraphType & g,
+        EdgeContainer& edgeTab,
+        Iter out,
+        VertCompContainer& asets,
+        int edgeNo=-1, //ujemne oznacza maksymalnie duzo
+        EdgeDirection mask=EdUndir)
+    {
+        return getForest(g,edgeTab,out,asets,edgeNo,mask,true);
+    }
+
 
     template <class GraphType, class EdgeContainer, class Iter>
     static Result<typename EdgeContainer::ValType::WeightType>
-    getForest(GraphType & g,EdgeContainer& edgeTab,Iter out)
+    getMinForest(const GraphType & g,EdgeContainer& edgeTab,Iter out)
     {
-        return getForest(g,edgeTab,out,blackHole());
+        return getMinForest(g,edgeTab,out,blackHole());
+    }
+
+
+    template <class GraphType, class EdgeContainer, class Iter, class VertCompContainer>
+    static Result<typename EdgeContainer::ValType::WeightType>
+    getMaxForest(
+        const GraphType & g,
+        EdgeContainer& edgeTab,
+        Iter out,
+        VertCompContainer& asets,
+        int edgeNo=-1, //ujemne oznacza maksymalnie duzo
+        EdgeDirection mask=EdUndir)
+    {
+        return getForest(g,edgeTab,out,asets,edgeNo,mask,false);
+    }
+
+
+    template <class GraphType, class EdgeContainer, class Iter>
+    static Result<typename EdgeContainer::ValType::WeightType>
+    getMaxForest(const GraphType & g,EdgeContainer& edgeTab,Iter out)
+    {
+        return getMaxForest(g,edgeTab,out,blackHole());
     }
 
 

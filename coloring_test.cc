@@ -65,14 +65,36 @@ int main() {
     c.clear();
     g.delEdges();
 
-    g.addEdge(v[0],v[1],""); g.addEdge(v[0],v[2],""); g.addEdge(v[3],v[1],"");
-    g.addEdge(v[3],v[2],"");g.addEdge(v[0],v[4],"");
+    for( unsigned i = 0; i < 10; i++ )
+        for( unsigned j = 0; j < 10; j++ ) if (i != j && i % 3 != j % 3) g.addEdge( v[i],v[j],"" );
+    std::cout << "Graf trojdzielny pelny, kolorowanie SL-em:";
+    Koala::SeqVertColoring::sl( g,c );
+    for( unsigned i = 0; i < 10; i++ )
+        if (c.hasKey( v[i] ) ) std::cout << " " << c[v[i]];
+        else std::cout << " -";
+    std::cout << std::endl;
+    c.clear();
+    g.delEdges();
 
-    c[v[2]]=c[v[1]]=2; c[v[3]]=2; c[v[4]]=3;
-     std::cout << '\n' << Koala::SeqVertColoring::interchangeComponents(g,c,v[0],cc,2,3);
+    for( unsigned i = 0; i < 10; i++ )
+        for( unsigned j = 0; j < 10; j++ ) if (i != j && i % 3 != j % 3) g.addEdge( v[i],v[j],"" );
+    std::cout << "Graf trojdzielny pelny, kolorowanie SLF-em:";
+    Koala::SeqVertColoring::slf( g,c );
+    for( unsigned i = 0; i < 10; i++ )
+        if (c.hasKey( v[i] ) ) std::cout << " " << c[v[i]];
+        else std::cout << " -";
+    std::cout << std::endl;
+    c.clear();
+    g.delEdges();
 
-    for(Vertex v=cc.firstKey();v;v=cc.nextKey(v))
-        std::cout << "\n (" << v->info << ':' << c[v] << ' ' << cc[v] << ')';
+     g.addEdge(v[0],v[1],""); g.addEdge(v[0],v[2],""); g.addEdge(v[3],v[1],"");
+     g.addEdge(v[3],v[2],"");g.addEdge(v[0],v[4],"");
+
+     c[v[2]]=c[v[1]]=2; c[v[3]]=2; c[v[4]]=3;
+      std::cout << '\n' << Koala::SeqVertColoring::interchangeComponents(g,c,v[0],cc,2,3);
+
+     for(Vertex v=cc.firstKey();v;v=cc.nextKey(v))
+         std::cout << "\n (" << v->info << ':' << c[v] << ' ' << cc[v] << ')';
 
 
     return 0;

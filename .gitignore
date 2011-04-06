@@ -1,4 +1,7 @@
 *.exe
 *.o
 *.prv
-*.xml
+*.cbp
+*.layout
+*.depend
+
