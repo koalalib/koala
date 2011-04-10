@@ -87,6 +87,16 @@ int main() {
     c.clear();
     g.delEdges();
 
+    for( unsigned i = 0; i < 10; i++ )
+        for( unsigned j = 0; j < 10; j++ ) if (i != j) g.addEdge( v[i],v[j],"" );
+    std::cout << "Graf pelny, kolorowanie wierzcholek po wierzcholku (z interchangem):";
+    Koala::SeqVertColoring::greedyWithInterchange( g,c );
+    for( unsigned i = 0; i < 10; i++ )
+        std::cout << " " << c[v[i]];
+    std::cout << std::endl;
+    c.clear();
+    g.delEdges();
+
      g.addEdge(v[0],v[1],""); g.addEdge(v[0],v[2],""); g.addEdge(v[3],v[1],"");
      g.addEdge(v[3],v[2],"");g.addEdge(v[0],v[4],"");
 
