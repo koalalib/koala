@@ -50,12 +50,11 @@ class SeqVertColoring {
             Const( int arg ): val( arg ) {}
             template< typename T > int operator()( T ) { return val; }
         } ;
-
+
         template< typename Graph, typename ColorMap, typename CompMap >
             static int interchangeComponents(
                 const Graph &g, ColorMap &c, typename Graph::PVertex v,
-                CompMap &map, int c1, int c2 );
-
+                CompMap &map, int c1, int c2 );
         template< typename Graph, typename ColorMap >
             static int colorInterchange(
                 const Graph &g, ColorMap &c, typename Graph::PVertex v );

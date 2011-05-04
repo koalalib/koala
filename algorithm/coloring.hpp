@@ -53,7 +53,7 @@ int SeqVertColoring::interchangeComponents(
         {
             BFS::scanAttainable(
                 makeSubgraph( const_cast< Graph & >( g ),std::make_pair(
-                assocChoose( c,c1 ) || assocChoose( c,c2 ),stdChoose( true ))),
+                assocChoose( assocTabInterf(c),c1 ) || assocChoose( assocTabInterf(c),c2 ),stdChoose( true ))),
                 u,assocInserter( map,Const( l ) ), EdDirIn|EdDirOut|EdUndir );
             l++;
         }

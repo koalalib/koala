@@ -304,6 +304,185 @@ class DAGCritPath : public ShortPathStructs {
 
 
 
+class BellmanFord : public ShortPathStructs {
+
+    class DefaultStructs {
+        public:
+
+        template <class A, class B> class AssocCont {
+            public:
+            typedef AssocArray<A,B> Type;
+        };
+
+    };
+
+    public:
+
+    template <class DType> struct EdgeLabs {
+
+        typedef DType DistType;
+        DistType length;
+    };
+
+    template <class DType, class GraphType> struct VertLabs {
+
+        typedef DType DistType;
+        DType distance;
+        typename GraphType::PVertex vPrev;
+        typename GraphType::PEdge  ePrev;
+
+        VertLabs() : vPrev(0), ePrev(0), distance(NumberTypeBounds<DType>::plusInfty()) {}
+    };
+
+    // wlasciwa procedura: odleglosc miedzy para wierzcholkow
+    template <class GraphType, class VertContainer, class EdgeContainer>
+    static typename EdgeContainer::ValType::DistType
+    distances (
+        const GraphType & g,
+        VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
+        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        typename GraphType::PVertex start, typename GraphType::PVertex end=0)
+    // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
+    {   assert(start);
+        typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
+        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
+                    vertTab=
+                BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
+
+        typename GraphType::PVertex U,V;
+
+        typename EdgeContainer::ValType::DistType
+                inf=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty(),nd;
+        typename EdgeContainer::ValType::DistType
+                zero=NumberTypeBounds<typename EdgeContainer::ValType::DistType> ::zero();
+        typename EdgeContainer::ValType::DistType
+                minusInf=NumberTypeBounds<typename EdgeContainer::ValType::DistType> ::minusInfty();
+        bool existNegCycle = false;
+
+
+        //sprawdzenie czy nie ma petli ujemnych - przerzucilam tutaj, bo bez sensu tracic czas na obliczenia,
+        //jezeli ich sie i tak nie wykorzysta
+        for(typename GraphType::PEdge E=g.getEdge(Koala::EdLoop|Koala::EdUndir);E;E=g.getEdgeNext(E, Koala::EdLoop|Koala::EdUndir))
+            if (edgeTab[E].length < zero)
+            {
+                for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+                    vertTab[v].distance=minusInf;
+                return minusInf;
+            }
+
+        //inicjalizacja
+        //for each v: d[v] <- INF (to jest zrealizowane juz przy tworzeniu vertTab)
+        //f[s] <- NIL
+        vertTab[start].vPrev=0;vertTab[start].ePrev=0;
+        //d[s] <- 0
+        vertTab[start].distance=zero;
+
+        //for 1 to n-1:
+        //  for each (u,v):
+        //      if  d[u]+w(u,v) < d[v]:
+        //          d[v] <- d[u]+w(u,v) and vPrev[v] <- u and ePrev[v] <- (u,v)
+        int n=g.getVertNo();
+        for(int i=1;i<n;i++){
+            //relaksacja krawedzi nieskierowanych
+            for(typename GraphType::PEdge E=g.getEdge(Koala::EdUndir); E; E=g.getEdgeNext(E, Koala::EdUndir)){
+                if (((nd=vertTab[U=g.getEdgeEnds(E).first].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance) && (vertTab[U].distance < inf))
+                    { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
+                else if (((nd=vertTab[U=g.getEdgeEnds(E).second].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).first].distance) && (vertTab[U].distance < inf))
+                    { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
+            }
+            //relaksacja krawedzi (u,v) skierowanych u->v
+            for(typename GraphType::PEdge E=g.getEdge(Koala::EdDirOut); E; E=g.getEdgeNext(E, Koala::EdDirOut))
+                if (((nd=vertTab[U=g.getEdgeEnds(E).first].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance) && (vertTab[U].distance < inf))
+                    { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
+        }
+
+        //sprawdzenie czy nie ma cykli ujemnych
+        {
+            for(typename GraphType::PEdge E=g.getEdge(Koala::EdUndir); E; E=g.getEdgeNext(E, Koala::EdUndir))
+                if (((nd=vertTab[U=g.getEdgeEnds(E).first].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance) && (vertTab[U].distance < inf))
+                    { existNegCycle=true; break; }
+                else if (((nd=vertTab[U=g.getEdgeEnds(E).second].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).first].distance) && (vertTab[U].distance < inf))
+                    { existNegCycle=true; break; }
+        }
+        if (!existNegCycle)
+            for(typename GraphType::PEdge E=g.getEdge(Koala::EdDirOut); E; E=g.getEdgeNext(E, Koala::EdDirOut))
+                if (((nd=vertTab[U=g.getEdgeEnds(E).first].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance) && (vertTab[U].distance < inf))
+                    { existNegCycle=true; break; }
+
+        //jesli ponizsze ustawianie wszystkich odleglosci na minusInf pominac to dotychczasowe obliczenia zostana, trzeba zdecydowac:
+        //1 podejscie: ustawic wszystkie odleglosci na minusInf - oczywista informacja dla uzytkownika
+        //2 podejscie: funkcja zwroci minusInf, ale pomijamy kasowanie dotychczasowych obliczen - uzytkownik musi spr czy funkcja distances nie zwraca minusInf
+        //zanim zacznie cokolwiek innego robic
+        if (existNegCycle){
+            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+                vertTab[v].distance=minusInf;
+            return minusInf;
+        }
+        //jezeli nie ma cykli ujemnych to mozemy zwrocic wynik
+        return end ? vertTab[end].distance : zero;
+    }
+
+
+    // wlasciwa procedura: zapisuje najkrotsza sciezke (wierzcholki i krawedzie) pod pare podanych iteratorow,
+    // zwraca liczbe krawedzi najkrotszej sciezki. Korzysta z kontenera vertTab z danymi z poprzedniej funkcji
+    template <class GraphType, class VertContainer, class VIter, class EIter>
+    static int
+        getPath(
+        const GraphType& g,
+        VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
+        typename GraphType::PVertex end,
+        ShortPathStructs::OutPath<VIter,EIter> iters)
+    {   assert(end);
+        if (NumberTypeBounds<typename VertContainer::ValType::DistType>::isPlusInfty(vertTab[end].distance))
+            return -1; // wierzcholek end jest nieosiagalny
+        else if (NumberTypeBounds<typename VertContainer::ValType::DistType>::isMinusInfty(vertTab[end].distance))
+            return -2; // w grafie jest cykl ujemny
+        return ShortPathStructs::getOutPath(g,vertTab,iters,end);
+    }
+
+
+    // Rekord wyjsciowy zawierajacy od razu dlugosc najkr. sciezki i jej liczbe krawedzi
+    template <class DistType> struct PathLengths {
+        DistType length;
+        int edgeNo;
+
+        PathLengths(DistType alen, int ano) : length(alen), edgeNo(ano) {}
+        PathLengths() {}
+    };
+
+    // wlasciwa procedura: zapisuje od razu najkrotsza sciezke (wierzcholki i krawedzie) pod pare podanych iteratorow
+    // Znajduje wszystko w jedym etapie
+    template <class GraphType, class EdgeContainer, class VIter, class EIter>
+    static PathLengths<typename EdgeContainer::ValType::DistType>
+        findPath(
+        const GraphType& g,
+        EdgeContainer& edgeTab,
+        typename GraphType::PVertex start, typename GraphType::PVertex end,
+        ShortPathStructs::OutPath<VIter,EIter> iters)
+    {   assert(start && end);
+        typename EdgeContainer::ValType::DistType dist;
+        typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
+
+        if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isPlusInfty(dist
+                                                            =distances(g,vertTab,edgeTab,start,end)))
+            return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-1); // end nieosiagalny
+        else if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isMinusInfty(dist
+                                                            /*=distances(g,vertTab,edgeTab,start,end)*/))
+            return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-2); // w grafie jest cykl ujemny
+
+        int len=getPath(g,vertTab,end,iters);
+        return PathLengths<typename EdgeContainer::ValType::DistType>(dist,len);
+        // dlugosc najkr. siezki i jej liczba krawedzi
+    }
+
+};
+
+
+
 class Kruskal {
 
     class DefaultStructs {
