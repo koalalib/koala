@@ -233,7 +233,7 @@ class DAGCritPath : public ShortPathStructs {
         typename DefaultStructs::AssocCont<typename GraphType::PVertex, char >::Type followers;
         typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
         Koala::BFS::scanAttainable(g,start,assocInserter(followers,emptyStruct((char)0)),EdDirOut);
-        Koala::DAGAlgs::topOrd(makeSubgraph(const_cast<GraphType&>(g),std::make_pair(assocKeyChoose(followers),stdChoose(true))),tabV);
+        Koala::DAGAlgs::topOrd(makeSubgraph(g,std::make_pair(assocKeyChoose(followers),stdChoose(true))),tabV);
 
         for(int i=1;i<followers.size();i++) {
             U=tabV[i];
@@ -363,8 +363,7 @@ class BellmanFord : public ShortPathStructs {
         bool existNegCycle = false;
 
 
-        //sprawdzenie czy nie ma petli ujemnych - przerzucilam tutaj, bo bez sensu tracic czas na obliczenia,
-        //jezeli ich sie i tak nie wykorzysta
+        //sprawdzenie czy nie ma petli ujemnych
         for(typename GraphType::PEdge E=g.getEdge(Koala::EdLoop|Koala::EdUndir);E;E=g.getEdgeNext(E, Koala::EdLoop|Koala::EdUndir))
             if (edgeTab[E].length < zero)
             {
@@ -388,28 +387,27 @@ class BellmanFord : public ShortPathStructs {
         for(int i=1;i<n;i++){
             //relaksacja krawedzi nieskierowanych
             for(typename GraphType::PEdge E=g.getEdge(Koala::EdUndir); E; E=g.getEdgeNext(E, Koala::EdUndir)){
-                if (((nd=vertTab[U=g.getEdgeEnds(E).first].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance) && (vertTab[U].distance < inf))
+                if (vertTab[U=g.getEdgeEnds(E).first].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance)
                     { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
-                else if (((nd=vertTab[U=g.getEdgeEnds(E).second].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).first].distance) && (vertTab[U].distance < inf))
+                else if (vertTab[U=g.getEdgeEnds(E).second].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).first].distance)
                     { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
             }
             //relaksacja krawedzi (u,v) skierowanych u->v
             for(typename GraphType::PEdge E=g.getEdge(Koala::EdDirOut); E; E=g.getEdgeNext(E, Koala::EdDirOut))
-                if (((nd=vertTab[U=g.getEdgeEnds(E).first].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance) && (vertTab[U].distance < inf))
+                if (vertTab[U=g.getEdgeEnds(E).first].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance)
                     { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
         }
 
         //sprawdzenie czy nie ma cykli ujemnych
-        {
-            for(typename GraphType::PEdge E=g.getEdge(Koala::EdUndir); E; E=g.getEdgeNext(E, Koala::EdUndir))
-                if (((nd=vertTab[U=g.getEdgeEnds(E).first].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance) && (vertTab[U].distance < inf))
-                    { existNegCycle=true; break; }
-                else if (((nd=vertTab[U=g.getEdgeEnds(E).second].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).first].distance) && (vertTab[U].distance < inf))
-                    { existNegCycle=true; break; }
-        }
+        for(typename GraphType::PEdge E=g.getEdge(Koala::EdUndir); E; E=g.getEdgeNext(E, Koala::EdUndir))
+            if (vertTab[U=g.getEdgeEnds(E).first].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance)
+                { existNegCycle=true; break; }
+            else if (vertTab[U=g.getEdgeEnds(E).second].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).first].distance)
+                { existNegCycle=true; break; }
+
         if (!existNegCycle)
             for(typename GraphType::PEdge E=g.getEdge(Koala::EdDirOut); E; E=g.getEdgeNext(E, Koala::EdDirOut))
-                if (((nd=vertTab[U=g.getEdgeEnds(E).first].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance) && (vertTab[U].distance < inf))
+                if (vertTab[U=g.getEdgeEnds(E).first].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance)
                     { existNegCycle=true; break; }
 
         //jesli ponizsze ustawianie wszystkich odleglosci na minusInf pominac to dotychczasowe obliczenia zostana, trzeba zdecydowac:
@@ -470,8 +468,7 @@ class BellmanFord : public ShortPathStructs {
         if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isPlusInfty(dist
                                                             =distances(g,vertTab,edgeTab,start,end)))
             return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-1); // end nieosiagalny
-        else if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isMinusInfty(dist
-                                                            /*=distances(g,vertTab,edgeTab,start,end)*/))
+        else if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isMinusInfty(dist))
             return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-2); // w grafie jest cykl ujemny
 
         int len=getPath(g,vertTab,end,iters);
@@ -481,6 +478,134 @@ class BellmanFord : public ShortPathStructs {
 
 };
 
+
+//algorytm liczy najkrotsza sciezke pomiedzy kazda para wierzcholków zostal zaproponowany przez Floyda i oparty na twierdzeniu Warshalla)
+class Floyd : public PathStructs {
+
+    template <class GraphType, class TwoDimVertContainer, class VIter, class EIter>
+    static int
+        getOutPathFromMatrix(const GraphType& g,
+            TwoDimVertContainer& vertMatrix, // dwuwymiarowa tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
+            OutPath<VIter,EIter> iters,
+            typename GraphType::PVertex start,
+            typename GraphType::PVertex end)
+        {   assert(end);
+            typename GraphType::PVertex u,v=vertMatrix(start,end).vPrev;
+            typename GraphType::PEdge  e=vertMatrix(start,end).ePrev;
+            typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
+            typename GraphType::PEdge LOCALARRAY(tabE,g.getVertNo());
+            int len=0;
+
+            if (end!=start) for(;v;len++)
+               { tabV[len]=v; tabE[len]=e; e=vertMatrix(start,v).ePrev; v=(v==start) ? 0 : vertMatrix(start,v).vPrev; }
+
+            for(int i=len-1;i>=0;i--)
+                { *iters.vertIter=tabV[i];*iters.edgeIter=tabE[i];++iters.vertIter;++iters.edgeIter; }
+            *iters.vertIter=end;++iters.vertIter;
+            return len;
+        }
+
+    public:
+
+    template <class DType> struct EdgeLabs {
+
+        typedef DType DistType;
+        DistType length;
+    };
+
+    template <class DType, class GraphType> struct VertLabs {
+
+        typedef DType DistType;
+        DType distance;
+        typename GraphType::PVertex vPrev;
+        typename GraphType::PEdge  ePrev;
+
+        VertLabs() : vPrev(0), ePrev(0), distance(NumberTypeBounds<DType>::plusInfty()) {}
+    };
+
+    // wlasciwa procedura: odleglosc miedzy para wierzcholkow
+    template <class GraphType, class TwoDimVertContainer, class EdgeContainer>
+    static bool // false - wykryto ujemny cykl
+    distances (
+        const GraphType & g,
+        TwoDimVertContainer& vertMatrix, // dwuwymiarowa tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
+        EdgeContainer& edgeTab) // i tablica dlugosci krawedzi
+    // i tak liczymy odleglosci pomiedzy wszystkimi parami
+    {
+        typename EdgeContainer::ValType::DistType
+                inf=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
+        typename EdgeContainer::ValType::DistType
+                zero=NumberTypeBounds<typename EdgeContainer::ValType::DistType> ::zero();
+//        typename EdgeContainer::ValType::DistType
+//                minusInf=NumberTypeBounds<typename EdgeContainer::ValType::DistType> ::minusInfty();
+        bool existNegCycle = false; //jezeli existNegCycle jest ustawiona to w grafie istnieje cykl ujemny
+
+        //sprawdzenie czy nie ma petli ujemnych
+        for(typename GraphType::PEdge E=g.getEdge(Koala::EdLoop|Koala::EdUndir);E;E=g.getEdgeNext(E, Koala::EdLoop|Koala::EdUndir))
+            if (edgeTab[E].length < zero) return false;
+
+        //inicjalizacja - ustawiam wartosci poczatkowe odleglosci w tablicy asocjacyjnej
+        for(typename GraphType::PVertex U=g.getVert();U;U=g.getVertNext(U))
+            for(typename GraphType::PVertex V=g.getVert();V;V=g.getVertNext(V))
+                if (U==V) vertMatrix(U,U).distance=zero; else vertMatrix(U,V).distance=inf;
+
+
+        for(typename GraphType::PEdge E=g.getEdge(Koala::EdDirOut);
+                        E;E=g.getEdgeNext(E,Koala::EdDirOut))
+        {   typename GraphType::PVertex U=E->getEnds().first, V=E->getEnds().second;
+            if (edgeTab[E].length<vertMatrix(U,V).distance)
+            { vertMatrix(U,V).distance=edgeTab[E].length; vertMatrix(U,V).ePrev=E; vertMatrix(U,V).vPrev=U; }
+        }
+
+        for(typename GraphType::PEdge E=g.getEdge(Koala::EdUndir);
+                        E;E=g.getEdgeNext(E,Koala::EdUndir))
+        {   typename GraphType::PVertex U=E->getEnds().first, V=E->getEnds().second,X;
+            if (edgeTab[E].length<vertMatrix(U,V).distance)
+            { vertMatrix(U,V).distance=edgeTab[E].length; vertMatrix(U,V).ePrev=E; vertMatrix(U,V).vPrev=U; }
+            X=U;U=V;V=X;
+            if (edgeTab[E].length<vertMatrix(U,V).distance)
+            { vertMatrix(U,V).distance=edgeTab[E].length; vertMatrix(U,V).ePrev=E; vertMatrix(U,V).vPrev=U; }
+        }
+
+        //run Floyd()
+        //szukam min{vertMatrix[vi][vj].distance, vertMatrix[vi][vl].distance+vertMatrix[vl][vj].distance}
+        typename EdgeContainer::ValType::DistType nd;
+        for(typename GraphType::PVertex Vl=g.getVert();Vl && !existNegCycle;Vl=g.getVertNext(Vl))
+            for(typename GraphType::PVertex Vi=g.getVert();Vi;Vi=g.getVertNext(Vi))
+            {
+                 //if (vertMatrix(Vi,Vl).distance < inf) mozna tak albo tak jak ponizej
+                 if (!NumberTypeBounds<typename TwoDimVertContainer::ValType::DistType>::isPlusInfty(vertMatrix(Vi,Vl).distance))
+                    for(typename GraphType::PVertex Vj=g.getVert();Vj;Vj=g.getVertNext(Vj))
+                        if (vertMatrix(Vl,Vj).distance < inf && ((nd=vertMatrix(Vi,Vl).distance+vertMatrix(Vl,Vj).distance) < vertMatrix(Vi,Vj).distance))
+                            { vertMatrix(Vi,Vj).distance=nd; vertMatrix(Vi,Vj).ePrev=vertMatrix(Vl,Vj).ePrev; vertMatrix(Vi,Vj).vPrev=vertMatrix(Vl,Vj).vPrev; }
+                //sprawdzenie czy nie ma cykli ujemnych
+                if (vertMatrix(Vi,Vi).distance < zero)
+                    { existNegCycle=true; break; }
+            }
+
+        //jezeli jest cykl ujemny to ustawiamy wszystkie odleglosci na minusInf i zwracamy wartosc minusInf
+        if (existNegCycle) return false;
+        //jezeli nie ma cykli ujemnych to zwracamy zero
+        return true;
+    }
+
+
+    // wlasciwa procedura: zapisuje najkrotsza sciezke (wierzcholki i krawedzie) pod pare podanych iteratorow,
+    // zwraca liczbe krawedzi najkrotszej sciezki. Korzysta z kontenera vertMatrix z danymi z poprzedniej funkcji
+    template <class GraphType, class TwoDimVertContainer, class VIter, class EIter>
+    static int
+        getPath(
+        const GraphType& g,
+        TwoDimVertContainer& vertMatrix, // tablica asoc. - rezultat poprzedniej funkcji
+        typename GraphType::PVertex start,
+        typename GraphType::PVertex end,
+        PathStructs::OutPath<VIter,EIter> iters)
+    {   assert(start && end);
+        if (NumberTypeBounds<typename TwoDimVertContainer::ValType::DistType>::isPlusInfty(vertMatrix(start,end).distance))
+            return -1; // wierzcholek end jest nieosiagalny
+        return getOutPathFromMatrix(g,vertMatrix,iters,start,end);
+    }
+};
 
 
 class Kruskal {
@@ -592,7 +717,7 @@ class Kruskal {
     static Result<typename EdgeContainer::ValType::WeightType>
     getMinForest(const GraphType & g,EdgeContainer& edgeTab,Iter out)
     {
-        return getMinForest(g,edgeTab,out,blackHole());
+        return getMinForest(g,edgeTab,out,blackHole);
     }
 
 
@@ -614,7 +739,7 @@ class Kruskal {
     static Result<typename EdgeContainer::ValType::WeightType>
     getMaxForest(const GraphType & g,EdgeContainer& edgeTab,Iter out)
     {
-        return getMaxForest(g,edgeTab,out,blackHole());
+        return getMaxForest(g,edgeTab,out,blackHole);
     }
 
 

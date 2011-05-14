@@ -33,6 +33,25 @@ public:
     AssocKeyContReg assocReg;
     std::pair<Vertex<VertInfo,EdgeInfo>*, Vertex<VertInfo,EdgeInfo>*>
         getEnds() { return std::make_pair(vert[0].vert, vert[1].vert); }
+    bool isEnd(Vertex<VertInfo,EdgeInfo>* v) { return vert[0].vert == v || vert[1].vert == v; }
+    Vertex<VertInfo,EdgeInfo>* getEnd(Vertex<VertInfo,EdgeInfo>* v)
+    {
+        if (vert[0].vert == v) return vert[1].vert;
+        if (vert[1].vert == v) return vert[0].vert;
+        return NULL;
+    }
+    EdgeDirection getDir(Vertex<VertInfo,EdgeInfo>* v)
+    {
+        if (!v || !isEnd( v )) return EdNone;
+        switch (type)
+        {
+            case Loop:
+                return EdLoop;
+            case Undirected:
+                return EdUndir;
+        }
+        return (vert[0].vert == v) ? EdDirOut : EdDirIn;
+    }
     EdgeType getType() { return type; }
     EdgeInfo getInfo() { return info; }
     void setInfo(const EdgeInfo& info) { this->info=info; }

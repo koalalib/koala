@@ -20,7 +20,7 @@ namespace Koala {
  * SearchStructs
  *
  * ------------------------------------------------------------------------- */
-    
+
 class SearchStructs {
     protected:
         class DefaultStructs
@@ -39,7 +39,7 @@ class SearchStructs {
         {
             typename GraphType::PVertex vPrev;
             typename GraphType::PEdge ePrev;
-            
+
             int distance, component;
 
             VisitVertLabs(
@@ -54,7 +54,7 @@ class SearchStructs {
         template< class GraphType >
         class VisitedMap: public DefaultStructs::AssocCont<
             typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type { } ;
-        
+
         template< class CIter, class VIter > struct CompStore
         {
             CIter compIter;
@@ -176,19 +176,19 @@ class Visitors: public SearchStructs {
         template< class GraphType, class Visitor >
         static bool endComponent(
             const GraphType &g, Visitor &v, unsigned, ... ) { return true; }
-                                 
+
         static bool endComponent( ... ) { return true; }
 
         /*
          * EmptyVisitor
          */
-        
+
         class EmptyVisitor: public simple_postorder_visitor_tag,
             public no_component_visitor_tag
         {
             public:
                 EmptyVisitor() { }
-                
+
                 template< class GraphType >
                 bool operator()(
                     const GraphType &g, typename GraphType::PVertex u,
@@ -210,17 +210,17 @@ class Visitors: public SearchStructs {
                 bool visitVertexPre(
                     const GraphType &g, typename GraphType::PVertex u,
                     VisitVertLabs< GraphType > &data ) { return true; }
-                
+
                 template< class GraphType >
                 bool visitVertexPost(
                     const GraphType &g, typename GraphType::PVertex u,
                     VisitVertLabs< GraphType > &v ) { return true; }
-                    
+
                 template< class GraphType >
                 bool visitEdgePre(
                     const GraphType &g, typename GraphType::PEdge e,
                     typename GraphType::PVertex u ) { return (void*)u != ptr; }
-                    
+
                 template< class GraphType >
                 bool visitEdgePost(
                     const GraphType &, typename GraphType::PEdge,
@@ -233,7 +233,7 @@ class Visitors: public SearchStructs {
         /*
          * StoreTargetToVertIter
          */
-        
+
         template< class VertIter >
         class StoreTargetToVertIter: public simple_postorder_visitor_tag,
             public no_component_visitor_tag
@@ -245,7 +245,7 @@ class Visitors: public SearchStructs {
                 bool operator()(
                     const GraphType &, typename GraphType::PVertex,
                     VisitVertLabs< GraphType > & );
-                    
+
             private:
                 VertIter &m_iter;
         } ;
@@ -253,7 +253,7 @@ class Visitors: public SearchStructs {
         /*
          * StoreCompVisitor
          */
-        
+
         template< class CompIter, class VertIter >
         class StoreCompVisitor: public simple_postorder_visitor_tag,
             public component_visitor_tag
@@ -263,7 +263,7 @@ class Visitors: public SearchStructs {
                 {
                     CompStore< CompIter,VertIter > iters;
                     unsigned p, id;
-                    
+
                     _State( CompStore< CompIter,VertIter > i );
                 } State;
 
@@ -287,33 +287,33 @@ class Visitors: public SearchStructs {
         /*
          * ComplexPreorderVisitor
          */
-        
+
         template< class Visitor >
         class ComplexPreorderVisitor: public complex_visitor_tag
         {
             public:
                 ComplexPreorderVisitor( Visitor &v ): visit( v ) { }
-                
+
                 template< class GraphType >
                 bool visitVertexPre(
                     const GraphType &, typename GraphType::PVertex,
                     VisitVertLabs< GraphType > & );
-                
+
                 template< class GraphType >
                 bool visitVertexPost(
                     const GraphType &, typename GraphType::PVertex,
                     VisitVertLabs< GraphType > & );
-                    
+
                 template< class GraphType >
                 bool visitEdgePre(
                     const GraphType &, typename GraphType::PEdge,
                     typename GraphType::PVertex );
-                    
+
                 template< class GraphType >
                 bool visitEdgePost(
                     const GraphType &, typename GraphType::PEdge,
                     typename GraphType::PVertex );
-                    
+
             private:
                 Visitor &visit;
         } ;
@@ -321,33 +321,33 @@ class Visitors: public SearchStructs {
         /*
          * ComplexPostorderVisitor
          */
-        
+
         template< class Visitor >
         class ComplexPostorderVisitor: public complex_visitor_tag
         {
             public:
                 ComplexPostorderVisitor( Visitor &v ): visit( v ) { }
-                
+
                 template< class GraphType >
                 bool visitVertexPre(
                     const GraphType &g, typename GraphType::PVertex u,
                     VisitVertLabs<GraphType> &data ) { return true; }
-                
+
                 template< class GraphType >
                 bool visitVertexPost(
                     const GraphType &, typename GraphType::PVertex,
                     VisitVertLabs< GraphType > & );
-                    
+
                 template< class GraphType >
                 bool visitEdgePre(
                     const GraphType &g, typename GraphType::PEdge e,
                     typename GraphType::PVertex u ) { return true; }
-                    
+
                 template< class GraphType >
                 bool visitEdgePost(
                     const GraphType &g, typename GraphType::PEdge e,
                     typename GraphType::PVertex u ) { return true; }
-                    
+
             private:
                 Visitor &visit;
         } ;
@@ -370,7 +370,7 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
         static int scanAttainable(
             const GraphType &, typename GraphType::PVertex, VertIter,
             EdgeDirection = EdUndir | EdDirOut );
-        
+
         template< class GraphType, class VertContainer, class VertIter >
         static int scan(
             const GraphType &, VertIter, EdgeDirection, VertContainer & );
@@ -431,7 +431,7 @@ class DFSBase: public GraphSearchBase< SearchImpl >
         static int dfsDoVisit(
             DFSParamBlock< GraphType,VertContainer,Visitor > &,
             typename GraphType::PVertex, unsigned );
-            
+
     public:
         template< class GraphType, class VertContainer, class Visitor >
         static int dfsVisitBase(
@@ -607,7 +607,7 @@ class SCC: protected SearchStructs
                 bool visitVertexPre(
                     const GraphType &, typename GraphType::PVertex,
                     VisitVertLabs< GraphType > & );
-                    
+
                 bool visitVertexPost(
                     const GraphType &, typename GraphType::PVertex,
                     VisitVertLabs< GraphType > & );
@@ -638,7 +638,7 @@ class DAGAlgs: protected SearchStructs
 
         template< class GraphType, class Iter >
         static bool isDAG( const GraphType &, Iter, Iter );
-        
+
         template< class GraphType >
         static bool isDAG( const GraphType & );
 } ;
@@ -706,7 +706,7 @@ class Blocks: protected SearchStructs
                 bool visitVertexPre(
                     const GraphType &, typename GraphType::PVertex,
                     VisitVertLabs< GraphType > & );
-                    
+
                 bool visitVertexPost(
                     const GraphType &, typename GraphType::PVertex,
                     VisitVertLabs< GraphType > & );
@@ -748,7 +748,214 @@ class Blocks: protected SearchStructs
             EdgeDirection = EdAll );
 } ;
 
+
+/*
+ * Eulerian cycle and path
+ */
+class Euler: public PathStructs, protected SearchStructs {
+private:
+	template<class GraphType>
+	struct EulerState {
+		GraphType &g;
+		StackInterface<std::pair<typename GraphType::PVertex, typename GraphType::PEdge> *> stk;
+		typename DefaultStructs::AssocCont<typename GraphType::PEdge, bool>::Type edgeVisited;
+		EdgeDirection mask;
+
+		EulerState(GraphType &_g,
+			   std::pair<typename GraphType::PVertex, typename GraphType::PEdge> *_stk,
+			   int nv,
+			   EdgeDirection m):
+			g(_g), stk(_stk, nv), edgeVisited(), mask(m)
+                {};
+		};
+
+	template<class GraphType>
+	static void eulerEngine(typename GraphType::PVertex u,
+				typename GraphType::PEdge ed,
+				EulerState<GraphType> &state) {
+		typename GraphType::PEdge e;
+		typename GraphType::PVertex v;
+		for(e = state.g.getEdge(u, state.mask);
+		    e != NULL;
+		    e = state.g.getEdgeNext(u, e, state.mask)) {
+			if(state.edgeVisited.hasKey(e)) continue;
+			state.edgeVisited[e] = true;
+//			if(state.g.getEdgeType(e) == Loop) {
+//				state.stk.push(std::make_pair(u, e));
+//				continue;
+//				};
+			v = state.g.getEdgeEnd(e, u);
+			eulerEngine(v, e, state);
+			};
+		state.stk.push(std::make_pair(u, ed));
+		};
+
+
+	template<class GraphType,
+		 class VertIter,
+		 class EdgeIter>
+	static void eulerResult(EulerState<GraphType> &state,
+				OutPath<VertIter, EdgeIter> &out) {
+		std::pair<typename GraphType::PVertex,
+			  typename GraphType::PEdge> p;
+		p = state.stk.top();
+		state.stk.pop();
+		*(out.vertIter) = p.first;
+		++(out.vertIter);
+		while(!state.stk.empty()) {
+			p = state.stk.top();
+			state.stk.pop();
+			*(out.vertIter) = p.first;
+			++(out.vertIter);
+			*(out.edgeIter) = p.second;
+			++(out.edgeIter);
+			};
+		};
+
+public:
+
+    template<class GraphType>
+	static std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
+    ends(GraphType &g,EdgeDirection mask=EdUndir)
+    {
+        EdgeDirection symmask = mask | ((mask&(EdDirIn|EdDirOut)) ? EdDirIn|EdDirOut : 0);
+        bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
+        assert(!(dir && (mask&EdUndir)));
+        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> zero(0,0),res(0,0);
+        typename GraphType::PVertex x;
+        int licz=0;
+        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            if (g.getEdge(v,symmask)) { licz++; x=v; }
+        if (licz==0) return zero;
+        if (licz!=BFS::scanAttainable(g,x,blackHole,symmask & ~EdLoop)) return zero;
+        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            if (!dir)
+            {
+                if (g.deg(v,symmask)&1)
+                    if (res.first==0) res.first=v;
+                    else if (res.second==0) res.second=v;
+                        else return zero;
+            }
+            else
+                switch (g.deg(v,EdDirOut)-g.deg(v,EdDirIn))
+                {   case 1: if (res.first==0) res.first=v; else return zero; break;
+                    case 0: break;
+                    case -1:if (res.second==0) res.second=v; else return zero; break;
+                    default: return zero;
+                }
+
+        if (res.first)
+            if (dir && (mask&EdDirIn)) return std::make_pair(res.second,res.first);
+            else return res;
+        else return std::pair<typename GraphType::PVertex,typename GraphType::PVertex>(x,x) ;
+    }
+
+	template<class GraphType>
+	static bool hasCycle(GraphType &g,
+			     EdgeDirection mask = EdUndir) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+		return res.first!=0 && res.first==res.second;
+	};
+
+	template<class GraphType>
+	static bool hasPath(GraphType &g,
+			    EdgeDirection mask = EdUndir) {
+        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+		return res.first!=0 && res.first!=res.second;
+    };
+
+	// test if graph has an eulerian path starting at vertex u
+	template<class GraphType>
+	static bool hasPath(GraphType &g,
+			    typename GraphType::PVertex u,
+			    EdgeDirection mask = EdUndir) {
+        assert(u);
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
+		return (res.first==u ||(!dir && res.second==u));
+		};
+
+	template<class GraphType>
+	static bool hasCycle(GraphType &g,
+			    typename GraphType::PVertex u,
+			    EdgeDirection mask = EdUndir) {
+        assert(u);
+		return hasCycle(g,mask) && g.deg(u,mask);
+		};
+
+	template<class GraphType,
+		 class VertIter,
+		 class EdgeIter>
+	static bool getCycle(GraphType &g,
+			    OutPath<VertIter, EdgeIter> out,
+			    EdgeDirection mask = EdUndir) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+		if (res.first==0 || res.first!=res.second) return false;
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo());
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
+		eulerEngine<GraphType>(res.first, NULL, state);
+		eulerResult(state, out);
+		return true;
+		};
+
+	template<class GraphType,
+		 class VertIter,
+		 class EdgeIter>
+	static bool getCycle(GraphType &g,
+			    typename GraphType::PVertex prefstart,
+			    OutPath<VertIter, EdgeIter> out,
+			    EdgeDirection mask = EdUndir) {
+
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+		if (res.first==0 || res.first!=res.second) return false;
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo());
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
+		eulerEngine<GraphType>(g.getEdge(prefstart,mask) ? prefstart : res.first, NULL, state);
+		eulerResult(state, out);
+		return true;
+        };
+
+
+	template<class GraphType,
+		 class VertIter,
+		 class EdgeIter>
+	static bool getPath(GraphType &g,
+			   OutPath<VertIter, EdgeIter> out,
+			   EdgeDirection mask = EdUndir) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+		if (res.first==0 || res.first==res.second) return false;
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo());
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
+		eulerEngine<GraphType>(res.first, NULL, state);
+		eulerResult(state, out);
+		return true;
+		};
+
+
+	template<class GraphType,
+		 class VertIter,
+		 class EdgeIter>
+	static bool getPath(GraphType &g,
+			    typename GraphType::PVertex prefstart,
+			   OutPath<VertIter, EdgeIter> out,
+			   EdgeDirection mask = EdUndir) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+		if (res.first==0 || res.first==res.second) return false;
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo());
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
+		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
+		eulerEngine<GraphType>((prefstart==res.second && !dir) ? res.second : res.first, NULL, state);
+		eulerResult(state, out);
+		return true;
+		};
+
+};
+
+
 #include "search.hpp"
+
+
+
 
 }
 

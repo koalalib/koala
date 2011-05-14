@@ -47,10 +47,10 @@ class SubgraphBase
         ~SubgraphBase();
 
     protected:
-        SubgraphBase *parent, *next, *child;
+        mutable const SubgraphBase *parent, *next, *child;
 
         bool unlink();
-        bool link( SubgraphBase * = NULL );
+        bool link(const SubgraphBase * = NULL );
 } ;
 
 /* ------------------------------------------------------------------------- *
@@ -257,14 +257,38 @@ class Graph: public SubgraphBase
             PVertex, PVertex,
             const Set< typename Graph< VertInfo,EdgeInfo >::PEdge > &,
             EdgeDirection = EdAll );
-        // Zmieniamy krawędź w łuki.
+
+        // zmiana typu podanych krawedzi na wartosc ostatniego argumentu
+        template< class Iterator > int chEdgesType(Iterator begin, Iterator end, EdgeType);
+        template< class Iterator > int chEdgesType2(Iterator begin, Iterator end, EdgeType);
+        int chEdgesType(const Set< typename Graph< VertInfo,EdgeInfo >::PEdge > &, EdgeType);
+        int chEdgesType(EdgeType);
+        int chEdgesType(PVertex,EdgeType);
+        int chEdgesType(PVertex,PVertex,EdgeType);
+
+        // Zmieniamy krawędź nieskierowana w dwa łuki.
         PEdge ch2Archs( PEdge );
         // Zmieniamy krawędzie w łuki.
         int ch2Archs();
         template< class Iterator > int ch2Archs( Iterator begin, Iterator end );
         int ch2Archs( const Set< typename Graph< VertInfo,EdgeInfo >::PEdge> & );
         // Informacja o tym, czy krawędzie są równoległe.
+        //relacja rownowaznosci, 3 mozliwosci
+        //reltype - dopuszczalne tylko jednobitowe: EdDirIn, EdDirOut lub EdUndir
+        //EdDirOut - luk nieskierowany jest rownolegly tylko do tak samo jak on skierowanego luku o tych samych koncach
+        //EdDirIn - jest on takze rownolegly do odwrotnie skierowanego luku o tych samych koncach
+        //EdUndir - jest on takze rownolegly do krawedzi nieskierowanej o tych samych koncach
         bool areParallel( PEdge, PEdge, EdgeDirection = EdUndir ) const;
+
+        // usuwanie krawedzi rownoleglych do podanej
+        int delParals(PEdge,EdgeDirection = EdUndir);
+        template< class Iterator > int delParals(Iterator begin,Iterator end,PEdge,EdgeDirection = EdUndir);
+        template< class Iterator > int delParals2(Iterator begin,Iterator end,PEdge,EdgeDirection = EdUndir);
+        int delParals(const Set<PEdge>&,PEdge,EdgeDirection = EdUndir);
+        int delParals(PVertex,EdgeDirection = EdUndir);
+        int delParals(PVertex,PVertex,EdgeDirection = EdUndir);
+        int delParals(EdgeDirection = EdUndir);
+        template< class OutputIterator > int getParals( OutputIterator, PEdge, EdgeDirection = EdUndir ) const;
 
     // Relacje pomiędzy wierzchołkami a krawędziami
         // Pierwsza krawędź incydentna z wierzchołkiem.
@@ -318,7 +342,7 @@ class Graph: public SubgraphBase
         bool defragAdjMatrix();
 
     // ??
-        Graph< VertInfo,EdgeInfo > *getRootPtr() { return this; }
+        const Graph< VertInfo,EdgeInfo > *getRootPtr() const { return this; }
         bool good( PVertex,bool=false ) const { return true; }
         bool good( PEdge,bool=false ) const { return true; }
         bool testGraph();
@@ -353,6 +377,14 @@ class Graph: public SubgraphBase
                 void defrag() { dirs.defrag(); undirs.defrag(); }
                 void add( PEdge edge );
         } *pAdj;
+
+        struct Parals2 {
+            typename Koala::Edge< VertInfo,EdgeInfo > *tab[3];
+            char size;
+
+            Parals2() : size(0) { tab[0]=tab[1]=tab[2]=0; }
+        };
+        template <class Container> int delParals(PVertex,EdgeDirection,Container &);
 
         PVertex first_vert, last_vert;
         PEdge first_edge, last_edge;

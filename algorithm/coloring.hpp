@@ -52,7 +52,7 @@ int SeqVertColoring::interchangeComponents(
         if (c.hasKey( u ) && (c[u] == c1 || c[u] == c2) && !map.hasKey( u ))
         {
             BFS::scanAttainable(
-                makeSubgraph( const_cast< Graph & >( g ),std::make_pair(
+                makeSubgraph( g ,std::make_pair(
                 assocChoose( assocTabInterf(c),c1 ) || assocChoose( assocTabInterf(c),c2 ),stdChoose( true ))),
                 u,assocInserter( map,Const( l ) ), EdDirIn|EdDirOut|EdUndir );
             l++;

@@ -45,12 +45,12 @@ template <class T> class EmptyStruct {
     template <class A, class B> T operator()(A,B) { return T(); }
     template <class A, class B, class C> T operator()(A,B,C) { return T(); }
     template <class A, class B, class C,class D> T operator() (A,B,C,D) { return T(); }
+    template <class A, class B, class C,class D, class E> T operator() (A,B,C,D,E) { return T(); }
+    template <class A, class B, class C,class D, class E, class F> T operator() (A,B,C,D,E,F) { return T(); }
 };
 
 template <class T>
 EmptyStruct<T> emptyStruct(T) { EmptyStruct<T>(); }
-
-static char __blackhole;
 
 //Jesli metoda chce iterator do zapisu ciagu, a nas sam ciag nie interesuje, tylko inne efekty uboczne procedury
 struct BlackHole : public std::iterator<std::output_iterator_tag,void,void,void,void> {
@@ -70,7 +70,8 @@ struct BlackHole : public std::iterator<std::output_iterator_tag,void,void,void,
 
 };
 
-BlackHole& blackHole() { return *((BlackHole*)(&__blackhole)); }
+static BlackHole blackHole;
+
 template <class T> bool isBlackHole(const T&) { return false; }
 bool isBlackHole(const BlackHole&) { return true; }
 
@@ -219,7 +220,8 @@ template <class T> class NumberTypeBounds {
     bool isZero(T arg) {return arg==zero(); }
 };
 
-struct ShortPathStructs {
+
+struct PathStructs {
     // Do odczytu sciezki miedzy wierzcholkiem a korzeniem, gdy droga wyznaczona jest w postaci
     // tablicy asocjacyjnej PVertex -> rekord z polami vPrev, ePrev (wierzcholek poprzedni i krawedz do niego).
     // Przydatne w roznych algorytmach najkrotszej sciezki
@@ -233,6 +235,11 @@ struct ShortPathStructs {
         // funkcja tworzaca, analogia make_pair
     template <class VIter, class EIter>
     static OutPath<VIter,EIter> outPath(VIter av, EIter ei) { return OutPath<VIter,EIter>(av,ei); }
+
+};
+
+
+struct ShortPathStructs : public PathStructs {
 
     template <class GraphType, class VertContainer, class VIter, class EIter>
     static int
@@ -715,22 +722,22 @@ ObjCaster<Funktor> stdCast(Funktor f) { return ObjCaster<Funktor>(f); }
 // polowki pelnego linkera, dzialaja w jedna strone
 
 // tylko false jest dopuszczalne - brak polaczenia
-struct pomNoLinker {
-    pomNoLinker(bool arg=false) { assert(!arg);}
+struct Std1NoLinker {
+    Std1NoLinker(bool arg=false) { assert(!arg);}
     template <class Dest,class Sour>
         void operator()(Dest*,Sour*) {}
 };
 // ustawia wskaznik na dolaczany obiekt w srodku struktury info obiektu docelowego
-template <class Info, class T> struct pomFieldLinker {
+template <class Info, class T> struct Std1FieldLinker {
     T Info::* pt;
-	pomFieldLinker(T Info::* awsk=0) : pt(awsk) {}
+	Std1FieldLinker(T Info::* awsk=0) : pt(awsk) {}
 	template <class Dest, class Sour>
         void operator()(Dest* wsk, Sour* w) {  if (pt && wsk) wsk->info.*pt=(T) w; }
 };
 // dopisuje powiazania do zewnetrznej! tablicy asocjacyjnej podanej w funkcji tworzacej stdLink
-template <class Map> struct pomAssocLinker{
+template <class Map> struct Std1AssocLinker{
     Map& map;
-    pomAssocLinker(Map& amap) : map(amap) {}
+    Std1AssocLinker(Map& amap) : map(amap) {}
 	template <class Dest, class Sour>
         void operator()(Dest* wsk, Sour* w) {   if (wsk) map[wsk]=w; }
 };
@@ -745,42 +752,53 @@ template <class Link1, class Link2> struct Std2Linker {
 };
 
 // i jego funkcje tworzace
-Std2Linker<pomNoLinker,pomNoLinker> stdLink(bool a1, bool a2)
-{ return Std2Linker<pomNoLinker,pomNoLinker>(pomNoLinker(a1),pomNoLinker(a2)); }
+
+Std1NoLinker stdLink(bool a1) { return Std1NoLinker(a1); }
+
+template <class Info1, class T1>
+Std1FieldLinker<Info1,T1> stdLink(T1 Info1:: *awsk1)
+{ return Std1FieldLinker<Info1,T1>(awsk1); }
+
+template <class Map1>
+Std1AssocLinker<Map1> stdLink(Map1& tab1)
+{ return Std1AssocLinker<Map1>(tab1); }
+
+Std2Linker<Std1NoLinker,Std1NoLinker> stdLink(bool a1, bool a2)
+{ return Std2Linker<Std1NoLinker,Std1NoLinker>(Std1NoLinker(a1),Std1NoLinker(a2)); }
 
 template <class Info,class T>
-Std2Linker<pomNoLinker,pomFieldLinker<Info,T> > stdLink(bool a1, T Info::* awsk)
-{ return Std2Linker<pomNoLinker,pomFieldLinker<Info,T> >(pomNoLinker(a1),pomFieldLinker<Info,T>(awsk)); }
+Std2Linker<Std1NoLinker,Std1FieldLinker<Info,T> > stdLink(bool a1, T Info::* awsk)
+{ return Std2Linker<Std1NoLinker,Std1FieldLinker<Info,T> >(Std1NoLinker(a1),Std1FieldLinker<Info,T>(awsk)); }
 
 template <class Map>
-Std2Linker<pomNoLinker,pomAssocLinker<Map> > stdLink(bool a1, Map& tab)
-{ return Std2Linker<pomNoLinker,pomAssocLinker<Map> >(pomNoLinker(a1),pomAssocLinker<Map>(tab)); }
+Std2Linker<Std1NoLinker,Std1AssocLinker<Map> > stdLink(bool a1, Map& tab)
+{ return Std2Linker<Std1NoLinker,Std1AssocLinker<Map> >(Std1NoLinker(a1),Std1AssocLinker<Map>(tab)); }
 
 
 template <class Info1, class T1>
-Std2Linker<pomFieldLinker<Info1,T1>,pomNoLinker> stdLink(T1 Info1:: *awsk1, bool a2)
-{ return Std2Linker<pomFieldLinker<Info1,T1>,pomNoLinker>(pomFieldLinker<Info1,T1>(awsk1),pomNoLinker(a2)); }
+Std2Linker<Std1FieldLinker<Info1,T1>,Std1NoLinker> stdLink(T1 Info1:: *awsk1, bool a2)
+{ return Std2Linker<Std1FieldLinker<Info1,T1>,Std1NoLinker>(Std1FieldLinker<Info1,T1>(awsk1),Std1NoLinker(a2)); }
 
 template <class Info1, class T1, class Info,class T>
-Std2Linker<pomFieldLinker<Info1,T1>,pomFieldLinker<Info,T> > stdLink(T1 Info1::* awsk1, T Info::* awsk)
-{ return Std2Linker<pomFieldLinker<Info1,T1>,pomFieldLinker<Info,T> >(pomFieldLinker<Info1,T1>(awsk1),pomFieldLinker<Info,T>(awsk)); }
+Std2Linker<Std1FieldLinker<Info1,T1>,Std1FieldLinker<Info,T> > stdLink(T1 Info1::* awsk1, T Info::* awsk)
+{ return Std2Linker<Std1FieldLinker<Info1,T1>,Std1FieldLinker<Info,T> >(Std1FieldLinker<Info1,T1>(awsk1),Std1FieldLinker<Info,T>(awsk)); }
 
 template <class Info1, class T1,class Map>
-Std2Linker<pomFieldLinker<Info1,T1>,pomAssocLinker<Map> > stdLink(T1 Info1::* awsk1, Map& tab)
-{ return Std2Linker<pomFieldLinker<Info1,T1>,pomAssocLinker<Map> >(pomFieldLinker<Info1,T1>(awsk1),pomAssocLinker<Map>(tab)); }
+Std2Linker<Std1FieldLinker<Info1,T1>,Std1AssocLinker<Map> > stdLink(T1 Info1::* awsk1, Map& tab)
+{ return Std2Linker<Std1FieldLinker<Info1,T1>,Std1AssocLinker<Map> >(Std1FieldLinker<Info1,T1>(awsk1),Std1AssocLinker<Map>(tab)); }
 
 
 template <class Map1>
-Std2Linker<pomAssocLinker<Map1>,pomNoLinker> stdLink(Map1& tab1, bool a2)
-{ return Std2Linker<pomAssocLinker<Map1>,pomNoLinker>(pomAssocLinker<Map1>(tab1),pomNoLinker(a2)); }
+Std2Linker<Std1AssocLinker<Map1>,Std1NoLinker> stdLink(Map1& tab1, bool a2)
+{ return Std2Linker<Std1AssocLinker<Map1>,Std1NoLinker>(Std1AssocLinker<Map1>(tab1),Std1NoLinker(a2)); }
 
 template <class Map1, class Info,class T>
-Std2Linker<pomAssocLinker<Map1>,pomFieldLinker<Info,T> > stdLink(Map1& tab1, T Info::* awsk)
-{ return Std2Linker<pomAssocLinker<Map1>,pomFieldLinker<Info,T> >(pomAssocLinker<Map1>(tab1),pomFieldLinker<Info,T>(awsk)); }
+Std2Linker<Std1AssocLinker<Map1>,Std1FieldLinker<Info,T> > stdLink(Map1& tab1, T Info::* awsk)
+{ return Std2Linker<Std1AssocLinker<Map1>,Std1FieldLinker<Info,T> >(Std1AssocLinker<Map1>(tab1),Std1FieldLinker<Info,T>(awsk)); }
 
 template <class Map1, class Map>
-Std2Linker<pomAssocLinker<Map1>,pomAssocLinker<Map> > stdLink(Map1& tab1, Map& tab)
-{ return Std2Linker<pomAssocLinker<Map1>,pomAssocLinker<Map> >(pomAssocLinker<Map1>(tab1),pomAssocLinker<Map>(tab)); }
+Std2Linker<Std1AssocLinker<Map1>,Std1AssocLinker<Map> > stdLink(Map1& tab1, Map& tab)
+{ return Std2Linker<Std1AssocLinker<Map1>,Std1AssocLinker<Map> >(Std1AssocLinker<Map1>(tab1),Std1AssocLinker<Map>(tab)); }
 
 
 

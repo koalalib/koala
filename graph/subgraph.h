@@ -41,18 +41,18 @@ class Subgraph: public SubgraphBase
     // Konstruktory
         Subgraph() {}
         Subgraph(
-            Graph &,
+            const Graph &,
             std::pair< VChooser,EChooser > = std::make_pair( VChooser(),EChooser() ) );
         Subgraph( std::pair< VChooser,EChooser > );
 
     // ??
-        void plug( Graph &g ) { SubgraphBase::link( &g ); }
+        void plug(const Graph &g ) { SubgraphBase::link( &g ); }
         bool unplug() { return SubgraphBase::unlink(); }
         void setChoose( const std::pair< VChooser,EChooser > & );
-        RootGrType* getRootPtr() const;
-        ParentGrType* getParentPtr() const { return (ParentGrType*)parent; }
-        ParentGrType &up() const;
-        RootGrType &root() const;
+        const RootGrType* getRootPtr() const;
+        const ParentGrType* getParentPtr() const { return (const ParentGrType*)parent; }
+        const ParentGrType &up() const;
+        const RootGrType &root() const;
         bool good( PVertex, bool = false ) const;
         bool good( PEdge, bool = false ) const;
 
@@ -63,7 +63,7 @@ class Subgraph: public SubgraphBase
 
         template< class OutputIterator > int getVerts( OutputIterator ) const;
         Set< PVertex > getVertSet() const;
-        int getVertNo() const { return getVerts( blackHole() ); }
+        int getVertNo() const { return getVerts( blackHole ); }
         VertInfoType getVertInfo( PVertex v ) const { return v->getInfo(); }
         EdgeInfoType getEdgeInfo( PEdge e ) const { return e->getInfo(); }
         EdgeType getEdgeType( PEdge e ) const { return e->getType(); }
@@ -130,7 +130,7 @@ class Subgraph: public SubgraphBase
 
 template< class Graph, class VChooser, class EChooser >
 Subgraph< Graph,VChooser,EChooser > makeSubgraph(
-     Graph &, const std::pair< VChooser,EChooser > & );
+     const Graph &, const std::pair< VChooser,EChooser > & );
 
 #include "subgraph.hpp"
 
