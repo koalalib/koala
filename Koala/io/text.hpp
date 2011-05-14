@@ -1,6 +1,6 @@
 #include<set>
 #include<map>
-#include<utility>
+
 
 namespace Koala {
 namespace IO {
@@ -202,7 +202,7 @@ bool readGraphText(Graph &g, std::istream &strm, RG_Format format,
  * @return true on success, false otherwise
  */
 template<class Graph>
-bool writeGraphVL(const Graph &g, std::ostream &out, bool directed) {
+bool writeGraphVL(const Graph &g, std::ostream &out, bool directed, std::pair<bool,bool> printinf) {
 	unsigned int i;
 	EdgeDirection flags;
 	typename Graph::PEdge e;
@@ -217,7 +217,8 @@ bool writeGraphVL(const Graph &g, std::ostream &out, bool directed) {
 	flags = EdLoop | EdDirOut | EdUndir;
 
 	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
-		out << ptrToIdx[u] << '(' << u->info << ')';
+		out << ptrToIdx[u];
+		if (printinf.first) out << '(' << u->info << ')';
 
 		for(i = 0, e = g.getEdge(u, flags); e != NULL; e = g.getEdgeNext(u, e, flags)) {
 			vs = g.getEdgeEnds(e);
@@ -237,7 +238,8 @@ bool writeGraphVL(const Graph &g, std::ostream &out, bool directed) {
 			out << ' ';
 			if(g.getType(e) == Undirected) out << '-';
 			else out << '>';
-			out << ptrToIdx[v] << '(' << e->info << ')';
+			out << ptrToIdx[v];
+			if (printinf.second) out << '(' << e->info << ')';
 			used.insert(e);
 			};
 		out << '\n';
@@ -256,7 +258,7 @@ bool writeGraphVL(const Graph &g, std::ostream &out, bool directed) {
  * @return true on success, false otherwise
  */
 template<class Graph>
-bool writeGraphEL(const Graph &g, std::ostream &out, bool directed) {
+bool writeGraphEL(const Graph &g, std::ostream &out, bool directed, std::pair<bool,bool> printinf) {
 	unsigned int idx;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u;
@@ -272,12 +274,15 @@ bool writeGraphEL(const Graph &g, std::ostream &out, bool directed) {
 		if(g.getType(e) == Undirected) out << "<->";
 		else out << "->";	// loop and undirected
 		out << ' ' << ptrToIdx[vs.second];
-		out << "(" << e->info << ")\n";
+		if (printinf.second) out << "(" << e->info << ")";
+		out << "\n";
 		};
 
 	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
 		if(ptrToIdx.find(u) == ptrToIdx.end()) ptrToIdx[u] = idx++;
-		out << ptrToIdx[u] << '(' << u->info << ")\n";
+		out << ptrToIdx[u];
+		if (printinf.first) out << '(' << u->info << ")";
+		out <<"\n";
 		};
 	return true;
 	};
@@ -292,12 +297,12 @@ bool writeGraphEL(const Graph &g, std::ostream &out, bool directed) {
  * @return true on success, false otherwise
  */
 template<class Graph>
-bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format) {
+bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format, std::pair<bool,bool> printinf) {
 	switch(format) {
-		case RG_DirectedVertexLists:	return writeGraphVL(g, out, true);
-		case RG_UndirectedVertexLists:	return writeGraphVL(g, out, false);
-		case RG_DirectedEdgeList:	return writeGraphEL(g, out, true);
-		case RG_UndirectedEdgeList:	return writeGraphEL(g, out, false);
+		case RG_DirectedVertexLists:	return writeGraphVL(g, out, true,printinf);
+		case RG_UndirectedVertexLists:	return writeGraphVL(g, out, false,printinf);
+		case RG_DirectedEdgeList:	return writeGraphEL(g, out, true,printinf);
+		case RG_UndirectedEdgeList:	return writeGraphEL(g, out, false,printinf);
 		};
 	return false;
 	};

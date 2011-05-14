@@ -107,6 +107,7 @@
 #include<string>
 #include<sstream>
 #include<iostream>
+#include<utility>
 
 
 
@@ -185,21 +186,25 @@ bool readGraphText(Graph &g, DESC desc, RG_Format format, VMap &vertexMap) {
 
 
 template<class Graph>
-bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format);
+bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format,
+                    std::pair<bool,bool> printinf=std::make_pair(true,true));
 
 
 template<class Graph>
-bool writeGraphText(const Graph &g, std::string &out, RG_Format format) {
+bool writeGraphText(const Graph &g, std::string &out, RG_Format format,
+                    std::pair<bool,bool> printinf=std::make_pair(true,true)) {
 	bool rv;
 	std::ostringstream s;
-	rv = writeGraphText(g, s, format);
+	rv = writeGraphText(g, s, format,printinf);
 	out = s.str();
 	return rv;
 	};
 
 
 template<class Graph>
-bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format format) {
+bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format format,
+                    std::pair<bool,bool> printinf=std::make_pair(true,true))
+{
 	bool rv;
 	const char *o;
 	unsigned int i;
@@ -208,7 +213,7 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format
 
 	if(out == NULL || maxlength == 0) return false;
 
-	rv = writeGraphText(g, s, format);
+	rv = writeGraphText(g, s, format, printinf);
 	if(!rv) return false;
 
 	str = s.str();

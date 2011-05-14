@@ -75,7 +75,7 @@ int main() {
 
 
     std::cout<<std::endl;
-    int compno=Koala::SCC::get(g,Koala::SearchStructs::compStore(comptab[0],tabV),blackHole());
+    int compno=Koala::SCC::get(g,Koala::SearchStructs::compStore(comptab[0],tabV),blackHole);
 //    std::cout << compno<<endl;
 //    for(int i=0;i<=compno;i++) cout << comptab[0][i] << ' '; cout << endl;
 //    cout << endl;

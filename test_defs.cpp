@@ -51,16 +51,16 @@ template <class T> void bht2(T& arg)
 void bht()
 {   int i;
     std::string  s="a";
-    blackHole()="ala";
-    (*blackHole())="ala";
+    blackHole="ala";
+    (*blackHole)="ala";
 //    (blackHole<std::string>())++;
 //    blackHole()[i]='a';
 //    blackHole()(4,s)='b';
     std::cout << isBlackHole(i) <<"\n";
-    std::cout << isBlackHole(blackHole()) <<"\n";
+    std::cout << isBlackHole(blackHole) <<"\n";
 //    std::cout << isBlackHole(blackHole<std::string>()) <<"\n";
 //    bht2(i);
-    bht2(blackHole());
+    bht2(blackHole);
 }
 
 

@@ -69,6 +69,10 @@ Koala::Subgraph<Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koal
     Koala::SetChooser<Koala::Vertex<OpisV,OpisE> >,Koala::BoolChooser>
         ssg=std::make_pair(Koala::stdChoose(gset),Koala::stdChoose(true));
 
+    Koala::makeSubgraph(g,std::make_pair(Koala::stdChoose(rset),Koala::stdChoose(true))).getParentPtr();
+    Koala::makeSubgraph(sg1,std::make_pair(Koala::stdChoose(gset),Koala::stdChoose(true)));
+    Koala::IO::writeGraphText(Koala::makeSubgraph(Koala::makeSubgraph(g,std::make_pair(Koala::stdChoose(rset),Koala::stdChoose(true))),std::make_pair(Koala::stdChoose(gset),Koala::stdChoose(true))),std::cout,Koala::IO::RG_DirectedEdgeList);
+    std::cout<< "\n---------";
 
 //    g.clear();g.addVert();
 

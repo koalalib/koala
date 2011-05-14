@@ -88,6 +88,8 @@ int main() {
     g2p.copy(g1);
     std::cout << "copy\n";
 
+    //stdLink(&InfoE2::b);
+
     for(Vertex<InfoV2,InfoE2>* p=g2.getVert();p;p=g2.getVertNext(p))
         cout << ((void*)p) << "  " << p->info.napis << "  " << (void*)m21[p]<<  endl;
     cout << n12.size();

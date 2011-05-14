@@ -3,7 +3,7 @@
 
 template< class Graph, class VChooser, class EChooser >
 Subgraph< Graph,VChooser,EChooser >::Subgraph(
-    Graph &g, std::pair< VChooser,EChooser > chs ):
+    const Graph &g, std::pair< VChooser,EChooser > chs ):
     vchoose( chs.first ),
     echoose( chs.second ),
     SubgraphBase()
@@ -28,26 +28,26 @@ void Subgraph< Graph,VChooser,EChooser >::setChoose(
 }
 
 template< class Graph, class VChooser, class EChooser >
-typename Subgraph< Graph,VChooser,EChooser >::RootGrType
+const typename Subgraph< Graph,VChooser,EChooser >::RootGrType
 *Subgraph< Graph,VChooser,EChooser >::getRootPtr() const
 {
-    return parent ? ((ParentGrType*)parent)->getRootPtr() : NULL;
+    return parent ? (( const ParentGrType*)parent)->getRootPtr() : NULL;
 }
 
 template< class Graph, class VChooser, class EChooser >
-typename Subgraph< Graph,VChooser,EChooser >::ParentGrType
+const typename Subgraph< Graph,VChooser,EChooser >::ParentGrType
 &Subgraph< Graph,VChooser,EChooser >::up() const
 {
-    ParentGrType *res = getParentPtr();
+    const ParentGrType *res = getParentPtr();
     assert( res );
     return *res;
 }
 
 template< class Graph, class VChooser, class EChooser >
-typename Subgraph< Graph,VChooser,EChooser >::RootGrType
+const typename Subgraph< Graph,VChooser,EChooser >::RootGrType
 &Subgraph< Graph,VChooser,EChooser >::root() const
 {
-    RootGrType *res = getRootPtr();
+    const RootGrType *res = getRootPtr();
     assert( res );
     return *res;
 }
@@ -199,7 +199,7 @@ bool Subgraph< Graph,VChooser,EChooser >::areParallel(
 
 template< class Graph, class VChooser, class EChooser >
 Subgraph< Graph,VChooser,EChooser > makeSubgraph(
-     Graph &g, const std::pair< VChooser,EChooser > &chs )
+    const Graph &g, const std::pair< VChooser,EChooser > &chs )
 {
     return Subgraph< Graph,VChooser,EChooser >( g,chs );
 }
@@ -273,7 +273,7 @@ int Subgraph< Graph,VChooser,EChooser >::getEdges(
 template< class Graph, class VChooser, class EChooser >
 int Subgraph< Graph,VChooser,EChooser >::getEdgeNo( EdgeDirection mask ) const
 {
-    return getEdges( blackHole(),mask );
+    return getEdges( blackHole,mask );
 }
 
 template< class Graph, class VChooser, class EChooser >
@@ -331,7 +331,7 @@ template< class Graph, class VChooser, class EChooser >
 int Subgraph< Graph,VChooser,EChooser >::getEdgeNo(
     PVertex vert, EdgeDirection mask ) const
 {
-    return getEdges( blackHole(),vert,mask );
+    return getEdges( blackHole,vert,mask );
 }
 
 template< class Graph, class VChooser, class EChooser >
@@ -404,7 +404,7 @@ template< class Graph, class VChooser, class EChooser >
 int Subgraph< Graph,VChooser,EChooser >::getEdgeNo(
     PVertex vert1, PVertex vert2, EdgeDirection mask ) const
 {
-    return getEdges( blackHole(),vert1,vert2,mask );
+    return getEdges( blackHole,vert1,vert2,mask );
 }
 
 template< class Graph, class VChooser, class EChooser > template< class OutputIterator >
@@ -445,7 +445,7 @@ template< class Graph, class VChooser, class EChooser >
 int Subgraph< Graph,VChooser,EChooser >::getNeighNo(
     PVertex vert, EdgeDirection mask ) const
 {
-    return getNeigh( blackHole(),vert,mask );
+    return getNeigh( blackHole,vert,mask );
 }
 
 template< class Graph, class VChooser, class EChooser >
@@ -486,7 +486,7 @@ template< class Graph, class VChooser, class EChooser >
 int Subgraph< Graph,VChooser,EChooser >::getClNeighNo(
     PVertex vert, EdgeDirection direct ) const
 {
-    return getClNeigh( blackHole(),vert,direct );
+    return getClNeigh( blackHole,vert,direct );
 }
 
 template< class Graph, class VChooser, class EChooser >

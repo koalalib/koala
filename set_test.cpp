@@ -132,7 +132,7 @@ int main()
     int tab3[]={1,3,5,7}, tab4[4];
     Set<int> iiset;
 
-    copy(tab3,tab3+4,blackHole());
+    copy(tab3,tab3+4,blackHole);
 //    iiset.assign(tab4,4);
     cout << iiset;
 

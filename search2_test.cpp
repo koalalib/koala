@@ -109,8 +109,8 @@ int main() {
     int comptab[2][100];
 
     std::cout<<std::endl;
-    std::cout <<Koala::Blocks::split(g,blackHole(),blackHole(),Koala::SearchStructs::compStore(blackHole(),blackHole()),
-                                   blackHole(),EdAll)<<std::endl;
+    std::cout <<Koala::Blocks::split(g,blackHole,blackHole,Koala::SearchStructs::compStore(blackHole,blackHole),
+                                   blackHole,EdAll)<<std::endl;
     int compno=Koala::Blocks::splitComp(g,C,vertCont,edgeCont,Koala::SearchStructs::compStore(comptab[0],tabV),
                                    comptab[1],EdAll);
     std::cout << compno<<endl;
@@ -136,7 +136,7 @@ int main() {
         std::cout << " {" << EE->getEnds().first->info.name << EE->getEnds().second->info.name << "}:" << edgeCont[EE];
 
     searchTest();
-    std::cout<<"\n"<<Koala::Blocks::split(g,blackHole(),blackHole(),Koala::SearchStructs::compStore(comptab[0],tabV),
+    std::cout<<"\n"<<Koala::Blocks::split(g,blackHole,blackHole,Koala::SearchStructs::compStore(comptab[0],tabV),
                                    comptab[1],EdAll);
 
     return 0;
