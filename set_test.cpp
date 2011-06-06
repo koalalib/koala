@@ -51,7 +51,7 @@ int main()
     Koala::AssocTabInterface<std::map<int,float> > imap=mapa;
 
 
-    assocInserter(mapa,EmptyStruct<int>())=4.1;
+    assocInserter(mapa,ConstFunctor<int>())=4.1;
     assocInserter(imap)=make_pair(4.0,5);
     imap[5]=7;
     imap.clear();
@@ -136,5 +136,6 @@ int main()
 //    iiset.assign(tab4,4);
     cout << iiset;
 
+//    cout << "\n" << (constFun(3.14))('a',"ala",45);
 
 }

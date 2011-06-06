@@ -42,14 +42,6 @@ class SeqVertColoring {
         template< typename Graph, typename ColorMap >
             static int satDeg(
                 const Graph &g, ColorMap &c, typename Graph::PVertex v );
-
-        struct Const
-        {
-            int val;
-
-            Const( int arg ): val( arg ) {}
-            template< typename T > int operator()( T ) { return val; }
-        } ;
 
         template< typename Graph, typename ColorMap, typename CompMap >
             static int interchangeComponents(

@@ -84,5 +84,11 @@ int main() {
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";
         std::cout<< std::endl;
 
+        g.clear();
+        A=g.addVert(); B=g.addVert(); C=g.addVert();
+        g.addArch(A,B); g.addEdge(B,A); //g.addLoop(C);
+
+        std::cout << g.mu(g.getEdge(),Koala::EdUndir);
+
     return 0;
 }

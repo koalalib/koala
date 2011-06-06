@@ -126,6 +126,36 @@ class Subgraph: public SubgraphBase
         int Delta( EdgeDirection = EdAll ) const;
         int delta( EdgeDirection = EdAll ) const;
         bool areParallel( PEdge, PEdge, EdgeDirection = EdUndir ) const;
+        template< class OutputIterator > int getParals( OutputIterator, typename Graph::PEdge, EdgeDirection = EdUndir ) const;
+        int mu( typename Graph::PEdge, EdgeDirection = EdUndir ) const;
+        int mu( EdgeDirection = EdUndir ) const;
+        std::pair< typename Graph::PEdge,int > maxMu( EdgeDirection = EdUndir ) const;
+
+
+        protected:
+
+            struct Parals3 {
+            typename Graph::PVertex v1,v2;
+            EdgeDirection direct;
+            typename Graph::PEdge edge;
+
+            Parals3(typename Graph::PVertex av1,typename Graph::PVertex av2,
+                    EdgeDirection adirect,
+                    typename Graph::PEdge aedge) :
+                    v1(av1), v2(av2), direct(adirect), edge(aedge) {}
+            Parals3() {}
+        };
+
+        struct Parals3cmp {
+            bool operator()(Parals3 a, Parals3 b)
+            {
+                return (a.v1 < b.v1) ||
+                (a.v1 == b.v1 && a.v2 < b.v2) ||
+                (a.v1 == b.v1 && a.v2 == b.v2 && a.direct < b.direct );
+            }
+
+        };
+
 };
 
 template< class Graph, class VChooser, class EChooser >

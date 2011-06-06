@@ -38,19 +38,21 @@ std::ostream& operator<<(std::ostream& os,EmptyEdgeInfo arg) { return os; }
 
 //Przydatny funktor domyslny tam, gdzie metoda chce dostac funktor generujacy jakies info dla
 // wierzcholka lub krawedzi
-template <class T> class EmptyStruct {
+template <class T> class ConstFunctor {
+    const T val;
     public:
+    ConstFunctor(const T& aval=T()) : val(aval) {}
     T operator()() { return T(); }
-    template <class A> T operator()(A) { return T(); }
-    template <class A, class B> T operator()(A,B) { return T(); }
-    template <class A, class B, class C> T operator()(A,B,C) { return T(); }
-    template <class A, class B, class C,class D> T operator() (A,B,C,D) { return T(); }
-    template <class A, class B, class C,class D, class E> T operator() (A,B,C,D,E) { return T(); }
-    template <class A, class B, class C,class D, class E, class F> T operator() (A,B,C,D,E,F) { return T(); }
+    template <class A> T operator()(A) { return val; }
+    template <class A, class B> T operator()(A,B) { return val; }
+    template <class A, class B, class C> T operator()(A,B,C) { return val; }
+    template <class A, class B, class C,class D> T operator() (A,B,C,D) { return val; }
+    template <class A, class B, class C,class D, class E> T operator() (A,B,C,D,E) { return val; }
+    template <class A, class B, class C,class D, class E, class F> T operator() (A,B,C,D,E,F) { return val; }
 };
 
 template <class T>
-EmptyStruct<T> emptyStruct(T) { EmptyStruct<T>(); }
+ConstFunctor<T> constFun(const T& a=T()) { return ConstFunctor<T>(a); }
 
 //Jesli metoda chce iterator do zapisu ciagu, a nas sam ciag nie interesuje, tylko inne efekty uboczne procedury
 struct BlackHole : public std::iterator<std::output_iterator_tag,void,void,void,void> {

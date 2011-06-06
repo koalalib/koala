@@ -1,4 +1,4 @@
-template< class GraphType > 
+template< class GraphType >
 SearchStructs::VisitVertLabs< GraphType >::VisitVertLabs(
     typename GraphType::PVertex vp, typename GraphType::PEdge ep,
     int dist, int comp ):
@@ -14,161 +14,161 @@ void SearchStructs::VisitVertLabs< GraphType >::get( Rec &r )
     r.vPrev = vPrev;
     r.ePrev = ePrev;
     r.distance = distance;
-    r.component = component; 
+    r.component = component;
 }
 
 template< class CIter, class VIter >
 SearchStructs::CompStore< CIter,VIter >
 SearchStructs::compStore( CIter ac, VIter av )
-{ 
-    return CompStore< CIter,VIter >( ac,av ); 
+{
+    return CompStore< CIter,VIter >( ac,av );
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitVertexPre(
     const GraphType &g, Visitor &v, typename GraphType::PVertex u,
     VisitVertLabs< GraphType > &r, simple_preorder_visitor_tag &s )
-{ 
-    return v( g,u,r ); 
-}
- 
-template< class GraphType, class Visitor >
-bool Visitors::visitVertexPre(
-    const GraphType &g, Visitor &v, typename GraphType::PVertex u,
-    VisitVertLabs< GraphType > &r, simple_postorder_visitor_tag &s ) 
-{ 
-    return true; 
-}
-
-template< class GraphType, class Visitor >
-bool Visitors::visitVertexPre(
-    const GraphType &g, Visitor &v, typename GraphType::PVertex u,
-    VisitVertLabs< GraphType > &r, complex_visitor_tag &c )               
 {
-    return v.visitVertexPre( g,u,r ); 
+    return v( g,u,r );
+}
+
+template< class GraphType, class Visitor >
+bool Visitors::visitVertexPre(
+    const GraphType &g, Visitor &v, typename GraphType::PVertex u,
+    VisitVertLabs< GraphType > &r, simple_postorder_visitor_tag &s )
+{
+    return true;
+}
+
+template< class GraphType, class Visitor >
+bool Visitors::visitVertexPre(
+    const GraphType &g, Visitor &v, typename GraphType::PVertex u,
+    VisitVertLabs< GraphType > &r, complex_visitor_tag &c )
+{
+    return v.visitVertexPre( g,u,r );
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitVertexPre(
     const GraphType &g, Visitor &v, typename GraphType::PVertex u,
     VisitVertLabs< GraphType > &r, ... )
-{ 
-    return v.operator()( g,u,r ); 
+{
+    return v.operator()( g,u,r );
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitVertexPost(
     const GraphType &g, Visitor &v, typename GraphType::PVertex u,
-    VisitVertLabs< GraphType > &r, simple_preorder_visitor_tag &s )      
-{ 
-    return true; 
+    VisitVertLabs< GraphType > &r, simple_preorder_visitor_tag &s )
+{
+    return true;
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitVertexPost(
     const GraphType &g, Visitor &v, typename GraphType::PVertex u,
-    VisitVertLabs< GraphType > &r, simple_postorder_visitor_tag &s )     
-{ 
-    return v( g,u,r ); 
+    VisitVertLabs< GraphType > &r, simple_postorder_visitor_tag &s )
+{
+    return v( g,u,r );
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitVertexPost(
     const GraphType &g, Visitor &v, typename GraphType::PVertex u,
-    VisitVertLabs< GraphType > &r, complex_visitor_tag &c )              
-{ 
-    return v.visitVertexPost( g,u,r); 
+    VisitVertLabs< GraphType > &r, complex_visitor_tag &c )
+{
+    return v.visitVertexPost( g,u,r);
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitVertexPost(
     const GraphType &g, Visitor &v, typename GraphType::PVertex u,
     VisitVertLabs< GraphType > &r, ... )
-{ 
-    return v.operator()( g,u,r ); 
+{
+    return v.operator()( g,u,r );
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitEdgePre(
     const GraphType &g, Visitor &v, typename GraphType::PEdge e,
-    typename GraphType::PVertex u, complex_visitor_tag &c ) 
-{ 
-    return v.visitEdgePre( g,e,u ); 
+    typename GraphType::PVertex u, complex_visitor_tag &c )
+{
+    return v.visitEdgePre( g,e,u );
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitEdgePre(
     const GraphType &g, Visitor &v, typename GraphType::PEdge e,
-    typename GraphType::PVertex u, simple_visitor_tag &s )  
-{ 
-    return true; 
+    typename GraphType::PVertex u, simple_visitor_tag &s )
+{
+    return true;
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitEdgePre(
     const GraphType &g, Visitor &v, typename GraphType::PEdge e,
     typename GraphType::PVertex u, ... )
-{ 
-    return true; 
+{
+    return true;
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitEdgePost(
     const GraphType &g, Visitor &v, typename GraphType::PEdge e,
-    typename GraphType::PVertex u, complex_visitor_tag &c ) 
-{ 
-    return v.visitEdgePost( g,e,u ); 
+    typename GraphType::PVertex u, complex_visitor_tag &c )
+{
+    return v.visitEdgePost( g,e,u );
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitEdgePost(
     const GraphType &g, Visitor &v, typename GraphType::PEdge e,
-    typename GraphType::PVertex u, simple_visitor_tag &s ) 
-{ 
-    return true; 
+    typename GraphType::PVertex u, simple_visitor_tag &s )
+{
+    return true;
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::visitEdgePost(
     const GraphType &g, Visitor &v, typename GraphType::PEdge e,
     typename GraphType::PVertex u, ... )
-{ 
-    return true; 
+{
+    return true;
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::beginComponent(
-    const GraphType &g, Visitor &v, unsigned comp, component_visitor_tag &c ) 
-{ 
-    return v.beginComponent( g,comp ); 
+    const GraphType &g, Visitor &v, unsigned comp, component_visitor_tag &c )
+{
+    return v.beginComponent( g,comp );
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::beginComponent(
     const GraphType &g, Visitor &v, unsigned comp, no_component_visitor_tag &c )
-{ 
+{
     return true;
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::endComponent(
-    const GraphType &g, Visitor &v, unsigned comp, component_visitor_tag &c ) 
-{ 
-    return v.endComponent( g,comp ); 
+    const GraphType &g, Visitor &v, unsigned comp, component_visitor_tag &c )
+{
+    return v.endComponent( g,comp );
 }
 
 template< class GraphType, class Visitor >
 bool Visitors::endComponent(
     const GraphType &g, Visitor &v, unsigned comp, no_component_visitor_tag &c )
-{ 
-    return true; 
+{
+    return true;
 }
 
 template< class GraphType >
 bool Visitors::EndVertVisitor::visitEdgePost(
     const GraphType &g, typename GraphType::PEdge e, typename GraphType::PVertex u )
-{ 
-    return !e || (void*)g.getEdgeEnd( e,u ) != ptr; 
+{
+    return !e || (void*)g.getEdgeEnd( e,u ) != ptr;
 }
 
 template< class VertIter > template< class GraphType >
@@ -219,44 +219,44 @@ bool Visitors::StoreCompVisitor< CompIter,VertIter >::endComponent(
     return true;
 }
 
-template< class Visitor > template< class GraphType >                
+template< class Visitor > template< class GraphType >
 bool Visitors::ComplexPreorderVisitor< Visitor >::visitVertexPre(
     const GraphType &g, typename GraphType::PVertex u,
     VisitVertLabs< GraphType > &data )
-{ 
-    return visit.operator()( g,u,data ); 
+{
+    return visit.operator()( g,u,data );
 }
 
-template< class Visitor > template< class GraphType >                
+template< class Visitor > template< class GraphType >
 bool Visitors::ComplexPreorderVisitor< Visitor >::visitVertexPost(
     const GraphType &g, typename GraphType::PVertex u,
-    VisitVertLabs< GraphType > &data ) 
-{ 
-    return true; 
-}
-
-template< class Visitor > template< class GraphType >                
-bool Visitors::ComplexPreorderVisitor< Visitor >::visitEdgePre(
-    const GraphType &g, typename GraphType::PEdge e,
-    typename GraphType::PVertex u )
-{ 
+    VisitVertLabs< GraphType > &data )
+{
     return true;
 }
 
-template< class Visitor > template< class GraphType >                
-bool Visitors::ComplexPreorderVisitor< Visitor >::visitEdgePost(
+template< class Visitor > template< class GraphType >
+bool Visitors::ComplexPreorderVisitor< Visitor >::visitEdgePre(
     const GraphType &g, typename GraphType::PEdge e,
-    typename GraphType::PVertex u )   
-{ 
-    return true; 
+    typename GraphType::PVertex u )
+{
+    return true;
 }
 
-template< class Visitor > template< class GraphType >                
+template< class Visitor > template< class GraphType >
+bool Visitors::ComplexPreorderVisitor< Visitor >::visitEdgePost(
+    const GraphType &g, typename GraphType::PEdge e,
+    typename GraphType::PVertex u )
+{
+    return true;
+}
+
+template< class Visitor > template< class GraphType >
 bool Visitors::ComplexPostorderVisitor< Visitor >::visitVertexPost(
     const GraphType &g, typename GraphType::PVertex u,
-    VisitVertLabs< GraphType > &data ) 
-{ 
-    return visit.operator()( g,u,data ); 
+    VisitVertLabs< GraphType > &data )
+{
+    return visit.operator()( g,u,data );
 }
 
 template< class SearchImpl > template< class GraphType, class VertContainer,
@@ -301,7 +301,7 @@ int GraphSearchBase< SearchImpl >::scanAttainable(
 template< class SearchImpl > template< class GraphType, class VertIter >
 int GraphSearchBase< SearchImpl >::scanAttainable(
     const GraphType &g, typename GraphType::PVertex root, VertIter comp,
-    EdgeDirection mask ) 
+    EdgeDirection mask )
 {
     VisitedMap< GraphType > cont;
     return scanAttainable( g,root,comp,mask,cont );
@@ -320,16 +320,23 @@ int GraphSearchBase< SearchImpl >::scan(
 
 template< class SearchImpl > template< class GraphType, class VertIter >
 int GraphSearchBase< SearchImpl >::scan(
-    const GraphType &g, VertIter iter, EdgeDirection mask ) 
+    const GraphType &g, VertIter iter, EdgeDirection mask )
 {
     VisitedMap< GraphType > cont;
     return scan( g,iter,mask,cont );
 }
 
+template< class SearchImpl > template< class GraphType>
+int GraphSearchBase< SearchImpl >::cyclNo(
+    const GraphType &g, EdgeDirection mask )
+{
+    return g.getEdgeNo(mask) - g.getVertNo() + scan( g,blackHole,mask );
+}
+
 template< class SearchImpl > template< class GraphType >
 Set< typename GraphType::PVertex > GraphSearchBase< SearchImpl >::getAttainableSet(
     const GraphType &g, typename GraphType::PVertex root, EdgeDirection mask )
-{   
+{
     assert( root );
     Set< typename GraphType::PVertex > res;
     scanAttainable( g,root,setInserter( res ),mask );
@@ -342,7 +349,7 @@ int GraphSearchBase< SearchImpl >::getPath(
     const GraphType &g, typename GraphType::PVertex start,
     typename GraphType::PVertex end, OutPath< VertIter,EdgeIter > path,
     EdgeDirection mask )
-{   
+{
     assert( start && end );
     mask &= ~EdLoop;
     VisitedMap< GraphType > tree;
@@ -392,7 +399,7 @@ template< class SearchImpl > template< class GraphType, class VertContainer,
     class Visitor >
 int DFSBase< SearchImpl >::dfsDoVisit(
     DFSParamBlock< GraphType,VertContainer,Visitor > &params,
-    typename GraphType::PVertex u, unsigned depth ) 
+    typename GraphType::PVertex u, unsigned depth )
 {
     int t, retVal = 0;
     typename GraphType::PEdge e;
@@ -416,7 +423,7 @@ int DFSBase< SearchImpl >::dfsDoVisit(
                 params.component );
         t = dfsDoVisit< GraphType,VertContainer,Visitor >( params,v,depth + 1 );
         if (t < 0)
-        { 
+        {
             retVal += -t;
             return -retVal;
         }
@@ -573,8 +580,8 @@ int BFS::visitBase(
 
 template< class Graph >
 void LexBFS::LexVisitContainer< Graph >::clear()
-{ 
-    m_sets.clear(); 
+{
+    m_sets.clear();
     m_splits.clear();
 }
 
@@ -835,7 +842,7 @@ bool SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitVertexPost(
 }
 
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-bool SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitEdgePre( 
+bool SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitEdgePre(
     const GraphType &g, typename GraphType::PEdge e,
     typename GraphType::PVertex u )
 {
@@ -1131,7 +1138,7 @@ template< class GraphType, class VertDataMap, class EdgeDataMap,
 int Blocks::splitComp(
     const GraphType &g, typename GraphType::PVertex u, VertDataMap &vertMap,
     EdgeDataMap &edgeMap, CompStore< CompIter,VertIter > blocks,
-    VertBlockIter vertBlocks, EdgeDirection mask ) 
+    VertBlockIter vertBlocks, EdgeDirection mask )
 {
     int rv;
     VisitedMap< GraphType > visited;
@@ -1148,6 +1155,6 @@ int Blocks::splitComp(
     {
         storeBlocksData( state,vertBlockList,vertMap,vertBlocks );
         return state.count;
-    } 
+    }
     return 0;
 }
