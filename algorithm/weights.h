@@ -232,7 +232,7 @@ class DAGCritPath : public ShortPathStructs {
 
         typename DefaultStructs::AssocCont<typename GraphType::PVertex, char >::Type followers;
         typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
-        Koala::BFS::scanAttainable(g,start,assocInserter(followers,emptyStruct((char)0)),EdDirOut);
+        Koala::BFS::scanAttainable(g,start,assocInserter(followers,constFun<char>(0)),EdDirOut);
         Koala::DAGAlgs::topOrd(makeSubgraph(g,std::make_pair(assocKeyChoose(followers),stdChoose(true))),tabV);
 
         for(int i=1;i<followers.size();i++) {

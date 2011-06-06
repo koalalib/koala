@@ -54,7 +54,7 @@ int SeqVertColoring::interchangeComponents(
             BFS::scanAttainable(
                 makeSubgraph( g ,std::make_pair(
                 assocChoose( assocTabInterf(c),c1 ) || assocChoose( assocTabInterf(c),c2 ),stdChoose( true ))),
-                u,assocInserter( map,Const( l ) ), EdDirIn|EdDirOut|EdUndir );
+                u,assocInserter( map,constFun( l ) ), EdDirIn|EdDirOut|EdUndir );
             l++;
         }
     } while (e = g.getEdgeNext( v,e,EdDirIn|EdDirOut|EdUndir )) ;

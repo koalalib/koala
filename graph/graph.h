@@ -136,17 +136,15 @@ class Graph: public SubgraphBase
                 std::pair< VCaster,ECaster >, std::pair< VLinker,ELinker > );
 
     // Operacje na wierzchołkach grafu
-        // Dodajemy nowy wierzchołek do grafu (bez etykiety).
-        PVertex addVert();
         // Dodajemy nowy wierzchołek do grafu (z etykietą).
-        PVertex addVert( const VertInfo & );
+        PVertex addVert( const VertInfo & = VertInfo() );
         // Usuwamy wierzchołek z grafu.
         void del( PVertex, bool = true );
         void delVert( PVertex, bool = true );
         // Etykieta wierzchołka.
         VertInfoType getVertInfo( PVertex ) const;
         // Zmieniamy etykietę wierzchołka.
-        void setVertInfo( PVertex, const VertInfo & ) const;
+        void setVertInfo( PVertex, const VertInfo & = VertInfo() ) const;
         // Pierwszy wierzchołek grafu.
         PVertex getVert() const;
         // Ostatni wierzchołek grafu.
@@ -191,18 +189,14 @@ class Graph: public SubgraphBase
         PEdge addEdge( PVertex, PVertex, EdgeDirection = EdUndir );
         // Dodajemy nową krawędź do grafu (z etykietą).
         PEdge addEdge( PVertex, PVertex, const EdgeInfo &, EdgeDirection = EdUndir );
-        // Dodajemy nowy łuk do grafu (bez etykiety).
-        PEdge addArch( PVertex, PVertex );
         // Dodajemy nowy łuk do grafu (z etykietą).
-        PEdge addArch( PVertex, PVertex, const EdgeInfo & );
+        PEdge addArch( PVertex, PVertex, const EdgeInfo & = EdgeInfo() );
         // Dodajemy nową pętlę do grafu (bez etykiety).
-        PEdge addLoop( PVertex );
-        // Dodajemy nową pętlę do grafu (z etykietą).
-        PEdge addLoop( PVertex, const EdgeInfo & );
+        PEdge addLoop( PVertex, const EdgeInfo & = EdgeInfo() );
         // Etykieta krawędzi.
         EdgeInfoType getEdgeInfo( PEdge ) const;
         // Zmieniamy etykietę krawędzi.
-        void setEdgeInfo( PEdge, const EdgeInfo & ) const;
+        void setEdgeInfo( PEdge, const EdgeInfo & = EdgeInfo() ) const;
         // Usuwamy krawędź z grafu.
         void del( PEdge );
         void delEdge( PEdge );
@@ -289,6 +283,9 @@ class Graph: public SubgraphBase
         int delParals(PVertex,PVertex,EdgeDirection = EdUndir);
         int delParals(EdgeDirection = EdUndir);
         template< class OutputIterator > int getParals( OutputIterator, PEdge, EdgeDirection = EdUndir ) const;
+        int mu( PEdge, EdgeDirection = EdUndir ) const;
+        int mu( EdgeDirection = EdUndir ) const;
+        std::pair< PEdge,int > maxMu( EdgeDirection = EdUndir ) const;
 
     // Relacje pomiędzy wierzchołkami a krawędziami
         // Pierwsza krawędź incydentna z wierzchołkiem.
@@ -346,10 +343,8 @@ class Graph: public SubgraphBase
         bool good( PVertex,bool=false ) const { return true; }
         bool good( PEdge,bool=false ) const { return true; }
         bool testGraph();
-        PVertex putVert( PEdge,const VertInfo & );
-        PVertex putVert( PEdge );
-        PEdge pickVert( PVertex, const EdgeInfo & );
-        PEdge pickVert( PVertex );
+        PVertex putVert( PEdge,const VertInfo & = VertInfo() );
+        PEdge pickVert( PVertex, const EdgeInfo & = EdgeInfo() );
         PVertex glue( PVertex, PVertex, bool makeloops = false );
         template< class Iterator > PVertex glue(
             Iterator, Iterator, bool makeloops = false, PVertex = NULL );
@@ -385,6 +380,29 @@ class Graph: public SubgraphBase
             Parals2() : size(0) { tab[0]=tab[1]=tab[2]=0; }
         };
         template <class Container> int delParals(PVertex,EdgeDirection,Container &);
+
+        struct Parals3 {
+            typename Koala::Vertex< VertInfo,EdgeInfo > *v1,*v2;
+            EdgeDirection direct;
+            typename Koala::Edge< VertInfo,EdgeInfo > *edge;
+
+            Parals3(typename Koala::Vertex< VertInfo,EdgeInfo > *av1,
+                    typename Koala::Vertex< VertInfo,EdgeInfo > *av2,
+                    EdgeDirection adirect,
+                    typename Koala::Edge< VertInfo,EdgeInfo > *aedge) :
+                    v1(av1), v2(av2), direct(adirect), edge(aedge) {}
+            Parals3() {}
+        };
+
+        struct Parals3cmp {
+            bool operator()(Parals3 a, Parals3 b)
+            {
+                return (a.v1 < b.v1) ||
+                (a.v1 == b.v1 && a.v2 < b.v2) ||
+                (a.v1 == b.v1 && a.v2 == b.v2 && a.direct < b.direct );
+            }
+
+        };
 
         PVertex first_vert, last_vert;
         PEdge first_edge, last_edge;

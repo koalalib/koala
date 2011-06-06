@@ -177,7 +177,8 @@ Subgraph< Graph,VChooser,EChooser >::getEdgePrev(
 
 template< class Graph, class VChooser, class EChooser >
 bool Subgraph< Graph,VChooser,EChooser >::areParallel(
-    PEdge e1, PEdge e2, EdgeDirection reltype ) const
+    typename Subgraph< Graph,VChooser,EChooser >::PEdge e1,
+    typename Subgraph< Graph,VChooser,EChooser >::PEdge e2, EdgeDirection reltype ) const
 {
     if (!e1 || !e2 || !(reltype == EdDirIn || reltype == EdDirOut
         || reltype == EdUndir)) return false;
@@ -196,6 +197,64 @@ bool Subgraph< Graph,VChooser,EChooser >::areParallel(
     else return e1->getType() == e2->getType() && ends1.first == ends2.first
         && ends1.second == ends2.second;
 }
+
+template< class Graph, class VChooser, class EChooser > template <class OutputIterator>
+int Subgraph< Graph,VChooser,EChooser >::getParals(
+                OutputIterator iter, typename Graph::PEdge edge, EdgeDirection reltype) const
+{
+    if (!edge || !(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)) return 0;
+    int licz=0;
+    std::pair<typename Graph::PVertex,typename Graph::PVertex>
+            ends=getEdgeEnds(edge);
+    for(typename Graph::PEdge e=getEdge(ends.first,ends.second,EdAll);e;
+                e=getEdgeNext(ends.first,ends.second,e,EdAll))
+        if (e!=edge && areParallel(e,edge,reltype))
+        {   *iter=e;
+            ++iter;
+            licz++;
+        }
+    return licz;
+}
+
+template< class Graph, class VChooser, class EChooser >
+int Subgraph< Graph,VChooser,EChooser >::mu( typename Graph::PEdge edge, EdgeDirection reltype) const
+{
+    if (!(edge && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir))) return 0;
+    return getParals(blackHole,edge,reltype)+1;
+}
+
+template< class Graph, class VChooser, class EChooser >
+int Subgraph< Graph,VChooser,EChooser >::mu( EdgeDirection reltype) const
+{
+    return maxMu(reltype).second;
+}
+
+template< class Graph, class VChooser, class EChooser >
+std::pair< typename Graph::PEdge,int >
+Subgraph< Graph,VChooser,EChooser >::maxMu( EdgeDirection reltype) const
+{
+    std::pair< typename Graph::PEdge,int > res(0,0);
+    if (!(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir) || !getEdgeNo(EdAll)) return res;
+    Parals3 LOCALARRAY(edges,getEdgeNo(EdAll));
+    int i=0,l=0;
+    typename Graph::PEdge edge;
+    for (typename Graph::PEdge e=getEdge(EdAll); e; e=getEdgeNext(e,EdAll) )
+        edges[i++]=Parals3(std::min(e->getEnds().first,e->getEnds().second),
+                           std::max(e->getEnds().first,e->getEnds().second),
+                           getEdgeDir(e,std::min(e->getEnds().first,e->getEnds().second)),e);
+    std::make_heap(edges,edges+i,Parals3cmp());
+    std::sort_heap(edges,edges+i,Parals3cmp());
+    for(i=0;i<getEdgeNo(EdAll);i++)
+    {
+        if (i==0 || !areParallel(edges[i-1].edge,edges[i].edge,reltype))
+        {
+            l=1; edge=edges[i].edge;
+        } else l++;
+        if (l>res.second) res=std::make_pair(edge,l);
+    }
+    return res;
+}
+
 
 template< class Graph, class VChooser, class EChooser >
 Subgraph< Graph,VChooser,EChooser > makeSubgraph(

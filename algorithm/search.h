@@ -380,6 +380,10 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
             const GraphType &, VertIter,
             EdgeDirection = EdDirOut | EdUndir | EdDirIn );
 
+        template< class GraphType>
+        static int cyclNo(
+            const GraphType &, EdgeDirection = EdAll );
+
         template< class GraphType >
         static Set< typename GraphType::PVertex > getAttainableSet(
             const GraphType &, typename GraphType::PVertex,
