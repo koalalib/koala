@@ -466,6 +466,19 @@ int Subgraph< Graph,VChooser,EChooser >::getEdgeNo(
     return getEdges( blackHole,vert1,vert2,mask );
 }
 
+template< class Graph, class VChooser, class EChooser > template <class Cont>
+void
+Subgraph< Graph,VChooser,EChooser >::getAdj(Cont& cont) const
+{
+    std::pair<PVertex,PVertex> ends;
+    for(PEdge e=getEdge();e;e=getEdgeNext(e))
+    {   ends=getEdgeEnds(e);
+        cont(ends.first,ends.second)=true;
+        if (getEdgeType(e)==Undirected)
+            cont(ends.second,ends.first)=true;
+    }
+}
+
 template< class Graph, class VChooser, class EChooser > template< class OutputIterator >
 int Subgraph< Graph,VChooser,EChooser >::getNeigh(
     OutputIterator out, PVertex vert, EdgeDirection direct ) const

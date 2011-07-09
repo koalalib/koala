@@ -756,6 +756,19 @@ int Graph< VertInfo,EdgeInfo >::getEdgeNo(
     return ans;
 }
 
+template< class VertInfo, class EdgeInfo > template <class Cont>
+void
+Graph< VertInfo,EdgeInfo >::getAdj(Cont& cont) const
+{
+    std::pair<PVertex,PVertex> ends;
+    for(PEdge e=getEdge();e;e=getEdgeNext(e))
+    {   ends=getEdgeEnds(e);
+        cont(ends.first,ends.second)=true;
+        if (getEdgeType(e)==Undirected)
+            cont(ends.second,ends.first)=true;
+    }
+}
+
 template< class VertInfo, class EdgeInfo >
 std::pair< typename Graph< VertInfo,EdgeInfo >::PVertex,
     typename Graph< VertInfo,EdgeInfo >::PVertex >

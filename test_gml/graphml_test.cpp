@@ -1,8 +1,8 @@
 #include <iostream>
-#include "Koala/graph/graph.h"
-#include "Koala/base/def_struct.h"
-#include "Koala/io/graphml.h"
-#define TEST3
+#include "../Koala/graph/graph.h"
+#include "../Koala/base/def_struct.h"
+#include "../Koala/io/graphml.h"
+#define TEST0
 
 using namespace std;
 using namespace Koala;

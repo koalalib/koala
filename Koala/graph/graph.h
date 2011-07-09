@@ -317,6 +317,9 @@ class Graph: public SubgraphBase
         // Liczba krawędzi łączących parę wierzchołków.
         int getEdgeNo( PVertex, PVertex, EdgeDirection = EdAll ) const;
         // Końce krawędzi.
+        // Wpisuje do kontenera relacje sasiedztwa miedzy wierzcholkami
+        template <class Cont>
+            void getAdj(Cont &) const;
         std::pair< PVertex,PVertex > getEdgeEnds( PEdge ) const;
         std::pair< PVertex,PVertex > getEnds( PEdge ) const;
         // Informacja o tym, czy wierzchołek jest incydentny z krawędzią.

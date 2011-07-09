@@ -67,10 +67,10 @@ bool readOutputId(std::istream &strm, unsigned int &id) {
  * @return true on success, false otherwise
  */
 template<class Graph, class VMap, class EMap>
-bool readGraphVL(Graph &g, std::istream &strm, bool directed,
+bool readGraphVL(Graph &g, std::istream &strm,
 		 VMap &vertexMap, EMap &edgeMap) {
 	char c;
-	unsigned int i, id, m, iu, iv;
+	unsigned int i, id, m, iu, iv, n;
 	std::istringstream ostrm;
 	EdgeDirection dir;
 	typename Graph::PEdge e;
@@ -78,9 +78,12 @@ bool readGraphVL(Graph &g, std::istream &strm, bool directed,
 	std::map<unsigned int, typename Graph::PVertex > idxToPtr;
 	typename std::map<unsigned int, typename Graph::PVertex >::iterator it;
 
-	while((strm >> iu)) {
+    if (!(bool)(strm >> n)) return false;
+    for(i=0;i<n;i++) idxToPtr[i] = u = g.addVert();
+	for (iu=0;iu<n;iu++) {
+	    if (!(bool)(strm >> i) || i!=iu) return false;
 		it = idxToPtr.find(iu);
-		if(it == idxToPtr.end()) idxToPtr[iu] = u = g.addVert();
+		if(it == idxToPtr.end()) return false;
 		else u = it->second;
 
 		if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (u->info))) return false;
@@ -91,17 +94,16 @@ bool readGraphVL(Graph &g, std::istream &strm, bool directed,
 			if(!(bool)(strm >> c)) return false;
 			if(c == '-') dir = EdUndir;
 			else if(c == '>') dir = EdDirOut;
-			else {
-				strm.unget();
-				dir = directed ? EdDirOut : EdUndir;
-				};
+			else if(c == '<') dir = EdDirIn;
+			else if(c == '*') dir = EdLoop;
+			else return false;
 
 			if(!(bool)(strm >> iv)) return false;
 			it = idxToPtr.find(iv);
-			if(it == idxToPtr.end()) idxToPtr[iv] = v = g.addVert();
+			if(it == idxToPtr.end()) return false;
 			else v = it->second;
 
-			if(u == v) dir = EdLoop;
+			if ((u == v) != (dir == EdLoop)) return false;
 			e = g.addEdge(u, v, dir);
 
 			if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (e->info))) return false;
@@ -121,53 +123,51 @@ bool readGraphVL(Graph &g, std::istream &strm, bool directed,
  * @return true on success, false otherwise
  */
 template<class Graph, class VMap, class EMap>
-bool readGraphEL(Graph &g, std::istream &strm, bool directed,
+bool readGraphEL(Graph &g, std::istream &strm,
 		 VMap &vertexMap, EMap &edgeMap) {
 	char c;
-	bool vertexMode;
 	std::string str;
 	std::istringstream ostrm;
 	EdgeDirection dir;
-	unsigned int id, iu, iv;
+	unsigned int id, iu, iv, n, m;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u, v;
 	std::map<unsigned int, typename Graph::PVertex> idxToPtr;
 	typename std::map<unsigned int, typename Graph::PVertex>::iterator it;
 
-	vertexMode = false;
-	while((strm >> iu)) {
+	if (!(bool)(strm >> n >> m)) return false;
+	for(id=0;id<n;id++) idxToPtr[id] = g.addVert();
+	for(int i=0;i<m;i++) {
+	    strm >> iu;
 		it = idxToPtr.find(iu);
-		if(it == idxToPtr.end()) idxToPtr[iu] = u = g.addVert();
+		if(it == idxToPtr.end()) return false;
 		else u = it->second;
 
-		if(vertexMode) {	// read vertex data
-			if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (u->info))) return false;
-			if(readOutputId(strm, id)) vertexMap[id] = u;
-		} else {		// read edges with edge data
+		 		// read edges with edge data
 			if(!(bool)(strm >> c)) return false;
-			if(c == '<' || c == '_') {
-				strm >> str;
-				str = c + str;
-				if(str == "->") dir = EdDirOut;
-				else if(str == "<-") dir = EdDirIn;
-				else if(str == "<->") dir = EdUndir;
-				else if(str == "-") dir = EdUndir;
+				if(c == '-') dir = EdUndir;
+				else if(c == '<') dir = EdDirIn;
+				else if(c == '>') dir = EdDirOut;
+				else if(c == '*') dir = EdLoop;
 				else return false;
-			} else {
-				strm.unget();
-				dir = directed ? EdDirOut : EdUndir;
-				};
 
+            strm >> iv;
 			it = idxToPtr.find(iv);
-			if(it == idxToPtr.end()) idxToPtr[iv] = v = g.addVert();
+			if(it == idxToPtr.end()) return false;
 			else v = it->second;
 
-			if(u == v) dir = EdLoop;
+			if ((u == v)!= (dir== EdLoop)) return false;
 			e = g.addEdge(u, v, dir);
 
 			if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (e->info))) return false;
 			if(readOutputId(strm, id)) edgeMap[id] = e;
 			};
+        for(id=0;id<n;id++) {
+            strm >> iu; if (iu!=id) return false;
+            it = idxToPtr.find(id);
+            u = it->second;
+            if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (u->info))) return false;
+			if(readOutputId(strm, id)) vertexMap[id] = u;
 		};
 	return true;
 	};
@@ -185,10 +185,8 @@ template<typename Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, std::istream &strm, RG_Format format,
 		   VMap &vertexMap, EMap &edgeMap) {
 	switch(format) {
-		case RG_DirectedVertexLists:	return readGraphVL(g, strm, true, vertexMap, edgeMap);
-		case RG_UndirectedVertexLists:	return readGraphVL(g, strm, false, vertexMap, edgeMap);
-		case RG_DirectedEdgeList:	return readGraphEL(g, strm, true, vertexMap, edgeMap);
-		case RG_UndirectedEdgeList:	return readGraphEL(g, strm, false, vertexMap, edgeMap);
+		case RG_VertexLists:	return readGraphVL(g, strm, vertexMap, edgeMap);
+		case RG_EdgeList:	return readGraphEL(g, strm, vertexMap, edgeMap);
 		};
 	return false;
 	};
@@ -202,7 +200,7 @@ bool readGraphText(Graph &g, std::istream &strm, RG_Format format,
  * @return true on success, false otherwise
  */
 template<class Graph>
-bool writeGraphVL(const Graph &g, std::ostream &out, bool directed, std::pair<bool,bool> printinf) {
+bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf) {
 	unsigned int i;
 	EdgeDirection flags;
 	typename Graph::PEdge e;
@@ -215,6 +213,7 @@ bool writeGraphVL(const Graph &g, std::ostream &out, bool directed, std::pair<bo
 		ptrToIdx[u] = i++;
 
 	flags = EdLoop | EdDirOut | EdUndir;
+	out << g.getVertNo() << '\n';
 
 	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
 		out << ptrToIdx[u];
@@ -237,6 +236,7 @@ bool writeGraphVL(const Graph &g, std::ostream &out, bool directed, std::pair<bo
 			else v = vs.first;
 			out << ' ';
 			if(g.getType(e) == Undirected) out << '-';
+			else if(g.getType(e) == Loop) out << '*';
 			else out << '>';
 			out << ptrToIdx[v];
 			if (printinf.second) out << '(' << e->info << ')';
@@ -258,28 +258,28 @@ bool writeGraphVL(const Graph &g, std::ostream &out, bool directed, std::pair<bo
  * @return true on success, false otherwise
  */
 template<class Graph>
-bool writeGraphEL(const Graph &g, std::ostream &out, bool directed, std::pair<bool,bool> printinf) {
-	unsigned int idx;
+bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf) {
+	unsigned int idx,i=0;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u;
 	std::pair<typename Graph::PVertex , typename Graph::PVertex > vs;
 	std::map<typename Graph::PVertex , unsigned int> ptrToIdx;
 
 	idx = 0;
+	out << g.getVertNo() << ' ' << g.getEdgeNo() << '\n';
+	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) ptrToIdx[u]=i++;
 	for(e = g.getEdge(); e != NULL; e = g.getEdgeNext(e)) {
 		vs = g.getEdgeEnds(e);
-		if(ptrToIdx.find(vs.first) == ptrToIdx.end()) ptrToIdx[vs.first] = idx++;
-		if(ptrToIdx.find(vs.second) == ptrToIdx.end()) ptrToIdx[vs.second] = idx++;
 		out << ptrToIdx[vs.first] << ' ';
-		if(g.getType(e) == Undirected) out << "<->";
-		else out << "->";	// loop and undirected
+		if(g.getType(e) == Undirected) out << "-";
+		else if(g.getType(e) == Directed) out << ">";
+		else out << "*";
 		out << ' ' << ptrToIdx[vs.second];
 		if (printinf.second) out << "(" << e->info << ")";
 		out << "\n";
 		};
 
 	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
-		if(ptrToIdx.find(u) == ptrToIdx.end()) ptrToIdx[u] = idx++;
 		out << ptrToIdx[u];
 		if (printinf.first) out << '(' << u->info << ")";
 		out <<"\n";
@@ -299,10 +299,8 @@ bool writeGraphEL(const Graph &g, std::ostream &out, bool directed, std::pair<bo
 template<class Graph>
 bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format, std::pair<bool,bool> printinf) {
 	switch(format) {
-		case RG_DirectedVertexLists:	return writeGraphVL(g, out, true,printinf);
-		case RG_UndirectedVertexLists:	return writeGraphVL(g, out, false,printinf);
-		case RG_DirectedEdgeList:	return writeGraphEL(g, out, true,printinf);
-		case RG_UndirectedEdgeList:	return writeGraphEL(g, out, false,printinf);
+		case RG_VertexLists:	return writeGraphVL(g, out, printinf);
+		case RG_EdgeList:	return writeGraphEL(g, out, printinf);
 		};
 	return false;
 	};

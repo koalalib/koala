@@ -880,6 +880,27 @@ int SCC::get(
     return state.count;
 }
 
+template< class GraphType, class CompMap, class PairIter >
+int SCC::connections(const GraphType &g, CompMap & comp, PairIter iter)
+{
+    int n=0;
+    std::pair<int,int> LOCALARRAY(buf,g.getEdgeNo(EdDirIn|EdDirOut));
+    for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut))
+    {
+        std::pair <typename GraphType::PVertex,typename GraphType::PVertex> ends=g.getEdgeEnds(e);
+        if (comp[ends.first]!=comp[ends.second])  buf[n++]=std::make_pair(comp[ends.first],comp[ends.second]);
+    }
+    std::make_heap( buf,buf + n );
+    std::sort_heap( buf,buf + n );
+    n = std::unique( buf,buf + n ) - buf;
+    for(int i=0;i<n;i++)
+    {
+        *iter=buf[i];
+        ++iter;
+    }
+    return n;
+}
+
 template< class GraphType, class VertIter >
 void DAGAlgs::topOrd( const GraphType &g, VertIter out )
 {
@@ -900,7 +921,7 @@ bool DAGAlgs::isDAG( const GraphType &g, Iter beg, Iter end )
     for( Iter i = beg; i != end; ++i ) topord[*i] = licz++;
     assert( topord.size() == g.getVertNo() );
     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-        if (topord[e->getEnds().first] > topord[e->getEnds().second]) return false;
+        if (topord[g.getEdgeEnds(e).first] > topord[g.getEdgeEnds(e).second]) return false;
     return true;
 }
 
@@ -910,6 +931,33 @@ bool DAGAlgs::isDAG( const GraphType &g )
     typename GraphType::PVertex LOCALARRAY( buf,g.getVertNo() );
     topOrd( g,buf );
     return isDAG( g,buf,buf + g.getVertNo() );
+}
+
+template< class GraphType, class Iter >
+int DAGAlgs::transEdges(const GraphType & g, Iter out)
+{
+    int res=0;
+    for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut))
+    {
+        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> ends=g.getEdgeEnds(e);
+        if (BFS::getPath(
+                makeSubgraph(g,std::make_pair(stdChoose(true),
+                                    !stdValChoose(e))),
+                            ends.first,ends.second,PathStructs::outPath(blackHole,blackHole),EdDirOut)!=-1)
+        {
+            *out=e; ++out; ++res;
+        }
+    }
+
+    return res;
+}
+
+template< class GraphType>
+void DAGAlgs::makeHasse(GraphType & g)
+{
+    typename GraphType::PEdge LOCALARRAY(buf,g.getEdgeNo());
+    int res=transEdges(g,buf);
+    for(int i=0;i<res;i++) g.delEdge(buf[i]);
 }
 
 

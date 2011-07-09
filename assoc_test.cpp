@@ -22,7 +22,8 @@ Vert *A=new Vert("Ala"),*B=new Vert("Basia"),*C=new Vert("Celina"),*D=new Vert("
 
 Vert* vtab[4]={A,B,C,D};
 
-void t(AssocArray<Vert*,std::string>& arr)
+template <class Cont>
+void t(Cont /*AssocArray<Vert*,std::string>*/ & arr)
 {   std::cout << "size:" << arr.size() << std::endl;
     for(Vert* k=arr.firstKey();k;k=arr.nextKey(k)) std::cout << "(" << k->name << "," << arr[k] << ")";
     std::cout << std::endl;
@@ -74,6 +75,37 @@ int main() {
 
     AssocArray<Vert*,std::string> a2=a;
 
+    std::cout << "\n----------------\n";
+
+//    HashMap<int,std::string> hmapa;
+//    AssocTabInterface<HashMap<int,std::string> > hamap=hmapa;
+//
+//
+//    AssocTable< HashMap<Vert*,std::string> > ha;
+//
+//
+//
+//    t(ha);
+//    ha[C]=std::string("Ca");
+//    ha[B]="Ba";
+//    t(ha);
+//    AssocTable< HashMap<Vert*,std::string> > hb;
+//    hb[C]="x";
+//    hb=ha;
+//    t(ha);
+//    t(hb);
+//    hb[A]="Ab";
+////    delete B;
+//    t(ha);
+//    t(hb);
+//    ha.clear();
+//    t(ha);
+//    t(hb);
+//
+//    AssocTable< HashMap<Vert*,std::string> > ha2=ha;
+
+
+    std::cout << "\nMatrixy:\n";
     AssocMatrix<Vert*,std::string,AMatrClTriangle> m,m1;
 
     m(A,B)="Wpis wspolny";

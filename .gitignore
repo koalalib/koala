@@ -1,7 +1,6 @@
 *.exe
 *.o
 *.prv
-*.cbp
 *.layout
 *.depend
 

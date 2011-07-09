@@ -100,9 +100,12 @@ class Subgraph: public SubgraphBase
         PEdge getEdgeNext( PVertex, PVertex, PEdge, EdgeDirection = EdAll ) const;
         PEdge getEdgePrev( PVertex, PVertex, PEdge, EdgeDirection = EdAll ) const;
         Set< PEdge > getEdgeSet( PVertex, PVertex, EdgeDirection = EdAll ) const;
+
         template< class OutputIterator > int getEdges(
             OutputIterator, PVertex, PVertex, EdgeDirection = EdAll ) const;
         int getEdgeNo( PVertex, PVertex, EdgeDirection = EdAll ) const;
+        template <class Cont>
+            void getAdj(Cont &) const;
 
         template< class OutputIterator > int getNeigh(
             OutputIterator, PVertex, EdgeDirection = EdAll ) const;
