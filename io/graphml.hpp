@@ -58,15 +58,15 @@ bool GraphMLKeyVal::setDef( const char *val )
             if (val[0] == '1' || val[0] == 't') pDef.intVal = 1;
             else pDef.intVal = 0;
             break;
-            
+
         case GraphMLKeyVal::Int:
             pDef.intVal = atoi( val );
             break;
-            
+
         case GraphMLKeyVal::Long:
             pDef.longVal = atoll( val );
             break;
-            
+
         case GraphMLKeyVal::Float:
         case GraphMLKeyVal::Double:
         {
@@ -74,12 +74,12 @@ bool GraphMLKeyVal::setDef( const char *val )
             pDef.dblVal = strtod( val,&endP );
         }
             break;
-            
+
         case GraphMLKeyVal::NotDefined:
         case GraphMLKeyVal::String:
             sDef = val;
             break;
-            
+
         default: return false;
     }
     is_def = true;
@@ -95,15 +95,15 @@ bool GraphMLKeyVal::setUsr( const char *val )
             if (val[0] == '1' || val[0] == 't') pUsr.intVal = 1;
             else pUsr.intVal = 0;
             break;
-            
+
         case GraphMLKeyVal::Int:
                 pUsr.intVal = atoi( val );
                 break;
-                
+
         case GraphMLKeyVal::Long:
                 pUsr.longVal = atoll( val );
                 break;
-                
+
         case GraphMLKeyVal::Float:
         case GraphMLKeyVal::Double:
         {
@@ -111,12 +111,12 @@ bool GraphMLKeyVal::setUsr( const char *val )
             pUsr.dblVal = strtod( val,&endP );
         }
             break;
-            
+
         case GraphMLKeyVal::NotDefined:
         case GraphMLKeyVal::String:
             sUsr = val;
             break;
-            
+
         default: return false;
     }
     return true;
@@ -303,7 +303,7 @@ void KeysHolderBase::setKeyFor( int id, GraphMLKeyVal::ForKey forKey )
     defs->at( id - 1 ).forKey = forKey;
 }
 
-void KeysHolderBase::setVal( int id, const char *val ) 
+void KeysHolderBase::setVal( int id, const char *val )
 {
     if (defs->at( id - 1 ).type == GraphMLKeyVal::None)
         defs->at( id - 1 ).type = GraphMLKeyVal::NotDefined;
@@ -370,7 +370,7 @@ bool KeysHolderRead::valid( int id )
     switch (type)
     {
         case 0: return true;
-        case 1: 
+        case 1:
             if (forKey == GraphMLKeyVal::All || forKey == GraphMLKeyVal::Graph)
                 return true;
             return false;
@@ -403,29 +403,29 @@ std::string KeysHolderRead::getKeyName( int id )
     return KeysHolderBase::getKeyName( id );
 }
 
-GraphMLKeyVal::Type KeysHolderRead::getKeyType( int id ) 
+GraphMLKeyVal::Type KeysHolderRead::getKeyType( int id )
 {
     return KeysHolderBase::getKeyType( id );
 }
 
-GraphMLKeyVal::ForKey KeysHolderRead::getKeyFor( int id ) 
+GraphMLKeyVal::ForKey KeysHolderRead::getKeyFor( int id )
 {
     return KeysHolderBase::getKeyFor( id );
 }
 
-bool KeysHolderRead::getBool( int id ) 
+bool KeysHolderRead::getBool( int id )
 {
     if (!valid( id )) return 0;
     return KeysHolderBase::getInt( id );
 }
 
-int KeysHolderRead::getInt( int id ) 
+int KeysHolderRead::getInt( int id )
 {
     if (!valid( id )) return 0;
     return KeysHolderBase::getInt( id );
 }
 
-int64_t KeysHolderRead::getLong( int id ) 
+int64_t KeysHolderRead::getLong( int id )
 {
     if (!valid( id )) return 0;
     return KeysHolderBase::getLong( id );
@@ -502,7 +502,7 @@ std::string KeysHolderWrite::getKeyName( int id )
     return KeysHolderBase::getKeyName( id );
 }
 
-GraphMLKeyVal::Type KeysHolderWrite::getKeyType( int id ) 
+GraphMLKeyVal::Type KeysHolderWrite::getKeyType( int id )
 {
     return KeysHolderBase::getKeyType( id );
 }
@@ -679,7 +679,7 @@ std::string KeysHolderGraph::getString( int id )
 }
 
 GraphML::GraphML()
-{ 
+{
     doc = NULL;
 }
 
@@ -777,7 +777,7 @@ bool GraphML::readGraph( Graph &graph, TiXmlElement *xmlGraph )
         if (!strcmp( edgeDef,"undirected" )) isDirected = false;
     }
 
-    std::map< std::string,typename Graph::Vertex * > verts;
+    std::map< std::string,typename Graph::PVertex > verts;
 
     TiXmlElement *xmlVert = xmlGraph->FirstChildElement( "node" );
     while (xmlVert)
@@ -822,7 +822,7 @@ bool GraphML::readGraph(
     const char *edgeDef = xmlGraph->Attribute( "edgedefault" );
     if (!strcmp( edgeDef,"undirected" )) isDirected = false;
 
-    std::map< std::string,typename Graph::Vertex * > verts;
+    std::map< std::string,typename Graph::PVertex > verts;
     khRead.clearCount();
 
     khRead.type = 2;
@@ -970,7 +970,7 @@ bool GraphML::writeGraph( const Graph &graph, const char *graphName )
     if (!xmlGraphs) return false;
 
     TiXmlElement *xmlGraph = xmlGraphs->FirstChildElement( "graph" );
-    while (xmlGraph && strcmp( xmlGraph->Attribute( "id" ),graphName )) 
+    while (xmlGraph && strcmp( xmlGraph->Attribute( "id" ),graphName ))
     {
         xmlGraph = xmlGraph->NextSiblingElement( "graph" );
     }
@@ -981,7 +981,7 @@ bool GraphML::writeGraph( const Graph &graph, const char *graphName )
 
     xmlGraphs->LinkEndChild( xmlGraph );
 
-    typename Graph::Vertex *vert = graph.getVert();
+    typename Graph::PVertex vert = graph.getVert();
     while (vert)
     {
         char adress[30];
@@ -991,7 +991,7 @@ bool GraphML::writeGraph( const Graph &graph, const char *graphName )
         xmlGraph->LinkEndChild( xmlVert );
         vert = graph.getVertNext( vert );
     }
-    typename Graph::Edge *edge = graph.getEdge();
+    typename Graph::PEdge edge = graph.getEdge();
     while (edge)
     {
         char adress[30];
@@ -999,7 +999,7 @@ bool GraphML::writeGraph( const Graph &graph, const char *graphName )
         TiXmlElement *xmlEdge = new TiXmlElement( "edge" );
         xmlEdge->SetAttribute( "id",adress );
 
-        std::pair< typename Graph::Vertex *,typename Graph::Vertex * >
+        std::pair< typename Graph::PVertex ,typename Graph::PVertex  >
             verts = graph.getEdgeEnds( edge );
         sprintf( adress,"n%08X",(int)verts.first );
         xmlEdge->SetAttribute( "source",adress );
@@ -1026,7 +1026,7 @@ bool GraphML::writeGraph(
     if (!xmlGraphs) return false;
 
     TiXmlElement *xmlGraph = xmlGraphs->FirstChildElement( "graph" );
-    while (xmlGraph && strcmp( xmlGraph->Attribute( "id" ),graphName )) 
+    while (xmlGraph && strcmp( xmlGraph->Attribute( "id" ),graphName ))
         xmlGraph = xmlGraph->NextSiblingElement( "graph" );
     if (xmlGraph) return false;
 
@@ -1037,7 +1037,7 @@ bool GraphML::writeGraph(
     khWrite.clearCount();
 
     khWrite.type = 2;
-    typename Graph::Vertex *vert = graph.getVert();
+    typename Graph::PVertex vert = graph.getVert();
     while (vert)
     {
         khWrite.next();
@@ -1061,7 +1061,7 @@ bool GraphML::writeGraph(
     }
 
     khWrite.type = 3;
-    typename Graph::Edge *edge = graph.getEdge();
+    typename Graph::PEdge edge = graph.getEdge();
     while (edge)
     {
         khWrite.next();
@@ -1073,7 +1073,7 @@ bool GraphML::writeGraph(
 
         infoEdge( edge,&khWrite );
         for( int i = 1; i <= khWrite.getKeysNo(); ++i )
-            if (khWrite.modified( i )) 
+            if (khWrite.modified( i ))
             {
                 TiXmlElement *xmlKey= new TiXmlElement( "data" );
                 xmlEdge->LinkEndChild( xmlKey );
@@ -1082,7 +1082,7 @@ bool GraphML::writeGraph(
                     new TiXmlText( khWrite.print( i,true ).c_str() ) );
             }
 
-        std::pair< typename Graph::Vertex *,typename Graph::Vertex * >
+        std::pair< typename Graph::PVertex ,typename Graph::PVertex >
             verts = graph.getEdgeEnds(edge);
         sprintf( adress,"n%08X",verts.first );
         xmlEdge->SetAttribute( "source",adress );
@@ -1216,15 +1216,15 @@ void GraphML::writeKeys()
             case GraphMLKeyVal::Graph:
                 xmlNewKey->SetAttribute( "for","graph" );
                 break;
-                
+
             case GraphMLKeyVal::Node:
                 xmlNewKey->SetAttribute( "for","node" );
                 break;
-                    
+
             case GraphMLKeyVal::Edge:
                 xmlNewKey->SetAttribute( "for","edge" );
                 break;
-                    
+
             case GraphMLKeyVal::All:
             default:
                 xmlNewKey->SetAttribute( "for","all" );
@@ -1235,23 +1235,23 @@ void GraphML::writeKeys()
             case GraphMLKeyVal::Bool:
                 xmlNewKey->SetAttribute( "attr.type","boolean" );
                 break;
-                
+
             case GraphMLKeyVal::Int:
                 xmlNewKey->SetAttribute( "attr.type","int" );
                 break;
-                
+
             case GraphMLKeyVal::Long:
                 xmlNewKey->SetAttribute( "attr.type","long" );
                 break;
-                
+
             case GraphMLKeyVal::Float:
                 xmlNewKey->SetAttribute( "attr.type","float" );
                 break;
-                
+
             case GraphMLKeyVal::Double:
                 xmlNewKey->SetAttribute( "attr.type","double" );
                 break;
-                
+
             case GraphMLKeyVal::String:
                 xmlNewKey->SetAttribute( "attr.type","string" );
                 break;
@@ -1269,22 +1269,22 @@ void GraphML::writeKeys()
                     xmlDef->LinkEndChild(
                         new TiXmlText(iter->pDef.intVal ? "1" : "0") );
                     break;
-                    
+
                 case GraphMLKeyVal::Int:
                     sprintf( tmp_ch,"%d",iter->pDef.intVal );
                     xmlDef->LinkEndChild( new TiXmlText( tmp_ch ) );
                     break;
-                    
+
                 case GraphMLKeyVal::Long:
                     sprintf( tmp_ch,"%lld",iter->pDef.longVal );
                     xmlDef->LinkEndChild( new TiXmlText( tmp_ch ) );
                     break;
-                    
+
                 case GraphMLKeyVal::Float:
                 case GraphMLKeyVal::Double:
                     sprintf( tmp_ch,"%lf",iter->pDef.dblVal );
                     xmlDef->LinkEndChild( new TiXmlText( tmp_ch ) );
-                    
+
                 default:
                     xmlDef->LinkEndChild( new TiXmlText( iter->sDef.c_str() ) );
             }
@@ -1302,7 +1302,7 @@ bool GraphML::readGraphParam( const char *graphName, KeysHolderGraph &kHolderG )
     if (!xmlGraphs) return false;
 
     TiXmlElement *xmlGraph = xmlGraphs->FirstChildElement( "graph" );
-    while (xmlGraph && strcmp( xmlGraph->Attribute( "id" ),graphName )) 
+    while (xmlGraph && strcmp( xmlGraph->Attribute( "id" ),graphName ))
         xmlGraph = xmlGraph->NextSiblingElement( "graph" );
     if (!xmlGraph) return false;
     return readGraphParam( xmlGraph,kHolderG );
@@ -1317,7 +1317,7 @@ bool GraphML::readGraphParam( int graphNr, KeysHolderGraph &kHolderG )
     if (!xmlGraphs) return false;
 
     TiXmlElement *xmlGraph = xmlGraphs->FirstChildElement( "graph" );
-    while (xmlGraph && graphNr) 
+    while (xmlGraph && graphNr)
     {
         xmlGraph = xmlGraph->NextSiblingElement( "graph" );
         --graphNr;
@@ -1355,7 +1355,7 @@ bool GraphML::writeGraphParam( const char *graphName, KeysHolderGraph &kHolderG 
     if (!xmlGraphs) return false;
 
     TiXmlElement *xmlGraph = xmlGraphs->FirstChildElement( "graph" );
-    while (xmlGraph && strcmp( xmlGraph->Attribute( "id" ),graphName )) 
+    while (xmlGraph && strcmp( xmlGraph->Attribute( "id" ),graphName ))
         xmlGraph = xmlGraph->NextSiblingElement( "graph" );
     if (!xmlGraph) return false;
     return writeGraphParam( xmlGraph,kHolderG );
@@ -1388,11 +1388,11 @@ bool GraphML::writeGraphParam( TiXmlElement *xmlGraph, KeysHolderGraph &kHolderG
         xmlGraphData = xmlGraph->FirstChildElement( "data" );
     }
 
-    for( int i = 1; i <= kHolderG.getKeysNo(); ++i ) 
+    for( int i = 1; i <= kHolderG.getKeysNo(); ++i )
     {
         if (!kHolderG.modified( i )) continue;
         int j = 1;
-        for( ; j <= this->keysHolder.getKeysNo(); ++j ) 
+        for( ; j <= this->keysHolder.getKeysNo(); ++j )
             if (kHolderG.getKeyName( i ) == this->keysHolder.getKeyName( j ))
                     break;
         if (j > this->keysHolder.getKeysNo())

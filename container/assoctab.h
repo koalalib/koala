@@ -20,7 +20,7 @@ template< class Container > class AssocTabInterface;
  * ------------------------------------------------------------------------- */
 
 template< class K, class V > class AssocTabInterface< std::map< K,V > >
-{    
+{
     public:
         AssocTabInterface( std::map< K,V > &acont ): cont( acont ) {}
 
@@ -29,7 +29,7 @@ template< class K, class V > class AssocTabInterface< std::map< K,V > >
 
         bool hasKey( K arg ) { return cont.find( arg ) != cont.end(); }
         bool delKey( K );
-        
+
         K firstKey();
         K lastKey();
         K prevKey( K );
@@ -40,13 +40,14 @@ template< class K, class V > class AssocTabInterface< std::map< K,V > >
         bool empty() { return this->size() == 0; }
         void clear() { cont.clear(); }
         template< class Iterator > int getKeys( Iterator );
-    
+
     private:
         std::map< K,V > &cont;
 } ;
 
+
 template< class T > class AssocTabInterface< AssocTabInterface< T > >
-{    
+{
     public:
         AssocTabInterface( AssocTabInterface< T > &acont ): cont( acont ) { }
 
@@ -104,7 +105,7 @@ template< class T > class AssocTable
         void clear() { inter.clear(); }
 
         template< class Iterator > int getKeys( Iterator );
-    
+
     private:
         AssocTabInterface< T > inter;
 };
@@ -117,7 +118,7 @@ template< class T > AssocTable< T > assocTab( const T & );
  *
  * ------------------------------------------------------------------------- */
 
-template< class T > class AssocTabInterface< AssocTable< T > > 
+template< class T > class AssocTabInterface< AssocTable< T > >
 {
     public:
         AssocTabInterface( AssocTable< T > &acont ): cont( acont ) { }
@@ -137,7 +138,7 @@ template< class T > class AssocTabInterface< AssocTable< T > >
         void clear() { cont.clear(); }
 
         template< class Iterator > int getKeys( Iterator );
-    
+
     private:
         AssocTable< T > &cont;
 };
@@ -161,7 +162,7 @@ class BlockList
     protected:
         int siz, first, last, ffree;
         Container cont;
-        
+
     public:
         typedef Element ElementType;
         typedef BlockOfBlockList< Element > BlockType;
@@ -222,7 +223,7 @@ struct AssocContReg
  *
  * ------------------------------------------------------------------------- */
 
-class AssocKeyContReg: public AssocContReg 
+class AssocKeyContReg: public AssocContReg
 {
     public:
         AssocKeyContReg() { next = 0; }
@@ -241,7 +242,7 @@ template< class Klucz, class Elem > struct BlockOfAssocArray
 } ;
 
 template< class Klucz > class KluczTest
-{    
+{
     public:
         KluczTest( Klucz v = 0 ) { AssocKeyContReg *ptr = &v->assocReg; }
 } ;
@@ -271,7 +272,7 @@ class AssocArray: public AssocContBase, public KluczTest< Klucz >
 
         AssocArray< Klucz,Elem,Container > &operator=(
             const AssocArray< Klucz,Elem,Container > & );
-            
+
         int size() { return tab.size(); }
         bool empty() { return tab.empty(); }
         void reserve( int arg ) { tab.reserve( arg ); }
@@ -288,7 +289,7 @@ class AssocArray: public AssocContBase, public KluczTest< Klucz >
         void clear();
 
         template< class Iterator > int getKeys( Iterator );
-        
+
         ~AssocArray() { clear(); }
 } ;
 
@@ -318,7 +319,7 @@ template< class K, class V, class C > class AssocTabInterface< AssocArray< K,V,C
         void clear() { cont.clear(); }
 
         template< class Iterator > int getKeys( Iterator );
-    
+
     private:
         AssocArray< K,V,C > &cont;
 };
@@ -421,24 +422,24 @@ class AssocMatrix: public AssocMatrixAddr< aType >
                 int klucz2pos( Klucz );
                 Klucz pos2klucz( int );
                 virtual void DelPosCommand( int );
-                
+
                 friend class AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >;
         } index;
-	
+
         friend class AssocIndex;
 
         Container bufor;
         int siz, first, last;
 
         void delPos( std::pair< int,int >  );
-        
+
     protected:
         struct DefragMatrixPom
         {
             Klucz u, v;
             Elem val;
         } ;
-        
+
     public:
         typedef Klucz KeyType;
         typedef Elem ValType;
@@ -462,7 +463,7 @@ class AssocMatrix: public AssocMatrixAddr< aType >
             Klucz, AssocArray< Klucz,Elem2,ExtCont > & );
         template< class Elem2, class ExtCont > int slice2(
             Klucz, AssocArray< Klucz,Elem2,ExtCont > & );
-        
+
         bool hasKey( Klucz, Klucz );
         bool hasKey( std::pair< Klucz,Klucz > k ) { return hasKey( k.first,k.second ); }
 
@@ -487,7 +488,7 @@ class AssocMatrix: public AssocMatrixAddr< aType >
         void reserve( int );
 
         void defrag();
-        
+
         template< class Iterator > int getKeys( Iterator );
 };
 
@@ -530,7 +531,7 @@ class AssocFunktorInserter: public std::iterator< std::output_iterator_tag,void,
         T* container;
         Fun funktor;
         Koala::AssocTabInterface< T > test;
-    
+
     public:
         typedef T container_type;
         typedef Fun FunktorType;

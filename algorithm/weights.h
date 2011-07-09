@@ -13,6 +13,7 @@
 #include "../container/localarray.h"
 
 
+
 namespace Koala {
 
 //Nazewnictwo javowe: nazwy wieloczlonowe - kazdy czlon z duzej bez podkerslen. Typy z z duzej litery, a inne
@@ -23,20 +24,24 @@ namespace Koala {
 //A tak wyobrazam sobie wszystkie nasze algorytmy - spokrewnione procedury i uzywane struktury
 //zamykamy w jednej klasie. Same procedury sa szablonami jej metod statycznych.
 
-class Dijkstra : public ShortPathStructs {
+
+class WeightAlgsDefaultStructs {
+    public:
+
+    template <class A, class B> class AssocCont {
+        public:
+        typedef AssocArray<A,B> Type;
+
+    };
+
+};
+
+template <class DefaultStructs>
+class DijkstraPar : public ShortPathStructs {
 // namespace Dijkstra { - druga mozliwosc, wtedy mozna by pozbyc sie staticow
 
     // wszystkie rodzaje nietrywialnych struktur uzywanych wewnatrz procedur okreslamy tutaj, aby w razie
     // ich wymiany wystarczylo zmieniac w jednym miejscu
-    class DefaultStructs {
-        public:
-
-        template <class A, class B> class AssocCont {
-            public:
-            typedef AssocArray<A,B> Type;
-        };
-
-    };
 
     public:
 
@@ -71,12 +76,12 @@ class Dijkstra : public ShortPathStructs {
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {   assert(start);
-        typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab, Q;
-        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
                     vertTab=
-                BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                BlackHoleSwitch<VertContainer,typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
 
         typename GraphType::PVertex U,V;
@@ -149,20 +154,23 @@ class Dijkstra : public ShortPathStructs {
 
     // wlasciwa procedura: zapisuje od razu najkrotsza sciezke (wierzcholki i krawedzie) pod pare podanych iteratorow
     // Znajduje wszystko w jedym etapie
+
     template <class GraphType, class EdgeContainer, class VIter, class EIter>
     static PathLengths<typename EdgeContainer::ValType::DistType>
         findPath(
         const GraphType& g,
         EdgeContainer& edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
-        ShortPathStructs::OutPath<VIter,EIter> iters)
+        ShortPathStructs::OutPath<VIter,EIter> iters,bool useHeap)
     {   assert(start && end);
         typename EdgeContainer::ValType::DistType dist;
-        typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+        typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
 
-        if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isPlusInfty(dist
-                                                            =distances(g,vertTab,edgeTab,start,end)))
+        if (!useHeap) dist=distances(g,vertTab,edgeTab,start,end);
+        else dist=distances2(g,vertTab,edgeTab,start,end);
+
+        if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isPlusInfty(dist))
             return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-1); // end nieosiagalny
 
         int len=getPath(g,vertTab,end,iters);
@@ -170,21 +178,121 @@ class Dijkstra : public ShortPathStructs {
         // dlugosc najkr. siezki i jej liczba krawedzi
     }
 
-};
+    // klasyczny Dijkstra
+    template <class GraphType, class EdgeContainer, class VIter, class EIter>
+    static PathLengths<typename EdgeContainer::ValType::DistType>
+        findPath(
+        const GraphType& g,
+        EdgeContainer& edgeTab,
+        typename GraphType::PVertex start, typename GraphType::PVertex end,
+        ShortPathStructs::OutPath<VIter,EIter> iters)
+    {   return findPath(g,edgeTab,start,end,iters,false); }
+
+    // Dijkstra na kopcu
+    template <class GraphType, class EdgeContainer, class VIter, class EIter>
+    static PathLengths<typename EdgeContainer::ValType::DistType>
+        findPath2(
+        const GraphType& g,
+        EdgeContainer& edgeTab,
+        typename GraphType::PVertex start, typename GraphType::PVertex end,
+        ShortPathStructs::OutPath<VIter,EIter> iters)
+    {   return findPath(g,edgeTab,start,end,iters,true); }
 
 
+// Dijkstra na kopcu
 
-class DAGCritPath : public ShortPathStructs {
+    protected:
 
-    class DefaultStructs {
+    template< typename Pair > struct Cmp        {            bool operator() ( Pair a, Pair b )
+            {   return a.second > b.second || (a.second == b.second && a.first < b.first); }        } ;
+
+    template <class Key, class Container>
+    class Queue : public Container {
+
+        private:
+
+            PriQueueInterface<std::pair<Key,typename Container::ValType::DistType>*,
+                Cmp<std::pair<Key,typename Container::ValType::DistType> > > q;
+
         public:
 
-        template <class A, class B> class AssocCont {
-            public:
-            typedef AssocArray<A,B> Type;
-        };
+            Queue(std::pair<Key,typename Container::ValType::DistType>* wsk,int max) : q(wsk,max) {}
 
+            void setDist(Key v,typename Container::ValType::DistType d)
+            {  (operator[](v)).distance=d;
+                q.push(std::make_pair(v,d));
+            }
+
+            typename Container::ValType::DistType getDist(Key v)
+            {
+                if (!hasKey(v)) return NumberTypeBounds<typename Container::ValType::DistType>::plusInfty();
+                else return (operator[](v)).distance;
+            }
+
+            std::pair<Key,typename Container::ValType::DistType> min()
+            {
+                std::pair<Key,typename Container::ValType::DistType> res;
+                while (!hasKey( (res=q.top()).first)) q.pop();
+                return res;
+            }
     };
+
+    public:
+
+    template <class GraphType, class VertContainer, class EdgeContainer>
+    static typename EdgeContainer::ValType::DistType
+    distances2 (
+        const GraphType & g,
+        VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
+        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        typename GraphType::PVertex start, typename GraphType::PVertex end=0)
+    // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
+    {   assert(start);
+        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
+
+        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
+                    vertTab=
+                BlackHoleSwitch<VertContainer,typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
+
+        std::pair<typename GraphType::PVertex, typename EdgeContainer::ValType::DistType> LOCALARRAY(qbufor,2*g.getEdgeNo()+2);
+        Queue<typename GraphType::PVertex, typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type> Q(qbufor,2*g.getEdgeNo()+1);
+
+        typename GraphType::PVertex U,V;
+
+        Q[start].vPrev=0;Q[start].ePrev=0;
+        Q.setDist(start,NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero());
+
+        while(!Q.empty()){
+            typename EdgeContainer::ValType::DistType d,nd;
+            std::pair<typename GraphType::PVertex,typename EdgeContainer::ValType::DistType> res=Q.min();
+            U=res.first; d=res.second;
+            vertTab[U]=Q[U]; Q.delKey(U);
+            if (U==end) return vertTab[end].distance;
+
+            for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirOut|Koala::EdUndir);
+                E;E=g.getEdgeNext(U,E,Koala::EdDirOut|Koala::EdUndir))
+                    if (!vertTab.hasKey(V=g.getEdgeEnd(E,U)))
+                        if ((nd=vertTab[U].distance+edgeTab[E].length)<Q.getDist(V))
+                            { Q.setDist(V,nd); Q[V].ePrev=E; Q[V].vPrev=U; }
+        }
+
+        return end ? NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty()
+                    : NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+    }
+
+};
+
+class Dijkstra : public DijkstraPar<WeightAlgsDefaultStructs> {};
+
+
+
+template <class DefaultStructs>
+class DAGCritPathPar : public ShortPathStructs {
+
 
     public:
 
@@ -215,12 +323,12 @@ class DAGCritPath : public ShortPathStructs {
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {   assert(start);
-        typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+        typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
-        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
                     vertTab=
-                BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
 
         typename GraphType::PVertex U,V;
@@ -230,7 +338,7 @@ class DAGCritPath : public ShortPathStructs {
         vertTab[start].distance=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
         if (start==end) return NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
 
-        typename DefaultStructs::AssocCont<typename GraphType::PVertex, char >::Type followers;
+        typename DefaultStructs::template AssocCont<typename GraphType::PVertex, char >::Type followers;
         typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
         Koala::BFS::scanAttainable(g,start,assocInserter(followers,constFun<char>(0)),EdDirOut);
         Koala::DAGAlgs::topOrd(makeSubgraph(g,std::make_pair(assocKeyChoose(followers),stdChoose(true))),tabV);
@@ -288,7 +396,7 @@ class DAGCritPath : public ShortPathStructs {
         ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(start && end);
         typename EdgeContainer::ValType::DistType dist;
-        typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+        typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
 
         if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isMinusInfty(dist
@@ -302,19 +410,12 @@ class DAGCritPath : public ShortPathStructs {
 
 };
 
+class DAGCritPath : public DAGCritPathPar<WeightAlgsDefaultStructs> {};
 
 
-class BellmanFord : public ShortPathStructs {
 
-    class DefaultStructs {
-        public:
-
-        template <class A, class B> class AssocCont {
-            public:
-            typedef AssocArray<A,B> Type;
-        };
-
-    };
+template <class DefaultStructs>
+class BellmanFordPar : public ShortPathStructs {
 
     public:
 
@@ -344,12 +445,12 @@ class BellmanFord : public ShortPathStructs {
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {   assert(start);
-        typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+        typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
-        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
                     vertTab=
-                BlackHoleSwitch<VertContainer,typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
 
         typename GraphType::PVertex U,V;
@@ -462,7 +563,7 @@ class BellmanFord : public ShortPathStructs {
         ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(start && end);
         typename EdgeContainer::ValType::DistType dist;
-        typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+        typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
 
         if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isPlusInfty(dist
@@ -477,6 +578,8 @@ class BellmanFord : public ShortPathStructs {
     }
 
 };
+
+class BellmanFord : public BellmanFordPar<WeightAlgsDefaultStructs> {};
 
 
 //algorytm liczy najkrotsza sciezke pomiedzy kazda para wierzcholków zostal zaproponowany przez Floyda i oparty na twierdzeniu Warshalla)
@@ -608,17 +711,9 @@ class Floyd : public PathStructs {
 };
 
 
-class Kruskal {
 
-    class DefaultStructs {
-        public:
-
-        template <class A, class B> class AssocCont {
-            public:
-            typedef AssocArray<A,B> Type;
-        };
-
-    };
+template <class DefaultStructs>
+class KruskalPar {
 
 
     public:
@@ -651,13 +746,13 @@ class Kruskal {
         int edgeNo, //ujemne oznacza maksymalnie duzo
         EdgeDirection mask,
         bool minWeight)
-        {   JoinableSets<typename GraphType::PVertex, typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+        {   JoinableSets<typename GraphType::PVertex, typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 JSPartDesrc<typename GraphType::PVertex> *>::Type > localSets;
             typename BlackHoleSwitch<VertCompContainer,JoinableSets<typename GraphType::PVertex,
-                typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                     JSPartDesrc<typename GraphType::PVertex> *>::Type > >::Type &
                         sets    = BlackHoleSwitch<VertCompContainer,JoinableSets<typename GraphType::PVertex,
-                typename DefaultStructs::AssocCont<typename GraphType::PVertex,
+                typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                     JSPartDesrc<typename GraphType::PVertex> *>::Type > >
                     ::get(asets,localSets);
 
@@ -744,6 +839,8 @@ class Kruskal {
 
 
 };
+
+class Kruskal : public KruskalPar<WeightAlgsDefaultStructs> {};
 
 }
 

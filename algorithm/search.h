@@ -13,6 +13,7 @@
 #include <cassert>
 #include "../graph/graph.h"
 #include "../base/def_struct.h"
+#include "../graph/subgraph.h"
 
 namespace Koala {
 
@@ -361,6 +362,7 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
         template< class GraphType, class VertContainer, class Visitor >
         static int visitAllBase(
             const GraphType &, VertContainer &, Visitor, EdgeDirection );
+
         template< class GraphType, class VertContainer, class Iter >
         static int scanAttainable(
             const GraphType &, typename GraphType::PVertex, Iter,
@@ -632,6 +634,9 @@ class SCC: protected SearchStructs
         template< class GraphType, class CompIter, class VertIter, class CompMap >
         static int get(
             const GraphType &, CompStore< CompIter,VertIter >, CompMap & );
+
+        template< class GraphType, class CompMap, class PairIter >
+        static int connections(const GraphType &, CompMap &, PairIter );
 } ;
 
 class DAGAlgs: protected SearchStructs
@@ -645,6 +650,13 @@ class DAGAlgs: protected SearchStructs
 
         template< class GraphType >
         static bool isDAG( const GraphType & );
+
+        template< class GraphType, class Iter >
+        static int transEdges(const GraphType &, Iter);
+
+        template< class GraphType>
+        static void makeHasse(GraphType & );
+
 } ;
 
 /*

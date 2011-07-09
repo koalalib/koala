@@ -1,3 +1,4 @@
+// TODO: nieaktualny opis formatow!
 /* functions:
  *
  * readGraphText(graph, text, format, [vertexmap, [edgemap]])
@@ -116,10 +117,8 @@ namespace IO {
 
 
 enum RG_Format {
-	RG_DirectedVertexLists,
-	RG_UndirectedVertexLists,
-	RG_DirectedEdgeList,
-	RG_UndirectedEdgeList,
+	RG_VertexLists,
+	RG_EdgeList
 	};
 
 
