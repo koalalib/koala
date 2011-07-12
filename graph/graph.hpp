@@ -801,14 +801,14 @@ template< class VertInfo,class EdgeInfo >
 typename Graph< VertInfo,EdgeInfo >::PVertex
 Graph< VertInfo,EdgeInfo >::getEdgeEnd( PEdge edge, PVertex vert ) const
 {
-    edge->getEnd(vert);
+    return edge->getEnd(vert);
 }
 
 template< class VertInfo, class EdgeInfo >
 typename Graph< VertInfo,EdgeInfo >::PVertex
 Graph< VertInfo,EdgeInfo >::getEnd( PEdge edge, PVertex vert ) const
 {
-    edge->getEnd(vert);
+    return edge->getEnd(vert);
 }
 
 template< class VertInfo, class EdgeInfo >

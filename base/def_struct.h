@@ -443,8 +443,9 @@ AssocBoolChooser<Cont> assocChoose(const Cont& arg) { return AssocBoolChooser<Co
 template<class Cont> struct AssocValChooser {
     mutable Cont cont;
     typename Cont::ValType val;
+    typedef typename Cont::ValType SelfValType;
     typedef AssocValChooser<Cont> ChoosersSelfType;
-    AssocValChooser(const Cont& arg=Cont(),typename Cont::ValType aval=typename Cont::ValType()) : cont(arg), val(aval) {}
+    AssocValChooser(const Cont& arg=Cont(),typename Cont::ValType aval=SelfValType()) : cont(arg), val(aval) {}
     template<class Elem, class Graph> bool operator()(Elem* elem,const Graph&) const
 	{ return cont.hasKey(elem) && cont[elem]==val; }
 };
