@@ -128,7 +128,7 @@ BlockList< Element,Container >::BlockList( const BlockList< Element,Container > 
 }
 
 template< class Element, class Container >
-BlockList< Element,Container >::BlockList< Element,Container > &
+BlockList< Element,Container > &
 BlockList< Element,Container >::operator=( const BlockList< Element,Container > &X )
 {
     if (&X == this) return *this;

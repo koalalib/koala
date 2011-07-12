@@ -41,6 +41,10 @@
 #include<stdio.h>
 #include<malloc.h>
 
+#ifdef __INTEL_COMPILER
+#include<alloca.h>
+#endif
+
 
 namespace Koala {
 

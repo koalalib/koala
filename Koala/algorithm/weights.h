@@ -161,7 +161,7 @@ class DijkstraPar : public ShortPathStructs {
         const GraphType& g,
         EdgeContainer& edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
-        ShortPathStructs::OutPath<VIter,EIter> iters,bool useHeap)
+        ShortPathStructs::OutPath<VIter,EIter> iters,bool useHeap=false)
     {   assert(start && end);
         typename EdgeContainer::ValType::DistType dist;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
@@ -177,16 +177,6 @@ class DijkstraPar : public ShortPathStructs {
         return PathLengths<typename EdgeContainer::ValType::DistType>(dist,len);
         // dlugosc najkr. siezki i jej liczba krawedzi
     }
-
-    // klasyczny Dijkstra
-    template <class GraphType, class EdgeContainer, class VIter, class EIter>
-    static PathLengths<typename EdgeContainer::ValType::DistType>
-        findPath(
-        const GraphType& g,
-        EdgeContainer& edgeTab,
-        typename GraphType::PVertex start, typename GraphType::PVertex end,
-        ShortPathStructs::OutPath<VIter,EIter> iters)
-    {   return findPath(g,edgeTab,start,end,iters,false); }
 
     // Dijkstra na kopcu
     template <class GraphType, class EdgeContainer, class VIter, class EIter>
@@ -363,7 +353,7 @@ class DAGCritPathPar : public ShortPathStructs {
 
     template <class GraphType, class VertContainer, class VIter, class EIter>
     static int
-        const getPath(
+        getPath(
         GraphType& g,
         VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
         typename GraphType::PVertex end,

@@ -448,7 +448,7 @@ int DFSBase< SearchImpl >::dfsVisitBase(
     if (g.getVertNo() == 0) return 0;
     if (first == NULL) first = g.getVert();
     visited[first] = SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,component );
-    return DFSBase< SearchImpl >::dfsDoVisit< GraphType,VertContainer,Visitor>(
+    return DFSBase< SearchImpl >::template dfsDoVisit< GraphType,VertContainer,Visitor>(
         params,first,0 );
 }
 
