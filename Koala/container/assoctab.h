@@ -13,6 +13,9 @@ namespace Koala
 
 template< class Container > class AssocTabInterface;
 
+template< class T >
+AssocTabInterface< T > assocTabInterf( T &cont );
+
 /* ------------------------------------------------------------------------- *
  * AssocTabInterface< M >
  *
@@ -44,6 +47,7 @@ template< class K, class V > class AssocTabInterface< std::map< K,V > >
     private:
         std::map< K,V > &cont;
 } ;
+
 
 
 template< class T > class AssocTabInterface< AssocTabInterface< T > >

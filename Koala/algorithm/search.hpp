@@ -259,9 +259,9 @@ bool Visitors::ComplexPostorderVisitor< Visitor >::visitVertexPost(
     return visit.operator()( g,u,data );
 }
 
-template< class SearchImpl > template< class GraphType, class VertContainer,
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer,
     class Visitor >
-int GraphSearchBase< SearchImpl >::visitAllBase(
+int GraphSearchBase< SearchImpl,  DefaultStructs >::visitAllBase(
     const GraphType &g, VertContainer &visited, Visitor visit, EdgeDirection mask )
 {
     int rv;
@@ -284,9 +284,9 @@ int GraphSearchBase< SearchImpl >::visitAllBase(
      return component;
 }
 
-template< class SearchImpl > template< class GraphType, class VertContainer,
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer,
     class Iter >
-int GraphSearchBase< SearchImpl >::scanAttainable(
+int GraphSearchBase< SearchImpl, DefaultStructs >::scanAttainable(
     const GraphType &g, typename GraphType::PVertex root, Iter comp,
     EdgeDirection mask, VertContainer &cont )
 {
@@ -298,8 +298,8 @@ int GraphSearchBase< SearchImpl >::scanAttainable(
     return (rv < 0) ? -rv : rv;
 }
 
-template< class SearchImpl > template< class GraphType, class VertIter >
-int GraphSearchBase< SearchImpl >::scanAttainable(
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertIter >
+int GraphSearchBase< SearchImpl, DefaultStructs >::scanAttainable(
     const GraphType &g, typename GraphType::PVertex root, VertIter comp,
     EdgeDirection mask )
 {
@@ -307,9 +307,9 @@ int GraphSearchBase< SearchImpl >::scanAttainable(
     return scanAttainable( g,root,comp,mask,cont );
 }
 
-template< class SearchImpl > template< class GraphType, class VertContainer,
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer,
     class VertIter >
-int GraphSearchBase< SearchImpl >::scan(
+int GraphSearchBase< SearchImpl, DefaultStructs >::scan(
     const GraphType &g, VertIter iter, EdgeDirection mask, VertContainer &tree )
 {
     mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
@@ -318,23 +318,23 @@ int GraphSearchBase< SearchImpl >::scan(
         Visitors::StoreTargetToVertIter< VertIter >( iter ),mask );
 }
 
-template< class SearchImpl > template< class GraphType, class VertIter >
-int GraphSearchBase< SearchImpl >::scan(
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertIter >
+int GraphSearchBase< SearchImpl, DefaultStructs >::scan(
     const GraphType &g, VertIter iter, EdgeDirection mask )
 {
     VisitedMap< GraphType > cont;
     return scan( g,iter,mask,cont );
 }
 
-template< class SearchImpl > template< class GraphType>
-int GraphSearchBase< SearchImpl >::cyclNo(
+template< class SearchImpl, class DefaultStructs > template< class GraphType>
+int GraphSearchBase< SearchImpl, DefaultStructs >::cyclNo(
     const GraphType &g, EdgeDirection mask )
 {
     return g.getEdgeNo(mask) - g.getVertNo() + scan( g,blackHole,mask );
 }
 
-template< class SearchImpl > template< class GraphType >
-Set< typename GraphType::PVertex > GraphSearchBase< SearchImpl >::getAttainableSet(
+template< class SearchImpl, class DefaultStructs > template< class GraphType >
+Set< typename GraphType::PVertex > GraphSearchBase< SearchImpl, DefaultStructs >::getAttainableSet(
     const GraphType &g, typename GraphType::PVertex root, EdgeDirection mask )
 {
     assert( root );
@@ -343,9 +343,9 @@ Set< typename GraphType::PVertex > GraphSearchBase< SearchImpl >::getAttainableS
     return res;
 }
 
-template< class SearchImpl > template< class GraphType, class VertIter,
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertIter,
     class EdgeIter >
-int GraphSearchBase< SearchImpl >::getPath(
+int GraphSearchBase< SearchImpl, DefaultStructs >::getPath(
     const GraphType &g, typename GraphType::PVertex start,
     typename GraphType::PVertex end, OutPath< VertIter,EdgeIter > path,
     EdgeDirection mask )
@@ -361,9 +361,9 @@ int GraphSearchBase< SearchImpl >::getPath(
     return res;
 }
 
-template< class SearchImpl > template< class GraphType, class VertContainer,
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer,
     class CompIter, class VertIter >
-int GraphSearchBase< SearchImpl >::getComponents(
+int GraphSearchBase< SearchImpl, DefaultStructs >::getComponents(
     const GraphType &g, CompStore< CompIter,VertIter > iters, EdgeDirection mask,
     VertContainer &cont )
 {
@@ -374,9 +374,9 @@ int GraphSearchBase< SearchImpl >::getComponents(
         Visitors::StoreCompVisitor< CompIter,VertIter >( st ),mask );
 }
 
-template< class SearchImpl > template< class GraphType, class CompIter,
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class CompIter,
     class VertIter >
-int GraphSearchBase< SearchImpl >::getComponents(
+int GraphSearchBase< SearchImpl, DefaultStructs >::getComponents(
     const GraphType &g, CompStore< CompIter,VertIter > iters, EdgeDirection mask )
 {
     VisitedMap< GraphType > cont;
@@ -395,9 +395,9 @@ DFSParamBlock< GraphType,VertContainer,Visitor >::DFSParamBlock(
 {
 }
 
-template< class SearchImpl > template< class GraphType, class VertContainer,
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer,
     class Visitor >
-int DFSBase< SearchImpl >::dfsDoVisit(
+int DFSBase< SearchImpl, DefaultStructs >::dfsDoVisit(
     DFSParamBlock< GraphType,VertContainer,Visitor > &params,
     typename GraphType::PVertex u, unsigned depth )
 {
@@ -437,9 +437,9 @@ int DFSBase< SearchImpl >::dfsDoVisit(
     return retVal;
 }
 
-template< class SearchImpl > template< class GraphType, class VertContainer,
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer,
     class Visitor >
-int DFSBase< SearchImpl >::dfsVisitBase(
+int DFSBase< SearchImpl, DefaultStructs >::dfsVisitBase(
     const GraphType &g, typename GraphType::PVertex first, VertContainer &visited,
     Visitor visit, EdgeDirection mask, int component )
 {
@@ -448,42 +448,46 @@ int DFSBase< SearchImpl >::dfsVisitBase(
     if (g.getVertNo() == 0) return 0;
     if (first == NULL) first = g.getVert();
     visited[first] = SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,component );
-    return DFSBase< SearchImpl >::template dfsDoVisit< GraphType,VertContainer,Visitor>(
+    return DFSBase< SearchImpl,DefaultStructs >:: template dfsDoVisit< GraphType,VertContainer,Visitor>(
         params,first,0 );
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertContainer, class Visitor >
-int DFS::visitBase(
+int DFSPar<DefaultStructs >::visitBase(
     const GraphType &g, typename GraphType::PVertex start, VertContainer &cont,
     Visitor visit, EdgeDirection mask, int component )
 {
-    return dfsVisitBase< GraphType,VertContainer,Visitor >( g,start,cont,visit,
+    return DFSBase< DFSPar<DefaultStructs >, DefaultStructs >:: template dfsVisitBase< GraphType,VertContainer,Visitor >( g,start,cont,visit,
         mask,component );
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertContainer, class Visitor >
-int DFSPreorder::dfsPreVisitBase(
+int DFSPreorderPar <DefaultStructs >::dfsPreVisitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component,
     Visitors::complex_visitor_tag & )
 {
-    return dfsVisitBase< GraphType,VertContainer,Visitor >( g,start,visited,
+    return DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStructs >:: template dfsVisitBase< GraphType,VertContainer,Visitor >( g,start,visited,
         visit,mask,component );
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertContainer, class Visitor >
-int DFSPreorder::dfsPreVisitBase(
+int DFSPreorderPar<DefaultStructs >::dfsPreVisitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component,
     Visitors::simple_visitor_tag & )
 {
-    return dfsVisitBase< GraphType,VertContainer,
+    return DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStructs >:: template dfsVisitBase< GraphType,VertContainer,
         Visitors::ComplexPreorderVisitor< Visitor > >( g,start,visited,
             Visitors::ComplexPreorderVisitor< Visitor >( visit ),mask,component );
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertContainer, class Visitor >
-int DFSPreorder::visitBase(
+int DFSPreorderPar <DefaultStructs >::visitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
 {
@@ -491,29 +495,33 @@ int DFSPreorder::visitBase(
         visit,mask,component,visit );
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertContainer, class Visitor >
-int DFSPostorder::dfsPostVisitBase(
+int DFSPostorderPar <DefaultStructs >::dfsPostVisitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component,
     Visitors::complex_visitor_tag & )
 {
-    return dfsVisitBase< GraphType,VertContainer,Visitor >( g,start,visited,
+    return DFSBase< DFSPostorderPar<DefaultStructs >, DefaultStructs >:: template
+        dfsVisitBase< GraphType,VertContainer,Visitor >( g,start,visited,
         visit,mask,component );
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertContainer, class Visitor >
-int DFSPostorder::dfsPostVisitBase(
+int DFSPostorderPar <DefaultStructs >::dfsPostVisitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component,
     Visitors::simple_visitor_tag & )
 {
-    return dfsVisitBase< GraphType,VertContainer,
+    return DFSBase< DFSPostorderPar<DefaultStructs >, DefaultStructs >:: template dfsVisitBase< GraphType,VertContainer,
         Visitors::ComplexPostorderVisitor< Visitor > >( g,start,visited,
             Visitors::ComplexPostorderVisitor< Visitor >( visit ),mask,component );
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertContainer, class Visitor >
-int DFSPostorder::visitBase(
+int DFSPostorderPar <DefaultStructs >::visitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
 {
@@ -521,8 +529,9 @@ int DFSPostorder::visitBase(
         visited,visit,mask,component,visit );
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertContainer, class Visitor >
-int BFS::bfsDoVisit(
+int BFSPar <DefaultStructs >::bfsDoVisit(
     const GraphType &g, typename GraphType::PVertex first,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
 {
@@ -569,8 +578,9 @@ int BFS::bfsDoVisit(
     return retVal;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertContainer, class Visitor >
-int BFS::visitBase(
+int BFSPar <DefaultStructs >::visitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
 {
@@ -578,15 +588,17 @@ int BFS::visitBase(
         visit,mask,component );
 }
 
+template <class DefaultStructs >
 template< class Graph >
-void LexBFS::LexVisitContainer< Graph >::clear()
+void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::clear()
 {
     m_sets.clear();
     m_splits.clear();
 }
 
+template <class DefaultStructs >
 template< class Graph >
-void LexBFS::LexVisitContainer< Graph >::initialize(
+void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::initialize(
     const Graph &g, typename Graph::PVertex first )
 {
     unsigned i;
@@ -599,8 +611,9 @@ void LexBFS::LexVisitContainer< Graph >::initialize(
     m_lastSet = np;
 }
 
+template <class DefaultStructs >
 template< class Graph >
-void LexBFS::LexVisitContainer< Graph >::pop()
+void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::pop()
 {
     while (!m_sets.empty() && m_sets.front().first.empty())
     {
@@ -618,8 +631,9 @@ void LexBFS::LexVisitContainer< Graph >::pop()
     }
 }
 
+template <class DefaultStructs >
 template< class Graph >
-void LexBFS::LexVisitContainer< Graph >::push( typename Graph::PVertex v )
+void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::push( typename Graph::PVertex v )
 {
     typename LexList::iterator vertListPos;
     typename NodeList::iterator np, vertNode;
@@ -661,8 +675,9 @@ void LexBFS::LexVisitContainer< Graph >::push( typename Graph::PVertex v )
     }
 }
 
+template <class DefaultStructs >
 template< class Graph >
-void LexBFS::LexVisitContainer< Graph >::step()
+void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::step()
 {
     typename LexList::iterator lit, le;
     typename NodeList::iterator newSet;
@@ -689,8 +704,9 @@ void LexBFS::LexVisitContainer< Graph >::step()
     m_splits.clear();
 }
 
+template <class DefaultStructs >
 template< class Graph >
-void LexBFS::LexVisitContainer< Graph >::dump()
+void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::dump()
 {
     typename NodeList::iterator it, e;
     typename LexList::iterator lit, le, split;
@@ -713,8 +729,9 @@ void LexBFS::LexVisitContainer< Graph >::dump()
     fflush(stdout);
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertContainer, class Visitor >
-int LexBFS::visitBase(
+int LexBFSPar <DefaultStructs >::visitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
 {
@@ -765,8 +782,9 @@ int LexBFS::visitBase(
     return retVal;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-SCC::SCCState< GraphType,CompIter,VertIter,CompMap >::SCCState(
+SCCPar < DefaultStructs >::SCCState< GraphType,CompIter,VertIter,CompMap >::SCCState(
     CompStore< CompIter,VertIter > _i, CompMap &cm,
     typename GraphType::PVertex *buf1, typename GraphType::PVertex *buf2,
     int n ):
@@ -781,8 +799,9 @@ SCC::SCCState< GraphType,CompIter,VertIter,CompMap >::SCCState(
 {
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-void SCC::SCCState< GraphType,CompIter,VertIter,CompMap >::addVert(
+void SCCPar <DefaultStructs >::SCCState< GraphType,CompIter,VertIter,CompMap >::addVert(
     typename GraphType::PVertex v )
 {
     *(iters.vertIter) = v;
@@ -792,16 +811,18 @@ void SCC::SCCState< GraphType,CompIter,VertIter,CompMap >::addVert(
     idx++;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-void SCC::SCCState< GraphType,CompIter,VertIter,CompMap >::newComp()
+void SCCPar <DefaultStructs >::SCCState< GraphType,CompIter,VertIter,CompMap >::newComp()
 {
     *(iters.compIter) = idx;
     ++(iters.compIter);
     ++count;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::SCCVisitor(
+SCCPar <DefaultStructs >::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::SCCVisitor(
     SCCState< GraphType,CompIter,VertIter,CompMap > &s ):
     state( s )
 {
@@ -811,8 +832,9 @@ SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::SCCVisitor(
     state.count = 0;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-bool SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitVertexPre(
+bool SCCPar <DefaultStructs >::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitVertexPre(
     const GraphType &g, typename GraphType::PVertex u,
     VisitVertLabs< GraphType > &r )
 {
@@ -823,8 +845,9 @@ bool SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitVertexPre(
     return true;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-bool SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitVertexPost(
+bool SCCPar <DefaultStructs >::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitVertexPost(
     const GraphType &g, typename GraphType::PVertex u,
     VisitVertLabs< GraphType > &r )
 {
@@ -841,8 +864,9 @@ bool SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitVertexPost(
     return true;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-bool SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitEdgePre(
+bool SCCPar <DefaultStructs >::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitEdgePre(
     const GraphType &g, typename GraphType::PEdge e,
     typename GraphType::PVertex u )
 {
@@ -856,32 +880,36 @@ bool SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitEdgePre(
     return false;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-bool SCC::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitEdgePost(
+bool SCCPar <DefaultStructs >::SCCVisitor< GraphType,CompIter,VertIter,CompMap >::visitEdgePost(
     const GraphType &g, typename GraphType::PEdge e,
     typename GraphType::PVertex u )
 {
     return true;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-int SCC::get(
+int SCCPar <DefaultStructs >::get(
     const GraphType &g, CompStore< CompIter,VertIter > out, CompMap &compMap )
 {
     int rv;
-    VisitedMap< GraphType > vertCont;
+    typename DefaultStructs:: template AssocCont<
+            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type vertCont;
     typename GraphType::PVertex LOCALARRAY( buf1,g.getVertNo() + 1 );
     typename GraphType::PVertex LOCALARRAY( buf2,g.getVertNo() + 1 );
     SCCState< GraphType,CompIter,VertIter,CompMap > state( out,compMap,buf1,
         buf2,g.getVertNo() );
     SCCVisitor< GraphType,CompIter,VertIter,CompMap > visit( state );
-    rv = DFS::visitAllBase( g,vertCont,visit,EdDirOut | EdUndir );
+    rv = DFSPar<DefaultStructs>::visitAllBase( g,vertCont,visit,EdDirOut | EdUndir );
     if (rv < 0) return rv;
     return state.count;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompMap, class PairIter >
-int SCC::connections(const GraphType &g, CompMap & comp, PairIter iter)
+int SCCPar <DefaultStructs >::connections(const GraphType &g, CompMap & comp, PairIter iter)
 {
     int n=0;
     std::pair<int,int> LOCALARRAY(buf,g.getEdgeNo(EdDirIn|EdDirOut));
@@ -901,21 +929,24 @@ int SCC::connections(const GraphType &g, CompMap & comp, PairIter iter)
     return n;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertIter >
-void DAGAlgs::topOrd( const GraphType &g, VertIter out )
+void DAGAlgsPar <DefaultStructs >::topOrd( const GraphType &g, VertIter out )
 {
-    VisitedMap< GraphType > visited;
-    DFSPostorder::visitAllBase( g,visited,
+    typename DefaultStructs:: template AssocCont<
+            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited;
+    DFSPostorderPar<DefaultStructs>:: template visitAllBase( g,visited,
         Visitors::StoreTargetToVertIter< typename GraphType::PVertex* >( out ),
             EdDirIn );
 }
 
+template <class DefaultStructs >
 template<class GraphType, class Iter>
-bool DAGAlgs::isDAG( const GraphType &g, Iter beg, Iter end )
+bool DAGAlgsPar <DefaultStructs >::isDAG( const GraphType &g, Iter beg, Iter end )
 {
     if (g.getEdgeNo( EdUndir|EdLoop )) return false;
     if (!g.getVertNo()) return true;
-    typename DefaultStructs::AssocCont< typename GraphType::PVertex,int >::Type
+    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,int >::Type
         topord;
     int licz = 0;
     for( Iter i = beg; i != end; ++i ) topord[*i] = licz++;
@@ -925,16 +956,18 @@ bool DAGAlgs::isDAG( const GraphType &g, Iter beg, Iter end )
     return true;
 }
 
+template <class DefaultStructs >
 template< class GraphType >
-bool DAGAlgs::isDAG( const GraphType &g )
+bool DAGAlgsPar <DefaultStructs >::isDAG( const GraphType &g )
 {
     typename GraphType::PVertex LOCALARRAY( buf,g.getVertNo() );
     topOrd( g,buf );
     return isDAG( g,buf,buf + g.getVertNo() );
 }
 
+template <class DefaultStructs >
 template< class GraphType, class Iter >
-int DAGAlgs::transEdges(const GraphType & g, Iter out)
+int DAGAlgsPar <DefaultStructs >::transEdges(const GraphType & g, Iter out)
 {
     int res=0;
     for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut))
@@ -952,17 +985,18 @@ int DAGAlgs::transEdges(const GraphType & g, Iter out)
     return res;
 }
 
+template <class DefaultStructs >
 template< class GraphType>
-void DAGAlgs::makeHasse(GraphType & g)
+void DAGAlgsPar <DefaultStructs >::makeHasse(GraphType & g)
 {
     typename GraphType::PEdge LOCALARRAY(buf,g.getEdgeNo());
     int res=transEdges(g,buf);
     for(int i=0;i<res;i++) g.delEdge(buf[i]);
 }
 
-
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class EdgeMap >
-Blocks::BiConState< GraphType,CompIter,VertIter,EdgeMap >::BiConState(
+BlocksPar <DefaultStructs >::BiConState< GraphType,CompIter,VertIter,EdgeMap >::BiConState(
     CompStore< CompIter,VertIter > _i, EdgeMap &em, EdgeDirection _m,
         std::pair< typename GraphType::PEdge *,int > st, VertBlockList *_vbl ):
     vmap(),
@@ -978,8 +1012,9 @@ Blocks::BiConState< GraphType,CompIter,VertIter,EdgeMap >::BiConState(
 {
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class EdgeMap >
-void Blocks::BiConState< GraphType,CompIter,VertIter,EdgeMap >::addVert(
+void BlocksPar <DefaultStructs >::BiConState< GraphType,CompIter,VertIter,EdgeMap >::addVert(
     typename GraphType::PVertex v )
 {
     *(iters.vertIter) = v;
@@ -992,22 +1027,25 @@ void Blocks::BiConState< GraphType,CompIter,VertIter,EdgeMap >::addVert(
     idx++;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class EdgeMap >
-void Blocks::BiConState< GraphType,CompIter,VertIter,EdgeMap >::addEdge(
+void BlocksPar <DefaultStructs >::BiConState< GraphType,CompIter,VertIter,EdgeMap >::addEdge(
     typename GraphType::PEdge e )
 {
     if (!isBlackHole( outEMap )) outEMap[e] = count;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class EdgeMap >
-void Blocks::BiConState< GraphType,CompIter,VertIter,EdgeMap >::newComp() {
+void BlocksPar <DefaultStructs >::BiConState< GraphType,CompIter,VertIter,EdgeMap >::newComp() {
     *(iters.compIter) = idx;
     ++(iters.compIter);
     ++count;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class EdgeMap >
-Blocks::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::BiConVisitor(
+BlocksPar <DefaultStructs >::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::BiConVisitor(
     BiConState< GraphType,CompIter,VertIter,EdgeMap > &s ):
     state( s )
 {
@@ -1016,8 +1054,9 @@ Blocks::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::BiConVisitor(
     state.count = 0;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class EdgeMap >
-bool Blocks::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitVertexPre(
+bool BlocksPar  <DefaultStructs >::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitVertexPre(
     const GraphType &g, typename GraphType::PVertex u,
     VisitVertLabs< GraphType > &data )
 {
@@ -1031,8 +1070,9 @@ bool Blocks::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitVertexPre
     return true;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class EdgeMap >
-bool Blocks::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitVertexPost(
+bool BlocksPar <DefaultStructs >::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitVertexPost(
     const GraphType &g, typename GraphType::PVertex u,
     VisitVertLabs< GraphType > &data )
 {
@@ -1066,8 +1106,9 @@ bool Blocks::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitVertexPos
     return true;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class EdgeMap >
-bool Blocks::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitEdgePre(
+bool BlocksPar <DefaultStructs >::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitEdgePre(
     const GraphType &g, typename GraphType::PEdge e, typename GraphType::PVertex u )
 {
     EdgeType tp;
@@ -1094,8 +1135,9 @@ bool Blocks::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitEdgePre(
     return true;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class EdgeMap >
-bool Blocks::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitEdgePost(
+bool BlocksPar <DefaultStructs >::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitEdgePost(
     const GraphType &g, typename GraphType::PEdge e,
     typename GraphType::PVertex u )
 {
@@ -1134,8 +1176,9 @@ bool Blocks::BiConVisitor< GraphType,CompIter,VertIter,EdgeMap >::visitEdgePost(
     return true;
 }
 
+template <class DefaultStructs >
 template< class State, class VertMap, class VertBlockIter >
-void Blocks::storeBlocksData(
+void BlocksPar <DefaultStructs >::storeBlocksData(
     State &state, VertBlockList *vertBlockList, VertMap &vertMap,
     VertBlockIter &vertBlocks )
 {
@@ -1157,15 +1200,17 @@ void Blocks::storeBlocksData(
     }
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertDataMap, class EdgeDataMap,
     class CompIter, class VertIter, class VertBlockIter >
-int Blocks::split(
+int BlocksPar <DefaultStructs >::split(
     const GraphType &g, VertDataMap &vertMap, EdgeDataMap &edgeMap,
     CompStore< CompIter,VertIter > blocks, VertBlockIter vertBlocks,
     EdgeDirection mask )
 {
     int rv;
-    VisitedMap< GraphType > visited;
+    typename DefaultStructs:: template AssocCont<
+            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited;
     typename GraphType::PEdge LOCALARRAY( stbuf,g.getEdgeNo() + 1 );
     VertBlockList LOCALARRAY( vertBlockList,g.getEdgeNo() * 2 + g.getVertNo() );
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap > state(
@@ -1173,7 +1218,7 @@ int Blocks::split(
     BiConVisitor< GraphType,CompIter,VertIter,EdgeDataMap > visit( state );
     if (mask & (EdDirIn | EdDirOut)) mask |= EdDirOut | EdDirIn;
 
-    rv = DFS::visitAllBase( g,visited,visit,mask );
+    rv = DFSPar<DefaultStructs>::visitAllBase( g,visited,visit,mask );
     if (rv < 0) return rv;
 
     storeBlocksData( state,vertBlockList,vertMap,vertBlocks );
@@ -1181,15 +1226,17 @@ int Blocks::split(
     return state.count;
 }
 
+template <class DefaultStructs >
 template< class GraphType, class VertDataMap, class EdgeDataMap,
     class CompIter, class VertIter, class VertBlockIter >
-int Blocks::splitComp(
+int BlocksPar  <DefaultStructs >::splitComp(
     const GraphType &g, typename GraphType::PVertex u, VertDataMap &vertMap,
     EdgeDataMap &edgeMap, CompStore< CompIter,VertIter > blocks,
     VertBlockIter vertBlocks, EdgeDirection mask )
 {
     int rv;
-    VisitedMap< GraphType > visited;
+    typename DefaultStructs:: template AssocCont<
+            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited;
     typename GraphType::PEdge LOCALARRAY( stbuf,g.getEdgeNo() + 1 );
     VertBlockList LOCALARRAY( vertBlockList,g.getEdgeNo() * 2 + g.getVertNo() );
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap > state(
@@ -1198,7 +1245,7 @@ int Blocks::splitComp(
 
     if (mask & (EdDirIn | EdDirOut)) mask |= EdDirOut | EdDirIn;
 
-    rv = DFS::visitBase( g,u,visited,visit,mask,0 );
+    rv = DFSPar<DefaultStructs>::visitBase( g,u,visited,visit,mask,0 );
     if (rv != 0)
     {
         storeBlocksData( state,vertBlockList,vertMap,vertBlocks );

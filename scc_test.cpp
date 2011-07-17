@@ -79,38 +79,38 @@ int main() {
 
     std::cout << std::boolalpha;
 
-//    searchTest2();
-//
-//    std::cout<<std::endl;
-//    int compno=Koala::SCC::get(g,Koala::SearchStructs::compStore(comptab[0],tabV),vertCont);
-//    std::cout << compno<<endl;
-//    for(int i=0;i<=compno;i++) cout << comptab[0][i] << ' '; cout << endl;
-//    cout << endl;
-//    for(int i=0;i<g.getVertNo();i++) cout << tabV[i]->info.name << " ";
-//    cout<< "\n";
-//    for(W=g.getVert();W;W=g.getVertNext(W))
-//        std::cout << W->info.name << ":: " << vertCont[W] << std::endl;
-//
-//    cout << "\n-------------\n";
-//    std::pair<int,int> conns[100];
-//    int cc=Koala::SCC::connections(g,vertCont,conns);
-//    cout << cc << '\n';
-//    for(int i=0;i<cc;i++) cout << '(' << conns[i].first << ',' << conns[i].second << ") ";
+    searchTest2();
 
-    int res;
-    searchTest();
-    Koala::DAGAlgs::topOrd(g,tabV);
-    std::cout << Koala::DAGAlgs::isDAG(g,tabV,tabV+g.getVertNo()) << "\n";
-
-    for(int i=0;i<g.getVertNo();i++)  cout << ((tabV[i]) ? tabV[i]->info.name : "NULL") << " ";
-
-    int r=DAGAlgs::transEdges(g,tabE);
-    std::cout << '\n' << r << '\n';
-    for(int i=0;i<r;i++) std::cout << tabE[i]->getEnds().first->info.name << ' ' << tabE[i]->getEnds().second->info.name << '\n';
+    std::cout<<std::endl;
+    int compno=Koala::SCC::get(g,Koala::SearchStructs::compStore(comptab[0],tabV),vertCont);
+    std::cout << compno<<endl;
+    for(int i=0;i<=compno;i++) cout << comptab[0][i] << ' '; cout << endl;
+    cout << endl;
+    for(int i=0;i<g.getVertNo();i++) cout << tabV[i]->info.name << " ";
+    cout<< "\n";
+    for(W=g.getVert();W;W=g.getVertNext(W))
+        std::cout << W->info.name << ":: " << vertCont[W] << std::endl;
 
     cout << "\n-------------\n";
-    DAGAlgs::makeHasse(g);
-    for(EE=g.getEdge();EE;EE=g.getEdgeNext(EE)) std::cout << EE->getEnds().first->info.name << ' ' << EE->getEnds().second->info.name << '\n';
+    std::pair<int,int> conns[100];
+    int cc=Koala::SCC::connections(g,vertCont,conns);
+    cout << cc << '\n';
+    for(int i=0;i<cc;i++) cout << '(' << conns[i].first << ',' << conns[i].second << ") ";
+
+//    int res;
+//    searchTest();
+//    Koala::DAGAlgs::topOrd(g,tabV);
+//    std::cout << Koala::DAGAlgs::isDAG(g,tabV,tabV+g.getVertNo()) << "\n";
+//
+//    for(int i=0;i<g.getVertNo();i++)  cout << ((tabV[i]) ? tabV[i]->info.name : "NULL") << " ";
+//
+//    int r=DAGAlgs::transEdges(g,tabE);
+//    std::cout << '\n' << r << '\n';
+//    for(int i=0;i<r;i++) std::cout << tabE[i]->getEnds().first->info.name << ' ' << tabE[i]->getEnds().second->info.name << '\n';
+//
+//    cout << "\n-------------\n";
+//    DAGAlgs::makeHasse(g);
+//    for(EE=g.getEdge();EE;EE=g.getEdgeNext(EE)) std::cout << EE->getEnds().first->info.name << ' ' << EE->getEnds().second->info.name << '\n';
 
     return 0;
 }

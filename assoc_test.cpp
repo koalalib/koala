@@ -1,6 +1,9 @@
 #include <iostream>
 #include <string>
+
+#include "Koala/container/hashcont.h"
 #include "Koala/container/assoctab.h"
+
 #include "Koala/base/def_struct.h"
 using namespace std;
 using namespace Koala;
@@ -77,32 +80,33 @@ int main() {
 
     std::cout << "\n----------------\n";
 
-//    HashMap<int,std::string> hmapa;
-//    AssocTabInterface<HashMap<int,std::string> > hamap=hmapa;
-//
-//
-//    AssocTable< HashMap<Vert*,std::string> > ha;
-//
-//
-//
-//    t(ha);
-//    ha[C]=std::string("Ca");
-//    ha[B]="Ba";
-//    t(ha);
-//    AssocTable< HashMap<Vert*,std::string> > hb;
-//    hb[C]="x";
-//    hb=ha;
-//    t(ha);
-//    t(hb);
-//    hb[A]="Ab";
-////    delete B;
-//    t(ha);
-//    t(hb);
-//    ha.clear();
-//    t(ha);
-//    t(hb);
-//
-//    AssocTable< HashMap<Vert*,std::string> > ha2=ha;
+    BiDiHashMap<int,std::string> hmapa;
+    AssocTabInterface<BiDiHashMap<int,std::string> > hamap=hmapa;
+
+
+    AssocTable< BiDiHashMap<Vert*,std::string> > ha;
+
+
+
+    t(ha);
+    ha[C]=std::string("Ca");
+    ha[B]="Ba";
+    t(ha);
+    AssocTable< BiDiHashMap<Vert*,std::string> > hb;
+    hb[C]="x";
+    hb=ha;
+    t(ha);
+    t(hb);
+    hb[A]="Ab";
+//    delete B;
+    t(ha);
+    t(hb);
+    ha.clear();
+    t(ha);
+    t(hb);
+
+
+    AssocTable< BiDiHashMap<Vert*,std::string> > ha2=ha;
 
 
     std::cout << "\nMatrixy:\n";

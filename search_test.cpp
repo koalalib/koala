@@ -92,9 +92,21 @@ int main() {
     for(int i=0;i<licz;i++) std::cout << ((tabV[i]) ? tabV[i]->info.name : string(" NULL"));
     std::cout << "\n***\n";
 
+    int comptab[2][10];
+    comptab[1][0]=0;
+
+
+    Koala::STRATEGY::visitAllBase(g,vertCont,Visitors::EndVertVisitor(G),EdAll);
+    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll,vertCont);
+    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll);
+    Koala::STRATEGY::scan(g,blackHole,EdAll,vertCont);
+    Koala::STRATEGY::scan(g,blackHole,EdAll);
+    Koala::STRATEGY::cyclNo(g,EdAll);
+    Koala::STRATEGY::getAttainableSet(g,A,EdAll);
+    Koala::STRATEGY::getComponents(g,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll,vertCont);
 
     searchTest();
-    std::cout << (licz=Koala::STRATEGY::scanAttainable(g,F,tabV,EdAll,vertCont)) << std::endl;
+    std::cout << (licz=Koala::STRATEGY::scanAttainable(g,A,tabV,EdAll,vertCont)) << std::endl;
     licz=g.getVertNo();
     for(W=g.getVert();W;W=g.getVertNext(W))
         std::cout << W->info.name << ":: dist:" << vertCont[W].distance << " pred:"
@@ -113,14 +125,12 @@ int main() {
     std::cout << "\n***\n";
         searchTest();
 
-    int comptab[2][10];
-    comptab[1][0]=0;
     vertCont.clear();
 
 //    g.del(I); g.del(G); g.del(H);
 
     std::cout<<std::endl;
-    int compno=Koala::BFS::getComponents(g,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll);
+    int compno=Koala::STRATEGY::getComponents(g,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll);
     std::cout << compno<<endl;
     for(int i=0;i<=compno;i++) cout << comptab[0][i] << ' '; cout << endl;
     cout << endl;

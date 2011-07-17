@@ -6,6 +6,7 @@
 #include <cassert>
 #include <iostream>
 #include "../container/assoctab.h"
+#include "../container/hashcont.h"
 #include "../container/set.h"
 
 

@@ -22,18 +22,19 @@ namespace Koala {
  *
  * ------------------------------------------------------------------------- */
 
-class SearchStructs {
-    protected:
-        class DefaultStructs
+class SearchAlgsDefaultStructs {
+    public:
+        template< class A, class B > class AssocCont
         {
             public:
-                template< class A, class B > class AssocCont
-                {
-                    public:
-                        typedef AssocArray< A,B > Type;
-                } ;
-
+                typedef AssocArray< A,B > Type;
+//                typedef AssocTable<BiDiHashMap< A,B > > Type;
         } ;
+
+} ;
+
+
+class SearchStructs {
 
     public:
         template< class GraphType > struct VisitVertLabs
@@ -52,9 +53,6 @@ class SearchStructs {
             template< class Rec > void get( Rec &r );
         } ;
 
-        template< class GraphType >
-        class VisitedMap: public DefaultStructs::AssocCont<
-            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type { } ;
 
         template< class CIter, class VIter > struct CompStore
         {
@@ -355,10 +353,15 @@ class Visitors: public SearchStructs {
 
 };
 
-template< class SearchImpl >
+template< class SearchImpl, class DefaultStructs >
 class GraphSearchBase: public ShortPathStructs, public SearchStructs
 {
     public:
+
+        template< class GraphType >
+        class VisitedMap: public DefaultStructs:: template AssocCont<
+            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type { } ;
+
         template< class GraphType, class VertContainer, class Visitor >
         static int visitAllBase(
             const GraphType &, VertContainer &, Visitor, EdgeDirection );
@@ -429,8 +432,8 @@ struct DFSParamBlock: public SearchStructs
  * DFSBase
  */
 
-template< class SearchImpl >
-class DFSBase: public GraphSearchBase< SearchImpl >
+template< class SearchImpl, class DefaultStructs >
+class DFSBase: public GraphSearchBase< SearchImpl , DefaultStructs >
 {
     private:
         template< class GraphType, class VertContainer, class Visitor >
@@ -449,7 +452,8 @@ class DFSBase: public GraphSearchBase< SearchImpl >
  * Depth-First-Search
  */
 
-class DFS: public DFSBase< DFS >
+template <class DefaultStructs >
+class DFSPar: public DFSBase< DFSPar<DefaultStructs >, DefaultStructs >
 {
     public:
         template< class GraphType, class VertContainer, class Visitor >
@@ -457,12 +461,16 @@ class DFS: public DFSBase< DFS >
             const GraphType &, typename GraphType::PVertex, VertContainer &,
             Visitor, EdgeDirection, int );
 } ;
+
+
+class DFS : public DFSPar<SearchAlgsDefaultStructs> {};
 
 /*
  * Preorder Depth-First-Search
  */
 
-class DFSPreorder: public DFSBase< DFSPreorder >
+template <class DefaultStructs>
+class DFSPreorderPar: public DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStructs >
 {
     private:
         template< class GraphType, class VertContainer, class Visitor >
@@ -481,12 +489,15 @@ class DFSPreorder: public DFSBase< DFSPreorder >
             const GraphType &, typename GraphType::PVertex, VertContainer &,
             Visitor, EdgeDirection, int );
 } ;
+
+class DFSPreorder : public DFSPreorderPar<SearchAlgsDefaultStructs> {};
 
 /*
  * Postorder Depth-First-Search
  */
 
-class DFSPostorder: public DFSBase< DFSPostorder >
+template <class DefaultStructs>
+class DFSPostorderPar: public DFSBase< DFSPostorderPar<DefaultStructs >, DefaultStructs >
 {
     private:
         template< class GraphType, class VertContainer, class Visitor >
@@ -506,11 +517,14 @@ class DFSPostorder: public DFSBase< DFSPostorder >
             Visitor, EdgeDirection, int );
 } ;
 
+class DFSPostorder: public DFSPostorderPar<SearchAlgsDefaultStructs> {};
+
 /*
  * Breadth-First-Search
  */
 
-class BFS: public GraphSearchBase< BFS >
+template <class DefaultStructs>
+class BFSPar: public GraphSearchBase< BFSPar<DefaultStructs >, DefaultStructs >
 {
     private:
         template< class GraphType, class VertContainer, class Visitor >
@@ -525,11 +539,14 @@ class BFS: public GraphSearchBase< BFS >
             Visitor, EdgeDirection, int );
 } ;
 
+class BFS: public BFSPar<SearchAlgsDefaultStructs> {};
+
 /*
  * lexicographical Breadth-First-Search
  */
 
-class LexBFS: public GraphSearchBase< LexBFS >
+template <class DefaultStructs>
+class LexBFSPar: public GraphSearchBase< LexBFSPar<DefaultStructs >, DefaultStructs >
 {
     public:
         template< class Graph > class LexVisitContainer
@@ -570,11 +587,14 @@ class LexBFS: public GraphSearchBase< LexBFS >
             Visitor, EdgeDirection, int );
 } ;
 
+class LexBFS: public LexBFSPar<SearchAlgsDefaultStructs> {};
+
 /*
  * Cheriyan–Mehlhorn/Gabow algorithm
  */
 
-class SCC: protected SearchStructs
+template <class DefaultStructs>
+class SCCPar: protected SearchStructs
 {
     protected:
         struct SCCData {
@@ -595,7 +615,7 @@ class SCC: protected SearchStructs
                 void addVert( typename GraphType::PVertex );
                 void newComp();
 
-                typename DefaultStructs::AssocCont< typename GraphType::PVertex,SCCData >::Type vmap;
+                typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,SCCData >::Type vmap;
                 StackInterface< typename GraphType::PVertex* > s, p;
                 CompStore< CompIter,VertIter > iters;
                 CompMap &compMap;
@@ -639,7 +659,11 @@ class SCC: protected SearchStructs
         static int connections(const GraphType &, CompMap &, PairIter );
 } ;
 
-class DAGAlgs: protected SearchStructs
+class SCC : public SCCPar<SearchAlgsDefaultStructs> {};
+
+
+template <class DefaultStructs>
+class DAGAlgsPar: protected SearchStructs
 {
     public:
         template< class GraphType, class VertIter >
@@ -659,11 +683,14 @@ class DAGAlgs: protected SearchStructs
 
 } ;
 
+class DAGAlgs : public DAGAlgsPar<SearchAlgsDefaultStructs> {};
+
 /*
  * Blocks -- biconnected components
  */
 
-class Blocks: protected SearchStructs
+template <class DefaultStructs>
+class BlocksPar : protected SearchStructs
 {
     protected:
         template< class GraphType >
@@ -698,9 +725,9 @@ class Blocks: protected SearchStructs
 
                 void newComp();
 
-                typename DefaultStructs::AssocCont<
+                typename DefaultStructs:: template AssocCont<
                     typename GraphType::PVertex,BiConVData< GraphType > >::Type vmap;
-                typename DefaultStructs::AssocCont<
+                typename DefaultStructs:: template AssocCont<
                     typename GraphType::PEdge,bool >::Type emap;
                 StackInterface< typename GraphType::PEdge* > estk;
                 CompStore< CompIter,VertIter > iters;
@@ -764,17 +791,20 @@ class Blocks: protected SearchStructs
             EdgeDirection = EdAll );
 } ;
 
+class Blocks : public BlocksPar<SearchAlgsDefaultStructs> {};
 
 /*
  * Eulerian cycle and path
  */
-class Euler: public PathStructs, protected SearchStructs {
+
+template <class DefaultStructs>
+class EulerPar: public PathStructs, protected SearchStructs {
 private:
 	template<class GraphType>
 	struct EulerState {
 		GraphType &g;
 		StackInterface<std::pair<typename GraphType::PVertex, typename GraphType::PEdge> *> stk;
-		typename DefaultStructs::AssocCont<typename GraphType::PEdge, bool>::Type edgeVisited;
+		typename DefaultStructs:: template AssocCont<typename GraphType::PEdge, bool>::Type edgeVisited;
 		EdgeDirection mask;
 
 		EulerState(GraphType &_g,
@@ -843,7 +873,7 @@ public:
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
             if (g.getEdge(v,symmask)) { licz++; x=v; }
         if (licz==0) return zero;
-        if (licz!=BFS::scanAttainable(g,x,blackHole,symmask & ~EdLoop)) return zero;
+        if (licz!=BFSPar<DefaultStructs>::scanAttainable(g,x,blackHole,symmask & ~EdLoop)) return zero;
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
             if (!dir)
             {
@@ -967,6 +997,7 @@ public:
 
 };
 
+class Euler : public EulerPar<SearchAlgsDefaultStructs> {};
 
 #include "search.hpp"
 

@@ -110,15 +110,15 @@ int main() {
     cout << g2b.getVertNo() << endl;
 
 //    cout << endl << g2.getVertNo() << endl << g2.getEdgeNo(A2,EdDirIn);
-        //Vertex<InfoV1,InfoE1>* tab[6]={C,D,C,B,0,B};
-
+//        Vertex<InfoV1,InfoE1>* tab[6]={C,D,C,B,0,B};
+//
 //    Edge<InfoV1,InfoE1>* tabe[3]={g1.getEdge(),0,g1.getEdge()};
 //    cout << endl << g1.glue(g1.getVertSet(),D)->info.name;
 //    cout << "\n" << g1.getVertNo();
 //        cout << endl << g1.glue(C,C)->info.name;
-
-
-
+//
+//
+//
 //    cout << endl << g1.getVertNo() << " " << g1.getEdgeNo() << " " << g1.getEdgeNo(A,EdUndir) << " " << g1.getEdgeNo(A,EdDirOut);
 //
 //    cout << endl << g1.hasAdjMatrix(); cout << " " << g1.makeAdjMatrix(); cout <<" " << g1.hasAdjMatrix();
@@ -131,7 +131,7 @@ int main() {
 //    cout <<" " << g1p.hasAdjMatrix ();
 //    cout << " Koniec\n";
 //    cout << g1p.getEdgeSet() << endl;
-
+//
 //    Set<Edge<InfoV1,InfoE1>*> vset;
 ////    vset+=A; vset+=D;
 //    cout << endl <<g1.getEdgeNo() << endl;
