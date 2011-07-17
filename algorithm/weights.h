@@ -31,6 +31,7 @@ class WeightAlgsDefaultStructs {
     template <class A, class B> class AssocCont {
         public:
         typedef AssocArray<A,B> Type;
+//        typedef AssocTable < BiDiHashMap<A,B> > Type;
 
     };
 
