@@ -28,16 +28,17 @@ int main() {
 	string buf2;
 	Graph<int, int> g; g.makeAdjMatrix();
 	Graph<int, int>::Vertex *v, *verts2[32], *verts[2] = {NULL, NULL};
+	Graph<int, int>::PEdge edges[10];
 
 	rv = true;
 
-//	readGraphText(g, "4\n"
-//            "0(0)@1 2 -1(101) >2(102)\n"
-//			 "1(1) 1 -2(112)\n"
-//			 "2(2) 0\n"
-//			 "3(3)@0 1 *3(0)\n", RG_VertexLists, verts);
+	readGraphText(g, "4\n"
+            "0(0)@1 2 -1(101) >2(102)\n"
+			 "1(1) 1 -2(112)\n"
+			 "2(2) 0\n"
+			 "3(3)@0 1 *3(0)\n", RG_VertexLists, verts,edges);
 
-//    writeGraphText(g,std::cout,RG_VertexLists); std::cout << "***\n";
+    writeGraphText(g,std::cout,RG_VertexLists); std::cout << "***\n";
 
 	for(i = 0, v = g.getVert(); v != NULL; v = g.getVertNext(v)) verts2[i++] = v;
 	if(verts[0] != verts2[3] || verts[1] != verts2[0]) {
