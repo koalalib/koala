@@ -125,17 +125,8 @@ enum RG_Format {
 template<class V>
 class EmptyMap {
 public:
-	V &operator[](unsigned int)	{ return m_dummy; };
+	V &operator[](unsigned int v)	{ return m_dummy; };
 	V m_dummy;
-	};
-
-class EmptyMap2 {
-public:
-    template <class T>
-        bool hasKey(T) { return false; }
-    template <class T>
-        int &operator[](T)	{ return m_dummy; };
-	int m_dummy;
 	};
 
 
@@ -186,42 +177,32 @@ bool readGraphText(Graph &g, const char *desc, RG_Format format) {
 	};
 
 
-template<class Graph, class VMap, class EMap>
-bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format,
-                    std::pair<bool,bool> printinf, VMap& vmap, EMap& emap);
+template<class Graph, class DESC, class VMap>
+bool readGraphText(Graph &g, DESC desc, RG_Format format, VMap &vertexMap) {
+	EmptyMap<typename Graph::PEdge> te;
+	return readGraphText(g, desc, format, vertexMap, te);
+	};
+
 
 template<class Graph>
 bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format,
-                    std::pair<bool,bool> printinf=std::make_pair(true,true))
-{
-    EmptyMap2 em;
-    return writeGraphText(g,out,format,printinf,em,em);
-}
+                    std::pair<bool,bool> printinf=std::make_pair(true,true));
 
 
-template<class Graph, class VMap, class EMap>
+template<class Graph>
 bool writeGraphText(const Graph &g, std::string &out, RG_Format format,
-                    std::pair<bool,bool> printinf,VMap& vmap, EMap& emap) {
+                    std::pair<bool,bool> printinf=std::make_pair(true,true)) {
 	bool rv;
 	std::ostringstream s;
-	rv = writeGraphText(g, s, format,printinf,vmap,emap);
+	rv = writeGraphText(g, s, format,printinf);
 	out = s.str();
 	return rv;
 	};
 
 
 template<class Graph>
-bool writeGraphText(const Graph &g, std::string &out, RG_Format format,
-                    std::pair<bool,bool> printinf=std::make_pair(true,true))
-{
-    EmptyMap2 em;
-    writeGraphText(g,out,format,printinf,em,em);
-
-}
-
-template<class Graph,class VMap, class EMap>
 bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format format,
-                    std::pair<bool,bool> printinf,VMap& vmap, EMap& emap)
+                    std::pair<bool,bool> printinf=std::make_pair(true,true))
 {
 	bool rv;
 	const char *o;
@@ -231,7 +212,7 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format
 
 	if(out == NULL || maxlength == 0) return false;
 
-	rv = writeGraphText(g, s, format, printinf,vmap,emap);
+	rv = writeGraphText(g, s, format, printinf);
 	if(!rv) return false;
 
 	str = s.str();
@@ -241,15 +222,6 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format
 	out[i] = 0;
 	return true;
 	};
-
-template<class Graph>
-bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format format,
-                    std::pair<bool,bool> printinf=std::make_pair(true,true))
-{
-    EmptyMap2 em;
-    writeGraphText(g,out,maxlength,format,printinf,em,em);
-}
-
 
 }; // namespace InOut
 }; // namespace Koala

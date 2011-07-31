@@ -2007,6 +2007,10 @@ Graph< VertInfo,EdgeInfo >::attach_undir( PEdge edge, PVertex vertU, PVertex ver
     if (!vertV) return NULL;
     if (vertU == vertV) return NULL;
     if (edge->type != Detached) detach( edge );
+//    if (vertU>vertV)
+//    {
+//            PVertex tmpvert=vertU; vertU=vertV; vertV=tmpvert;
+//    }
     edge->vert[Graph< VertInfo,EdgeInfo >::Edge::V_U].vert = vertU;
     edge->vert[Graph< VertInfo,EdgeInfo >::Edge::V_V].vert = vertV;
     edge->type = Undirected;

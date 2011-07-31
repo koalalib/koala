@@ -31,11 +31,11 @@ int main() {
 
 	rv = true;
 
-	readGraphText(g, "4\n"
-            "0(0)@1 2 -1(101) >2(102)\n"
-			 "1(1) 1 -2(112)\n"
-			 "2(2) 0\n"
-			 "3(3)@0 1 *3(0)\n", RG_VertexLists, verts);
+//	readGraphText(g, "4\n"
+//            "0(0)@1 2 -1(101) >2(102)\n"
+//			 "1(1) 1 -2(112)\n"
+//			 "2(2) 0\n"
+//			 "3(3)@0 1 *3(0)\n", RG_VertexLists, verts);
 
 //    writeGraphText(g,std::cout,RG_VertexLists); std::cout << "***\n";
 

@@ -22,8 +22,15 @@ int main() {
     Graph<char,string>::PEdge d,e,f,h,p,q,x,y,z;
     char text[10000];
 
+    AssocTable<std::map<Graph<char,string>::PVertex,int> > v2int;
+    AssocTable<std::map<Graph<char,string>::PEdge,int> > e2int;
+    std::map<int,Graph<char,string>::PVertex> int2v;
+    std::map<int,Graph<char,string>::PEdge> int2e;
+
+
 	A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');
 //	C=g.addVert();B=g.addVert();A=g.addVert();D=g.addVert();
+
 
 	d=g.addEdge(A,B,"ab");
 	e=g.addEdge(A,C,"ac");
@@ -59,6 +66,7 @@ int main() {
 
     cout << "\n******************\n";
 
+
     std::pair<bool,bool> form =std::make_pair(false,false);
 
     cout << writeGraphText(g, cout, RG_VertexLists);
@@ -85,10 +93,16 @@ int main() {
 	cout << endl;cout << endl;
 
 	cout << "\n----------------\n";
-	writeGraphText(g, cout, RG_VertexLists,std::make_pair(true,true));
+
+    v2int[g.getVertNext(g.getVert())]=99;
+    e2int[g.getEdge(EdLoop)]=102;
+
+	writeGraphText(g, cout, RG_EdgeList,std::make_pair(true,true),v2int,e2int);
 	ofstream pliko("plik.txt");
+//	writeGraphText(g, pliko, RG_VertexLists,form,v2int,e2int);
 	writeGraphText(g, pliko, RG_EdgeList,form);
 //	pliko << '\n';
+//	writeGraphText(g, pliko, RG_VertexLists,std::make_pair(true,true),v2int,e2int);
 	writeGraphText(g, pliko, RG_EdgeList,std::make_pair(true,true));
 	pliko.close();
 	cout << "\n----------------\n";
@@ -97,12 +111,14 @@ int main() {
 	g.clear();
 	readGraphText(g, pliki, RG_EdgeList);
 	g.clear();
+//	readGraphText(g, pliki, RG_VertexLists,int2v,int2e);
 	readGraphText(g, pliki, RG_EdgeList);
 	pliki.close();
 	writeGraphText(g, cout, RG_VertexLists);
 
-	Graph<> gc; gc.copy(g);
-	writeGraphText(gc, cout, RG_VertexLists);
+//    cout << "\n\n" << int2v[99]->info << ' ' << int2e[102]->info;
+//	Graph<> gc; gc.copy(g);
+//	writeGraphText(gc, cout, RG_VertexLists);
 
 //
 //	writeGraphText(g, cout, RG_UndirectedEdgeList);

@@ -54,6 +54,7 @@ int main() {
     AssocTabInterface<std::map<int,std::string> > amap=mapa;
 
 
+
     AssocArray<Vert*,std::string> a;
     Vert * tab[5];
 
@@ -78,13 +79,17 @@ int main() {
 
     AssocArray<Vert*,std::string> a2=a;
 
+    AssocTable<AssocArray<Vert*,std::string> > ax(20);
+    ax.reserve(30);
+    ax.capacity();
+
     std::cout << "\n----------------\n";
 
     BiDiHashMap<int,std::string> hmapa;
     AssocTabInterface<BiDiHashMap<int,std::string> > hamap=hmapa;
 
 
-    AssocTable< BiDiHashMap<Vert*,std::string> > ha;
+    AssocTable< BiDiHashMap<Vert*,std::string> > ha(10);
 
 
 

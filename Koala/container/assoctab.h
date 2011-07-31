@@ -44,7 +44,6 @@ template< class K, class V > class AssocTabInterface< std::map< K,V > >
         void clear() { cont.clear(); }
         template< class Iterator > int getKeys( Iterator );
 
-    private:
         std::map< K,V > &cont;
 } ;
 
@@ -71,7 +70,10 @@ template< class T > class AssocTabInterface< AssocTabInterface< T > >
 
         template< class Iterator > int getKeys( Iterator );
 
-    private:
+        // nieobowiazkowe, moze byc nieobslugiwane przez niektore kontenery
+        int capacity () { return cont.capacity(); }
+        void reserve(int n) { cont.reserve(n); }
+
         AssocTabInterface< T > &cont;
 };
 
@@ -110,6 +112,11 @@ template< class T > class AssocTable
 
         template< class Iterator > int getKeys( Iterator );
 
+        // nieobowiazkowe, moze byc nieobslugiwane przez niektore kontenery
+        int capacity () { return cont.capacity(); }
+        void reserve(int n) { cont.reserve(n); }
+        AssocTable(int n): cont(n), inter( cont ) { }
+
     private:
         AssocTabInterface< T > inter;
 };
@@ -142,8 +149,10 @@ template< class T > class AssocTabInterface< AssocTable< T > >
         void clear() { cont.clear(); }
 
         template< class Iterator > int getKeys( Iterator );
+        // nieobowiazkowe, moze byc nieobslugiwane przez niektore kontenery
+        int capacity () { return cont.capacity(); }
+        void reserve(int n) { cont.reserve(n); }
 
-    private:
         AssocTable< T > &cont;
 };
 
@@ -324,7 +333,9 @@ template< class K, class V, class C > class AssocTabInterface< AssocArray< K,V,C
 
         template< class Iterator > int getKeys( Iterator );
 
-    private:
+        int capacity () { return cont.capacity(); }
+        void reserve(int n) { cont.reserve(n); }
+
         AssocArray< K,V,C > &cont;
 };
 
