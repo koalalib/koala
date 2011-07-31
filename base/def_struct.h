@@ -143,6 +143,7 @@ template <class T> class VectorInterface<T*> {
     typedef T value_type;
 
     VectorInterface(T* bufor, int max) : start(bufor), limit(bufor+max), siz(0) {}
+    void link(T* newbuf, int newmax) { start=newbuf; limit=start+newmax; siz=0; }
 
     T* begin() { return start ; }
     T* end()   { return start+siz ; }

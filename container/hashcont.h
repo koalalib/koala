@@ -816,7 +816,6 @@ template< class K, class V> class AssocTabInterface< BiDiHashMap< K,V > >
         void clear() { cont.clear(); }
         template< class Iterator > int getKeys( Iterator );
 
-    private:
         BiDiHashMap< K,V > &cont;
 } ;
 

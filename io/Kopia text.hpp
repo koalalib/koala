@@ -70,7 +70,7 @@ template<class Graph, class VMap, class EMap>
 bool readGraphVL(Graph &g, std::istream &strm,
 		 VMap &vertexMap, EMap &edgeMap) {
 	char c;
-	unsigned int i, id, m, iu, iv, n,ix;
+	unsigned int i, id, m, iu, iv, n;
 	std::istringstream ostrm;
 	EdgeDirection dir;
 	typename Graph::PEdge e;
@@ -87,7 +87,7 @@ bool readGraphVL(Graph &g, std::istream &strm,
 		else u = it->second;
 
 		if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (u->info))) return false;
-		if(readOutputId(strm, ix)) vertexMap[ix] = u;
+		if(readOutputId(strm, id)) vertexMap[id] = u;
 
 		if(!(bool)(strm >> m)) return false;
 		for(i = 0; i < m; i++) {
@@ -107,7 +107,7 @@ bool readGraphVL(Graph &g, std::istream &strm,
 			e = g.addEdge(u, v, dir);
 
 			if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (e->info))) return false;
-			if(readOutputId(strm, ix)) edgeMap[ix] = e;
+			if(readOutputId(strm, id)) edgeMap[id] = e;
 			};
 		};
 	return true;
@@ -129,7 +129,7 @@ bool readGraphEL(Graph &g, std::istream &strm,
 	std::string str;
 	std::istringstream ostrm;
 	EdgeDirection dir;
-	unsigned int id, iu, iv, n, m,ie,ix;
+	unsigned int id, iu, iv, n, m;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u, v;
 	std::map<unsigned int, typename Graph::PVertex> idxToPtr;
@@ -160,14 +160,14 @@ bool readGraphEL(Graph &g, std::istream &strm,
 			e = g.addEdge(u, v, dir);
 
 			if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (e->info))) return false;
-			if(readOutputId(strm, ix)) edgeMap[ix] = e;
+			if(readOutputId(strm, id)) edgeMap[id] = e;
 			};
         for(id=0;id<n;id++) {
             strm >> iu; if (iu!=id) return false;
             it = idxToPtr.find(id);
             u = it->second;
             if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (u->info))) return false;
-			if(readOutputId(strm, ix)) vertexMap[ix] = u;
+			if(readOutputId(strm, id)) vertexMap[id] = u;
 		};
 	return true;
 	};
@@ -199,9 +199,8 @@ bool readGraphText(Graph &g, std::istream &strm, RG_Format format,
  * 		added edges will be undirected
  * @return true on success, false otherwise
  */
-template<class Graph, class VMap, class EMap>
-bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf,
-                  VMap& vmap, EMap& emap) {
+template<class Graph>
+bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf) {
 	unsigned int i;
 	EdgeDirection flags;
 	typename Graph::PEdge e;
@@ -219,7 +218,6 @@ bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
 		out << ptrToIdx[u];
 		if (printinf.first) out << '(' << u->info << ')';
-		if (vmap.hasKey(u)) out << '@' << vmap[u];
 
 		for(i = 0, e = g.getEdge(u, flags); e != NULL; e = g.getEdgeNext(u, e, flags)) {
 			vs = g.getEdgeEnds(e);
@@ -242,7 +240,6 @@ bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 			else out << '>';
 			out << ptrToIdx[v];
 			if (printinf.second) out << '(' << e->info << ')';
-			if (emap.hasKey(e)) out << '@' << emap[e];
 			used.insert(e);
 			};
 		out << '\n';
@@ -260,9 +257,8 @@ bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
  * @param[out] vertexMap
  * @return true on success, false otherwise
  */
-template<class Graph, class VMap, class EMap>
-bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf,
-                  VMap& vmap, EMap& emap) {
+template<class Graph>
+bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf) {
 	unsigned int idx,i=0;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u;
@@ -280,14 +276,12 @@ bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 		else out << "*";
 		out << ' ' << ptrToIdx[vs.second];
 		if (printinf.second) out << "(" << e->info << ")";
-		if (emap.hasKey(e)) out << '@' << emap[e];
 		out << "\n";
 		};
 
 	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
 		out << ptrToIdx[u];
 		if (printinf.first) out << '(' << u->info << ")";
-		if (vmap.hasKey(u)) out << '@' << vmap[u];
 		out <<"\n";
 		};
 	return true;
@@ -302,12 +296,11 @@ bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
  * @param[in] format describes format of the stream (RG_* values)
  * @return true on success, false otherwise
  */
-template<class Graph, class VMap, class EMap>
-bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format, std::pair<bool,bool> printinf,
-                    VMap& vmap, EMap& emap) {
+template<class Graph>
+bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format, std::pair<bool,bool> printinf) {
 	switch(format) {
-		case RG_VertexLists:	return writeGraphVL(g, out, printinf,vmap,emap);
-		case RG_EdgeList:	return writeGraphEL(g, out, printinf,vmap,emap);
+		case RG_VertexLists:	return writeGraphVL(g, out, printinf);
+		case RG_EdgeList:	return writeGraphEL(g, out, printinf);
 		};
 	return false;
 	};
