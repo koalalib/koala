@@ -12,18 +12,51 @@
 #include <algorithm>
 #include <cstdio>
 #include <cassert>
-#include <utility>
 
-namespace Koala
-{
+#include "../base/def_struct.h"
 
-template< class VertInfo, class EdgeInfo > class Graph;
-template< class VertInfo, class EdgeInfo > class Vertex;
-template< class VertInfo, class EdgeInfo > class Edge;
+
+#ifndef KOALA_GRAPH_PARAMS_DEFINED
+
+namespace Koala {
+
+class GraphClassDefaultSettings {
+    public:
+
+    template <class A, class B> class VertAssocCont {
+        public:
+        typedef AssocArray<A,B> Type;
+    };
+
+    template <class A, class B> class ExtVertAssocCont {
+        public:
+        typedef AssocArray<A,B> Type;
+    };
+
+    template <class K, class V> class AdjMatrixDirEdges {
+        public:
+        typedef AssocMatrix<K,V,AMatrNoDiag> Type;
+    };
+
+    template <class K, class V> class AdjMatrixUndirEdges {
+        public:
+        typedef AssocMatrix<K,V,AMatrTriangle> Type;
+    };
+
+    template<class VertInfo, class EdgeInfo, EdgeType EdAllow> struct VertAdditData {
+        AssocKeyContReg assocReg;
+    };
+
+    template<class VertInfo, class EdgeInfo, EdgeType EdAllow> struct EdgeAdditData {
+        AssocKeyContReg assocReg;
+    };
+
+};
 
 }
 
-#include "../base/def_struct.h"
+#endif
+
 #include "vertex.h"
 #include "edge.h"
 
@@ -53,8 +86,19 @@ class SubgraphBase
         bool link(const SubgraphBase * = NULL );
 } ;
 
+
+template <EdgeType EdgeAllow>
+class EdgeAllowTest;
+
+template <>
+class EdgeAllowTest<EdNone> {};
+
+template <>
+class EdgeAllowTest<EdDirIn|EdDirOut> {};
+
+
 /* ------------------------------------------------------------------------- *
- * Graph< VertInfo,EdgeInfo >
+ * Graph< VertInfo,EdgeInfo,EdAllow >
  *
  * Graf wraz z wszystkimi podstawowymi operacjami wykonywanymi na grafach.
  * Parametry grafu to klasy, których instancje będą etykietami wierzchołków
@@ -62,18 +106,18 @@ class SubgraphBase
  *
  * ------------------------------------------------------------------------- */
 
-template< class VertInfo = EmptyVertInfo, class EdgeInfo = EmptyVertInfo >
-class Graph: public SubgraphBase
+template< class VertInfo = EmptyVertInfo, class EdgeInfo = EmptyVertInfo, EdgeType EdAllow = EdAll|AdjMatrixAllowed >
+class Graph: public SubgraphBase, public EdgeAllowTest<EdAllow & (EdDirIn|EdDirOut)>
 {
     public:
-        friend class Edge< VertInfo,EdgeInfo >;
+        friend class Edge< VertInfo,EdgeInfo,EdAllow >;
 
-        typedef Koala::Vertex< VertInfo,EdgeInfo > Vertex;
+        typedef Koala::Vertex< VertInfo,EdgeInfo,EdAllow > Vertex;
         typedef Vertex* PVertex;
-        typedef Koala::Edge< VertInfo,EdgeInfo > Edge;
+        typedef Koala::Edge< VertInfo,EdgeInfo,EdAllow > Edge;
         typedef Edge* PEdge;
-        typedef Graph< VertInfo,EdgeInfo > GraphType;
-        typedef Graph< VertInfo,EdgeInfo > RootGrType;
+        typedef Graph< VertInfo,EdgeInfo,EdAllow > GraphType;
+        typedef Graph< VertInfo,EdgeInfo,EdAllow > RootGrType;
         typedef VertInfo VertInfoType;
         typedef EdgeInfo EdgeInfoType;
 
@@ -87,6 +131,7 @@ class Graph: public SubgraphBase
         ~Graph();
 
     // Parametry grafu
+        EdgeType allowedEdgeTypes() const { return EdAllow; }
         // Liczba wierzchołków (rząd grafu).
         int getVertNo() const;
         // Liczba krawędzi podanego typu.
@@ -105,11 +150,11 @@ class Graph: public SubgraphBase
         // Usuwamy wszystkie wierzchołki grafu.
         void clearEdges();
         // Operator przypisania.
-        Graph< VertInfo,EdgeInfo > &operator=( const Graph< VertInfo,EdgeInfo > & );
+        Graph< VertInfo,EdgeInfo,EdAllow > &operator=( const Graph< VertInfo,EdgeInfo,EdAllow > & );
         // Suma grafów.
-        Graph< VertInfo,EdgeInfo > &operator+=( const Graph< VertInfo,EdgeInfo > & );
+        Graph< VertInfo,EdgeInfo,EdAllow > &operator+=( const Graph< VertInfo,EdgeInfo,EdAllow > & );
         // Przenosimy wszystkie wierzchołki i krawędzie do naszego grafu.
-        PVertex move( Graph< VertInfo,EdgeInfo > & );
+        PVertex move( Graph< VertInfo,EdgeInfo,EdAllow > & );
         // Kopiujemy wierzchołki i krawędzie do innego grafu.
         template< class ExtGraph > PVertex copy( const ExtGraph & );
         template< class ExtGraph, class VChooser, class EChooser >
@@ -182,7 +227,7 @@ class Graph: public SubgraphBase
         int delVerts();
         template< class Iterator > int delVerts( Iterator begin, Iterator end );
         template< class Iterator > int delVerts2( Iterator begin, Iterator end );
-        int delVerts( const Set< typename Graph< VertInfo,EdgeInfo >::PVertex> & );
+        int delVerts( const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex> & );
 
     // Operacje na krawędziach grafu
         // Dodajemy nową krawędź do grafu (bez etykiety).
@@ -234,14 +279,14 @@ class Graph: public SubgraphBase
         template< class Iterator > int delEdges2(
             Iterator begin, Iterator end, EdgeDirection = EdAll );
         int delEdges(
-            const Set< typename Graph< VertInfo,EdgeInfo >::PEdge> &,
+            const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> &,
             EdgeDirection = EdAll );
         template< class Iterator > int delEdges(
             PVertex, Iterator begin, Iterator end, EdgeDirection = EdAll );
         template< class Iterator > int delEdges2(
             PVertex, Iterator begin, Iterator end, EdgeDirection = EdAll );
         int delEdges(
-            PVertex, const Set< typename Graph< VertInfo,EdgeInfo >::PEdge > &,
+            PVertex, const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge > &,
             EdgeDirection = EdAll );
         template< class Iterator > int delEdges(
             PVertex, PVertex, Iterator begin, Iterator end, EdgeDirection = EdAll );
@@ -249,13 +294,13 @@ class Graph: public SubgraphBase
             PVertex, PVertex, Iterator begin, Iterator end, EdgeDirection = EdAll );
         int delEdges(
             PVertex, PVertex,
-            const Set< typename Graph< VertInfo,EdgeInfo >::PEdge > &,
+            const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge > &,
             EdgeDirection = EdAll );
 
         // zmiana typu podanych krawedzi na wartosc ostatniego argumentu
         template< class Iterator > int chEdgesType(Iterator begin, Iterator end, EdgeType);
         template< class Iterator > int chEdgesType2(Iterator begin, Iterator end, EdgeType);
-        int chEdgesType(const Set< typename Graph< VertInfo,EdgeInfo >::PEdge > &, EdgeType);
+        int chEdgesType(const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge > &, EdgeType);
         int chEdgesType(EdgeType);
         int chEdgesType(PVertex,EdgeType);
         int chEdgesType(PVertex,PVertex,EdgeType);
@@ -265,7 +310,7 @@ class Graph: public SubgraphBase
         // Zmieniamy krawędzie w łuki.
         int ch2Archs();
         template< class Iterator > int ch2Archs( Iterator begin, Iterator end );
-        int ch2Archs( const Set< typename Graph< VertInfo,EdgeInfo >::PEdge> & );
+        int ch2Archs( const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> & );
         // Informacja o tym, czy krawędzie są równoległe.
         //relacja rownowaznosci, 3 mozliwosci
         //reltype - dopuszczalne tylko jednobitowe: EdDirIn, EdDirOut lub EdUndir
@@ -322,6 +367,8 @@ class Graph: public SubgraphBase
             void getAdj(Cont &) const;
         std::pair< PVertex,PVertex > getEdgeEnds( PEdge ) const;
         std::pair< PVertex,PVertex > getEnds( PEdge ) const;
+        PVertex getEdgeEnd1( PEdge ) const;
+        PVertex getEdgeEnd2( PEdge ) const;
         // Informacja o tym, czy wierzchołek jest incydentny z krawędzią.
         bool isEdgeEnd( PEdge, PVertex ) const;
         bool isEnd( PEdge, PVertex ) const;
@@ -342,10 +389,10 @@ class Graph: public SubgraphBase
         bool defragAdjMatrix();
 
     // ??
-        const Graph< VertInfo,EdgeInfo > *getRootPtr() const { return this; }
+        const Graph< VertInfo,EdgeInfo,EdAllow > *getRootPtr() const { return this; }
         bool good( PVertex,bool=false ) const { return true; }
         bool good( PEdge,bool=false ) const { return true; }
-        bool testGraph();
+//        bool testGraph();
         PVertex putVert( PEdge,const VertInfo & = VertInfo() );
         PEdge pickVert( PVertex, const EdgeInfo & = EdgeInfo() );
         PVertex glue( PVertex, PVertex, bool makeloops = false );
@@ -354,12 +401,12 @@ class Graph: public SubgraphBase
         template< class Iterator > PVertex glue2(
             Iterator, Iterator, bool makeloops = false, PVertex = NULL );
         PVertex glue(
-            const Set< typename Graph< VertInfo,EdgeInfo >::PVertex> &,
+            const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex> &,
             bool makeloops = false, PVertex = NULL );
 
     private:
         struct Parals {
-            typename Koala::Edge< VertInfo,EdgeInfo > *first, *last;
+            typename Koala::Edge< VertInfo,EdgeInfo,EdAllow > *first, *last;
             int degree;
 
             Parals(): first( NULL ), last( NULL ), degree( 0 ) {}
@@ -367,9 +414,17 @@ class Graph: public SubgraphBase
 
         class AdjMatrix {
             public:
-                AssocMatrix< typename Koala::Vertex< VertInfo,EdgeInfo > *,Parals,AMatrNoDiag > dirs;
-                AssocMatrix< typename Koala::Vertex< VertInfo,EdgeInfo > *,Parals,AMatrTriangle > undirs;
-                AdjMatrix( int asize = 0 ): dirs( asize ), undirs( asize ) { }
+                typename GraphClassDefaultSettings:: template AdjMatrixDirEdges
+                    <typename Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *,Parals>
+                    ::Type dirs;
+                typename GraphClassDefaultSettings:: template AdjMatrixUndirEdges
+                    <typename Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *,Parals>
+                    ::Type undirs;
+
+                AdjMatrix( int asize = 0 ):
+                    dirs( (EdAllow&EdDirOut)? asize : 0 ),
+                    undirs( (EdAllow&EdUndir)? asize : 0 )
+                    { }
 
                 void clear() { dirs.clear(); undirs.clear(); }
                 void defrag() { dirs.defrag(); undirs.defrag(); }
@@ -377,7 +432,7 @@ class Graph: public SubgraphBase
         } *pAdj;
 
         struct Parals2 {
-            typename Koala::Edge< VertInfo,EdgeInfo > *tab[3];
+            typename Koala::Edge< VertInfo,EdgeInfo,EdAllow > *tab[3];
             char size;
 
             Parals2() : size(0) { tab[0]=tab[1]=tab[2]=0; }
@@ -385,14 +440,14 @@ class Graph: public SubgraphBase
         template <class Container> int delParals(PVertex,EdgeDirection,Container &);
 
         struct Parals3 {
-            typename Koala::Vertex< VertInfo,EdgeInfo > *v1,*v2;
+            typename Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *v1,*v2;
             EdgeDirection direct;
-            typename Koala::Edge< VertInfo,EdgeInfo > *edge;
+            typename Koala::Edge< VertInfo,EdgeInfo,EdAllow > *edge;
 
-            Parals3(typename Koala::Vertex< VertInfo,EdgeInfo > *av1,
-                    typename Koala::Vertex< VertInfo,EdgeInfo > *av2,
+            Parals3(typename Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *av1,
+                    typename Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *av2,
                     EdgeDirection adirect,
-                    typename Koala::Edge< VertInfo,EdgeInfo > *aedge) :
+                    typename Koala::Edge< VertInfo,EdgeInfo,EdAllow > *aedge) :
                     v1(av1), v2(av2), direct(adirect), edge(aedge) {}
             Parals3() {}
         };
@@ -422,7 +477,7 @@ class Graph: public SubgraphBase
 
 #include "graph.hpp"
 #include "adjmatrix.hpp"
-#include "graph_test.hpp"
+//#include "graph_test.hpp"
 
 }
 

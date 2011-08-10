@@ -1,34 +1,102 @@
 #ifndef KOALA_VERTEX_H
 #define KOALA_VERTEX_H
 
-#include "../base/def_struct.h"
 
 namespace Koala {
 
-class VertexConst {
-protected:
-	//do not change constans
-	static const int loop = 0;
-	static const int undir = 1;
-	static const int dir_in = 2;
-	static const int dir_out = 3;
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+struct NormalVertLink {
+            Edge<VertInfo,EdgeInfo,EdAllow> *first, *last;
+            int degree;
+
+            NormalVertLink(): first(NULL), last(NULL), degree(0) {}
+            Edge<VertInfo,EdgeInfo,EdAllow>* &getFirst() { return first; }
+            Edge<VertInfo,EdgeInfo,EdAllow>* &getLast() { return last; }
+            int& getDegree() { return degree; }
 };
 
-template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo>
-class Vertex : public VertexConst {
-	friend class Graph<VertInfo,EdgeInfo>;
-	friend class Edge<VertInfo,EdgeInfo>;
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+struct EmptyVertLink {
+
+            EmptyVertLink() {}
+            Edge<VertInfo,EdgeInfo,EdAllow>* &getFirst()
+                { return *(Edge<VertInfo,EdgeInfo,EdAllow>**)(&_KoalaEmptyEdgePoiner); }
+            Edge<VertInfo,EdgeInfo,EdAllow>* &getLast()
+                { return *(Edge<VertInfo,EdgeInfo,EdAllow>**)(&_KoalaEmptyEdgePoiner); }
+            int& getDegree() { return _KoalaEmptyVertDegree; }
+};
+
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow, EdgeType Present>
+struct VertLinkEdDirIn;
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+struct VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn> : public NormalVertLink<VertInfo,EdgeInfo,EdAllow>
+    {};
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+struct VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,0> : public EmptyVertLink<VertInfo,EdgeInfo,EdAllow>
+    {};
+
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow, EdgeType Present>
+struct VertLinkEdDirOut;
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+struct VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut> : public NormalVertLink<VertInfo,EdgeInfo,EdAllow>
+    {};
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+struct VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,0> : public EmptyVertLink<VertInfo,EdgeInfo,EdAllow>
+    {};
+
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow, EdgeType Present>
+struct VertLinkEdUndir;
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+struct VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir> : public NormalVertLink<VertInfo,EdgeInfo,EdAllow>
+    {};
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+struct VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,0> : public EmptyVertLink<VertInfo,EdgeInfo,EdAllow>
+    {};
+
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow, EdgeType Present>
+struct VertLinkEdLoop;
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+struct VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop> : public NormalVertLink<VertInfo,EdgeInfo,EdAllow>
+    {};
+
+template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+struct VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,0> : public EmptyVertLink<VertInfo,EdgeInfo,EdAllow>
+    {};
+
+
+
+template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, EdgeType EdAllow=EdAll|AdjMatrixAllowed>
+class Vertex :
+    private VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>,
+    private VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>,
+    private VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>,
+    private VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>,
+    public GraphClassDefaultSettings::template VertAdditData<VertInfo,EdgeInfo,EdAllow>
+{
+	friend class Graph<VertInfo,EdgeInfo,EdAllow>;
+	friend class Edge<VertInfo,EdgeInfo,EdAllow>;
+
 public:
+
 	VertInfo info; ///< Additional user information in the vertex.
-    AssocKeyContReg assocReg;
     VertInfo getInfo() { return info; }
     void setInfo(const VertInfo& info) { this->info=info; }
+
 private:
-    struct VertLink {
-            Edge<VertInfo,EdgeInfo> *first, *last;
-            int degree;
-            VertLink(): first(NULL), last(NULL), degree(-1) {}
-        };
+
 
 	/** Standard constructor*/
 	Vertex();
@@ -36,7 +104,6 @@ private:
 	Vertex(const VertInfo &);
 
 	Vertex *next, *prev;
-	VertLink edges[4]; //undir, dir_out, dir_in, loop
 };
 
 #include "vertex.hpp"

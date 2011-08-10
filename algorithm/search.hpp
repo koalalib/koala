@@ -355,7 +355,7 @@ int GraphSearchBase< SearchImpl, DefaultStructs >::getPath(
     VisitedMap< GraphType > tree;
     SearchImpl::visitBase( g,start,tree,Visitors::EndVertVisitor( end ),mask,0 );
     int res = tree[end].distance;
-    if (NumberTypeBounds< int >::isPlusInfty( res )) return -1;
+    if (std::numeric_limits<int>::max()== res ) return -1;
     if (!isBlackHole( path.vertIter ) || !isBlackHole( path.edgeIter ))
         getOutPath( g,tree,path,end );
     return res;
@@ -952,7 +952,7 @@ bool DAGAlgsPar <DefaultStructs >::isDAG( const GraphType &g, Iter beg, Iter end
     for( Iter i = beg; i != end; ++i ) topord[*i] = licz++;
     assert( topord.size() == g.getVertNo() );
     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-        if (topord[g.getEdgeEnds(e).first] > topord[g.getEdgeEnds(e).second]) return false;
+        if (topord[g.getEdgeEnd1(e)] > topord[g.getEdgeEnd2(e)]) return false;
     return true;
 }
 

@@ -1,10 +1,17 @@
 #ifndef DEF_STRUCT_H
 #define DEF_STRUCT_H
 
-#include <algorithm>
 #include <limits>
 #include <cassert>
 #include <iostream>
+#include <utility>
+#include <map>
+#include <list>
+#include <stack>
+#include <iterator>
+#include <algorithm>
+
+#include "../container/localarray.h"
 #include "../container/assoctab.h"
 #include "../container/hashcont.h"
 #include "../container/set.h"
@@ -12,7 +19,9 @@
 
 namespace Koala {
 
-typedef unsigned char EdgeDirection; ///< Direction of a edge.
+typedef unsigned char EdgeType;
+typedef unsigned char EdgeDirection;
+
 //do not change constans
 static const EdgeDirection EdNone = 0x00; ///< Edge direction is not specified.
 static const EdgeDirection EdLoop = 0x01; ///< Edge is a loop.
@@ -20,7 +29,13 @@ static const EdgeDirection EdUndir = 0x02; ///< Edge is undirected
 static const EdgeDirection EdDirIn = 0x04; ///< Edge is directed in a vertex.
 static const EdgeDirection EdDirOut = 0x08; ///< Edge is directed out of a vertex.
 static const EdgeDirection EdAll = 0x0F; ///< All directions are included.
-enum EdgeType {Detached=0x0, Loop=0x1, Undirected=0x2, Directed=0xC}; ///< Types of an edge.
+
+static const EdgeDirection AdjMatrixAllowed = 0x10;
+
+static const EdgeType Detached=0x0;
+static const EdgeType Loop=0x1;
+static const EdgeType Undirected=0x2;
+static const EdgeType Directed=0xC;
 
 
 struct EmptyVertInfo {};
@@ -31,10 +46,37 @@ struct EmptyEdgeInfo {};
 std::istream& operator>>(std::istream& is,EmptyEdgeInfo arg) { return is; }
 std::ostream& operator<<(std::ostream& os,EmptyEdgeInfo arg) { return os; }
 
-//W kodzie wlasciwie nie tworzymy obiektow tych klas, tylko wolamy odopwiednie funkcje tworzace
-//tam, gdzie metoda wymaga np. choosera, castera czy iteratora
 
-//TODO: sprywatyzowac konstruktory i zafriendowac do odpowiednich funkcji tworzacych
+template< class VertInfo, class EdgeInfo, EdgeType > class Graph;
+template< class VertInfo, class EdgeInfo, EdgeType > class Vertex;
+template< class VertInfo, class EdgeInfo, EdgeType > class Edge;
+
+
+class AlgorithmsDefaultSettings {
+    public:
+
+    template <class A, class B> class AssocCont {
+        public:
+        typedef AssocArray<A,B> Type;
+//        typedef AssocTable < BiDiHashMap<A,B> > Type;
+
+    };
+
+
+    // Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych
+    // w algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda
+    template <class T> class NumberTypeBounds {
+        public:
+
+        static T plusInfty() { return std::numeric_limits<T>::max(); }
+        static bool isPlusInfty(T arg) {return arg==plusInfty(); }
+        static T minusInfty() { return std::numeric_limits<T>::min(); }
+        static bool isMinusInfty(T arg) {return arg==minusInfty(); }
+        static T zero() { return (T)0; }
+        static bool isZero(T arg) {return arg==zero(); }
+    };
+
+};
 
 
 //Przydatny funktor domyslny tam, gdzie metoda chce dostac funktor generujacy jakies info dla
@@ -58,10 +100,11 @@ ConstFunctor<T> constFun(const T& a=T()) { return ConstFunctor<T>(a); }
 //Jesli metoda chce iterator do zapisu ciagu, a nas sam ciag nie interesuje, tylko inne efekty uboczne procedury
 struct BlackHole : public std::iterator<std::output_iterator_tag,void,void,void,void> {
     template <class T>
-        BlackHole& operator=(T) { return *this; }
+    BlackHole& operator=(T) { return *this; }
     BlackHole& operator* () { return *this; }
     BlackHole& operator++() { return *this; }
     BlackHole operator++ (int) { return *this; }
+    BlackHole() {}
 
     // rowniez moze sluzyc jako zaslepka dla nie interesujacego nas kontenera asocjacyjnego wymaganego w procedurze
     template <class T>
@@ -73,7 +116,14 @@ struct BlackHole : public std::iterator<std::output_iterator_tag,void,void,void,
 
 };
 
-static BlackHole blackHole;
+BlackHole blackHole;
+int _KoalaEmptyVertDegree=0;
+void* _KoalaEmptyEdgePoiner=0;
+
+//extern BlackHole blackHole;
+//extern int _KoalaEmptyVertDegree;
+//extern void* _KoalaEmptyEdgePoiner;
+
 
 template <class T> bool isBlackHole(const T&) { return false; }
 bool isBlackHole(const BlackHole&) { return true; }
@@ -208,20 +258,6 @@ template <class T, class Comp> class PriQueueInterface<T*,Comp> {
         void pop() { assert(siz); std::pop_heap(buf,buf+siz,comp); siz--; }
         T top() { assert(siz); return buf[0]; }
         void clear() { siz=0; }
-};
-
-
-// Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych
-// w algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda
-template <class T> class NumberTypeBounds {
-    public:
-
-    static T plusInfty() { return std::numeric_limits<T>::max(); }
-    static bool isPlusInfty(T arg) {return arg==plusInfty(); }
-    static T minusInfty() { return std::numeric_limits<T>::min(); }
-    static bool isMinusInfty(T arg) {return arg==minusInfty(); }
-    static T zero() { return (T)0; }
-    bool isZero(T arg) {return arg==zero(); }
 };
 
 

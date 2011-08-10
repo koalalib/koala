@@ -46,6 +46,7 @@ class Subgraph: public SubgraphBase
         Subgraph( std::pair< VChooser,EChooser > );
 
     // ??
+        EdgeType allowedEdgeTypes() const { return root().allowedEdgeTypes(); }
         void plug(const Graph &g ) { SubgraphBase::link( &g ); }
         bool unplug() { return SubgraphBase::unlink(); }
         void setChoose( const std::pair< VChooser,EChooser > & );
@@ -72,6 +73,8 @@ class Subgraph: public SubgraphBase
             getEdgeEnds( PEdge edge ) const { return edge->getEnds(); }
         std::pair< typename Graph::PVertex,typename Graph::PVertex >
             getEnds( PEdge edge ) const { return edge->getEnds(); }
+        PVertex getEdgeEnd1( PEdge edge ) const { return edge->getEnd1(); }
+        PVertex getEdgeEnd2( PEdge edge ) const { return edge->getEnd2(); }
         bool isEdgeEnd( PEdge edge, PVertex vert ) const { return root().isEnd( edge,vert ); }
         bool isEnd( PEdge edge, PVertex vert ) const { return root().isEnd( edge,vert ); }
         typename Graph::PVertex getEdgeEnd( PEdge, PVertex ) const;
