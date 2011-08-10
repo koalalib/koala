@@ -9,7 +9,6 @@
 
 #include "../base/def_struct.h"
 #include "../graph/subgraph.h"
-#include "../container/set.h"
 #include "search.h"
 #include <algorithm>
 #include <cassert>

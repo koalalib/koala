@@ -39,10 +39,10 @@ int main() {
 	GraphI graph;
 	GraphI::PVertex v1 = graph.addVert(3);
 	GraphI::PVertex v2 = graph.addVert();
-	graph.testGraph();
+//	graph.testGraph();
 	GraphI::PEdge e1 = graph.addEdge(v1,v2,Undirected);
 	printf("%d\n",e1);
-	graph.testGraph();
+//	graph.testGraph();
 	cout << graph.getEdgeNo() << " " << graph.getEdgeNo(Undirected) <<endl;
 	e1 = graph.addEdge(v1,v2,10);
 	printf("%d\n",e1);
@@ -74,7 +74,7 @@ int main() {
 	printf("%d\n",e1);
 
 	printf("TEST\n");
-	graph.testGraph();
+//	graph.testGraph();
 
 	printf("Szukanie krawedzi\n");
 	e1 = graph.getEdgePrev(v1,NULL,EdLoop|EdDirIn);
@@ -91,10 +91,10 @@ int main() {
 
 	GraphD graphd;
 	graphd.copy(graph);
-	graphd.testGraph();
+//	graphd.testGraph();
 
 	GraphI grapha = graph;
-	grapha.testGraph();
+//	grapha.testGraph();
 	GraphI::PVertex wierzcholki[30];
 	int len_wer = graph.getVerts(wierzcholki);
 	for(int i=0; i<len_wer; i++)

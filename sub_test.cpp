@@ -128,6 +128,8 @@ Koala::Subgraph<Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koal
     std::cout << "\n";
     ssg.plug(sg1);
 
+//    ssg.allowedEdgeTypes();
+
     std:: cout << ssg.areParallel(ssg.getEdgeLast(),ssg.getEdgeLast());
     std::cout << "\n\n";
 

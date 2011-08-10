@@ -6,12 +6,6 @@
  *
  * ------------------------------------------------------------------------- */
 
-#include <vector>
-#include <map>
-#include <list>
-#include <stack>
-#include <cassert>
-#include "../graph/graph.h"
 #include "../base/def_struct.h"
 #include "../graph/subgraph.h"
 
@@ -21,17 +15,6 @@ namespace Koala {
  * SearchStructs
  *
  * ------------------------------------------------------------------------- */
-
-class SearchAlgsDefaultStructs {
-    public:
-        template< class A, class B > class AssocCont
-        {
-            public:
-                typedef AssocArray< A,B > Type;
-//                typedef AssocTable<BiDiHashMap< A,B > > Type;
-        } ;
-
-} ;
 
 
 class SearchStructs {
@@ -47,7 +30,7 @@ class SearchStructs {
             VisitVertLabs(
                 typename GraphType::PVertex vp = 0,
                 typename GraphType::PEdge ep = 0,
-                int dist = NumberTypeBounds< int >::plusInfty(),
+                int dist = std::numeric_limits<int>::max(),
                 int comp = -1 );
 
             template< class Rec > void get( Rec &r );
@@ -463,7 +446,7 @@ class DFSPar: public DFSBase< DFSPar<DefaultStructs >, DefaultStructs >
 } ;
 
 
-class DFS : public DFSPar<SearchAlgsDefaultStructs> {};
+class DFS : public DFSPar<AlgorithmsDefaultSettings> {};
 
 /*
  * Preorder Depth-First-Search
@@ -490,7 +473,7 @@ class DFSPreorderPar: public DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStr
             Visitor, EdgeDirection, int );
 } ;
 
-class DFSPreorder : public DFSPreorderPar<SearchAlgsDefaultStructs> {};
+class DFSPreorder : public DFSPreorderPar<AlgorithmsDefaultSettings> {};
 
 /*
  * Postorder Depth-First-Search
@@ -517,7 +500,7 @@ class DFSPostorderPar: public DFSBase< DFSPostorderPar<DefaultStructs >, Default
             Visitor, EdgeDirection, int );
 } ;
 
-class DFSPostorder: public DFSPostorderPar<SearchAlgsDefaultStructs> {};
+class DFSPostorder: public DFSPostorderPar<AlgorithmsDefaultSettings> {};
 
 /*
  * Breadth-First-Search
@@ -539,7 +522,7 @@ class BFSPar: public GraphSearchBase< BFSPar<DefaultStructs >, DefaultStructs >
             Visitor, EdgeDirection, int );
 } ;
 
-class BFS: public BFSPar<SearchAlgsDefaultStructs> {};
+class BFS: public BFSPar<AlgorithmsDefaultSettings> {};
 
 /*
  * lexicographical Breadth-First-Search
@@ -587,7 +570,7 @@ class LexBFSPar: public GraphSearchBase< LexBFSPar<DefaultStructs >, DefaultStru
             Visitor, EdgeDirection, int );
 } ;
 
-class LexBFS: public LexBFSPar<SearchAlgsDefaultStructs> {};
+class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
 
 /*
  * Cheriyan–Mehlhorn/Gabow algorithm
@@ -659,7 +642,7 @@ class SCCPar: protected SearchStructs
         static int connections(const GraphType &, CompMap &, PairIter );
 } ;
 
-class SCC : public SCCPar<SearchAlgsDefaultStructs> {};
+class SCC : public SCCPar<AlgorithmsDefaultSettings> {};
 
 
 template <class DefaultStructs>
@@ -683,7 +666,7 @@ class DAGAlgsPar: protected SearchStructs
 
 } ;
 
-class DAGAlgs : public DAGAlgsPar<SearchAlgsDefaultStructs> {};
+class DAGAlgs : public DAGAlgsPar<AlgorithmsDefaultSettings> {};
 
 /*
  * Blocks -- biconnected components
@@ -791,7 +774,7 @@ class BlocksPar : protected SearchStructs
             EdgeDirection = EdAll );
 } ;
 
-class Blocks : public BlocksPar<SearchAlgsDefaultStructs> {};
+class Blocks : public BlocksPar<AlgorithmsDefaultSettings> {};
 
 /*
  * Eulerian cycle and path
@@ -802,12 +785,12 @@ class EulerPar: public PathStructs, protected SearchStructs {
 private:
 	template<class GraphType>
 	struct EulerState {
-		GraphType &g;
+		const GraphType &g;
 		StackInterface<std::pair<typename GraphType::PVertex, typename GraphType::PEdge> *> stk;
 		typename DefaultStructs:: template AssocCont<typename GraphType::PEdge, bool>::Type edgeVisited;
 		EdgeDirection mask;
 
-		EulerState(GraphType &_g,
+		EulerState(const GraphType &_g,
 			   std::pair<typename GraphType::PVertex, typename GraphType::PEdge> *_stk,
 			   int nv,
 			   EdgeDirection m):
@@ -862,7 +845,7 @@ public:
 
     template<class GraphType>
 	static std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
-    ends(GraphType &g,EdgeDirection mask=EdUndir)
+    ends(const GraphType &g,EdgeDirection mask=EdUndir)
     {
         EdgeDirection symmask = mask | ((mask&(EdDirIn|EdDirOut)) ? EdDirIn|EdDirOut : 0);
         bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
@@ -897,14 +880,14 @@ public:
     }
 
 	template<class GraphType>
-	static bool hasCycle(GraphType &g,
+	static bool hasCycle(const GraphType &g,
 			     EdgeDirection mask = EdUndir) {
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		return res.first!=0 && res.first==res.second;
 	};
 
 	template<class GraphType>
-	static bool hasPath(GraphType &g,
+	static bool hasPath(const GraphType &g,
 			    EdgeDirection mask = EdUndir) {
         std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		return res.first!=0 && res.first!=res.second;
@@ -912,7 +895,7 @@ public:
 
 	// test if graph has an eulerian path starting at vertex u
 	template<class GraphType>
-	static bool hasPath(GraphType &g,
+	static bool hasPath(const GraphType &g,
 			    typename GraphType::PVertex u,
 			    EdgeDirection mask = EdUndir) {
         assert(u);
@@ -922,7 +905,7 @@ public:
 		};
 
 	template<class GraphType>
-	static bool hasCycle(GraphType &g,
+	static bool hasCycle(const GraphType &g,
 			    typename GraphType::PVertex u,
 			    EdgeDirection mask = EdUndir) {
         assert(u);
@@ -932,7 +915,7 @@ public:
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
-	static bool getCycle(GraphType &g,
+	static bool getCycle(const GraphType &g,
 			    OutPath<VertIter, EdgeIter> out,
 			    EdgeDirection mask = EdUndir) {
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
@@ -947,7 +930,7 @@ public:
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
-	static bool getCycle(GraphType &g,
+	static bool getCycle(const GraphType &g,
 			    typename GraphType::PVertex prefstart,
 			    OutPath<VertIter, EdgeIter> out,
 			    EdgeDirection mask = EdUndir) {
@@ -965,7 +948,7 @@ public:
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
-	static bool getPath(GraphType &g,
+	static bool getPath(const GraphType &g,
 			   OutPath<VertIter, EdgeIter> out,
 			   EdgeDirection mask = EdUndir) {
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
@@ -981,7 +964,7 @@ public:
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
-	static bool getPath(GraphType &g,
+	static bool getPath(const GraphType &g,
 			    typename GraphType::PVertex prefstart,
 			   OutPath<VertIter, EdgeIter> out,
 			   EdgeDirection mask = EdUndir) {
@@ -997,7 +980,7 @@ public:
 
 };
 
-class Euler : public EulerPar<SearchAlgsDefaultStructs> {};
+class Euler : public EulerPar<AlgorithmsDefaultSettings> {};
 
 #include "search.hpp"
 

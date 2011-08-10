@@ -1,50 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns &#x0A;        ./graphml.xsd">
-    <key id="x" for="node" attr.type="int" attr.name="nn">
-        <default>100</default>
-    </key>
-    <key id="y" for="edge" attr.type="int" attr.name="ee">
-        <default>200</default>
-    </key>
-    <graph id="G" edgedefault="undirected">
-        <edge id="e0" source="n0" target="n2">
-            <data key="y">20</data>
-        </edge>
-        <node id="n0">
-            <data key="x">10</data>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+    <key id="k04F9" for="all" attr.name="EE" />
+    <key id="k7BC7" for="all" attr.name="EDG" />
+    <key id="k1E14" for="all" attr.name="NN" />
+    <key id="k1FD3" for="all" attr.name="VRT" />
+    <graph id="test" edgedefault="undirected">
+        <node id="n003E7700">
+            <data key="k1E14">10</data>
         </node>
-        <node id="n1">
-            <data key="x">11</data>
+        <node id="n003E7768">
+            <data key="k1E14">11</data>
         </node>
-        <node id="n2">
-            <data key="x">12</data>
+        <node id="n003E77D0">
+            <data key="k1E14">12</data>
         </node>
-        <node id="n3">
-            <data key="x">13</data>
+        <node id="n003E7838">
+            <data key="k1E14">13</data>
         </node>
-        <node id="n4">
-            <data key="x">14</data>
+        <node id="n003E78C0">
+            <data key="k1E14">14</data>
         </node>
-        <edge id="e4" source="n2" target="n4">
-            <data key="y">24</data>
-        </edge>
-        <node id="n5">
-            <data key="x">15</data>
+        <node id="n003E7948">
+            <data key="k1E14">15</data>
         </node>
-        <edge id="e1" source="n0" target="n1">
-            <data key="y">21</data>
+        <edge id="e003E75E8" source="n003E7700" target="n003E77D0">
+            <data key="k04F9">20</data>
         </edge>
-        <edge id="e2" source="n1" target="n3">
-            <data key="y">22</data>
+        <edge id="e003E79C8" source="n003E77D0" target="n003E78C0">
+            <data key="k04F9">24</data>
         </edge>
-        <edge id="e3" source="n3" target="n2">
-            <data key="y">23</data>
+        <edge id="e003E7A08" source="n003E7700" target="n003E7768">
+            <data key="k04F9">21</data>
         </edge>
-        <edge id="e5" source="n3" target="n5">
-            <data key="y">25</data>
+        <edge id="e003E7A48" source="n003E7768" target="n003E7838">
+            <data key="k04F9">22</data>
         </edge>
-        <edge id="e6" source="n5" target="n4">
-            <data key="y">26</data>
+        <edge id="e003E7A88" source="n003E7838" target="n003E77D0">
+            <data key="k04F9">23</data>
+        </edge>
+        <edge id="e003E7AC8" source="n003E7838" target="n003E7948">
+            <data key="k04F9">25</data>
+        </edge>
+        <edge id="e003E7B08" source="n003E7948" target="n003E78C0">
+            <data key="k04F9">26</data>
         </edge>
     </graph>
 </graphml>

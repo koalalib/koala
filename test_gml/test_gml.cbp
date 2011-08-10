@@ -32,6 +32,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="..\Koala\base\global.cpp" />
 		<Unit filename="..\Koala\io\graphml.h" />
 		<Unit filename="..\Koala\tinyxml\tinystr.cpp" />
 		<Unit filename="..\Koala\tinyxml\tinystr.h" />

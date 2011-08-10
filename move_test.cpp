@@ -142,7 +142,22 @@ int main() {
     }
     cout << endl << ((e==en) ? "=" : "!");
 
-    cout << "\n Koniec\n";
+    cout << "\n Koniec\n\n\n";
+
+    EdgeDirection maska=EdDirOut|EdDirIn;
+    Graph<char,string> gs;
+    gs.makeAdjMatrix();
+    Graph<char,string>::PVertex As=gs.addVert('A'), Bs=gs.addVert('B'), Cs=gs.addVert('C');
+    gs.addArch(As,Bs,"A>B 1");gs.addArch(As,Bs,"A>B 2"); gs.addArch(As,Bs,"A>B 3");
+    gs.addArch(Bs,As,"B>A 1");gs.addArch(Bs,As,"B>A 2"); gs.addArch(Bs,As,"B>A 3");
+    gs.addEdge(As,Bs,"A-B 1");gs.addEdge(Bs,As,"A-B 2"); gs.addEdge(As,Bs,"A-B 3");
+    for(Graph<char,string>::PEdge e=gs.getEdge(As,Bs,maska);e;e=gs.getEdgeNext(As,Bs,e,maska))
+        cout << e->info << "\n";
+
+    cout <<  "\n\n";
+
+    for(Graph<char,string>::PEdge e=gs.getEdgeLast(As,Bs,maska);e;e=gs.getEdgePrev(As,Bs,e,maska))
+        cout << e->info << "\n";
 
 //    cout << g1.glue(g1.getClNeighSet(B),true,A);
 

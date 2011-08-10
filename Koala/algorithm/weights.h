@@ -1,16 +1,12 @@
 #ifndef DEF_WEIGHTS_H
 #define DEF_WEIGHTS_H
 
-#include <vector>
-#include <map>
-#include <algorithm>
-#include <cassert>
 #include "../base/def_struct.h"
 #include "../graph/graph.h"
 #include "../graph/subgraph.h"
 #include "search.h"
 #include "../container/joinsets.h"
-#include "../container/localarray.h"
+
 
 
 
@@ -25,17 +21,6 @@ namespace Koala {
 //zamykamy w jednej klasie. Same procedury sa szablonami jej metod statycznych.
 
 
-class WeightAlgsDefaultStructs {
-    public:
-
-    template <class A, class B> class AssocCont {
-        public:
-        typedef AssocArray<A,B> Type;
-//        typedef AssocTable < BiDiHashMap<A,B> > Type;
-
-    };
-
-};
 
 template <class DefaultStructs>
 class DijkstraPar : public ShortPathStructs {
@@ -64,7 +49,8 @@ class DijkstraPar : public ShortPathStructs {
         typename GraphType::PVertex vPrev;
         typename GraphType::PEdge  ePrev;
 
-        VertLabs() : vPrev(0), ePrev(0), distance(NumberTypeBounds<DType>::plusInfty()) {}
+        VertLabs() : vPrev(0), ePrev(0),
+        distance(DefaultStructs:: template NumberTypeBounds<DType>::plusInfty()) {}
     };
 
     // wlasciwa procedura: odleglosc miedzy para wierzcholkow
@@ -77,6 +63,11 @@ class DijkstraPar : public ShortPathStructs {
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {   assert(start);
+        const typename EdgeContainer::ValType::DistType Zero=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        const typename EdgeContainer::ValType::DistType PlusInfty=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
+
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab, Q;
         typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
@@ -88,11 +79,11 @@ class DijkstraPar : public ShortPathStructs {
         typename GraphType::PVertex U,V;
 
         Q[start].vPrev=0;Q[start].ePrev=0;
-        Q[start].distance=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        Q[start].distance=Zero;
 
         while(!Q.empty()){
             typename EdgeContainer::ValType::DistType
-                    d=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty(),nd;
+                    d=PlusInfty,nd;
             for(V=Q.firstKey();V;V=Q.nextKey(V)) if (Q[V].distance<d) d=Q[U=V].distance;
             vertTab[U]=Q[U]; Q.delKey(U);
             if (U==end) return vertTab[end].distance;
@@ -104,8 +95,7 @@ class DijkstraPar : public ShortPathStructs {
                     { Q[V].distance=nd; Q[V].ePrev=E; Q[V].vPrev=U; }
         }
 
-        return end ? NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty()
-                    : NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        return end ? PlusInfty : Zero;
     }
 
 
@@ -137,7 +127,10 @@ class DijkstraPar : public ShortPathStructs {
         typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(end);
-        if (NumberTypeBounds<typename VertContainer::ValType::DistType>::isPlusInfty(vertTab[end].distance))
+        const typename VertContainer::ValType::DistType PlusInfty=
+            DefaultStructs:: template NumberTypeBounds<typename VertContainer::ValType::DistType>::plusInfty();
+
+        if (PlusInfty==vertTab[end].distance)
             return -1; // wierzcholek end jest nieosiagalny
 
         return ShortPathStructs::getOutPath(g,vertTab,iters,end);
@@ -164,6 +157,9 @@ class DijkstraPar : public ShortPathStructs {
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters,bool useHeap=false)
     {   assert(start && end);
+        const typename EdgeContainer::ValType::DistType PlusInfty=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
+
         typename EdgeContainer::ValType::DistType dist;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
@@ -171,7 +167,7 @@ class DijkstraPar : public ShortPathStructs {
         if (!useHeap) dist=distances(g,vertTab,edgeTab,start,end);
         else dist=distances2(g,vertTab,edgeTab,start,end);
 
-        if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isPlusInfty(dist))
+        if (PlusInfty==dist)
             return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-1); // end nieosiagalny
 
         int len=getPath(g,vertTab,end,iters);
@@ -216,7 +212,9 @@ class DijkstraPar : public ShortPathStructs {
 
             typename Container::ValType::DistType getDist(Key v)
             {
-                if (!hasKey(v)) return NumberTypeBounds<typename Container::ValType::DistType>::plusInfty();
+                if (!hasKey(v)) return
+                    DefaultStructs::template NumberTypeBounds<typename Container::ValType::DistType>
+                                    ::plusInfty();
                 else return (operator[](v)).distance;
             }
 
@@ -239,6 +237,11 @@ class DijkstraPar : public ShortPathStructs {
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {   assert(start);
+        const typename EdgeContainer::ValType::DistType Zero=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        const typename EdgeContainer::ValType::DistType PlusInfty=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
+
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
 
@@ -255,7 +258,7 @@ class DijkstraPar : public ShortPathStructs {
         typename GraphType::PVertex U,V;
 
         Q[start].vPrev=0;Q[start].ePrev=0;
-        Q.setDist(start,NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero());
+        Q.setDist(start,Zero);
 
         while(!Q.empty()){
             typename EdgeContainer::ValType::DistType d,nd;
@@ -271,13 +274,12 @@ class DijkstraPar : public ShortPathStructs {
                             { Q.setDist(V,nd); Q[V].ePrev=E; Q[V].vPrev=U; }
         }
 
-        return end ? NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty()
-                    : NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        return end ? PlusInfty : Zero;
     }
 
 };
 
-class Dijkstra : public DijkstraPar<WeightAlgsDefaultStructs> {};
+class Dijkstra : public DijkstraPar<AlgorithmsDefaultSettings> {};
 
 
 
@@ -301,7 +303,8 @@ class DAGCritPathPar : public ShortPathStructs {
         typename GraphType::PVertex vPrev;
         typename GraphType::PEdge  ePrev;
 
-        VertLabs() : vPrev(0), ePrev(0), distance(NumberTypeBounds<DType>::minusInfty()) {}
+        VertLabs() : vPrev(0), ePrev(0),
+                    distance(DefaultStructs:: template NumberTypeBounds<DType>::minusInfty()) {}
     };
 
 
@@ -313,7 +316,14 @@ class DAGCritPathPar : public ShortPathStructs {
         EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
-    {   assert(start);
+    {
+        const typename EdgeContainer::ValType::DistType Zero=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        const typename EdgeContainer::ValType::DistType PlusInfty=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
+        const typename EdgeContainer::ValType::DistType MinusInfty=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::minusInfty();
+
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
         typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
@@ -324,31 +334,45 @@ class DAGCritPathPar : public ShortPathStructs {
 
         typename GraphType::PVertex U,V;
         typename EdgeContainer::ValType::DistType nd;
+        int ibeg,iend;
 
-        vertTab[start].vPrev=0;vertTab[start].ePrev=0;
-        vertTab[start].distance=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
-        if (start==end) return NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        if (start)
+        {
+            vertTab[start].vPrev=0;vertTab[start].ePrev=0;
+            vertTab[start].distance=Zero;
+            if (start==end) return Zero;
+        }
 
-        typename DefaultStructs::template AssocCont<typename GraphType::PVertex, char >::Type followers;
+
+        typename DefaultStructs::template AssocCont<typename GraphType::PVertex, char >
+                ::Type followers(start ? g.getVertNo() : 0);
         typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
-        Koala::BFS::scanAttainable(g,start,assocInserter(followers,constFun<char>(0)),EdDirOut);
-        Koala::DAGAlgs::topOrd(makeSubgraph(g,std::make_pair(assocKeyChoose(followers),stdChoose(true))),tabV);
+        if (start)
+        {   Koala::BFS::scanAttainable(g,start,assocInserter(followers,constFun<char>(0)),EdDirOut);
+            Koala::DAGAlgs::topOrd(makeSubgraph(g,std::make_pair(assocKeyChoose(followers),stdChoose(true))),tabV);
+            ibeg=1;iend=followers.size();
+        } else
+        {   Koala::DAGAlgs::topOrd(g,tabV);
+            ibeg=0; iend=g.getVertNo();
+        }
 
-        for(int i=1;i<followers.size();i++) {
+
+        for(int i=ibeg;i<iend;i++) {
             U=tabV[i];
             vertTab[U].vPrev=0;vertTab[U].ePrev=0;
-            vertTab[U].distance=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::minusInfty();
+            vertTab[U].distance=(g.getEdgeNo(U,EdDirIn)) ? MinusInfty : Zero;
 
             for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirIn);
                 E;E=g.getEdgeNext(U,E,Koala::EdDirIn))
-                    if (followers.hasKey(V=g.getEdgeEnd(E,U)))
+                {   V=g.getEdgeEnd(E,U);
+                    if ((!start) || followers.hasKey(V))
                         if ((nd=vertTab[V].distance+edgeTab[E].length)>vertTab[U].distance)
                     { vertTab[U].distance=nd; vertTab[U].ePrev=E; vertTab[U].vPrev=V;  }
+                }
             if (U==end) return vertTab[U].distance;
         }
 
-        return end ? NumberTypeBounds<typename EdgeContainer::ValType::DistType>::minusInfty()
-                    : NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        return end ? MinusInfty : Zero;
     }
 
 
@@ -360,7 +384,8 @@ class DAGCritPathPar : public ShortPathStructs {
         typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(end);
-        if (NumberTypeBounds<typename VertContainer::ValType::DistType>::isMinusInfty(vertTab[end].distance))
+        if (DefaultStructs:: template NumberTypeBounds<typename VertContainer::ValType::DistType>
+                        ::isMinusInfty(vertTab[end].distance))
             return -1; // wierzcholek end jest nieosiagalny
 
         return ShortPathStructs::getOutPath(g,vertTab,iters,end);
@@ -385,13 +410,15 @@ class DAGCritPathPar : public ShortPathStructs {
         EdgeContainer& edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters)
-    {   assert(start && end);
+    {
+        const typename EdgeContainer::ValType::DistType MinusInfty=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::minusInfty();
+
         typename EdgeContainer::ValType::DistType dist;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
 
-        if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isMinusInfty(dist
-                                                            =critPathLength(g,vertTab,edgeTab,start,end)))
+        if (MinusInfty==(dist=critPathLength(g,vertTab,edgeTab,start,end)))
             return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-1); // end nieosiagalny
 
         int len=getPath(g,vertTab,end,iters);
@@ -401,7 +428,7 @@ class DAGCritPathPar : public ShortPathStructs {
 
 };
 
-class DAGCritPath : public DAGCritPathPar<WeightAlgsDefaultStructs> {};
+class DAGCritPath : public DAGCritPathPar<AlgorithmsDefaultSettings> {};
 
 
 
@@ -423,7 +450,8 @@ class BellmanFordPar : public ShortPathStructs {
         typename GraphType::PVertex vPrev;
         typename GraphType::PEdge  ePrev;
 
-        VertLabs() : vPrev(0), ePrev(0), distance(NumberTypeBounds<DType>::plusInfty()) {}
+        VertLabs() : vPrev(0), ePrev(0),
+                    distance(DefaultStructs:: template NumberTypeBounds<DType>::plusInfty()) {}
     };
 
     // wlasciwa procedura: odleglosc miedzy para wierzcholkow
@@ -446,12 +474,16 @@ class BellmanFordPar : public ShortPathStructs {
 
         typename GraphType::PVertex U,V;
 
-        typename EdgeContainer::ValType::DistType
-                inf=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty(),nd;
-        typename EdgeContainer::ValType::DistType
-                zero=NumberTypeBounds<typename EdgeContainer::ValType::DistType> ::zero();
-        typename EdgeContainer::ValType::DistType
-                minusInf=NumberTypeBounds<typename EdgeContainer::ValType::DistType> ::minusInfty();
+        const typename EdgeContainer::ValType::DistType
+                inf=DefaultStructs:: template NumberTypeBounds
+                                    <typename EdgeContainer::ValType::DistType>::plusInfty();
+        const typename EdgeContainer::ValType::DistType
+                zero=DefaultStructs:: template NumberTypeBounds
+                                        <typename EdgeContainer::ValType::DistType> ::zero();
+        const typename EdgeContainer::ValType::DistType
+                minusInf=DefaultStructs:: template NumberTypeBounds
+                                        <typename EdgeContainer::ValType::DistType> ::minusInfty();
+        typename EdgeContainer::ValType::DistType nd;
         bool existNegCycle = false;
 
 
@@ -479,27 +511,27 @@ class BellmanFordPar : public ShortPathStructs {
         for(int i=1;i<n;i++){
             //relaksacja krawedzi nieskierowanych
             for(typename GraphType::PEdge E=g.getEdge(Koala::EdUndir); E; E=g.getEdgeNext(E, Koala::EdUndir)){
-                if (vertTab[U=g.getEdgeEnds(E).first].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance)
+                if (vertTab[U=g.getEdgeEnd1(E)].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnd2(E)].distance)
                     { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
-                else if (vertTab[U=g.getEdgeEnds(E).second].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).first].distance)
+                else if (vertTab[U=g.getEdgeEnd2(E)].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnd1(E)].distance)
                     { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
             }
             //relaksacja krawedzi (u,v) skierowanych u->v
             for(typename GraphType::PEdge E=g.getEdge(Koala::EdDirOut); E; E=g.getEdgeNext(E, Koala::EdDirOut))
-                if (vertTab[U=g.getEdgeEnds(E).first].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance)
+                if (vertTab[U=g.getEdgeEnd1(E)].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnd2(E)].distance)
                     { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
         }
 
         //sprawdzenie czy nie ma cykli ujemnych
         for(typename GraphType::PEdge E=g.getEdge(Koala::EdUndir); E; E=g.getEdgeNext(E, Koala::EdUndir))
-            if (vertTab[U=g.getEdgeEnds(E).first].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance)
+            if (vertTab[U=g.getEdgeEnd1(E)].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnd2(E)].distance)
                 { existNegCycle=true; break; }
-            else if (vertTab[U=g.getEdgeEnds(E).second].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).first].distance)
+            else if (vertTab[U=g.getEdgeEnd2(E)].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnd1(E)].distance)
                 { existNegCycle=true; break; }
 
         if (!existNegCycle)
             for(typename GraphType::PEdge E=g.getEdge(Koala::EdDirOut); E; E=g.getEdgeNext(E, Koala::EdDirOut))
-                if (vertTab[U=g.getEdgeEnds(E).first].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnds(E).second].distance)
+                if (vertTab[U=g.getEdgeEnd1(E)].distance < inf && (nd=vertTab[U].distance+edgeTab[E].length) < vertTab[V=g.getEdgeEnd2(E)].distance)
                     { existNegCycle=true; break; }
 
         //jesli ponizsze ustawianie wszystkich odleglosci na minusInf pominac to dotychczasowe obliczenia zostana, trzeba zdecydowac:
@@ -526,9 +558,11 @@ class BellmanFordPar : public ShortPathStructs {
         typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(end);
-        if (NumberTypeBounds<typename VertContainer::ValType::DistType>::isPlusInfty(vertTab[end].distance))
+        if (DefaultStructs:: template NumberTypeBounds<typename VertContainer::ValType::DistType>
+                                                    ::isPlusInfty(vertTab[end].distance))
             return -1; // wierzcholek end jest nieosiagalny
-        else if (NumberTypeBounds<typename VertContainer::ValType::DistType>::isMinusInfty(vertTab[end].distance))
+        else if (DefaultStructs:: template NumberTypeBounds<typename VertContainer::ValType::DistType>
+                                                    ::isMinusInfty(vertTab[end].distance))
             return -2; // w grafie jest cykl ujemny
         return ShortPathStructs::getOutPath(g,vertTab,iters,end);
     }
@@ -557,10 +591,11 @@ class BellmanFordPar : public ShortPathStructs {
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
 
-        if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isPlusInfty(dist
-                                                            =distances(g,vertTab,edgeTab,start,end)))
+        if (DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType >
+                            ::isPlusInfty(dist=distances(g,vertTab,edgeTab,start,end)))
             return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-1); // end nieosiagalny
-        else if (NumberTypeBounds<typename EdgeContainer::ValType::DistType >::isMinusInfty(dist))
+        else if (DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType >
+                            ::isMinusInfty(dist))
             return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-2); // w grafie jest cykl ujemny
 
         int len=getPath(g,vertTab,end,iters);
@@ -570,11 +605,12 @@ class BellmanFordPar : public ShortPathStructs {
 
 };
 
-class BellmanFord : public BellmanFordPar<WeightAlgsDefaultStructs> {};
+class BellmanFord : public BellmanFordPar<AlgorithmsDefaultSettings> {};
 
 
 //algorytm liczy najkrotsza sciezke pomiedzy kazda para wierzcholków zostal zaproponowany przez Floyda i oparty na twierdzeniu Warshalla)
-class Floyd : public PathStructs {
+template <class DefaultStructs>
+class FloydPar : public PathStructs {
 
     template <class GraphType, class TwoDimVertContainer, class VIter, class EIter>
     static int
@@ -614,7 +650,8 @@ class Floyd : public PathStructs {
         typename GraphType::PVertex vPrev;
         typename GraphType::PEdge  ePrev;
 
-        VertLabs() : vPrev(0), ePrev(0), distance(NumberTypeBounds<DType>::plusInfty()) {}
+        VertLabs() : vPrev(0), ePrev(0),
+                    distance(DefaultStructs :: template NumberTypeBounds<DType>::plusInfty()) {}
     };
 
     // wlasciwa procedura: odleglosc miedzy para wierzcholkow
@@ -626,10 +663,12 @@ class Floyd : public PathStructs {
         EdgeContainer& edgeTab) // i tablica dlugosci krawedzi
     // i tak liczymy odleglosci pomiedzy wszystkimi parami
     {
-        typename EdgeContainer::ValType::DistType
-                inf=NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
-        typename EdgeContainer::ValType::DistType
-                zero=NumberTypeBounds<typename EdgeContainer::ValType::DistType> ::zero();
+        const typename EdgeContainer::ValType::DistType
+                inf=DefaultStructs:: template NumberTypeBounds
+                            <typename EdgeContainer::ValType::DistType>::plusInfty();
+        const typename EdgeContainer::ValType::DistType
+                zero=DefaultStructs:: template NumberTypeBounds
+                            <typename EdgeContainer::ValType::DistType> ::zero();
 //        typename EdgeContainer::ValType::DistType
 //                minusInf=NumberTypeBounds<typename EdgeContainer::ValType::DistType> ::minusInfty();
         bool existNegCycle = false; //jezeli existNegCycle jest ustawiona to w grafie istnieje cykl ujemny
@@ -646,14 +685,14 @@ class Floyd : public PathStructs {
 
         for(typename GraphType::PEdge E=g.getEdge(Koala::EdDirOut);
                         E;E=g.getEdgeNext(E,Koala::EdDirOut))
-        {   typename GraphType::PVertex U=E->getEnds().first, V=E->getEnds().second;
+        {   typename GraphType::PVertex U=g.getEdgeEnd1(E), V=g.getEdgeEnd2(E);
             if (edgeTab[E].length<vertMatrix(U,V).distance)
             { vertMatrix(U,V).distance=edgeTab[E].length; vertMatrix(U,V).ePrev=E; vertMatrix(U,V).vPrev=U; }
         }
 
         for(typename GraphType::PEdge E=g.getEdge(Koala::EdUndir);
                         E;E=g.getEdgeNext(E,Koala::EdUndir))
-        {   typename GraphType::PVertex U=E->getEnds().first, V=E->getEnds().second,X;
+        {   typename GraphType::PVertex U=g.getEdgeEnd1(E), V=g.getEdgeEnd2(E),X;
             if (edgeTab[E].length<vertMatrix(U,V).distance)
             { vertMatrix(U,V).distance=edgeTab[E].length; vertMatrix(U,V).ePrev=E; vertMatrix(U,V).vPrev=U; }
             X=U;U=V;V=X;
@@ -668,7 +707,7 @@ class Floyd : public PathStructs {
             for(typename GraphType::PVertex Vi=g.getVert();Vi;Vi=g.getVertNext(Vi))
             {
                  //if (vertMatrix(Vi,Vl).distance < inf) mozna tak albo tak jak ponizej
-                 if (!NumberTypeBounds<typename TwoDimVertContainer::ValType::DistType>::isPlusInfty(vertMatrix(Vi,Vl).distance))
+                 if (inf!=vertMatrix(Vi,Vl).distance)
                     for(typename GraphType::PVertex Vj=g.getVert();Vj;Vj=g.getVertNext(Vj))
                         if (vertMatrix(Vl,Vj).distance < inf && ((nd=vertMatrix(Vi,Vl).distance+vertMatrix(Vl,Vj).distance) < vertMatrix(Vi,Vj).distance))
                             { vertMatrix(Vi,Vj).distance=nd; vertMatrix(Vi,Vj).ePrev=vertMatrix(Vl,Vj).ePrev; vertMatrix(Vi,Vj).vPrev=vertMatrix(Vl,Vj).vPrev; }
@@ -695,11 +734,14 @@ class Floyd : public PathStructs {
         typename GraphType::PVertex end,
         PathStructs::OutPath<VIter,EIter> iters)
     {   assert(start && end);
-        if (NumberTypeBounds<typename TwoDimVertContainer::ValType::DistType>::isPlusInfty(vertMatrix(start,end).distance))
+        if (DefaultStructs:: template NumberTypeBounds<typename TwoDimVertContainer::ValType::DistType>
+                ::isPlusInfty(vertMatrix(start,end).distance))
             return -1; // wierzcholek end jest nieosiagalny
         return getOutPathFromMatrix(g,vertMatrix,iters,start,end);
     }
 };
+
+class Floyd : public FloydPar<AlgorithmsDefaultSettings> {};
 
 
 
@@ -748,7 +790,8 @@ class KruskalPar {
                     ::get(asets,localSets);
 
             Result<typename EdgeContainer::ValType::WeightType> res;
-            res.edgeNo=0; res.weight=NumberTypeBounds<typename EdgeContainer::ValType::WeightType>::zero();
+            res.edgeNo=0; res.weight=DefaultStructs:: template NumberTypeBounds
+                                    <typename EdgeContainer::ValType::WeightType>::zero();
 
             sets.clear(); sets.resize(g.getVertNo());
             if (g.getVertNo()==0) return res;
@@ -831,7 +874,7 @@ class KruskalPar {
 
 };
 
-class Kruskal : public KruskalPar<WeightAlgsDefaultStructs> {};
+class Kruskal : public KruskalPar<AlgorithmsDefaultSettings> {};
 
 }
 
