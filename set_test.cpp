@@ -6,10 +6,9 @@
 
 //#define KOALA_SET_ON_VECTOR
 
-#include "Koala/container/set.h"
-#include "Koala/container/assoctab.h"
-#include "Koala/container/joinsets.h"
 #include "Koala/base/def_struct.h"
+#include "Koala/container/joinsets.h"
+
 
 using namespace std;
 using namespace Koala;

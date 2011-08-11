@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
-#include "Koala/container/assoctab.h"
 #include "Koala/base/def_struct.h"
+#include "Koala/container/assoctab.h"
+
 using namespace std;
 using namespace Koala;
 

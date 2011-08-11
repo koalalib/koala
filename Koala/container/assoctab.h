@@ -6,6 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include "localarray.h"
 
 namespace Koala
@@ -45,6 +46,8 @@ template< class K, class V > class AssocTabInterface< std::map< K,V > >
         template< class Iterator > int getKeys( Iterator );
 
         std::map< K,V > &cont;
+        int capacity () { return std::numeric_limits<int>::max(); }
+        void reserve(int) {  }
 } ;
 
 
@@ -113,9 +116,9 @@ template< class T > class AssocTable
         template< class Iterator > int getKeys( Iterator );
 
         // nieobowiazkowe, moze byc nieobslugiwane przez niektore kontenery
-        int capacity () { return cont.capacity(); }
-        void reserve(int n) { cont.reserve(n); }
-        AssocTable(int n): cont(n), inter( cont ) { }
+        int capacity () { return inter.capacity(); }
+        void reserve(int n) { inter.reserve(n); }
+        AssocTable(int n): cont(), inter( cont ) { inter.reserve(n); }
 
     private:
         AssocTabInterface< T > inter;

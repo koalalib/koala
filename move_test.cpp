@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
-#include "Koala/container/assoctab.h"
-#include "Koala/graph/graph.h"
 #include "Koala/base/def_struct.h"
+#include "Koala/graph/graph.h"
+
 
 using namespace std;
 using namespace Koala;
@@ -51,7 +51,7 @@ int main() {
     g1.addLoop(A,InfoE1(0,"A2"));
 
 //    g1.del(ee);
-    g1.delAdjMatrix();
+//    g1.delAdjMatrix();
 
     EdgeDirection mask=0;
     mask|=EdDirIn;

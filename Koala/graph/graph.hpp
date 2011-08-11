@@ -9,7 +9,7 @@ SubgraphBase::SubgraphBase( const SubgraphBase &x ):
     link( x.parent );
 }
 
-inline SubgraphBase &SubgraphBase::operator=( const SubgraphBase &x )
+SubgraphBase &SubgraphBase::operator=( const SubgraphBase &x )
 {
     if (&x != this) link( x.parent );
     return *this;
@@ -97,13 +97,13 @@ Graph< VertInfo,EdgeInfo,EdAllow >::~Graph()
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::getVertNo() const
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::getVertNo() const
 {
     return this->no_vert;
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNo( EdgeDirection direct ) const
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNo( EdgeDirection direct ) const
 {
     int ans = 0;
     if (direct & EdLoop) ans += this->no_loop_edge;
@@ -138,7 +138,7 @@ void Graph< VertInfo,EdgeInfo,EdAllow >::clear()
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
 void Graph< VertInfo,EdgeInfo,EdAllow >::clearEdges()
 {
-    if (pAdj) pAdj->dirs.clear();
+    if (pAdj) pAdj->clear();
     PEdge cur_edge = first_edge;
     while (cur_edge)
     {
@@ -172,7 +172,7 @@ void Graph< VertInfo,EdgeInfo,EdAllow >::clearEdges()
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::addVert( const VertInfo &infoExt )
 {
     PVertex tmp_vert = new Vertex( infoExt );
@@ -202,40 +202,40 @@ void Graph< VertInfo,EdgeInfo,EdAllow >::delVert( PVertex vert, bool force )
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-void Graph< VertInfo,EdgeInfo,EdAllow >::del( PVertex vert, bool force )
+inline void Graph< VertInfo,EdgeInfo,EdAllow >::del( PVertex vert, bool force )
 {
     this->delVert( vert,force );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::VertInfoType
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::VertInfoType
 Graph< VertInfo,EdgeInfo,EdAllow >::getVertInfo( PVertex vert ) const
 {
     return vert->getInfo();
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-void Graph< VertInfo,EdgeInfo,EdAllow >::setVertInfo( PVertex vert, const VertInfo &info ) const
+inline void Graph< VertInfo,EdgeInfo,EdAllow >::setVertInfo( PVertex vert, const VertInfo &info ) const
 {
     vert->setInfo( info );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::getVert() const
 {
     return this->first_vert;
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::getVertLast() const
 {
     return this->last_vert;
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::getVertNext( PVertex vert ) const
 {
     if (!vert) return this->first_vert;
@@ -243,7 +243,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getVertNext( PVertex vert ) const
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::getVertPrev( PVertex vert ) const
 {
     if (!vert) return this->last_vert;
@@ -280,7 +280,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::getVerts( OutputIterator out ) const
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::addEdge(
     PVertex vert1, PVertex vert2, EdgeDirection direct )
 {
@@ -294,7 +294,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::addEdge(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::addEdge(
     PVertex vert1, PVertex vert2, const EdgeInfo &infoExt, EdgeDirection direct )
 {
@@ -308,7 +308,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::addEdge(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::addArch(
     PVertex v_out, PVertex v_in, const EdgeInfo &infoExt )
 {
@@ -322,7 +322,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::addArch(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::addLoop( PVertex vert, const EdgeInfo &infoExt )
 {
     PEdge tmp_edge = new Edge( infoExt );
@@ -335,32 +335,32 @@ Graph< VertInfo,EdgeInfo,EdAllow >::addLoop( PVertex vert, const EdgeInfo &infoE
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::EdgeInfoType
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::EdgeInfoType
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeInfo( PEdge edge ) const
 {
     return edge->getInfo();
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-void Graph< VertInfo,EdgeInfo,EdAllow >::setEdgeInfo( PEdge edge, const EdgeInfo& info ) const
+inline void Graph< VertInfo,EdgeInfo,EdAllow >::setEdgeInfo( PEdge edge, const EdgeInfo& info ) const
 {
     edge->setInfo( info );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-void Graph< VertInfo,EdgeInfo,EdAllow >::del( PEdge edge )
+inline void Graph< VertInfo,EdgeInfo,EdAllow >::del( PEdge edge )
 {
     if (detach( edge )) delete edge;
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-void Graph< VertInfo,EdgeInfo,EdAllow >::delEdge( PEdge edge )
+inline void Graph< VertInfo,EdgeInfo,EdAllow >::delEdge( PEdge edge )
 {
     this->del( edge );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdge( EdgeDirection direct ) const
 {
     PEdge edge = this->first_edge;
@@ -369,7 +369,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdge( EdgeDirection direct ) const
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeLast( EdgeDirection direct ) const
 {
     PEdge tmp_edge = this->last_edge;
@@ -378,7 +378,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeLast( EdgeDirection direct ) const
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNext(
     PEdge edge, EdgeDirection direct ) const
 {
@@ -388,7 +388,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNext(
 }
 
 template< class VertInfo,class EdgeInfo , EdgeType EdAllow>
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdgePrev( PEdge edge, EdgeDirection direct ) const
 {
     PEdge tmp_edge = edge ? edge->prev : this->last_edge;
@@ -428,26 +428,26 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::getEdges( OutputIterator out, EdgeDirect
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-EdgeType Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeType( PEdge edge ) const
+inline EdgeType Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeType( PEdge edge ) const
 {
     return edge->getType();
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-EdgeType Graph< VertInfo,EdgeInfo,EdAllow >::getType( PEdge edge ) const
+inline EdgeType Graph< VertInfo,EdgeInfo,EdAllow >::getType( PEdge edge ) const
 {
     return edge->getType();
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdge( PVertex vert, EdgeDirection direct ) const
 {
     return getEdgeNext( vert,NULL,direct );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeLast( PVertex vert, EdgeDirection direct ) const
 {
     return getEdgePrev( vert,NULL,direct );
@@ -549,7 +549,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::getEdges(
 }
 
 template< class VertInfo,class EdgeInfo , EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNo( PVertex vert, EdgeDirection direct ) const
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNo( PVertex vert, EdgeDirection direct ) const
 {
     int ans = 0;
     if (direct & EdLoop)
@@ -564,7 +564,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNo( PVertex vert, EdgeDirection d
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdge(
     PVertex vert1, PVertex vert2, EdgeDirection direct ) const
 {
@@ -572,7 +572,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdge(
 }
 
 template< class VertInfo,class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeLast(
     PVertex vert1, PVertex vert2, EdgeDirection direct ) const
 {
@@ -601,7 +601,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNext(
     }
     if (pAdj)
     {
-        Parals* p;
+        AdjMatrixParals<VertInfo,EdgeInfo,EdAllow>* p;
         EdgeDirection type = getEdgeDir( edge,vert1 );
         EdgeDirection nexttype = (type == EdNone) ? EdLoop : type << 1;
         typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge res;
@@ -614,7 +614,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNext(
             case EdUndir:
                 if (direct & EdUndir)
                 {
-                    p = pAdj->undirs.presentValPtr( vert1,vert2 );
+                    p = pAdj->undirspresentValPtr( vert1,vert2 );
                     if (!p) res = 0;
                     else res = p->first;
                 }
@@ -622,7 +622,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNext(
             case EdDirIn:
                 if (direct & EdDirIn)
                 {
-                    p = pAdj->dirs.presentValPtr( vert2,vert1 );
+                    p = pAdj->dirspresentValPtr( vert2,vert1 );
                     if (!p) res = 0;
                     else res = p->first;
                 }
@@ -630,7 +630,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNext(
             case EdDirOut:
                 if (direct & EdDirOut)
                 {
-                    p = pAdj->dirs.presentValPtr( vert1,vert2 );
+                    p = pAdj->dirspresentValPtr( vert1,vert2 );
                     if (!p) res = 0;
                     else res = p->first;
                 }
@@ -666,7 +666,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgePrev(
     }
     if (pAdj)
     {
-        Parals* p;
+        AdjMatrixParals<VertInfo,EdgeInfo,EdAllow>* p;
         EdgeDirection type = getEdgeDir( edge,vert1 );
         EdgeDirection nexttype = (type == EdNone) ? EdDirOut : type >> 1;
         typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge res;
@@ -677,7 +677,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgePrev(
             case EdDirOut:
                 if (direct & EdDirOut)
                 {
-                    p = pAdj->dirs.presentValPtr( vert1,vert2 );
+                    p = pAdj->dirspresentValPtr( vert1,vert2 );
                     if (!p) res = 0;
                     else res = p->last;
                 }
@@ -685,7 +685,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgePrev(
             case EdDirIn:
                 if (direct & EdDirIn)
                 {
-                    p = pAdj->dirs.presentValPtr( vert2,vert1 );
+                    p = pAdj->dirspresentValPtr( vert2,vert1 );
                     if (!p) res = 0;
                     else res = p->last;
                 }
@@ -693,7 +693,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgePrev(
             case EdUndir:
                 if (direct & EdUndir)
                 {
-                    p = pAdj->undirs.presentValPtr( vert1,vert2 );
+                    p = pAdj->undirspresentValPtr( vert1,vert2 );
                     if (!p) res = 0;
                     else res = p->last;
                 }
@@ -752,9 +752,9 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNo(
         if (direct & EdLoop) direct &= ~EdLoop;
     if (!direct) return 0;
     if (pAdj)
-        return ((direct & EdDirIn) ? pAdj->dirs( vert2,vert1 ).degree : 0) +
-               ((direct & EdDirOut) ? pAdj->dirs( vert1,vert2 ).degree : 0) +
-               ((direct & EdUndir) ? pAdj->undirs( vert2,vert1 ).degree : 0);
+        return ((direct & EdDirIn) ? pAdj->vald( vert2,vert1 ).degree : 0) +
+               ((direct & EdDirOut) ? pAdj->vald( vert1,vert2 ).degree : 0) +
+               ((direct & EdUndir) ? pAdj->valund( vert2,vert1 ).degree : 0);
     int ans = 0;
     PEdge tmp_edge = getEdge( vert1,vert2,direct );
     while (tmp_edge)
@@ -779,7 +779,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getAdj(Cont& cont) const
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-std::pair< typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex,
+inline std::pair< typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex,
     typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex >
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeEnds( PEdge edge ) const
 {
@@ -787,7 +787,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeEnds( PEdge edge ) const
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-std::pair< typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex,
+inline std::pair< typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex,
     typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex >
 Graph< VertInfo,EdgeInfo,EdAllow >::getEnds( PEdge edge ) const
 {
@@ -795,47 +795,47 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEnds( PEdge edge ) const
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeEnd1( PEdge edge ) const
 {
     return edge->getEnd1();
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeEnd2( PEdge edge ) const
 {
     return edge->getEnd2();
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-bool Graph< VertInfo,EdgeInfo,EdAllow >::isEdgeEnd( PEdge edge, PVertex vert ) const
+inline bool Graph< VertInfo,EdgeInfo,EdAllow >::isEdgeEnd( PEdge edge, PVertex vert ) const
 {
     return edge->isEnd(vert);
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-bool Graph< VertInfo,EdgeInfo,EdAllow >::isEnd( PEdge edge, PVertex vert ) const
+inline bool Graph< VertInfo,EdgeInfo,EdAllow >::isEnd( PEdge edge, PVertex vert ) const
 {
     return edge->isEnd(vert);
 }
 
 template< class VertInfo,class EdgeInfo , EdgeType EdAllow>
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeEnd( PEdge edge, PVertex vert ) const
 {
     return edge->getEnd(vert);
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::getEnd( PEdge edge, PVertex vert ) const
 {
     return edge->getEnd(vert);
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-EdgeDirection Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeDir( PEdge edge, PVertex vert ) const
+inline EdgeDirection Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeDir( PEdge edge, PVertex vert ) const
 {
     if (!edge) return EdNone; else return edge->getDir(vert);
 }
@@ -880,7 +880,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::getNeigh(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::getNeighNo( PVertex vert, EdgeDirection direct ) const
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::getNeighNo( PVertex vert, EdgeDirection direct ) const
 {
     return getNeigh( blackHole,vert,direct );
 }
@@ -921,7 +921,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::getClNeigh(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::getClNeighNo( PVertex vert, EdgeDirection direct ) const
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::getClNeighNo( PVertex vert, EdgeDirection direct ) const
 {
     return getClNeigh( blackHole,vert,direct );
 }
@@ -974,13 +974,13 @@ Graph< VertInfo,EdgeInfo,EdAllow >::maxDeg( EdgeDirection direct ) const
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::Delta( EdgeDirection direct ) const
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::Delta( EdgeDirection direct ) const
 {
     return std::max( 0,maxDeg( direct ).second );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delta( EdgeDirection direct ) const
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::delta( EdgeDirection direct ) const
 {
     return std::max( 0,minDeg( direct ).second );
 }
@@ -1059,7 +1059,7 @@ bool Graph< VertInfo,EdgeInfo,EdAllow >::chEdgeType( PEdge edge, EdgeType type )
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-bool Graph< VertInfo,EdgeInfo,EdAllow >::revertEdge( PEdge edge )
+inline bool Graph< VertInfo,EdgeInfo,EdAllow >::revertEdge( PEdge edge )
 {
     if (edge->type == Directed)
     {
@@ -1072,7 +1072,7 @@ bool Graph< VertInfo,EdgeInfo,EdAllow >::revertEdge( PEdge edge )
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::moveEdge(
     PEdge edge, PVertex vert1, PVertex vert2, EdgeDirection direct )
 {
@@ -1080,7 +1080,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::moveEdge(
 }
 
 template< class VertInfo,class EdgeInfo , EdgeType EdAllow>
-int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts()
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts()
 {
     int res = getVertNo();
     clear();
@@ -1115,7 +1115,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts2( Iterator begin, Iterator end 
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts(
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex> &s )
 {
     return delVerts2( s.begin(),s.end() );
@@ -1200,7 +1200,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges2(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge > &s, EdgeDirection direct )
 {
     return delEdges2( s.begin(),s.end(),direct );
@@ -1240,7 +1240,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges2(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
     PVertex vert, const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> &s,
     EdgeDirection direct )
 {
@@ -1285,7 +1285,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges2(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph<VertInfo,EdgeInfo,EdAllow>::delEdges(
+inline int Graph<VertInfo,EdgeInfo,EdAllow>::delEdges(
     PVertex vert1, PVertex vert2,
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> &s, EdgeDirection direct )
 {
@@ -1320,7 +1320,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::chEdgesType2(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::chEdgesType(
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::chEdgesType(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> &s, EdgeType type)
 {
     return chEdgesType2( s.begin(),s.end(), type );
@@ -1363,7 +1363,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::ch2Archs( PEdge edge )
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template < class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::ch2Archs( Iterator begin,Iterator end )
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::ch2Archs( Iterator begin,Iterator end )
 {
     int res = 0;
     for( Iterator iter = begin; iter != end; iter++ )
@@ -1372,7 +1372,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::ch2Archs( Iterator begin,Iterator end )
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::ch2Archs(
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::ch2Archs(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> &s )
 {
     return ch2Archs( s.begin(),s.end() );
@@ -1440,7 +1440,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delParals2(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> &s, PEdge edge, EdgeDirection reltype)
 {
     return delParals2( s.begin(),s.end(), edge, reltype );
@@ -1486,7 +1486,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(PVertex vert, EdgeDirection re
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(PVertex vert, EdgeDirection reltype)
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(PVertex vert, EdgeDirection reltype)
 {
     typename GraphClassDefaultSettings:: template VertAssocCont
             <typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex,Parals2>
@@ -1527,7 +1527,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(PVertex vert1,PVertex vert2, E
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(EdgeDirection reltype)
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(EdgeDirection reltype)
 {
     int licz=0;
     typename GraphClassDefaultSettings:: template VertAssocCont
@@ -1557,14 +1557,14 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::getParals(  OutputIterator iter, PEdge e
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::mu( PEdge edge, EdgeDirection reltype) const
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::mu( PEdge edge, EdgeDirection reltype) const
 {
     if (!(edge && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir))) return 0;
     return getParals(blackHole,edge,reltype)+1;
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-int Graph< VertInfo,EdgeInfo,EdAllow >::mu( EdgeDirection reltype) const
+inline int Graph< VertInfo,EdgeInfo,EdAllow >::mu( EdgeDirection reltype) const
 {
     return maxMu(reltype).second;
 }
@@ -1639,7 +1639,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::pickVert( PVertex vert, const EdgeInfo & inf
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::glue( PVertex vert1, PVertex vert2, bool makeloops )
 {
     if (!vert1) return vert2;
@@ -1710,7 +1710,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::glue2(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::glue(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex> &s,
     bool makeloops, PVertex res )
@@ -1724,7 +1724,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::move( Graph< VertInfo,EdgeInfo,EdAllow > &gr
 {
     if (&graph == this) return 0;
     typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex res = getVertLast();
-    if (graph.pAdj) graph.pAdj->dirs.clear();
+    if (graph.pAdj) graph.pAdj->clear();
     if (pAdj) {
         typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge e = graph.first_edge;
         for( ; e; e = e->next) pAdj->add( e );
@@ -1944,20 +1944,20 @@ template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
 bool Graph< VertInfo,EdgeInfo,EdAllow >::makeAdjMatrix()
 {   if ((EdAllow&AdjMatrixAllowed)==0) return false;
     if (pAdj) return false;
-    pAdj = new AdjMatrix( this->no_vert );
+    pAdj = new AdjMatrix< VertInfo,EdgeInfo,EdAllow,AdjMatrixAllowed & EdAllow >( this->no_vert );
     typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge edge = first_edge;
     for( ; edge; edge = edge->next ) pAdj->add( edge );
     return true;
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-bool Graph< VertInfo,EdgeInfo,EdAllow >::hasAdjMatrix() const
+inline bool Graph< VertInfo,EdgeInfo,EdAllow >::hasAdjMatrix() const
 {
     return pAdj;
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-bool Graph< VertInfo,EdgeInfo,EdAllow >::delAdjMatrix()
+inline bool Graph< VertInfo,EdgeInfo,EdAllow >::delAdjMatrix()
 {
     if (!pAdj) return false;
     delete pAdj;
@@ -1966,7 +1966,7 @@ bool Graph< VertInfo,EdgeInfo,EdAllow >::delAdjMatrix()
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-bool Graph< VertInfo,EdgeInfo,EdAllow >::defragAdjMatrix()
+inline bool Graph< VertInfo,EdgeInfo,EdAllow >::defragAdjMatrix()
 {
     if (!pAdj) return false;
     pAdj->defrag();
@@ -1974,7 +1974,7 @@ bool Graph< VertInfo,EdgeInfo,EdAllow >::defragAdjMatrix()
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::attach( PVertex vert )
 {
     if (!vert) return NULL;
@@ -1996,7 +1996,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::attach( PVertex vert )
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::detach( PVertex vert )
 {
     if (!vert) return NULL;
@@ -2016,7 +2016,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::detach( PVertex vert )
 }
 
 template< class VertInfo,class EdgeInfo, EdgeType EdAllow >
-typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
+inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge
 Graph< VertInfo,EdgeInfo,EdAllow >::attach(
     PEdge edge, PVertex vert1, PVertex vert2, EdgeDirection direct )
 {
@@ -2223,7 +2223,8 @@ Graph< VertInfo,EdgeInfo,EdAllow >::detach( PEdge edge )
             --no_dir_edge;
             if (pAdj)
             {
-                Parals &pole = pAdj->dirs( edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].vert,
+                AdjMatrixParals<VertInfo,EdgeInfo,EdAllow> &pole
+                                    = pAdj->vald( edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].vert,
                                     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].vert );
                 if (edge->nParal()) edge->nParal()->pParal() = edge->pParal();
                 else pole.last = edge->pParal();
@@ -2286,7 +2287,8 @@ Graph< VertInfo,EdgeInfo,EdAllow >::detach( PEdge edge )
             --no_undir_edge;
             if (pAdj)
             {
-                Parals &pole = pAdj->undirs( edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].vert,
+                AdjMatrixParals<VertInfo,EdgeInfo,EdAllow> &pole
+                                    = pAdj->valund( edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].vert,
                                    edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_U].vert );
                 if (edge->nParal()) edge->nParal()->pParal() = edge->pParal();
                 else pole.last = edge->pParal();

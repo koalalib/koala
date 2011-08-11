@@ -30,7 +30,7 @@ Koala::Graph<OpisV,OpisE,Allow>::PEdge tabE[10];
 
 int main() {
 
-//    g.makeAdjMatrix();
+    g.makeAdjMatrix();
 
     A=g.addVert(OpisV("A"));B=g.addVert(OpisV("B"));C=g.addVert(OpisV("C"));
     D=g.addVert(OpisV("D"));E=g.addVert(OpisV("E"));F=g.addVert(OpisV("F"));

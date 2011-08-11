@@ -1,3 +1,4 @@
+
 template< typename Element > inline
      Set< Element >::Set( const Set< Element > &s ):
         std::vector< Element >( s ) { }
@@ -282,19 +283,19 @@ template< typename Element >
 
 template< typename Element > inline
     Element Set< Element >::first() const
-    {
+    {   if (size()==0) return (Element)0;
         return *begin();
     }
 
 template< typename Element > inline
    Element Set< Element >::last() const
-   {
+   {   if (size()==0) return (Element)0;
        return *std::vector< Element >::rbegin();
    }
 
 template< typename Element > inline
     Element Set< Element >::prev( const Element &e ) const
-    {
+    {   if (!a) return last();
         unsigned l = 0, r = size() - 1;
         while (l <= r && r < size()) {
             unsigned c = (l + r) >> 1;
@@ -307,7 +308,7 @@ template< typename Element > inline
 
 template< typename Element > inline
     Element Set< Element >::next( const Element &e ) const
-    {
+    {   if (!a) return first();
         unsigned l = 0, r = size() - 1;
         while (l <= r && r < size()) {
             unsigned c = (l + r) >> 1;
