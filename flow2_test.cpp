@@ -2,8 +2,7 @@
 #include <string>
 #include <cstdio>
 #include "Koala/graph/graph.h"
-#include "Koala/algorithm/conflows.h"
-#include "Koala/algorithm/conflows.h"
+#include "Koala/algorithm/conflow.h"
 #include "Koala/io/text.h"
 
 using namespace std;
