@@ -57,7 +57,7 @@ class Edge : public EdgeConst,
 {
 	friend class Graph<VertInfo, EdgeInfo,EdAllow>;
 	friend class Vertex<VertInfo, EdgeInfo,EdAllow>;
-	friend  class Graph<VertInfo, EdgeInfo,EdAllow>::AdjMatrix;
+	friend  class AdjMatrix<VertInfo, EdgeInfo,EdAllow,AdjMatrixAllowed&EdAllow>;
 
 public:
 

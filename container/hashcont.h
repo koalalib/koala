@@ -7,6 +7,7 @@
 #include<utility>
 #include<iterator>
 #include <cassert>
+#include <limits>
 
 #ifndef __GNUC__
 typedef unsigned __int64	uint64_t;
@@ -816,6 +817,10 @@ template< class K, class V> class AssocTabInterface< BiDiHashMap< K,V > >
         void clear() { cont.clear(); }
         template< class Iterator > int getKeys( Iterator );
 
+        int capacity () { return std::numeric_limits<int>::max(); }
+        void reserve(int) {  }
+
+
         BiDiHashMap< K,V > &cont;
 } ;
 
@@ -847,6 +852,7 @@ K AssocTabInterface< BiDiHashMap< K,V > >::lastKey()
 template< class K, class V >
 K AssocTabInterface< BiDiHashMap< K,V > >::prevKey( K arg )
 {
+    if (!arg) return lastKey();
     typename BiDiHashMap< K,V >::iterator pos = cont.find( arg );
     assert( pos != cont.end() );
     if (pos == cont.begin()) return (K)0;
@@ -857,6 +863,7 @@ K AssocTabInterface< BiDiHashMap< K,V > >::prevKey( K arg )
 template< class K, class V >
 K AssocTabInterface< BiDiHashMap< K,V > >::nextKey( K arg )
 {
+    if (!arg) return firstKey();
     typename BiDiHashMap< K,V >::iterator pos = cont.find( arg );
     assert( pos != cont.end() );
     pos++;

@@ -219,21 +219,21 @@ template< typename Element > template< class Iter >
 
 template< typename Element >
     Element Set< Element >::first() const
-    {
-        assert( this->size() );
+    {   if (this->size()==0) return (Element)0;
+//        assert( this->size() );
         return *this->begin();
     }
 
 template< typename Element >
     Element Set< Element >::last() const
-    {
-        assert( this->size() );
+    {   if (this->size()==0) return (Element)0;
+//        assert( this->size() );
         return *(--this->end());
     }
 
 template< typename Element >
     Element Set< Element >::next( const Element &a ) const
-    {
+    {   if (!a) return first();
         typename std::set< Element >::iterator i = this->find( a );
         assert( i != this->end() );
         i++;
@@ -243,7 +243,7 @@ template< typename Element >
 
 template< typename Element >
     Element Set< Element >::prev( const Element &a ) const
-    {
+    {   if (!a) return last();
         typename std::set< Element >::iterator i = this->find( a );
         assert( i != this->end() && i != this->begin() );
         i--;

@@ -29,6 +29,7 @@ K AssocTabInterface< std::map< K,V > >::lastKey()
 template< class K, class V >
 K AssocTabInterface< std::map< K,V > >::prevKey( K arg )
 {
+    if (!arg) return lastKey();
     typename std::map< K,V >::iterator pos = cont.find( arg );
     assert( pos != cont.end() );
     if (pos == cont.begin()) return (K)0;
@@ -39,6 +40,7 @@ K AssocTabInterface< std::map< K,V > >::prevKey( K arg )
 template< class K, class V >
 K AssocTabInterface< std::map< K,V > >::nextKey( K arg )
 {
+    if (!arg) return firstKey();
     typename std::map< K,V >::iterator pos = cont.find( arg );
     assert( pos != cont.end() );
     pos++;
