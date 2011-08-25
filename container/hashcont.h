@@ -16,6 +16,7 @@ typedef unsigned __int32	uint32_t;
 
 namespace Koala {
 
+
 #ifdef HASHSETDEBUG
 #define COLLISION()		collisions++;
 #else
@@ -89,6 +90,8 @@ public:
 
 	HashSet_const_iterator &operator++()			{ advance(); return *this; };
 	HashSet_const_iterator operator++(int)			{ HashSet_const_iterator rv(*this); advance(); return rv; };
+	HashSet_const_iterator &operator--()			{ recede(); return *this; };
+	HashSet_const_iterator operator--(int)			{ HashSet_const_iterator rv(*this); recede(); return rv; };
 	HashSet_const_iterator &operator =(const HashSet_const_iterator<KeyType, HashFunction, Allocator> &it)	{ m_slot = it.m_slot; m_cur = it.m_cur; return *this; };
 
 	bool operator ==(const HashSet_const_iterator<KeyType, HashFunction, Allocator> &it)	{ return m_slot == it.m_slot && m_cur == it.m_cur; };
@@ -96,6 +99,7 @@ public:
 private:
 	HashSet_const_iterator(HSNode<KeyType> *slot)			{ m_slot = m_cur = slot; advance_if_needed(); };
 	HashSet_const_iterator(HSNode<KeyType> *slot, bool)		{ m_slot = m_cur = slot; };
+	HashSet_const_iterator(HSNode<KeyType> *slot, HSNode<KeyType> *cur)	{ m_slot = slot; m_cur = cur; };
 
 	void advance_if_needed() {
 		if(m_cur->next == HASHSETEMPTYPTR) advance();
@@ -109,6 +113,20 @@ private:
 		} else m_cur = m_cur->next;
 		};
 
+	void recede() {
+		if(m_cur == m_slot) {
+			m_slot--;
+			while(m_slot->next == HASHSETEMPTYPTR) m_slot--;
+			m_cur = m_slot;
+			if(m_slot->next == HASHSETSENTRYPTR) return;
+			while(m_cur->next >= HASHSETVALIDPTR) m_cur = m_cur->next;
+		} else {
+			HSNode<KeyType> *p = m_slot;
+			while(p->next != m_cur) p = p->next;
+			m_cur = p;
+			};
+		};
+
 	HSNode<KeyType> *m_slot, *m_cur;
 	friend class HashSet<KeyType, HashFunction, Allocator>;
 	};
@@ -118,7 +136,7 @@ private:
  * default hash functions
  */
 template<class KeyType>
-class DefaultHashFun	{};
+class DefaultHashFunction	{};
 
 
 /*
@@ -166,19 +184,19 @@ public:
 		};
 	};
 
-template<> class DefaultHashFun<int>: public Int32Hash<int>			{ };
-template<> class DefaultHashFun<long>: public Int32Hash<long>			{ };
-template<> class DefaultHashFun<short>: public Int32Hash<short>			{ };
-template<> class DefaultHashFun<unsigned int>: public Int32Hash<unsigned int>	{ };
-template<> class DefaultHashFun<unsigned long>: public Int32Hash<unsigned long>	{ };
-template<> class DefaultHashFun<unsigned short>: public Int32Hash<unsigned short>	{ };
-template<class T> class DefaultHashFun<T *>: public Int32Hash<T *>		{ };
+template<> class DefaultHashFunction<int>: public Int32Hash<int>			{ };
+template<> class DefaultHashFunction<long>: public Int32Hash<long>			{ };
+template<> class DefaultHashFunction<short>: public Int32Hash<short>			{ };
+template<> class DefaultHashFunction<unsigned int>: public Int32Hash<unsigned int>	{ };
+template<> class DefaultHashFunction<unsigned long>: public Int32Hash<unsigned long>	{ };
+template<> class DefaultHashFunction<unsigned short>: public Int32Hash<unsigned short>	{ };
+template<class T> class DefaultHashFunction<T *>: public Int32Hash<T *>		{ };
 
-template<> class DefaultHashFun<char *>: public CStringHash<char>			{ };
-template<> class DefaultHashFun<const char *>: public CStringHash<char>		{ };
-template<> class DefaultHashFun<wchar_t *>: public CStringHash<wchar_t>		{ };
-template<> class DefaultHashFun<const wchar_t *>: public CStringHash<wchar_t>	{ };
-template<> class DefaultHashFun<std::string>: public StringHash			{ };
+template<> class DefaultHashFunction<char *>: public CStringHash<char>			{ };
+template<> class DefaultHashFunction<const char *>: public CStringHash<char>		{ };
+template<> class DefaultHashFunction<wchar_t *>: public CStringHash<wchar_t>		{ };
+template<> class DefaultHashFunction<const wchar_t *>: public CStringHash<wchar_t>	{ };
+template<> class DefaultHashFunction<std::string>: public StringHash			{ };
 
 
 /*
@@ -189,7 +207,7 @@ template<> class DefaultHashFun<std::string>: public StringHash			{ };
  * 	   or size_t operator()(KeyType key, size_t m) const
  */
 template<class KeyType,
-	 class HashFunction = DefaultHashFun<KeyType>,
+	 class HashFunction = DefaultHashFunction<KeyType>,
 	 class Allocator = HashDefaultCPPAllocator>
 class HashSet {
 public:
@@ -207,11 +225,12 @@ public:
 	typedef HashSet_const_iterator<KeyType, HashFunction, Allocator> const_iterator;
 
 public:
-	HashSet(): m_table(NULL), m_tables(NULL)	{ };
-	HashSet(size_t size)				{ initialize(size); };
-	HashSet(const HashSet &t) 			{ initialize(t.m_size); *this = t; };
+	HashSet(): m_table(NULL), m_tables(NULL), m_count(0), m_size(0)	{ };
+	HashSet(size_t size): m_count(0), m_size(0)			{ initialize(size); };
+	HashSet(const HashSet &t): m_count(0), m_size(0) 		{ initialize(t.m_size); *this = t; };
 	template<class HF, class Alloc>
-	HashSet(const HashSet<KeyType, HF, Alloc> &t) 	{ initialize(t.m_size); *this = t; };
+	HashSet(const HashSet<KeyType, HF, Alloc> &t): m_count(0), m_size(0)
+									{ initialize(t.m_size); *this = t; };
 
 	~HashSet()					{ free(true); };
 
@@ -247,9 +266,17 @@ public:
 	const_iterator find(const KeyType &key) const		{ return const_iterator(Find(key)); };
 	std::pair<iterator, bool> insert(const KeyType &key)	{ return find_or_insert(key); };
 
+
 	void resize(size_t size) {
-		free(true);
-		initialize(size);
+		if(size == m_size) return;
+		if(!empty()) {
+			HashSet<KeyType, HashFunction, Allocator> other(size);
+			other = *this;
+			this->swap(other);
+		} else {
+			free(true);
+			initialize(size);
+			};
 		};
 
 
@@ -257,6 +284,17 @@ public:
 		free(false);
 		m_count = 0;
 		m_firstFree = NULL;
+		};
+
+
+	void swap(HashSet &other) {
+		std::swap(m_table, other.m_table);
+		std::swap(m_count, other.m_count);
+		std::swap(m_size, other.m_size);
+		std::swap(m_firstFree, other.m_firstFree);
+		std::swap(m_tables, other.m_tables);
+		std::swap(m_overflowFirst, other.m_overflowFirst);
+		std::swap(m_overflowSize, other.m_overflowSize);
 		};
 
 
@@ -287,6 +325,7 @@ public:
 		m_count++;
 		return std::make_pair(iterator(p), true);
 		};
+
 
 	bool contains(const KeyType &key) const {
 		HSNode<KeyType> *c;
@@ -340,6 +379,7 @@ public:
 		erase(pos.m_cur->key);
 		};
 
+
 private:
 	HSNode<KeyType> *make_overflow_node() {
 		HSNode<KeyType> *rv;
@@ -374,9 +414,10 @@ private:
 		if(size < 4) size = 4;
 		m_count = 0;
 		m_size = size;
-		m_tables = CreateTable(size + 1);
+		m_tables = CreateTable(size + 2);
 		m_tables->next = NULL;
-		m_table = m_tables->array;
+		m_table = m_tables->array + 1;
+		m_table[-1].next = (HSNode<KeyType> *)HASHSETSENTRYPTR;
 		m_table[size].next = (HSNode<KeyType> *)HASHSETSENTRYPTR;
 		m_firstFree = NULL;
 		m_overflowFirst = 0;
@@ -385,6 +426,7 @@ private:
 			m_table[i].next = (HSNode<KeyType> *)HASHSETEMPTYPTR;
 			};
 		};
+
 
 	void free(bool deleteFirst) {
 		HashSetTableList<KeyType> *t, *c;
@@ -397,6 +439,10 @@ private:
 			c = c->next;
 			allocate.deallocate((char *)t, 0);
 			};
+		if(!deleteFirst) m_tables->next = NULL;
+		else m_tables = NULL;
+		m_overflowSize = 0;
+		m_firstFree = NULL;
 		};
 
 
@@ -416,18 +462,19 @@ private:
 
 
 	iterator Find(const KeyType &key) const {
-		HSNode<KeyType> *c;
-		c = m_table + hashfn(key, m_size);
+		HSNode<KeyType> *c, *s;
+		s = c = m_table + hashfn(key, m_size);
 
 		if(c->next == HASHSETEMPTYPTR) return end();
 		if(c->key == key) return iterator(c, true);
 		c = c->next;
 		while(c >= HASHSETVALIDPTR) {
-			if(c->key == key) return iterator(c, true);
+			if(c->key == key) return iterator(s, c);
 			c = c->next;
 			};
 		return end();
 		};
+
 
 	HashSetTableList<KeyType> *CreateTable(size_t size) {
 		HashSetTableList<KeyType> *p;
@@ -435,6 +482,7 @@ private:
 		n = sizeof(HashSetTableList<KeyType>) + size * sizeof(HSNode<KeyType>) / sizeof(char);
 		p = (HashSetTableList<KeyType> *)allocate.template allocate<char>(n);
 		p->size = size;
+		p->next = NULL;
 		return p;
 		};
 
@@ -553,6 +601,11 @@ public:
 	void erase(const KeyType &k)		{ SetType::erase(find(k)); };
 	void erase(const_iterator it)		{ SetType::erase(find(it->first)); };
 
+	void swap(SetToMap &other) {
+		SetType::swap((SetType &)other);
+		std::swap(m_defaultValue, other.m_defaultValue);
+		};
+
 protected:
 	ValueType m_defaultValue;
 	};
@@ -563,7 +616,7 @@ protected:
  */
 template<typename KeyType,
 	 typename ValueType,
-	 class HashFunction = DefaultHashFun<KeyType>,
+	 class HashFunction = DefaultHashFunction<KeyType>,
 	 class Allocator = HashDefaultCPPAllocator>
 class HashMap: public SetToMap<KeyType, ValueType,
 			       HashMapPair<KeyType, ValueType>,
@@ -682,7 +735,7 @@ private:
  */
 template<typename KeyType,
 	 typename ValueType,
-	 class HashFunction = DefaultHashFun<KeyType>,
+	 class HashFunction = DefaultHashFunction<KeyType>,
 	 class Allocator = HashDefaultCPPAllocator>
 class BiDiHashMap: public SetToMap<KeyType, ValueType,
 				   BiDiHashMapPair<KeyType, ValueType>,
@@ -729,13 +782,13 @@ public:
 	const_iterator end() const	{ return const_iterator(&m_end); };
 
 	ValueType &operator [](const KeyType &key) {
-		std::pair<iterator, bool> res = insert(key, baseType::m_defaultValue);
+		std::pair<iterator, bool> res = insert(key, this->m_defaultValue);
 		return const_cast<ValueType &>(res.first->second);
 		};
 
 	const ValueType &operator [](const KeyType &key) const {
-		typename baseType::iterator it = find(PairType(key, baseType::m_defaultValue));
-		if(it == this->end()) return baseType::m_defaultValue;
+		typename baseType::iterator it = find(PairType(key, this->m_defaultValue));
+		if(it == this->end()) return this->m_defaultValue;
 		return it->second;
 		};
 
@@ -758,7 +811,6 @@ public:
 		};
 
 
-	void resize(size_t size)	{ baseType::resize(size); initialize(); };
 	void clear()			{ baseType::clear(); initialize(); };
 
 	void erase(const KeyType &key)	{ erase(find(key)); };
@@ -767,6 +819,33 @@ public:
 		DelFromList(pos.operator ->());
 		baseType::erase(pos->first);
 		};
+
+
+	void resize(size_t size) {
+		if(size == this->slots()) return;
+		if(!this->empty()) {
+			BiDiHashMap<KeyType, ValueType, HashFunction, Allocator> other(size, this->m_defaultValue);
+			other = *this;
+			this->swap(other);
+		} else {
+			baseType::resize(size);
+			initialize();
+			};
+		};
+
+
+	void swap(BiDiHashMap &other) {
+		baseType::swap((baseType &)other);
+		if(m_begin.next != &m_end)
+			std::swap(m_begin.next->prev, other.m_begin.next->prev);
+		std::swap(m_begin.next, other.m_begin.next);
+
+		if(m_end.prev != &m_begin) {
+			std::swap(m_end.prev->next, other.m_end.prev->next);
+			};
+		std::swap(m_end.prev, other.m_end.prev);
+		};
+
 
 private:
 	void initialize() {
@@ -793,6 +872,7 @@ private:
 	};
 
 
+
 template <class T> class AssocTabInterface;
 
 template< class K, class V> class AssocTabInterface< BiDiHashMap< K,V > >
@@ -815,10 +895,9 @@ template< class K, class V> class AssocTabInterface< BiDiHashMap< K,V > >
         unsigned size() { return cont.size(); }
         bool empty() { return this->size() == 0; }
         void clear() { cont.clear(); }
+        void reserve(int n)	{ cont.resize(n); }
         template< class Iterator > int getKeys( Iterator );
-
         int capacity () { return std::numeric_limits<int>::max(); }
-        void reserve(int) {  }
 
 
         BiDiHashMap< K,V > &cont;
@@ -851,8 +930,7 @@ K AssocTabInterface< BiDiHashMap< K,V > >::lastKey()
 
 template< class K, class V >
 K AssocTabInterface< BiDiHashMap< K,V > >::prevKey( K arg )
-{
-    if (!arg) return lastKey();
+{   if (!arg) return lastKey();
     typename BiDiHashMap< K,V >::iterator pos = cont.find( arg );
     assert( pos != cont.end() );
     if (pos == cont.begin()) return (K)0;
@@ -862,8 +940,7 @@ K AssocTabInterface< BiDiHashMap< K,V > >::prevKey( K arg )
 
 template< class K, class V >
 K AssocTabInterface< BiDiHashMap< K,V > >::nextKey( K arg )
-{
-    if (!arg) return firstKey();
+{   if (!arg) return firstKey();
     typename BiDiHashMap< K,V >::iterator pos = cont.find( arg );
     assert( pos != cont.end() );
     pos++;
@@ -873,6 +950,91 @@ K AssocTabInterface< BiDiHashMap< K,V > >::nextKey( K arg )
 
 template< class K, class V > template <class Iterator>
 int AssocTabInterface< BiDiHashMap< K,V > >::getKeys( Iterator iter )
+{
+    for( K key = firstKey(); key; key = nextKey( key ) )
+    {
+        *iter = key;
+        iter++;
+    }
+    return size();
+}
+
+
+template< class K, class V> class AssocTabInterface< HashMap< K,V > >
+{
+    public:
+        AssocTabInterface( HashMap< K,V > &acont ): cont( acont ) {}
+
+        typedef K KeyType;
+        typedef V ValType;
+
+        bool hasKey( K arg ) { return cont.find( arg ) != cont.end(); }
+        bool delKey( K );
+
+        K firstKey();
+        K lastKey();
+        K prevKey( K );
+        K nextKey( K );
+
+        V &operator[]( K arg ) { return cont[arg]; }
+        unsigned size() { return cont.size(); }
+        bool empty() { return this->size() == 0; }
+        void clear() { cont.clear(); }
+        void reserve(int n)	{ cont.resize(n); }
+        int capacity () { return std::numeric_limits<int>::max(); }
+        template< class Iterator > int getKeys( Iterator );
+
+
+        HashMap< K,V > &cont;
+} ;
+
+template< class K, class V >
+bool AssocTabInterface< HashMap< K,V > >::delKey( K arg )
+{
+    typename HashMap< K,V >::iterator pos = cont.find( arg );
+    if (pos == cont.end()) return false;
+    cont.erase( pos );
+    return true;
+}
+
+template< class K, class V >
+K AssocTabInterface< HashMap< K,V > >::firstKey()
+{
+    if (cont.begin() == cont.end()) return (K)0;
+    return cont.begin()->first;
+}
+
+template< class K, class V >
+K AssocTabInterface< HashMap< K,V > >::lastKey()
+{
+    typename HashMap< K,V >::iterator pos;
+    if (cont.begin() == (pos = cont.end())) return (K)0;
+    pos--;
+    return pos->first;
+}
+
+template< class K, class V >
+K AssocTabInterface< HashMap< K,V > >::prevKey( K arg )
+{   if (!arg) return lastKey();
+    typename HashMap< K,V >::iterator pos = cont.find( arg );
+    assert( pos != cont.end() );
+    if (pos == cont.begin()) return (K)0;
+    pos--;
+    return pos->first;
+}
+
+template< class K, class V >
+K AssocTabInterface< HashMap< K,V > >::nextKey( K arg )
+{   if (!arg) return firstKey();
+    typename HashMap< K,V >::iterator pos = cont.find( arg );
+    assert( pos != cont.end() );
+    pos++;
+    if (pos == cont.end()) return (K)0;
+    return pos->first;
+}
+
+template< class K, class V > template <class Iterator>
+int AssocTabInterface< HashMap< K,V > >::getKeys( Iterator iter )
 {
     for( K key = firstKey(); key; key = nextKey( key ) )
     {
