@@ -122,6 +122,9 @@ enum RG_Format {
 	};
 
 
+
+namespace Privates {
+
 template<class V>
 class EmptyMap {
 public:
@@ -137,6 +140,8 @@ public:
         int &operator[](T)	{ return m_dummy; };
 	int m_dummy;
 	};
+
+}
 
 
 template<class Graph, class VMap, class EMap>
@@ -164,8 +169,8 @@ bool readGraphText(Graph &g, const char *desc, RG_Format format,
 
 template<class Graph>
 bool readGraphText(Graph &g, std::istream &s, RG_Format format) {
-	EmptyMap<typename Graph::PVertex> tv;
-	EmptyMap<typename Graph::PEdge> te;
+	Privates::EmptyMap<typename Graph::PVertex> tv;
+	Privates::EmptyMap<typename Graph::PEdge> te;
 	return readGraphText(g, s, format, tv, te);
 	};
 
@@ -194,7 +199,7 @@ template<class Graph>
 bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format,
                     std::pair<bool,bool> printinf=std::make_pair(true,true))
 {
-    EmptyMap2 em;
+    Privates::EmptyMap2 em;
     return writeGraphText(g,out,format,printinf,em,em);
 }
 
@@ -214,7 +219,7 @@ template<class Graph>
 bool writeGraphText(const Graph &g, std::string &out, RG_Format format,
                     std::pair<bool,bool> printinf=std::make_pair(true,true))
 {
-    EmptyMap2 em;
+    Privates::EmptyMap2 em;
     writeGraphText(g,out,format,printinf,em,em);
 
 }
@@ -246,7 +251,7 @@ template<class Graph>
 bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format format,
                     std::pair<bool,bool> printinf=std::make_pair(true,true))
 {
-    EmptyMap2 em;
+    Privates::EmptyMap2 em;
     writeGraphText(g,out,maxlength,format,printinf,em,em);
 }
 

@@ -16,6 +16,8 @@ protected:
 };
 
 
+namespace Privates {
+
 template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
 class NormalParalLink {
     protected:
@@ -49,15 +51,17 @@ template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
 struct ParalLink<VertInfo,EdgeInfo,EdAllow,EdNone> : public EmptyParalLink<VertInfo,EdgeInfo,EdAllow>
     {};
 
+}
+
 
 template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, EdgeType EdAllow=EdAll|AdjMatrixAllowed>
 class Edge : public EdgeConst,
              public GraphClassDefaultSettings::template EdgeAdditData<VertInfo,EdgeInfo,EdAllow>,
-             public ParalLink<VertInfo,EdgeInfo,EdAllow,EdAllow&AdjMatrixAllowed>
+             public Privates::ParalLink<VertInfo,EdgeInfo,EdAllow,EdAllow&AdjMatrixAllowed>
 {
 	friend class Graph<VertInfo, EdgeInfo,EdAllow>;
 	friend class Vertex<VertInfo, EdgeInfo,EdAllow>;
-	friend  class AdjMatrix<VertInfo, EdgeInfo,EdAllow,AdjMatrixAllowed&EdAllow>;
+	friend class AdjMatrix<VertInfo, EdgeInfo,EdAllow,AdjMatrixAllowed&EdAllow>;
 
 public:
 
@@ -106,6 +110,8 @@ private:
 	Edge();
 	/** Constructor sets info variable. */
 	Edge(const EdgeInfo &);
+
+	~Edge() {}
 
 	Edge *next, *prev;
 	EdgeLink vert[2]; //0==U==out; 1==V==in;

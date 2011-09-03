@@ -5,6 +5,9 @@
 namespace Koala {
 
 
+
+namespace Privates {
+
 template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
 struct NormalVertLink {
             Edge<VertInfo,EdgeInfo,EdAllow> *first, *last;
@@ -76,14 +79,16 @@ template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
 struct VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,0> : public EmptyVertLink<VertInfo,EdgeInfo,EdAllow>
     {};
 
+}
+
 
 
 template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, EdgeType EdAllow=EdAll|AdjMatrixAllowed>
 class Vertex :
-    private VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>,
-    private VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>,
-    private VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>,
-    private VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>,
+    private Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>,
+    private Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>,
+    private Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>,
+    private Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>,
     public GraphClassDefaultSettings::template VertAdditData<VertInfo,EdgeInfo,EdAllow>
 {
 	friend class Graph<VertInfo,EdgeInfo,EdAllow>;
@@ -102,6 +107,8 @@ private:
 	Vertex();
 	/** Constructor sets info variable */
 	Vertex(const VertInfo &);
+
+	~Vertex() {}
 
 	Vertex *next, *prev;
 };

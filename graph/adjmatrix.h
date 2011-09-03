@@ -4,6 +4,8 @@
 namespace Koala
 {
 
+namespace Privates {
+
 template< class VertInfo , class EdgeInfo , EdgeType EdAllow>
 struct AdjMatrixParals {
 
@@ -13,6 +15,7 @@ struct AdjMatrixParals {
     AdjMatrixParals(): first( NULL ), last( NULL ), degree( 0 ) {}
 };
 
+}
 
 template< class VertInfo , class EdgeInfo , EdgeType EdAllow,EdgeType Flag> class AdjMatrix;
 
@@ -20,10 +23,10 @@ template <class VertInfo , class EdgeInfo , EdgeType EdAllow>
 class AdjMatrix<VertInfo , EdgeInfo , EdAllow,AdjMatrixAllowed> {
     public:
         typename GraphClassDefaultSettings:: template AdjMatrixDirEdges
-            <typename Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *,AdjMatrixParals< VertInfo,EdgeInfo,EdAllow > >
+            <typename Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *,Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow > >
                 ::Type dirs;
         typename GraphClassDefaultSettings:: template AdjMatrixUndirEdges
-            <typename Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *,AdjMatrixParals< VertInfo,EdgeInfo,EdAllow > >
+            <typename Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *,Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow > >
                 ::Type undirs;
 
         AdjMatrix( int asize = 0 ):
@@ -33,16 +36,20 @@ class AdjMatrix<VertInfo , EdgeInfo , EdAllow,AdjMatrixAllowed> {
         void clear() { dirs.clear(); undirs.clear(); }
         void defrag() { dirs.defrag(); undirs.defrag(); }
         void add(  Koala::Edge< VertInfo,EdgeInfo,EdAllow > * );
-        AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >&
+        void delVert(Koala::Vertex< VertInfo,EdgeInfo,EdAllow > * u)
+        {   if (EdAllow & EdUndir) undirs.delInd(u);
+            if (EdAllow & (EdDirIn|EdDirOut)) dirs.delInd(u);
+        }
+        Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >&
             vald(Koala::Vertex< VertInfo,EdgeInfo,EdAllow > * u,Koala::Vertex< VertInfo,EdgeInfo,EdAllow > * v)
             { return dirs(u,v); }
-        AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >&
+        Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >&
             valund(Koala::Vertex< VertInfo,EdgeInfo,EdAllow > * u,Koala::Vertex< VertInfo,EdgeInfo,EdAllow > * v)
             { return undirs(u,v); }
-        AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >* undirspresentValPtr(
+        Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >* undirspresentValPtr(
                 Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *  v1,Koala::Vertex< VertInfo,EdgeInfo,EdAllow > * v2 )
             { return undirs.presentValPtr(v1,v2 );}
-        AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >* dirspresentValPtr(
+        Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >* dirspresentValPtr(
                 Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *  v1,Koala::Vertex< VertInfo,EdgeInfo,EdAllow > * v2 )
             { return dirs.presentValPtr(v1,v2 );}
 };
@@ -56,14 +63,15 @@ class AdjMatrix<VertInfo , EdgeInfo , EdAllow,0> {
         void clear() {}
         void defrag() {}
         void add( void* ) {}
-        AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >& vald(void* ,void*)
-            { return *(AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >*)(_KoalaEmptyEdgePoiner); }
-        AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >& valund(void* ,void*)
-            { return *(AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >*)(_KoalaEmptyEdgePoiner); }
-        AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >* undirspresentValPtr(void*,void*)
-            { return (AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >*)(_KoalaEmptyEdgePoiner);}
-        AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >* dirspresentValPtr(void*,void*)
-            { return (AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >*)(_KoalaEmptyEdgePoiner);}
+        void delVert(void* ) {}
+        Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >& vald(void* ,void*)
+            { return *(Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >*)(_KoalaEmptyEdgePoiner); }
+        Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >& valund(void* ,void*)
+            { return *(Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >*)(_KoalaEmptyEdgePoiner); }
+        Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >* undirspresentValPtr(void*,void*)
+            { return (Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >*)(_KoalaEmptyEdgePoiner);}
+        Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >* dirspresentValPtr(void*,void*)
+            { return (Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >*)(_KoalaEmptyEdgePoiner);}
 };
 
 
@@ -74,7 +82,7 @@ void AdjMatrix<VertInfo, EdgeInfo,EdAllow,AdjMatrixAllowed>::add
     if (edge->type==Directed)
     {   std::pair<typename Graph<VertInfo,EdgeInfo,EdAllow>::PVertex,typename Graph<VertInfo,EdgeInfo,EdAllow>::PVertex>
 			ends(edge->vert[0].vert, edge->vert[1].vert);
-	AdjMatrixParals<VertInfo, EdgeInfo,EdAllow>& pole=dirs(ends.first,ends.second);
+	Privates::AdjMatrixParals<VertInfo, EdgeInfo,EdAllow>& pole=dirs(ends.first,ends.second);
 	edge->pParal() = pole.last;
 	edge->nParal() = NULL;
 	if(edge->pParal())
@@ -87,7 +95,7 @@ void AdjMatrix<VertInfo, EdgeInfo,EdAllow,AdjMatrixAllowed>::add
     else if (edge->type==Undirected)
     {   std::pair<typename Graph<VertInfo,EdgeInfo,EdAllow>::PVertex,typename Graph<VertInfo,EdgeInfo,EdAllow>::PVertex>
 			ends(edge->vert[0].vert, edge->vert[1].vert);
-	AdjMatrixParals<VertInfo, EdgeInfo,EdAllow>& pole=undirs(ends.first,ends.second);
+	Privates::AdjMatrixParals<VertInfo, EdgeInfo,EdAllow>& pole=undirs(ends.first,ends.second);
 	edge->pParal() = pole.last;
 	edge->nParal() = NULL;
 	if(edge->pParal())

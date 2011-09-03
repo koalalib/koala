@@ -61,9 +61,6 @@ Graph< VertInfo,EdgeInfo,EdAllow >::Graph():
     first_edge( NULL ),
     last_edge( NULL ),
     no_vert( 0 ),
-    no_loop_edge( 0 ),
-    no_dir_edge( 0 ),
-    no_undir_edge( 0 ),
     pAdj( NULL ),
     SubgraphBase()
 {
@@ -76,9 +73,6 @@ Graph< VertInfo,EdgeInfo,EdAllow >::Graph( const Graph< VertInfo,EdgeInfo,EdAllo
     first_edge( NULL ),
     last_edge( NULL ),
     no_vert( 0 ),
-    no_loop_edge( 0 ),
-    no_dir_edge( 0 ),
-    no_undir_edge( 0 ),
     pAdj( NULL ),
     SubgraphBase()
 {
@@ -106,9 +100,9 @@ template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
 inline int Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNo( EdgeDirection direct ) const
 {
     int ans = 0;
-    if (direct & EdLoop) ans += this->no_loop_edge;
-    if (direct & EdUndir) ans += this->no_undir_edge;
-    if (direct & (EdDirIn | EdDirOut)) ans += this->no_dir_edge;
+    if (direct & EdLoop) ans += this->no_loop_edge();
+    if (direct & EdUndir) ans += this->no_undir_edge();
+    if (direct & (EdDirIn | EdDirOut)) ans += this->no_dir_edge();
     return ans;
 }
 
@@ -132,7 +126,7 @@ void Graph< VertInfo,EdgeInfo,EdAllow >::clear()
     }
     first_vert = last_vert = NULL;
     first_edge = last_edge = NULL;
-    no_vert = no_loop_edge = no_dir_edge = no_undir_edge = 0;
+    no_vert = no_loop_edge() = no_dir_edge() = no_undir_edge() = 0;
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
@@ -147,25 +141,25 @@ void Graph< VertInfo,EdgeInfo,EdAllow >::clearEdges()
         cur_edge = tmp_edge;
     }
     first_edge = last_edge = NULL;
-    no_loop_edge = no_dir_edge = no_undir_edge = 0;
+    no_loop_edge() = no_dir_edge() = no_undir_edge() = 0;
 
     PVertex cur_vert = first_vert;
     while (cur_vert)
     {
 //        for( int i = 0; i < 4; i++ )
-        {   cur_vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getFirst()=
-            cur_vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst()=
-            cur_vert->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getFirst()=
-            cur_vert->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getFirst()=
-            cur_vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast()=
-            cur_vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast()=
-            cur_vert->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast()=
-            cur_vert->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast()= NULL;
+        {   cur_vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getFirst()=
+            cur_vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst()=
+            cur_vert->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getFirst()=
+            cur_vert->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getFirst()=
+            cur_vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast()=
+            cur_vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast()=
+            cur_vert->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast()=
+            cur_vert->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast()= NULL;
 
-            cur_vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree()=
-            cur_vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree()=
-            cur_vert->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree()=
-            cur_vert->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree()= 0;
+            cur_vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree()=
+            cur_vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree()=
+            cur_vert->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree()=
+            cur_vert->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree()= 0;
         }
         cur_vert = cur_vert->next;
     }
@@ -471,16 +465,16 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNext(
     switch (nexttype)
     {
         case EdLoop:
-            if (direct & EdLoop) res = vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getFirst();
+            if (direct & EdLoop) res = vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getFirst();
             if (res) return res;
         case EdUndir:
-            if (direct & EdUndir) res = vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst();
+            if (direct & EdUndir) res = vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst();
             if (res) return res;
         case EdDirIn:
-            if (direct & EdDirIn) res = vert->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getFirst();
+            if (direct & EdDirIn) res = vert->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getFirst();
             if (res) return res;
         case EdDirOut:
-            if (direct & EdDirOut) res = vert->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getFirst();
+            if (direct & EdDirOut) res = vert->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getFirst();
     }
     return res;
 }
@@ -503,16 +497,16 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgePrev(
     switch (nexttype)
     {
         case EdDirOut:
-            if (direct & EdDirOut) res = vert->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast();
+            if (direct & EdDirOut) res = vert->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast();
             if (res) return res;
         case EdDirIn:
-            if (direct & EdDirIn) res = vert->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast();
+            if (direct & EdDirIn) res = vert->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast();
             if (res) return res;
         case EdUndir:
-            if (direct & EdUndir) res = vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast();
+            if (direct & EdUndir) res = vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast();
             if (res) return res;
         case EdLoop:
-            if (direct & EdLoop) res = vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast();
+            if (direct & EdLoop) res = vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast();
             if (res) return res;
     }
     return res;
@@ -553,13 +547,13 @@ inline int Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNo( PVertex vert, EdgeDire
 {
     int ans = 0;
     if (direct & EdLoop)
-        ans += vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree();
+        ans += vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree();
     if (direct & EdUndir)
-        ans += vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
+        ans += vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
     if (direct & EdDirIn)
-        ans += vert->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree();
+        ans += vert->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree();
     if (direct & EdDirOut)
-        ans += vert->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree();
+        ans += vert->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree();
     return ans;
 }
 
@@ -601,7 +595,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgeNext(
     }
     if (pAdj)
     {
-        AdjMatrixParals<VertInfo,EdgeInfo,EdAllow>* p;
+        Privates::AdjMatrixParals<VertInfo,EdgeInfo,EdAllow>* p;
         EdgeDirection type = getEdgeDir( edge,vert1 );
         EdgeDirection nexttype = (type == EdNone) ? EdLoop : type << 1;
         typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge res;
@@ -666,7 +660,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::getEdgePrev(
     }
     if (pAdj)
     {
-        AdjMatrixParals<VertInfo,EdgeInfo,EdAllow>* p;
+        Privates::AdjMatrixParals<VertInfo,EdgeInfo,EdAllow>* p;
         EdgeDirection type = getEdgeDir( edge,vert1 );
         EdgeDirection nexttype = (type == EdNone) ? EdDirOut : type >> 1;
         typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge res;
@@ -931,13 +925,13 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::deg( PVertex vert, EdgeDirection direct 
 {
     int ans = 0;
     if (direct & EdLoop)
-        ans += 2 * vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree();
+        ans += 2 * vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree();
     if (direct & EdUndir)
-        ans += vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
+        ans += vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
     if (direct & EdDirIn)
-        ans += vert->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree();
+        ans += vert->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree();
     if (direct & EdDirOut)
-        ans += vert->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree();
+        ans += vert->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree();
     return ans;
 }
 
@@ -1758,12 +1752,12 @@ Graph< VertInfo,EdgeInfo,EdAllow >::move( Graph< VertInfo,EdgeInfo,EdAllow > &gr
         this->last_edge = graph.last_edge;
     }
     this->no_vert += graph.no_vert;
-    this->no_dir_edge += graph.no_dir_edge;
-    this->no_loop_edge += graph.no_loop_edge;
-    this->no_undir_edge += graph.no_undir_edge;
+    this->no_dir_edge() += graph.no_dir_edge();
+    this->no_loop_edge() += graph.no_loop_edge();
+    this->no_undir_edge() += graph.no_undir_edge();
     graph.first_vert = graph.last_vert = NULL;
     graph.first_edge = graph.last_edge = NULL;
-    graph.no_vert = graph.no_dir_edge = graph.no_loop_edge = graph.no_undir_edge = 0;
+    graph.no_vert = graph.no_dir_edge() = graph.no_loop_edge() = graph.no_undir_edge() = 0;
     return res;
 }
 
@@ -1982,10 +1976,10 @@ Graph< VertInfo,EdgeInfo,EdAllow >::attach( PVertex vert )
 //        return NULL;
 //    for( int i = 0; i < 4; i++)
 
-//        vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree() =
-//        vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree() =
-//        vert->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree() =
-//        vert->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree() = 0;
+//        vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree() =
+//        vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree() =
+//        vert->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree() =
+//        vert->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree() = 0;
     vert->prev = last_vert;
     vert->next = NULL;
     if (last_vert) last_vert->next = vert;
@@ -2000,10 +1994,10 @@ inline typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
 Graph< VertInfo,EdgeInfo,EdAllow >::detach( PVertex vert )
 {
     if (!vert) return NULL;
-    if (vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree() != 0 ||
-        vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree() != 0 ||
-        vert->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree() != 0 ||
-        vert->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree() != 0)
+    if (vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree() != 0 ||
+        vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree() != 0 ||
+        vert->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree() != 0 ||
+        vert->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree() != 0)
         return NULL;
 //    vert->edgesd(Graph< VertInfo,EdgeInfo,EdAllow >::Vertex::undir) = -1;
     if (vert->next) vert->next->prev = vert->prev;
@@ -2012,6 +2006,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::detach( PVertex vert )
     else first_vert = vert->next;
     vert->next = vert->prev = NULL;
     --no_vert;
+    if (pAdj) pAdj->delVert(vert);
     return vert;
 }
 
@@ -2057,35 +2052,35 @@ Graph< VertInfo,EdgeInfo,EdAllow >::attach_undir( PEdge edge, PVertex vertU, PVe
     if (last_edge) last_edge->next = edge;
     else first_edge = edge;
     last_edge = edge;
-    ++no_undir_edge;
+    ++no_undir_edge();
     if (pAdj) pAdj->add( edge );
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_U].prev =
-        vertU->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast();
+        vertU->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast();
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_U].next = NULL;
-    if (vertU->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast())
+    if (vertU->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast())
     {
-        PEdge tmp_edge = vertU->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast();
+        PEdge tmp_edge = vertU->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast();
         if (tmp_edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_U].vert == vertU)
             tmp_edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_U].next = edge;
         else tmp_edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].next = edge;
     }
-    else vertU->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst() = edge;
-    vertU->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast() = edge;
-    ++vertU->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
+    else vertU->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst() = edge;
+    vertU->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast() = edge;
+    ++vertU->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
 
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].prev =
-        vertV->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast();
+        vertV->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast();
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].next = NULL;
-    if (vertV->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast())
+    if (vertV->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast())
     {
-        PEdge tmp_edge = vertV->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast();
+        PEdge tmp_edge = vertV->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast();
         if (tmp_edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].vert == vertV)
             tmp_edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].next = edge;
         else tmp_edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_U].next = edge;
     }
-    else vertV->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst() = edge;
-    vertV->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast() = edge;
-    ++vertV->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
+    else vertV->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst() = edge;
+    vertV->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast() = edge;
+    ++vertV->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
     return edge;
 }
 
@@ -2106,27 +2101,27 @@ Graph< VertInfo,EdgeInfo,EdAllow >::attach_dir( PEdge edge, PVertex vert_out, PV
     if (last_edge) last_edge->next = edge;
     else first_edge = edge;
     last_edge = edge;
-    ++no_dir_edge;
+    ++no_dir_edge();
     if (pAdj) pAdj->add( edge );
 
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].prev =
-        vert_out->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast();
+        vert_out->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast();
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].next = NULL;
-    if (vert_out->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast())
-        vert_out->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast()
+    if (vert_out->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast())
+        vert_out->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast()
             ->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].next = edge;
-    else vert_out->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getFirst() = edge;
-    vert_out->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast() = edge;
-    ++vert_out->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree();
+    else vert_out->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getFirst() = edge;
+    vert_out->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast() = edge;
+    ++vert_out->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree();
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].prev =
-        vert_in->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast();
+        vert_in->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast();
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].next = NULL;
-    if (vert_in->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast())
-        vert_in->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast()
+    if (vert_in->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast())
+        vert_in->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast()
             ->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].next = edge;
-    else vert_in->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getFirst() = edge;
-    vert_in->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast() = edge;
-    ++vert_in->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree();
+    else vert_in->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getFirst() = edge;
+    vert_in->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast() = edge;
+    ++vert_in->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree();
     return edge;
 }
 
@@ -2145,16 +2140,16 @@ Graph< VertInfo,EdgeInfo,EdAllow >::attach_loop( PEdge edge, PVertex vert )
     if (last_edge) last_edge->next = edge;
     else first_edge = edge;
     last_edge = edge;
-    ++no_loop_edge;
+    ++no_loop_edge();
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].prev =
-        vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast();
+        vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast();
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].next = NULL;
-    if(vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast())
-        vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast()
+    if(vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast())
+        vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast()
             ->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].next = edge;
-    else vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getFirst() = edge;
-    vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast() = edge;
-    ++vert->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree();
+    else vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getFirst() = edge;
+    vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast() = edge;
+    ++vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree();
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_Nloop].next = NULL;
     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_Nloop].prev = NULL;
     return edge;
@@ -2174,18 +2169,18 @@ Graph< VertInfo,EdgeInfo,EdAllow >::detach( PEdge edge )
                         ->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_loop].prev
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_loop].prev;
             else edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].vert
-                        ->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast()
+                        ->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getLast()
                     = edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].prev;
             if (edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].prev)
                 edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].prev
                         ->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].next
                     = edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].next;
             else edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].vert
-                        ->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getFirst()
+                        ->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getFirst()
                     = edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].next;
             --edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_loop].vert
-                        ->VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree();
-            --no_loop_edge;
+                        ->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,EdAllow,EdLoop&EdAllow>::getDegree();
+            --no_loop_edge();
             break;
         case Directed:
             if (edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].next)
@@ -2193,37 +2188,37 @@ Graph< VertInfo,EdgeInfo,EdAllow >::detach( PEdge edge )
                         ->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].prev
                     = edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].prev;
             else edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].vert
-                        ->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast()
+                        ->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getLast()
                     = edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].prev;
             if (edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].prev)
                 edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].prev
                         ->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].next
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_out].next;
             else edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].vert
-                        ->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getFirst()
+                        ->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getFirst()
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_out].next;
             --edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].vert
-                        ->VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree();
+                        ->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,EdAllow,EdDirOut&EdAllow>::getDegree();
             if (edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].next)
                 edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].next
                             ->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].prev
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_in].prev;
             else edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].vert
-                        ->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast()
+                        ->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getLast()
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_in].prev;
             if (edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].prev)
                 edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].prev
                         ->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].next
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_in].next;
             else edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].vert
-                        ->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getFirst()
+                        ->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getFirst()
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_in].next;
             --edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].vert
-                        ->VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree();
-            --no_dir_edge;
+                        ->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,EdAllow,EdDirIn&EdAllow>::getDegree();
+            --no_dir_edge();
             if (pAdj)
             {
-                AdjMatrixParals<VertInfo,EdgeInfo,EdAllow> &pole
+                Privates::AdjMatrixParals<VertInfo,EdgeInfo,EdAllow> &pole
                                     = pAdj->vald( edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_out].vert,
                                     edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_in].vert );
                 if (edge->nParal()) edge->nParal()->pParal() = edge->pParal();
@@ -2246,7 +2241,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::detach( PEdge edge )
                 else next_edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].prev
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_U].prev;
             }
-            else vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast()
+            else vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast()
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_U].prev;
             if (edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_U].prev)
             {
@@ -2257,9 +2252,9 @@ Graph< VertInfo,EdgeInfo,EdAllow >::detach( PEdge edge )
                 else prev_edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].next
                         = edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_U].next;
             }
-            else vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst()
+            else vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst()
                     = edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_U].next;
-            --vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
+            --vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
             vert = edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].vert;
             if (edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].next)
             {
@@ -2270,7 +2265,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::detach( PEdge edge )
                 else next_edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].prev
                         = edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].prev;
             }
-            else vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast()
+            else vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getLast()
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_V].prev;
             if (edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].prev)
             {
@@ -2281,13 +2276,13 @@ Graph< VertInfo,EdgeInfo,EdAllow >::detach( PEdge edge )
                 else prev_edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].next
                         = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_V].next;
             }
-            else vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst()
+            else vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getFirst()
                     = edge->vert[Graph<VertInfo,EdgeInfo,EdAllow>::Edge::V_V].next;
-            --vert->VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
-            --no_undir_edge;
+            --vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,EdAllow,EdUndir&EdAllow>::getDegree();
+            --no_undir_edge();
             if (pAdj)
             {
-                AdjMatrixParals<VertInfo,EdgeInfo,EdAllow> &pole
+                Privates::AdjMatrixParals<VertInfo,EdgeInfo,EdAllow> &pole
                                     = pAdj->valund( edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_V].vert,
                                    edge->vert[Graph< VertInfo,EdgeInfo,EdAllow >::Edge::V_U].vert );
                 if (edge->nParal()) edge->nParal()->pParal() = edge->pParal();

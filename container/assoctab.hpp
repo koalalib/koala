@@ -233,7 +233,7 @@ AssocContReg *AssocKeyContReg::find( AssocContBase *cont )
     return NULL;
 }
 
-AssocKeyContReg::~AssocKeyContReg()
+void AssocKeyContReg::deregister()
 {
     std::pair< AssocContBase *,int >
         a = std::pair< AssocContBase *,int >( next,nextPos ), n;
@@ -374,33 +374,91 @@ int AssocArray< Klucz,Elem,Container >::getKeys( Iterator iter )
     return size();
 }
 
-template< class K, class V, class C > template< class Iterator >
-int AssocTabInterface< AssocArray< K,V,C > >::getKeys( Iterator iter )
+
+template< class Klucz, class Elem, class AssocCont,class Container >
+int PseudoAssocArray< Klucz,Elem,AssocCont,Container >::keyPos( Klucz v )
 {
-    return cont.getKeys( iter );
+    if (!v) return -1;
+    if (!assocTab.hasKey(v)) return -1;
+    return assocTab[v];
 }
 
-template< class Klucz, class Container >
-void sum(
-    AssocArray< Klucz,DummyVal,Container > &a1,
-    AssocArray< Klucz,DummyVal,Container > &a2,
-    AssocArray< Klucz,DummyVal,Container > &res )
+template< class Klucz, class Elem, class AssocCont,class Container >
+bool PseudoAssocArray< Klucz,Elem,AssocCont,Container >::delKey( Klucz v )
 {
-    AssocArray< Klucz,DummyVal,Container > ares = a1;
-    for( Klucz k = a2.firstKey(); k; k = a2.nextKey( k ) ) ares[k];
-    res = ares;
+    if (!v) return false;
+    if (!assocTab.hasKey(v)) return false;
+    tab.delPos( assocTab[v] );
+    assocTab.delKey(v);
+    return true;
 }
 
-template< class Klucz, class Container >
-void diff(
-    AssocArray< Klucz,DummyVal,Container > &a1,
-    AssocArray< Klucz,DummyVal,Container > &a2,
-    AssocArray< Klucz,DummyVal,Container > &res )
+template< class Klucz, class Elem, class AssocCont,class Container >
+Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::firstKey()
 {
-    AssocArray< Klucz,DummyVal,Container > ares = a1;
-    for( Klucz k = a2.firstKey(); k; k = a2.nextKey( k ) ) ares.delKey( k );
-    res = ares;
+    if (tab.empty()) return 0;
+    else return tab[tab.firstPos()].key;
 }
+
+template< class Klucz, class Elem, class AssocCont,class Container >
+Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::lastKey()
+{
+    if (tab.empty()) return 0;
+    else return tab[tab.lastPos()].key;
+}
+
+template< class Klucz, class Elem, class AssocCont,class Container >
+Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::nextKey( Klucz v )
+{
+    if (!v) return firstKey();
+    int x;
+    assert((x = keyPos( v )) != -1);
+    if ((x = tab.nextPos( x )) == -1) return 0;
+    return tab[x].key;
+}
+
+template< class Klucz, class Elem, class AssocCont,class Container >
+Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::prevKey( Klucz v )
+{
+    if (!v) return lastKey();
+    int x;
+    assert((x = keyPos( v )) != -1);
+    if ((x = tab.prevPos( x )) == -1) return 0;
+    return tab[x].key;
+}
+
+template< class Klucz, class Elem, class AssocCont,class Container >
+Elem &PseudoAssocArray< Klucz,Elem,AssocCont,Container >::operator[]( Klucz v )
+{
+    assert( v );
+    int x = keyPos( v );
+    if (x == -1)
+    {
+        tab[x = tab.newPos()].key = v;
+        assocTab[v]=x;
+    }
+    return tab[x].val;
+}
+
+template< class Klucz, class Elem, class AssocCont,class Container >
+void PseudoAssocArray< Klucz,Elem,AssocCont,Container >::defrag()
+{
+    tab.defrag();
+    for( int i = 0; i < tab.size(); i++ ) assocTab[tab[i].key] = i;
+}
+
+
+template< class Klucz, class Elem, class AssocCont, class Container > template< class Iterator >
+int PseudoAssocArray< Klucz,Elem,AssocCont,Container >::getKeys( Iterator iter )
+{
+    for( Klucz key = firstKey(); key; key = nextKey( key ) )
+    {
+        *iter = key;
+        iter++;
+    }
+    return size();
+}
+
 
 int AssocMatrixAddr< AMatrFull >::wsp2pos( std::pair< int,int > w )
 {
@@ -517,7 +575,7 @@ std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrTriangle >::key(
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::AssocIndex(
     int asize ):
-    AssocArray< Klucz,int,IndexContainer >( asize )
+    IndexContainer( asize )
 {
 }
 
@@ -526,7 +584,7 @@ int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::klucz2
     Klucz v )
 {
     if (!v) return -1;
-    return AssocArray< Klucz,int,IndexContainer >::keyPos( v );
+    return IndexContainer::keyPos( v );
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
@@ -535,7 +593,7 @@ AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::pos2klucz(
     int arg )
 {
     if (arg == -1) return 0;
-    return AssocArray< Klucz,int,IndexContainer >::tab[arg].key;
+    return IndexContainer::tab[arg].key;
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
@@ -545,8 +603,8 @@ AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::DelPosComm
 {
     int LOCALARRAY( tabpos,size() );
     int l = 0;
-    int i = AssocArray< Klucz,int,IndexContainer >::tab.firstPos();
-    for( ; i != -1; i = AssocArray< Klucz,int,IndexContainer >::tab.nextPos( i ) )
+    int i = IndexContainer::tab.firstPos();
+    for( ; i != -1; i = IndexContainer::tab.nextPos( i ) )
         tabpos[l++] = i;
     for( l--; l >= 0; l-- )
     {
@@ -554,12 +612,12 @@ AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::DelPosComm
         if ((aType == AMatrNoDiag || aType == AMatrFull) && (pos != tabpos[l]))
             owner->delPos( std::pair< int,int >( tabpos[l],pos ) );
     }
-    AssocArray< Klucz,int,IndexContainer >::tab.delPos( pos );
+    IndexContainer::tab.delPos( pos );
     Klucz k,n;
-    for( k = AssocArray< Klucz,int,IndexContainer >::firstKey(); k; k = n )
+    for( k = IndexContainer ::firstKey(); k; k = n )
     {
-        n = AssocArray< Klucz,int,IndexContainer >::nextKey( k );
-        if (!operator[]( k )) AssocArray< Klucz,int,IndexContainer >::delKey( k );
+        n = IndexContainer::nextKey( k );
+        if (!operator[]( k )) IndexContainer::delKey( k );
     }
 }
 
@@ -623,7 +681,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 bool AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::delInd( Klucz v )
 {
     if (!hasInd( v )) return false;
-    Klucz tab[index.size()];
+    Klucz LOCALARRAY(tab,index.size());
     int i = 0;
     for( Klucz x = index.firstKey(); x; x = index.nextKey( x ) ) tab[i++] = x;
     for( i--; i >= 0; i-- )
@@ -638,8 +696,7 @@ bool AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::delInd( Klucz v )
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 template <class Elem2, class ExtCont>
-int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::slice1(
-    Klucz v, AssocArray< Klucz,Elem2,ExtCont > & tab )
+int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::slice1(Klucz v, ExtCont & tab )
 {
     if (!index.hasKey( v )) return 0;
     int licz = 0;
@@ -654,8 +711,7 @@ int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::slice1(
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 template <class Elem2, class ExtCont>
-int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::slice2(
-    Klucz v, AssocArray< Klucz,Elem2,ExtCont > &tab )
+int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::slice2(Klucz v, ExtCont &tab )
 {
     if (!index.hasKey( v )) return 0;
     int licz = 0;
