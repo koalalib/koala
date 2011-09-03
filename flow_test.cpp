@@ -21,10 +21,10 @@ Koala::Graph<char,OpisE> g;
 Koala::Graph<char,OpisE>::PVertex A,B,C,D,E,F,V,U,S,T,tabV[20],*tabVit;
 Koala::Graph<char,OpisE>::PEdge tabE[20];
 
-Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeLabs<int> > edgeCont;
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeLabs<int> > >edgeCont;
 
-Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeBound<int> > tedgeCont;
-Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::VertLoss<int> > tvertCont;
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeBound<int> > > tedgeCont;
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::VertLoss<int> > > tvertCont;
 
 void dijTest()
 {   g.clear();edgeCont.clear();
@@ -224,7 +224,7 @@ void conTest()
 
 int main() {
 
-//    g.makeAdjMatrix();
+    g.makeAdjMatrix();
     dijTest();
     Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists,std::make_pair(true,true));
     cout << "\n***=\n";

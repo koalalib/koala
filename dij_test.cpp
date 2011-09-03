@@ -48,7 +48,7 @@ void dijTest()
 
 int main() {
 
-//    g.makeAdjMatrix();
+    g.makeAdjMatrix();
     dijTest();
 
     std::cout<< "Odleglosc: "<< Koala::Dijkstra::distances(g,vertCont,edgeCont,U,V)<<":";
@@ -163,7 +163,6 @@ int main() {
     std::cout<< std::endl;
     dijTest();
     std::cout<< "Odleglosc: "<< Koala::Dijkstra::distances2(g,Koala::blackHole,edgeCont,U,V)<<":";
-
 
     return 0;
 }

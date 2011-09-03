@@ -45,6 +45,7 @@ public:
 	};
 
 
+namespace Privates {
 /*
  * HSNode
  */
@@ -66,6 +67,7 @@ public:
 	HSNode<KeyType> array[];
 	};
 
+}
 
 /*
  * HashSet_const_iterator
@@ -97,9 +99,9 @@ public:
 	bool operator ==(const HashSet_const_iterator<KeyType, HashFunction, Allocator> &it)	{ return m_slot == it.m_slot && m_cur == it.m_cur; };
 	bool operator !=(const HashSet_const_iterator<KeyType, HashFunction, Allocator> &it)	{ return m_slot != it.m_slot || m_cur != it.m_cur; };
 private:
-	HashSet_const_iterator(HSNode<KeyType> *slot)			{ m_slot = m_cur = slot; advance_if_needed(); };
-	HashSet_const_iterator(HSNode<KeyType> *slot, bool)		{ m_slot = m_cur = slot; };
-	HashSet_const_iterator(HSNode<KeyType> *slot, HSNode<KeyType> *cur)	{ m_slot = slot; m_cur = cur; };
+	HashSet_const_iterator(Privates::HSNode<KeyType> *slot)			{ m_slot = m_cur = slot; advance_if_needed(); };
+	HashSet_const_iterator(Privates::HSNode<KeyType> *slot, bool)		{ m_slot = m_cur = slot; };
+	HashSet_const_iterator(Privates::HSNode<KeyType> *slot, Privates::HSNode<KeyType> *cur)	{ m_slot = slot; m_cur = cur; };
 
 	void advance_if_needed() {
 		if(m_cur->next == HASHSETEMPTYPTR) advance();
@@ -121,13 +123,13 @@ private:
 			if(m_slot->next == HASHSETSENTRYPTR) return;
 			while(m_cur->next >= HASHSETVALIDPTR) m_cur = m_cur->next;
 		} else {
-			HSNode<KeyType> *p = m_slot;
+			Privates::HSNode<KeyType> *p = m_slot;
 			while(p->next != m_cur) p = p->next;
 			m_cur = p;
 			};
 		};
 
-	HSNode<KeyType> *m_slot, *m_cur;
+	Privates::HSNode<KeyType> *m_slot, *m_cur;
 	friend class HashSet<KeyType, HashFunction, Allocator>;
 	};
 
@@ -139,6 +141,7 @@ template<class KeyType>
 class DefaultHashFunction	{};
 
 
+namespace Privates {
 /*
  * Int32Hash
  *  default hash for int and pointer types
@@ -184,19 +187,22 @@ public:
 		};
 	};
 
-template<> class DefaultHashFunction<int>: public Int32Hash<int>			{ };
-template<> class DefaultHashFunction<long>: public Int32Hash<long>			{ };
-template<> class DefaultHashFunction<short>: public Int32Hash<short>			{ };
-template<> class DefaultHashFunction<unsigned int>: public Int32Hash<unsigned int>	{ };
-template<> class DefaultHashFunction<unsigned long>: public Int32Hash<unsigned long>	{ };
-template<> class DefaultHashFunction<unsigned short>: public Int32Hash<unsigned short>	{ };
-template<class T> class DefaultHashFunction<T *>: public Int32Hash<T *>		{ };
+}
 
-template<> class DefaultHashFunction<char *>: public CStringHash<char>			{ };
-template<> class DefaultHashFunction<const char *>: public CStringHash<char>		{ };
-template<> class DefaultHashFunction<wchar_t *>: public CStringHash<wchar_t>		{ };
-template<> class DefaultHashFunction<const wchar_t *>: public CStringHash<wchar_t>	{ };
-template<> class DefaultHashFunction<std::string>: public StringHash			{ };
+
+template<> class DefaultHashFunction<int>: public Privates::Int32Hash<int>			{ };
+template<> class DefaultHashFunction<long>: public Privates::Int32Hash<long>			{ };
+template<> class DefaultHashFunction<short>: public Privates::Int32Hash<short>			{ };
+template<> class DefaultHashFunction<unsigned int>: public Privates::Int32Hash<unsigned int>	{ };
+template<> class DefaultHashFunction<unsigned long>: public Privates::Int32Hash<unsigned long>	{ };
+template<> class DefaultHashFunction<unsigned short>: public Privates::Int32Hash<unsigned short>	{ };
+template<class T> class DefaultHashFunction<T *>: public Privates::Int32Hash<T *>		{ };
+
+template<> class DefaultHashFunction<char *>: public Privates::CStringHash<char>			{ };
+template<> class DefaultHashFunction<const char *>: public Privates::CStringHash<char>		{ };
+template<> class DefaultHashFunction<wchar_t *>: public Privates::CStringHash<wchar_t>		{ };
+template<> class DefaultHashFunction<const wchar_t *>: public Privates::CStringHash<wchar_t>	{ };
+template<> class DefaultHashFunction<std::string>: public Privates::StringHash			{ };
 
 
 /*
@@ -211,7 +217,7 @@ template<class KeyType,
 	 class Allocator = HashDefaultCPPAllocator>
 class HashSet {
 public:
-	static const size_t node_size = sizeof(HSNode<KeyType>);
+	static const size_t node_size = sizeof(Privates::HSNode<KeyType>);
 
 	typedef KeyType value_type;
 	typedef KeyType key_type;
@@ -299,12 +305,12 @@ public:
 
 
 	std::pair<iterator, bool> find_or_insert(const KeyType &key) {
-		HSNode<KeyType> *c, *p;
+		Privates::HSNode<KeyType> *c, *p;
 		c = m_table + hashfn(key, m_size);
 
 		if(c->next == HASHSETEMPTYPTR) {
 			new (&(c->key)) key_type(key);
-			c->next = (HSNode<KeyType> *)HASHSETNONEXTPTR;
+			c->next = (Privates::HSNode<KeyType> *)HASHSETNONEXTPTR;
 			m_count++;
 			return std::make_pair(iterator(c, true), true);
 			};
@@ -328,7 +334,7 @@ public:
 
 
 	bool contains(const KeyType &key) const {
-		HSNode<KeyType> *c;
+		Privates::HSNode<KeyType> *c;
 		c = m_table + hashfn(key, m_size);
 		if(c->next == HASHSETEMPTYPTR) return false;
 		if(c->key == key) return true;
@@ -343,7 +349,7 @@ public:
 
 
 	void erase(const KeyType &key) {
-		HSNode<KeyType> *c, *p;
+		Privates::HSNode<KeyType> *c, *p;
 		c = m_table + hashfn(key, m_size);
 		p = NULL;
 		if(c->next == HASHSETEMPTYPTR) return;
@@ -367,7 +373,7 @@ public:
 				m_firstFree = p;
 			} else {	// if first and don't have next
 				c->key.~KeyType();
-				c->next = (HSNode<KeyType> *)HASHSETEMPTYPTR;
+				c->next = (Privates::HSNode<KeyType> *)HASHSETEMPTYPTR;
 				};
 			m_count--;
 			return;
@@ -381,9 +387,9 @@ public:
 
 
 private:
-	HSNode<KeyType> *make_overflow_node() {
-		HSNode<KeyType> *rv;
-		HashSetTableList<KeyType> *l;
+	Privates::HSNode<KeyType> *make_overflow_node() {
+		Privates::HSNode<KeyType> *rv;
+		Privates::HashSetTableList<KeyType> *l;
 
 		if(m_firstFree >= HASHSETVALIDPTR) {	// free slot on free list
 			rv = m_firstFree;
@@ -417,19 +423,19 @@ private:
 		m_tables = CreateTable(size + 2);
 		m_tables->next = NULL;
 		m_table = m_tables->array + 1;
-		m_table[-1].next = (HSNode<KeyType> *)HASHSETSENTRYPTR;
-		m_table[size].next = (HSNode<KeyType> *)HASHSETSENTRYPTR;
+		m_table[-1].next = (Privates::HSNode<KeyType> *)HASHSETSENTRYPTR;
+		m_table[size].next = (Privates::HSNode<KeyType> *)HASHSETSENTRYPTR;
 		m_firstFree = NULL;
 		m_overflowFirst = 0;
 		m_overflowSize = 0;
 		for(size_t i = 0; i < m_size; i++) {
-			m_table[i].next = (HSNode<KeyType> *)HASHSETEMPTYPTR;
+			m_table[i].next = (Privates::HSNode<KeyType> *)HASHSETEMPTYPTR;
 			};
 		};
 
 
 	void free(bool deleteFirst) {
-		HashSetTableList<KeyType> *t, *c;
+		Privates::HashSetTableList<KeyType> *t, *c;
 		if(m_tables == NULL) return;
 		eraseAll();
 		c = m_tables;
@@ -447,22 +453,22 @@ private:
 
 
 	void eraseAll() {
-		HSNode<KeyType> *p;
+		Privates::HSNode<KeyType> *p;
 		for(size_t i = 0; i < m_size; i++) {
 			p = m_table + i;
-			if(p->next != (HSNode<KeyType> *)HASHSETEMPTYPTR) {
-				while(p >= (HSNode<KeyType> *)HASHSETVALIDPTR) {
+			if(p->next != (Privates::HSNode<KeyType> *)HASHSETEMPTYPTR) {
+				while(p >= (Privates::HSNode<KeyType> *)HASHSETVALIDPTR) {
 					p->key.~KeyType();
 					p = p->next;
 					};
-				m_table[i].next = (HSNode<KeyType> *)HASHSETEMPTYPTR;
+				m_table[i].next = (Privates::HSNode<KeyType> *)HASHSETEMPTYPTR;
 				};
 			};
 		};
 
 
 	iterator Find(const KeyType &key) const {
-		HSNode<KeyType> *c, *s;
+		Privates::HSNode<KeyType> *c, *s;
 		s = c = m_table + hashfn(key, m_size);
 
 		if(c->next == HASHSETEMPTYPTR) return end();
@@ -476,11 +482,11 @@ private:
 		};
 
 
-	HashSetTableList<KeyType> *CreateTable(size_t size) {
-		HashSetTableList<KeyType> *p;
+	Privates::HashSetTableList<KeyType> *CreateTable(size_t size) {
+		Privates::HashSetTableList<KeyType> *p;
 		size_t n;
-		n = sizeof(HashSetTableList<KeyType>) + size * sizeof(HSNode<KeyType>) / sizeof(char);
-		p = (HashSetTableList<KeyType> *)allocate.template allocate<char>(n);
+		n = sizeof(Privates::HashSetTableList<KeyType>) + size * sizeof(Privates::HSNode<KeyType>) / sizeof(char);
+		p = (Privates::HashSetTableList<KeyType> *)allocate.template allocate<char>(n);
 		p->size = size;
 		p->next = NULL;
 		return p;
@@ -492,11 +498,11 @@ public:
 #endif
 
 private:
-	HSNode<KeyType> *m_table;
+	Privates::HSNode<KeyType> *m_table;
 	size_t m_count;
 	size_t m_size;
-	HSNode<KeyType> *m_firstFree;
-	HashSetTableList<KeyType> *m_tables;
+	Privates::HSNode<KeyType> *m_firstFree;
+	Privates::HashSetTableList<KeyType> *m_tables;
 	size_t m_overflowFirst;
 	size_t m_overflowSize;
 	HashFunction hashfn;
@@ -513,6 +519,8 @@ class BiDiHashMap;
 template<class KeyType, class ValueType, class HashFunction, class Allocator>
 class BiDiHashMap_const_iterator;
 
+
+namespace Privates {
 
 template<class KeyType, class ValueType>
 class HashMapPair {
@@ -534,12 +542,6 @@ public:
 	bool operator !=(const HashMapPair<KeyType, ValueType> &other) const { return first != other.first; };
 	};
 
-/*
-template<class KeyType, class ValueType>
-HashMapPair<KeyType, ValueType> makeHashMapPair(const KeyType &f, const ValueType &s) {
-	return HashMapPair<KeyType, ValueType>(f, s);
-	};
-*/
 
 template<class HashFn, class K, class V>
 class HashMapHashWrapper {
@@ -610,6 +612,7 @@ protected:
 	ValueType m_defaultValue;
 	};
 
+}
 
 /*
  * HashMap
@@ -618,17 +621,17 @@ template<typename KeyType,
 	 typename ValueType,
 	 class HashFunction = DefaultHashFunction<KeyType>,
 	 class Allocator = HashDefaultCPPAllocator>
-class HashMap: public SetToMap<KeyType, ValueType,
-			       HashMapPair<KeyType, ValueType>,
-			       HashSet<HashMapPair<KeyType, ValueType>,
-			       	       HashMapHashWrapper<HashFunction, KeyType, ValueType>,
+class HashMap: public Privates::SetToMap<KeyType, ValueType,
+			       Privates::HashMapPair<KeyType, ValueType>,
+			       HashSet<Privates::HashMapPair<KeyType, ValueType>,
+			       	       Privates::HashMapHashWrapper<HashFunction, KeyType, ValueType>,
 				       Allocator>
 			       > {
 private:
-	typedef SetToMap<KeyType, ValueType,
-			 HashMapPair<KeyType, ValueType>,
-			 HashSet<HashMapPair<KeyType, ValueType>,
-			     	 HashMapHashWrapper<HashFunction, KeyType, ValueType>,
+	typedef Privates::SetToMap<KeyType, ValueType,
+			 Privates::HashMapPair<KeyType, ValueType>,
+			 HashSet<Privates::HashMapPair<KeyType, ValueType>,
+			     	 Privates::HashMapHashWrapper<HashFunction, KeyType, ValueType>,
 				 Allocator> > baseType;
 public:
 	HashMap(size_t size = 1021): baseType()				{ baseType::resize(size); };
@@ -638,6 +641,8 @@ public:
 	~HashMap()							{ };
 	};
 
+
+namespace Privates {
 
 /*
  * BiDiHashMapPair
@@ -681,6 +686,8 @@ private:
 	HashFn hashfn;
 	};
 
+}
+
 /*
  * BiDiHashMap_const_iterator
  */
@@ -690,17 +697,17 @@ template<class KeyType,
 	 class Allocator>
 class BiDiHashMap_const_iterator: public std::bidirectional_iterator_tag {
 private:
-	typedef SetToMap<KeyType, ValueType,
-			 BiDiHashMapPair<KeyType, ValueType>,
-			 HashSet<BiDiHashMapPair<KeyType, ValueType>,
-				 BiDiHashMapHashWrapper<HashFunction, KeyType, ValueType>,
+	typedef Privates::SetToMap<KeyType, ValueType,
+			 Privates::BiDiHashMapPair<KeyType, ValueType>,
+			 HashSet<Privates::BiDiHashMapPair<KeyType, ValueType>,
+				 Privates::BiDiHashMapHashWrapper<HashFunction, KeyType, ValueType>,
 				 Allocator> > mapBase;
 public:
 	typedef std::bidirectional_iterator_tag iterator_category;
-	typedef BiDiHashMapPair<KeyType, ValueType> value_type;
+	typedef Privates::BiDiHashMapPair<KeyType, ValueType> value_type;
 	typedef ptrdiff_t difference_type;
-	typedef const BiDiHashMapPair<KeyType, ValueType> *pointer;
-	typedef BiDiHashMapPair<KeyType, ValueType> &reference;
+	typedef const Privates::BiDiHashMapPair<KeyType, ValueType> *pointer;
+	typedef Privates::BiDiHashMapPair<KeyType, ValueType> &reference;
 
 	BiDiHashMap_const_iterator()					{ };
 	BiDiHashMap_const_iterator(const BiDiHashMap_const_iterator &it){ *this = it; };
@@ -722,9 +729,9 @@ public:
 	bool operator ==(const BiDiHashMap_const_iterator<KeyType, ValueType, HashFunction, Allocator> &it)	{ return m_cur == it.m_cur; };
 	bool operator !=(const BiDiHashMap_const_iterator<KeyType, ValueType, HashFunction, Allocator> &it)	{ return m_cur != it.m_cur; };
 private:
-	BiDiHashMap_const_iterator(const BiDiHashMapPair<KeyType, ValueType> *elem)	{ m_cur = elem; };
+	BiDiHashMap_const_iterator(const Privates::BiDiHashMapPair<KeyType, ValueType> *elem)	{ m_cur = elem; };
 
-	const BiDiHashMapPair<KeyType, ValueType> *m_cur;
+	const Privates::BiDiHashMapPair<KeyType, ValueType> *m_cur;
 	friend class BiDiHashMap<KeyType, ValueType, HashFunction, Allocator>;
 	};
 
@@ -737,17 +744,17 @@ template<typename KeyType,
 	 typename ValueType,
 	 class HashFunction = DefaultHashFunction<KeyType>,
 	 class Allocator = HashDefaultCPPAllocator>
-class BiDiHashMap: public SetToMap<KeyType, ValueType,
-				   BiDiHashMapPair<KeyType, ValueType>,
-				   HashSet<BiDiHashMapPair<KeyType, ValueType>,
-				   	   BiDiHashMapHashWrapper<HashFunction, KeyType, ValueType>,
+class BiDiHashMap: public Privates::SetToMap<KeyType, ValueType,
+				   Privates::BiDiHashMapPair<KeyType, ValueType>,
+				   HashSet<Privates::BiDiHashMapPair<KeyType, ValueType>,
+				   	   Privates::BiDiHashMapHashWrapper<HashFunction, KeyType, ValueType>,
 				           Allocator>
 				   > {
 private:
-	typedef SetToMap<KeyType, ValueType,
-			 BiDiHashMapPair<KeyType, ValueType>,
-			 HashSet<BiDiHashMapPair<KeyType, ValueType>,
-				 BiDiHashMapHashWrapper<HashFunction, KeyType, ValueType>,
+	typedef Privates::SetToMap<KeyType, ValueType,
+			 Privates::BiDiHashMapPair<KeyType, ValueType>,
+			 HashSet<Privates::BiDiHashMapPair<KeyType, ValueType>,
+				 Privates::BiDiHashMapHashWrapper<HashFunction, KeyType, ValueType>,
 			         Allocator> > baseType;
 
 public:
@@ -855,20 +862,20 @@ private:
 		m_end.next = &m_end;
 		};
 
-	void AddToList(const BiDiHashMapPair<KeyType, ValueType> *ptr) {
+	void AddToList(const Privates::BiDiHashMapPair<KeyType, ValueType> *ptr) {
 		ptr->prev = &m_begin;
 		ptr->next = m_begin.next;
 		m_begin.next = ptr;
 		ptr->next->prev = ptr;
 		};
 
-	void DelFromList(const BiDiHashMapPair<KeyType, ValueType> *ptr) {
+	void DelFromList(const Privates::BiDiHashMapPair<KeyType, ValueType> *ptr) {
 		ptr->prev->next = ptr->next;
 		ptr->next->prev = ptr->prev;
 		};
 
 private:
-	BiDiHashMapPair<KeyType, ValueType> m_begin, m_end;
+	Privates::BiDiHashMapPair<KeyType, ValueType> m_begin, m_end;
 	};
 
 

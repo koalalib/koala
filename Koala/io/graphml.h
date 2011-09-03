@@ -25,10 +25,18 @@ class GraphML;
  *
  * ------------------------------------------------------------------------- */
 
-struct GraphMLKeyVal {
+struct GraphMLKeyTypes {
+    enum Type { None, NotDefined, Bool, Int, Long, Float, Double, String };
+    enum ForKey { All, Graph, Node, Edge };
+};
+
+
+namespace Privates {
+
+struct GraphMLKeyVal : public GraphMLKeyTypes {
     std::string id, name;
-    enum Type { None, NotDefined, Bool, Int, Long, Float, Double, String } type;
-    enum ForKey { All, Graph, Node, Edge } forKey;
+    GraphMLKeyTypes::Type type;
+    GraphMLKeyTypes::ForKey forKey;
     bool is_def;
     union {
         int intVal;
@@ -51,15 +59,16 @@ typedef std::vector< GraphMLKeyVal > GraphMLKeys;
  * ------------------------------------------------------------------------- */
 
 class KeysHolderBase {
+    friend class Koala::IO::GraphML;
     private:
-        friend class GraphML;
+
         int count;
 
         void next();
         void clearCount();
         void setValUsr();
         void clear();
-        
+
     protected:
         GraphMLKeys *defs;
 
@@ -76,8 +85,8 @@ class KeysHolderBase {
         std::string getKeyId( int );
         std::string getKeyName( int );
 
-        GraphMLKeyVal::Type getKeyType( int );
-        GraphMLKeyVal::ForKey getKeyFor( int );
+        GraphMLKeyTypes::Type getKeyType( int );
+        GraphMLKeyTypes::ForKey getKeyFor( int );
 
         std::string getString( int );
         int getInt( int );
@@ -95,38 +104,41 @@ class KeysHolderBase {
 
         void setValUsr( int, const char * );
         void setValDef( int, const char * );
-        
+
     public:
         KeysHolderBase();
         KeysHolderBase( const KeysHolderBase & );
         ~KeysHolderBase();
-        
+
         int getKeysNo();
         int getCount();
 } ;
+
+}
+
 
 /* ------------------------------------------------------------------------- *
  * KeysHolderRead
  *
  * ------------------------------------------------------------------------- */
 
-class KeysHolderRead: public KeysHolderBase
+class KeysHolderRead: public Privates::KeysHolderBase
 {
     private:
         friend class GraphML;
         char type;
-        
+
     public:
-        KeysHolderRead( const KeysHolderBase & );
+        KeysHolderRead( const Privates::KeysHolderBase & );
         ~KeysHolderRead();
-        
+
         int getId( const char * );
         bool valid( int );
 
         std::string getKeyId( int );
         std::string getKeyName( int );
-        GraphMLKeyVal::Type getKeyType( int );
-        GraphMLKeyVal::ForKey getKeyFor( int );
+        GraphMLKeyTypes::Type getKeyType( int );
+        GraphMLKeyTypes::ForKey getKeyFor( int );
 
         bool getBool( int );
         int getInt( int );
@@ -140,23 +152,23 @@ class KeysHolderRead: public KeysHolderBase
  *
  * ------------------------------------------------------------------------- */
 
-class KeysHolderWrite : public KeysHolderBase {
+class KeysHolderWrite : public Privates::KeysHolderBase {
     private:
         friend class GraphML;
         char type;
-        
+
     public:
-        KeysHolderWrite( const KeysHolderBase & );
+        KeysHolderWrite( const Privates::KeysHolderBase & );
         ~KeysHolderWrite();
-        
+
         int getIdCr( const char * );
         int getIdNoCr( const char * );
         bool valid( int );
 
         std::string getKeyId( int );
         std::string getKeyName( int );
-        GraphMLKeyVal::Type getKeyType( int );
-        GraphMLKeyVal::ForKey getKeyFor( int );
+        GraphMLKeyTypes::Type getKeyType( int );
+        GraphMLKeyTypes::ForKey getKeyFor( int );
 
         bool setNotDef( int, const char * );
         bool setBool( int, bool );
@@ -171,23 +183,23 @@ class KeysHolderWrite : public KeysHolderBase {
  *
  * ------------------------------------------------------------------------- */
 
-class KeysHolderGraph: public KeysHolderBase
+class KeysHolderGraph: public Privates::KeysHolderBase
 {
     private:
         friend class GraphML;
-        
+
     public:
         KeysHolderGraph();
         ~KeysHolderGraph();
-        
+
         int getIdCr( const char * );
         int getIdNoCr( const char * );
         bool valid( int );
 
         std::string getKeyId( int );
         std::string getKeyName( int );
-        GraphMLKeyVal::Type getKeyType( int );
-        GraphMLKeyVal::ForKey getKeyFor( int );
+        GraphMLKeyTypes::Type getKeyType( int );
+        GraphMLKeyTypes::ForKey getKeyFor( int );
 
         bool setBool( int, bool );
         bool setInt( int, int );
@@ -212,7 +224,7 @@ class GraphML
     public:
         GraphML();
         ~GraphML();
-        
+
         bool readFile( const char * );
         bool writeFile( const char * );
         void clear();
@@ -227,7 +239,7 @@ class GraphML
             bool readGraph( Graph &, const char *, InfoVertex, InfoEdge );
         template< class Graph, class InfoVertex, class InfoEdge >
             bool readGraph( Graph &, int, InfoVertex, InfoEdge );
-        
+
         template< class Graph > bool writeGraph( const Graph &, const char * );
         template< class Graph, class InfoVertex, class InfoEdge >
             bool writeGraph( const Graph &, const char *, InfoVertex, InfoEdge );
@@ -237,11 +249,11 @@ class GraphML
         bool readGraphParam( int, KeysHolderGraph & );
         bool writeGraphParam( const char *, KeysHolderGraph & );
         bool writeGraphParam( int, KeysHolderGraph & );
-        
+
     private:
-        KeysHolderBase keysHolder;
+        Privates::KeysHolderBase keysHolder;
         TiXmlDocument *doc;
-        
+
         template< class Graph > bool readGraph( Graph &, TiXmlElement * );
         template< class Graph, class InfoVertex, class InfoEdge >
             bool readGraph( Graph &, TiXmlElement *, InfoVertex, InfoEdge );

@@ -38,11 +38,13 @@ class GraphClassDefaultSettings {
     template <class K, class V> class AdjMatrixDirEdges {
         public:
         typedef AssocMatrix<K,V,AMatrNoDiag> Type;
+//        typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
     };
 
     template <class K, class V> class AdjMatrixUndirEdges {
         public:
         typedef AssocMatrix<K,V,AMatrTriangle> Type;
+//        typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
     };
 
     template<class VertInfo, class EdgeInfo, EdgeType EdAllow> struct VertAdditData {
@@ -91,15 +93,60 @@ class SubgraphBase
 } ;
 
 
+namespace Privates {
+
 template <EdgeType EdgeAllow>
-class EdgeAllowTest;
+class EdgeCounterLoop
+{   protected:
+
+    mutable int n;
+    int & no() const { return n; }
+    EdgeCounterLoop(): n(0) {}
+};
 
 template <>
-class EdgeAllowTest<EdNone> {};
+class EdgeCounterLoop<0>
+{   protected:
+
+    int & no() const { return _KoalaEmptyVertDegree; }
+};
+
+template <EdgeType EdgeAllow>
+class EdgeCounterDir;
 
 template <>
-class EdgeAllowTest<EdDirIn|EdDirOut> {};
+class EdgeCounterDir<EdDirIn|EdDirOut>
+{   protected:
 
+    mutable int n;
+    int & no() const { return n; }
+    EdgeCounterDir(): n(0) {}
+};
+
+template <>
+class EdgeCounterDir<0>
+{   protected:
+
+    int & no() const { return _KoalaEmptyVertDegree; }
+};
+
+template <EdgeType EdgeAllow>
+class EdgeCounterUndir
+{   protected:
+
+    mutable int n;
+    int & no() const { return n; }
+    EdgeCounterUndir(): n(0) {}
+};
+
+template <>
+class EdgeCounterUndir<0>
+{   protected:
+
+    int & no() const { return _KoalaEmptyVertDegree; }
+};
+
+}
 
 /* ------------------------------------------------------------------------- *
  * Graph< VertInfo,EdgeInfo,EdAllow >
@@ -111,7 +158,10 @@ class EdgeAllowTest<EdDirIn|EdDirOut> {};
  * ------------------------------------------------------------------------- */
 
 template< class VertInfo = EmptyVertInfo, class EdgeInfo = EmptyVertInfo, EdgeType EdAllow = EdAll|AdjMatrixAllowed >
-class Graph: public SubgraphBase, public EdgeAllowTest<EdAllow & (EdDirIn|EdDirOut)>
+class Graph: public SubgraphBase,
+    protected Privates::EdgeCounterLoop<EdAllow & Loop>,
+    protected Privates::EdgeCounterDir<EdAllow & (EdDirIn|EdDirOut)>,
+    protected Privates::EdgeCounterUndir<EdAllow & Undirected>
 {
     public:
         friend class Edge< VertInfo,EdgeInfo,EdAllow >;
@@ -445,7 +495,10 @@ class Graph: public SubgraphBase, public EdgeAllowTest<EdAllow & (EdDirIn|EdDirO
 
         PVertex first_vert, last_vert;
         PEdge first_edge, last_edge;
-        int no_vert, no_loop_edge, no_dir_edge, no_undir_edge;
+        int& no_loop_edge() const { return this->Privates::EdgeCounterLoop<EdAllow & Loop>::no(); }
+        int& no_dir_edge() const { return this->Privates::EdgeCounterDir<EdAllow & (EdDirIn|EdDirOut)>::no(); }
+        int& no_undir_edge() const { return this->Privates::EdgeCounterUndir<EdAllow & Undirected>::no(); }
+        int no_vert;
 
         inline PVertex attach( PVertex );
         inline PVertex detach( PVertex );

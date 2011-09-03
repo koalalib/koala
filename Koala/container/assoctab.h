@@ -247,7 +247,8 @@ class AssocKeyContReg: public AssocContReg
         AssocKeyContReg &operator=( const AssocKeyContReg & );
 
         AssocContReg *find( AssocContBase *cont );
-        ~AssocKeyContReg();
+        void deregister();
+        ~AssocKeyContReg() { deregister(); }
 } ;
 
 template< class Klucz, class Elem > struct BlockOfAssocArray
@@ -334,7 +335,7 @@ template< class K, class V, class C > class AssocTabInterface< AssocArray< K,V,C
         bool empty() { return cont.empty(); }
         void clear() { cont.clear(); }
 
-        template< class Iterator > int getKeys( Iterator );
+        template< class Iterator > int getKeys( Iterator iter) { cont.getKeys(iter); }
 
         int capacity () { return cont.capacity(); }
         void reserve(int n) { cont.reserve(n); }
@@ -342,19 +343,69 @@ template< class K, class V, class C > class AssocTabInterface< AssocArray< K,V,C
         AssocArray< K,V,C > &cont;
 };
 
-struct DummyVal {};
 
-template< class Klucz, class Container >
-void sum(
-    AssocArray< Klucz,DummyVal,Container > &,
-    AssocArray< Klucz,DummyVal,Container > &,
-    AssocArray< Klucz,DummyVal,Container > & );
+template< class Klucz, class Elem, class AssocCont, class Container = std::vector< BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > > >
+class PseudoAssocArray
+{
+    protected:
+        BlockList< BlockOfAssocArray< Klucz,Elem >,std::vector< BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > > > tab;
+        AssocCont assocTab;
 
-template< class Klucz, class Container >
-void diff(
-    AssocArray< Klucz,DummyVal,Container > &,
-    AssocArray< Klucz,DummyVal,Container > &,
-    AssocArray< Klucz,DummyVal,Container > & );
+    public:
+        typedef Klucz KeyType;
+        typedef Elem ValType;
+        typedef BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > BlockType;
+
+        PseudoAssocArray( int asize = 0 ): tab( asize ), assocTab(asize) { }
+
+        int size() { return tab.size(); }
+        bool empty() { return tab.empty(); }
+        void reserve( int arg ) { tab.reserve( arg ); assocTab.reserve(arg); }
+        int capacity() { return tab.capacity(); }
+        bool hasKey( Klucz v ) { return keyPos( v ) != -1; }
+        int keyPos( Klucz );
+        bool delKey( Klucz );
+        Klucz firstKey();
+        Klucz lastKey();
+        Klucz nextKey( Klucz );
+        Klucz prevKey( Klucz );
+        Elem &operator[]( Klucz );
+        void defrag();
+        void clear() { tab.clear(); assocTab.clear(); }
+
+        template< class Iterator > int getKeys( Iterator );
+
+        ~PseudoAssocArray() { clear(); }
+} ;
+
+
+template< class K, class V, class AC, class C > class AssocTabInterface< PseudoAssocArray< K,V,AC,C > >
+{
+    public:
+        AssocTabInterface( PseudoAssocArray< K,V,AC,C > &acont ): cont( acont ) { }
+
+        typedef K KeyType;
+        typedef V ValType;
+
+        bool hasKey( KeyType arg ) { return cont.hasKey( arg ); }
+        bool delKey( KeyType arg ) { return cont.delKey( arg ); }
+        KeyType firstKey() { return cont.firstKey(); }
+        KeyType lastKey() { return cont.lastKey(); }
+        KeyType prevKey( KeyType arg ) { return cont.prevKey( arg ); }
+        KeyType nextKey( KeyType arg ) { return cont.nextKey( arg ); }
+        ValType &operator[]( KeyType arg ) { return cont[arg]; }
+        unsigned size() { return cont.size(); }
+        bool empty() { return cont.empty(); }
+        void clear() { cont.clear(); }
+
+        template< class Iterator > int getKeys( Iterator iter) { cont.getKeys(iter); }
+
+        int capacity () { return cont.capacity(); }
+        void reserve(int n) { cont.reserve(n); }
+
+        PseudoAssocArray< K,V,AC,C > &cont;
+};
+
 
 enum AssocMatrixType { AMatrFull, AMatrNoDiag, AMatrTriangle, AMatrClTriangle };
 template< AssocMatrixType > class AssocMatrixAddr;
@@ -411,6 +462,7 @@ template <> class AssocMatrixAddr< AMatrTriangle >
         template< class Klucz > std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > );
 } ;
 
+
 template< class Elem > struct BlockOfAssocMatrix
 {
     Elem val;
@@ -418,6 +470,8 @@ template< class Elem > struct BlockOfAssocMatrix
     bool present() { return next || prev; }
     BlockOfAssocMatrix(): next( 0 ), prev( 0 ), val() { }
 } ;
+
+
 
 /* ------------------------------------------------------------------------- *
  * AssocMatrix
@@ -427,11 +481,11 @@ template< class Elem > struct BlockOfAssocMatrix
 
 template< class Klucz, class Elem, AssocMatrixType aType,
           class Container = std::vector< BlockOfAssocMatrix< Elem > >,
-          class IndexContainer = std::vector< BlockOfBlockList< BlockOfAssocArray< Klucz,int > > > >
+          class IndexContainer = AssocArray<Klucz,int,std::vector< BlockOfBlockList< BlockOfAssocArray< Klucz,int > > > > >
 class AssocMatrix: public AssocMatrixAddr< aType >
 {
     private:
-        class AssocIndex: public AssocArray< Klucz,int,IndexContainer >
+        class AssocIndex: public IndexContainer
         {
             public:
                 AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > *owner;
@@ -461,8 +515,8 @@ class AssocMatrix: public AssocMatrixAddr< aType >
     public:
         typedef Klucz KeyType;
         typedef Elem ValType;
-        typedef BlockOfAssocMatrix< Elem > BlockType;
-        typedef BlockOfBlockList< BlockOfAssocArray< Klucz,int > > IndexBlockType;
+//        typedef BlockOfAssocMatrix< Elem > BlockType;
+//        typedef BlockOfBlockList< BlockOfAssocArray< Klucz,int > > IndexBlockType;
 
         AssocMatrix( int = 0 );
         AssocMatrix( const AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > & );
@@ -477,10 +531,8 @@ class AssocMatrix: public AssocMatrixAddr< aType >
         Klucz prevInd( Klucz v ) { return index.prevKey( v ); }
         int indSize() { return index.size(); }
 
-        template< class Elem2, class ExtCont > int slice1(
-            Klucz, AssocArray< Klucz,Elem2,ExtCont > & );
-        template< class Elem2, class ExtCont > int slice2(
-            Klucz, AssocArray< Klucz,Elem2,ExtCont > & );
+        template< class Elem2, class ExtCont > int slice1(Klucz, ExtCont & );
+        template< class Elem2, class ExtCont > int slice2(Klucz, ExtCont & );
 
         bool hasKey( Klucz, Klucz );
         bool hasKey( std::pair< Klucz,Klucz > k ) { return hasKey( k.first,k.second ); }

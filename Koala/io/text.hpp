@@ -5,6 +5,9 @@
 namespace Koala {
 namespace IO {
 
+
+namespace Privates {
+
 /** move object info in '(info)' format from input stream to string stream
  * and strip parentheses
  * @param[in] strm stream to read from
@@ -172,6 +175,8 @@ bool readGraphEL(Graph &g, std::istream &strm,
 	return true;
 	};
 
+}
+
 
 /** append a graph described by a stream
  * requires overloading >> operator for std::istream for VertexInfo and EdgeInfo
@@ -185,12 +190,14 @@ template<typename Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, std::istream &strm, RG_Format format,
 		   VMap &vertexMap, EMap &edgeMap) {
 	switch(format) {
-		case RG_VertexLists:	return readGraphVL(g, strm, vertexMap, edgeMap);
-		case RG_EdgeList:	return readGraphEL(g, strm, vertexMap, edgeMap);
+		case RG_VertexLists:	return Privates::readGraphVL(g, strm, vertexMap, edgeMap);
+		case RG_EdgeList:	return Privates::readGraphEL(g, strm, vertexMap, edgeMap);
 		};
 	return false;
 	};
 
+
+namespace Privates {
 
 /** write a graph to the stream in a Vertex-List format
  * @param[out] graph to write
@@ -293,6 +300,7 @@ bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 	return true;
 	};
 
+}
 
 
 /** output a graph to the given stream
@@ -306,8 +314,8 @@ template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format, std::pair<bool,bool> printinf,
                     VMap& vmap, EMap& emap) {
 	switch(format) {
-		case RG_VertexLists:	return writeGraphVL(g, out, printinf,vmap,emap);
-		case RG_EdgeList:	return writeGraphEL(g, out, printinf,vmap,emap);
+		case RG_VertexLists:	return Privates::writeGraphVL(g, out, printinf,vmap,emap);
+		case RG_EdgeList:	return Privates::writeGraphEL(g, out, printinf,vmap,emap);
 		};
 	return false;
 	};

@@ -20,7 +20,7 @@ struct OpisE {
     int dlugosc; // dla Dijkstry niepotrzebne
 };
 
-const Koala::EdgeType Allow=Koala::EdDirIn|Koala::EdDirOut;
+const Koala::EdgeType Allow=Koala::EdDirIn|Koala::EdDirOut|Koala::AdjMatrixAllowed;
 
 Koala::Graph<OpisV,OpisE,Allow> g;
 Koala::Graph<OpisV,OpisE,Allow>::PVertex A,B,C,D,E,F,V,U,tabV[10];
@@ -44,6 +44,7 @@ int main() {
 //    g.addLoop(F,OpisE(2));
 //    g.makeAdjMatrix();
 //    std::cout << g.hasAdjMatrix();
+    std::cout << '\n' << g.getEdgeNo(Koala::EdDirOut|Koala::EdDirIn);
 
     return 0;
 }

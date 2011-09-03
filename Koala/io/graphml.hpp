@@ -1,3 +1,5 @@
+namespace Privates {
+
 GraphMLKeyVal::GraphMLKeyVal()
 {
     is_def = false;
@@ -352,8 +354,12 @@ void KeysHolderBase::setValDef( int id, const char *val )
     defs->at( id - 1 ).setDef( val );
 }
 
-KeysHolderRead::KeysHolderRead( const KeysHolderBase &khBase ):
-    KeysHolderBase( khBase )
+
+}
+
+
+KeysHolderRead::KeysHolderRead( const Privates::KeysHolderBase &khBase ):
+    Privates::KeysHolderBase( khBase )
 {
     this->type = 0;
 }
@@ -365,21 +371,21 @@ KeysHolderRead::~KeysHolderRead()
 
 bool KeysHolderRead::valid( int id )
 {
-    if (id <= 0 || id > KeysHolderBase::getKeysNo()) return false;
-    GraphMLKeyVal::ForKey forKey = KeysHolderBase::getKeyFor( id );
+    if (id <= 0 || id > Privates::KeysHolderBase::getKeysNo()) return false;
+    GraphMLKeyTypes::ForKey forKey = Privates::KeysHolderBase::getKeyFor( id );
     switch (type)
     {
         case 0: return true;
         case 1:
-            if (forKey == GraphMLKeyVal::All || forKey == GraphMLKeyVal::Graph)
+            if (forKey == Privates::GraphMLKeyVal::All || forKey == Privates::GraphMLKeyVal::Graph)
                 return true;
             return false;
         case 2:
-            if (forKey == GraphMLKeyVal::All || forKey == GraphMLKeyVal::Node)
+            if (forKey == Privates::GraphMLKeyVal::All || forKey == Privates::GraphMLKeyVal::Node)
                 return true;
             return false;
         case 3:
-            if (forKey == GraphMLKeyVal::All || forKey == GraphMLKeyVal::Edge)
+            if (forKey == Privates::GraphMLKeyVal::All || forKey == Privates::GraphMLKeyVal::Edge)
                 return true;
             return false;
     }
@@ -388,63 +394,63 @@ bool KeysHolderRead::valid( int id )
 
 int KeysHolderRead::getId( const char *keyName )
 {
-    int id = KeysHolderBase::getId( keyName );
+    int id = Privates::KeysHolderBase::getId( keyName );
     if (!valid( id )) return 0;
     return id;
 }
 
 std::string KeysHolderRead::getKeyId( int id )
 {
-    return KeysHolderBase::getKeyId( id );
+    return Privates::KeysHolderBase::getKeyId( id );
 }
 
 std::string KeysHolderRead::getKeyName( int id )
 {
-    return KeysHolderBase::getKeyName( id );
+    return Privates::KeysHolderBase::getKeyName( id );
 }
 
-GraphMLKeyVal::Type KeysHolderRead::getKeyType( int id )
+GraphMLKeyTypes::Type KeysHolderRead::getKeyType( int id )
 {
-    return KeysHolderBase::getKeyType( id );
+    return Privates::KeysHolderBase::getKeyType( id );
 }
 
-GraphMLKeyVal::ForKey KeysHolderRead::getKeyFor( int id )
+GraphMLKeyTypes::ForKey KeysHolderRead::getKeyFor( int id )
 {
-    return KeysHolderBase::getKeyFor( id );
+    return Privates::KeysHolderBase::getKeyFor( id );
 }
 
 bool KeysHolderRead::getBool( int id )
 {
     if (!valid( id )) return 0;
-    return KeysHolderBase::getInt( id );
+    return Privates::KeysHolderBase::getInt( id );
 }
 
 int KeysHolderRead::getInt( int id )
 {
     if (!valid( id )) return 0;
-    return KeysHolderBase::getInt( id );
+    return Privates::KeysHolderBase::getInt( id );
 }
 
 int64_t KeysHolderRead::getLong( int id )
 {
     if (!valid( id )) return 0;
-    return KeysHolderBase::getLong( id );
+    return Privates::KeysHolderBase::getLong( id );
 }
 
 double KeysHolderRead::getDouble( int id )
 {
     if (!valid( id )) return 0;
-    return KeysHolderBase::getDouble( id );
+    return Privates::KeysHolderBase::getDouble( id );
 }
 
 std::string KeysHolderRead::getString( int id )
 {
     if (!valid( id )) return "";
-    return KeysHolderBase::getString( id );
+    return Privates::KeysHolderBase::getString( id );
 }
 
-KeysHolderWrite::KeysHolderWrite( const KeysHolderBase &khBase ):
-    KeysHolderBase( khBase )
+KeysHolderWrite::KeysHolderWrite( const Privates::KeysHolderBase &khBase ):
+    Privates::KeysHolderBase( khBase )
 {
     type = 0;
 }
@@ -457,20 +463,20 @@ KeysHolderWrite::~KeysHolderWrite()
 bool KeysHolderWrite::valid( int id )
 {
     if (id <= 0 || id > this->defs->size()) return false;
-    GraphMLKeyVal::ForKey forKey = KeysHolderBase::getKeyFor( id );
+    GraphMLKeyTypes::ForKey forKey = Privates::KeysHolderBase::getKeyFor( id );
     switch (this->type)
     {
         case 0: return true;
         case 1:
-            if (forKey == GraphMLKeyVal::All || forKey==GraphMLKeyVal::Graph)
+            if (forKey == Privates::GraphMLKeyVal::All || forKey==Privates::GraphMLKeyVal::Graph)
                     return true;
             return false;
         case 2:
-            if (forKey == GraphMLKeyVal::All || forKey == GraphMLKeyVal::Node)
+            if (forKey == Privates::GraphMLKeyVal::All || forKey == Privates::GraphMLKeyVal::Node)
                 return true;
             return false;
         case 3:
-            if (forKey == GraphMLKeyVal::All || forKey == GraphMLKeyVal::Edge)
+            if (forKey == Privates::GraphMLKeyVal::All || forKey == Privates::GraphMLKeyVal::Edge)
                 return true;
             return false;
     }
@@ -479,102 +485,102 @@ bool KeysHolderWrite::valid( int id )
 
 int KeysHolderWrite::getIdCr( const char *keyName )
 {
-    int id = KeysHolderBase::getId( keyName );
-    if (!id) id = KeysHolderBase::createKey( keyName );
+    int id = Privates::KeysHolderBase::getId( keyName );
+    if (!id) id = Privates::KeysHolderBase::createKey( keyName );
     else if (!valid( id )) return 0;
     return id;
 }
 
 int KeysHolderWrite::getIdNoCr( const char *keyName )
 {
-    int id = KeysHolderBase::getId( keyName );
+    int id = Privates::KeysHolderBase::getId( keyName );
     if (!valid( id )) return 0;
     return id;
 }
 
 std::string KeysHolderWrite::getKeyId( int id )
 {
-    return KeysHolderBase::getKeyId( id );
+    return Privates::KeysHolderBase::getKeyId( id );
 }
 
 std::string KeysHolderWrite::getKeyName( int id )
 {
-    return KeysHolderBase::getKeyName( id );
+    return Privates::KeysHolderBase::getKeyName( id );
 }
 
-GraphMLKeyVal::Type KeysHolderWrite::getKeyType( int id )
+GraphMLKeyTypes::Type KeysHolderWrite::getKeyType( int id )
 {
-    return KeysHolderBase::getKeyType( id );
+    return Privates::KeysHolderBase::getKeyType( id );
 }
 
-GraphMLKeyVal::ForKey KeysHolderWrite::getKeyFor( int id )
+GraphMLKeyTypes::ForKey KeysHolderWrite::getKeyFor( int id )
 {
-    return KeysHolderBase::getKeyFor( id );
+    return Privates::KeysHolderBase::getKeyFor( id );
 }
 
 bool KeysHolderWrite::setNotDef( int id, const char *val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
 bool KeysHolderWrite::setBool( int id, bool val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
 bool KeysHolderWrite::setInt( int id, int val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
 bool KeysHolderWrite::setLong( int id, int64_t val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
 bool KeysHolderWrite::setDouble( int id, double val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
 bool KeysHolderWrite::setString( int id, const char *val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
-KeysHolderGraph::KeysHolderGraph(): KeysHolderBase() { }
+KeysHolderGraph::KeysHolderGraph(): Privates::KeysHolderBase() { }
 
 KeysHolderGraph::~KeysHolderGraph() { }
 
 int KeysHolderGraph::getIdCr( const char *keyName )
 {
-    int id = KeysHolderBase::getId( keyName );
-    if (!id) id = KeysHolderBase::createKey( keyName );
+    int id = Privates::KeysHolderBase::getId( keyName );
+    if (!id) id = Privates::KeysHolderBase::createKey( keyName );
     else if (!valid( id )) return 0;
     return id;
 }
 
 int KeysHolderGraph::getIdNoCr( const char *keyName )
 {
-    int id = KeysHolderBase::getId( keyName );
+    int id = Privates::KeysHolderBase::getId( keyName );
     if (!valid( id )) return 0;
     return id;
 }
@@ -582,100 +588,100 @@ int KeysHolderGraph::getIdNoCr( const char *keyName )
 bool KeysHolderGraph::valid( int id )
 {
     if (id <= 0 || id > this->defs->size()) return false;
-    GraphMLKeyVal::ForKey forKey = KeysHolderBase::getKeyFor( id );
-    if (forKey == GraphMLKeyVal::All || forKey == GraphMLKeyVal::Graph)
+    GraphMLKeyTypes::ForKey forKey = Privates::KeysHolderBase::getKeyFor( id );
+    if (forKey == Privates::GraphMLKeyVal::All || forKey == Privates::GraphMLKeyVal::Graph)
         return true;
     return false;
 }
 
 std::string KeysHolderGraph::getKeyId( int id )
 {
-    return KeysHolderBase::getKeyId( id );
+    return Privates::KeysHolderBase::getKeyId( id );
 }
 
 std::string KeysHolderGraph::getKeyName( int id )
 {
-    return KeysHolderBase::getKeyName( id );
+    return Privates::KeysHolderBase::getKeyName( id );
 }
 
-GraphMLKeyVal::Type KeysHolderGraph::getKeyType( int id )
+GraphMLKeyTypes::Type KeysHolderGraph::getKeyType( int id )
 {
-    return KeysHolderBase::getKeyType( id );
+    return Privates::KeysHolderBase::getKeyType( id );
 }
 
-GraphMLKeyVal::ForKey KeysHolderGraph::getKeyFor( int id )
+GraphMLKeyTypes::ForKey KeysHolderGraph::getKeyFor( int id )
 {
-    return KeysHolderBase::getKeyFor( id );
+    return Privates::KeysHolderBase::getKeyFor( id );
 }
 
 bool KeysHolderGraph::setBool( int id, bool val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
 bool KeysHolderGraph::setInt( int id, int val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
 bool KeysHolderGraph::setLong( int id, int64_t val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
 bool KeysHolderGraph::setDouble( int id, double val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
 bool KeysHolderGraph::setString( int id, const char *val )
 {
     if (!valid( id )) return false;
-    KeysHolderBase::setVal( id,val );
-    KeysHolderBase::touch( id );
+    Privates::KeysHolderBase::setVal( id,val );
+    Privates::KeysHolderBase::touch( id );
     return true;
 }
 
 bool KeysHolderGraph::getBool( int id )
 {
     if (!valid( id )) return 0;
-    return KeysHolderBase::getInt( id );
+    return Privates::KeysHolderBase::getInt( id );
 }
 
 int KeysHolderGraph::getInt( int id )
 {
     if (!valid( id )) return 0;
-    return KeysHolderBase::getInt( id );
+    return Privates::KeysHolderBase::getInt( id );
 }
 
 int64_t KeysHolderGraph::getLong( int id )
 {
     if (!valid( id )) return 0;
-    return KeysHolderBase::getLong( id );
+    return Privates::KeysHolderBase::getLong( id );
 }
 
 double KeysHolderGraph::getDouble( int id )
 {
     if (!valid( id )) return 0;
-    return KeysHolderBase::getDouble( id );
+    return Privates::KeysHolderBase::getDouble( id );
 }
 
 std::string KeysHolderGraph::getString( int id )
 {
     if (!valid( id )) return "";
-    return KeysHolderBase::getString( id );
+    return Privates::KeysHolderBase::getString( id );
 }
 
 GraphML::GraphML()
@@ -1151,24 +1157,24 @@ bool GraphML::readKeys()
         const char *keyType = xmlKey->Attribute( "attr.type" );
         const char *keyName = xmlKey->Attribute( "attr.name" );
 
-        GraphMLKeyVal::ForKey forKey;
+        GraphMLKeyTypes::ForKey forKey;
         if (!keyFor) continue;
-        else if (!strcmp( keyFor,"all" )) forKey = GraphMLKeyVal::All;
-        else if (!strcmp( keyFor,"node" )) forKey = GraphMLKeyVal::Node;
-        else if (!strcmp( keyFor,"edge" )) forKey = GraphMLKeyVal::Edge;
-        else if (!strcmp( keyFor,"graph" )) forKey = GraphMLKeyVal::Graph;
+        else if (!strcmp( keyFor,"all" )) forKey = Privates::GraphMLKeyVal::All;
+        else if (!strcmp( keyFor,"node" )) forKey = Privates::GraphMLKeyVal::Node;
+        else if (!strcmp( keyFor,"edge" )) forKey = Privates::GraphMLKeyVal::Edge;
+        else if (!strcmp( keyFor,"graph" )) forKey = Privates::GraphMLKeyVal::Graph;
         else continue;
 
         int id = keysHolder.createKey( keyId,keyName );
         keysHolder.setKeyFor( id,forKey );
 
-        GraphMLKeyVal::Type typeKey = GraphMLKeyVal::None;
-        if (!strcmp( keyType,"boolean" )) typeKey = GraphMLKeyVal::Bool;
-        else if (!strcmp( keyType,"int" )) typeKey = GraphMLKeyVal::Int;
-        else if (!strcmp( keyType,"long" )) typeKey = GraphMLKeyVal::Long;
-        else if (!strcmp( keyType,"float" )) typeKey = GraphMLKeyVal::Float;
-        else if (!strcmp( keyType,"double" )) typeKey = GraphMLKeyVal::Double;
-        else if (!strcmp( keyType,"string" )) typeKey = GraphMLKeyVal::String;
+        GraphMLKeyTypes::Type typeKey = Privates::GraphMLKeyVal::None;
+        if (!strcmp( keyType,"boolean" )) typeKey = Privates::GraphMLKeyVal::Bool;
+        else if (!strcmp( keyType,"int" )) typeKey = Privates::GraphMLKeyVal::Int;
+        else if (!strcmp( keyType,"long" )) typeKey = Privates::GraphMLKeyVal::Long;
+        else if (!strcmp( keyType,"float" )) typeKey = Privates::GraphMLKeyVal::Float;
+        else if (!strcmp( keyType,"double" )) typeKey = Privates::GraphMLKeyVal::Double;
+        else if (!strcmp( keyType,"string" )) typeKey = Privates::GraphMLKeyVal::String;
 
         keysHolder.setKeyType( id,typeKey );
 
@@ -1201,7 +1207,7 @@ void GraphML::writeKeys()
     TiXmlElement *tmpElem = new TiXmlElement( "key" );
 
     TiXmlNode *xmlFirst = xmlGraphs->FirstChild();
-    GraphMLKeys::iterator iter = keysHolder.defs->begin();
+    Privates::GraphMLKeys::iterator iter = keysHolder.defs->begin();
     for( ; iter != keysHolder.defs->end(); ++iter )
     {
         if (iter->count == keysHolder.count) continue;
@@ -1213,46 +1219,46 @@ void GraphML::writeKeys()
 
         switch (iter->forKey)
         {
-            case GraphMLKeyVal::Graph:
+            case Privates::GraphMLKeyVal::Graph:
                 xmlNewKey->SetAttribute( "for","graph" );
                 break;
 
-            case GraphMLKeyVal::Node:
+            case Privates::GraphMLKeyVal::Node:
                 xmlNewKey->SetAttribute( "for","node" );
                 break;
 
-            case GraphMLKeyVal::Edge:
+            case Privates::GraphMLKeyVal::Edge:
                 xmlNewKey->SetAttribute( "for","edge" );
                 break;
 
-            case GraphMLKeyVal::All:
+            case Privates::GraphMLKeyVal::All:
             default:
                 xmlNewKey->SetAttribute( "for","all" );
         }
 
         switch (iter->type)
         {
-            case GraphMLKeyVal::Bool:
+            case Privates::GraphMLKeyVal::Bool:
                 xmlNewKey->SetAttribute( "attr.type","boolean" );
                 break;
 
-            case GraphMLKeyVal::Int:
+            case Privates::GraphMLKeyVal::Int:
                 xmlNewKey->SetAttribute( "attr.type","int" );
                 break;
 
-            case GraphMLKeyVal::Long:
+            case Privates::GraphMLKeyVal::Long:
                 xmlNewKey->SetAttribute( "attr.type","long" );
                 break;
 
-            case GraphMLKeyVal::Float:
+            case Privates::GraphMLKeyVal::Float:
                 xmlNewKey->SetAttribute( "attr.type","float" );
                 break;
 
-            case GraphMLKeyVal::Double:
+            case Privates::GraphMLKeyVal::Double:
                 xmlNewKey->SetAttribute( "attr.type","double" );
                 break;
 
-            case GraphMLKeyVal::String:
+            case Privates::GraphMLKeyVal::String:
                 xmlNewKey->SetAttribute( "attr.type","string" );
                 break;
         }
@@ -1265,23 +1271,23 @@ void GraphML::writeKeys()
             char tmp_ch[40];
             switch (iter->type)
             {
-                case GraphMLKeyVal::Bool:
+                case Privates::GraphMLKeyVal::Bool:
                     xmlDef->LinkEndChild(
                         new TiXmlText(iter->pDef.intVal ? "1" : "0") );
                     break;
 
-                case GraphMLKeyVal::Int:
+                case Privates::GraphMLKeyVal::Int:
                     sprintf( tmp_ch,"%d",iter->pDef.intVal );
                     xmlDef->LinkEndChild( new TiXmlText( tmp_ch ) );
                     break;
 
-                case GraphMLKeyVal::Long:
+                case Privates::GraphMLKeyVal::Long:
                     sprintf( tmp_ch,"%lld",iter->pDef.longVal );
                     xmlDef->LinkEndChild( new TiXmlText( tmp_ch ) );
                     break;
 
-                case GraphMLKeyVal::Float:
-                case GraphMLKeyVal::Double:
+                case Privates::GraphMLKeyVal::Float:
+                case Privates::GraphMLKeyVal::Double:
                     sprintf( tmp_ch,"%lf",iter->pDef.dblVal );
                     xmlDef->LinkEndChild( new TiXmlText( tmp_ch ) );
 
@@ -1399,8 +1405,8 @@ bool GraphML::writeGraphParam( TiXmlElement *xmlGraph, KeysHolderGraph &kHolderG
             this->keysHolder.newVal( kHolderG.defs->at( i - 1 ) );
         else
         {
-            if (this->keysHolder.getKeyFor( j ) != GraphMLKeyVal::All
-                && this->keysHolder.getKeyFor( j ) != GraphMLKeyVal::Graph)
+            if (this->keysHolder.getKeyFor( j ) != Privates::GraphMLKeyVal::All
+                && this->keysHolder.getKeyFor( j ) != Privates::GraphMLKeyVal::Graph)
                     continue;
         }
         TiXmlElement *xmlKey = new TiXmlElement( "data" );
