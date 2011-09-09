@@ -50,12 +50,13 @@ void t(AssocMatrix<A,B,aType,D,E>& m)
 
 int main() {
 
+    BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > > bufor[10];
     std::map<int,std::string> mapa;
     AssocTabInterface<std::map<int,std::string> > amap=mapa;
 
 
 
-    AssocArray<Vert*,std::string> a;
+    AssocArray<Vert*,std::string> a(5,(int*)bufor);
     Vert * tab[5];
 
 
@@ -78,6 +79,8 @@ int main() {
     t(b);
 
     AssocArray<Vert*,std::string> a2=a;
+    AssocArray<Vert*,std::string> a3;
+    a3=a;
 
     AssocTable<AssocArray<Vert*,std::string> > ax(20);
     ax.reserve(30);
@@ -177,6 +180,36 @@ int main() {
     PseudoAssocArray<Vert*,std::string,AssocTable<std::map<Vert*,int> > > pst3=pst;
     t(pst3);
 //    assocTabInterf(pst3).getKeys(blackHole);
+
+    std::cout << "\n***Locals***\n";
+
+
+    AssocArray<Vert*,std::string,VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >
+        vitab(3,bufor);
+
+
+    t(vitab);
+    vitab[A]="Ala";
+    t(vitab);
+    vitab[B]="Basia";
+    t(vitab);
+    vitab[C]="Celina";
+//    vitab[D]="Celina";
+    t(vitab);
+    vitab.delKey(B);
+    t(vitab);
+    vitab.delKey(A);
+    t(vitab);
+    vitab[A]="Ania";
+    t(vitab);
+    vitab.defrag();
+    t(vitab);
+    vitab.clear();
+    t(vitab);
+    vitab[D]="Dagmara";
+    t(vitab);
+
+    std::cout << "\n\n" << AssocArrayVectIntSwitch<AssocArray<Vert*,std::string,VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >  >::isAAVI();
 
 }
 

@@ -59,6 +59,7 @@ class AlgorithmsDefaultSettings {
         public:
         typedef AssocArray<A,B> Type;
 //        typedef AssocTable < BiDiHashMap<A,B> > Type;
+//            typedef PseudoAssocArray<A,B,AssocTable<std::map<A,int> > > Type;
 
     };
 
@@ -75,6 +76,15 @@ class AlgorithmsDefaultSettings {
         static T zero() { return (T)0; }
         static bool isZero(T arg) {return arg==zero(); }
     };
+
+
+    template <class Iterator>
+    static void sort ( Iterator first, Iterator last )
+    { std::make_heap(first,last); std::sort_heap(first,last);}
+
+    template <class Iterator, class Comp>
+    static void sort ( Iterator first, Iterator last, Comp comp )
+    { std::make_heap(first,last,comp); std::sort_heap(first,last,comp);}
 
 };
 
@@ -193,7 +203,7 @@ template <class T> class VectorInterface<T*> {
     typedef T value_type;
 
     VectorInterface(T* bufor, int max) : start(bufor), limit(bufor+max), siz(0) {}
-    void link(T* newbuf, int newmax) { start=newbuf; limit=start+newmax; siz=0; }
+//    void link(T* newbuf, int newmax) { start=newbuf; limit=start+newmax; siz=0; }
 
     T* begin() { return start ; }
     T* end()   { return start+siz ; }

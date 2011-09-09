@@ -555,13 +555,11 @@ class LexBFSPar: public GraphSearchBase< LexBFSPar<DefaultStructs >, DefaultStru
                 typedef std::list< typename Graph::PVertex > LexList;
                 typedef std::pair< LexList,typename LexList::iterator > Node;
                 typedef std::list< Node > NodeList;
-                typedef AssocArray< typename Graph::PVertex,
-                    std::pair< typename NodeList::iterator,typename LexList::iterator > >
-                    MapStruct;
+                typename DefaultStructs:: template AssocCont< typename Graph::PVertex,
+                    std::pair< typename NodeList::iterator,typename LexList::iterator > >::Type m_vertexToListPos;
                 NodeList m_sets;
                 typename NodeList::iterator m_lastSet;
                 typename std::list< typename NodeList::iterator > m_splits;
-                MapStruct m_vertexToListPos;
         } ;
 
         template< class GraphType, class VertContainer, class Visitor >
@@ -701,7 +699,7 @@ class BlocksPar : protected SearchStructs
                 BiConState(
                     CompStore< CompIter,VertIter >, EdgeMap &, EdgeDirection,
                         std::pair< typename GraphType::PEdge *,int >,
-                        VertBlockList * );
+                        VertBlockList *,int );
 
                 void addVert( typename GraphType::PVertex );
                 void addEdge( typename GraphType::PEdge );
@@ -794,7 +792,7 @@ private:
 			   std::pair<typename GraphType::PVertex, typename GraphType::PEdge> *_stk,
 			   int nv,
 			   EdgeDirection m):
-			g(_g), stk(_stk, nv), edgeVisited(), mask(m)
+			g(_g), stk(_stk, nv), edgeVisited(_g.getEdgeNo()), mask(m)
                 {};
 		};
 

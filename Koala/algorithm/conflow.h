@@ -20,7 +20,7 @@ class FlowAlgsDefaultStructs : public AlgorithmsDefaultSettings {
     public:
 
     static bool useFulkersonFord() { return false; };
-    static bool useCostFulkersonFord() { return false; };
+    static bool useCostFulkersonFord() { return true; };
 };
 
 
@@ -530,7 +530,7 @@ class FlowPar : public PathStructs {
         typename GraphType::PVertex start, typename GraphType::PVertex end)
     {   assert(start && end && start!=end);
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabsCost<GraphType, typename EdgeContainer::ValType::CostType> >::Type Q;
+                VertLabsCost<GraphType, typename EdgeContainer::ValType::CostType> >::Type Q(g.getVertNo());
         typename GraphType::PVertex U,V;
 
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))

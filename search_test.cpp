@@ -76,7 +76,7 @@ void searchTest2()
 
 
 
-#define STRATEGY DFSPostorder
+#define STRATEGY LexBFS
 
 int main() {
 
