@@ -69,7 +69,7 @@ class DijkstraPar : public ShortPathStructs {
             DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
 
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab, Q;
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab, Q(g.getVertNo());
         typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
                     vertTab=
@@ -77,6 +77,8 @@ class DijkstraPar : public ShortPathStructs {
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
 
         typename GraphType::PVertex U,V;
+
+        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
 
         Q[start].vPrev=0;Q[start].ePrev=0;
         Q[start].distance=Zero;
@@ -162,7 +164,7 @@ class DijkstraPar : public ShortPathStructs {
 
         typename EdgeContainer::ValType::DistType dist;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab(g.getVertNo());
 
         if (!useHeap) dist=distances(g,vertTab,edgeTab,start,end);
         else dist=distances2(g,vertTab,edgeTab,start,end);
@@ -257,6 +259,8 @@ class DijkstraPar : public ShortPathStructs {
 
         typename GraphType::PVertex U,V;
 
+        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+
         Q[start].vPrev=0;Q[start].ePrev=0;
         Q.setDist(start,Zero);
 
@@ -335,6 +339,8 @@ class DAGCritPathPar : public ShortPathStructs {
         typename GraphType::PVertex U,V;
         typename EdgeContainer::ValType::DistType nd;
         int ibeg,iend;
+
+        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
 
         if (start)
         {
@@ -416,7 +422,7 @@ class DAGCritPathPar : public ShortPathStructs {
 
         typename EdgeContainer::ValType::DistType dist;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab(g.getVertNo());
 
         if (MinusInfty==(dist=critPathLength(g,vertTab,edgeTab,start,end)))
             return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-1); // end nieosiagalny
@@ -484,6 +490,9 @@ class BellmanFordPar : public ShortPathStructs {
                 minusInf=DefaultStructs:: template NumberTypeBounds
                                         <typename EdgeContainer::ValType::DistType> ::minusInfty();
         typename EdgeContainer::ValType::DistType nd;
+
+        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+
         bool existNegCycle = false;
 
 
@@ -589,7 +598,7 @@ class BellmanFordPar : public ShortPathStructs {
     {   assert(start && end);
         typename EdgeContainer::ValType::DistType dist;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab;
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab(g.getVertNo());
 
         if (DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType >
                             ::isPlusInfty(dist=distances(g,vertTab,edgeTab,start,end)))
@@ -807,7 +816,7 @@ class KruskalPar {
             typename GraphType::PEdge e;
             for(e = g.getEdge(mask); e != NULL; e = g.getEdgeNext(e, mask))
                 edges[i++] = std::make_pair(edgeTab[e].weight, e);
-            std::make_heap(edges,edges+g.getEdgeNo(mask)); std::sort_heap(edges,edges+g.getEdgeNo(mask));
+            DefaultStructs::sort(edges,edges+g.getEdgeNo(mask));
             if (!minWeight) std::reverse(edges,edges+g.getEdgeNo(mask));
 
             for(i = 0; i < g.getEdgeNo(mask) && edgeNo>0; i++)

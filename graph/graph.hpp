@@ -861,8 +861,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::getNeigh(
         ans[size++] = getEdgeEnd( edge,vert );
         edge = getEdgeNext( vert,edge,direct );
     }
-    std::make_heap( ans,ans+size );
-    std::sort_heap( ans,ans+size );
+    GraphClassDefaultSettings::sort( ans,ans+size );
     for( int i = 0; i < size; i++)
         if (i == 0 || ans[i - 1] != ans[i])
         {
@@ -902,8 +901,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::getClNeigh(
         ans[size++] = getEdgeEnd( edge,vert );
         edge = getEdgeNext( vert,edge,direct );
     }
-    std::make_heap( ans,ans+size );
-    std::sort_heap( ans,ans+size );
+    GraphClassDefaultSettings::sort( ans,ans+size );
     for( int i = 0; i < size; i++)
         if (i == 0 || ans[i - 1] != ans[i])
         {
@@ -1082,21 +1080,20 @@ inline int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts()
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template < class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts( Iterator begin, Iterator end )
+int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts2( Iterator begin, Iterator end )
 {
     int size = 0;
     for( Iterator iter = begin; iter != end; iter++ ) size++;
     typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex LOCALARRAY( buf,size );
     size = 0;
     for( Iterator iter = begin; iter != end; iter++) buf[size++] = *iter;
-    std::make_heap( buf,buf + size );
-    std::sort_heap( buf,buf + size );
+    GraphClassDefaultSettings::sort( buf,buf + size );
     size = std::unique( buf,buf + size ) - buf;
-    return delVerts2( buf,buf + size );
+    return delVerts( buf,buf + size );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template < class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts2( Iterator begin, Iterator end )
+int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts( Iterator begin, Iterator end )
 {
     int res = 0;
     for( Iterator i = begin; i != end; i++)
@@ -1112,7 +1109,7 @@ template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
 inline int Graph< VertInfo,EdgeInfo,EdAllow >::delVerts(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex> &s )
 {
-    return delVerts2( s.begin(),s.end() );
+    return delVerts( s.begin(),s.end() );
 }
 
 template< class VertInfo,class EdgeInfo , EdgeType EdAllow>
@@ -1165,7 +1162,7 @@ int Graph<VertInfo,EdgeInfo,EdAllow>::delEdges(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
+int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges2(
     Iterator begin, Iterator end, EdgeDirection direct )
 {
     int size = 0;
@@ -1173,14 +1170,13 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
     typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge LOCALARRAY( buf,size );
     size = 0;
     for( Iterator iter = begin; iter != end; iter++ ) buf[size++] = *iter;
-    std::make_heap( buf,buf + size );
-    std::sort_heap( buf,buf + size );
+    GraphClassDefaultSettings::sort( buf,buf + size );
     size = std::unique( buf,buf + size ) - buf;
-    return delEdges2( buf,buf + size,direct );
+    return delEdges( buf,buf + size,direct );
 }
 
 template< class VertInfo,class EdgeInfo, EdgeType EdAllow > template< class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges2(
+int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
     Iterator begin, Iterator end, EdgeDirection direct )
 {
     int res = 0;
@@ -1197,11 +1193,11 @@ template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
 inline int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge > &s, EdgeDirection direct )
 {
-    return delEdges2( s.begin(),s.end(),direct );
+    return delEdges( s.begin(),s.end(),direct );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
+int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges2(
     PVertex vert, Iterator begin, Iterator end, EdgeDirection direct )
 {
     int size = 0;
@@ -1209,14 +1205,13 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
     typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge LOCALARRAY( buf,size );
     size = 0;
     for( Iterator iter = begin; iter != end; iter++ ) buf[size++] = *iter;
-    std::make_heap( buf,buf + size );
-    std::sort_heap( buf,buf + size );
+    GraphClassDefaultSettings::sort( buf,buf + size );
     size = std::unique( buf,buf + size ) - buf;
-    return delEdges2( vert,buf,buf + size );
+    return delEdges( vert,buf,buf + size );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges2(
+int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
     PVertex vert, Iterator begin, Iterator end, EdgeDirection direct )
 {
     int res = 0;
@@ -1238,11 +1233,11 @@ inline int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
     PVertex vert, const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> &s,
     EdgeDirection direct )
 {
-    return delEdges2( vert,s.begin(),s.end(),direct );
+    return delEdges( vert,s.begin(),s.end(),direct );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
+int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges2(
     PVertex vert1, PVertex vert2, Iterator begin, Iterator end, EdgeDirection direct )
 {
     int size = 0;
@@ -1250,14 +1245,13 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
     typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge LOCALARRAY( buf,size );
     size = 0;
     for( Iterator iter = begin; iter != end; iter++ ) buf[size++] = *iter;
-    std::make_heap( buf,buf + size );
-    std::sort_heap( buf,buf + size );
+    GraphClassDefaultSettings::sort( buf,buf + size );
     size = std::unique( buf,buf + size ) - buf;
-    return delEdges2( vert1,vert2,buf,buf + size,direct );
+    return delEdges( vert1,vert2,buf,buf + size,direct );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges2(
+int Graph< VertInfo,EdgeInfo,EdAllow >::delEdges(
     PVertex vert1, PVertex vert2, Iterator begin, Iterator end, EdgeDirection direct )
 {
     int res = 0;
@@ -1283,11 +1277,11 @@ inline int Graph<VertInfo,EdgeInfo,EdAllow>::delEdges(
     PVertex vert1, PVertex vert2,
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> &s, EdgeDirection direct )
 {
-    return delEdges2( vert1,vert2,s.begin(),s.end(),direct );
+    return delEdges( vert1,vert2,s.begin(),s.end(),direct );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::chEdgesType(
+int Graph< VertInfo,EdgeInfo,EdAllow >::chEdgesType2(
     Iterator begin, Iterator end, EdgeType type)
 {
     int size = 0;
@@ -1296,14 +1290,13 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::chEdgesType(
     size = 0;
     for( Iterator iter = begin; iter != end; iter++ )
         if (*iter) buf[size++] = *iter;
-    std::make_heap( buf,buf + size );
-    std::sort_heap( buf,buf + size );
+    GraphClassDefaultSettings::sort( buf,buf + size );
     size = std::unique( buf,buf + size ) - buf;
-    return chEdgesType2( buf,buf + size,type );
+    return chEdgesType( buf,buf + size,type );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::chEdgesType2(
+int Graph< VertInfo,EdgeInfo,EdAllow >::chEdgesType(
     Iterator begin, Iterator end, EdgeType type)
 {
     int res = 0;
@@ -1317,7 +1310,7 @@ template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
 inline int Graph< VertInfo,EdgeInfo,EdAllow >::chEdgesType(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> &s, EdgeType type)
 {
-    return chEdgesType2( s.begin(),s.end(), type );
+    return chEdgesType( s.begin(),s.end(), type );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
@@ -1407,7 +1400,7 @@ bool Graph< VertInfo,EdgeInfo,EdAllow >::areParallel(
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(
+int Graph< VertInfo,EdgeInfo,EdAllow >::delParals2(
     Iterator begin, Iterator end, PEdge edge, EdgeDirection reltype)
 {   if (!edge) return 0;
     int size = 0;
@@ -1416,14 +1409,13 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(
     size = 0;
     for( Iterator iter = begin; iter != end; iter++ )
         if (*iter) buf[size++] = *iter;
-    std::make_heap( buf,buf + size );
-    std::sort_heap( buf,buf + size );
+    GraphClassDefaultSettings::sort( buf,buf + size );
     size = std::unique( buf,buf + size ) - buf;
-    return delParals2( buf,buf + size,edge,reltype );
+    return delParals( buf,buf + size,edge,reltype );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
-int Graph< VertInfo,EdgeInfo,EdAllow >::delParals2(
+int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(
     Iterator begin, Iterator end, PEdge edge, EdgeDirection reltype)
 {   if (!edge) return 0;
     int res = 0;
@@ -1437,7 +1429,7 @@ template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
 inline int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge> &s, PEdge edge, EdgeDirection reltype)
 {
-    return delParals2( s.begin(),s.end(), edge, reltype );
+    return delParals( s.begin(),s.end(), edge, reltype );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >
@@ -1447,7 +1439,7 @@ int Graph< VertInfo,EdgeInfo,EdAllow >::delParals(PEdge edge, EdgeDirection relt
         ends=getEnds(edge);
     typename Graph< VertInfo,EdgeInfo,EdAllow >::PEdge LOCALARRAY( buf,std::min(getEdgeNo(ends.first),getEdgeNo(ends.second)) );
     int size=getEdges(buf,ends.first,ends.second);
-    return delParals2(buf,buf+size,edge,reltype);
+    return delParals(buf,buf+size,edge,reltype);
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template <class Container>
@@ -1576,8 +1568,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::maxMu( EdgeDirection reltype) const
         edges[i++]=Parals3(std::min(e->getEnds().first,e->getEnds().second),
                            std::max(e->getEnds().first,e->getEnds().second),
                            getEdgeDir(e,std::min(e->getEnds().first,e->getEnds().second)),e);
-    std::make_heap(edges,edges+i,Parals3cmp());
-    std::sort_heap(edges,edges+i,Parals3cmp());
+    GraphClassDefaultSettings::sort(edges,edges+i,Parals3cmp());
     for(i=0;i<getEdgeNo(EdAll);i++)
     {
         if (i==0 || !areParallel(edges[i-1].edge,edges[i].edge,reltype))
@@ -1645,7 +1636,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::glue( PVertex vert1, PVertex vert2, bool mak
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
 typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
-Graph< VertInfo,EdgeInfo,EdAllow >::glue(
+Graph< VertInfo,EdgeInfo,EdAllow >::glue2(
     Iterator begin, Iterator end, bool makeloops, PVertex res )
 {
     int size = 0;
@@ -1653,15 +1644,14 @@ Graph< VertInfo,EdgeInfo,EdAllow >::glue(
     typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex LOCALARRAY( buf,size );
     size = 0;
     for( Iterator iter = begin; iter != end; iter++ ) buf[size++] = *iter;
-    std::make_heap( buf,buf + size );
-    std::sort_heap( buf,buf + size );
+    GraphClassDefaultSettings::sort( buf,buf + size );
     size = std::unique( buf,buf + size ) - buf;
-    return glue2( buf,buf + size,makeloops,res );
+    return glue( buf,buf + size,makeloops,res );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow > template< class Iterator >
 typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex
-Graph< VertInfo,EdgeInfo,EdAllow >::glue2(
+Graph< VertInfo,EdgeInfo,EdAllow >::glue(
     Iterator begin, Iterator end, bool makeloops, PVertex res )
 {
     bool present = false;
@@ -1709,7 +1699,7 @@ Graph< VertInfo,EdgeInfo,EdAllow >::glue(
     const Set< typename Graph< VertInfo,EdgeInfo,EdAllow >::PVertex> &s,
     bool makeloops, PVertex res )
 {
-    glue2( s.begin(),s.end(),makeloops,res );
+    glue( s.begin(),s.end(),makeloops,res );
 }
 
 template< class VertInfo, class EdgeInfo, EdgeType EdAllow >

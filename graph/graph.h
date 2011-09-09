@@ -55,6 +55,15 @@ class GraphClassDefaultSettings {
         AssocKeyContReg assocReg;
     };
 
+
+    template <class Iterator>
+    static void sort ( Iterator first, Iterator last )
+    { std::make_heap(first,last); std::sort_heap(first,last);}
+
+    template <class Iterator, class Comp>
+    static void sort ( Iterator first, Iterator last, Comp comp )
+    { std::make_heap(first,last,comp); std::sort_heap(first,last,comp);}
+
 };
 
 

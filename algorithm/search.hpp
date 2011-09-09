@@ -788,7 +788,7 @@ SCCPar < DefaultStructs >::SCCState< GraphType,CompIter,VertIter,CompMap >::SCCS
     CompStore< CompIter,VertIter > _i, CompMap &cm,
     typename GraphType::PVertex *buf1, typename GraphType::PVertex *buf2,
     int n ):
-    vmap(),
+    vmap(n),
     s( buf1,n ),
     p( buf2,n ),
     iters( _i ),
@@ -896,7 +896,7 @@ int SCCPar <DefaultStructs >::get(
 {
     int rv;
     typename DefaultStructs:: template AssocCont<
-            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type vertCont;
+            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type vertCont(g.getVertNo());
     typename GraphType::PVertex LOCALARRAY( buf1,g.getVertNo() + 1 );
     typename GraphType::PVertex LOCALARRAY( buf2,g.getVertNo() + 1 );
     SCCState< GraphType,CompIter,VertIter,CompMap > state( out,compMap,buf1,
@@ -918,8 +918,7 @@ int SCCPar <DefaultStructs >::connections(const GraphType &g, CompMap & comp, Pa
         std::pair <typename GraphType::PVertex,typename GraphType::PVertex> ends=g.getEdgeEnds(e);
         if (comp[ends.first]!=comp[ends.second])  buf[n++]=std::make_pair(comp[ends.first],comp[ends.second]);
     }
-    std::make_heap( buf,buf + n );
-    std::sort_heap( buf,buf + n );
+    DefaultStructs::sort( buf,buf + n );
     n = std::unique( buf,buf + n ) - buf;
     for(int i=0;i<n;i++)
     {
@@ -934,7 +933,7 @@ template< class GraphType, class VertIter >
 void DAGAlgsPar <DefaultStructs >::topOrd( const GraphType &g, VertIter out )
 {
     typename DefaultStructs:: template AssocCont<
-            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited;
+            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited(g.getVertNo());
     DFSPostorderPar<DefaultStructs>:: template visitAllBase( g,visited,
         Visitors::StoreTargetToVertIter< typename GraphType::PVertex* >( out ),
             EdDirIn );
@@ -947,7 +946,7 @@ bool DAGAlgsPar <DefaultStructs >::isDAG( const GraphType &g, Iter beg, Iter end
     if (g.getEdgeNo( EdUndir|EdLoop )) return false;
     if (!g.getVertNo()) return true;
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,int >::Type
-        topord;
+        topord(g.getVertNo());
     int licz = 0;
     for( Iter i = beg; i != end; ++i ) topord[*i] = licz++;
     assert( topord.size() == g.getVertNo() );
@@ -998,9 +997,9 @@ template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class EdgeMap >
 BlocksPar <DefaultStructs >::BiConState< GraphType,CompIter,VertIter,EdgeMap >::BiConState(
     CompStore< CompIter,VertIter > _i, EdgeMap &em, EdgeDirection _m,
-        std::pair< typename GraphType::PEdge *,int > st, VertBlockList *_vbl ):
-    vmap(),
-    emap(),
+        std::pair< typename GraphType::PEdge *,int > st, VertBlockList *_vbl,int vno ):
+    vmap(vno),
+    emap(st.second-1),
     estk( st.first,st.second ),
     iters( _i ),
     idx( 0 ),
@@ -1210,11 +1209,11 @@ int BlocksPar <DefaultStructs >::split(
 {
     int rv;
     typename DefaultStructs:: template AssocCont<
-            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited;
+            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited(g.getVertNo());
     typename GraphType::PEdge LOCALARRAY( stbuf,g.getEdgeNo() + 1 );
     VertBlockList LOCALARRAY( vertBlockList,g.getEdgeNo() * 2 + g.getVertNo() );
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap > state(
-        blocks,edgeMap,mask,std::make_pair( stbuf,g.getEdgeNo() + 1 ),vertBlockList );
+        blocks,edgeMap,mask,std::make_pair( stbuf,g.getEdgeNo() + 1 ),vertBlockList,g.getVertNo() );
     BiConVisitor< GraphType,CompIter,VertIter,EdgeDataMap > visit( state );
     if (mask & (EdDirIn | EdDirOut)) mask |= EdDirOut | EdDirIn;
 
@@ -1236,11 +1235,11 @@ int BlocksPar  <DefaultStructs >::splitComp(
 {
     int rv;
     typename DefaultStructs:: template AssocCont<
-            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited;
+            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited(g.getVertNo());
     typename GraphType::PEdge LOCALARRAY( stbuf,g.getEdgeNo() + 1 );
     VertBlockList LOCALARRAY( vertBlockList,g.getEdgeNo() * 2 + g.getVertNo() );
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap > state(
-        blocks,edgeMap,mask,std::make_pair( stbuf,g.getEdgeNo() + 1 ),vertBlockList );
+        blocks,edgeMap,mask,std::make_pair( stbuf,g.getEdgeNo() + 1 ),vertBlockList,g.getVertNo() );
     BiConVisitor< GraphType,CompIter,VertIter,EdgeDataMap > visit( state );
 
     if (mask & (EdDirIn | EdDirOut)) mask |= EdDirOut | EdDirIn;

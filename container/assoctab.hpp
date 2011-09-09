@@ -134,6 +134,7 @@ BlockList< Element,Container > &
 BlockList< Element,Container >::operator=( const BlockList< Element,Container > &X )
 {
     if (&X == this) return *this;
+    Privates::BlockListVectInerfTest<Container> error;
     siz = X.siz;
     first = X.first;
     last = X.last;

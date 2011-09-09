@@ -242,8 +242,7 @@ Subgraph< Graph,VChooser,EChooser >::maxMu( EdgeDirection reltype) const
         edges[i++]=Parals3(std::min(e->getEnds().first,e->getEnds().second),
                            std::max(e->getEnds().first,e->getEnds().second),
                            getEdgeDir(e,std::min(e->getEnds().first,e->getEnds().second)),e);
-    std::make_heap(edges,edges+i,Parals3cmp());
-    std::sort_heap(edges,edges+i,Parals3cmp());
+    GraphClassDefaultSettings::sort(edges,edges+i,Parals3cmp());
     for(i=0;i<getEdgeNo(EdAll);i++)
     {
         if (i==0 || !areParallel(edges[i-1].edge,edges[i].edge,reltype))
@@ -491,8 +490,7 @@ int Subgraph< Graph,VChooser,EChooser >::getNeigh(
         ans[size++] = getEdgeEnd( edge,vert );
         edge = getEdgeNext( vert,edge,direct );
     }
-    std::make_heap( ans,ans + size );
-    std::sort_heap( ans,ans + size );
+    GraphClassDefaultSettings::sort( ans,ans + size );
     for( int i = 0; i < size; i++ )
         if (i == 0 || ans[i - 1] != ans[i])
         {
@@ -542,8 +540,7 @@ int Subgraph< Graph,VChooser,EChooser >::getClNeigh(
         ans[size++] = getEdgeEnd( edge,vert );
         edge = getEdgeNext( vert,edge,direct );
     }
-    std::make_heap( ans,ans + size );
-    std::sort_heap( ans,ans + size );
+    GraphClassDefaultSettings::sort( ans,ans + size );
     for( int i = 0; i < size; i++ )
         if (i == 0 || ans[i - 1] != ans[i])
         {

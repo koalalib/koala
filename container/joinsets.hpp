@@ -1,24 +1,24 @@
 template< class ITEM, class AssocContainer >
 JoinableSets< ITEM,AssocContainer >::JoinableSets( unsigned int n ):
     mapa()
-{ 
-    siz = 0; 
-    bufor = NULL; 
-    resize( n ); 
+{
+    siz = 0;
+    bufor = NULL;
+    resize( n );
 }
 
 template< class ITEM, class AssocContainer >
 JoinableSets< ITEM,AssocContainer >::JoinableSets(
     const JoinableSets< ITEM,AssocContainer > &s ):
-    mapa(),
+    mapa(s.maxsize),
     siz( s.siz ),
     part_no( s.part_no ),
     maxsize( s.maxsize )
-{   
+{
     if (!maxsize) bufor = 0;
     else bufor = new JSPartDesrc< ITEM >[maxsize];
     for( int i = 0; i < siz; i++ )
-    {   
+    {
         bufor[i].deg = s.bufor[i].deg;
         bufor[i].size = s.bufor[i].size;
         bufor[i].key = s.bufor[i].key;
@@ -34,14 +34,14 @@ template< class ITEM, class AssocContainer >
 JoinableSets< ITEM,AssocContainer > &
 JoinableSets< ITEM,AssocContainer >::operator=(
     const JoinableSets< ITEM,AssocContainer > &s )
-{   
+{
     if (&s == this) return *this;
     resize( s.maxsize );
-    mapa.clear();
+//    mapa.clear();
     siz = s.siz;
     part_no = s.part_no;
     for( int i = 0; i < siz; i++ )
-    {   
+    {
         bufor[i].deg = s.bufor[i].deg;
         bufor[i].size = s.bufor[i].size;
         bufor[i].key = s.bufor[i].key;
@@ -60,7 +60,7 @@ void JoinableSets< ITEM,AssocContainer >::resize( unsigned int n )
     delete bufor;
     mapa.clear();
     siz = part_no = 0;
-    if (n == 0) 
+    if (n == 0)
     {
         bufor = NULL;
         maxsize = 0;
@@ -68,25 +68,25 @@ void JoinableSets< ITEM,AssocContainer >::resize( unsigned int n )
     else
     {
         bufor = new JSPartDesrc< ITEM >[n];
-        maxsize = n;
+        mapa.reserve(maxsize = n);
     }
 }
 
 template< class ITEM, class AssocContainer > template< class Iter >
-int JoinableSets< ITEM,AssocContainer >::getElements( Iter iter ) 
-{ 
+int JoinableSets< ITEM,AssocContainer >::getElements( Iter iter )
+{
     mapa.getKeys( iter );
-    return siz; 
+    return siz;
 }
 
 template< class ITEM, class AssocContainer > template <class Iter>
 int  JoinableSets< ITEM,AssocContainer >::getSetIds( Iter iter )
-{ 
+{
     for( int i = 0; i < siz; i++ )
         if (bufor[i].parent == bufor + i)
-        { 
+        {
             *iter = bufor + i;
-            ++iter; 
+            ++iter;
         }
     return part_no;
 }
@@ -94,13 +94,13 @@ int  JoinableSets< ITEM,AssocContainer >::getSetIds( Iter iter )
 template< class ITEM, class AssocContainer > template <class Iter>
 int JoinableSets< ITEM,AssocContainer >::getSet(
     typename JoinableSets< ITEM >::Repr s, Iter iter )
-{   
+{
     if (!s) return 0;
     s = getSetId( s );
     for( typename JoinableSets< ITEM >::Repr p = s->first; p; p = p->next )
-    { 
+    {
         *iter = p->key;
-        ++iter; 
+        ++iter;
     }
     return s->size;
 }
@@ -113,21 +113,21 @@ int  JoinableSets< ITEM,AssocContainer >::getSet( const ITEM &i, Iter iter )
 
 template< class ITEM, class AssocContainer >
 int JoinableSets< ITEM,AssocContainer >::size( typename JoinableSets< ITEM >::Repr s )
-{   
+{
     if (!s) return 0;
     return getSetId( s )->size;
 }
 
 template< class ITEM, class AssocContainer >
 int  JoinableSets< ITEM,AssocContainer >::size( const ITEM &i )
-{   
+{
     typename JoinableSets< ITEM >::Repr s = getSetId( i );
     return (s) ? s->size : 0;
 }
 
 template< class ITEM, class AssocContainer >
 typename JoinableSets<ITEM>::Repr
-JoinableSets< ITEM,AssocContainer >::makeSinglet( const ITEM &i ) 
+JoinableSets< ITEM,AssocContainer >::makeSinglet( const ITEM &i )
 {
     if (mapa.hasKey( i )) return 0;
     assert( siz < maxsize );
@@ -144,7 +144,7 @@ JoinableSets< ITEM,AssocContainer >::makeSinglet( const ITEM &i )
 
 template< class ITEM, class AssocContainer >
 typename JoinableSets< ITEM >::Repr
-JoinableSets< ITEM,AssocContainer >::getSetId( const ITEM &i ) 
+JoinableSets< ITEM,AssocContainer >::getSetId( const ITEM &i )
 {
     if (!mapa.hasKey( i )) return 0;
     return getSetId( mapa[i] );
@@ -152,7 +152,7 @@ JoinableSets< ITEM,AssocContainer >::getSetId( const ITEM &i )
 
 template< class ITEM, class AssocContainer >
 typename JoinableSets<ITEM>::Repr
-JoinableSets< ITEM,AssocContainer >::getSetId( typename JoinableSets< ITEM >::Repr s) 
+JoinableSets< ITEM,AssocContainer >::getSetId( typename JoinableSets< ITEM >::Repr s)
 {
     if (!s) return 0;
     typename JoinableSets< ITEM >::Repr p;
@@ -164,7 +164,7 @@ JoinableSets< ITEM,AssocContainer >::getSetId( typename JoinableSets< ITEM >::Re
 template< class ITEM, class AssocContainer >
 typename JoinableSets< ITEM >::Repr
 JoinableSets< ITEM,AssocContainer >::join(
-    typename JoinableSets< ITEM >::Repr a, typename JoinableSets< ITEM >::Repr b) 
+    typename JoinableSets< ITEM >::Repr a, typename JoinableSets< ITEM >::Repr b)
 {
     if (!a || !b) return 0;
     typename JoinableSets< ITEM >::Repr res;
@@ -186,8 +186,8 @@ JoinableSets< ITEM,AssocContainer >::join(
 }
 
 template< class ITEM, class AssocContainer >
-typename JoinableSets< ITEM >::Repr 
-JoinableSets< ITEM,AssocContainer >::join( const ITEM &a, const ITEM &b ) 
+typename JoinableSets< ITEM >::Repr
+JoinableSets< ITEM,AssocContainer >::join( const ITEM &a, const ITEM &b )
 {
     if (!mapa.hasKey( a ) || !mapa.hasKey( b )) return 0;
     return join( mapa[a],mapa[b] );
@@ -196,7 +196,7 @@ JoinableSets< ITEM,AssocContainer >::join( const ITEM &a, const ITEM &b )
 template< class ITEM, class AssocContainer >
 typename JoinableSets< ITEM >::Repr
 JoinableSets< ITEM,AssocContainer >::join(
-    typename JoinableSets< ITEM >::Repr a, const ITEM &b ) 
+    typename JoinableSets< ITEM >::Repr a, const ITEM &b )
 {
     if (!mapa.hasKey( b ) || !a) return 0;
     return join( a,mapa[b] );
@@ -205,7 +205,7 @@ JoinableSets< ITEM,AssocContainer >::join(
 template< class ITEM, class AssocContainer >
 typename JoinableSets< ITEM >::Repr
 JoinableSets< ITEM,AssocContainer >::join(
-    const ITEM &a, typename JoinableSets< ITEM >::Repr b ) 
+    const ITEM &a, typename JoinableSets< ITEM >::Repr b )
 {
     if (!mapa.hasKey( a ) || !b) return 0;
     return join( mapa[a],b );
@@ -213,13 +213,13 @@ JoinableSets< ITEM,AssocContainer >::join(
 
 template< typename Element, typename Cont >
 std::ostream &operator<<( std::ostream &is, JoinableSets< Element,Cont > &s )
-{   
+{
     is << "{";
     int l = s.getSetNo();
     JSPartDesrc< Element >* LOCALARRAY( tab,l );
     s.getSetIds( tab );
     for( int i = 0; i < l; i++ )
-    {   
+    {
         Set< Element > zb;
         s.getSet( tab[i],setInserter( zb ) );
         is << zb;
