@@ -32,6 +32,10 @@ template< class K, class V > class AssocTabInterface< std::map< K,V > >
         typedef V ValType;
 
         bool hasKey( K arg ) { return cont.find( arg ) != cont.end(); }
+        ValType* valPtr(K arg)
+        {   typename std::map<K,V>::iterator i=cont.find( arg );
+            if (i==cont.end()) return NULL; else return &cont[arg];
+        }
         bool delKey( K );
 
         K firstKey();
@@ -61,6 +65,7 @@ template< class T > class AssocTabInterface< AssocTabInterface< T > >
         typedef typename AssocTabInterface< T >::ValType ValType;
 
         bool hasKey( KeyType arg ) { return cont.hasKey( arg ); }
+        ValType* valPtr(KeyType arg) { return cont.valPtr(arg); }
         bool delKey( KeyType arg ) { return cont.delKey( arg ); }
         KeyType firstKey() { return cont.firstKey(); }
         KeyType lastKey() { return cont.lastKey(); }
@@ -103,6 +108,7 @@ template< class T > class AssocTable
         typedef typename AssocTabInterface< T >::ValType ValType;
 
         bool hasKey( KeyType arg ) { return inter.hasKey( arg ); }
+        ValType* valPtr(KeyType arg) { return inter.valPtr(arg); }
         bool delKey( KeyType arg ) { return inter.delKey( arg ); }
         KeyType firstKey() { return inter.firstKey(); }
         KeyType lastKey() { return inter.lastKey(); }
@@ -141,6 +147,7 @@ template< class T > class AssocTabInterface< AssocTable< T > >
         typedef typename AssocTable< T >::ValType ValType;
 
         bool hasKey( KeyType arg ) { return cont.hasKey( arg ); }
+        ValType* valPtr(KeyType arg) { return cont.valPtr(arg); }
         bool delKey( KeyType arg ) { return cont.delKey( arg ); }
         KeyType firstKey() { return cont.firstKey(); }
         KeyType lastKey() { return cont.lastKey(); }
@@ -328,6 +335,10 @@ class AssocArray: public AssocContBase, protected Privates::KluczTest< Klucz >
         void reserve( int arg ) { tab.reserve( arg ); }
         int capacity() { return tab.capacity(); }
         bool hasKey( Klucz v ) { return keyPos( v ) != -1; }
+        Elem* valPtr(Klucz v)
+        {   int x=keyPos(v);
+            if (x==-1) return NULL; else return &tab[x].val;
+        }
         int keyPos( Klucz );
         bool delKey( Klucz );
         Klucz firstKey();
@@ -376,6 +387,7 @@ template< class K, class V, class C > class AssocTabInterface< AssocArray< K,V,C
 
         bool hasKey( KeyType arg ) { return cont.hasKey( arg ); }
         bool delKey( KeyType arg ) { return cont.delKey( arg ); }
+        ValType* valPtr(KeyType arg) { return cont.valPtr(arg); }
         KeyType firstKey() { return cont.firstKey(); }
         KeyType lastKey() { return cont.lastKey(); }
         KeyType prevKey( KeyType arg ) { return cont.prevKey( arg ); }
@@ -413,6 +425,10 @@ class PseudoAssocArray
         void reserve( int arg ) { tab.reserve( arg ); assocTab.reserve(arg); }
         int capacity() { return tab.capacity(); }
         bool hasKey( Klucz v ) { return keyPos( v ) != -1; }
+        Elem* valPtr(Klucz v)
+        {   int x=keyPos(v);
+            if (x==-1) return NULL; else return &tab[x].val;
+        }
         int keyPos( Klucz );
         bool delKey( Klucz );
         Klucz firstKey();
@@ -438,6 +454,7 @@ template< class K, class V, class AC, class C > class AssocTabInterface< PseudoA
         typedef V ValType;
 
         bool hasKey( KeyType arg ) { return cont.hasKey( arg ); }
+        ValType* valPtr(KeyType arg) { return cont.valPtr(arg); }
         bool delKey( KeyType arg ) { return cont.delKey( arg ); }
         KeyType firstKey() { return cont.firstKey(); }
         KeyType lastKey() { return cont.lastKey(); }
@@ -470,34 +487,34 @@ template <> class AssocMatrixAddr< AMatrFull >
 {
     public:
         static int bufLen( int n ) { return n * n; }
-        int wsp2pos( std::pair< int,int > );
-        std::pair< int,int > pos2wsp( int );
+        inline int wsp2pos( std::pair< int,int > );
+        inline std::pair< int,int > pos2wsp( int );
 
         template< class T > bool correctPos( T, T ) { return true; }
-        template< class Klucz > std::pair< Klucz,Klucz > key( Klucz, Klucz );
-        template< class Klucz > std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > );
+        template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz, Klucz );
+        template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > );
 } ;
 
 template <> class AssocMatrixAddr< AMatrNoDiag >
 {
     public:
         static int bufLen( int n ) { return n * (n - 1); }
-        int wsp2pos( std::pair< int,int > );
-        std::pair< int,int > pos2wsp( int );
+        inline int wsp2pos( std::pair< int,int > );
+        inline std::pair< int,int > pos2wsp( int );
         template< class T > bool correctPos( T u, T v ) { return u != v; }
-        template< class Klucz > std::pair< Klucz,Klucz > key( Klucz, Klucz );
-        template< class Klucz > std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz> );
+        template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz, Klucz );
+        template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz> );
 } ;
 
 template <> class AssocMatrixAddr< AMatrClTriangle >
 {
     public:
         static int bufLen( int n )  { return n * (n + 1) / 2; }
-        int wsp2pos( std::pair< int,int > );
-        std::pair< int,int > pos2wsp( int );
+        inline int wsp2pos( std::pair< int,int > );
+        inline std::pair< int,int > pos2wsp( int );
         template< class T > bool correctPos( T, T ) { return true; }
-        template< class Klucz > std::pair< Klucz,Klucz > key( Klucz, Klucz );
-        template< class Klucz > std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > );
+        template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz, Klucz );
+        template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > );
 } ;
 
 
@@ -505,11 +522,11 @@ template <> class AssocMatrixAddr< AMatrTriangle >
 {
     public:
         static int bufLen( int n ) { return n * (n - 1) / 2; }
-        int wsp2pos( std::pair< int,int > );
-        std::pair< int,int > pos2wsp( int );
+        inline int wsp2pos( std::pair< int,int > );
+        inline std::pair< int,int > pos2wsp( int );
         template< class T > bool correctPos( T u, T v ) { return u != v; }
-        template< class Klucz > std::pair< Klucz,Klucz > key( Klucz, Klucz );
-        template< class Klucz > std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > );
+        template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz, Klucz );
+        template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > );
 } ;
 
 
@@ -529,6 +546,7 @@ template< class Elem > struct BlockOfAssocMatrix
  *
  * ------------------------------------------------------------------------- */
 
+
 template< class Klucz, class Elem, AssocMatrixType aType,
           class Container = std::vector< BlockOfAssocMatrix< Elem > >,
           class IndexContainer = AssocArray<Klucz,int,std::vector< BlockOfBlockList< BlockOfAssocArray< Klucz,int > > > > >
@@ -541,6 +559,7 @@ class AssocMatrix: public AssocMatrixAddr< aType >
                 AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > *owner;
 
                 AssocIndex( int = 0 );
+                AssocIndex( int, BlockOfBlockList< BlockOfAssocArray< Klucz,int > >*);
                 int klucz2pos( Klucz );
                 Klucz pos2klucz( int );
                 virtual void DelPosCommand( int );
@@ -568,10 +587,20 @@ class AssocMatrix: public AssocMatrixAddr< aType >
 //        typedef BlockOfAssocMatrix< Elem > BlockType;
 //        typedef BlockOfBlockList< BlockOfAssocArray< Klucz,int > > IndexBlockType;
 
-        AssocMatrix( int = 0 );
+        AssocMatrix( int = 0,void* p=0, void* q=0 );
         AssocMatrix( const AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > & );
         AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > &operator=(
             const AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > & );
+
+        AssocMatrix( int asize, BlockOfAssocMatrix< Elem >* contBuf,
+                    BlockOfBlockList< BlockOfAssocArray< Klucz,int > >* indBuf ):
+            index( asize,indBuf),siz( 0 ),first( -1 ),last( -1 ),
+            bufor(contBuf,AssocMatrixAddr< aType >::bufLen( asize ))
+        {
+            bufor.clear();
+            bufor.reserve( AssocMatrixAddr< aType >::bufLen( asize ) );
+            index.owner = this;
+        }
 
         bool hasInd( Klucz v ) { return index.hasKey( v ); }
         bool delInd( Klucz );
@@ -593,7 +622,7 @@ class AssocMatrix: public AssocMatrixAddr< aType >
         Elem &operator()( Klucz, Klucz );
         Elem &operator()( std::pair< Klucz,Klucz > k ) { return operator()( k.first,k.second ); }
 
-        Elem* presentValPtr( Klucz, Klucz );
+        Elem* valPtr( Klucz, Klucz );
         std::pair< Klucz,Klucz > firstKey();
         std::pair< Klucz,Klucz > lastKey();
         std::pair< Klucz,Klucz > nextKey( Klucz, Klucz );
@@ -611,6 +640,29 @@ class AssocMatrix: public AssocMatrixAddr< aType >
 
         template< class Iterator > int getKeys( Iterator );
 };
+
+
+template <class T>
+struct AssocMatrixVectIntSwitch
+{
+    typedef void* BufType;
+    typedef void* IndBufType;
+    static bool isAMVI() { return false; }
+};
+
+template <class K, class E,AssocMatrixType aType>
+struct AssocMatrixVectIntSwitch<AssocMatrix<K,E,aType,VectorInterface< BlockOfAssocMatrix< E > *>,
+       AssocArray<K,int,VectorInterface< BlockOfBlockList< BlockOfAssocArray< K,int > >* > > > >
+{
+    typedef BlockOfAssocMatrix< E >* BufType;
+    typedef BlockOfBlockList< BlockOfAssocArray< K,int > >* IndBufType;
+    static bool isAMVI() { return true; }
+};
+
+
+template<class Klucz, class Elem, AssocMatrixType aType, class C,class IC >
+std::ostream &operator<<(std::ostream &out, AssocMatrix< Klucz,Elem,aType,C,IC > & cont );
+
 
 /* ------------------------------------------------------------------------- *
  * AssocInserter

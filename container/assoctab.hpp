@@ -134,7 +134,7 @@ BlockList< Element,Container > &
 BlockList< Element,Container >::operator=( const BlockList< Element,Container > &X )
 {
     if (&X == this) return *this;
-    Privates::BlockListVectInerfTest<Container> error;
+    Privates::BlockListVectInerfTest<Container> error; // wymuszony blad kompilacji
     siz = X.siz;
     first = X.first;
     last = X.last;
@@ -461,13 +461,13 @@ int PseudoAssocArray< Klucz,Elem,AssocCont,Container >::getKeys( Iterator iter )
 }
 
 
-int AssocMatrixAddr< AMatrFull >::wsp2pos( std::pair< int,int > w )
+inline int AssocMatrixAddr< AMatrFull >::wsp2pos( std::pair< int,int > w )
 {
     int mfs = std::max( w.first,w.second );
     return mfs * mfs + mfs + w.second - w.first;
 }
 
-std::pair< int,int > AssocMatrixAddr< AMatrFull >::pos2wsp( int pos )
+inline std::pair< int,int > AssocMatrixAddr< AMatrFull >::pos2wsp( int pos )
 {
     int x = (int)sqrt( (double)pos );
     if (x * x + x - pos > 0) return std::pair< int,int >( x,pos - x * x );
@@ -475,24 +475,24 @@ std::pair< int,int > AssocMatrixAddr< AMatrFull >::pos2wsp( int pos )
 }
 
 template< class Klucz >
-std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrFull >::key( Klucz u, Klucz v )
+inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrFull >::key( Klucz u, Klucz v )
 {
     return std::pair< Klucz,Klucz >( u,v );
 }
 
 template< class Klucz >
-std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrFull >::key( std::pair< Klucz,Klucz> k )
+inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrFull >::key( std::pair< Klucz,Klucz> k )
 {
     return key( k.first,k.second );
 }
 
-int AssocMatrixAddr< AMatrNoDiag >::wsp2pos( std::pair< int,int > w )
+inline int AssocMatrixAddr< AMatrNoDiag >::wsp2pos( std::pair< int,int > w )
 {
     int mfs = std::max( w.first,w.second );
     return mfs * mfs + w.second - w.first - ((w.first > w.second) ? 0 : 1);
 }
 
-std::pair< int,int > AssocMatrixAddr< AMatrNoDiag >::pos2wsp( int pos )
+inline std::pair< int,int > AssocMatrixAddr< AMatrNoDiag >::pos2wsp( int pos )
 {
     int x = (int)sqrt( (double)pos );
     if (pos - x * x - x >= 0) return std::pair< int,int >( x + 1,pos - x * x - x );
@@ -500,18 +500,18 @@ std::pair< int,int > AssocMatrixAddr< AMatrNoDiag >::pos2wsp( int pos )
 }
 
 template< class Klucz >
-std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrNoDiag >::key( Klucz u, Klucz v )
+inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrNoDiag >::key( Klucz u, Klucz v )
 {
     return std::pair< Klucz,Klucz >( u,v );
 }
 
 template< class Klucz >
-std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > k )
+inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > k )
 {
     return key( k.first,k.second );
 }
 
-int AssocMatrixAddr< AMatrClTriangle >::wsp2pos( std::pair< int,int > w )
+inline int AssocMatrixAddr< AMatrClTriangle >::wsp2pos( std::pair< int,int > w )
 {
     if (w.first < w.second)
     {
@@ -522,7 +522,7 @@ int AssocMatrixAddr< AMatrClTriangle >::wsp2pos( std::pair< int,int > w )
     return w.first * (w.first + 1) / 2 + w.second;
 }
 
-std::pair< int,int > AssocMatrixAddr< AMatrClTriangle >::pos2wsp( int pos )
+inline std::pair< int,int > AssocMatrixAddr< AMatrClTriangle >::pos2wsp( int pos )
 {
     int x = (int)sqrt( (double)2 * pos ), xx = pos - x * (x + 1) / 2;
     if (xx >= 0) return std::pair< int,int >( x,xx );
@@ -530,19 +530,19 @@ std::pair< int,int > AssocMatrixAddr< AMatrClTriangle >::pos2wsp( int pos )
 }
 
 template< class Klucz >
-std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrClTriangle >::key( Klucz u, Klucz v )
+inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrClTriangle >::key( Klucz u, Klucz v )
 {
     return std::pair< Klucz,Klucz >( std::min( u,v ),std::max( u,v ) );
 }
 
 template< class Klucz >
-std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrClTriangle >::key(
+inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrClTriangle >::key(
     std::pair< Klucz,Klucz > k )
 {
     return key( k.first,k.second );
 }
 
-int AssocMatrixAddr< AMatrTriangle >::wsp2pos( std::pair< int,int > w )
+inline int AssocMatrixAddr< AMatrTriangle >::wsp2pos( std::pair< int,int > w )
 {
     if (w.first < w.second)
     {
@@ -553,7 +553,7 @@ int AssocMatrixAddr< AMatrTriangle >::wsp2pos( std::pair< int,int > w )
     return w.first * (w.first - 1) / 2 + w.second;
 }
 
-std::pair< int,int > AssocMatrixAddr< AMatrTriangle >::pos2wsp( int pos )
+inline std::pair< int,int > AssocMatrixAddr< AMatrTriangle >::pos2wsp( int pos )
 {
     int x = (int)sqrt( (double)2 * pos ), xx = pos - x * (x + 1) / 2;
     if (xx >= 0) return std::pair< int,int >( x + 1,xx );
@@ -561,13 +561,13 @@ std::pair< int,int > AssocMatrixAddr< AMatrTriangle >::pos2wsp( int pos )
 }
 
 template< class Klucz >
-std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrTriangle >::key( Klucz u, Klucz v )
+inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrTriangle >::key( Klucz u, Klucz v )
 {
     return std::pair< Klucz,Klucz >( std::min( u,v ),std::max( u,v ) );
 }
 
 template< class Klucz >
-std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrTriangle >::key(
+inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrTriangle >::key(
     std::pair< Klucz,Klucz > k )
 {
     return key( k.first,k.second );
@@ -577,6 +577,13 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::AssocIndex(
     int asize ):
     IndexContainer( asize )
+{
+}
+
+template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
+AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::AssocIndex(
+    int asize,BlockOfBlockList< BlockOfAssocArray< Klucz,int > >* indbuf):
+    IndexContainer( asize,indbuf )
 {
 }
 
@@ -640,7 +647,7 @@ void AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::delPos(
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
-AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocMatrix( int asize ):
+AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocMatrix( int asize,void* p, void* q ):
     index( asize ),
     siz( 0 ),
     first( -1 ),
@@ -793,7 +800,7 @@ Elem &AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::operator()(
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
-Elem* AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::presentValPtr(
+Elem* AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::valPtr(
     Klucz u, Klucz v )
 {
     if (!u || !v) return NULL;
@@ -935,6 +942,27 @@ int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::getKeys( Iterator 
     }
     return size();
 }
+
+template<class Klucz, class Elem, AssocMatrixType aType, class C,class IC >
+std::ostream &operator<<(std::ostream &out, AssocMatrix< Klucz,Elem,aType,C,IC > & cont )
+{
+    out << '{';
+    int siz = cont.size();
+    std::pair<typename AssocMatrix< Klucz,Elem,aType,C,IC >::KeyType,typename AssocMatrix< Klucz,Elem,aType,C,IC >::KeyType>
+        key = cont.firstKey();
+    for( ; siz; siz-- )
+    {
+        out << '(' << key.first << ',' << key.second << ':'<< cont(key) << ')';
+        if (siz>1)
+        {
+            key = cont.nextKey( key );
+            out << ',';
+        }
+    }
+    out << '}';
+    return out;
+}
+
 
 template< class T > template< class K, class V >
 AssocInserter< T > &AssocInserter< T >::operator=( const std::pair< K,V > &pair )

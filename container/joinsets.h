@@ -5,6 +5,7 @@
 #include <cassert>
 #include "set.h"
 #include "localarray.h"
+#include "assoctab.h"
 
 namespace Koala {
 
@@ -14,6 +15,10 @@ template< class Klucz > struct JSPartDesrc
     unsigned int deg, size;
     Klucz key;
 } ;
+
+
+template <class Container> class VectorInterface;
+
 
 template< class ITEM, class AssocContainer = AssocArray< ITEM,JSPartDesrc< ITEM > * > >
 class JoinableSets
@@ -27,10 +32,15 @@ class JoinableSets
         typedef JSPartDesrc< ITEM > *Repr;
         typedef ITEM ElemType;
 
-        JoinableSets( unsigned int = 0 );
+        JoinableSets( unsigned int = 0, void* p=0,void* q=0 );
         JoinableSets( const JoinableSets< ITEM,AssocContainer > & );
         JoinableSets &operator=( const JoinableSets< ITEM,AssocContainer > & );
         ~JoinableSets() { resize( 0 ); }
+
+        JoinableSets( unsigned int n, JSPartDesrc< ITEM > * buf,
+                        BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc< ITEM > * > >* mapbuf ) :
+                mapa(n,mapbuf), siz(0), bufor(buf), part_no(0), maxsize(n)
+        { }
 
         void resize( unsigned int );
 
@@ -62,6 +72,25 @@ class JoinableSets
 
 template< typename Element, typename Cont >
 std::ostream &operator<<( std::ostream &, JoinableSets< Element,Cont > & );
+
+
+template <class T>
+struct JoinableSetsVectIntSwitch
+{
+    typedef void* BufType;
+    typedef void* MapBufType;
+    static bool isJSVI() { return false; }
+};
+
+template <class ITEM>
+struct JoinableSetsVectIntSwitch< JoinableSets<ITEM, AssocArray<ITEM, JSPartDesrc<ITEM>*,
+            VectorInterface<BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc<ITEM>* > >*> > > >
+{
+    typedef JSPartDesrc< ITEM > * BufType;
+    typedef BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc< ITEM > * > >* MapBufType;
+    static bool isJSVI() { return true; }
+};
+
 
 #include "joinsets.hpp"
 

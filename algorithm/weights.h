@@ -51,6 +51,9 @@ class DijkstraPar : public ShortPathStructs {
 
         VertLabs() : vPrev(0), ePrev(0),
         distance(DefaultStructs:: template NumberTypeBounds<DType>::plusInfty()) {}
+
+        template <class Rec>
+            void copy(Rec& rec) { rec.distance=distance; rec.vPrev=vPrev; rec.ePrev=ePrev; }
     };
 
     // wlasciwa procedura: odleglosc miedzy para wierzcholkow
@@ -87,7 +90,9 @@ class DijkstraPar : public ShortPathStructs {
             typename EdgeContainer::ValType::DistType
                     d=PlusInfty,nd;
             for(V=Q.firstKey();V;V=Q.nextKey(V)) if (Q[V].distance<d) d=Q[U=V].distance;
-            vertTab[U]=Q[U]; Q.delKey(U);
+//            vertTab[U]=Q[U];
+            Q[U].copy(vertTab[U]);
+            Q.delKey(U);
             if (U==end) return vertTab[end].distance;
 
             for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirOut|Koala::EdUndir);
@@ -268,7 +273,9 @@ class DijkstraPar : public ShortPathStructs {
             typename EdgeContainer::ValType::DistType d,nd;
             std::pair<typename GraphType::PVertex,typename EdgeContainer::ValType::DistType> res=Q.min();
             U=res.first; d=res.second;
-            vertTab[U]=Q[U]; Q.delKey(U);
+//            vertTab[U]=Q[U];
+            Q[U].copy(vertTab[U]);
+            Q.delKey(U);
             if (U==end) return vertTab[end].distance;
 
             for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirOut|Koala::EdUndir);
@@ -500,8 +507,8 @@ class BellmanFordPar : public ShortPathStructs {
         for(typename GraphType::PEdge E=g.getEdge(Koala::EdLoop|Koala::EdUndir);E;E=g.getEdgeNext(E, Koala::EdLoop|Koala::EdUndir))
             if (edgeTab[E].length < zero)
             {
-                for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-                    vertTab[v].distance=minusInf;
+//                for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+//                    vertTab[v].distance=minusInf;
                 return minusInf;
             }
 
@@ -548,8 +555,8 @@ class BellmanFordPar : public ShortPathStructs {
         //2 podejscie: funkcja zwroci minusInf, ale pomijamy kasowanie dotychczasowych obliczen - uzytkownik musi spr czy funkcja distances nie zwraca minusInf
         //zanim zacznie cokolwiek innego robic
         if (existNegCycle){
-            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-                vertTab[v].distance=minusInf;
+//            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+//                vertTab[v].distance=minusInf;
             return minusInf;
         }
         //jezeli nie ma cykli ujemnych to mozemy zwrocic wynik
@@ -620,6 +627,8 @@ class BellmanFord : public BellmanFordPar<AlgorithmsDefaultSettings> {};
 //algorytm liczy najkrotsza sciezke pomiedzy kazda para wierzcholków zostal zaproponowany przez Floyda i oparty na twierdzeniu Warshalla)
 template <class DefaultStructs>
 class FloydPar : public PathStructs {
+
+    protected:
 
     template <class GraphType, class TwoDimVertContainer, class VIter, class EIter>
     static int
