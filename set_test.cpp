@@ -20,7 +20,19 @@ class Funktor {
     bool operator()(int a) { return fun(a); }
 };
 
+class Vert  {
+    public:
 
+    Vert(std::string aname="") : name(aname) {}
+    std::string name;
+    int a;
+    AssocKeyContReg assocReg;
+};
+
+
+Vert *A=new Vert("Ala"),*B=new Vert("Basia"),*C=new Vert("Celina"),*D=new Vert("Dagmara");
+
+Vert* vtab[4]={A,B,C,D};
 
 int main()
 {
@@ -59,9 +71,9 @@ int main()
 
     cout << "\n*******\n";
     JoinableSets<int, AssocTable<std::map<int, JSPartDesrc<int>*> > > jset0;
-    jset0.resize(5);
-    JoinableSets<int, AssocTable<std::map<int, JSPartDesrc<int>*> > > jset=jset0;
-
+    jset0.resize(0); jset0.resize(5);
+    JoinableSets<int, AssocTable<std::map<int, JSPartDesrc<int>*> > > jset;
+    jset=jset0;
 
     Set<JSPartDesrc<int>*> sdesc;
     Set<int> sint;
@@ -134,6 +146,43 @@ int main()
     copy(tab3,tab3+4,blackHole);
 //    iiset.assign(tab4,4);
     cout << iiset;
+
+
+    cout << cout << "\n\nLocals:\n\n";
+    JSPartDesrc< Vert* > buf1[20];
+    BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc< Vert* > * > > buf2[20];
+    JoinableSets<Vert*, AssocArray<Vert*, JSPartDesrc<Vert*>*,
+        VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > >
+            locjset(4,(JoinableSetsVectIntSwitch<JoinableSets<Vert*,
+                        AssocArray<Vert*, JSPartDesrc<Vert*>*,
+                            VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > > >::BufType)
+                        buf1,(JoinableSetsVectIntSwitch<JoinableSets<Vert*,
+                              AssocArray<Vert*, JSPartDesrc<Vert*>*,
+                                VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > > >::MapBufType)
+                        buf2);
+
+    locjset.resize(0);
+    locjset.resize(3);
+    Set<Vert*> locsint;
+    Set<JSPartDesrc<Vert*>*> locsdesc;
+
+
+    cout << locjset << endl;
+    locsdesc.clear(); locsint.clear();
+    cout << locjset.getElements(setInserter(locsint));cout << locsint << endl;
+    cout << locjset.getSetIds(setInserter(locsdesc));cout << locsdesc << endl;
+    cout << locjset << endl;
+    locsint.clear();cout << locjset.getSet(B,setInserter(locsint));cout << locsint << endl;
+
+    cout << "size: " << locjset.size() << " parts: " << locjset.getSetNo() << endl;
+    cout << locjset.makeSinglet(A) << endl;
+    cout << locjset.makeSinglet(B) << endl;
+    cout << locjset.makeSinglet(C) << endl;
+    locsdesc.clear(); locsint.clear();
+    cout << locjset.getElements(setInserter(locsint));cout << locsint << endl;
+    cout << locjset.getSetIds(setInserter(locsdesc));cout << locsdesc << endl;
+    locsint.clear();cout << locjset.getSet(A,setInserter(locsint));cout << locsint << endl;
+    cout << locjset << endl;
 
 //    cout << "\n" << (constFun(3.14))('a',"ala",45);
 

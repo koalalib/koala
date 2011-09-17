@@ -891,6 +891,10 @@ template< class K, class V> class AssocTabInterface< BiDiHashMap< K,V > >
         typedef V ValType;
 
         bool hasKey( K arg ) { return cont.find( arg ) != cont.end(); }
+        ValType* valPtr(K arg)
+        {   typename BiDiHashMap< K,V >::iterator i=cont.find( arg );
+            if (i==cont.end()) return NULL; else return &cont[arg];
+        }
         bool delKey( K );
 
         K firstKey();
@@ -976,6 +980,11 @@ template< class K, class V> class AssocTabInterface< HashMap< K,V > >
         typedef V ValType;
 
         bool hasKey( K arg ) { return cont.find( arg ) != cont.end(); }
+        ValType* valPtr(K arg)
+        {   typename HashMap< K,V >::iterator i=cont.find( arg );
+            if (i==cont.end()) return NULL; else return &cont[arg];
+        }
+
         bool delKey( K );
 
         K firstKey();

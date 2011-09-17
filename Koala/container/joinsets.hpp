@@ -1,10 +1,8 @@
 template< class ITEM, class AssocContainer >
-JoinableSets< ITEM,AssocContainer >::JoinableSets( unsigned int n ):
-    mapa()
+JoinableSets< ITEM,AssocContainer >::JoinableSets( unsigned int n,void* p,void* q):
+    mapa(n), siz(0), bufor(NULL), part_no(0), maxsize(n)
 {
-    siz = 0;
-    bufor = NULL;
-    resize( n );
+    if (n) bufor = new JSPartDesrc< ITEM >[n];
 }
 
 template< class ITEM, class AssocContainer >
@@ -36,6 +34,7 @@ JoinableSets< ITEM,AssocContainer >::operator=(
     const JoinableSets< ITEM,AssocContainer > &s )
 {
     if (&s == this) return *this;
+    if (AssocArrayVectIntSwitch<AssocContainer>::isAAVI()) mapa=s.mapa; // wymuszony blad kompilacji
     resize( s.maxsize );
 //    mapa.clear();
     siz = s.siz;
@@ -57,17 +56,17 @@ JoinableSets< ITEM,AssocContainer >::operator=(
 template< class ITEM, class AssocContainer >
 void JoinableSets< ITEM,AssocContainer >::resize( unsigned int n )
 {
-    delete bufor;
+    if (!AssocArrayVectIntSwitch<AssocContainer>::isAAVI()) delete bufor;
     mapa.clear();
     siz = part_no = 0;
     if (n == 0)
     {
-        bufor = NULL;
+        if (!AssocArrayVectIntSwitch<AssocContainer>::isAAVI()) bufor = NULL;
         maxsize = 0;
     }
     else
     {
-        bufor = new JSPartDesrc< ITEM >[n];
+        if (!AssocArrayVectIntSwitch<AssocContainer>::isAAVI()) bufor = new JSPartDesrc< ITEM >[n];
         mapa.reserve(maxsize = n);
     }
 }

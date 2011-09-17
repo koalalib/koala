@@ -113,38 +113,39 @@ class DijkstraPar : public ShortPathStructs {
         BlockOfBlockList< BlockOfAssocArray< typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> > >
                     LOCALARRAY(buforQ,bufsize);
+        {
+            typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                    VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type
+                        localvertTab((isBlackHole(avertTab)? g.getVertNo():0),(typename AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                            VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::BufType)buforl),
+                        Q(g.getVertNo(),(typename AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                            VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::BufType)buforQ);
+            typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
+                    VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
+                        vertTab=
+                    BlackHoleSwitch<VertContainer,typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                    VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
 
-        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type
-                    localvertTab((isBlackHole(avertTab)? g.getVertNo():0),(typename AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                        VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::BufType)buforl),
-                    Q(g.getVertNo(),(typename AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                        VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::BufType)buforQ);
-        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
-                    vertTab=
-                BlackHoleSwitch<VertContainer,typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
+            typename GraphType::PVertex U,V;
 
-        typename GraphType::PVertex U,V;
+            if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
 
-        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+            Q[start].vPrev=0;Q[start].ePrev=0;
+            Q[start].distance=Zero;
 
-        Q[start].vPrev=0;Q[start].ePrev=0;
-        Q[start].distance=Zero;
+            while(!Q.empty()){
+                typename EdgeContainer::ValType::DistType
+                        d=PlusInfty,nd;
+                for(V=Q.firstKey();V;V=Q.nextKey(V)) if (Q[V].distance<d) d=Q[U=V].distance;
+                vertTab[U]=Q[U]; Q.delKey(U);
+                if (U==end) return vertTab[end].distance;
 
-        while(!Q.empty()){
-            typename EdgeContainer::ValType::DistType
-                    d=PlusInfty,nd;
-            for(V=Q.firstKey();V;V=Q.nextKey(V)) if (Q[V].distance<d) d=Q[U=V].distance;
-            vertTab[U]=Q[U]; Q.delKey(U);
-            if (U==end) return vertTab[end].distance;
-
-            for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirOut|Koala::EdUndir);
-                E;E=g.getEdgeNext(U,E,Koala::EdDirOut|Koala::EdUndir))
-                    if (!vertTab.hasKey(V=g.getEdgeEnd(E,U)))
-                        if ((nd=vertTab[U].distance+edgeTab[E].length)<Q[V].distance)
-                    { Q[V].distance=nd; Q[V].ePrev=E; Q[V].vPrev=U; }
+                for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirOut|Koala::EdUndir);
+                    E;E=g.getEdgeNext(U,E,Koala::EdDirOut|Koala::EdUndir))
+                        if (!vertTab.hasKey(V=g.getEdgeEnd(E,U)))
+                            if ((nd=vertTab[U].distance+edgeTab[E].length)<Q[V].distance)
+                        { Q[V].distance=nd; Q[V].ePrev=E; Q[V].vPrev=U; }
+            }
         }
 
         return end ? PlusInfty : Zero;

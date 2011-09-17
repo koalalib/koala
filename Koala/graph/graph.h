@@ -194,7 +194,7 @@ class Graph: public SubgraphBase,
         ~Graph();
 
     // Parametry grafu
-        EdgeType allowedEdgeTypes() const { return EdAllow; }
+        EdgeType allowedEdgeTypes() const { return EdAllow & EdAll; }
         // Liczba wierzchołków (rząd grafu).
         inline int getVertNo() const;
         // Liczba krawędzi podanego typu.
@@ -450,6 +450,8 @@ class Graph: public SubgraphBase,
         inline bool hasAdjMatrix() const;
         // ??
         inline bool defragAdjMatrix();
+
+        bool allowedAdjMatrix() const { return EdAllow & AdjMatrixAllowed; }
 
     // ??
         const Graph< VertInfo,EdgeInfo,EdAllow > *getRootPtr() const { return this; }

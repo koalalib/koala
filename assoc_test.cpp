@@ -57,6 +57,9 @@ int main() {
 
 
     AssocArray<Vert*,std::string> a(5,(int*)bufor);
+    BlockOfAssocMatrix< std::string > matbuf[100];
+    BlockOfBlockList< BlockOfAssocArray< Vert*,int > > indbuf[100];
+
     Vert * tab[5];
 
 
@@ -118,7 +121,7 @@ int main() {
 
 
     std::cout << "\nMatrixy:\n";
-    AssocMatrix<Vert*,std::string,AMatrClTriangle> m,m1;
+    AssocMatrix<Vert*,std::string,AMatrClTriangle> m,m1(0,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle> >::BufType)matbuf,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle> >::BufType)indbuf);
 
     m(A,B)="Wpis wspolny";
     m(A,A)="Wpis pojedynczy";
@@ -154,6 +157,38 @@ int main() {
     pm1.defrag();
     t(pm1);
 
+
+    std::cout << "\nMatrixy3:\n";
+    AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
+         ,AssocArray<Vert*,int,VectorInterface< BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > >
+        lpm(4,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
+         ,AssocArray<Vert*,int,VectorInterface< BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::BufType)matbuf,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
+         ,AssocArray<Vert*,int,VectorInterface< BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::IndBufType)indbuf);
+
+
+    lpm(A,B)="Wpis skasowany";
+    lpm(A,B).clear();
+    lpm(A,B)="Wpis wspolny";
+    lpm(A,A)="Wpis pojedynczy";
+    lpm(C,C)="Wpis";
+    lpm(D,D)="Wpis2";
+    t(lpm);
+
+    lpm.delKey(C,C);
+    t(lpm);
+    std::cout <<"\ndefr\n";
+    lpm.defrag();
+//    pm1=pm;
+//    lpm.defrag();
+    t(lpm);
+//    delete D;
+    lpm.defrag();
+    t(lpm);
+    pm1.defrag();
+    t(lpm);
+//    lpm.clear();
+//    std::cout << lpm << "\n";
+
 //    AssocTable<std::map<std::string,int> > atab;
 //    AssocTabInterface< AssocTable<std::map<std::string,int> > > iatab=atab,tatab2=iatab;
     std::cout << "\n*************\n";
@@ -186,6 +221,7 @@ int main() {
 
     AssocArray<Vert*,std::string,VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >
         vitab(3,bufor);
+
 
 
     t(vitab);

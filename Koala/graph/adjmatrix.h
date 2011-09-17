@@ -48,10 +48,10 @@ class AdjMatrix<VertInfo , EdgeInfo , EdAllow,AdjMatrixAllowed> {
             { return undirs(u,v); }
         Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >* undirspresentValPtr(
                 Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *  v1,Koala::Vertex< VertInfo,EdgeInfo,EdAllow > * v2 )
-            { return undirs.presentValPtr(v1,v2 );}
+            { return undirs.valPtr(v1,v2 );}
         Privates::AdjMatrixParals< VertInfo,EdgeInfo,EdAllow >* dirspresentValPtr(
                 Koala::Vertex< VertInfo,EdgeInfo,EdAllow > *  v1,Koala::Vertex< VertInfo,EdgeInfo,EdAllow > * v2 )
-            { return dirs.presentValPtr(v1,v2 );}
+            { return dirs.valPtr(v1,v2 );}
 };
 
 template <class VertInfo , class EdgeInfo , EdgeType EdAllow>

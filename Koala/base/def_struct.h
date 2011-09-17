@@ -212,10 +212,10 @@ template <class T> class VectorInterface<T*> {
     int capacity() { return limit-start ; }
     bool empty() { return siz==0 ; }
     void reserve(int arg) { assert(arg<=max_size()); }
-    void resize(int arg) {   assert(arg<=max_size()); }
+    void resize(int arg) {   assert(arg<=max_size()); while(siz<arg) push_back(T()); }
 
     T& operator[] (int pos) { return at(pos); }
-    T& at(int pos) { assert(pos<capacity()); return start[pos]; }
+    T& at(int pos) { assert(pos>=0 && pos<capacity()); return start[pos]; }
     T& front() { return at(0); }
     T& back() { return at(siz-1); }
 
@@ -245,6 +245,8 @@ template <class T> class VectorInterface<T*> {
     }
     void erase(T* f) { erase(f,f+1); }
     void clear() { siz=0; }
+
+    void clearBuf(T val=T()) { for(T* i=start;i<limit;i++) *i=val; }
 };
 
 

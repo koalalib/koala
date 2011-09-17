@@ -25,8 +25,17 @@ Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,V,U,tabV[10];
 Koala::Graph<OpisV,OpisE>::PEdge tabE[10];
 
 
-Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex,
-            Koala::Dijkstra::VertLabs<int, Koala::Graph<OpisV,OpisE> > > > vertCont;
+struct VLab {
+    Koala::Graph<OpisV,OpisE>::PVertex vPrev;
+    Koala::Graph<OpisV,OpisE>::PEdge ePrev;
+    int distance;
+
+    typedef int DistType;
+};
+
+Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex, VLab> > vertCont;
+//            Koala::Dijkstra::VertLabs<int, Koala::Graph<OpisV,OpisE> > > > vertCont;
+
 Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Dijkstra::EdgeLabs<int> > > edgeCont;
 
 
