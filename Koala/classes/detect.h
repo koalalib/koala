@@ -493,12 +493,119 @@ class IsItPar : public SearchStructs {
             return maxCliques(g,vbuf,vbuf+g.getVertNo(),out,qte);
         }
 
+
+	template<class Graph>
+	static bool CoChordalTest(Graph &g) {
+		int i, m, n, p, ui, vi;
+		int x, px, xp, pxp;
+		bool fail;
+		n = g.getVertNo();
+		m = g.getEdgeNo(EdUndir | EdDirOut | EdDirIn);
+
+		int LOCALARRAY(parent, n);
+		int LOCALARRAY(postOrd, n);
+		int LOCALARRAY(RNp, n + 1);
+		int LOCALARRAY(RN2, n + m);
+		typename Graph::PEdge e;
+		typename Graph::PVertex u, v;
+		typename Graph::PVertex LOCALARRAY(pi, n);
+		std::pair<int, int> LOCALARRAY(RN, n + m);
+		typename DefaultStructs::template AssocCont<typename Graph::PVertex, int>::Type vidx(n);
+
+		for(i = 0, v = g.getVert(); v != NULL; v = g.getVertNext(v))
+			pi[i++] = v;
+		CoLexBFS::order2(g, n, pi, EdUndir | EdDirIn | EdDirOut, pi);
+		std::reverse(pi, pi + n);
+
+		for(i = 0; i < n; i++) vidx[pi[i]] = i;
+
+		// let RN(x) be its neighbors to the right
+		for(ui = 0, p = 0; ui < n; ui++) {
+			u = pi[ui];
+			RNp[ui] = p;
+			for(e = g.getEdge(u, EdUndir | EdDirIn | EdDirOut);
+			    e != NULL;
+			    e = g.getEdgeNext(u, e)) {
+				v = g.getEdgeEnd(e, u);
+				vi = vidx[v];
+				if(vi <= ui) continue;
+				RN[p++] = std::make_pair(ui, vi);
+				};
+			};
+		RNp[n] = p;
+
+		RadixSort(RN, p, n, RNp, RN2);
+
+		// let parent(x) be the leftmost non-neighbour to the right in pi
+		for(i = 0; i < n; i++) {
+			if(RNp[i] < RNp[i + 1]) {
+				if(RN2[RNp[i]] > i + 1) parent[i] = i + 1;
+				else {
+					int j = RNp[i];
+					while(j < RNp[i + 1] - 1) {
+						if(RN2[j] + 1 < RN2[j + 1]) {
+							parent[i] = RN2[j] + 1;
+							break;
+							};
+						j++;
+						};
+					if(j == RNp[i + 1] - 1)
+						parent[i] = RN2[j] + 1;
+					};
+				if(parent[i] >= n) parent[i] = -1;
+			} else {
+				if(i < n - 1) parent[i] = i + 1;
+				else parent[i] = -1;
+				};
+			};
+
+		fail = false;
+
+		// let T be the the defined by the parent pointers
+		SemiPostOrderTree(parent, n, postOrd);
+
+		// for each vertex in T in postorder
+		for(i = 0; i < n; i++) {
+			x = postOrd[i];
+			//check that RN(parent(x)) sub RN(x)
+			xp = RNp[x];
+			if(parent[x] < 0) continue;
+			px = parent[x];
+			pxp = RNp[px];
+
+			for(; xp < RNp[x + 1] && pxp < RNp[px + 1];) {
+				if(RN2[xp] == RN2[pxp]) {	// match
+					xp++;
+					pxp++;
+					continue;
+				} else if(RN2[xp] < RN2[pxp]) {	// mismatch
+					xp++;
+					continue;
+				} else {			// mismatch
+					fail = true;
+					break;
+					};
+				};
+			if(pxp < RNp[parent[x] + 1]) fail = true;
+
+			if(fail) return false;
+			};
+
+		return true;
+		};
+
     };
 
     template <class GraphType>
 	static bool chordal(const GraphType& g)
 	{
 	    return Chordal::getOrder(g,blackHole,blackHole);
+	}
+
+    template <class GraphType>
+	static bool cochordal(const GraphType& g)
+	{
+	    return Chordal::CoChordalTest(g);
 	}
 
 
@@ -833,7 +940,7 @@ class IsItPar : public SearchStructs {
 
             struct Segment {
                 int left, right;
-                Segment(int l=0,int r=1) : left(l), right(r) { assert(l<r); }
+                Segment(int l=0,int r=1) : left(l), right(r) { /*assert(l<r);*/ }
             };
 
             static bool touch(Segment a, Segment b)
@@ -911,7 +1018,14 @@ class IsItPar : public SearchStructs {
 
             for(i = 0; i < n; i++) data[sigma[i]].posSigma = i;
 
-            return IsUmbrellaFree(g, data, sigma);
+            if(IsUmbrellaFree(g, data, sigma)) {
+                if(!isBlackHole(outmap)) {
+		    CalculateI(g, sigma, data, &IvData::posSigma, &IvData::ip);
+                    for(int i=0;i<g.getVertNo();i++) { outmap[sigma[i]] = Segment(i, data[sigma[i]].ip); }
+		    };
+                return true;
+	    	};
+            return false;
             };
 
         protected:
@@ -1026,7 +1140,7 @@ class IsItPar : public SearchStructs {
                     pv = pu = i;
                     for(e = g.getEdge(u, EdUndir); e != NULL; e = g.getEdgeNext(u, e, EdUndir)) {
                         v = g.getEdgeEnd(e, u);
-                        if(data[v].*ifn > pv) pv = data[v].*ifn;
+                        if(data[v].*pos > pv) pv = data[v].*pos;
                         };
                     data[u].*ifn = pv;
                     };

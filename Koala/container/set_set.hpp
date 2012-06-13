@@ -234,7 +234,7 @@ template< typename Element >
 template< typename Element >
     Element Set< Element >::next( const Element &a ) const
     {   if (!a) return first();
-        typename std::set< Element >::iterator i = this->find( a );
+        typename std::set< Element >::const_iterator i = this->find( a );
         assert( i != this->end() );
         i++;
         assert( i != this->end() );

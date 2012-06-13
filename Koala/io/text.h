@@ -252,7 +252,7 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format
                     std::pair<bool,bool> printinf=std::make_pair(true,true))
 {
     Privates::EmptyMap2 em;
-    writeGraphText(g,out,maxlength,format,printinf,em,em);
+    return writeGraphText(g,out,maxlength,format,printinf,em,em);
 }
 
 

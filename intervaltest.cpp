@@ -86,6 +86,21 @@ int main() {
 			   "5 1 -6\n"
 			   "6 0");
 
+	Graph<int, int> g;
+	readGraphText(g, "7\n"
+			   "0(0) 3 -1 -2 -3\n"
+			   "1(1) 1 -2\n"
+			   "2(2) 3 -3 -4 -5\n"
+			   "3(3) 2 -4 -5\n"
+			   "4(4) 0\n"
+			   "5(5) 1 -6\n"
+			   "6(6) 0", RG_VertexLists);
+	map<Graph<int, int>::PVertex, IsIt::Interval::Segment> out;
+	map<Graph<int, int>::PVertex, IsIt::Interval::Segment>::iterator it;
+	IsIt::Interval::graph2segs(g, out);
+	for(it = out.begin(); it != out.end(); it++) {
+		printf("%d: <%d, %d>\n", it->first->info, it->second.left, it->second.right);
+		};
 
 //	cout << endl << endl;
 //	Graph<int, int> g;

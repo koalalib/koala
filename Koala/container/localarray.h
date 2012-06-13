@@ -160,3 +160,4 @@ inline void *k__cast(void *, void *p2)			{ return (void *)p2; };
 }; // namespace Koala
 
 #endif
+
