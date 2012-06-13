@@ -8,6 +8,7 @@
 
 #include "../base/def_struct.h"
 #include "../graph/subgraph.h"
+#include "../container/list.h"
 
 namespace Koala {
 
@@ -528,47 +529,410 @@ class BFS: public BFSPar<AlgorithmsDefaultSettings> {};
  * lexicographical Breadth-First-Search
  */
 
-template <class DefaultStructs>
-class LexBFSPar: public GraphSearchBase< LexBFSPar<DefaultStructs >, DefaultStructs >
-{
-    public:
-        template< class Graph > class LexVisitContainer
-        {
-            public:
-                LexVisitContainer(): m_sets(), m_splits(), m_vertexToListPos() { }
-                ~LexVisitContainer() { clear(); }
 
-                void clear();
-                bool empty() { return m_sets.empty(); }
 
-                void initialize( const Graph &, typename Graph::PVertex );
 
-                typename Graph::PVertex top() { return m_sets.front().first.front(); }
+template<class DefaultStructs>
+class LexBFSPar: public GraphSearchBase<LexBFSPar<DefaultStructs>,
+					 DefaultStructs> {
+public:
+	template<class Graph, class Allocator>
+	class LexVisitContainer {
+	private:
+		template<template<class, class> class CONT, class Alloc>
+		struct LVCNode {
+			typename Graph::PVertex v;
+			typename CONT<LVCNode, Alloc>::iterator block;
 
-                void pop();
-                void push( typename Graph::PVertex v );
+			LVCNode(typename Graph::PVertex _v = NULL): v(_v) { };
+			LVCNode(typename Graph::PVertex _v, typename CONT<LVCNode, Alloc>::iterator it): v(_v), block(it) { };
+			};
 
-                void step();
-                void dump();
+		typedef LVCNode<List, ListDefaultCPPAllocator> Node;
 
-            private:
-                typedef std::list< typename Graph::PVertex > LexList;
-                typedef std::pair< LexList,typename LexList::iterator > Node;
-                typedef std::list< Node > NodeList;
-                typename DefaultStructs:: template AssocCont< typename Graph::PVertex,
-                    std::pair< typename NodeList::iterator,typename LexList::iterator > >::Type m_vertexToListPos;
-                NodeList m_sets;
-                typename NodeList::iterator m_lastSet;
-                typename std::list< typename NodeList::iterator > m_splits;
-        } ;
+		class Container: public List<Node, ListDefaultCPPAllocator>	{};
 
-        template< class GraphType, class VertContainer, class Visitor >
-        static int visitBase(
-            const GraphType &, typename GraphType::PVertex, VertContainer &,
-            Visitor, EdgeDirection, int );
-} ;
+		Container m_data;
+		typename Container::iterator m_openBlock;
+		List<typename Container::iterator> m_splits;
+		typename DefaultStructs::template AssocCont<typename Graph::PVertex, typename Container::iterator>::Type m_vertexToPos;
+
+	public:
+		LexVisitContainer(): m_data(), m_openBlock(), m_vertexToPos()	{ }
+		~LexVisitContainer()						{ clear(); }
+
+		void clear() {
+			m_data.clear();
+			m_splits.clear();
+			};
+
+		void initialize(const Graph &g) {
+			clear();
+			m_data.push_back(Node(NULL));
+			m_data.back().block = m_data.end();
+			m_openBlock = m_data.begin();
+			};
+
+		void initialize(const Graph &g, size_t n, typename Graph::PVertex *tab) {
+			initialize(g);
+			for(size_t i = 0; i < n; i++) push(tab[i]);
+			};
+
+		void initializeAddAll(const Graph &g) {
+			typename Graph::PVertex v;
+			initialize(g);
+			for(v = g.getVert(); v != NULL; v = g.getVertNext(v))
+				push(v);
+			};
+
+		void cleanup() {
+			if(m_data.size() < 2) return;
+			while(m_data.begin().next()->v == NULL) {
+				if(m_data.begin() == m_openBlock) m_openBlock = m_data.end();
+				m_data.pop_front();
+				};
+			};
+
+		bool empty() {
+			cleanup();
+			return m_data.size() < 2;
+			};
+
+		typename Graph::PVertex top() {
+			cleanup();
+			return m_data.begin().next()->v;
+			};
+
+		void pop() {
+			m_data.erase(m_data.begin().next());
+			cleanup();
+			};
+
+		void push(typename Graph::PVertex v) {
+			if(m_openBlock == m_data.end()) {
+				m_data.push_back(Node(NULL));
+				m_data.back().block = m_data.end().prev();
+				};
+			m_data.push_back(Node(v, m_openBlock));
+			m_vertexToPos[v] = m_data.end().prev();
+			};
+
+		void move(typename Graph::PVertex v) {
+			typename Container::iterator grp, newGrp;
+			typename Container::iterator elem;
+			if(!m_vertexToPos.hasKey(v)) push(v);
+			elem = m_vertexToPos[v];
+			grp = elem->block;
+			newGrp = grp->block;
+			if(newGrp == m_data.end()) {
+				newGrp = m_data.insert_before(grp, Node(NULL));
+				grp->block = newGrp;
+				m_splits.push_back(grp);
+				newGrp->block = m_data.end();
+				};
+			m_data.move_before(grp, elem);
+			elem->block = newGrp;
+			};
+
+		void remove(typename Graph::PVertex v) {
+			m_data.erase(m_vertexToPos[v]);
+			};
+
+		void done() {
+			typename List<typename Container::iterator>::iterator it, e;
+			for(it = m_splits.begin(), e = m_splits.end(); it != e; ++it) {
+				(*it)->block = m_data.end();
+				};
+			m_splits.clear();
+			};
+
+		void dump() {
+			typename Container::iterator it;
+			for(it = m_data.begin(); it != m_data.end(); ++it) {
+				if(it->v == NULL) printf(" |");
+				else printf(" %p", it->v);
+				};
+			printf("\n");
+			};
+		};
+
+	template<class GraphType,
+		 class VertContainer,
+		 class Visitor>
+	static int visitBase(const GraphType & g,
+			     typename GraphType::PVertex start,
+			     VertContainer &visited,
+			     Visitor visit,
+			     EdgeDirection mask,
+			     int component) {
+		unsigned int depth, n, retVal;
+		typename GraphType::PEdge e;
+		typename GraphType::PVertex u, v;
+		LexVisitContainer<GraphType, ListDefaultCPPAllocator> cont;
+
+		n = g.getVertNo();
+		if(n == 0) return 0;
+		if(start == NULL) start = g.getVert();
+
+		cont.initialize(g);
+
+		visited[start] = SearchStructs::VisitVertLabs<GraphType>(NULL, NULL, 0, component);
+		cont.push(start);
+		retVal = 0;
+
+		while(!cont.empty()) {
+//			printf("before: ");
+//			cont.dump();
+			u = cont.top();
+			depth = visited[u].distance;
+			visited[u].component = component;
+
+			if(!Visitors::visitVertexPre(g, visit, u, visited[u], visit)) {
+				retVal++;
+				continue;
+				};
+			cont.pop();
+
+			for(e = g.getEdge(u, mask); e != NULL; e = g.getEdgeNext(u, e, mask)) {
+				v = g.getEdgeEnd(e, u);
+				if(!Visitors::visitEdgePre(g, visit, e, u, visit)) continue;
+//				if(visited.hasKey(v)) continue;
+//				visited[v] = SearchStructs::VisitVertLabs<GraphType>(u, e, depth + 1, component);
+				if(visited.hasKey(v)) {
+					if(visited[v].component == -1) {
+						cont.move(v);
+						};
+					continue;
+					};
+				visited[v] = SearchStructs::VisitVertLabs<GraphType>(u, e, depth + 1, -1);
+				cont.move(v);
+				if(!Visitors::visitEdgePost(g, visit, e, u, visit)) return -retVal;
+				};
+			cont.done();
+//			printf("after:  ");
+//			cont.dump();
+
+			retVal++;
+			if(!Visitors::visitVertexPost(g, visit, u, visited[u], visit))
+				return -retVal;
+			};
+		return retVal;
+		};
+
+
+/*
+	template<class GraphType,
+		 class OutVertIter>
+	static int order(const GraphType & g,
+			 size_t in,
+			 typename GraphType::PVertex *tab,
+			 EdgeDirection mask,
+			 OutVertIter out) {
+		unsigned int n, retVal;
+		typename GraphType::PEdge e;
+		typename GraphType::PVertex u, v;
+		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, bool>::Type visited;
+		LexVisitContainer<GraphType, ListDefaultCPPAllocator> cont;
+
+		n = g.getVertNo();
+		if(n == 0) return 0;
+		if(in == 0 || tab == NULL) {
+			v = g.getVert();
+			tab = &v;
+			in = 1;
+			};
+
+		retVal = 0;
+		cont.initialize(g, in, tab);
+
+//		cont.dump();
+
+		while(!cont.empty()) {
+			u = cont.top();
+			cont.pop();
+			visited[u] = true;
+			*out = u;
+			++out;
+			++retVal;
+
+			for(e = g.getEdge(u, mask); e != NULL; e = g.getEdgeNext(u, e, mask)) {
+				v = g.getEdgeEnd(e, u);
+				if(visited.hasKey(v)) continue;
+				visited[v] = true;
+				cont.move(v);
+				};
+			cont.done();
+//		cont.dump();
+			};
+		return retVal;
+		};
+*/
+
+	template<class GraphType>
+	struct OrderData {
+		typename GraphType::PVertex v;
+		int vertId;	// kogo jest s¹siadem (numer s¹siada w porz¹dku)
+		int orderId;	// numer w porz¹dku
+		};
+
+
+	template<class GraphType,
+		 class OutVertIter>
+	static int order2(const GraphType & g,
+			  size_t in,
+			  typename GraphType::PVertex *tab,
+			  EdgeDirection mask,
+			  OutVertIter out) {
+
+		int i, j, o, n, m, retVal;
+		EdgeDirection bmask = mask;
+		typename GraphType::PEdge e;
+		typename GraphType::PVertex u, v;
+		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData;
+		LexVisitContainer<GraphType, ListDefaultCPPAllocator> cont;
+
+		bmask &= ~EdLoop;
+		if(bmask & EdDirOut) bmask &= ~EdDirIn;
+
+		n = g.getVertNo();
+		assert(in == n);
+		m = g.getEdgeNo(bmask);
+		int LOCALARRAY(first, n + 1);
+		OrderData<GraphType> LOCALARRAY(neigh, m * 2);
+		OrderData<GraphType> LOCALARRAY(neigh2, m * 2);
+
+		for(o = 0; o < n; o++) orderData[tab[o]].second = o;
+
+		i = j = 0;
+		for(o = 0; o < n; o++) {
+			u = tab[o];
+			first[i] = j;
+			orderData[u].first = 0;
+			orderData[u].second = o;
+			for(e = g.getEdge(u, bmask); e != NULL; e = g.getEdgeNext(u, e, bmask)) {
+				v = g.getEdgeEnd(e, u);
+				neigh[j].v = v;
+				neigh[j].orderId = orderData[v].second;
+				neigh[j].vertId = o;
+				j++;
+				};
+			i++;
+			};
+		first[i] = j;
+
+		LexBFSPar<DefaultStructs>::StableRadixSort(neigh, j, n, &OrderData<GraphType>::orderId, neigh2);
+		LexBFSPar<DefaultStructs>::StableRadixSort(neigh2, j, n, &OrderData<GraphType>::vertId, neigh);
+
+		retVal = 0;
+		cont.initialize(g, in, tab);
+
+//		cont.dump();
+
+		while(!cont.empty()) {
+			u = cont.top();
+			cont.pop();
+			orderData[u].first = 2;
+			*out = u;
+			++out;
+			++retVal;
+
+			j = orderData[u].second;
+			for(i = first[j]; i < first[j + 1]; i++) {
+				v = neigh[i].v;
+//				if(orderData[v].first) continue;
+//				orderData[v].first = true;
+				if(orderData[v].first > 0) {
+					if(orderData[v].first == 1) {
+						cont.move(v);
+						};
+					continue;
+					};
+				orderData[v].first = 1;
+				cont.move(v);
+				};
+			cont.done();
+//		cont.dump();
+			};
+		return retVal;
+		};
+
+	template<class T>
+	static void StableRadixSort(T *data,
+				    int n,
+				    int nb,
+				    int T::*field,
+				    T *out) {
+		int LOCALARRAY(bucketFirst, nb);
+		int LOCALARRAY(next, n);
+		int i, bp;
+		for(i = 0; i < nb; i++) bucketFirst[i] = -1;
+		for(i = 0; i < n; i++) {
+			bp = data[i].*field;
+			if(bucketFirst[bp] < 0) {
+				next[i] = i;
+			} else {
+				next[i] = next[bucketFirst[bp]];
+				next[bucketFirst[bp]] = i;
+				};
+			bucketFirst[bp] = i;
+			};
+		for(bp = 0; bp < nb; bp++) {
+			i = bucketFirst[bp];
+			if(i < 0) continue;
+			do {
+				i = next[i];
+				*out = data[i];
+				++out;
+			} while(i != bucketFirst[bp]);
+			};
+		};
+
+	};
+
 
 class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
+
+//template <class DefaultStructs>
+//class LexBFSPar: public GraphSearchBase< LexBFSPar<DefaultStructs >, DefaultStructs >
+//{
+//    public:
+//        template< class Graph > class LexVisitContainer
+//        {
+//            public:
+//                LexVisitContainer(): m_sets(), m_splits(), m_vertexToListPos() { }
+//                ~LexVisitContainer() { clear(); }
+//
+//                void clear();
+//                bool empty() { return m_sets.empty(); }
+//
+//                void initialize( const Graph &, typename Graph::PVertex );
+//
+//                typename Graph::PVertex top() { return m_sets.front().first.front(); }
+//
+//                void pop();
+//                void push( typename Graph::PVertex v );
+//
+//                void step();
+//                void dump();
+//
+//            private:
+//                typedef std::list< typename Graph::PVertex > LexList;
+//                typedef std::pair< LexList,typename LexList::iterator > Node;
+//                typedef std::list< Node > NodeList;
+//                typename DefaultStructs:: template AssocCont< typename Graph::PVertex,
+//                    std::pair< typename NodeList::iterator,typename LexList::iterator > >::Type m_vertexToListPos;
+//                NodeList m_sets;
+//                typename NodeList::iterator m_lastSet;
+//                typename std::list< typename NodeList::iterator > m_splits;
+//        } ;
+//
+//        template< class GraphType, class VertContainer, class Visitor >
+//        static int visitBase(
+//            const GraphType &, typename GraphType::PVertex, VertContainer &,
+//            Visitor, EdgeDirection, int );
+//} ;
+//
+//class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
 
 /*
  * Cheriyan–Mehlhorn/Gabow algorithm
