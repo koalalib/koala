@@ -151,6 +151,16 @@ private:
 
 /*
  * List
+ * lista podobna do stl-owej
+ * size ma z³o¿onoœæ O(1) (std::list ma O(n))
+ * interfejs jest ubo¿szy (nie z przyczyn technicznych -- czêœæ metod nie
+ * by³a potrzebna)
+ * dodatkowe metody:
+ * insert_after(iterator, value)
+ * insert_before(iterator, value)
+ * move_after(iterator, iterator) -- przeniesienie wewn¹trz jednej listy
+ * move_before(iterator, iterator) -- przeniesienie wewn¹trz jednej listy
+ *
  */
 template<class T, class Allocator = ListDefaultCPPAllocator>
 class List {
@@ -239,13 +249,29 @@ public:
 		Node *a, *b, *pa;
 		size_t i;
 		if(m_count < 2) return;
+		if(m_count == 2) {
+			if(m_root.prev->elem < m_root.next->elem) {
+				a = m_root.next;
+				b = m_root.prev;
+				b->next = a;
+				b->prev = (Node *)&m_root;
+				a->prev = b;
+				a->next = (Node *)&m_root;
+				m_root.next = b;
+				m_root.prev = a;
+				};
+			return;
+			};
 		a = b = m_root.next;
 		i = m_count / 2;
-		while(i) { a = a->next; i--; };
-		b = a->next;
+		while(i) { b = b->next; i--; };
+		a = b->prev;
 		a->next = NULL;
+		b->prev = NULL;
 		List<T, Allocator> other(b, m_root.prev, m_count - m_count / 2);
+		m_count = m_count / 2;
 		m_root.prev = a;
+		a->next = (Node *)&m_root;
 		sort();
 		other.sort();
 		merge(other);
@@ -253,14 +279,24 @@ public:
 
 	// czyœci zawartoœæ o
 	void merge(List &o) {
-		Node *a, *b, *e;
+		Node *a, *b, *e, *ae, *be;
+		if(&o == this) return;
 		if(o.empty()) return;
 		if(empty()) { swap(o); return; };
 		a = m_root.next;
 		b = o.m_root.next;
-		if(a->elem < b->elem) { m_root.next = e = a; a->prev = (Node *)&m_root; a = a->next; }
-		else { m_root.next = e = b; b->prev = (Node *)&m_root; b = b->next; };
-		if(a != NULL && b != NULL) {
+		ae = (Node *)&m_root;
+		be = (Node *)&(o.m_root);
+		if(a->elem < b->elem) {
+			m_root.next = e = a;
+			a->prev = (Node *)&m_root;
+			a = a->next;
+		} else {
+			m_root.next = e = b;
+			b->prev = (Node *)&m_root;
+			b = b->next;
+			};
+		if(a != ae && b != be) {
 			while(true) {
 				if(a->elem < b->elem) {
 					e->next = a;
@@ -271,16 +307,21 @@ public:
 					e->next = b;
 					b->prev = e;
 					e = b;
-					if((b = b->next) == NULL) break;
+					if((b = b->next) == be) break;
 					};
 				};
 			};
-		if(a == NULL) { e->next = b; b->prev = e; m_root.prev = o.m_root.prev; }
-		else { e->next = a; a->prev = e; };
+		if(a == ae) {
+			e->next = b;
+			b->prev = e;
+			m_root.prev = o.m_root.prev;
+			o.m_root.prev->next = (Node *)&m_root;
+		} else {
+			e->next = a;
+			a->prev = e;
+			};
 		m_count = m_count + o.m_count;
-		o.m_root.next = (Node *)&(o.m_root);
-		o.m_root.prev = (Node *)&(o.m_root);
-		o.m_count = 0;
+		o.Zero();
 		};
 
 	friend class List_iterator<T, Allocator>;
@@ -290,6 +331,8 @@ private:
 	List(Node *n, Node *p, size_t c): allocator() {
 		m_root.next = n;
 		m_root.prev = p;
+		n->prev = (Node *)&m_root;
+		p->next = (Node *)&m_root;
 		m_count = c;
 		};
 

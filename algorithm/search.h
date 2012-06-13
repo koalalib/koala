@@ -935,6 +935,293 @@ class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
 //class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
 
 /*
+ * lexicographical Breadth-First-Search on a complement of a graph
+ */
+template<class DefaultStructs>
+class CoLexBFSPar: public LexBFSPar<DefaultStructs> {
+public:
+	template<class Graph, class Allocator>
+	class CoLexVisitContainer {
+	private:
+		template<template<class, class> class CONT, class Alloc>
+		struct CoLVCNode {
+			typename Graph::PVertex v;
+			typename CONT<CoLVCNode, Alloc>::iterator block;
+
+			CoLVCNode(typename Graph::PVertex _v = NULL): v(_v) { };
+			CoLVCNode(typename Graph::PVertex _v, typename CONT<CoLVCNode, Alloc>::iterator it): v(_v), block(it) { };
+			};
+
+		typedef CoLVCNode<List, ListDefaultCPPAllocator> Node;
+
+		class Container: public List<Node, ListDefaultCPPAllocator>	{};
+
+		Container m_data;
+		typename Container::iterator m_openBlock;
+		List<typename Container::iterator> m_splits;
+		typename DefaultStructs::template AssocCont<typename Graph::PVertex, typename Container::iterator>::Type m_vertexToPos;
+
+	public:
+		CoLexVisitContainer(): m_data(), m_openBlock(), m_vertexToPos()	{ }
+		~CoLexVisitContainer()						{ clear(); }
+
+		void clear() {
+			m_data.clear();
+			m_splits.clear();
+			};
+
+		void initialize(const Graph &g) {
+			clear();		
+			m_data.push_back(Node(NULL));
+			m_data.back().block = m_data.end();
+			m_openBlock = m_data.begin();
+			};
+
+		void initialize(const Graph &g, size_t n, typename Graph::PVertex *tab) {
+			initialize(g);
+			for(size_t i = 0; i < n; i++) push(tab[i]);
+			};
+
+		void initializeAddAll(const Graph &g) {
+			typename Graph::PVertex v;
+			initialize(g);
+			for(v = g.getVert(); v != NULL; v = g.getVertNext(v))
+				push(v);
+			};
+
+		void cleanup() {
+			if(m_data.size() < 2) return;
+			while(m_data.end().prev()->v == NULL) {
+				if(m_data.end().prev() == m_openBlock) m_openBlock = m_data.end();
+				m_data.pop_back();
+				};
+			};
+
+		bool empty() {
+			cleanup();
+			return m_data.size() < 2;
+			};
+
+		typename Graph::PVertex top() {
+			cleanup();
+			return m_data.end().prev()->v;
+			};
+
+		void pop() {
+			m_data.pop_back();
+//			m_data.erase(m_data.back());
+			cleanup();
+			};
+
+		void push(typename Graph::PVertex v) {
+			if(m_openBlock == m_data.end()) {
+				m_data.push_front(Node(NULL));
+				m_data.back().block = m_data.begin();
+				};
+//			m_data.push_back(Node(v, m_openBlock));
+//			m_vertexToPos[v] = m_data.end().prev();
+			m_data.insert(m_data.begin().next(), Node(v, m_openBlock));
+			m_vertexToPos[v] = m_data.begin().next();
+			};
+
+		void move(typename Graph::PVertex v) {
+			typename Container::iterator grp, newGrp;
+			typename Container::iterator elem;
+			if(!m_vertexToPos.hasKey(v)) push(v);
+			elem = m_vertexToPos[v];
+			grp = elem->block;
+			newGrp = grp->block;
+			if(newGrp == m_data.end()) {
+				newGrp = m_data.insert_before(grp, Node(NULL));
+				grp->block = newGrp;
+				m_splits.push_back(grp);
+				newGrp->block = m_data.end();
+				};
+			m_data.move_before(grp, elem);
+			elem->block = newGrp;
+			};
+
+		void remove(typename Graph::PVertex v) {
+			m_data.erase(m_vertexToPos[v]);
+			};
+
+		void done() {
+			typename List<typename Container::iterator>::iterator it, e;
+			for(it = m_splits.begin(), e = m_splits.end(); it != e; ++it) {
+				(*it)->block = m_data.end();
+				};
+			m_splits.clear();
+			};
+
+		void dump() {
+			typename Container::iterator it;
+			for(it = m_data.begin(); it != m_data.end(); ++it) {
+				if(it->v == NULL) printf(" |");
+				else printf(" %p", it->v);
+				};
+			printf("\n");
+			};
+		};
+
+/*
+	template<class GraphType,
+		 class VertContainer,
+		 class Visitor>
+	static int visitBase(const GraphType & g,
+			     typename GraphType::PVertex start,
+			     VertContainer &visited,
+			     Visitor visit,
+			     EdgeDirection mask,
+			     int component) {
+		unsigned int depth, n, retVal;
+		typename GraphType::PEdge e;
+		typename GraphType::PVertex u, v;
+		CoLexVisitContainer<GraphType, ListDefaultCPPAllocator> cont;
+
+		n = g.getVertNo();
+		if(n == 0) return 0;
+		if(start == NULL) start = g.getVert();
+
+		cont.initialize(g);
+
+		visited[start] = SearchStructs::VisitVertLabs<GraphType>(NULL, NULL, 0, component);
+		cont.push(start);
+		retVal = 0;
+
+		while(!cont.empty()) {
+//			printf("before: ");
+//			cont.dump();
+			u = cont.top();
+			depth = visited[u].distance;
+			visited[u].component = component;
+
+			if(!Visitors::visitVertexPre(g, visit, u, visited[u], visit)) {
+				retVal++;
+				continue;
+				};
+			cont.pop();
+
+			for(e = g.getEdge(u, mask); e != NULL; e = g.getEdgeNext(u, e, mask)) {
+				v = g.getEdgeEnd(e, u);
+				if(!Visitors::visitEdgePre(g, visit, e, u, visit)) continue;
+//				if(visited.hasKey(v)) continue;
+//				visited[v] = SearchStructs::VisitVertLabs<GraphType>(u, e, depth + 1, component);
+				if(visited.hasKey(v)) {
+					if(visited[v].component == -1) {
+						cont.move(v);
+						};
+					continue;
+					};
+				visited[v] = SearchStructs::VisitVertLabs<GraphType>(u, e, depth + 1, -1);
+				cont.move(v);
+				if(!Visitors::visitEdgePost(g, visit, e, u, visit)) return -retVal;
+				};
+			cont.done();
+//			printf("after:  ");
+//			cont.dump();
+
+			retVal++;
+			if(!Visitors::visitVertexPost(g, visit, u, visited[u], visit))
+				return -retVal;
+			};
+		return retVal;
+		};
+*/
+
+	template<class GraphType>
+	struct OrderData {
+		typename GraphType::PVertex v;
+		int vertId;	// kogo jest s¹siadem (numer s¹siada w porz¹dku)
+		int orderId;	// numer w porz¹dku
+		};
+
+
+	template<class GraphType,
+		 class OutVertIter>
+	static int order2(const GraphType & g,
+			  size_t in,
+			  typename GraphType::PVertex *tab,
+			  EdgeDirection mask,
+			  OutVertIter out) {
+
+		int i, j, o, n, m, retVal;
+		EdgeDirection bmask = mask;
+		typename GraphType::PEdge e;
+		typename GraphType::PVertex u, v;
+		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData;
+		CoLexVisitContainer<GraphType, ListDefaultCPPAllocator> cont;
+
+		bmask &= ~EdLoop;
+		if(bmask & EdDirOut) bmask &= ~EdDirIn;
+
+		n = g.getVertNo();
+		assert(in == n);
+		m = g.getEdgeNo(bmask);
+		int LOCALARRAY(first, n + 1);
+		OrderData<GraphType> LOCALARRAY(neigh, m * 2);
+		OrderData<GraphType> LOCALARRAY(neigh2, m * 2);
+
+		for(o = 0; o < n; o++) orderData[tab[o]].second = o;
+
+		i = j = 0;
+		for(o = 0; o < n; o++) {
+			u = tab[o];
+			first[i] = j;
+			orderData[u].first = 0;
+			orderData[u].second = o;
+			for(e = g.getEdge(u, bmask); e != NULL; e = g.getEdgeNext(u, e, bmask)) {
+				v = g.getEdgeEnd(e, u);
+				neigh[j].v = v;
+				neigh[j].orderId = orderData[v].second;
+				neigh[j].vertId = o;
+				j++;
+				};
+			i++;
+			};
+		first[i] = j;
+
+		CoLexBFSPar<DefaultStructs>::StableRadixSort(neigh, j, n, &OrderData<GraphType>::orderId, neigh2);
+		CoLexBFSPar<DefaultStructs>::StableRadixSort(neigh2, j, n, &OrderData<GraphType>::vertId, neigh);
+
+		retVal = 0;
+		cont.initialize(g, in, tab);
+
+//		cont.dump();
+
+		while(!cont.empty()) {
+			u = cont.top();
+			cont.pop();
+			orderData[u].first = 2;
+			*out = u;
+			++out;
+			++retVal;
+			
+			j = orderData[u].second;
+			for(i = first[j]; i < first[j + 1]; i++) {
+				v = neigh[i].v;
+//				if(orderData[v].first) continue;
+//				orderData[v].first = true;
+				if(orderData[v].first > 0) {
+					if(orderData[v].first == 1) {
+						cont.move(v);
+						};
+					continue;
+					};
+				orderData[v].first = 1;
+				cont.move(v);
+				};
+			cont.done();
+//		cont.dump();
+			};
+		return retVal;
+		};
+
+	};
+
+class CoLexBFS: public CoLexBFSPar<AlgorithmsDefaultSettings> {};
+
+
+/*
  * Cheriyanâ€“Mehlhorn/Gabow algorithm
  */
 
