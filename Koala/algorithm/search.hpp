@@ -588,199 +588,199 @@ int BFSPar <DefaultStructs >::visitBase(
         visit,mask,component );
 }
 
-template <class DefaultStructs >
-template< class Graph >
-void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::clear()
-{
-    m_sets.clear();
-    m_splits.clear();
-}
-
-template <class DefaultStructs >
-template< class Graph >
-void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::initialize(
-    const Graph &g, typename Graph::PVertex first )
-{
-    unsigned i;
-    typename Graph::PVertex v;
-    typename NodeList::iterator np;
-
-    clear();
-    m_sets.push_back( Node() );
-    np = --(m_sets.end());
-    m_lastSet = np;
-}
-
-template <class DefaultStructs >
-template< class Graph >
-void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::pop()
-{
-    while (!m_sets.empty() && m_sets.front().first.empty())
-    {
-        if (m_sets.begin() == m_lastSet) m_lastSet = m_sets.end();
-        m_sets.pop_front();
-    }
-    if (m_sets.size() == 0) return;
-    m_sets.front().first.front();
-    m_sets.front().first.pop_front();
-    m_sets.front().second = m_sets.front().first.begin();
-    while (!m_sets.empty() && m_sets.front().first.empty())
-    {
-        if(m_sets.begin() == m_lastSet) m_lastSet = m_sets.end();
-        m_sets.pop_front();
-    }
-}
-
-template <class DefaultStructs >
-template< class Graph >
-void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::push( typename Graph::PVertex v )
-{
-    typename LexList::iterator vertListPos;
-    typename NodeList::iterator np, vertNode;
-
-    if (!m_vertexToListPos.hasKey( v ))
-    {
-        if (m_lastSet == m_sets.end())
-        {
-            m_sets.push_back( Node() );
-            np = --(m_sets.end());
-            m_lastSet = np;
-        }
-        np = m_lastSet;
-        if (np->first.empty())
-        {
-            np->first.push_back( v );
-            np->second = np->first.begin();
-        }
-        else np->first.push_back( v );
-        m_vertexToListPos[v] = std::make_pair( np,--(np->first.end()) );
-        return;
-    }
-
-    vertNode = m_vertexToListPos[v].first;
-    vertListPos = m_vertexToListPos[v].second;
-
-    LexList &vertList = vertNode->first;
-    typename LexList::iterator &splitPos = vertNode->second;
-
-    if (splitPos == vertListPos)
-    {
-        m_splits.push_back( vertNode );
-        ++splitPos;
-    }
-    else
-    {
-        if (splitPos == vertList.begin()) m_splits.push_back( vertNode );
-        vertList.splice( splitPos,vertList,vertListPos );
-    }
-}
-
-template <class DefaultStructs >
-template< class Graph >
-void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::step()
-{
-    typename LexList::iterator lit, le;
-    typename NodeList::iterator newSet;
-    typename std::list< typename NodeList::iterator >::iterator e, it;
-
-    e = m_splits.end();
-    it = m_splits.begin();
-    while (it != e)
-    {
-        if ((*it)->second != (*it)->first.begin() &&
-            (*it)->second != (*it)->first.end())
-        {
-            newSet = m_sets.insert( *it,Node() );
-            newSet->first.splice( newSet->first.begin(),(*it)->first,
-                (*it)->first.begin(),(*it)->second );
-            newSet->second = newSet->first.begin();
-
-            le = newSet->first.end();
-            for( lit = newSet->first.begin(); lit != le; ++lit )
-                m_vertexToListPos[*lit] = std::make_pair( newSet,lit );
-        }
-        ++it;
-    }
-    m_splits.clear();
-}
-
-template <class DefaultStructs >
-template< class Graph >
-void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::dump()
-{
-    typename NodeList::iterator it, e;
-    typename LexList::iterator lit, le, split;
-    e = m_sets.end();
-    for( it = m_sets.begin(); it != e; ++it )
-    {
-        split = it->second;
-        printf( "<" );
-        if (it == m_lastSet) printf( "<" );
-        le = it->first.end();
-        for( lit = it->first.begin(); lit != le; ++lit )
-        {
-            if (lit == split) printf( " |" );
-            printf( " %u",((unsigned)(*lit) & 0xffff) / 8 );
-        }
-        if(it == m_lastSet) printf(" >>  ");
-        else printf(" >  ");
-    }
-    printf("\n");
-    fflush(stdout);
-}
-
-template <class DefaultStructs >
-template< class GraphType, class VertContainer, class Visitor >
-int LexBFSPar <DefaultStructs >::visitBase(
-    const GraphType &g, typename GraphType::PVertex start,
-    VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
-{
-    unsigned int depth, n, retVal;
-    typename GraphType::PEdge e;
-    typename GraphType::PVertex u, v;
-    LexVisitContainer< GraphType > cont;
-
-    n = g.getVertNo();
-    if (n == 0) return 0;
-    if (start == NULL) start = g.getVert();
-
-    cont.initialize( g,start );
-
-    visited[start] = SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,
-        component );
-    cont.push( start );
-    retVal = 0;
-
-    while (!cont.empty())
-    {
-        u = cont.top();
-        depth = visited[u].distance;
-
-        if (!Visitors::visitVertexPre( g,visit,u,visited[u],visit ))
-        {
-            retVal++;
-            continue;
-        }
-        cont.pop();
-
-        for( e = g.getEdge( u,mask ); e != NULL; e = g.getEdgeNext( u,e,mask ) )
-        {
-            v = g.getEdgeEnd( e,u );
-            if (!Visitors::visitEdgePre( g,visit,e,u,visit )) continue;
-            if (visited.hasKey( v )) continue;
-            visited[v] = SearchStructs::VisitVertLabs< GraphType >( u,e,
-                depth + 1,component );
-            cont.push( v );
-            if (!Visitors::visitEdgePost( g,visit,e,u,visit )) return -retVal;
-        }
-        cont.step();
-
-        retVal++;
-        if (!Visitors::visitVertexPost( g,visit,u,visited[u],visit ))
-            return -retVal;
-    }
-    return retVal;
-}
+//template <class DefaultStructs >
+//template< class Graph >
+//void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::clear()
+//{
+//    m_sets.clear();
+//    m_splits.clear();
+//}
+//
+//template <class DefaultStructs >
+//template< class Graph >
+//void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::initialize(
+//    const Graph &g, typename Graph::PVertex first )
+//{
+//    unsigned i;
+//    typename Graph::PVertex v;
+//    typename NodeList::iterator np;
+//
+//    clear();
+//    m_sets.push_back( Node() );
+//    np = --(m_sets.end());
+//    m_lastSet = np;
+//}
+//
+//template <class DefaultStructs >
+//template< class Graph >
+//void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::pop()
+//{
+//    while (!m_sets.empty() && m_sets.front().first.empty())
+//    {
+//        if (m_sets.begin() == m_lastSet) m_lastSet = m_sets.end();
+//        m_sets.pop_front();
+//    }
+//    if (m_sets.size() == 0) return;
+//    m_sets.front().first.front();
+//    m_sets.front().first.pop_front();
+//    m_sets.front().second = m_sets.front().first.begin();
+//    while (!m_sets.empty() && m_sets.front().first.empty())
+//    {
+//        if(m_sets.begin() == m_lastSet) m_lastSet = m_sets.end();
+//        m_sets.pop_front();
+//    }
+//}
+//
+//template <class DefaultStructs >
+//template< class Graph >
+//void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::push( typename Graph::PVertex v )
+//{
+//    typename LexList::iterator vertListPos;
+//    typename NodeList::iterator np, vertNode;
+//
+//    if (!m_vertexToListPos.hasKey( v ))
+//    {
+//        if (m_lastSet == m_sets.end())
+//        {
+//            m_sets.push_back( Node() );
+//            np = --(m_sets.end());
+//            m_lastSet = np;
+//        }
+//        np = m_lastSet;
+//        if (np->first.empty())
+//        {
+//            np->first.push_back( v );
+//            np->second = np->first.begin();
+//        }
+//        else np->first.push_back( v );
+//        m_vertexToListPos[v] = std::make_pair( np,--(np->first.end()) );
+//        return;
+//    }
+//
+//    vertNode = m_vertexToListPos[v].first;
+//    vertListPos = m_vertexToListPos[v].second;
+//
+//    LexList &vertList = vertNode->first;
+//    typename LexList::iterator &splitPos = vertNode->second;
+//
+//    if (splitPos == vertListPos)
+//    {
+//        m_splits.push_back( vertNode );
+//        ++splitPos;
+//    }
+//    else
+//    {
+//        if (splitPos == vertList.begin()) m_splits.push_back( vertNode );
+//        vertList.splice( splitPos,vertList,vertListPos );
+//    }
+//}
+//
+//template <class DefaultStructs >
+//template< class Graph >
+//void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::step()
+//{
+//    typename LexList::iterator lit, le;
+//    typename NodeList::iterator newSet;
+//    typename std::list< typename NodeList::iterator >::iterator e, it;
+//
+//    e = m_splits.end();
+//    it = m_splits.begin();
+//    while (it != e)
+//    {
+//        if ((*it)->second != (*it)->first.begin() &&
+//            (*it)->second != (*it)->first.end())
+//        {
+//            newSet = m_sets.insert( *it,Node() );
+//            newSet->first.splice( newSet->first.begin(),(*it)->first,
+//                (*it)->first.begin(),(*it)->second );
+//            newSet->second = newSet->first.begin();
+//
+//            le = newSet->first.end();
+//            for( lit = newSet->first.begin(); lit != le; ++lit )
+//                m_vertexToListPos[*lit] = std::make_pair( newSet,lit );
+//        }
+//        ++it;
+//    }
+//    m_splits.clear();
+//}
+//
+//template <class DefaultStructs >
+//template< class Graph >
+//void LexBFSPar <DefaultStructs >::LexVisitContainer< Graph >::dump()
+//{
+//    typename NodeList::iterator it, e;
+//    typename LexList::iterator lit, le, split;
+//    e = m_sets.end();
+//    for( it = m_sets.begin(); it != e; ++it )
+//    {
+//        split = it->second;
+//        printf( "<" );
+//        if (it == m_lastSet) printf( "<" );
+//        le = it->first.end();
+//        for( lit = it->first.begin(); lit != le; ++lit )
+//        {
+//            if (lit == split) printf( " |" );
+//            printf( " %u",((unsigned)(*lit) & 0xffff) / 8 );
+//        }
+//        if(it == m_lastSet) printf(" >>  ");
+//        else printf(" >  ");
+//    }
+//    printf("\n");
+//    fflush(stdout);
+//}
+//
+//template <class DefaultStructs >
+//template< class GraphType, class VertContainer, class Visitor >
+//int LexBFSPar <DefaultStructs >::visitBase(
+//    const GraphType &g, typename GraphType::PVertex start,
+//    VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
+//{
+//    unsigned int depth, n, retVal;
+//    typename GraphType::PEdge e;
+//    typename GraphType::PVertex u, v;
+//    LexVisitContainer< GraphType > cont;
+//
+//    n = g.getVertNo();
+//    if (n == 0) return 0;
+//    if (start == NULL) start = g.getVert();
+//
+//    cont.initialize( g,start );
+//
+//    visited[start] = SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,
+//        component );
+//    cont.push( start );
+//    retVal = 0;
+//
+//    while (!cont.empty())
+//    {
+//        u = cont.top();
+//        depth = visited[u].distance;
+//
+//        if (!Visitors::visitVertexPre( g,visit,u,visited[u],visit ))
+//        {
+//            retVal++;
+//            continue;
+//        }
+//        cont.pop();
+//
+//        for( e = g.getEdge( u,mask ); e != NULL; e = g.getEdgeNext( u,e,mask ) )
+//        {
+//            v = g.getEdgeEnd( e,u );
+//            if (!Visitors::visitEdgePre( g,visit,e,u,visit )) continue;
+//            if (visited.hasKey( v )) continue;
+//            visited[v] = SearchStructs::VisitVertLabs< GraphType >( u,e,
+//                depth + 1,component );
+//            cont.push( v );
+//            if (!Visitors::visitEdgePost( g,visit,e,u,visit )) return -retVal;
+//        }
+//        cont.step();
+//
+//        retVal++;
+//        if (!Visitors::visitVertexPost( g,visit,u,visited[u],visit ))
+//            return -retVal;
+//    }
+//    return retVal;
+//}
 
 template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
