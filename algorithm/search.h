@@ -8,7 +8,7 @@
 
 #include "../base/def_struct.h"
 #include "../graph/subgraph.h"
-#include "../container/list.h"
+
 
 namespace Koala {
 
@@ -530,35 +530,523 @@ class BFS: public BFSPar<AlgorithmsDefaultSettings> {};
  */
 
 
+namespace Privates {
+
+    class ListDefaultCPPAllocator {
+    public:
+        template<class T> T *allocate()			{ return new T(); };
+        template<class T> void deallocate(T *p)		{ delete p; };
+        template<class T> T *allocate(size_t n)		{ return new T[n]; };
+        template<class T> void deallocate(T *p, size_t)	{ delete[] p; };
+        } ;
+
+
+
+
+    template <class T> struct ListNode;
+    template <class T>	struct BaseListNode {
+            ListNode<T> *next;
+            ListNode<T> *prev;
+            };
+    template <class T>	struct ListNode: public BaseListNode<T> {
+            T elem;
+            };
+
+    template <class T>
+    class ListBlockListAllocator
+    {
+
+        private:
+            typedef ListNode<T> Element;
+            BlockOfBlockList< Element >* wsk;
+            BlockList<Element,VectorInterface<BlockOfBlockList< Element > *> > *manager;
+    //        mutable int licz;
+
+            ListBlockListAllocator(const ListBlockListAllocator& ){}
+            const ListBlockListAllocator& operator=(const ListBlockListAllocator&) {}
+
+            template <class U,class W> class TestEqTypes;
+            template <class U> class TestEqTypes<U,U> {};
+
+            Element* alloc() { return &(manager->operator[](manager->newPos())); }
+
+            void dealloc(Element* ptr)
+            {   if (!ptr) return;
+                int pos=(((char*)ptr)-((char*)wsk))/sizeof(BlockOfBlockList< Element >);
+                assert(manager->ready(pos));
+                manager->delPos(pos);
+            }
+
+
+
+        public:
+            ListBlockListAllocator(int n)  // : licz(0)
+            {   wsk=new BlockOfBlockList< Element >[n];
+                manager=new BlockList<Element,VectorInterface<BlockOfBlockList< Element > *> >(wsk,n);
+            }
+
+            ~ListBlockListAllocator()
+            {
+                delete manager;
+                delete [] wsk;
+            }
+
+
+
+            template<class U> U *allocate()
+           { TestEqTypes<U,Element> x; return alloc(); };
+           template<class U> void deallocate(U *p)
+           { TestEqTypes<U,Element> x; dealloc(p); };
+    };
+
+
+
+    /*
+     * List_iterator
+     */
+    template<class T>
+    struct List_iterator {
+    //public:
+        typedef std::bidirectional_iterator_tag iterator_category;
+        typedef T value_type;
+        typedef ptrdiff_t difference_type;
+        typedef T *pointer;
+        typedef T &reference;
+
+        List_iterator(): ptr(NULL)				{};
+        List_iterator(const List_iterator &i): ptr(i.ptr)	{};
+
+        List_iterator next()					{ return List_iterator(ptr->next); };
+        List_iterator prev()					{ return List_iterator(ptr->prev); };
+
+        List_iterator &operator =(const List_iterator &i)	{ ptr = i.ptr; return *this; };
+
+        bool operator ==(const List_iterator &i) const		{ return ptr == i.ptr; };
+        bool operator !=(const List_iterator &i) const		{ return ptr != i.ptr; };
+
+        T &operator *()			{ return ptr->elem; };
+        const T &operator *() const	{ return ptr->elem; };
+        T *operator ->()		{ return &(ptr->elem); };
+        const T *operator ->() const	{ return &(ptr->elem); };
+
+        List_iterator &operator++() {
+            ptr = ptr->next;
+            return *this;
+            };
+
+        List_iterator &operator--() {
+            ptr = ptr->prev;
+            return *this;
+            };
+
+        List_iterator operator++(int) {
+            List_iterator it;
+            it = *this;
+            ++(*this);
+            return it;
+            };
+
+        List_iterator operator--(int) {
+            List_iterator it;
+            it = *this;
+            --(*this);
+            return it;
+            };
+
+    //	friend class List<T, Allocator>;
+    //	friend class List_const_iterator<T, Allocator>;
+
+    //private:
+        List_iterator(ListNode<T> *p): ptr(p)	{};
+
+    //private:
+        ListNode<T> *ptr;
+        };
+
+
+    /*
+     * List_const_iterator
+     */
+    template<class T>
+    struct List_const_iterator {
+    //public:
+        typedef std::bidirectional_iterator_tag iterator_category;
+        typedef T value_type;
+        typedef ptrdiff_t difference_type;
+        typedef T *pointer;
+        typedef T &reference;
+
+        List_const_iterator(): ptr(NULL)				{};
+        List_const_iterator(const List_const_iterator &i): ptr(i.ptr)	{};
+        List_const_iterator(const List_iterator<T> &i): ptr(i.ptr)		{};
+
+        List_const_iterator next()					{ return List_const_iterator(ptr->next); };
+        List_const_iterator prev()					{ return List_const_iterator(ptr->prev); };
+
+        List_const_iterator &operator =(const List_const_iterator &i)	{ ptr = i.ptr; return *this; };
+
+        bool operator ==(const List_const_iterator &i) const		{ return ptr == i.ptr; };
+        bool operator !=(const List_const_iterator &i) const		{ return ptr != i.ptr; };
+
+        T &operator *()			{ return ptr->elem; };
+        const T &operator *() const	{ return ptr->elem; };
+        T *operator ->()		{ return &(ptr->elem); };
+        const T *operator ->() const	{ return &(ptr->elem); };
+
+        List_const_iterator &operator++() {
+            ptr = ptr->next;
+            return *this;
+            };
+
+        List_const_iterator &operator--() {
+            ptr = ptr->prev;
+            return *this;
+            };
+
+        List_const_iterator operator++(int) {
+            List_const_iterator it;
+            it = *this;
+            ++(*this);
+            return it;
+            };
+
+        List_const_iterator operator--(int) {
+            List_const_iterator it;
+            it = *this;
+            --(*this);
+            return it;
+            };
+
+    //	friend class List<T, Allocator>;
+
+    //private:
+        List_const_iterator(ListNode<T> *p): ptr(p)	{};
+
+    //private:
+        ListNode<T> *ptr;
+        };
+
+
+    /*
+     * List
+     * lista podobna do stl-owej
+     * size ma z³o¿onoœæ O(1) (std::list ma O(n))
+     * interfejs jest ubo¿szy (nie z przyczyn technicznych -- czêœæ metod nie
+     * by³a potrzebna)
+     * dodatkowe metody:
+     * insert_after(iterator, value)
+     * insert_before(iterator, value)
+     * move_after(iterator, iterator) -- przeniesienie wewn¹trz jednej listy
+     * move_before(iterator, iterator) -- przeniesienie wewn¹trz jednej listy
+     *
+     */
+    template<class T, class Allocator = ListDefaultCPPAllocator>
+    class List {
+    public:
+        typedef T value_type;
+        typedef List_iterator<T> iterator;
+        typedef List_const_iterator<T> const_iterator;
+    //	typedef ListNode<T> ListNode;
+
+    //	List(): allocator()				{ Zero(); };
+        List(Allocator &a): allocator(a)		{ Zero(); };
+        List(const List &lst): allocator(lst.allocator)	{ Zero(); *this = lst; };
+        ~List()						{ clear(); };
+
+        iterator begin()			{ return iterator(m_root.next); };
+        const_iterator begin() const		{ return const_iterator(m_root.next); };
+        iterator end()				{ return iterator((ListNode<T> *)(&m_root)); };
+        const_iterator end() const		{ return const_iterator((ListNode<T> *)&m_root); };
+
+        T &front()				{ return m_root.next->elem; };
+        const T &front() const			{ return m_root.next->elem; };
+
+        T &back()				{ return m_root.prev->elem; };
+        const T &back() const			{ return m_root.prev->elem; };
+
+        bool empty() const			{ return m_count == 0; };
+
+        size_t size() const			{ return m_count; };
+
+        iterator find(const T &v) 		{ return iterator(_find(v)); };
+        const_iterator find(const T &v) const	{ return const_iterator(_find(v)); };
+
+        void push_front(const T &v)		{ _insert_before(m_root.next, v); };
+        void pop_front()			{ _erase(m_root.next); };
+        void push_back(const T &v)		{ _insert_after(m_root.prev, v); };
+        void pop_back()				{ _erase(m_root.prev); };
+
+        void clear()				{ while(!empty()) pop_front(); };
+
+        iterator insert(const_iterator pos, const T &v)		{ return iterator(_insert_before(pos.ptr, v)); };
+        iterator insert_before(const_iterator pos, const T &v)	{ return iterator(_insert_before(pos.ptr, v)); };
+        iterator insert_after(const_iterator pos, const T &v)	{ return iterator(_insert_after(pos.ptr, v)); };
+
+        // przesuniêcie wewn¹trz kontenera, a NIE miêdzy kontenerami!
+        void move_before(iterator pos, iterator elem) {
+            _unlink(elem.ptr);
+            _link_before(pos.ptr, elem.ptr);
+            };
+
+        // przesuniêcie wewn¹trz kontenera, a NIE miêdzy kontenerami!
+        void move_after(iterator pos, iterator elem) {
+            _unlink(elem.ptr);
+            _link_after(pos.ptr, elem.ptr);
+            };
+
+        void erase(iterator pos)				{ _erase(pos.ptr); };
+
+        template <class Alloc>
+        void copy(const List<T, Alloc> &lst) {
+            const_iterator it, e;
+            if(this == (List*)(&lst)) return;
+            clear();
+            for(it = lst.begin(), e = lst.end(); it != e; ++it) push_back(*it);
+            };
+
+        List &operator = (const List<T, Allocator> &lst) {
+            const_iterator it, e;
+            if(this == &lst) return *this;
+            clear();
+            for(it = lst.begin(), e = lst.end(); it != e; ++it) push_back(*it);
+            return *this;
+            };
+
+        void swap(List &o) {
+            size_t t;
+            ListNode<T> *p;
+            p = m_root.next; m_root.next = o.m_root.next; o.m_root.next = p;
+            p = m_root.prev; m_root.prev = o.m_root.prev; o.m_root.prev = p;
+            t = m_count; m_count = o.m_count; o.m_count = t;
+            };
+
+        void sort() {
+            ListNode<T> *a, *b, *pa;
+            size_t i;
+            if(m_count < 2) return;
+            if(m_count == 2) {
+                if(m_root.prev->elem < m_root.next->elem) {
+                    a = m_root.next;
+                    b = m_root.prev;
+                    b->next = a;
+                    b->prev = (ListNode<T> *)&m_root;
+                    a->prev = b;
+                    a->next = (ListNode<T> *)&m_root;
+                    m_root.next = b;
+                    m_root.prev = a;
+                    };
+                return;
+                };
+            a = b = m_root.next;
+            i = m_count / 2;
+            while(i) { b = b->next; i--; };
+            a = b->prev;
+            a->next = NULL;
+            b->prev = NULL;
+            List<T, Allocator> other(b, m_root.prev, m_count - m_count / 2,allocator);
+            m_count = m_count / 2;
+            m_root.prev = a;
+            a->next = (ListNode<T> *)&m_root;
+            sort();
+            other.sort();
+            merge(other);
+            };
+
+        // czyœci zawartoœæ o
+        void merge(List &o) {
+            ListNode<T> *a, *b, *e, *ae, *be;
+            if(&o == this) return;
+            if(o.empty()) return;
+            if(empty()) { swap(o); return; };
+            a = m_root.next;
+            b = o.m_root.next;
+            ae = (ListNode<T> *)&m_root;
+            be = (ListNode<T> *)&(o.m_root);
+            if(a->elem < b->elem) {
+                m_root.next = e = a;
+                a->prev = (ListNode<T> *)&m_root;
+                a = a->next;
+            } else {
+                m_root.next = e = b;
+                b->prev = (ListNode<T> *)&m_root;
+                b = b->next;
+                };
+            if(a != ae && b != be) {
+                while(true) {
+                    if(a->elem < b->elem) {
+                        e->next = a;
+                        a->prev = e;
+                        e = a;
+                        if((a = a->next) == NULL) break;
+                    } else {
+                        e->next = b;
+                        b->prev = e;
+                        e = b;
+                        if((b = b->next) == be) break;
+                        };
+                    };
+                };
+            if(a == ae) {
+                e->next = b;
+                b->prev = e;
+                m_root.prev = o.m_root.prev;
+                o.m_root.prev->next = (ListNode<T> *)&m_root;
+            } else {
+                e->next = a;
+                a->prev = e;
+                };
+            m_count = m_count + o.m_count;
+            o.Zero();
+            };
+
+        friend struct List_iterator<T>;
+        friend struct List_const_iterator<T>;
+
+    private:
+        List(ListNode<T> *n, ListNode<T> *p, size_t c,Allocator &a): allocator(a) {
+            m_root.next = n;
+            m_root.prev = p;
+            n->prev = (ListNode<T> *)&m_root;
+            p->next = (ListNode<T> *)&m_root;
+            m_count = c;
+            };
+
+        void Zero() {
+            m_root.next = (ListNode<T> *)&m_root;
+            m_root.prev = (ListNode<T> *)&m_root;
+            m_count = 0;
+            };
+
+        ListNode<T> *NewElem() {
+            return allocator.template allocate<ListNode<T> >();
+            };
+
+        ListNode<T> *_find(const T &v) {
+            ListNode<T> *n = m_root.next;
+            while(n != NULL) {
+                if(n->elem == v) break;
+                n = n->next;
+                };
+            return n;
+            };
+
+        void _link_before(ListNode<T> *ptr, ListNode<T> *p) {
+            p->next = ptr;
+            p->prev = ptr->prev;
+            p->next->prev = p;
+            p->prev->next = p;
+            };
+
+        void _link_after(ListNode<T> *ptr, ListNode<T> *p) {
+            p->next = ptr->next;
+            p->prev = ptr;
+            p->next->prev = p;
+            p->prev->next = p;
+            };
+
+        void _unlink(ListNode<T> *p) {
+            p->prev->next = p->next;
+            p->next->prev = p->prev;
+            };
+
+        ListNode<T> *_insert_before(ListNode<T> *ptr, const T &v) {
+            ListNode<T> *p = NewElem();
+            if(p == NULL) return NULL;
+            _link_before(ptr, p);
+            p->elem = v;
+            m_count++;
+            return p;
+            };
+
+        ListNode<T> *_insert_after(ListNode<T> *ptr, const T &v) {
+            ListNode<T> *p = NewElem();
+            if(p == NULL) return NULL;
+            _link_after(ptr, p);
+            p->elem = v;
+            m_count++;
+            return p;
+            };
+
+        void _erase(ListNode<T> *p) {
+            if(empty()) return;
+            if(p == (ListNode<T> *)&m_root) return;
+            _unlink(p);
+            allocator.deallocate(p);
+            m_count--;
+            };
+
+
+    private:
+        BaseListNode<T> m_root;
+        size_t m_count;
+        Allocator& allocator;
+        };
+
+
+    template<class T, class Allocator>
+    std::ostream &operator <<(std::ostream &strm, const List<T, Allocator> &lst) {
+        typename List<T, Allocator>::const_iterator b, e, it;
+        strm << "[";
+        b = lst.begin();
+        e = lst.end();
+        for(it = b; it != e; ++it) {
+            if(it != b) strm << ", ";
+            else strm << " ";
+            strm << *it;
+            };
+        strm << " ]";
+        return strm;
+        };
+
+        template <class T>
+        class BlobObj {
+            private:
+                char blob[sizeof(T)];
+            public:
+                BlobObj() {}
+                T& content() {  return *((T*)blob); }
+        //        void init() { new ( &content() ) T; }
+                template <class A> void init(A& arg) { new ( &content() ) T(arg); }
+        //        template <class A,class B> void init(A arg1, B arg2) { new ( &content() ) T(arg1,arg2); }
+        //        template <class A,class B,class C> void init(A arg1, B arg2,C arg3) { new ( &content() ) T(arg1,arg2,arg3); }
+                ~BlobObj() { content().~T(); }
+
+        };
+
+}
 
 
 template<class DefaultStructs>
 class LexBFSPar: public GraphSearchBase<LexBFSPar<DefaultStructs>,
 					 DefaultStructs> {
 public:
-	template<class Graph, class Allocator>
-	class LexVisitContainer {
-	private:
-		template<template<class, class> class CONT, class Alloc>
-		struct LVCNode {
+    template <class Graph>
+    struct LVCNode {
 			typename Graph::PVertex v;
-			typename CONT<LVCNode, Alloc>::iterator block;
+			Privates::List_iterator<LVCNode> block;
 
 			LVCNode(typename Graph::PVertex _v = NULL): v(_v) { };
-			LVCNode(typename Graph::PVertex _v, typename CONT<LVCNode, Alloc>::iterator it): v(_v), block(it) { };
+			LVCNode(typename Graph::PVertex _v,Privates::List_iterator<LVCNode> it): v(_v), block(it) { };
 			};
 
-		typedef LVCNode<List, ListDefaultCPPAllocator> Node;
+	template<class Graph, class Allocator, class ContAllocator>
+	class LexVisitContainer {
+	public:
 
-		class Container: public List<Node, ListDefaultCPPAllocator>	{};
+		typedef LVCNode<Graph> Node;
+
+		class Container: public Privates::List<Node,ContAllocator>	{
+		    public:
+            Container(ContAllocator& a) : Privates::List<Node,ContAllocator>(a) {}
+		};
 
 		Container m_data;
-		typename Container::iterator m_openBlock;
-		List<typename Container::iterator> m_splits;
-		typename DefaultStructs::template AssocCont<typename Graph::PVertex, typename Container::iterator>::Type m_vertexToPos;
+		Privates::List_iterator<Node>  m_openBlock;
+		Privates::List<Privates::List_iterator<Node>,Allocator> m_splits;
+		typename DefaultStructs::template AssocCont<typename Graph::PVertex, Privates::List_iterator<Node> >::Type m_vertexToPos;
 
 	public:
-		LexVisitContainer(): m_data(), m_openBlock(), m_vertexToPos()	{ }
+		LexVisitContainer(Allocator& a, ContAllocator& ca): m_data(ca), m_splits(a), m_openBlock(), m_vertexToPos()	{ }
 		~LexVisitContainer()						{ clear(); }
 
 		void clear() {
@@ -618,8 +1106,8 @@ public:
 			};
 
 		void move(typename Graph::PVertex v) {
-			typename Container::iterator grp, newGrp;
-			typename Container::iterator elem;
+			Privates::List_iterator<Node> grp, newGrp;
+			Privates::List_iterator<Node> elem;
 			if(!m_vertexToPos.hasKey(v)) push(v);
 			elem = m_vertexToPos[v];
 			grp = elem->block;
@@ -639,7 +1127,7 @@ public:
 			};
 
 		void done() {
-			typename List<typename Container::iterator>::iterator it, e;
+			Privates::List_iterator<Privates::List_iterator<Node> > it, e;
 			for(it = m_splits.begin(), e = m_splits.end(); it != e; ++it) {
 				(*it)->block = m_data.end();
 				};
@@ -647,7 +1135,7 @@ public:
 			};
 
 		void dump() {
-			typename Container::iterator it;
+			Privates::List_iterator<Node> it;
 			for(it = m_data.begin(); it != m_data.end(); ++it) {
 				if(it->v == NULL) printf(" |");
 				else printf(" %p", it->v);
@@ -655,6 +1143,8 @@ public:
 			printf("\n");
 			};
 		};
+
+    public:
 
 	template<class GraphType,
 		 class VertContainer,
@@ -668,7 +1158,15 @@ public:
 		unsigned int depth, n, retVal;
 		typename GraphType::PEdge e;
 		typename GraphType::PVertex u, v;
-		LexVisitContainer<GraphType, ListDefaultCPPAllocator> cont;
+//		ListDefaultCPPAllocator allocat;
+//        ListDefaultCPPAllocator2 allocat2;
+//		LexVisitContainer<GraphType, ListDefaultCPPAllocator,ListDefaultCPPAllocator2> cont(allocat,allocat2);
+
+		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1);
+        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1);
+		LexVisitContainer<GraphType, Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > >,Privates::ListBlockListAllocator<LVCNode<GraphType> > >
+            cont(allocat,allocat2);
+
 
 		n = g.getVertNo();
 		if(n == 0) return 0;
@@ -789,7 +1287,10 @@ public:
 		typename GraphType::PEdge e;
 		typename GraphType::PVertex u, v;
 		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData;
-		LexVisitContainer<GraphType, ListDefaultCPPAllocator> cont;
+		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1);
+        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1);;
+		LexVisitContainer<GraphType, Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > >,Privates::ListBlockListAllocator<LVCNode<GraphType> > >
+            cont(allocat,allocat2);
 
 		bmask &= ~EdLoop;
 		if(bmask & EdDirOut) bmask &= ~EdDirIn;
@@ -934,291 +1435,6 @@ class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
 //
 //class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
 
-/*
- * lexicographical Breadth-First-Search on a complement of a graph
- */
-template<class DefaultStructs>
-class CoLexBFSPar: public LexBFSPar<DefaultStructs> {
-public:
-	template<class Graph, class Allocator>
-	class CoLexVisitContainer {
-	private:
-		template<template<class, class> class CONT, class Alloc>
-		struct CoLVCNode {
-			typename Graph::PVertex v;
-			typename CONT<CoLVCNode, Alloc>::iterator block;
-
-			CoLVCNode(typename Graph::PVertex _v = NULL): v(_v) { };
-			CoLVCNode(typename Graph::PVertex _v, typename CONT<CoLVCNode, Alloc>::iterator it): v(_v), block(it) { };
-			};
-
-		typedef CoLVCNode<List, ListDefaultCPPAllocator> Node;
-
-		class Container: public List<Node, ListDefaultCPPAllocator>	{};
-
-		Container m_data;
-		typename Container::iterator m_openBlock;
-		List<typename Container::iterator> m_splits;
-		typename DefaultStructs::template AssocCont<typename Graph::PVertex, typename Container::iterator>::Type m_vertexToPos;
-
-	public:
-		CoLexVisitContainer(): m_data(), m_openBlock(), m_vertexToPos()	{ }
-		~CoLexVisitContainer()						{ clear(); }
-
-		void clear() {
-			m_data.clear();
-			m_splits.clear();
-			};
-
-		void initialize(const Graph &g) {
-			clear();		
-			m_data.push_back(Node(NULL));
-			m_data.back().block = m_data.end();
-			m_openBlock = m_data.begin();
-			};
-
-		void initialize(const Graph &g, size_t n, typename Graph::PVertex *tab) {
-			initialize(g);
-			for(size_t i = 0; i < n; i++) push(tab[i]);
-			};
-
-		void initializeAddAll(const Graph &g) {
-			typename Graph::PVertex v;
-			initialize(g);
-			for(v = g.getVert(); v != NULL; v = g.getVertNext(v))
-				push(v);
-			};
-
-		void cleanup() {
-			if(m_data.size() < 2) return;
-			while(m_data.end().prev()->v == NULL) {
-				if(m_data.end().prev() == m_openBlock) m_openBlock = m_data.end();
-				m_data.pop_back();
-				};
-			};
-
-		bool empty() {
-			cleanup();
-			return m_data.size() < 2;
-			};
-
-		typename Graph::PVertex top() {
-			cleanup();
-			return m_data.end().prev()->v;
-			};
-
-		void pop() {
-			m_data.pop_back();
-//			m_data.erase(m_data.back());
-			cleanup();
-			};
-
-		void push(typename Graph::PVertex v) {
-			if(m_openBlock == m_data.end()) {
-				m_data.push_front(Node(NULL));
-				m_data.back().block = m_data.begin();
-				};
-//			m_data.push_back(Node(v, m_openBlock));
-//			m_vertexToPos[v] = m_data.end().prev();
-			m_data.insert(m_data.begin().next(), Node(v, m_openBlock));
-			m_vertexToPos[v] = m_data.begin().next();
-			};
-
-		void move(typename Graph::PVertex v) {
-			typename Container::iterator grp, newGrp;
-			typename Container::iterator elem;
-			if(!m_vertexToPos.hasKey(v)) push(v);
-			elem = m_vertexToPos[v];
-			grp = elem->block;
-			newGrp = grp->block;
-			if(newGrp == m_data.end()) {
-				newGrp = m_data.insert_before(grp, Node(NULL));
-				grp->block = newGrp;
-				m_splits.push_back(grp);
-				newGrp->block = m_data.end();
-				};
-			m_data.move_before(grp, elem);
-			elem->block = newGrp;
-			};
-
-		void remove(typename Graph::PVertex v) {
-			m_data.erase(m_vertexToPos[v]);
-			};
-
-		void done() {
-			typename List<typename Container::iterator>::iterator it, e;
-			for(it = m_splits.begin(), e = m_splits.end(); it != e; ++it) {
-				(*it)->block = m_data.end();
-				};
-			m_splits.clear();
-			};
-
-		void dump() {
-			typename Container::iterator it;
-			for(it = m_data.begin(); it != m_data.end(); ++it) {
-				if(it->v == NULL) printf(" |");
-				else printf(" %p", it->v);
-				};
-			printf("\n");
-			};
-		};
-
-/*
-	template<class GraphType,
-		 class VertContainer,
-		 class Visitor>
-	static int visitBase(const GraphType & g,
-			     typename GraphType::PVertex start,
-			     VertContainer &visited,
-			     Visitor visit,
-			     EdgeDirection mask,
-			     int component) {
-		unsigned int depth, n, retVal;
-		typename GraphType::PEdge e;
-		typename GraphType::PVertex u, v;
-		CoLexVisitContainer<GraphType, ListDefaultCPPAllocator> cont;
-
-		n = g.getVertNo();
-		if(n == 0) return 0;
-		if(start == NULL) start = g.getVert();
-
-		cont.initialize(g);
-
-		visited[start] = SearchStructs::VisitVertLabs<GraphType>(NULL, NULL, 0, component);
-		cont.push(start);
-		retVal = 0;
-
-		while(!cont.empty()) {
-//			printf("before: ");
-//			cont.dump();
-			u = cont.top();
-			depth = visited[u].distance;
-			visited[u].component = component;
-
-			if(!Visitors::visitVertexPre(g, visit, u, visited[u], visit)) {
-				retVal++;
-				continue;
-				};
-			cont.pop();
-
-			for(e = g.getEdge(u, mask); e != NULL; e = g.getEdgeNext(u, e, mask)) {
-				v = g.getEdgeEnd(e, u);
-				if(!Visitors::visitEdgePre(g, visit, e, u, visit)) continue;
-//				if(visited.hasKey(v)) continue;
-//				visited[v] = SearchStructs::VisitVertLabs<GraphType>(u, e, depth + 1, component);
-				if(visited.hasKey(v)) {
-					if(visited[v].component == -1) {
-						cont.move(v);
-						};
-					continue;
-					};
-				visited[v] = SearchStructs::VisitVertLabs<GraphType>(u, e, depth + 1, -1);
-				cont.move(v);
-				if(!Visitors::visitEdgePost(g, visit, e, u, visit)) return -retVal;
-				};
-			cont.done();
-//			printf("after:  ");
-//			cont.dump();
-
-			retVal++;
-			if(!Visitors::visitVertexPost(g, visit, u, visited[u], visit))
-				return -retVal;
-			};
-		return retVal;
-		};
-*/
-
-	template<class GraphType>
-	struct OrderData {
-		typename GraphType::PVertex v;
-		int vertId;	// kogo jest s�siadem (numer s�siada w porz�dku)
-		int orderId;	// numer w porz�dku
-		};
-
-
-	template<class GraphType,
-		 class OutVertIter>
-	static int order2(const GraphType & g,
-			  size_t in,
-			  typename GraphType::PVertex *tab,
-			  EdgeDirection mask,
-			  OutVertIter out) {
-
-		int i, j, o, n, m, retVal;
-		EdgeDirection bmask = mask;
-		typename GraphType::PEdge e;
-		typename GraphType::PVertex u, v;
-		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData;
-		CoLexVisitContainer<GraphType, ListDefaultCPPAllocator> cont;
-
-		bmask &= ~EdLoop;
-		if(bmask & EdDirOut) bmask &= ~EdDirIn;
-
-		n = g.getVertNo();
-		assert(in == n);
-		m = g.getEdgeNo(bmask);
-		int LOCALARRAY(first, n + 1);
-		OrderData<GraphType> LOCALARRAY(neigh, m * 2);
-		OrderData<GraphType> LOCALARRAY(neigh2, m * 2);
-
-		for(o = 0; o < n; o++) orderData[tab[o]].second = o;
-
-		i = j = 0;
-		for(o = 0; o < n; o++) {
-			u = tab[o];
-			first[i] = j;
-			orderData[u].first = 0;
-			orderData[u].second = o;
-			for(e = g.getEdge(u, bmask); e != NULL; e = g.getEdgeNext(u, e, bmask)) {
-				v = g.getEdgeEnd(e, u);
-				neigh[j].v = v;
-				neigh[j].orderId = orderData[v].second;
-				neigh[j].vertId = o;
-				j++;
-				};
-			i++;
-			};
-		first[i] = j;
-
-		CoLexBFSPar<DefaultStructs>::StableRadixSort(neigh, j, n, &OrderData<GraphType>::orderId, neigh2);
-		CoLexBFSPar<DefaultStructs>::StableRadixSort(neigh2, j, n, &OrderData<GraphType>::vertId, neigh);
-
-		retVal = 0;
-		cont.initialize(g, in, tab);
-
-//		cont.dump();
-
-		while(!cont.empty()) {
-			u = cont.top();
-			cont.pop();
-			orderData[u].first = 2;
-			*out = u;
-			++out;
-			++retVal;
-			
-			j = orderData[u].second;
-			for(i = first[j]; i < first[j + 1]; i++) {
-				v = neigh[i].v;
-//				if(orderData[v].first) continue;
-//				orderData[v].first = true;
-				if(orderData[v].first > 0) {
-					if(orderData[v].first == 1) {
-						cont.move(v);
-						};
-					continue;
-					};
-				orderData[v].first = 1;
-				cont.move(v);
-				};
-			cont.done();
-//		cont.dump();
-			};
-		return retVal;
-		};
-
-	};
-
-class CoLexBFS: public CoLexBFSPar<AlgorithmsDefaultSettings> {};
 
 
 /*

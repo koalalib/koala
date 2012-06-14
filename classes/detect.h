@@ -296,17 +296,17 @@ class IsItPar : public SearchStructs {
 
             for(i = 0; i < n; i++) bucket[i] = -1;
 
-            // podzia³ na kube³ki wg. .second
+            // podziaÂ³ na kubeÂ³ki wg. .second
             for(i = 0; i < size; i++) {
                 j = src[i].second;
                 next[i] = bucket[j];
                 bucket[j] = i;
                 };
 
-            // policzenie pocz¹tku ka¿dego zbioru RN w tablicy out
+            // policzenie poczÂ¹tku kaÂ¿dego zbioru RN w tablicy out
             for(i = 0; i < n; i++) pos[i] = hints[i];
 
-            // wpisanie kube³ków do tablicy
+            // wpisanie kubeÂ³kÃ³w do tablicy
             for(i = 0; i < n; i++) {
                 for(j = bucket[i]; j >= 0; j = next[j])
                     out[pos[src[j].first]++] = src[j].second;
@@ -314,9 +314,9 @@ class IsItPar : public SearchStructs {
             };
 
 
-        // porz¹dkuje wêz³y drzewa zdefiniowanego przez relacjê parent
-        // wszyscy potomkowie p wyst¹pi¹ przed wyst¹pieniem p, ale
-        // nie koniecznie bêdzie to kolejnoœæ wygenerowana przez DFSa na
+        // porzÂ¹dkuje wÃªzÂ³y drzewa zdefiniowanego przez relacjÃª parent
+        // wszyscy potomkowie p wystÂ¹piÂ¹ przed wystÂ¹pieniem p, ale
+        // nie koniecznie bÃªdzie to kolejnoÅ“Ã¦ wygenerowana przez DFSa na
         // drzewie, np. dla:
         //     D
         //    / \
@@ -324,7 +324,7 @@ class IsItPar : public SearchStructs {
         //  / \
         // A   B
         // DFSPostorder da: A B C E D
-        // a poni¿sza funkcja mo¿e zwróciæ np.: A E B C D
+        // a poniÂ¿sza funkcja moÂ¿e zwrÃ³ciÃ¦ np.: A E B C D
         static void SemiPostOrderTree(int *parent, int n, int *out) {
             int i, k;
             int LOCALARRAY(sons, n);
@@ -494,106 +494,6 @@ class IsItPar : public SearchStructs {
         }
 
 
-	template<class Graph>
-	static bool CoChordalTest(Graph &g) {
-		int i, m, n, p, ui, vi;
-		int x, px, xp, pxp;
-		bool fail;
-		n = g.getVertNo();
-		m = g.getEdgeNo(EdUndir | EdDirOut | EdDirIn);
-
-		int LOCALARRAY(parent, n);
-		int LOCALARRAY(postOrd, n);
-		int LOCALARRAY(RNp, n + 1);
-		int LOCALARRAY(RN2, n + m);
-		typename Graph::PEdge e;
-		typename Graph::PVertex u, v;
-		typename Graph::PVertex LOCALARRAY(pi, n);
-		std::pair<int, int> LOCALARRAY(RN, n + m);
-		typename DefaultStructs::template AssocCont<typename Graph::PVertex, int>::Type vidx(n);
-
-		for(i = 0, v = g.getVert(); v != NULL; v = g.getVertNext(v))
-			pi[i++] = v;
-		CoLexBFS::order2(g, n, pi, EdUndir | EdDirIn | EdDirOut, pi);
-		std::reverse(pi, pi + n);
-
-		for(i = 0; i < n; i++) vidx[pi[i]] = i;
-
-		// let RN(x) be its neighbors to the right
-		for(ui = 0, p = 0; ui < n; ui++) {
-			u = pi[ui];
-			RNp[ui] = p;
-			for(e = g.getEdge(u, EdUndir | EdDirIn | EdDirOut);
-			    e != NULL;
-			    e = g.getEdgeNext(u, e)) {
-				v = g.getEdgeEnd(e, u);
-				vi = vidx[v];
-				if(vi <= ui) continue;
-				RN[p++] = std::make_pair(ui, vi);
-				};
-			};
-		RNp[n] = p;
-
-		RadixSort(RN, p, n, RNp, RN2);
-
-		// let parent(x) be the leftmost non-neighbour to the right in pi
-		for(i = 0; i < n; i++) {
-			if(RNp[i] < RNp[i + 1]) {
-				if(RN2[RNp[i]] > i + 1) parent[i] = i + 1;
-				else {
-					int j = RNp[i];
-					while(j < RNp[i + 1] - 1) {
-						if(RN2[j] + 1 < RN2[j + 1]) {
-							parent[i] = RN2[j] + 1;
-							break;
-							};
-						j++;
-						};
-					if(j == RNp[i + 1] - 1)
-						parent[i] = RN2[j] + 1;
-					};
-				if(parent[i] >= n) parent[i] = -1;
-			} else {
-				if(i < n - 1) parent[i] = i + 1;
-				else parent[i] = -1;
-				};
-			};
-
-		fail = false;
-
-		// let T be the the defined by the parent pointers
-		SemiPostOrderTree(parent, n, postOrd);
-
-		// for each vertex in T in postorder
-		for(i = 0; i < n; i++) {
-			x = postOrd[i];
-			//check that RN(parent(x)) sub RN(x)
-			xp = RNp[x];
-			if(parent[x] < 0) continue;
-			px = parent[x];
-			pxp = RNp[px];
-
-			for(; xp < RNp[x + 1] && pxp < RNp[px + 1];) {
-				if(RN2[xp] == RN2[pxp]) {	// match
-					xp++;
-					pxp++;
-					continue;
-				} else if(RN2[xp] < RN2[pxp]) {	// mismatch
-					xp++;
-					continue;
-				} else {			// mismatch
-					fail = true;
-					break;
-					};
-				};
-			if(pxp < RNp[parent[x] + 1]) fail = true;
-
-			if(fail) return false;
-			};
-
-		return true;
-		};
-
     };
 
     template <class GraphType>
@@ -602,25 +502,142 @@ class IsItPar : public SearchStructs {
 	    return Chordal::getOrder(g,blackHole,blackHole);
 	}
 
-    template <class GraphType>
-	static bool cochordal(const GraphType& g)
-	{
-	    return Chordal::CoChordalTest(g);
-	}
+//    protected:
+//
+//	    class CoChordal : public Chordal {
+//        public:
+//
+//        template<class Graph>
+//        static bool CoChordalTest(const Graph &g) {
+//            if (!undir(g,false)) return false;
+//            int i, m, n, p, ui, vi;
+//            int x, px, xp, pxp;
+//            bool fail;
+//            n = g.getVertNo();
+//            m = g.getEdgeNo(EdUndir);
+//
+//            int LOCALARRAY(parent, n);
+//            int LOCALARRAY(postOrd, n);
+//            int LOCALARRAY(RNp, n + 1);
+//            int LOCALARRAY(RN2, n + m);
+//            typename Graph::PEdge e;
+//            typename Graph::PVertex u, v;
+//            typename Graph::PVertex LOCALARRAY(pi, n);
+//            std::pair<int, int> LOCALARRAY(RN, n + m);
+//            typename DefaultStructs::template AssocCont<typename Graph::PVertex, int>::Type vidx(n);
+//
+//            for(i = 0, v = g.getVert(); v != NULL; v = g.getVertNext(v))
+//                pi[i++] = v;
+//            Privates::CoLexBFS::order2(g, n, pi, EdUndir, pi);
+//            std::reverse(pi, pi + n);
+//
+//            for(i = 0; i < n; i++) vidx[pi[i]] = i;
+//
+//            // let RN(x) be its neighbors to the right
+//            for(ui = 0, p = 0; ui < n; ui++) {
+//                u = pi[ui];
+//                RNp[ui] = p;
+//                for(e = g.getEdge(u, EdUndir );
+//                    e != NULL;
+//                    e = g.getEdgeNext(u, e)) {
+//                    v = g.getEdgeEnd(e, u);
+//                    vi = vidx[v];
+//                    if(vi <= ui) continue;
+//                    RN[p++] = std::make_pair(ui, vi);
+//                    };
+//                };
+//            RNp[n] = p;
+//
+//            Chordal::RadixSort(RN, p, n, RNp, RN2);
+//
+//            // let parent(x) be the leftmost non-neighbour to the right in pi
+//            for(i = 0; i < n; i++) {
+//                if(RNp[i] < RNp[i + 1]) {
+//                    if(RN2[RNp[i]] > i + 1) parent[i] = i + 1;
+//                    else {
+//                        int j = RNp[i];
+//                        while(j < RNp[i + 1] - 1) {
+//                            if(RN2[j] + 1 < RN2[j + 1]) {
+//                                parent[i] = RN2[j] + 1;
+//                                break;
+//                                };
+//                            j++;
+//                            };
+//                        if(j == RNp[i + 1] - 1)
+//                            parent[i] = RN2[j] + 1;
+//                        };
+//                    if(parent[i] >= n) parent[i] = -1;
+//                } else {
+//                    if(i < n - 1) parent[i] = i + 1;
+//                    else parent[i] = -1;
+//                    };
+//                };
+//
+//            fail = false;
+//
+//            // let T be the the defined by the parent pointers
+//            Chordal::SemiPostOrderTree(parent, n, postOrd);
+//
+//            // for each vertex in T in postorder
+//            for(i = 0; i < n; i++) {
+//                x = postOrd[i];
+//                //check that RN(parent(x)) sub RN(x)
+//                xp = RNp[x];
+//                if(parent[x] < 0) continue;
+//                px = parent[x];
+//                pxp = RNp[px];
+//
+//                for(; xp < RNp[x + 1] && pxp < RNp[px + 1];) {
+//                    if(RN2[xp] == RN2[pxp]) {	// match
+//                        xp++;
+//                        pxp++;
+//                        continue;
+//                    } else if(RN2[xp] < RN2[pxp]) {	// mismatch
+//                        xp++;
+//                        continue;
+//                    } else {			// mismatch
+//                        fail = true;
+//                        break;
+//                        };
+//                    };
+//                if(pxp < RNp[parent[x] + 1]) fail = true;
+//
+//                if(fail) return false;
+//                };
+//
+//            return true;
+//            };
+//
+//	    };
+//
+//    public:
+//
+//    template <class GraphType>
+//	static bool cochordal(const GraphType& g)
+//	{
+//	    return CoChordal::CoChordalTest(g);
+//	}
+//
+//    template <class GraphType>
+//	static bool split(const GraphType& g)
+//	{
+//	    return chordal(g)&& cochordal(g);
+//	}
 
 
     class Comparability {
 
         protected:
+
             template<class Graph>
             class AdjStruct {
             public:
                 struct Node {
                     int v;
                     int cls;
-                    typename std::list<Node>::iterator inv;
+                    Privates::List_iterator<Node> inv;
                     Node() { v = 0; cls = 0; };
-                    Node(int _v, int _c, typename std::list<Node>::iterator _i) {
+                    Node(int _v, int _c, Privates::List_iterator<Node> _i) {
                         v = _v;
                         cls = _c;
                         inv = _i;
@@ -628,9 +645,9 @@ class IsItPar : public SearchStructs {
                     bool operator <(const Node &b) { return v < b.v; };
                 };
 
-                typedef typename std::list<Node>::iterator Ptr;
+                typedef Privates::List_iterator<Node> Ptr;
 
-                AdjStruct(size_t s,std::list<Node>* adata): datasize(s),data(adata) {
+                AdjStruct(size_t s,Privates::List<Node,Privates::ListBlockListAllocator<Node> >* adata): datasize(s),data(adata) {
                     };
 
                 Ptr Begin(int idx)	{ return data[idx].begin(); };
@@ -641,7 +658,7 @@ class IsItPar : public SearchStructs {
                 void Init(const Graph &g, VertMap &vertexToIndex) {
                     int u, v;
                     typename Graph::PEdge e;
-                    typename std::list<Node>::iterator a, b;
+                    Privates::List_iterator<Node> a, b;
                     std::pair<typename Graph::PVertex, typename Graph::PVertex> p;
                     int CompUndefined = DefaultStructs::template NumberTypeBounds<int>::plusInfty();
 
@@ -675,7 +692,7 @@ class IsItPar : public SearchStructs {
         //			};
 
         //		Table<list<Node, Allocator>, Allocator> data;
-                std::list<Node> *data;
+                Privates::List<Node,Privates::ListBlockListAllocator<Node> > *data;
                 int datasize;
         };  //AdjStruct
 
@@ -685,7 +702,7 @@ class IsItPar : public SearchStructs {
             bool flag;
             int k;
             int ud;
-            CTState(size_t n,std::list<typename AdjStruct<Graph>::Node>* acls)
+            CTState(size_t n,Privates::List<typename AdjStruct<Graph>::Node,Privates::ListBlockListAllocator<typename AdjStruct<Graph>::Node> > * acls)
                 : cls(n,acls)		{};
         };
 
@@ -864,10 +881,18 @@ class IsItPar : public SearchStructs {
 
 
                 typename Graph::PVertex LOCALARRAY(idxv, n);
-                std::list<typename AdjStruct<Graph>::Node> LOCALARRAY(statebuf,n);
-                CTState<Graph> state(n,statebuf);
+//                std::list<typename AdjStruct<Graph>::Node> LOCALARRAY(statebuf,n);
+                Privates::ListBlockListAllocator<typename AdjStruct<Graph>::Node> pula(2*g.getEdgeNo());
+                Privates::BlobObj<Privates::List<typename AdjStruct<Graph>::Node,Privates::ListBlockListAllocator<typename AdjStruct<Graph>::Node> > >
+                    LOCALARRAY(statebuf,n);
+
+                for(int i=0;i<n;i++) statebuf[i].init(pula);
+                CTState<Graph> state(n,&statebuf[0].content());
+
                 typename DefaultStructs::template AssocCont<typename Graph::PVertex, int>::Type vidx(g.getVertNo());
+
                 InitState(g, state, vidx, idxv);
+
                 if (!ComparabilityTool(g, state)) return -1;
                 int LOCALARRAY(height, n);
                 typename AdjStruct<Graph>::Ptr ip, ie;
@@ -972,49 +997,60 @@ class IsItPar : public SearchStructs {
 
 
         template<class GraphType,class IntMap>
-        // TODO: w przypadku true i !blackHole(outmap) wypelnianie mapy typu PVertex->Segment
         static bool graph2segs(const GraphType &g,IntMap& outmap) {
             if (!undir(g,false)) return false;
             unsigned int i, n;
             n = g.getVertNo();
 
-            ListDefaultCPPAllocator allocator;
+
             typename GraphType::PVertex LOCALARRAY(sigma, n);
             typename GraphType::PVertex LOCALARRAY(sigmap, n);
             typename GraphType::PVertex LOCALARRAY(sigmapp, n);
             typename DefaultStructs::template AssocCont<typename GraphType::PVertex, IvData>::Type data;
 
-            std::pair<typename Sets<ListDefaultCPPAllocator>::Entry,
-                typename Sets<ListDefaultCPPAllocator>::Entry::iterator> LOCALARRAY(Abuf,g.getVertNo());
-            std::pair<typename Sets<ListDefaultCPPAllocator>::Entry,
-                typename Sets<ListDefaultCPPAllocator>::Entry::iterator> LOCALARRAY(Bbuf,g.getVertNo());
-            Sets<ListDefaultCPPAllocator> A(Abuf,g.getVertNo(),allocator), B(Bbuf,g.getVertNo(),allocator);
+
+            Privates::ListBlockListAllocator<Privates::List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > allocat(2*g.getVertNo()+2);
+            Privates::ListBlockListAllocator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > allocat2(2*g.getVertNo()+2);
+            Privates::ListBlockListAllocator<typename Sets::Elem> allocat3(2*g.getVertNo()*g.getVertNo());
+
+
+//            ListDefaultCPPAllocator allocat3;
+            std::pair<Privates::BlobObj<typename Sets::Entry>,
+                typename Sets::Entry::iterator> LOCALARRAY(Abuf,g.getVertNo());
+            std::pair<Privates::BlobObj<typename Sets::Entry>,
+                typename Sets::Entry::iterator> LOCALARRAY(Bbuf,g.getVertNo());
+            for(int i=0;i<g.getVertNo();i++)
+                { Abuf[i].first.init(allocat3); Bbuf[i].first.init(allocat3);}
+            Sets A((std::pair< typename Sets::Entry,
+                typename Sets::Entry::iterator>*)Abuf,g.getVertNo(),allocat3),
+                B((std::pair< typename Sets::Entry,
+                typename Sets::Entry::iterator>*)Bbuf,g.getVertNo(),allocat3);
 
     //		A.resize(g.getVertNo(), allocator);
     //		B.resize(g.getVertNo(), allocator);
 
-            LexBFS::scan(g, sigmap);
+            LexBFSPar<DefaultStructs>::scan(g, sigmap);
 
             reverse(sigmap, n);
-            LexBFS::order2(g, n, sigmap, EdUndir, sigmapp);
+            LexBFSPar<DefaultStructs>::order2(g, n, sigmap, EdUndir, sigmapp);
 
             reverse(sigmapp, n);
-            LexBFS::order2(g, n, sigmapp, EdUndir, sigma);
+            LexBFSPar<DefaultStructs>::order2(g, n, sigmapp, EdUndir, sigma);
 
             reverse(sigma, n);
-            LexBFS::order2(g, n, sigma, EdUndir, sigmap);
+            LexBFSPar<DefaultStructs>::order2(g, n, sigma, EdUndir, sigmap);
 
             CalculateI(g, sigmap, data, &IvData::posSigmap, &IvData::ip);
             BuildSet(g, A, data, &IvData::posSigmap, &IvData::ip);
 
             reverse(sigmap, n);
-            LexBFS::order2(g, n, sigmap, EdUndir, sigmapp);
+            LexBFSPar<DefaultStructs>::order2(g, n, sigmap, EdUndir, sigmapp);
 
             CalculateI(g, sigmapp, data, &IvData::posSigmapp, &IvData::ipp);
             BuildSet(g, B, data, &IvData::posSigmapp, &IvData::ipp);
 
             reverse(sigmapp, n);
-            LBFSStar(g, A, B, data, sigmap, sigmapp, sigma);
+            LBFSStar(g, A, B, data, sigmap, sigmapp, sigma,allocat,allocat2);
 
             for(i = 0; i < n; i++) data[sigma[i]].posSigma = i;
 
@@ -1030,21 +1066,22 @@ class IsItPar : public SearchStructs {
 
         protected:
 
-            template<class Allocator>
+//            template<class Allocator>
             struct Sets {
 //            private:
-                template<template<class, class> class Cont, class Alloc>
-                struct TElem {
+//                template<template<class, class> class Cont, class Alloc>
+                struct Elem {
                     int value;
-                    Cont<TElem, Alloc> *cont;
-                    typename Cont<TElem, Alloc>::iterator next;
-                    TElem(int _v = -1): value(_v), next(), cont(NULL) {};
+                    Privates::List<Elem, Privates::ListBlockListAllocator<Elem> > *cont;
+                    Privates::List_iterator<Elem> next;
+                    Elem(int _v = -1): value(_v), next(), cont(NULL) {};
                     };
-                typedef TElem<List, Allocator> Elem;
-                typedef List<Elem, Allocator> Entry;
+//                typedef TElem<List, Allocator> Elem;
+//                typedef List<Elem, ListDefaultCPPAllocator> Entry;
+                typedef Privates::List<Elem, Privates::ListBlockListAllocator<Elem> > Entry;
 
 //            public:
-                Sets(std::pair<Entry, typename Entry::iterator>* data,size_t n,Allocator &a): m_data(data)
+                Sets(std::pair<Entry, Privates::List_iterator<Elem> >* data,size_t n,Privates::ListBlockListAllocator<Elem> &a): m_data(data)
                 {
                     Entry e(a);
             //		m_data.resize(n, std::make_pair(e, e.end()));
@@ -1072,9 +1109,9 @@ class IsItPar : public SearchStructs {
                     m_data[trg].second = m_data[id].first.end().prev();
                     };
 
-                // usuwa id ze wszystkich zbiorów
+                // usuwa id ze wszystkich zbiorÃ³w
                 void remove(int id) {
-                    typename Entry::iterator it, t;
+                    Privates::List_iterator<Elem> it, t;
                     for(it = m_data[id].second; it != m_data[id].first.end(); ) {
                         t = it;
                         it = it->next;
@@ -1082,12 +1119,12 @@ class IsItPar : public SearchStructs {
                         };
                     };
 
-                // iloœæ elementów w zbiorze id
+                // iloÅ“Ã¦ elementÃ³w w zbiorze id
                 int count(int id) {
                     return m_data[id].first.size();
                     };
 
-                // czy zbiór id pusty
+                // czy zbiÃ³r id pusty
                 bool empty(int id) {
                     return m_data[id].first.empty();
                     };
@@ -1109,9 +1146,9 @@ class IsItPar : public SearchStructs {
             //		};
 
 //            private:
-                // para: lista dla v + wskaŸnik na g³owê v na innych listach
+                // para: lista dla v + wskaÅ¸nik na gÂ³owÃª v na innych listach
             //	Table<std::pair<Entry, typename Entry::iterator> > m_data;
-                    std::pair<Entry, typename Entry::iterator>* m_data;
+                    std::pair<Entry, Privates::List_iterator<Elem> >* m_data;
             }; //Sets
 
 
@@ -1175,8 +1212,8 @@ class IsItPar : public SearchStructs {
             template<class GraphType>
             struct OrderData {
                 typename GraphType::PVertex v;
-                int vertId;	// kogo jest s¹siadem (numer s¹siada w porz¹dku)
-                int orderId;	// numer w porz¹dku
+                int vertId;	// kogo jest sÂ¹siadem (numer sÂ¹siada w porzÂ¹dku)
+                int orderId;	// numer w porzÂ¹dku
                 };
 
             struct LBSData {
@@ -1187,14 +1224,15 @@ class IsItPar : public SearchStructs {
                 };
 
             // LBFSStar
-            template<class GraphType, class MapType, class SetsType, class OutIter>
+            template<class GraphType, class MapType, class SetsType, class OutIter, class Alloc1, class Alloc2>
             static void LBFSStar(const GraphType &g,
                          SetsType &A,
                          SetsType &B,
                          MapType &data,
                          typename GraphType::PVertex *sigmap,
                          typename GraphType::PVertex *sigmapp,
-                         OutIter out) {
+                         OutIter out,
+                         Alloc1& allocat,Alloc2& allocat2) {
                 int i, j, o;
                 unsigned int n, m, aidx, bidx;
                 typename GraphType::PEdge e;
@@ -1209,8 +1247,18 @@ class IsItPar : public SearchStructs {
                 OrderData<GraphType> LOCALARRAY(neigha, m * 2);
                 OrderData<GraphType> LOCALARRAY(neighb, m * 2);
                 OrderData<GraphType> LOCALARRAY(neigh2, m * 2);
-                LexBFS::LexVisitContainer<GraphType, ListDefaultCPPAllocator> alpha;
-                LexBFS::LexVisitContainer<GraphType, ListDefaultCPPAllocator> beta;
+
+
+                //ListBlockListAllocator<List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > allocat(2*g.getVertNo()+2);
+                //ListBlockListAllocator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > allocat2(2*g.getVertNo()+2);
+                typename LexBFSPar<DefaultStructs>::template
+                    LexVisitContainer<GraphType,
+                        Privates::ListBlockListAllocator<Privates::List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > >,
+                        Privates::ListBlockListAllocator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > >
+                alpha(allocat,allocat2),beta(allocat,allocat2);
+
+//                typename LexBFSPar<DefaultStructs>::template LexVisitContainer<GraphType, ListDefaultCPPAllocator,ListDefaultCPPAllocator> alpha(pula,pula);
+//                typename LexBFSPar<DefaultStructs>::template LexVisitContainer<GraphType, ListDefaultCPPAllocator,ListDefaultCPPAllocator> beta(pula,pula);
                 typename DefaultStructs::template AssocCont<typename GraphType::PVertex, LBSData>::Type vertData;
 
                 for(i = 0; i < n; i++) {
@@ -1233,8 +1281,8 @@ class IsItPar : public SearchStructs {
                     };
                 firsta[i] = j;
 
-                LexBFS::StableRadixSort(neigha, j, n, &OrderData<GraphType>::orderId, neigh2);
-                LexBFS::StableRadixSort(neigh2, j, n, &OrderData<GraphType>::vertId, neigha);
+                LexBFSPar<DefaultStructs>::StableRadixSort(neigha, j, n, &OrderData<GraphType>::orderId, neigh2);
+                LexBFSPar<DefaultStructs>::StableRadixSort(neigh2, j, n, &OrderData<GraphType>::vertId, neigha);
 
                 i = j = 0;
                 for(o = 0; o < n; o++) {
@@ -1251,8 +1299,8 @@ class IsItPar : public SearchStructs {
                     };
                 firstb[i] = j;
 
-                LexBFS::StableRadixSort(neighb, j, n, &OrderData<GraphType>::orderId, neigh2);
-                LexBFS::StableRadixSort(neigh2, j, n, &OrderData<GraphType>::vertId, neighb);
+                LexBFSPar<DefaultStructs>::StableRadixSort(neighb, j, n, &OrderData<GraphType>::orderId, neigh2);
+                LexBFSPar<DefaultStructs>::StableRadixSort(neigh2, j, n, &OrderData<GraphType>::vertId, neighb);
 
                 alpha.initialize(g, n, sigmap);
                 beta.initialize(g, n, sigmapp);
@@ -1328,7 +1376,7 @@ class IsItPar : public SearchStructs {
                 bool LOCALARRAY(T, d);
 
                 for(o = 0; o < d; o++) T[o] = false;
-                base = data[u].posSigma + 1;	// siebie nie zaznaczamy: 0 to pierwszy s¹siad
+                base = data[u].posSigma + 1;	// siebie nie zaznaczamy: 0 to pierwszy sÂ¹siad
 
                 for(e = g.getEdge(u, EdUndir); e != NULL; e = g.getEdgeNext(u, e, EdUndir)) {
                     v = g.getEdgeEnd(e, u);
