@@ -34,9 +34,9 @@ int main() {
     u4=g.addVert(4);
     u5=g.addVert(5);
     u6=g.addVert(6);
-    u7=g.addVert(7);
-    u8=g.addVert(8);
-    u9=g.addVert(9);
+//    u7=g.addVert(7);
+//    u8=g.addVert(8);
+//    u9=g.addVert(9);
 //
 //
 
@@ -49,7 +49,8 @@ int main() {
 //    g.addEdge(u6,u5);
 
 //    g.addEdge(u1,u2);
-//    g.addEdge(u3,u2);
+//    g.addEdge(u3,u4);
+//    g.addEdge(u1,u4);
 ////    g.addEdge(u1,u3);
 //    g.addEdge(u4,u2);
 //    g.addEdge(u5,u2);
@@ -66,6 +67,9 @@ int main() {
     //g.addEdge(u,y);
 
 
+ g.addEdge(u1,u4);g.addEdge(u1,u6);
+    g.addEdge(u3,u4);g.addEdge(u5,u4);g.addEdge(u4,u6);
+    g.addEdge(u5,u6);
 
 
 //    g.addEdge(u1,u2);g.addEdge(u1,u5);g.addEdge(u2,u3);g.addEdge(u3,u4);g.addEdge(u5,u4);g.addEdge(u1,u3);
@@ -80,31 +84,32 @@ int main() {
 //    g.addEdge(u3,u4);g.addEdge(u5,u4);g.addEdge(u4,u6);
 //    g.addEdge(u5,u6);
 
-    g.addEdge(u1,u2);g.addEdge(u1,u3);g.addEdge(u3,u2);
-    g.addEdge(u1,u5);g.addEdge(u5,u3);g.addEdge(u5,u2);
-    g.addEdge(u2,u6);g.addEdge(u6,u3);g.addEdge(u4,u2);
-    g.addEdge(u8,u7);g.addEdge(u7,u9);
+//    g.addEdge(u1,u2);g.addEdge(u1,u3);g.addEdge(u3,u2);
+//    g.addEdge(u1,u5);g.addEdge(u5,u3);g.addEdge(u5,u2);
+//    g.addEdge(u2,u6);g.addEdge(u6,u3);g.addEdge(u4,u2);
+//    g.addEdge(u8,u7);g.addEdge(u7,u9);
+//
+//    g.addEdge(u8,u9);
+//    g.addEdge(u2,u9);g.addEdge(u8,u2);
 
-    g.addEdge(u8,u9);
-    g.addEdge(u2,u9);g.addEdge(u8,u2);
+    cout << IsIt::chordal(g);
 
-
-	Graph<int, int>::PVertex cq[128], cq2[128];
-	int ncq;
-	if (IsIt::chordal(g))
-	{ printf("Orders: \n"); IsIt::Chordal::getOrder(g, cq,cq2);
-        for(int i = 0; i < g.getVertNo(); i++) cout << cq[i]->info;
-        printf("\n");
-        for(int i = 0; i < g.getVertNo(); i++) cout << cq2[i]->info;
-        int cl=IsIt::Chordal::maxCliques(g,IsIt::compStore(comptab,tabV),tabpar);
-        cout << endl << cl << endl;
-        for(int i=0;i<cl;i++)
-        { for(int j=comptab[i];j<comptab[i+1];j++) cout << tabV[j]->info;
-          cout  << ' ';
-        }
-        cout << endl;
-        for(int i=0;i<cl-1;i++) cout << tabpar[i].first << tabpar[i].second << ' ';
-	}
+//	Graph<int, int>::PVertex cq[128], cq2[128];
+//	int ncq;
+//	if (IsIt::chordal(g))
+//	{ printf("Orders: \n"); IsIt::Chordal::getOrder(g, cq,cq2);
+//        for(int i = 0; i < g.getVertNo(); i++) cout << cq[i]->info;
+//        printf("\n");
+//        for(int i = 0; i < g.getVertNo(); i++) cout << cq2[i]->info;
+//        int cl=IsIt::Chordal::maxCliques(g,IsIt::compStore(comptab,tabV),tabpar);
+//        cout << endl << cl << endl;
+//        for(int i=0;i<cl;i++)
+//        { for(int j=comptab[i];j<comptab[i+1];j++) cout << tabV[j]->info;
+//          cout  << ' ';
+//        }
+//        cout << endl;
+//        for(int i=0;i<cl-1;i++) cout << tabpar[i].first << tabpar[i].second << ' ';
+//	}
 
 
 

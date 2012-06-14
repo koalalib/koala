@@ -39,7 +39,7 @@ ChTest tests[] = {
 
 	{true, true, 2, "4 0 1 -1 1 1 -2 2 1 -3 3 0"},		// 16	// p4
 	{true, true, 3, "4 0 3 -1 -2 -3 1 1 -2 2 0 3 0"},	// 17
-	
+
 	{true, true, 3,						// 18
 		"6\n"
 		"0 2 -3 -5\n"
@@ -48,7 +48,7 @@ ChTest tests[] = {
 		"3 2 -4 -5\n"
 		"4 1 -5\n"
 		"5 0\n"},
-	
+
 	{true, true, 4, "5 0 3 -1 -2 -3 1 2 -2 -3 2 1 -3 3 1 -4 4 0"},	// 19 K4+leaf
 	{true, true, 2, "5 0 1 -4 1 1 -4 2 1 -4 3 0 4 0"},	// 20 inv K4+leaf
 
@@ -74,11 +74,12 @@ int main() {
 			printf("bad IsChordal answer (%s instead of %s)\n",
 			       rv ? "true" : "false", tests[i].ans ? "true" : "false");
 			};
-		rv = IsIt::cochordal(g);
-		if(rv != tests[i].coans) {
-			printf("bad IsCoChordal answer (%s instead of %s)\n",
-			       rv ? "true" : "false", tests[i].ans ? "true" : "false");
-			};
+//		rv = IsIt::cochordal(g);
+//		if(rv != tests[i].coans) {
+//			printf("bad IsCoChordal answer (%s instead of %s)\n",
+//			       rv ? "true" : "false", tests[i].ans ? "true" : "false");
+//			};
+
 //		ncq = IsIt::Chordal::maxClique(g, cq);
 //		if(ncq != tests[i].clq) {
 //			printf("bad MaxClique answer (%d instead of %d)\n",
