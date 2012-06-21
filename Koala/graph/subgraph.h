@@ -37,6 +37,7 @@ class Subgraph: public SubgraphBase
         typedef Graph ParentGrType;
         typedef typename Graph::VertInfoType VertInfoType;
         typedef typename Graph::EdgeInfoType EdgeInfoType;
+        typedef typename Graph::GraphSettings GraphSettings;
 
     // Konstruktory
         Subgraph() {}
@@ -65,16 +66,16 @@ class Subgraph: public SubgraphBase
         template< class OutputIterator > int getVerts( OutputIterator ) const;
         Set< PVertex > getVertSet() const;
         int getVertNo() const { return getVerts( blackHole ); }
-        VertInfoType getVertInfo( PVertex v ) const { return v->getInfo(); }
-        EdgeInfoType getEdgeInfo( PEdge e ) const { return e->getInfo(); }
-        EdgeType getEdgeType( PEdge e ) const { return e->getType(); }
-        EdgeType getType( PEdge e ) const { return e->getType(); }
+        VertInfoType getVertInfo( PVertex v ) const { return root().getVertInfo(v); }
+        EdgeInfoType getEdgeInfo( PEdge e ) const { return root().getEdgeInfo(e); }
+        EdgeType getEdgeType( PEdge e ) const { return up().getEdgeType(e); }
+        EdgeType getType( PEdge e ) const { return up().getType(e); }
         std::pair< typename Graph::PVertex,typename Graph::PVertex >
-            getEdgeEnds( PEdge edge ) const { return edge->getEnds(); }
+            getEdgeEnds( PEdge edge ) const { return up().getEdgeEnds(edge); }
         std::pair< typename Graph::PVertex,typename Graph::PVertex >
-            getEnds( PEdge edge ) const { return edge->getEnds(); }
-        PVertex getEdgeEnd1( PEdge edge ) const { return edge->getEnd1(); }
-        PVertex getEdgeEnd2( PEdge edge ) const { return edge->getEnd2(); }
+            getEnds( PEdge edge ) const { return up().getEnds(edge); }
+        PVertex getEdgeEnd1( PEdge edge ) const { return up().getEdgeEnd1(edge); }
+        PVertex getEdgeEnd2( PEdge edge ) const { return up().getEdgeEnd2(edge); }
         bool isEdgeEnd( PEdge edge, PVertex vert ) const { return root().isEnd( edge,vert ); }
         bool isEnd( PEdge edge, PVertex vert ) const { return root().isEnd( edge,vert ); }
         typename Graph::PVertex getEdgeEnd( PEdge, PVertex ) const;
@@ -133,9 +134,16 @@ class Subgraph: public SubgraphBase
         int delta( EdgeDirection = EdAll ) const;
         bool areParallel( PEdge, PEdge, EdgeDirection = EdUndir ) const;
         template< class OutputIterator > int getParals( OutputIterator, typename Graph::PEdge, EdgeDirection = EdUndir ) const;
+        Set<typename Graph::PEdge> getParalsSet(typename Graph::PEdge, EdgeDirection = EdUndir) const;
         int mu( typename Graph::PEdge, EdgeDirection = EdUndir ) const;
         int mu( EdgeDirection = EdUndir ) const;
         std::pair< typename Graph::PEdge,int > maxMu( EdgeDirection = EdUndir ) const;
+
+        template <class Iterator,class OutIter> int getIndEdges(OutIter,Iterator, Iterator, EdgeType = EdAll ) const;
+        template <class Iterator> Set< typename Graph::PEdge > getIndEdgeSet(Iterator beg, Iterator end, EdgeType = EdAll ) const;
+        template <class OutIter> int getIndEdges(OutIter,const Set<typename Graph::PVertex>&, EdgeType = EdAll ) const;
+        Set< typename Graph::PEdge > getIndEdgeSet(const Set<typename Graph::PVertex>&, EdgeType = EdAll ) const;
+
 
 
         protected:

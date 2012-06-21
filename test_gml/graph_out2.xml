@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
-    <key id="k2FA1" for="all" attr.name="EE" />
-    <key id="k53D5" for="all" attr.name="EDG" />
-    <key id="k74C8" for="all" attr.name="NN" />
-    <key id="k06A2" for="all" attr.name="VRT" />
+    <key id="k12A6" for="all" attr.name="EE" />
+    <key id="k4ED0" for="all" attr.name="EDG" />
+    <key id="k1E67" for="all" attr.name="NN" />
+    <key id="k72B8" for="all" attr.name="VRT" />
     <graph id="test" edgedefault="undirected">
-        <node id="n003E7700">
-            <data key="k74C8">10</data>
+        <node id="n003E7748">
+            <data key="k1E67">10</data>
         </node>
-        <node id="n003E7768">
-            <data key="k74C8">11</data>
+        <node id="n003E77B0">
+            <data key="k1E67">11</data>
         </node>
-        <node id="n003E77D0">
-            <data key="k74C8">12</data>
+        <node id="n003E7818">
+            <data key="k1E67">12</data>
         </node>
-        <node id="n003E7838">
-            <data key="k74C8">13</data>
+        <node id="n003E7880">
+            <data key="k1E67">13</data>
         </node>
-        <node id="n003E78C0">
-            <data key="k74C8">14</data>
+        <node id="n003E7908">
+            <data key="k1E67">14</data>
         </node>
-        <node id="n003E7948">
-            <data key="k74C8">15</data>
+        <node id="n003E7990">
+            <data key="k1E67">15</data>
         </node>
-        <edge id="e003E75E8" source="n003E7700" target="n003E77D0">
-            <data key="k2FA1">20</data>
+        <edge id="e003E27D0" source="n003E7748" target="n003E7818">
+            <data key="k12A6">20</data>
         </edge>
-        <edge id="e003E79C8" source="n003E77D0" target="n003E78C0">
-            <data key="k2FA1">24</data>
+        <edge id="e003E7A10" source="n003E7818" target="n003E7908">
+            <data key="k12A6">24</data>
         </edge>
-        <edge id="e003E7A08" source="n003E7700" target="n003E7768">
-            <data key="k2FA1">21</data>
+        <edge id="e003E7A50" source="n003E7748" target="n003E77B0">
+            <data key="k12A6">21</data>
         </edge>
-        <edge id="e003E7A48" source="n003E7768" target="n003E7838">
-            <data key="k2FA1">22</data>
+        <edge id="e003E7A90" source="n003E77B0" target="n003E7880">
+            <data key="k12A6">22</data>
         </edge>
-        <edge id="e003E7A88" source="n003E7838" target="n003E77D0">
-            <data key="k2FA1">23</data>
+        <edge id="e003E7AD0" source="n003E7880" target="n003E7818">
+            <data key="k12A6">23</data>
         </edge>
-        <edge id="e003E7AC8" source="n003E7838" target="n003E7948">
-            <data key="k2FA1">25</data>
+        <edge id="e003E7B10" source="n003E7880" target="n003E7990">
+            <data key="k12A6">25</data>
         </edge>
-        <edge id="e003E7B08" source="n003E7948" target="n003E78C0">
-            <data key="k2FA1">26</data>
+        <edge id="e003E7B50" source="n003E7990" target="n003E7908">
+            <data key="k12A6">26</data>
         </edge>
     </graph>
 </graphml>

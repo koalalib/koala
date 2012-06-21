@@ -20,11 +20,12 @@ struct OpisE {
     int dlugosc; // dla Dijkstry niepotrzebne
 };
 
-const Koala::EdgeType Allow=Koala::EdDirIn|Koala::EdDirOut|Koala::AdjMatrixAllowed;
+const Koala::EdgeType Allow=Koala::EdDirIn|Koala::EdDirOut;
+const bool AdjAllow=true;
 
-Koala::Graph<OpisV,OpisE,Allow> g;
-Koala::Graph<OpisV,OpisE,Allow>::PVertex A,B,C,D,E,F,V,U,tabV[10];
-Koala::Graph<OpisV,OpisE,Allow>::PEdge tabE[10];
+Koala::Graph<OpisV,OpisE,Koala::DefaultGrSettings<Allow,AdjAllow> > g;
+Koala::Graph<OpisV,OpisE,Koala::DefaultGrSettings<Allow,AdjAllow> >::PVertex A,B,C,D,E,F,V,U,tabV[10];
+Koala::Graph<OpisV,OpisE,Koala::DefaultGrSettings<Allow,AdjAllow> >::PEdge tabE[10];
 
 
 
@@ -41,9 +42,10 @@ int main() {
     g.addEdge(B,C,OpisE(2),Koala::EdDirOut);
     g.addEdge(D,E,OpisE(1),Koala::EdDirOut);
     g.addEdge(F,D,OpisE(2),Koala::EdDirOut);
+//    g.addEdge(F,D);
 //    g.addLoop(F,OpisE(2));
-//    g.makeAdjMatrix();
-//    std::cout << g.hasAdjMatrix();
+
+    std::cout << std::boolalpha << g.hasAdjMatrix();
     std::cout << '\n' << g.getEdgeNo(Koala::EdDirOut|Koala::EdDirIn);
 
     return 0;

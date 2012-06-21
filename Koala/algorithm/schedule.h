@@ -1,0 +1,227 @@
+#ifndef DEF_SCHEDULING_H
+#define DEF_SCHEDULING_H
+
+#include <algorithm>
+#include <cstdlib>
+#include <vector>
+#include "../base/def_struct.h"
+#include "../base/kstd.h"
+#include "../container/assoctab.h"
+#include "../algorithm/search.h"
+
+namespace Koala
+{
+	template <class DefaultStructs>
+	class SchedulingPar
+	{
+    public:
+		template<class GraphType>
+		struct Task
+		{
+			int length, release, duedate;
+			typename GraphType::PVertex vertex;
+
+			Task(typename GraphType::PVertex _vertex = 0) : length(1), release(0),
+				duedate(AlgorithmsDefaultSettings::NumberTypeBounds<int>::plusInfty()), vertex(_vertex) { }
+
+			Task(int _length, int _release, int _duedate, typename GraphType::PVertex _vertex = 0)
+				: length(_length), release(_release), duedate(_duedate), vertex(_vertex) { }
+		};
+
+		struct TaskPart
+		{
+			int task, start, end, part;
+
+			TaskPart(int _task = 0, int _start = 0, int _end = 0, int _part = 0)
+                : task(_task), start(_start), end(_end), part(_part) { }
+		};
+
+		struct TaskWindow
+		{
+			int earliestStart, earliestFinish, latestStart, latestFinish;
+
+			TaskWindow() { }
+
+			template<class GraphType>
+			TaskWindow(Task<GraphType> task, int start, int finish) : earliestStart(start), latestFinish(finish),
+				earliestFinish(start + task.length), latestStart(finish - task.length) { }
+		};
+
+		struct Schedule
+		{
+			std::vector<std::vector<TaskPart> > machines;
+
+			Schedule(int m = 0)
+			{
+				setMachNo(m);
+			}
+
+			void setMachNo(int m)
+			{
+				machines.resize(m);
+			}
+
+			int getMachNo()
+			{
+				return machines.size();
+			}
+
+			void clearMachine(int m)
+			{
+				machines[m].clear();
+			}
+
+			void clearMachines()
+			{
+				int m = getMachNo();
+				machines.clear(); machines.resize(m);
+			}
+		};
+
+        template<typename TaskIterator, typename Iterator>
+        static int sortLPT(TaskIterator begin, TaskIterator end, Iterator out)
+		{
+		    return sortByComp<compareLPT<std::pair<TaskIterator, int> > >(begin,end,out);
+		}
+
+        template<typename TaskIterator, typename Iterator>
+        static int sortSPT(TaskIterator begin, TaskIterator end, Iterator out)
+		{
+		    return sortByComp<compareSPT<std::pair<TaskIterator, int> >  > (begin,end,out);
+		}
+
+        template<typename TaskIterator, typename Iterator>
+        static int sortEDD(TaskIterator begin, TaskIterator end, Iterator out)
+		{
+		    return sortByComp<compareEDD<std::pair<TaskIterator, int> > > (begin,end,out);
+		}
+
+		//Test poprawnoœci danego harmonogramu
+		template<typename GraphType, typename TaskIterator>
+		static bool test(TaskIterator, TaskIterator, const GraphType&, Schedule&,bool=true);
+
+		//-|prec|Cmax - czyli szeregowanie œcie¿k¹ krytyczn¹ z zadaniami w wierzcho³kach
+        template<typename GraphType, typename TaskIterator, typename TaskWindowIterator>
+		static int critPath(TaskIterator, TaskIterator, const GraphType&, TaskWindowIterator);
+
+		//P|prec|- - szeregowanie listowe przy zadanej liœcie
+        template<typename GraphType, typename TaskIterator>
+		static int ls(TaskIterator, TaskIterator, const GraphType&, Schedule&);
+
+		//P2|UET,prec|Cmax - algorytm Coffmana–Grahama
+		template<typename GraphType, typename TaskIterator>
+		static int coffmanGraham(TaskIterator, TaskIterator, const GraphType&, Schedule&);
+
+		//1|pmtn,prec,ri|Lmax – zmodyfikowany algorytm Liu
+		template<typename GraphType, typename TaskIterator>
+		static int precLiu(TaskIterator, TaskIterator, const GraphType&, Schedule&);
+
+		//P|UET,in–tree|Lmax – algorytm Bruckera
+		template<typename GraphType, typename TaskIterator>
+		static int brucker(TaskIterator, TaskIterator, const GraphType&, Schedule&);
+
+		//P|UET,in–tree|Cmax – procedura Hu
+		template<typename GraphType, typename TaskIterator>
+		static int hu(TaskIterator, TaskIterator, const GraphType&, Schedule&);
+
+    protected:
+
+        template<typename Comp, typename TaskIterator, typename Iterator>
+        static int sortByComp(TaskIterator begin, TaskIterator end, Iterator out)
+		{
+            typedef std::pair<TaskIterator, int> Pair;
+
+            int n = 0;
+            for(TaskIterator i = begin; i != end; ++i)
+				n++;
+            Pair LOCALARRAY(tasks, n);
+            for(n = 0; begin != end; ++begin, n++)
+				tasks[n].first = begin, tasks[n].second = n;
+
+			DefaultStructs::sort(tasks, tasks + n, Comp());
+			for(int i = 0; i < n; i++, ++out)
+				*out = tasks[i].second;
+			return n;
+		}
+
+
+        template<typename Pair>
+		struct compareLPT
+		{
+			bool operator() (Pair a, Pair b)
+			{
+				return a.first->length > b.first->length || (a.first->length == b.first->length && a.second < b.second);
+			}
+		};
+
+        template<typename Pair>
+		struct compareSPT
+		{
+			bool operator() (Pair a, Pair b)
+			{
+				return a.first->length < b.first->length || (a.first->length == b.first->length && a.second < b.second);
+			}
+		};
+
+        template<typename Pair>
+		struct compareEDD
+		{
+			bool operator() (Pair a, Pair b)
+			{
+				return a.first->duedate < b.first->duedate || (a.first->duedate == b.first->duedate && a.second < b.second);
+			}
+		};
+
+        template<typename Pair>
+		struct compareSecondFirst
+		{
+			bool operator() (Pair a, Pair b)
+			{
+				return a.second < b.second;
+			}
+		};
+
+        template<typename Pair>
+		struct compareSecondLast
+		{
+			bool operator() (Pair a, Pair b)
+			{
+				return a.second > b.second;
+			}
+		};
+
+        template<typename Task>
+		struct Triple
+		{
+			Task task;
+			int start, finish;
+
+			Triple(Task _task = Task()) : task(_task) { }
+		};
+
+        template<typename Task>
+		struct BruckerElement
+		{
+			Task task;
+			int index, priority, degree;
+
+			BruckerElement(Task _task = Task(), int _index = 0) : task(_task), index(_index) { }
+		};
+
+        template<typename Task>
+		struct LiuElement
+		{
+			Task task;
+			int index, duedate, degree, timeleft, parts;
+
+			LiuElement(Task task = Task(), int index = 0) : task(task), index(index),
+				timeleft(task.length), parts(0) { }
+		};
+	};
+
+	class Scheduling : public SchedulingPar<AlgorithmsDefaultSettings> {};
+
+	#include "schedule.hpp"
+}
+
+#endif

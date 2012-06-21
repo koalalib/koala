@@ -130,7 +130,7 @@ template< class Graph, class VChooser, class EChooser >
 EdgeDirection Subgraph< Graph,VChooser,EChooser >::getEdgeDir(
     PEdge edge, PVertex vert ) const
 {
-    return root().getEdgeDir( edge,vert );
+    return up().getEdgeDir( edge,vert );
 }
 
 template< class Graph, class VChooser, class EChooser >
@@ -140,8 +140,8 @@ Subgraph< Graph,VChooser,EChooser >::getEdgeNext(
 {
     do
         e = up().getEdgeNext( e,mask );
-    while (e && !(vchoose( e->getEnds().first,up() )
-        && vchoose( e->getEnds().second,up() ) && echoose( e,up() )));
+    while (e && !(vchoose( up().getEdgeEnd1(e),up() )
+        && vchoose( up().getEdgeEnd2(e),up() ) && echoose( e,up() )));
     return e;
 }
 
@@ -158,8 +158,8 @@ Subgraph< Graph,VChooser,EChooser >::getEdgeNext(
 {
     do
         e = up().getEdgeNext( vert,e,mask );
-    while (e && !(vchoose( e->getEnds().first,up() )
-        && vchoose( e->getEnds().second,up() ) && echoose( e,up() )));
+    while (e && !(vchoose( up().getEdgeEnd1(e),up() )
+        && vchoose( up().getEdgeEnd2(e),up() ) && echoose( e,up() )));
     return e;
 }
 
@@ -170,8 +170,8 @@ Subgraph< Graph,VChooser,EChooser >::getEdgePrev(
 {
     do
         e = up().getEdgePrev( e,mask );
-    while (e && !(vchoose( e->getEnds().first,up() )
-        && vchoose( e->getEnds().second,up() ) && echoose( e,up() )));
+    while (e && !(vchoose( up().getEdgeEnd1(e),up() )
+        && vchoose( up().getEdgeEnd2(e),up() ) && echoose( e,up() )));
     return e;
 }
 
@@ -185,16 +185,16 @@ bool Subgraph< Graph,VChooser,EChooser >::areParallel(
     std::pair< typename Graph::PVertex,typename Graph::PVertex >
         ends1 = getEdgeEnds( e1 ), ends2 = getEdgeEnds( e2 );
     if (e1 == e2) return true;
-    else if (e1->getType() == Loop)
-        return e2->getType() == Loop && ends1.first == ends2.first;
-    else if (e2->getType() == Loop) return false;
-    else if ((e1->getType() == Undirected && e2->getType() == Undirected)
-        || (e1->getType() != e2->getType() && reltype == EdUndir)
-        || (e1->getType() == Directed && e2->getType() == Directed
+    else if (getType(e1) == Loop)
+        return getType(e2) == Loop && ends1.first == ends2.first;
+    else if (getType(e2) == Loop) return false;
+    else if ((getType(e1) == Undirected && getType(e2) == Undirected)
+        || (getType(e1) != getType(e2) && reltype == EdUndir)
+        || (getType(e1) == Directed && getType(e2) == Directed
         && (reltype == EdUndir || reltype == EdDirIn)))
         return (ends1.first == ends2.first && ends1.second == ends2.second)
                 || (ends1.second == ends2.first && ends1.first == ends2.second);
-    else return e1->getType() == e2->getType() && ends1.first == ends2.first
+    else return getType(e1) == getType(e2) && ends1.first == ends2.first
         && ends1.second == ends2.second;
 }
 
@@ -214,6 +214,15 @@ int Subgraph< Graph,VChooser,EChooser >::getParals(
             licz++;
         }
     return licz;
+}
+
+template< class Graph, class VChooser, class EChooser >
+Set< typename Graph::PEdge >
+Subgraph< Graph,VChooser,EChooser >::getParalsSet(typename Graph::PEdge edge, EdgeDirection reltype) const
+{
+    Set<typename Graph::PEdge > res;
+    getParals(setInserter(res),edge,reltype);
+    return res;
 }
 
 template< class Graph, class VChooser, class EChooser >
@@ -239,10 +248,10 @@ Subgraph< Graph,VChooser,EChooser >::maxMu( EdgeDirection reltype) const
     int i=0,l=0;
     typename Graph::PEdge edge;
     for (typename Graph::PEdge e=getEdge(EdAll); e; e=getEdgeNext(e,EdAll) )
-        edges[i++]=Parals3(std::min(e->getEnds().first,e->getEnds().second),
-                           std::max(e->getEnds().first,e->getEnds().second),
-                           getEdgeDir(e,std::min(e->getEnds().first,e->getEnds().second)),e);
-    GraphClassDefaultSettings::sort(edges,edges+i,Parals3cmp());
+        edges[i++]=Parals3(std::min(getEdgeEnd1(e),getEdgeEnd2(e)),
+                           std::max(getEdgeEnd1(e),getEdgeEnd2(e)),
+                           getEdgeDir(e,std::min(getEdgeEnd1(e),getEdgeEnd2(e))),e);
+    GraphSettings::sort(edges,edges+i,Parals3cmp());
     for(i=0;i<getEdgeNo(EdAll);i++)
     {
         if (i==0 || !areParallel(edges[i-1].edge,edges[i].edge,reltype))
@@ -255,11 +264,40 @@ Subgraph< Graph,VChooser,EChooser >::maxMu( EdgeDirection reltype) const
 }
 
 
-template< class Graph, class VChooser, class EChooser >
-Subgraph< Graph,VChooser,EChooser > makeSubgraph(
-    const Graph &g, const std::pair< VChooser,EChooser > &chs )
+template< class Graph, class VChooser, class EChooser > template <class Iterator, class OutIter>
+int Subgraph< Graph,VChooser,EChooser >::getIndEdges(OutIter out,Iterator beg, Iterator end, EdgeType type ) const
+{   int licze=0;
+    typename GraphSettings:: template VertAssocCont
+            <typename Graph::PVertex,bool>::Type vset(getVertNo());
+    for(Iterator i=beg;i!=end;++i ) vset[*i]=true;
+    for(typename Graph::PEdge e=getEdge(type );e;e=getEdgeNext(e,type ))
+        if (vset.hasKey(getEdgeEnd1(e)) && vset.hasKey(getEdgeEnd2(e)))
+            { *out=e; ++out; ++ licze; }
+    return licze;
+}
+
+template< class Graph, class VChooser, class EChooser > template <class Iterator>
+Set<typename Graph::PEdge>
+Subgraph< Graph,VChooser,EChooser >::getIndEdgeSet(Iterator beg, Iterator end, EdgeType type ) const
 {
-    return Subgraph< Graph,VChooser,EChooser >( g,chs );
+    Set<typename Graph::PEdge> res;
+    getIndEdges(setInserter(res),beg,end,type);
+    return res;
+}
+
+template< class Graph, class VChooser, class EChooser > template <class OutIter>
+int Subgraph< Graph,VChooser,EChooser >::getIndEdges(OutIter out,const Set<typename Graph::PVertex>& vset, EdgeType type ) const
+{
+    return getIndEdges(out,vset.begin(),vset.end(),type);
+}
+
+template< class Graph, class VChooser, class EChooser >
+Set<typename Graph::PEdge>
+Subgraph< Graph,VChooser,EChooser >::getIndEdgeSet(const Set<typename Graph::PVertex>& vset, EdgeType type ) const
+{
+    Set<typename Graph::PEdge> res;
+    getIndEdges(setInserter(res),vset.begin(),vset.end(),type);
+    return res;
 }
 
 template< class Graph, class VChooser, class EChooser >
@@ -355,8 +393,8 @@ Subgraph< Graph,VChooser,EChooser >::getEdgePrev(
 {
     do
         e = up().getEdgePrev( vert,e,mask );
-    while (e && !(vchoose( e->getEnds().first,up() )
-        && vchoose( e->getEnds().second,up() ) && echoose( e,up() )));
+    while (e && !(vchoose( up().getEdgeEnd1(e),up() )
+        && vchoose( up().getEdgeEnd2(e),up() ) && echoose( e,up() )));
     return e;
 }
 
@@ -415,8 +453,8 @@ Subgraph< Graph,VChooser,EChooser >::getEdgeNext(
 {
     do
         e = up().getEdgeNext( vert1,vert2,e,mask );
-    while (e && !(vchoose( e->getEnds().first,up() )
-        && vchoose( e->getEnds().second,up() ) && echoose( e,up() )));
+    while (e && !(vchoose( up().getEdgeEnd1(e),up() )
+        && vchoose( up().getEdgeEnd2(e),up() ) && echoose( e,up() )));
     return e;
 }
 
@@ -427,8 +465,8 @@ Subgraph< Graph,VChooser,EChooser >::getEdgePrev(
 {
     do
         e = up().getEdgePrev( vert1,vert2,e,mask );
-    while (e && !(vchoose( e->getEnds().first,up() )
-        && vchoose( e->getEnds().second,up() ) && echoose( e,up() )));
+    while (e && !(vchoose( up().getEdgeEnd1(e),up() )
+        && vchoose( up().getEdgeEnd2(e),up() ) && echoose( e,up() )));
     return e;
 }
 
@@ -490,7 +528,7 @@ int Subgraph< Graph,VChooser,EChooser >::getNeigh(
         ans[size++] = getEdgeEnd( edge,vert );
         edge = getEdgeNext( vert,edge,direct );
     }
-    GraphClassDefaultSettings::sort( ans,ans + size );
+    GraphSettings::sort( ans,ans + size );
     for( int i = 0; i < size; i++ )
         if (i == 0 || ans[i - 1] != ans[i])
         {
@@ -540,7 +578,7 @@ int Subgraph< Graph,VChooser,EChooser >::getClNeigh(
         ans[size++] = getEdgeEnd( edge,vert );
         edge = getEdgeNext( vert,edge,direct );
     }
-    GraphClassDefaultSettings::sort( ans,ans + size );
+    GraphSettings::sort( ans,ans + size );
     for( int i = 0; i < size; i++ )
         if (i == 0 || ans[i - 1] != ans[i])
         {
@@ -608,4 +646,11 @@ int Subgraph< Graph,VChooser,EChooser >::edgePos( PEdge edge ) const
         ++idx;
     }
     return tmp_edge ? idx : -1;
+}
+
+template< class Graph, class VChooser, class EChooser >
+Subgraph< Graph,VChooser,EChooser > makeSubgraph(
+    const Graph &g, const std::pair< VChooser,EChooser > &chs )
+{
+    return Subgraph< Graph,VChooser,EChooser >( g,chs );
 }

@@ -126,5 +126,43 @@ int main() {
 //    writeGraphText(g, cout, RG_UndirectedEdgeList,form);
 //	cout << endl;cout << endl;
 
+    cout << "\n\n!!!!!!!!!!!!!\n\n";
+    g.clear();v2int.clear(); e2int.clear();
+
+    A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
+    g.addLoop(A,"AoA");e=g.addEdge(A,B,"A-B");g.addArch(B,C,"B>C");
+
+//    v2int[A]=6;e2int[e]=1;
+    char napis[1000];
+
+
+#define flagi false,false
+
+    writeGraphText(g, cout, RG_EdgeList,make_pair(flagi)
+                   ,v2int,e2int
+                   );
+    writeGraphText(g, napis,1000, RG_EdgeList,make_pair(flagi)
+                   ,v2int,e2int
+                   );
+
+    cout <<"\n\n????????????????\n\n";
+    g.clear();v2int.clear(); e2int.clear();
+    Graph<char,string>::PVertex vtab[100]={0};
+    Graph<char,string>::PEdge etab[100]={0};
+
+    readGraphText(g,napis,RG_EdgeList
+                  ,vtab,etab
+                  );
+    for(int i=0;i<100;i++) if (vtab[i]) v2int[vtab[i]]=i;
+    for(int i=0;i<100;i++) if (etab[i]) e2int[etab[i]]=i;
+    writeGraphText(g, cout, RG_EdgeList,make_pair(flagi),v2int,e2int);
+    cout << "\n\n";
+
+    for(int i=0;i<100;i++) if (vtab[i]) cout << vtab[i]->info << ":" << i << " ";
+    cout << "\n\n";
+    for(int i=0;i<100;i++) if (etab[i]) cout << etab[i]->info << ":" << i << " ";
+
+
+
 
 }

@@ -882,12 +882,12 @@ class IsItPar : public SearchStructs {
 
                 typename Graph::PVertex LOCALARRAY(idxv, n);
 //                std::list<typename AdjStruct<Graph>::Node> LOCALARRAY(statebuf,n);
-                Privates::ListBlockListAllocator<typename AdjStruct<Graph>::Node> pula(2*g.getEdgeNo());
-                Privates::BlobObj<Privates::List<typename AdjStruct<Graph>::Node,Privates::ListBlockListAllocator<typename AdjStruct<Graph>::Node> > >
+                Privates::ListBlockListAllocator<typename AdjStruct<Graph>::Node> pula(2*g.getEdgeNo());    // TODO: size?
+                Privates::List<typename AdjStruct<Graph>::Node,Privates::ListBlockListAllocator<typename AdjStruct<Graph>::Node> >
                     LOCALARRAY(statebuf,n);
 
                 for(int i=0;i<n;i++) statebuf[i].init(pula);
-                CTState<Graph> state(n,&statebuf[0].content());
+                CTState<Graph> state(n,statebuf);
 
                 typename DefaultStructs::template AssocCont<typename Graph::PVertex, int>::Type vidx(g.getVertNo());
 
@@ -1006,25 +1006,22 @@ class IsItPar : public SearchStructs {
             typename GraphType::PVertex LOCALARRAY(sigma, n);
             typename GraphType::PVertex LOCALARRAY(sigmap, n);
             typename GraphType::PVertex LOCALARRAY(sigmapp, n);
-            typename DefaultStructs::template AssocCont<typename GraphType::PVertex, IvData>::Type data;
+            typename DefaultStructs::template AssocCont<typename GraphType::PVertex, IvData>::Type data(g.getVertNo());
 
 
-            Privates::ListBlockListAllocator<Privates::List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > allocat(2*g.getVertNo()+2);
-            Privates::ListBlockListAllocator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > allocat2(2*g.getVertNo()+2);
-            Privates::ListBlockListAllocator<typename Sets::Elem> allocat3(2*g.getVertNo()*g.getVertNo());
+            Privates::ListBlockListAllocator<Privates::List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > allocat(2*g.getVertNo()+2); //TODO: size?
+            Privates::ListBlockListAllocator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > allocat2(2*g.getVertNo()+2); //TODO: size?
+            Privates::ListBlockListAllocator<typename Sets::Elem> allocat3(2*g.getVertNo()*g.getVertNo()); //TODO: size?
 
 
 //            ListDefaultCPPAllocator allocat3;
-            std::pair<Privates::BlobObj<typename Sets::Entry>,
+            std::pair<typename Sets::Entry,
                 typename Sets::Entry::iterator> LOCALARRAY(Abuf,g.getVertNo());
-            std::pair<Privates::BlobObj<typename Sets::Entry>,
+            std::pair<typename Sets::Entry,
                 typename Sets::Entry::iterator> LOCALARRAY(Bbuf,g.getVertNo());
             for(int i=0;i<g.getVertNo();i++)
                 { Abuf[i].first.init(allocat3); Bbuf[i].first.init(allocat3);}
-            Sets A((std::pair< typename Sets::Entry,
-                typename Sets::Entry::iterator>*)Abuf,g.getVertNo(),allocat3),
-                B((std::pair< typename Sets::Entry,
-                typename Sets::Entry::iterator>*)Bbuf,g.getVertNo(),allocat3);
+            Sets A(Abuf,g.getVertNo(),allocat3),B(Bbuf,g.getVertNo(),allocat3);
 
     //		A.resize(g.getVertNo(), allocator);
     //		B.resize(g.getVertNo(), allocator);
@@ -1255,11 +1252,11 @@ class IsItPar : public SearchStructs {
                     LexVisitContainer<GraphType,
                         Privates::ListBlockListAllocator<Privates::List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > >,
                         Privates::ListBlockListAllocator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > >
-                alpha(allocat,allocat2),beta(allocat,allocat2);
+                alpha(allocat,allocat2,g.getVertNo()),beta(allocat,allocat2,g.getVertNo());
 
 //                typename LexBFSPar<DefaultStructs>::template LexVisitContainer<GraphType, ListDefaultCPPAllocator,ListDefaultCPPAllocator> alpha(pula,pula);
 //                typename LexBFSPar<DefaultStructs>::template LexVisitContainer<GraphType, ListDefaultCPPAllocator,ListDefaultCPPAllocator> beta(pula,pula);
-                typename DefaultStructs::template AssocCont<typename GraphType::PVertex, LBSData>::Type vertData;
+                typename DefaultStructs::template AssocCont<typename GraphType::PVertex, LBSData>::Type vertData(g.getVertNo());
 
                 for(i = 0; i < n; i++) {
                     vertData[sigmap[i]].aOrder = i;

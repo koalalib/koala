@@ -34,7 +34,7 @@ class SearchStructs {
                 int dist = std::numeric_limits<int>::max(),
                 int comp = -1 );
 
-            template< class Rec > void get( Rec &r );
+//            template< class Rec > void get( Rec &r );
         } ;
 
 
@@ -344,7 +344,12 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 
         template< class GraphType >
         class VisitedMap: public DefaultStructs:: template AssocCont<
-            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type { } ;
+            typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type
+            {   public:
+                VisitedMap(int asize) :
+                    DefaultStructs:: template AssocCont<typename GraphType::PVertex, VisitVertLabs< GraphType > >
+                        ::Type ( asize) {}
+            } ;
 
         template< class GraphType, class VertContainer, class Visitor >
         static int visitAllBase(
@@ -748,8 +753,9 @@ namespace Privates {
         typedef List_const_iterator<T> const_iterator;
     //	typedef ListNode<T> ListNode;
 
-    //	List(): allocator()				{ Zero(); };
-        List(Allocator &a): allocator(a)		{ Zero(); };
+    	List(): allocator()	{ Zero(); }; // niebezpieczny, do tworzenia tablic list, nalezy natychmiast wykonac init
+    	void init(Allocator &a) { allocator=&a; }
+        List(Allocator &a): allocator(&a)		{ Zero(); };
         List(const List &lst): allocator(lst.allocator)	{ Zero(); *this = lst; };
         ~List()						{ clear(); };
 
@@ -807,6 +813,7 @@ namespace Privates {
         List &operator = (const List<T, Allocator> &lst) {
             const_iterator it, e;
             if(this == &lst) return *this;
+            if (!allocator) allocator=lst.allocator;
             clear();
             for(it = lst.begin(), e = lst.end(); it != e; ++it) push_back(*it);
             return *this;
@@ -903,7 +910,7 @@ namespace Privates {
         friend struct List_const_iterator<T>;
 
     private:
-        List(ListNode<T> *n, ListNode<T> *p, size_t c,Allocator &a): allocator(a) {
+        List(ListNode<T> *n, ListNode<T> *p, size_t c,Allocator *a): allocator(a) {
             m_root.next = n;
             m_root.prev = p;
             n->prev = (ListNode<T> *)&m_root;
@@ -918,7 +925,7 @@ namespace Privates {
             };
 
         ListNode<T> *NewElem() {
-            return allocator.template allocate<ListNode<T> >();
+            return allocator->template allocate<ListNode<T> >();
             };
 
         ListNode<T> *_find(const T &v) {
@@ -971,7 +978,7 @@ namespace Privates {
             if(empty()) return;
             if(p == (ListNode<T> *)&m_root) return;
             _unlink(p);
-            allocator.deallocate(p);
+            allocator->deallocate(p);
             m_count--;
             };
 
@@ -979,7 +986,7 @@ namespace Privates {
     private:
         BaseListNode<T> m_root;
         size_t m_count;
-        Allocator& allocator;
+        Allocator* allocator;
         };
 
 
@@ -998,20 +1005,6 @@ namespace Privates {
         return strm;
         };
 
-        template <class T>
-        class BlobObj {
-            private:
-                char blob[sizeof(T)];
-            public:
-                BlobObj() {}
-                T& content() {  return *((T*)blob); }
-        //        void init() { new ( &content() ) T; }
-                template <class A> void init(A& arg) { new ( &content() ) T(arg); }
-        //        template <class A,class B> void init(A arg1, B arg2) { new ( &content() ) T(arg1,arg2); }
-        //        template <class A,class B,class C> void init(A arg1, B arg2,C arg3) { new ( &content() ) T(arg1,arg2,arg3); }
-                ~BlobObj() { content().~T(); }
-
-        };
 
 }
 
@@ -1046,7 +1039,7 @@ public:
 		typename DefaultStructs::template AssocCont<typename Graph::PVertex, Privates::List_iterator<Node> >::Type m_vertexToPos;
 
 	public:
-		LexVisitContainer(Allocator& a, ContAllocator& ca): m_data(ca), m_splits(a), m_openBlock(), m_vertexToPos()	{ }
+		LexVisitContainer(Allocator& a, ContAllocator& ca,int n): m_data(ca), m_splits(a), m_openBlock(), m_vertexToPos(n)	{ }
 		~LexVisitContainer()						{ clear(); }
 
 		void clear() {
@@ -1162,10 +1155,11 @@ public:
 //        ListDefaultCPPAllocator2 allocat2;
 //		LexVisitContainer<GraphType, ListDefaultCPPAllocator,ListDefaultCPPAllocator2> cont(allocat,allocat2);
 
-		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1);
-        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1);
+        assert(((mask&Directed)==0)||((mask&Directed)==Directed)); // TODO: LexBFS ma sens dla gr. nieskierowanych, chyba?
+		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size?
+        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1); //TODO: size?
 		LexVisitContainer<GraphType, Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > >,Privates::ListBlockListAllocator<LVCNode<GraphType> > >
-            cont(allocat,allocat2);
+            cont(allocat,allocat2,g.getVertNo());
 
 
 		n = g.getVertNo();
@@ -1218,53 +1212,6 @@ public:
 		};
 
 
-/*
-	template<class GraphType,
-		 class OutVertIter>
-	static int order(const GraphType & g,
-			 size_t in,
-			 typename GraphType::PVertex *tab,
-			 EdgeDirection mask,
-			 OutVertIter out) {
-		unsigned int n, retVal;
-		typename GraphType::PEdge e;
-		typename GraphType::PVertex u, v;
-		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, bool>::Type visited;
-		LexVisitContainer<GraphType, ListDefaultCPPAllocator> cont;
-
-		n = g.getVertNo();
-		if(n == 0) return 0;
-		if(in == 0 || tab == NULL) {
-			v = g.getVert();
-			tab = &v;
-			in = 1;
-			};
-
-		retVal = 0;
-		cont.initialize(g, in, tab);
-
-//		cont.dump();
-
-		while(!cont.empty()) {
-			u = cont.top();
-			cont.pop();
-			visited[u] = true;
-			*out = u;
-			++out;
-			++retVal;
-
-			for(e = g.getEdge(u, mask); e != NULL; e = g.getEdgeNext(u, e, mask)) {
-				v = g.getEdgeEnd(e, u);
-				if(visited.hasKey(v)) continue;
-				visited[v] = true;
-				cont.move(v);
-				};
-			cont.done();
-//		cont.dump();
-			};
-		return retVal;
-		};
-*/
 
 	template<class GraphType>
 	struct OrderData {
@@ -1286,14 +1233,15 @@ public:
 		EdgeDirection bmask = mask;
 		typename GraphType::PEdge e;
 		typename GraphType::PVertex u, v;
-		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData;
-		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1);
+		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData(g.getVertNo());
+		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size?
         Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1);;
 		LexVisitContainer<GraphType, Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > >,Privates::ListBlockListAllocator<LVCNode<GraphType> > >
-            cont(allocat,allocat2);
+            cont(allocat,allocat2,g.getVertNo());
 
 		bmask &= ~EdLoop;
-		if(bmask & EdDirOut) bmask &= ~EdDirIn;
+//		if(bmask & EdDirOut) bmask &= ~EdDirIn; //TODO: watpliwe
+        assert(((bmask&Directed)==0)||((bmask&Directed)==Directed)); // TODO: LexBFS ma sens dla gr. nieskierowanych, chyba?
 
 		n = g.getVertNo();
 		assert(in == n);
@@ -1392,49 +1340,6 @@ public:
 
 
 class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
-
-//template <class DefaultStructs>
-//class LexBFSPar: public GraphSearchBase< LexBFSPar<DefaultStructs >, DefaultStructs >
-//{
-//    public:
-//        template< class Graph > class LexVisitContainer
-//        {
-//            public:
-//                LexVisitContainer(): m_sets(), m_splits(), m_vertexToListPos() { }
-//                ~LexVisitContainer() { clear(); }
-//
-//                void clear();
-//                bool empty() { return m_sets.empty(); }
-//
-//                void initialize( const Graph &, typename Graph::PVertex );
-//
-//                typename Graph::PVertex top() { return m_sets.front().first.front(); }
-//
-//                void pop();
-//                void push( typename Graph::PVertex v );
-//
-//                void step();
-//                void dump();
-//
-//            private:
-//                typedef std::list< typename Graph::PVertex > LexList;
-//                typedef std::pair< LexList,typename LexList::iterator > Node;
-//                typedef std::list< Node > NodeList;
-//                typename DefaultStructs:: template AssocCont< typename Graph::PVertex,
-//                    std::pair< typename NodeList::iterator,typename LexList::iterator > >::Type m_vertexToListPos;
-//                NodeList m_sets;
-//                typename NodeList::iterator m_lastSet;
-//                typename std::list< typename NodeList::iterator > m_splits;
-//        } ;
-//
-//        template< class GraphType, class VertContainer, class Visitor >
-//        static int visitBase(
-//            const GraphType &, typename GraphType::PVertex, VertContainer &,
-//            Visitor, EdgeDirection, int );
-//} ;
-//
-//class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
-
 
 
 /*
@@ -1629,14 +1534,37 @@ class BlocksPar : protected SearchStructs
             class CompIter, class VertIter, class VertBlockIter >
         static int split(
             const GraphType &, VertDataMap &, EdgeDataMap &,
-            CompStore< CompIter,VertIter >, VertBlockIter, EdgeDirection = EdAll );
+            CompStore< CompIter,VertIter >, VertBlockIter, EdgeType = EdAll );
 
         template< class GraphType, class VertDataMap, class EdgeDataMap,
             class CompIter, class VertIter, class VertBlockIter >
         static int splitComp(
             const GraphType &, typename GraphType::PVertex, VertDataMap &,
             EdgeDataMap &, CompStore< CompIter,VertIter >, VertBlockIter,
-            EdgeDirection = EdAll );
+            EdgeType = EdAll );
+
+        template<class GraphType,class Iterator>
+        static int core(const GraphType &g,Iterator out, EdgeType mask=EdAll)
+        {   mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
+            typename DefaultStructs:: template AssocCont<
+                typename GraphType::PVertex, int >::Type degs(g.getVertNo());
+            std::pair<int, typename GraphType::PVertex> LOCALARRAY(buf,2*g.getVertNo());
+            PriQueueInterface< std::pair<int, typename GraphType::PVertex>*,
+                    std::greater<std::pair<int, typename GraphType::PVertex> > > q(buf,2*g.getVertNo());
+            if (!g.getVertNo()) return 0;
+            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+                q.push(std::make_pair(degs[v]=g.deg(v,mask),v));
+            while(!q.empty() && q.top().first<=1)
+            {   if (!degs.hasKey(q.top().second)) { q.pop(); continue; }
+                typename GraphType::PVertex v=q.top().second,u;
+                typename GraphType::PEdge e=g.getEdge(v,mask);
+                degs.delKey(v);q.pop();
+                if (e && degs.hasKey(u=g.getEdgeEnd(e,v))) q.push(std::make_pair(--degs[u],u));
+            }
+            for(typename GraphType::PVertex v=degs.firstKey();v;v=degs.nextKey(v))
+            {   *out=v; ++ out;   }
+            return degs.size();
+        }
 } ;
 
 class Blocks : public BlocksPar<AlgorithmsDefaultSettings> {};
@@ -1710,7 +1638,7 @@ public:
 
     template<class GraphType>
 	static std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
-    ends(const GraphType &g,EdgeDirection mask=EdUndir)
+    ends(const GraphType &g,EdgeType mask=Undirected)
     {
         EdgeDirection symmask = mask | ((mask&(EdDirIn|EdDirOut)) ? EdDirIn|EdDirOut : 0);
         bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
@@ -1746,14 +1674,14 @@ public:
 
 	template<class GraphType>
 	static bool hasCycle(const GraphType &g,
-			     EdgeDirection mask = EdUndir) {
+			     EdgeType mask = Undirected) {
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		return res.first!=0 && res.first==res.second;
 	};
 
 	template<class GraphType>
 	static bool hasPath(const GraphType &g,
-			    EdgeDirection mask = EdUndir) {
+			    EdgeType mask = Undirected) {
         std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		return res.first!=0 && res.first!=res.second;
     };
@@ -1762,7 +1690,7 @@ public:
 	template<class GraphType>
 	static bool hasPath(const GraphType &g,
 			    typename GraphType::PVertex u,
-			    EdgeDirection mask = EdUndir) {
+			    EdgeType mask = Undirected) {
         assert(u);
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
@@ -1772,7 +1700,7 @@ public:
 	template<class GraphType>
 	static bool hasCycle(const GraphType &g,
 			    typename GraphType::PVertex u,
-			    EdgeDirection mask = EdUndir) {
+			    EdgeType mask = Undirected) {
         assert(u);
 		return hasCycle(g,mask) && g.deg(u,mask);
 		};
@@ -1782,10 +1710,10 @@ public:
 		 class EdgeIter>
 	static bool getCycle(const GraphType &g,
 			    OutPath<VertIter, EdgeIter> out,
-			    EdgeDirection mask = EdUndir) {
+			    EdgeType mask = Undirected) {
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		if (res.first==0 || res.first!=res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo());
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size?
 		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
 		eulerEngine<GraphType>(res.first, NULL, state);
 		eulerResult(state, out);
@@ -1798,11 +1726,11 @@ public:
 	static bool getCycle(const GraphType &g,
 			    typename GraphType::PVertex prefstart,
 			    OutPath<VertIter, EdgeIter> out,
-			    EdgeDirection mask = EdUndir) {
+			    EdgeType mask = Undirected) {
 
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		if (res.first==0 || res.first!=res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo());
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size?
 		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
 		eulerEngine<GraphType>(g.getEdge(prefstart,mask) ? prefstart : res.first, NULL, state);
 		eulerResult(state, out);
@@ -1815,10 +1743,10 @@ public:
 		 class EdgeIter>
 	static bool getPath(const GraphType &g,
 			   OutPath<VertIter, EdgeIter> out,
-			   EdgeDirection mask = EdUndir) {
+			   EdgeType mask = Undirected) {
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		if (res.first==0 || res.first==res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo());
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size?
 		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
 		eulerEngine<GraphType>(res.first, NULL, state);
 		eulerResult(state, out);
@@ -1832,10 +1760,10 @@ public:
 	static bool getPath(const GraphType &g,
 			    typename GraphType::PVertex prefstart,
 			   OutPath<VertIter, EdgeIter> out,
-			   EdgeDirection mask = EdUndir) {
+			   EdgeType mask = Undirected) {
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		if (res.first==0 || res.first==res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo());
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size?
 		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
 		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
 		eulerEngine<GraphType>((prefstart==res.second && !dir) ? res.second : res.first, NULL, state);

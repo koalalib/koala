@@ -18,70 +18,70 @@ protected:
 
 namespace Privates {
 
-template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+template<class VertInfo, class EdgeInfo, class Settings>
 class NormalParalLink {
     protected:
-            Edge<VertInfo,EdgeInfo,EdAllow> *n, *p;
+            Edge<VertInfo,EdgeInfo,Settings> *n, *p;
 
     public:
             NormalParalLink(): n(NULL), p(NULL) {}
-            Edge<VertInfo,EdgeInfo,EdAllow>* &nParal() { return n; }
-            Edge<VertInfo,EdgeInfo,EdAllow>* &pParal() { return p; }
+            Edge<VertInfo,EdgeInfo,Settings>* &nParal() { return n; }
+            Edge<VertInfo,EdgeInfo,Settings>* &pParal() { return p; }
 };
 
 
-template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
+template<class VertInfo, class EdgeInfo, class Settings>
 struct EmptyParalLink {
 
             EmptyParalLink() {}
-            Edge<VertInfo,EdgeInfo,EdAllow>* &nParal()
-                { return *(Edge<VertInfo,EdgeInfo,EdAllow>**)(&_KoalaEmptyEdgePoiner); }
-            Edge<VertInfo,EdgeInfo,EdAllow>* &pParal()
-                { return *(Edge<VertInfo,EdgeInfo,EdAllow>**)(&_KoalaEmptyEdgePoiner); }
+            Edge<VertInfo,EdgeInfo,Settings>* &nParal()
+                { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
+            Edge<VertInfo,EdgeInfo,Settings>* &pParal()
+                { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
 };
 
-template<class VertInfo, class EdgeInfo, EdgeType EdAllow, EdgeType Present>
+template<class VertInfo, class EdgeInfo, class Settings, bool Present>
 struct ParalLink;
 
-template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
-struct ParalLink<VertInfo,EdgeInfo,EdAllow,AdjMatrixAllowed> : public NormalParalLink<VertInfo,EdgeInfo,EdAllow>
+template<class VertInfo, class EdgeInfo, class Settings>
+struct ParalLink<VertInfo,EdgeInfo,Settings,true> : public NormalParalLink<VertInfo,EdgeInfo,Settings>
     {};
 
-template<class VertInfo, class EdgeInfo, EdgeType EdAllow>
-struct ParalLink<VertInfo,EdgeInfo,EdAllow,EdNone> : public EmptyParalLink<VertInfo,EdgeInfo,EdAllow>
+template<class VertInfo, class EdgeInfo, class Settings>
+struct ParalLink<VertInfo,EdgeInfo,Settings,false> : public EmptyParalLink<VertInfo,EdgeInfo,Settings>
     {};
 
 }
 
 
-template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, EdgeType EdAllow=EdAll|AdjMatrixAllowed>
+template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, class Settings = DefaultGrSettings<EdAll,true> >
 class Edge : public EdgeConst,
-             public GraphClassDefaultSettings::template EdgeAdditData<VertInfo,EdgeInfo,EdAllow>,
-             public Privates::ParalLink<VertInfo,EdgeInfo,EdAllow,EdAllow&AdjMatrixAllowed>
+             public Settings::template EdgeAdditData<VertInfo,EdgeInfo,Settings>,
+             public Privates::ParalLink<VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed>
 {
-	friend class Graph<VertInfo, EdgeInfo,EdAllow>;
-	friend class Vertex<VertInfo, EdgeInfo,EdAllow>;
-	friend class AdjMatrix<VertInfo, EdgeInfo,EdAllow,AdjMatrixAllowed&EdAllow>;
+	friend class Graph<VertInfo, EdgeInfo,Settings>;
+	friend class Vertex<VertInfo, EdgeInfo,Settings>;
+	friend class AdjMatrix<VertInfo, EdgeInfo,Settings,Settings::AdjMatrixAllowed>;
 
 public:
 
 	EdgeInfo info; ///< Additional user information in the edge.
 
-    std::pair<Vertex<VertInfo,EdgeInfo,EdAllow>*, Vertex<VertInfo,EdgeInfo,EdAllow>*>
+    std::pair<Vertex<VertInfo,EdgeInfo,Settings>*, Vertex<VertInfo,EdgeInfo,Settings>*>
         getEnds() { return std::make_pair(vert[0].vert, vert[1].vert); }
 
-    Vertex<VertInfo,EdgeInfo,EdAllow>* getEnd1() { return vert[0].vert; }
-    Vertex<VertInfo,EdgeInfo,EdAllow>* getEnd2() { return vert[1].vert; }
-    bool isEnd(Vertex<VertInfo,EdgeInfo,EdAllow>* v) { return vert[0].vert == v || vert[1].vert == v; }
+    Vertex<VertInfo,EdgeInfo,Settings>* getEnd1() { return vert[0].vert; }
+    Vertex<VertInfo,EdgeInfo,Settings>* getEnd2() { return vert[1].vert; }
+    bool isEnd(Vertex<VertInfo,EdgeInfo,Settings>* v) { return vert[0].vert == v || vert[1].vert == v; }
 
-    Vertex<VertInfo,EdgeInfo,EdAllow>* getEnd(Vertex<VertInfo,EdgeInfo,EdAllow>* v)
+    Vertex<VertInfo,EdgeInfo,Settings>* getEnd(Vertex<VertInfo,EdgeInfo,Settings>* v)
     {
         if (vert[0].vert == v) return vert[1].vert;
         if (vert[1].vert == v) return vert[0].vert;
         return NULL;
     }
 
-    EdgeDirection getDir(Vertex<VertInfo,EdgeInfo,EdAllow>* v)
+    EdgeDirection getDir(Vertex<VertInfo,EdgeInfo,Settings>* v)
     {
         if (!v || !isEnd( v )) return EdNone;
         switch (type)
@@ -102,7 +102,7 @@ public:
 
 private:
 	struct EdgeLink {
-		Vertex<VertInfo,EdgeInfo,EdAllow> *vert;
+		Vertex<VertInfo,EdgeInfo,Settings> *vert;
 		Edge *next, *prev;
 		EdgeLink(): vert(NULL), next(NULL), prev(NULL) {}
 	};
@@ -110,6 +110,10 @@ private:
 	Edge();
 	/** Constructor sets info variable. */
 	Edge(const EdgeInfo &);
+
+	// klasa niekopiowalna
+	Edge(const Edge& X) {}
+	Edge& operator=(const Edge& X) {}
 
 	~Edge() {}
 

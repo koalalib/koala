@@ -69,7 +69,8 @@ int main() {
 //	List<int> l(all);
 
     ball.allocate<Privates::ListNode<int> >();
-    Privates::List<int,Privates::ListBlockListAllocator<int> > l(ball);
+    Privates::List<int,Privates::ListBlockListAllocator<int> > l,l2();
+    l.init(ball);
 	Privates::List<int,Privates::ListBlockListAllocator<int> >::iterator it;
 	for(j = 0; j < 19; j++) {
 		l.clear();
@@ -79,9 +80,9 @@ int main() {
 			printf("%d ", *it);
 			};
 		printf("\n");
-		Privates::List<int,Privates::ListBlockListAllocator<int> > l2(ball);
+		Privates::List<int,Privates::ListBlockListAllocator<int> > l2;
 		l2=l;
-
+        cout << l2;
 
 		Privates::List<int> l3(all);
 		l3.copy(l2);
