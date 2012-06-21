@@ -795,7 +795,6 @@ class KruskalPar {
         Iter out,
         VertCompContainer& asets,
         int edgeNo, //ujemne oznacza maksymalnie duzo
-        EdgeDirection mask,
         bool minWeight)
         {   JoinableSets<typename GraphType::PVertex, typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 JSPartDesrc<typename GraphType::PVertex> *>::Type > localSets;
@@ -815,7 +814,7 @@ class KruskalPar {
             if (g.getVertNo()==0) return res;
             for(typename GraphType::PVertex v = g.getVert(); v ; v = g.getVertNext(v)) sets.makeSinglet(v);
 
-            mask&=(~EdLoop);
+            const EdgeDirection mask=EdUndir;
             edgeNo = (edgeNo>=0) ? edgeNo : g.getVertNo()-1;
             if (g.getEdgeNo(mask)==0||edgeNo==0) return res;
 
@@ -853,10 +852,9 @@ class KruskalPar {
         EdgeContainer& edgeTab,
         Iter out,
         VertCompContainer& asets,
-        int edgeNo=-1, //ujemne oznacza maksymalnie duzo
-        EdgeDirection mask=EdUndir)
+        int edgeNo=-1) //ujemne oznacza maksymalnie duzo
     {
-        return getForest(g,edgeTab,out,asets,edgeNo,mask,true);
+        return getForest(g,edgeTab,out,asets,edgeNo,true);
     }
 
 
@@ -875,10 +873,10 @@ class KruskalPar {
         EdgeContainer& edgeTab,
         Iter out,
         VertCompContainer& asets,
-        int edgeNo=-1, //ujemne oznacza maksymalnie duzo
-        EdgeDirection mask=EdUndir)
+        int edgeNo=-1) //ujemne oznacza maksymalnie duzo
+
     {
-        return getForest(g,edgeTab,out,asets,edgeNo,mask,false);
+        return getForest(g,edgeTab,out,asets,edgeNo,false);
     }
 
 

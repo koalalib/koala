@@ -47,9 +47,13 @@ std::istream& operator>>(std::istream& is,EmptyEdgeInfo arg) { return is; }
 std::ostream& operator<<(std::ostream& os,EmptyEdgeInfo arg) { return os; }
 
 
-template< class VertInfo, class EdgeInfo, EdgeType > class Graph;
-template< class VertInfo, class EdgeInfo, EdgeType > class Vertex;
-template< class VertInfo, class EdgeInfo, EdgeType > class Edge;
+//template< class VertInfo, class EdgeInfo, EdgeType > class Graph;
+//template< class VertInfo, class EdgeInfo, EdgeType > class Vertex;
+//template< class VertInfo, class EdgeInfo, EdgeType > class Edge;
+
+template< class VertInfo, class EdgeInfo, class Settings> class Graph;
+template< class VertInfo, class EdgeInfo, class Settings> class Vertex;
+template< class VertInfo, class EdgeInfo, class Settings> class Edge;
 
 
 class AlgorithmsDefaultSettings {
@@ -147,6 +151,7 @@ template <class Cont2> struct BlackHoleSwitch<BlackHole, Cont2 > {
     typedef Cont2 Type;
     static Cont2& get(BlackHole& a, Cont2& b) { return b; }
 };
+
 
 
 template <class Container> class StackInterface;

@@ -1258,7 +1258,7 @@ class ConnectParAlgsDefaultStructs : public FlowAlgsDefaultStructs {
 
     template <class A, class B> class LocalGraph {
         public:
-        typedef Graph<A,B,EdDirIn|EdDirOut> Type;
+        typedef Graph<A,B,DefaultGrSettings<EdDirIn|EdDirOut,false> > Type;
 //              typedef Graph<A,B> Type; // wersja bez trzeciego par. szablonu grafu
     };
 
