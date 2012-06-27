@@ -55,6 +55,72 @@ class SearchStructs {
  *
  * ------------------------------------------------------------------------- */
 
+/** visitor's code is called by searching algorithms (BFS, DFS, LexBFS)
+ * visitor should inherit from one of:
+ * - simple_visitor_tag 
+ * - simple_preorder_visitor_tag
+ * - simple_postorder_visitor_tag
+ * - complex_visitor_tag
+ * and one of:
+ * - component_visitor_tag
+ * - no_component_visitor_tag
+ *
+ * simple visitors (inheriting from simple_*_tag) have operator() called
+ * with the following arguments:
+ * template< class GraphType >
+ * bool operator()(const GraphType &g,
+ * 		   typename GraphType::PVertex u,
+ * 		   VisitVertLabs< GraphType > &data)
+ * where g - graph containing vertex, u - visited vertex, data - visited vertex's data
+ * returning true allows to continue search, retrurning false terminate
+ * searching algorithm
+ * simple_preorder_visitor_tag indicate to visit vertex before its neighbourrs
+ * simple_postorder_visitor_tag indicate to visit vertex after its neighbourrs
+ * simple_visitor_tag do not specify the order
+ *
+ * complex visitors are notified by a searching algorithm using following methods:
+ * (g - graph containing vertex, u - visited vertex,
+ *  data - visited vertex's data, e - visited edge, v - vertex from which we
+ *  visit edge e)
+ *
+ * template< class GraphType >
+ * bool visitVertexPre(const GraphType &g,
+ * 		       typename GraphType::PVertex u,
+ * 		       VisitVertLabs< GraphType > &data);
+ * called before visiting u's neighbours
+ * returning false prevents visiting u's neighbours
+ *
+ * template< class GraphType >
+ * bool visitVertexPost(const GraphType &g,
+ * 			typename GraphType::PVertex u,
+ * 			VisitVertLabs< GraphType > &data);
+ * called after visiting u's neighbours
+ * returning false terminates searching
+ *
+ * template< class GraphType >
+ * bool visitEdgePre(const GraphType &g,
+ * 		     typename GraphType::PEdge e,
+ * 		     typename GraphType::PVertex v);
+ * called before visiting other end of e
+ * returning false prevents visiting vertex on the other end of e
+ *
+ * template< class GraphType >
+ * bool visitEdgePost(const GraphType &g,
+ * 		      typename GraphType::PEdge e,
+ * 		      typename GraphType::PVertex v);
+ * called after visiting other end of e
+ * returning false terminates searching
+ *
+ * visitors with component_visitor_tag are notified about components with
+ * methods:
+ * template< class GraphType >
+ * bool beginComponent(const GraphType &g, unsigned compid);
+ * template< class GraphType >
+ * bool endComponent(const GraphType &g, unsigned compid);
+ * where g is the visited graph and compid is the component number (starting from 0)
+ * return values are ignored (TODO: u¿yæ albo zmieniæ na void)
+ *
+ */
 class Visitors: public SearchStructs {
     public:
         class component_visitor_tag { } ;
@@ -351,53 +417,115 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
                         ::Type ( asize) {}
             } ;
 
+	/** visit all vertices in a graph
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visitor visitor called for each vertex
+	 * @param[in] dir direction of edges to consider
+	 * @return number of components
+	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int visitAllBase(
-            const GraphType &, VertContainer &, Visitor, EdgeDirection );
+            const GraphType &g, VertContainer &visited, Visitor visitor, EdgeDirection dir);
 
+	/** visit all vertices in the same component as a given vertex
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] src given vertex
+	 * @param[out] out iterator to write vertices to
+	 * @param[in] dir direction of edges to consider
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @return number of visited vertices
+	 */
         template< class GraphType, class VertContainer, class Iter >
         static int scanAttainable(
             const GraphType &, typename GraphType::PVertex, Iter,
             EdgeDirection, VertContainer & );
 
+	/** visit all vertices in the same component as a given vertex
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] src given vertex
+	 * @param[out] out iterator to write vertices to
+	 * @param[in] dir direction of edges to consider
+	 * @return number of visited vertices
+	 */
         template< class GraphType, class VertIter >
         static int scanAttainable(
-            const GraphType &, typename GraphType::PVertex, VertIter,
-            EdgeDirection = EdUndir | EdDirOut );
+            const GraphType &g, typename GraphType::PVertex src, VertIter out,
+            EdgeDirection dir = EdUndir | EdDirOut );
 
+	/** visit all vertices in a graph
+	 * @param[in] g graph containing vertices to visit
+	 * @param[out] out iterator to write vertices to
+	 * @param[in] dir direction of edges to consider
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @return number of visited vertices
+	 */
         template< class GraphType, class VertContainer, class VertIter >
         static int scan(
-            const GraphType &, VertIter, EdgeDirection, VertContainer & );
+            const GraphType &g, VertIter out, EdgeDirection dir, VertContainer &visited);
 
+	/** visit all vertices in a graph
+	 * @param[in] g graph containing vertices to visit
+	 * @param[out] out iterator to write vertices to
+	 * @param[in] dir direction of edges to consider
+	 * @return number of visited vertices
+	 */
         template< class GraphType, class VertIter >
         static int scan(
-            const GraphType &, VertIter,
-            EdgeDirection = EdDirOut | EdUndir | EdDirIn );
+            const GraphType &g, VertIter out,
+            EdgeDirection dir = EdDirOut | EdUndir | EdDirIn );
 
+	/** TODO */
         template< class GraphType>
         static int cyclNo(
             const GraphType &, EdgeDirection = EdAll );
 
+	/** return all vertices in the same component as a given vertex
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] src given vertex
+	 * @return set of vertices in the component
+	 */
         template< class GraphType >
         static Set< typename GraphType::PVertex > getAttainableSet(
-            const GraphType &, typename GraphType::PVertex,
-            EdgeDirection = EdDirOut | EdUndir );
+            const GraphType &g, typename GraphType::PVertex src,
+            EdgeDirection dir = EdDirOut | EdUndir );
 
+	/** find a path between vertices
+	 * @param[in] g graph to search path in
+	 * @param[in] src starting vertex
+	 * @param[in] dest target vertex
+	 * @param[out] path found path
+	 * @param[in] dir direction of edges to consider
+	 * @return length of the path
+	 */
         template< class GraphType, class VertIter, class EdgeIter >
         static int getPath(
-            const GraphType &, typename GraphType::PVertex,
-            typename GraphType::PVertex, OutPath< VertIter,EdgeIter >,
-            EdgeDirection = EdUndir | EdDirOut );
+            const GraphType &g, typename GraphType::PVertex src,
+            typename GraphType::PVertex dest, OutPath< VertIter,EdgeIter >path,
+            EdgeDirection dir = EdUndir | EdDirOut );
 
+	/** split graph into components
+	 * @param[in] g graph to split
+	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
+	 * @param[in] dir direction of edges to consider
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @return number of components
+	 */
         template< class GraphType, class VertContainer, class CompIter, class VertIter >
         static int getComponents(
-            const GraphType &, CompStore< CompIter,VertIter >, EdgeDirection,
-            VertContainer & );
+            const GraphType &g, CompStore< CompIter,VertIter > out,
+	    EdgeDirection dir, VertContainer &visited );
 
+	/** split graph into components
+	 * @param[in] g graph to split
+	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
+	 * @param[in] dir direction of edges to consider
+	 * @return number of components
+	 */
         template< class GraphType, class CompIter, class VertIter >
         static int getComponents(
-            const GraphType &, CompStore< CompIter,VertIter >,
-            EdgeDirection = EdUndir | EdDirOut | EdDirIn );
+            const GraphType &g, CompStore< CompIter,VertIter > out,
+            EdgeDirection dir = EdUndir | EdDirOut | EdDirIn );
 } ;
 
 /*
@@ -431,10 +559,19 @@ class DFSBase: public GraphSearchBase< SearchImpl , DefaultStructs >
             typename GraphType::PVertex, unsigned );
 
     public:
+	/** visit all vertices in the same component as a given vertex
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] src given vertex
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visitor visitor called for each vertex
+	 * @param[in] dir direction of edges to consider
+	 * @param[in] compid component identifier (give 0 if don't know)
+	 * @return number of visited vertices
+	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int dfsVisitBase(
-            const GraphType &, typename GraphType::PVertex, VertContainer &,
-            Visitor, EdgeDirection, int );
+            const GraphType &g, typename GraphType::PVertex src, VertContainer &visited,
+            Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
 /*
@@ -445,10 +582,19 @@ template <class DefaultStructs >
 class DFSPar: public DFSBase< DFSPar<DefaultStructs >, DefaultStructs >
 {
     public:
+	/** visit all vertices in the same component as a given vertex
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] src given vertex
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visitor visitor called for each vertex
+	 * @param[in] dir direction of edges to consider
+	 * @param[in] compid component identifier (give 0 if don't know)
+	 * @return number of visited vertices
+	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int visitBase(
-            const GraphType &, typename GraphType::PVertex, VertContainer &,
-            Visitor, EdgeDirection, int );
+            const GraphType &g, typename GraphType::PVertex src, VertContainer &visited,
+            Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
 
@@ -473,10 +619,19 @@ class DFSPreorderPar: public DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStr
             Visitor, EdgeDirection, int, Visitors::simple_visitor_tag & );
 
     public:
+	/** visit all vertices in the same component as a given vertex
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] src given vertex
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visitor visitor called for each vertex
+	 * @param[in] dir direction of edges to consider
+	 * @param[in] compid component identifier (give 0 if don't know)
+	 * @return number of visited vertices
+	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int visitBase(
-            const GraphType &, typename GraphType::PVertex, VertContainer &,
-            Visitor, EdgeDirection, int );
+            const GraphType &g, typename GraphType::PVertex src, VertContainer &visited,
+            Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
 class DFSPreorder : public DFSPreorderPar<AlgorithmsDefaultSettings> {};
@@ -500,10 +655,19 @@ class DFSPostorderPar: public DFSBase< DFSPostorderPar<DefaultStructs >, Default
             Visitor, EdgeDirection, int, Visitors::simple_visitor_tag & );
 
     public:
+	/** visit all vertices in the same component as a given vertex
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] src given vertex
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visitor visitor called for each vertex
+	 * @param[in] dir direction of edges to consider
+	 * @param[in] compid component identifier (give 0 if don't know)
+	 * @return number of visited vertices
+	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int visitBase(
-            const GraphType &, typename GraphType::PVertex, VertContainer &,
-            Visitor, EdgeDirection, int );
+            const GraphType &g, typename GraphType::PVertex src, VertContainer &visited,
+            Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
 class DFSPostorder: public DFSPostorderPar<AlgorithmsDefaultSettings> {};
@@ -522,10 +686,19 @@ class BFSPar: public GraphSearchBase< BFSPar<DefaultStructs >, DefaultStructs >
             Visitor, EdgeDirection, int );
 
     public:
+	/** visit all vertices in the same component as a given vertex
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] src given vertex
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visitor visitor called for each vertex
+	 * @param[in] dir direction of edges to consider
+	 * @param[in] compid component identifier (give 0 if don't know)
+	 * @return number of visited vertices
+	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int visitBase(
-            const GraphType &, typename GraphType::PVertex, VertContainer &,
-            Visitor, EdgeDirection, int );
+            const GraphType &g, typename GraphType::PVertex src, VertContainer &visited,
+            Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
 class BFS: public BFSPar<AlgorithmsDefaultSettings> {};
@@ -1139,6 +1312,15 @@ public:
 
     public:
 
+	/** visit all vertices in the same component as a given vertex
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] src given vertex
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visitor visitor called for each vertex
+	 * @param[in] dir direction of edges to consider
+	 * @param[in] compid component identifier (give 0 if don't know)
+	 * @return number of visited vertices
+	 */
 	template<class GraphType,
 		 class VertContainer,
 		 class Visitor>
@@ -1156,8 +1338,8 @@ public:
 //		LexVisitContainer<GraphType, ListDefaultCPPAllocator,ListDefaultCPPAllocator2> cont(allocat,allocat2);
 
         assert(((mask&Directed)==0)||((mask&Directed)==Directed)); // TODO: LexBFS ma sens dla gr. nieskierowanych, chyba?
-		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size?
-        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1); //TODO: size?
+		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size? - spr
+        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(g.getVertNo()+1); //TODO: size? - spr 2n+1 -> n+1
 		LexVisitContainer<GraphType, Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > >,Privates::ListBlockListAllocator<LVCNode<GraphType> > >
             cont(allocat,allocat2,g.getVertNo());
 
@@ -1221,6 +1403,14 @@ public:
 		};
 
 
+	/** order vertices with LexBFS order, starting with a given sequence
+	 * @param[in] g graph
+	 * @param[in] in number of vertices in table tab
+	 * @param[in] tab table containing initial order of vertices
+	 * @param[in] mask direction of edges to consider
+	 * @param[out] out iterator to write ordered vertices
+	 * @return number of vertices written to out
+	 */
 	template<class GraphType,
 		 class OutVertIter>
 	static int order2(const GraphType & g,
@@ -1234,8 +1424,8 @@ public:
 		typename GraphType::PEdge e;
 		typename GraphType::PVertex u, v;
 		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData(g.getVertNo());
-		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size?
-        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1);;
+		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size? - spr
+        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(g.getVertNo()+1); // j.w. 2n+1 -> n + 1
 		LexVisitContainer<GraphType, Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > >,Privates::ListBlockListAllocator<LVCNode<GraphType> > >
             cont(allocat,allocat2,g.getVertNo());
 
@@ -1343,7 +1533,7 @@ class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
 
 
 /*
- * Cheriyanâ€“Mehlhorn/Gabow algorithm
+ * Cheriyan/Mehlhorn/Gabow algorithm
  */
 
 template <class DefaultStructs>
@@ -1404,9 +1594,15 @@ class SCCPar: protected SearchStructs
         } ;
 
     public:
+	/** split graph into strongly connected components
+	 * @param[in] g graph to split
+	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
+	 * @param[out] vtoc map (PVertex -> int indexOfItsComponent(zero based))
+	 * @return number of components
+	 */
         template< class GraphType, class CompIter, class VertIter, class CompMap >
         static int get(
-            const GraphType &, CompStore< CompIter,VertIter >, CompMap & );
+            const GraphType &g, CompStore< CompIter,VertIter > out, CompMap & vtoc);
 
         template< class GraphType, class CompMap, class PairIter >
         static int connections(const GraphType &, CompMap &, PairIter );
@@ -1530,41 +1726,37 @@ class BlocksPar : protected SearchStructs
             VertData( int b = 0, int f = -1 ): blockNo( b ), firstBlock( f ) { }
         } ;
 
+	/** split graph into blocks
+	 * @param[in] g graph to split
+	 * @param[out] vmap ???
+	 * @param[out] emap ???
+	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
+	 * @param[out] viter ???
+	 * @param[in] type type of edges to consider
+	 * @return number of components
+	 */
         template< class GraphType, class VertDataMap, class EdgeDataMap,
             class CompIter, class VertIter, class VertBlockIter >
         static int split(
-            const GraphType &, VertDataMap &, EdgeDataMap &,
-            CompStore< CompIter,VertIter >, VertBlockIter, EdgeType = EdAll );
+            const GraphType &g, VertDataMap &, EdgeDataMap &,
+            CompStore< CompIter,VertIter > out, VertBlockIter, EdgeType type = EdAll );
 
+	/** split a component containing given vertex into blocks
+	 * @param[in] g graph to split
+	 * @param[in] src given vertex
+	 * @param[out] vmap ???
+	 * @param[out] emap ???
+	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
+	 * @param[out] viter ???
+	 * @param[in] type type of edges to consider
+	 * @return number of components
+	 */
         template< class GraphType, class VertDataMap, class EdgeDataMap,
             class CompIter, class VertIter, class VertBlockIter >
         static int splitComp(
-            const GraphType &, typename GraphType::PVertex, VertDataMap &,
-            EdgeDataMap &, CompStore< CompIter,VertIter >, VertBlockIter,
-            EdgeType = EdAll );
-
-        template<class GraphType,class Iterator>
-        static int core(const GraphType &g,Iterator out, EdgeType mask=EdAll)
-        {   mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
-            typename DefaultStructs:: template AssocCont<
-                typename GraphType::PVertex, int >::Type degs(g.getVertNo());
-            std::pair<int, typename GraphType::PVertex> LOCALARRAY(buf,2*g.getVertNo());
-            PriQueueInterface< std::pair<int, typename GraphType::PVertex>*,
-                    std::greater<std::pair<int, typename GraphType::PVertex> > > q(buf,2*g.getVertNo());
-            if (!g.getVertNo()) return 0;
-            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-                q.push(std::make_pair(degs[v]=g.deg(v,mask),v));
-            while(!q.empty() && q.top().first<=1)
-            {   if (!degs.hasKey(q.top().second)) { q.pop(); continue; }
-                typename GraphType::PVertex v=q.top().second,u;
-                typename GraphType::PEdge e=g.getEdge(v,mask);
-                degs.delKey(v);q.pop();
-                if (e && degs.hasKey(u=g.getEdgeEnd(e,v))) q.push(std::make_pair(--degs[u],u));
-            }
-            for(typename GraphType::PVertex v=degs.firstKey();v;v=degs.nextKey(v))
-            {   *out=v; ++ out;   }
-            return degs.size();
-        }
+            const GraphType &g, typename GraphType::PVertex src, VertDataMap &vmap,
+            EdgeDataMap &emap, CompStore< CompIter,VertIter > out, VertBlockIter viter,
+            EdgeType type = EdAll );
 } ;
 
 class Blocks : public BlocksPar<AlgorithmsDefaultSettings> {};
@@ -1643,7 +1835,7 @@ public:
         EdgeDirection symmask = mask | ((mask&(EdDirIn|EdDirOut)) ? EdDirIn|EdDirOut : 0);
         bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
         assert(!(dir && (mask&EdUndir)));
-        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> zero(0,0),res(0,0);
+        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> zero((typename GraphType::PVertex)0,(typename GraphType::PVertex)0),res((typename GraphType::PVertex)0,(typename GraphType::PVertex)0);
         typename GraphType::PVertex x;
         int licz=0;
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
@@ -1672,6 +1864,10 @@ public:
         else return std::pair<typename GraphType::PVertex,typename GraphType::PVertex>(x,x) ;
     }
 
+	/** test if graph has an Eulerian cycle
+	 * @param[in] g graph
+	 * @param[in] mask type of edges to consider
+	 * @return true if it has, false otherwise */
 	template<class GraphType>
 	static bool hasCycle(const GraphType &g,
 			     EdgeType mask = Undirected) {
@@ -1679,6 +1875,10 @@ public:
 		return res.first!=0 && res.first==res.second;
 	};
 
+	/** test if graph has an Eulerian path
+	 * @param[in] g graph
+	 * @param[in] mask type of edges to consider
+	 * @return true if it has, false otherwise */
 	template<class GraphType>
 	static bool hasPath(const GraphType &g,
 			    EdgeType mask = Undirected) {
@@ -1686,7 +1886,11 @@ public:
 		return res.first!=0 && res.first!=res.second;
     };
 
-	// test if graph has an eulerian path starting at vertex u
+	/** test if graph has an Eulerian path starting at vertex u
+	 * @param[in] g graph
+	 * @param[in] u starting vertex
+	 * @param[in] mask type of edges to consider
+	 * @return true if it has, false otherwise */
 	template<class GraphType>
 	static bool hasPath(const GraphType &g,
 			    typename GraphType::PVertex u,
@@ -1697,6 +1901,11 @@ public:
 		return (res.first==u ||(!dir && res.second==u));
 		};
 
+	/** test if graph has an Eulerian cycle containing vertex u
+	 * @param[in] g graph
+	 * @param[in] u given vertex
+	 * @param[in] mask type of edges to consider
+	 * @return true if it has, false otherwise */
 	template<class GraphType>
 	static bool hasCycle(const GraphType &g,
 			    typename GraphType::PVertex u,
@@ -1705,6 +1914,11 @@ public:
 		return hasCycle(g,mask) && g.deg(u,mask);
 		};
 
+	/** get Eulerian cycle
+	 * @param[in] g graph
+	 * @param[out] out found cycle
+	 * @param[in] mask type of edges to consider
+	 * @return true if graph has an Eulerian cycle, false otherwise */
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
@@ -1713,13 +1927,19 @@ public:
 			    EdgeType mask = Undirected) {
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		if (res.first==0 || res.first!=res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size?
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
 		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
 		eulerEngine<GraphType>(res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
 		};
 
+	/** get Eulerian cycle
+	 * @param[in] g graph
+	 * @param[in] prefstart preferred starting vertex
+	 * @param[out] out found cucle
+	 * @param[in] mask type of edges to consider
+	 * @return true if graph has an Eulerian cycle, false otherwise */
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
@@ -1730,7 +1950,7 @@ public:
 
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		if (res.first==0 || res.first!=res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size?
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
 		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
 		eulerEngine<GraphType>(g.getEdge(prefstart,mask) ? prefstart : res.first, NULL, state);
 		eulerResult(state, out);
@@ -1738,6 +1958,11 @@ public:
         };
 
 
+	/** get Eulerian path
+	 * @param[in] g graph
+	 * @param[out] out found path
+	 * @param[in] mask type of edges to consider
+	 * @return true if graph has an Eulerian cycle, false otherwise */
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
@@ -1746,7 +1971,7 @@ public:
 			   EdgeType mask = Undirected) {
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		if (res.first==0 || res.first==res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size?
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
 		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
 		eulerEngine<GraphType>(res.first, NULL, state);
 		eulerResult(state, out);
@@ -1754,6 +1979,12 @@ public:
 		};
 
 
+	/** get Eulerian path
+	 * @param[in] g graph
+	 * @param[in] prefstart preferred starting vertex
+	 * @param[out] out found path
+	 * @param[in] mask type of edges to consider
+	 * @return true if graph has an Eulerian cycle, false otherwise */
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
@@ -1763,7 +1994,7 @@ public:
 			   EdgeType mask = Undirected) {
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
 		if (res.first==0 || res.first==res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size?
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
 		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
 		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
 		eulerEngine<GraphType>((prefstart==res.second && !dir) ? res.second : res.first, NULL, state);
@@ -1775,7 +2006,7 @@ public:
 
 class Euler : public EulerPar<AlgorithmsDefaultSettings> {};
 
-#include "search.hpp"
+#include "../algorithm/search.hpp"
 
 
 

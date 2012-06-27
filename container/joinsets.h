@@ -3,9 +3,9 @@
 
 #include <map>
 #include <cassert>
-#include "set.h"
-#include "localarray.h"
-#include "assoctab.h"
+#include "../container/set.h"
+#include "../container/localarray.h"
+#include "../container/assoctab.h"
 
 namespace Koala {
 
@@ -92,7 +92,7 @@ struct JoinableSetsVectIntSwitch< JoinableSets<ITEM, AssocArray<ITEM, JSPartDesr
 };
 
 
-#include "joinsets.hpp"
+#include "../container/joinsets.hpp"
 
 }
 

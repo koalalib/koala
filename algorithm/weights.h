@@ -213,22 +213,22 @@ class DijkstraPar : public ShortPathStructs {
             Queue(std::pair<Key,typename Container::ValType::DistType>* wsk,int max) : q(wsk,max) {}
 
             void setDist(Key v,typename Container::ValType::DistType d)
-            {  (operator[](v)).distance=d;
+            {  (this->operator[](v)).distance=d;
                 q.push(std::make_pair(v,d));
             }
 
             typename Container::ValType::DistType getDist(Key v)
             {
-                if (!hasKey(v)) return
+                if (!this->hasKey(v)) return
                     DefaultStructs::template NumberTypeBounds<typename Container::ValType::DistType>
                                     ::plusInfty();
-                else return (operator[](v)).distance;
+                else return (this->operator[](v)).distance;
             }
 
             std::pair<Key,typename Container::ValType::DistType> min()
             {
                 std::pair<Key,typename Container::ValType::DistType> res;
-                while (!hasKey( (res=q.top()).first)) q.pop();
+                while (!this->hasKey( (res=q.top()).first)) q.pop();
                 return res;
             }
     };

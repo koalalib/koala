@@ -15,7 +15,7 @@ JoinableSets< ITEM,AssocContainer >::JoinableSets(
 {
     if (!maxsize) bufor = 0;
     else bufor = new JSPartDesrc< ITEM >[maxsize];
-    for( int i = 0; i < siz; i++ )
+    for( unsigned int i = 0; i < siz; i++ )
     {
         bufor[i].deg = s.bufor[i].deg;
         bufor[i].size = s.bufor[i].size;
@@ -39,7 +39,7 @@ JoinableSets< ITEM,AssocContainer >::operator=(
 //    mapa.clear();
     siz = s.siz;
     part_no = s.part_no;
-    for( int i = 0; i < siz; i++ )
+    for( unsigned int i = 0; i < siz; i++ )
     {
         bufor[i].deg = s.bufor[i].deg;
         bufor[i].size = s.bufor[i].size;

@@ -128,8 +128,10 @@ class Subgraph: public SubgraphBase
         int edgePos( PEdge ) const;
 
         int deg( PVertex, EdgeDirection = EdAll ) const;
-        std::pair< typename Graph::PVertex,int > minDeg( EdgeDirection = EdAll ) const;
-        std::pair< typename Graph::PVertex,int > maxDeg( EdgeDirection = EdAll ) const;
+//        std::pair< typename Graph::PVertex,int > minDeg( EdgeDirection = EdAll ) const;
+//        std::pair< typename Graph::PVertex,int > maxDeg( EdgeDirection = EdAll ) const;
+        std::pair< PVertex,int > minDeg( EdgeDirection = EdAll ) const;
+        std::pair< PVertex,int > maxDeg( EdgeDirection = EdAll ) const;
         int Delta( EdgeDirection = EdAll ) const;
         int delta( EdgeDirection = EdAll ) const;
         bool areParallel( PEdge, PEdge, EdgeDirection = EdUndir ) const;

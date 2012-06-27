@@ -8,12 +8,17 @@
 
 #include "../graph/graph.h"
 #include "../tinyxml/tinyxml.h"
-#include "../base/kstd.h"
+//#include "../base/kstd.h"
 #include <map>
 #include <string>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
+
+#if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__)
+#define atoll		_atoi64
+typedef __int64 int64_t;
+#endif
 
 namespace Koala {
 namespace IO {

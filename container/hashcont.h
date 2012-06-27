@@ -9,9 +9,12 @@
 #include <cassert>
 #include <limits>
 
-#ifndef __GNUC__
+#if !defined(__GNUC__) && !defined(__INTEL_COMPILER)
 typedef unsigned __int64	uint64_t;
 typedef unsigned __int32	uint32_t;
+#endif
+#ifdef __INTEL_COMPILER
+#include<stdint.h>
 #endif
 
 namespace Koala {
