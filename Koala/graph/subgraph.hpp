@@ -242,7 +242,7 @@ template< class Graph, class VChooser, class EChooser >
 std::pair< typename Graph::PEdge,int >
 Subgraph< Graph,VChooser,EChooser >::maxMu( EdgeDirection reltype) const
 {
-    std::pair< typename Graph::PEdge,int > res(0,0);
+    std::pair< typename Graph::PEdge,int > res((typename Graph::PEdge)0,0);
     if (!(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir) || !getEdgeNo(EdAll)) return res;
     Parals3 LOCALARRAY(edges,getEdgeNo(EdAll));
     int i=0,l=0;
@@ -300,11 +300,20 @@ Subgraph< Graph,VChooser,EChooser >::getIndEdgeSet(const Set<typename Graph::PVe
     return res;
 }
 
+
 template< class Graph, class VChooser, class EChooser >
-std::pair< typename Graph::PVertex,int >
+Subgraph< Graph,VChooser,EChooser > makeSubgraph(
+    const Graph &g, const std::pair< VChooser,EChooser > &chs )
+{
+    return Subgraph< Graph,VChooser,EChooser >( g,chs );
+}
+
+template< class Graph, class VChooser, class EChooser >
+//std::pair< typename Graph::PVertex,int >
+std::pair< typename Subgraph< Graph,VChooser,EChooser >::PVertex,int >
 Subgraph< Graph,VChooser,EChooser >::maxDeg( EdgeDirection direct ) const
 {
-    std::pair< typename Graph::PVertex,int > res( 0,-1 );
+    std::pair< typename Graph::PVertex,int > res( (typename Graph::PVertex)0,-1 );
     if (!getVertNo()) return res;
     else
     {
@@ -326,10 +335,11 @@ int Subgraph< Graph,VChooser,EChooser >::delta( EdgeDirection direct ) const
 }
 
 template< class Graph, class VChooser, class EChooser >
-std::pair< typename Graph::PVertex,int >
+//std::pair< typename Graph::PVertex,int >
+std::pair< typename Subgraph< Graph,VChooser,EChooser >::PVertex,int >
 Subgraph< Graph,VChooser,EChooser >::minDeg( EdgeDirection direct ) const
 {
-    std::pair< typename Graph::PVertex,int > res( 0,-1 );
+    std::pair< typename Graph::PVertex,int > res( (typename Graph::PVertex)0,-1 );
     if (!getVertNo()) return res;
     else
     {
@@ -646,11 +656,4 @@ int Subgraph< Graph,VChooser,EChooser >::edgePos( PEdge edge ) const
         ++idx;
     }
     return tmp_edge ? idx : -1;
-}
-
-template< class Graph, class VChooser, class EChooser >
-Subgraph< Graph,VChooser,EChooser > makeSubgraph(
-    const Graph &g, const std::pair< VChooser,EChooser > &chs )
-{
-    return Subgraph< Graph,VChooser,EChooser >( g,chs );
 }

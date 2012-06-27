@@ -933,7 +933,7 @@ bool BlocksPar <DefaultStructs >::BiConVisitor< GraphType,CompIter,VertIter,Edge
     if (state.vmap.hasKey( v ))
     {
         if (state.vmap[v].depth < state.vmap[u].depth) state.estk.push( e );
-        state.vmap[u].lowpoint = min( state.vmap[u].lowpoint,state.vmap[v].depth );
+        state.vmap[u].lowpoint = std::min( state.vmap[u].lowpoint,state.vmap[v].depth );
         return false;
     }
     state.estk.push( e );
@@ -951,7 +951,7 @@ bool BlocksPar <DefaultStructs >::BiConVisitor< GraphType,CompIter,VertIter,Edge
     typename GraphType::PVertex v;
     v = g.getEdgeEnd( e,u );
 
-    state.vmap[u].lowpoint = min( state.vmap[u].lowpoint,state.vmap[v].lowpoint );
+    state.vmap[u].lowpoint = std::min( state.vmap[u].lowpoint,state.vmap[v].lowpoint );
 
     if ((state.vmap[v].lowpoint >= state.vmap[u].depth && state.vmap[u].depth > 0)
         || (state.vmap[u].depth == 0 && state.vmap[u].sons > 1))
@@ -1021,7 +1021,8 @@ int BlocksPar <DefaultStructs >::split(
     typename GraphType::PEdge LOCALARRAY( stbuf,g.getEdgeNo() + 1 );    // TODO: size?
     VertBlockList LOCALARRAY( vertBlockList,g.getEdgeNo() * 2 + g.getVertNo() );    // TODO: size?
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap > state(
-        blocks,edgeMap,mask,std::make_pair( stbuf,g.getEdgeNo() + 1 ),vertBlockList,g.getVertNo() );
+//        blocks,edgeMap,mask,std::make_pair( stbuf,g.getEdgeNo() + 1 ),vertBlockList,g.getVertNo() );
+        blocks,edgeMap,mask,std::make_pair( stbuf,g.getEdgeNo() + 1 ),vertBlockList,g.getEdgeNo() * 2 + g.getVertNo() );
     BiConVisitor< GraphType,CompIter,VertIter,EdgeDataMap > visit( state );
 
     rv = DFSPar<DefaultStructs>::visitAllBase( g,visited,visit,mask );
@@ -1047,7 +1048,8 @@ int BlocksPar  <DefaultStructs >::splitComp(
     typename GraphType::PEdge LOCALARRAY( stbuf,g.getEdgeNo() + 1 );    // TODO: size?
     VertBlockList LOCALARRAY( vertBlockList,g.getEdgeNo() * 2 + g.getVertNo() );    // TODO: size?
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap > state(
-        blocks,edgeMap,mask,std::make_pair( stbuf,g.getEdgeNo() + 1 ),vertBlockList,g.getVertNo() );
+//        blocks,edgeMap,mask,std::make_pair( stbuf,g.getEdgeNo() + 1 ),vertBlockList,g.getVertNo() );
+        blocks,edgeMap,mask,std::make_pair( stbuf,g.getEdgeNo() + 1 ),vertBlockList,g.getEdgeNo() * 2 + g.getVertNo() );
     BiConVisitor< GraphType,CompIter,VertIter,EdgeDataMap > visit( state );
 
 

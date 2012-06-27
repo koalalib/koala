@@ -284,6 +284,10 @@ class IsItPar : public SearchStructs {
 	    return CompMPartite::getParts(g,blackHole,blackHole)!=-1;
 	}
 
+/* M. Habib, R. McConnel, C. Paul, L.Viennot
+ * Lex-BFS and Partition Refinement, with Applications to Transitive
+ * Orientation, Interval Graph Recognition and Consecutive Ones Testing
+ */
     class Chordal {
     protected:
 
@@ -496,6 +500,9 @@ class IsItPar : public SearchStructs {
 
     };
 
+    /** test if graph is chordal
+     * @param[in] g graph to test
+     * @return true if graph is chordal, false otherwise */
     template <class GraphType>
 	static bool chordal(const GraphType& g)
 	{
@@ -886,7 +893,7 @@ class IsItPar : public SearchStructs {
                 Privates::List<typename AdjStruct<Graph>::Node,Privates::ListBlockListAllocator<typename AdjStruct<Graph>::Node> >
                     LOCALARRAY(statebuf,n);
 
-                for(int i=0;i<n;i++) statebuf[i].init(pula);
+                for(i=0;i<n;i++) statebuf[i].init(pula);
                 CTState<Graph> state(n,statebuf);
 
                 typename DefaultStructs::template AssocCont<typename Graph::PVertex, int>::Type vidx(g.getVertNo());
@@ -947,12 +954,19 @@ class IsItPar : public SearchStructs {
             static int color(const Graph &g, OutMap& avmap)
             {   return explore(g,blackHole,avmap,blackHole); }
 
+	    /** find a largest clique in a comparability graph
+	     * @param[in] g graph
+	     * @param[out] iter iterator to write clique's vertices
+	     * @return number of vertices in the clique */
             template<class Graph,class OutIter>
             static int maxClique(const Graph &g, OutIter iter)
             {   return explore(g,blackHole,blackHole,iter); }
 
     };
 
+    /** test if graph is a comparability graph
+     * @param[in] g graph to test
+     * @return true if graph is a comparability graph, false otherwise */
     template <class GraphType>
 	static bool comparability(const GraphType& g)
 	{
@@ -995,7 +1009,10 @@ class IsItPar : public SearchStructs {
                             ConstFunctor<typename GraphType::EdgeInfoType>());
         }
 
-
+	/** convert interval graph to its interval representation
+	 * @param[in] g graph
+	 * @param[out] outmap map (PVertex -> Segment)
+	 * @return true if g is interval, false otherwise */
         template<class GraphType,class IntMap>
         static bool graph2segs(const GraphType &g,IntMap& outmap) {
             if (!undir(g,false)) return false;
@@ -1019,7 +1036,7 @@ class IsItPar : public SearchStructs {
                 typename Sets::Entry::iterator> LOCALARRAY(Abuf,g.getVertNo());
             std::pair<typename Sets::Entry,
                 typename Sets::Entry::iterator> LOCALARRAY(Bbuf,g.getVertNo());
-            for(int i=0;i<g.getVertNo();i++)
+            for(i=0;i<g.getVertNo();i++)
                 { Abuf[i].first.init(allocat3); Bbuf[i].first.init(allocat3);}
             Sets A(Abuf,g.getVertNo(),allocat3),B(Bbuf,g.getVertNo(),allocat3);
 
@@ -1418,6 +1435,9 @@ class IsItPar : public SearchStructs {
 
     };
 
+    /** test if graph is an interval graph
+     * @param[in] g graph
+     * @return true if g is interval, false otherwise */
     template <class GraphType>
 	static bool interval(const GraphType& g)
 	{

@@ -69,7 +69,7 @@ int main() {
 //	List<int> l(all);
 
     ball.allocate<Privates::ListNode<int> >();
-    Privates::List<int,Privates::ListBlockListAllocator<int> > l,l2();
+    Privates::List<int,Privates::ListBlockListAllocator<int> > l,l2;
     l.init(ball);
 	Privates::List<int,Privates::ListBlockListAllocator<int> >::iterator it;
 	for(j = 0; j < 19; j++) {

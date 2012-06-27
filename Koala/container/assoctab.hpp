@@ -215,9 +215,9 @@ void BlockList< Element,Container >::defrag()
 {
     int asiz = 0;
     Element LOCALARRAY( buf,siz );
-    for( int i = firstPos(); i != -1; i = nextPos( i ) ) buf[asiz++] = operator[]( i );
+    for( int i = firstPos(); i != -1; i = nextPos( i ) ) buf[asiz++] = this->operator[]( i );
     clear();
-    for( int i = 0; i < asiz; i++ ) operator[]( newPos() ) = buf[i];
+    for( int i = 0; i < asiz; i++ ) this->operator[]( newPos() ) = buf[i];
 }
 
 AssocKeyContReg &AssocKeyContReg::operator=( const AssocKeyContReg &X )
@@ -625,7 +625,7 @@ AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::DelPosComm
     for( k = IndexContainer ::firstKey(); k; k = n )
     {
         n = IndexContainer::nextKey( k );
-        if (!operator[]( k )) IndexContainer::delKey( k );
+        if (!this->operator[]( k )) IndexContainer::delKey( k );
     }
 }
 
@@ -711,7 +711,7 @@ int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::slice1(Klucz v, Ex
     for( Klucz x = index.firstKey(); x; x = index.nextKey( x ) )
         if (hasKey( v,x ))
         {
-            tab[x] = operator()( v,x );
+            tab[x] = this->operator()( v,x );
             licz++;
         }
     return licz;
@@ -726,7 +726,7 @@ int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::slice2(Klucz v, Ex
     for( Klucz x = index.firstKey(); x; x = index.nextKey( x ) )
         if (hasKey( x,v ))
         {
-            tab[x] = operator()( x,v );
+            tab[x] = this->operator()( x,v );
             licz++;
         }
     return licz;
@@ -928,7 +928,7 @@ void AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::defrag()
     index.defrag();
     siz = 0;
     first = last = -1;
-    for( int ii = 0; ii < i ; ii++ ) operator()( tab[ii].u,tab[ii].v ) = tab[ii].val;
+    for( int ii = 0; ii < i ; ii++ ) this->operator()( tab[ii].u,tab[ii].v ) = tab[ii].val;
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >

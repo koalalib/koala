@@ -17,7 +17,7 @@
  *   - safer than stack-based local arrays (int table[n] will overflow the
  *     stack for large n, LOCALARRAY will use heap-allocated memory for
  *     large arrays; see KOALA_STACK_THRESHOLD)
- *   - will work for anonymous structures:
+ *   - will work for anonymous structures (UNDER GCC WILL NOT CALL IT'S CONSTRUCTOR):
  *     eg. struct {int a, b;} LOCALARRAY(table, 10);
  *
  * KOALA_STACK_THRESHOLD

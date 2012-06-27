@@ -5,10 +5,11 @@
 #include <map>
 #include <algorithm>
 #include <cassert>
+#include <limits>
 #include "../base/def_struct.h"
 #include "../graph/graph.h"
 #include "../graph/subgraph.h"
-#include "search.h"
+#include "../algorithm/search.h"
 
 
 
@@ -543,7 +544,7 @@ class FlowPar : public PathStructs {
             typename EdgeContainer::ValType::CostType
                     d=DefaultStructs:: template NumberTypeBounds
                                         <typename EdgeContainer::ValType::CostType> ::plusInfty(),nd;
-            for(V=Q.firstKey();V;V=Q.nextKey(V)) if (Q[V].distance<d) d=Q[U=V].distance;
+            for(V=Q.firstKey();V;V=Q.nextKey(V)) if (d>Q[V].distance) d=Q[U=V].distance;
             {   vertTab[U].distance=Q[U].distance;
                 vertTab[U].ePrev=Q[U].ePrev;
                 vertTab[U].vPrev=Q[U].vPrev;
@@ -558,8 +559,8 @@ class FlowPar : public PathStructs {
                         if ((nd=vertTab[U].distance+costFlowDij(g,edgeTab,vertTab,E,U))<Q[V].distance)
                     { Q[V].distance=nd; Q[V].ePrev=E; Q[V].vPrev=U; }
         }
-        bool res=vertTab[end].distance<DefaultStructs:: template NumberTypeBounds
-                                        <typename EdgeContainer::ValType::CostType> ::plusInfty();
+        bool res=DefaultStructs:: template NumberTypeBounds
+                                        <typename EdgeContainer::ValType::CostType> ::plusInfty()>vertTab[end].distance;
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
             vertTab[v].distance+=vertTab[v].pot-vertTab[start].pot;
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
@@ -932,7 +933,7 @@ class FlowPar : public PathStructs {
         res.capac=maxFlow(g,edgeTab,start,end);
         BFSFlow(g,edgeTab,vertTab,start,end,true,blackHole);
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-        if (vertTab[v].distance<std::numeric_limits<int>::max())
+        if (std::numeric_limits<int>::max()>vertTab[v].distance)
         {   res.vertNo++;
             if (!isBlackHole(iters.vertIter)) { *iters.vertIter=v;++iters.vertIter; }
             for(typename GraphType::PEdge e=g.getEdge(v,EdDirOut|EdUndir);e;e=g.getEdgeNext(v,e,EdDirOut|EdUndir))
@@ -1388,19 +1389,19 @@ class ConnectPar : public PathStructs {
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
         {   images[v].first=ig.addVert(v);images[v].second=ig.addVert(v);
             ig.addArch(images[v].first,images[v].second,
-                       std::pair<typename GraphType::PVertex,typename GraphType::PEdge>(v,0));
+                       std::pair<typename GraphType::PVertex,typename GraphType::PEdge>(v,(typename GraphType::PEdge)0));
         }
         for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut))
             ig.addArch(images[g.getEdgeEnd1(e)].second,
                                  images[g.getEdgeEnd2(e)].first,
-                       std::pair<typename GraphType::PVertex,typename GraphType::PEdge>(0,e));
+                       std::pair<typename GraphType::PVertex,typename GraphType::PEdge>((typename GraphType::PVertex)0,e));
         for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir))
         {   ig.addArch(images[g.getEdgeEnd1(e)].second,
                                  images[g.getEdgeEnd2(e)].first,
-                       std::pair<typename GraphType::PVertex,typename GraphType::PEdge>(0,e));
+                       std::pair<typename GraphType::PVertex,typename GraphType::PEdge>((typename GraphType::PVertex)0,e));
             ig.addArch(images[g.getEdgeEnd2(e)].second,
                                  images[g.getEdgeEnd1(e)].first,
-                       std::pair<typename GraphType::PVertex,typename GraphType::PEdge>(0,e));
+                       std::pair<typename GraphType::PVertex,typename GraphType::PEdge>((typename GraphType::PVertex)0,e));
         }
     }
 

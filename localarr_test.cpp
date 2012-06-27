@@ -33,8 +33,10 @@ int main() {
 	int LOCALARRAY(iht, 8192);
 	int LOCALARRAY(ist, 128);
 
+#if _MSC_VER >= 1500 	// Visual Studio 2008 or better
 	struct { int a, b; } LOCALARRAY(ast, 5);
 	printf("%d vs %d\n", sizeof(intpair), ast_KILLER.GetSize());
+#endif
 
 	printf("%p\n", ht);
 	printf("%p\n", st);

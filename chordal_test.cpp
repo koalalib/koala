@@ -14,7 +14,7 @@ using namespace Koala::IO;
 struct ChTest {
 	bool ans, coans;
 	int clq;
-	char *graph;
+	const char *graph;
 	};
 
 ChTest tests[] = {

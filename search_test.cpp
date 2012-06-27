@@ -95,7 +95,30 @@ int main() {
     int comptab[2][10];
     comptab[1][0]=0;
 
+#undef STRATEGY
+#define STRATEGY BFS
+    Koala::STRATEGY::visitAllBase(g,vertCont,Visitors::EndVertVisitor(G),EdAll);
+    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll,vertCont);
+    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll);
+    Koala::STRATEGY::scan(g,blackHole,EdAll,vertCont);
+    Koala::STRATEGY::scan(g,blackHole,EdAll);
+    Koala::STRATEGY::cyclNo(g,EdAll);
+    Koala::STRATEGY::getAttainableSet(g,A,EdAll);
+    Koala::STRATEGY::getComponents(g,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll,vertCont);
 
+#undef STRATEGY
+#define STRATEGY DFS
+    Koala::STRATEGY::visitAllBase(g,vertCont,Visitors::EndVertVisitor(G),EdAll);
+    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll,vertCont);
+    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll);
+    Koala::STRATEGY::scan(g,blackHole,EdAll,vertCont);
+    Koala::STRATEGY::scan(g,blackHole,EdAll);
+    Koala::STRATEGY::cyclNo(g,EdAll);
+    Koala::STRATEGY::getAttainableSet(g,A,EdAll);
+    Koala::STRATEGY::getComponents(g,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll,vertCont);
+
+#undef STRATEGY
+#define STRATEGY LexBFS
     Koala::STRATEGY::visitAllBase(g,vertCont,Visitors::EndVertVisitor(G),EdAll);
     Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll,vertCont);
     Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll);

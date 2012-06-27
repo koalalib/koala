@@ -61,17 +61,31 @@ void searchTest_()
 
 
 void searchTest()
-{   vertCont.clear();g.clear();
+{  
+    vertCont.clear();
+    g.clear();
     A=g.addVert(OpisV("A"));
 
-    B=g.addVert(OpisV("B"));C=g.addVert(OpisV("C"));
-    D=g.addVert(OpisV("D"));E=g.addVert(OpisV("E"));F=g.addVert(OpisV("F"));
-    G=g.addVert(OpisV("G"));H=g.addVert(OpisV("H"));I=g.addVert(OpisV("I"));
+    B=g.addVert(OpisV("B"));
+    C=g.addVert(OpisV("C"));
+    D=g.addVert(OpisV("D"));
+    E=g.addVert(OpisV("E"));
+    F=g.addVert(OpisV("F"));
+    G=g.addVert(OpisV("G"));
+    H=g.addVert(OpisV("H"));
+    I=g.addVert(OpisV("I"));
 
-    g.addEdge(A,B,OpisE(1));g.addEdge(A,C,OpisE(4));g.addEdge(B,D,OpisE(5));g.addEdge(B,C,OpisE(2));
-    g.addEdge(C,D,OpisE(1));g.addEdge(C,E,OpisE(2));g.addEdge(C,F,OpisE(1));
+    g.addEdge(A,B,OpisE(1));
+    g.addEdge(A,C,OpisE(4));
+    g.addEdge(B,D,OpisE(5));
+    g.addEdge(B,C,OpisE(2));
+    g.addEdge(C,D,OpisE(1));
+    g.addEdge(C,E,OpisE(2));
+    g.addEdge(C,F,OpisE(1));
     g.addEdge(D,G,OpisE(2));
-    g.addEdge(G,H,OpisE(2));g.addEdge(G,H,OpisE(2)); g.addLoop(G,OpisE(2));
+    g.addEdge(G,H,OpisE(2));
+    g.addEdge(G,H,OpisE(2));
+    g.addLoop(G,OpisE(2));
 
     g.addEdge(E,F,OpisE(2));    //g.addArch(H,F,OpisE(2));
 //    g.addEdge(H,I,OpisE(2));g.addEdge(D,I,OpisE(2));
@@ -102,6 +116,7 @@ void searchTest2()
 
 int main() {
 
+
     searchTest();
     int licz;
 
@@ -111,7 +126,8 @@ int main() {
     std::cout<<std::endl;
     std::cout <<Koala::Blocks::split(g,blackHole,blackHole,Koala::SearchStructs::compStore(blackHole,blackHole),
                                    blackHole,EdAll)<<std::endl;
-    int compno=Koala::Blocks::splitComp(g,C,vertCont,edgeCont,Koala::SearchStructs::compStore(comptab[0],tabV),
+
+    int compno = Koala::Blocks::splitComp(g,C,vertCont,edgeCont,Koala::SearchStructs::compStore(comptab[0],tabV),
                                    comptab[1],EdAll);
     std::cout << compno<<endl;
     for(int i=0;i<compno;i++)
@@ -138,6 +154,7 @@ int main() {
     searchTest();
     std::cout<<"\n"<<Koala::Blocks::split(g,blackHole,blackHole,Koala::SearchStructs::compStore(comptab[0],tabV),
                                    comptab[1],EdAll);
+
 
     return 0;
 }
