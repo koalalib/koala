@@ -43,7 +43,8 @@ void scheduling_brucker()
 	};
 	Scheduling::Schedule S(3);
 
-	cout << "Lmax = " << Scheduling::brucker(T, T + N, G, S) << endl;
+	cout << "Lmax = " << Scheduling::brucker(T, T + N, G, S) << " ";
+	cout << Scheduling::LMax(T, T + N, S) << endl;
 
 	for(int m = 0; m < 3; m++)
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
@@ -55,19 +56,21 @@ void scheduling_coffman()
 	typedef Graph<string, string> GraphType;
 
 	GraphType G;
-	int N = 15;
+	int N = 17;
     Vertex<string, string>* V[] =
 	{
 		G.addVert("3 "), G.addVert("4 "), G.addVert("5 "), G.addVert("6 "),
         G.addVert("7 "), G.addVert("8 "), G.addVert("9 "), G.addVert("10"),
 		G.addVert("11"), G.addVert("12"), G.addVert("13"), G.addVert("14"),
-		G.addVert("15"), G.addVert("16"), G.addVert("17")
+		G.addVert("15"), G.addVert("16"), G.addVert("17"), 
+		G.addVert("1 "), G.addVert("2 ")
     };
 
 	G.addArch(V[0], V[6]), G.addArch(V[0], V[7]), G.addArch(V[1], V[5]), G.addArch(V[2], V[7]);
 	G.addArch(V[3], V[7]), G.addArch(V[4], V[8]), G.addArch(V[4], V[9]), G.addArch(V[5], V[10]);
 	G.addArch(V[6], V[10]), G.addArch(V[7], V[11]), G.addArch(V[7], V[12]), G.addArch(V[7], V[14]);
 	G.addArch(V[8], V[11]), G.addArch(V[8], V[12]), G.addArch(V[9], V[13]), G.addArch(V[13], V[12]);
+	G.addArch(V[15], V[1]), G.addArch(V[15], V[2]), G.addArch(V[16], V[3]), G.addArch(V[16], V[4]);
 
 	Scheduling::Task<GraphType> T[] =
 	{
@@ -78,11 +81,13 @@ void scheduling_coffman()
 		Scheduling::Task<GraphType>(V[8]), Scheduling::Task<GraphType>(V[9]),
 		Scheduling::Task<GraphType>(V[10]), Scheduling::Task<GraphType>(V[11]),
 		Scheduling::Task<GraphType>(V[12]), Scheduling::Task<GraphType>(V[13]),
-		Scheduling::Task<GraphType>(V[14])
+		Scheduling::Task<GraphType>(V[14]), Scheduling::Task<GraphType>(V[15]),
+		Scheduling::Task<GraphType>(V[16])
 	};
 	Scheduling::Schedule S(2);
 
-	cout << "Cmax = " << Scheduling::coffmanGraham(T, T + N, G, S) << endl;
+	cout << "Cmax = " << Scheduling::coffmanGraham(T, T + N, G, S) << " ";
+	cout << Scheduling::CMax(T, T + N, S) << endl;
 
 	for(int m = 0; m < S.getMachNo(); m++)
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
@@ -118,7 +123,8 @@ void scheduling_hu()
 	};
 	Scheduling::Schedule S(3);
 
-	cout << "Cmax = " << Scheduling::hu(T, T + N, G, S) << endl;
+	cout << "Cmax = " << Scheduling::hu(T, T + N, G, S) << " ";
+	cout << Scheduling::CMax(T, T + N, S) << endl;
 
 	for(int m = 0; m < S.getMachNo(); m++)
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
@@ -153,11 +159,75 @@ void scheduling_liu()
 	};
 	Scheduling::Schedule S(1);
 
-	cout << "Lmax = " << Scheduling::precLiu(T, T + N, G, S) << endl;
+	cout << "Lmax = " << Scheduling::precLiu(T, T + N, G, S) << " ";
+	cout << Scheduling::LMax(T, T + N, S) << endl;
+	
 
-	for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[0].begin(); i != S.machines[0].end(); ++i)
-		cout << "Z" << T[i->task].vertex->info << " " << i->part << " " << i->start << " " << i->end << endl;
+	for(int m = 0; m < S.getMachNo(); m++)
+		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
+			cout << "Z" << T[i->task].vertex->info << " " << i->part << " " << i->start << " " << i->end << endl;
     assert(Scheduling::test(T, T + N, G, S,false));
+}
+
+void scheduling_mcnaughton()
+{
+	typedef Graph<string, string> GraphType;
+	GraphType G;
+
+	int N = 5;
+    Vertex<string, string>* V[] =
+	{
+        G.addVert("1"), G.addVert("2"), G.addVert("3"), G.addVert("4"), G.addVert("5")
+    };
+
+	Scheduling::Task<GraphType> T[] =
+	{
+		Scheduling::Task<GraphType>(4, 0, 0, V[0]),
+		Scheduling::Task<GraphType>(5, 0, 0, V[1]),
+		Scheduling::Task<GraphType>(2, 0, 0, V[2]),
+		Scheduling::Task<GraphType>(1, 0, 0, V[3]),
+		Scheduling::Task<GraphType>(2, 0, 0, V[4])
+	};
+	Scheduling::Schedule S(3);
+
+	cout << "Cmax = " << Scheduling::mcNaughton(T, T + N, S) << " ";
+	cout << Scheduling::CMax(T, T + N, S) << endl;
+	
+	for(int m = 0; m < S.getMachNo(); m++)
+		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
+			cout << "Z" << T[i->task].vertex->info << " " << i->start << " " << i->end << endl;
+    assert(Scheduling::test(T, T + N, G, S, false));
+}
+
+void scheduling_hodgson()
+{
+	typedef Graph<string, string> GraphType;
+	GraphType G;
+
+	int N = 6;
+    Vertex<string, string>* V[] =
+	{
+        G.addVert("1"), G.addVert("2"), G.addVert("3"), G.addVert("4"), G.addVert("5"), G.addVert("6")
+    };
+
+	Scheduling::Task<GraphType> T[] =
+	{
+		Scheduling::Task<GraphType>(4, 0, 9, V[0]),
+		Scheduling::Task<GraphType>(1, 0, 9, V[1]),
+		Scheduling::Task<GraphType>(9, 0, 8, V[2]),
+		Scheduling::Task<GraphType>(1, 0, 8, V[3]),
+		Scheduling::Task<GraphType>(4, 0, 4, V[4]),
+		Scheduling::Task<GraphType>(2, 0, 18, V[5])
+	};
+	Scheduling::Schedule S(3);
+
+	cout << "SigmaUi = " << Scheduling::hodgson(T, T + N, S) << " ";
+	cout << Scheduling::SigmaUi(T, T + N, S) << endl;
+	
+	for(int m = 0; m < S.getMachNo(); m++)
+		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
+			cout << "Z" << T[i->task].vertex->info << " " << i->start << " " << i->end << endl;
+    assert(Scheduling::test(T, T + N, G, S, true));
 }
 
 void scheduling_list()
@@ -171,17 +241,18 @@ void scheduling_list()
         G.addVert("1"), G.addVert("2"), G.addVert("3"), G.addVert("4"),
         G.addVert("5"), G.addVert("6"), G.addVert("7")
     };
-	G.addArch(V[0], V[1]);
+	G.addArch(V[0], V[1]), G.addArch(V[1], V[2]), G.addArch(V[2], V[3]);
+	G.addArch(V[4], V[5]), G.addArch(V[5], V[6]);
 
 	Scheduling::Task<GraphType> T[] =
 	{
-		Scheduling::Task<GraphType>(3, 0, 0, V[0]),
-		Scheduling::Task<GraphType>(2, 0, 0, V[1]),
-		Scheduling::Task<GraphType>(2, 0, 0, V[2]),
-		Scheduling::Task<GraphType>(1, 0, 0, V[3]),
-		Scheduling::Task<GraphType>(4, 0, 0, V[4]),
+		Scheduling::Task<GraphType>(3, 5, 0, V[0]),
+		Scheduling::Task<GraphType>(2, 1, 0, V[1]),
+		Scheduling::Task<GraphType>(2, 12, 0, V[2]),
+		Scheduling::Task<GraphType>(1, 3, 0, V[3]),
+		Scheduling::Task<GraphType>(4, 1, 0, V[4]),
 		Scheduling::Task<GraphType>(1, 0, 0, V[5]),
-		Scheduling::Task<GraphType>(2, 0, 0, V[6])
+		Scheduling::Task<GraphType>(2, 9, 0, V[6])
 	};
 	Scheduling::Schedule S(2);
 
@@ -198,8 +269,8 @@ void scheduling_list()
     for(int i=0;i<N-1;i++)
     {   assert(T[out[i]].duedate<=T[out[i+1]].duedate); }
 
-
-	cout << "Cmax = " << Scheduling::ls(T, T + N, G, S) << endl;
+	cout << "Cmax = " << Scheduling::ls(T, T + N, G, S) << " ";
+	cout << Scheduling::CMax(T, T + N, S) << endl;
 
 	for(int m = 0; m < S.getMachNo(); m++)
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
@@ -242,14 +313,14 @@ void scheduling_critical()
 		cout << " " << i->earliestStart << " " << i->latestStart << " " << i->earliestFinish << " " << i->latestFinish << endl;
 }
 
-
-
 int main()
 {
 	scheduling_brucker();
 	scheduling_coffman();
 	scheduling_hu();
 	scheduling_liu();
+	scheduling_mcnaughton();
+	scheduling_hodgson();
 
 	scheduling_list();
 	scheduling_critical();
