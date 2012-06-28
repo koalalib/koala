@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <vector>
 #include "../base/def_struct.h"
-#include "../base/kstd.h"
 #include "../container/assoctab.h"
 #include "../algorithm/search.h"
 
@@ -49,7 +48,10 @@ namespace Koala
 
 		struct Schedule
 		{
-			std::vector<std::vector<TaskPart> > machines;
+			typedef std::vector<TaskPart> Machine;
+			typedef std::vector<Machine> Type;
+
+			Type machines;
 
 			Schedule(int m = 0)
 			{
@@ -96,9 +98,20 @@ namespace Koala
 		    return sortByComp<compareEDD<std::pair<TaskIterator, int> > > (begin,end,out);
 		}
 
+        template<typename TaskIterator>
+		static int CMax(TaskIterator, TaskIterator, const Schedule&);
+        template<typename TaskIterator>
+		static int SigmaCi(TaskIterator, TaskIterator, const Schedule&);
+        template<typename TaskIterator>
+		static int SigmaTi(TaskIterator, TaskIterator, const Schedule&);
+        template<typename TaskIterator>
+		static int SigmaUi(TaskIterator, TaskIterator, const Schedule&);
+        template<typename TaskIterator>
+		static int LMax(TaskIterator, TaskIterator, const Schedule&);
+
 		//Test poprawnoœci danego harmonogramu
 		template<typename GraphType, typename TaskIterator>
-		static bool test(TaskIterator, TaskIterator, const GraphType&, Schedule&,bool=true);
+		static bool test(TaskIterator, TaskIterator, const GraphType&, const Schedule&, bool = true);
 
 		//-|prec|Cmax - czyli szeregowanie œcie¿k¹ krytyczn¹ z zadaniami w wierzcho³kach
         template<typename GraphType, typename TaskIterator, typename TaskWindowIterator>
@@ -123,6 +136,14 @@ namespace Koala
 		//P|UET,in–tree|Cmax – procedura Hu
 		template<typename GraphType, typename TaskIterator>
 		static int hu(TaskIterator, TaskIterator, const GraphType&, Schedule&);
+
+		//P|pmtn|Cmax – algorytm McNaughtona
+		template<typename TaskIterator>
+		static int mcNaughton(TaskIterator, TaskIterator, Schedule&);
+
+		//1||SigmaUi – algorytm Hodgsona
+		template<typename TaskIterator>
+		static int hodgson(TaskIterator, TaskIterator, Schedule&);
 
     protected:
 
@@ -200,22 +221,22 @@ namespace Koala
 		};
 
         template<typename Task>
-		struct BruckerElement
+		struct Element
 		{
 			Task task;
-			int index, priority, degree;
+			int index, priority, duedate, degree, timeleft, parts;
 
-			BruckerElement(Task _task = Task(), int _index = 0) : task(_task), index(_index) { }
+			Element(Task _task = Task(), int _index = 0) : task(_task), index(_index),
+				priority(0), duedate(0), timeleft(_task.length), parts(0) { }
 		};
 
-        template<typename Task>
-		struct LiuElement
+		struct HodgsonElement
 		{
-			Task task;
-			int index, duedate, degree, timeleft, parts;
+			int index, length, duedate;
+			bool late;
 
-			LiuElement(Task task = Task(), int index = 0) : task(task), index(index),
-				timeleft(task.length), parts(0) { }
+			HodgsonElement(int _index = 0, int _length = 1, int _duedate = 0) : index(_index), length(_length),
+				duedate(_duedate), late(0) { }
 		};
 	};
 
