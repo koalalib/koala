@@ -2,6 +2,7 @@
 #define KOALA_CREATOR_H
 
 #include "..\graph\graph.h"
+#include "..\algorithm\weights.h"
 #include <cstdlib>
 #include <ctime>
 
@@ -507,6 +508,267 @@ class Creator{
 };
 
 #include "create.hpp"
+
+
+class RelDiagramAlgsDefaultStructs : public AlgorithmsDefaultSettings {
+    public:
+
+    template <class A, class B> class TwoDimNoDiagAssocCont {
+        public:
+        typedef AssocMatrix<A,B,AMatrNoDiag> Type;
+    };
+
+    template <class A, class B> class TwoDimFullAssocCont {
+        public:
+        typedef AssocMatrix<A,B,AMatrFull> Type;
+    };
+
+
+};
+
+
+template <class DefaultStructs>
+class RelDiagramPar {
+    public:
+
+    template <class Graph>
+    static void repair(Graph& g)
+    {   g.ch2Archs();g.delAllParals(EdDirOut);  }
+
+    template <class Graph>
+    static void empty(Graph& g)
+    {   g.clearEdges(); }
+
+    template <class Graph>
+    static void total(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
+    {
+        g.clearEdges();
+        for(typename Graph::PVertex u=g.getVert();u;u=g.getVertNext(u))
+        {   g.addLoop(u,einfo);
+            for(typename Graph::PVertex v=g.getVertNext(u);v;v=g.getVertNext(v))
+            {
+                g.addArch(u,v,einfo);g.addArch(v,u,einfo);
+            }
+        }
+    }
+
+    template <class Graph>
+    static void inv(Graph& g)
+    {   g.revert(); }
+
+    template <class Graph>
+    static void reflClousure(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
+    {
+        for(typename Graph::PVertex u=g.getVert();u;u=g.getVertNext(u))
+            if (!g.getEdge(u,EdLoop)) g.addLoop(u,einfo);
+    }
+
+    template <class Cont>
+    static void symmClousure(Cont& cont, int size)
+    {   for(int i=0;i<size-1;++i) for(int j=i+1;j<size;++j)  cont[i][j]=cont[j][i]=cont[i][j] || cont[j][i];    }
+
+    template <class Cont,class Iter>
+    static void symmClousure(Cont& cont,Iter beg, Iter end)
+    {   for(Iter i=beg;i!=end;++i) for(Iter j=i;j!=end;++j)
+            if (i!=j) cont(*i,*j)=cont(*j,*i)= cont(*i,*j)||cont(*j,*i);    }
+
+    template <class Graph>
+    static void symmClousure(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
+    {   typename DefaultStructs::template TwoDimNoDiagAssocCont<typename Graph::PVertex,bool> :: Type matr(g.getVertNo());
+        typename Graph::PEdge e,enext;
+        for(e=g.getEdge(Directed|Undirected);e;e=g.getEdgeNext(e,Directed|Undirected))
+        {   matr(g.getEdgeEnd1(e),g.getEdgeEnd2(e))=true;
+            if (g.getEdgeType(e)==Undirected)
+                matr(g.getEdgeEnd2(e),g.getEdgeEnd1(e))=true;
+        }
+        for(e=g.getEdge(Directed);e;e=enext)
+        {   enext=g.getEdgeNext(e,Directed);
+            if (matr(g.getEdgeEnd1(e),g.getEdgeEnd2(e))!=matr(g.getEdgeEnd2(e),g.getEdgeEnd1(e)))
+            {   g.addArch(g.getEdgeEnd2(e),g.getEdgeEnd1(e),einfo);
+                matr(g.getEdgeEnd1(e),g.getEdgeEnd2(e))=false;
+            }
+        }
+    }
+
+
+    template <class Graph>
+    static void transClousure(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
+    {   typename DefaultStructs::template TwoDimFullAssocCont<typename Graph::PVertex, typename FloydPar<DefaultStructs>
+                        ::template VertLabs<int,Graph> > :: Type matr(g.getVertNo());
+//        UnitLengthsEdgeCont econt;
+        typename FloydPar<DefaultStructs>::template UnitLengthEdges<int> econt;
+        FloydPar<DefaultStructs>::distances(g,matr,econt);
+        for(typename Graph::PVertex u=g.getVert();u;u=g.getVertNext(u))
+            for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            if(u!=v && matr(u,v).distance>1 && DefaultStructs::template NumberTypeBounds<int>::plusInfty()
+                                >matr(u,v).distance) g.addArch(u,v,einfo);
+        for(typename Graph::PEdge e=g.getEdge(Directed|Undirected);e;e=g.getEdgeNext(e,Directed|Undirected))
+            if ((g.getEdgeType(e)==Undirected)||
+                ((g.getEdgeType(e)==Directed)&& matr(g.getEdgeEnd2(e),g.getEdgeEnd1(e)).distance
+                    <DefaultStructs::template NumberTypeBounds<int>::plusInfty()))
+            {
+                if (!g.getEdge(g.getEdgeEnd1(e),EdLoop)) g.addLoop(g.getEdgeEnd1(e),einfo);
+                if (!g.getEdge(g.getEdgeEnd2(e),EdLoop)) g.addLoop(g.getEdgeEnd2(e),einfo);
+            }
+    }
+
+    struct MatrixForm {
+
+        template <class Cont>
+        static void empty(Cont& cont, int size)
+        {   for(int i=0;i<size;++i) for(int j=0;j<size;++j)  cont[i][j]=false;  }
+
+        template <class Cont, class Iter>
+        static void empty(Cont& cont, Iter beg,Iter end)
+        {   for(Iter i=beg;i!=end;++i) for(Iter j=beg;j!=end;++j)  cont(*i,*j)=false;  }
+
+        template <class Cont>
+        static void total(Cont& cont, int size)
+        {   for(int i=0;i<size;++i) for(int j=0;j<size;++j)  cont[i][j]=true;   }
+
+        template <class Cont,class Iter>
+        static void total(Cont& cont, Iter beg,Iter end)
+        {   for(Iter i=beg;i!=end;++i) for(Iter j=beg;j!=end;++j)  cont(*i,*j)=true; }
+
+        template <class Cont>
+        static void inv(Cont& cont, int size)
+        {   for(int i=0;i<size-1;++i) for(int j=i+1;j<size;++j)
+                if (cont[i][j]!=cont[j][i])
+                {  bool tmp=(bool)cont[i][j];   cont[i][j]=cont[j][i]; cont[j][i]=tmp; }
+        }
+
+        template <class Cont,class Iter>
+        static void inv(Cont& cont, Iter beg,Iter end)
+        {   for(Iter i=beg;i!=end;++i)
+            {   Iter j=i;
+                for(++j;j!=end;++j) if (cont(*i,*j)!=cont(*j,*i))
+                {  bool tmp=(bool)cont(*i,*j);   cont(*i,*j)=cont(*j,*i); cont(*j,*i)=tmp; }
+            }
+        }
+
+        template <class Cont>
+        static void reflClousure(Cont& cont, int size)
+        {   for(int i=0;i<size;++i) cont[i][i]=true;    }
+
+        template <class Cont, class Iter>
+        static void reflClousure(Cont& cont,Iter beg, Iter end)
+        {   for(Iter i=beg;i!=end;++i) cont(*i,*i)=true; }
+
+        template <class Cont>
+        static void transClousure(Cont& cont,int size)
+        {   for(int k=0;k<size;++k) for(int i=0;i<size;++i) for(int j=0;j<size;++j)
+                cont[i][j]=cont[i][j] || (cont[i][k] && cont[k][j]);
+        }
+
+        template <class Cont, class Iter>
+        static void transClousure(Cont& cont,Iter beg, Iter end)
+        {   for(Iter k=beg;k!=end;++k) for(Iter i=beg;i!=end;++i) for(Iter j=beg;j!=end;++j)
+                cont(*i,*j)=
+                    cont(*i,*j) || (cont(*i,*k) && cont(*k,*j));
+        }
+
+    };
+
+};
+
+
+class RelDiagram : public RelDiagramPar<RelDiagramAlgsDefaultStructs> {};
+
+
+
+template <class DefaultStructs>
+class LineGraphPar {
+    public:
+
+        template <class Graph>
+        static bool open(const Graph& g,typename Graph::PEdge e,typename Graph::PVertex v, typename Graph::PEdge f)
+            {
+                return (e!=f) && g.isEdgeEnd(e,v) && g.isEdgeEnd(f,v);
+            }
+
+        template <class Graph>
+        static bool openDir(const Graph& g,typename Graph::PEdge e,typename Graph::PVertex v, typename Graph::PEdge f)
+            {
+                return  (e!=f) && g.isEdgeEnd(e,v) && g.isEdgeEnd(f,v)
+                        && (g.getEdgeDir(e,v)!=EdDirOut) && (g.getEdgeDir(f,v)!=EdDirIn);
+            }
+
+        template <class GraphIn,class GraphOut,class VCaster, class ECaster,class VLinker>
+        static typename GraphOut::PVertex undir(const GraphIn& g,GraphOut& lg,
+                                                std::pair< VCaster,ECaster > casters,VLinker linker)
+        {   typename DefaultStructs::template AssocCont<typename GraphIn::PEdge,typename GraphOut::PVertex>
+                :: Type e2vtab(g.getEdgeNo());
+            typename GraphOut::PVertex res=0;
+            for(typename GraphIn::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+            {   typename GraphOut::VertInfoType vinfo;
+                casters.first(vinfo,g.getEdgeInfo(e));
+                linker(e2vtab[e]=lg.addVert(vinfo),e);
+                if (!res && g.getEdgeNo()) res=lg.getVertLast();
+            }
+
+            for(typename GraphIn::PVertex v=g.getVert();v;v=g.getVertNext(v))
+                for(typename GraphIn::PEdge e=g.getEdge(v);e;e=g.getEdgeNext(v,e))
+                    for(typename GraphIn::PEdge f=g.getEdgeNext(v,e);f;f=g.getEdgeNext(v,f))
+                        if (open(g,e,v,f) &&
+                            (!open(g,e,g.getEdgeEnd(e,v),f) ||(g.getEdgeEnd(e,v)>=v) ))
+                            {   typename GraphOut::EdgeInfoType einfo;
+                                casters.second(einfo,g.getVertInfo(v));
+                                lg.addEdge(e2vtab[e],e2vtab[f],einfo);
+                            }
+            return res;
+        }
+
+
+        template <class GraphIn,class GraphOut,class VCaster, class ECaster>
+        static typename GraphOut::PVertex undir(const GraphIn& g,GraphOut& lg,
+                                                std::pair< VCaster,ECaster > casters)
+        {   return undir(g,lg,casters,stdLink( false,false ));  }
+
+        template <class GraphIn,class GraphOut>
+        static typename GraphOut::PVertex undir(const GraphIn& g,GraphOut& lg)
+        {   return undir(g,lg,std::make_pair(stdCast( false ),stdCast( false )),stdLink( false,false ));  }
+
+
+        template <class GraphIn,class GraphOut,class VCaster, class ECaster,class VLinker>
+        static typename GraphOut::PVertex dir(const GraphIn& g,GraphOut& lg,
+                                                std::pair< VCaster,ECaster > casters,VLinker linker)
+        {   typename DefaultStructs::template AssocCont<typename GraphIn::PEdge,typename GraphOut::PVertex>
+                :: Type e2vtab(g.getEdgeNo());
+            typename GraphOut::PVertex res=0;
+            for(typename GraphIn::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+            {   typename GraphOut::VertInfoType vinfo;
+                casters.first(vinfo,g.getEdgeInfo(e));
+                linker(e2vtab[e]=lg.addVert(vinfo),e);
+                if (!res && g.getEdgeNo()) res=lg.getVertLast();
+            }
+
+            for(typename GraphIn::PVertex v=g.getVert();v;v=g.getVertNext(v))
+                for(typename GraphIn::PEdge e=g.getEdge(v);e;e=g.getEdgeNext(v,e))
+                    for(typename GraphIn::PEdge f=g.getEdge(v);f;f=g.getEdgeNext(v,f))
+                        if (openDir(g,e,v,f))
+                            {   typename GraphOut::EdgeInfoType einfo;
+                                casters.second(einfo,g.getVertInfo(v));
+                                lg.addArch(e2vtab[e],e2vtab[f],einfo);
+                            }
+            return res;
+        }
+
+
+        template <class GraphIn,class GraphOut,class VCaster, class ECaster>
+        static typename GraphOut::PVertex dir(const GraphIn& g,GraphOut& lg,
+                                                std::pair< VCaster,ECaster > casters)
+        {   return dir(g,lg,casters,stdLink( false,false ));  }
+
+        template <class GraphIn,class GraphOut>
+        static typename GraphOut::PVertex dir(const GraphIn& g,GraphOut& lg)
+        {   return dir(g,lg,std::make_pair(stdCast( false ),stdCast( false )),stdLink( false,false ));  }
+
+
+};
+
+
+class LineGraph : public LineGraphPar<AlgorithmsDefaultSettings> {};
+
 
 }
 #endif

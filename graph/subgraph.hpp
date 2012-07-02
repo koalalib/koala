@@ -218,7 +218,7 @@ int Subgraph< Graph,VChooser,EChooser >::getParals(
 
 template< class Graph, class VChooser, class EChooser >
 Set< typename Graph::PEdge >
-Subgraph< Graph,VChooser,EChooser >::getParalsSet(typename Graph::PEdge edge, EdgeDirection reltype) const
+Subgraph< Graph,VChooser,EChooser >::getParalSet(typename Graph::PEdge edge, EdgeDirection reltype) const
 {
     Set<typename Graph::PEdge > res;
     getParals(setInserter(res),edge,reltype);
@@ -270,8 +270,11 @@ int Subgraph< Graph,VChooser,EChooser >::getIndEdges(OutIter out,Iterator beg, I
     typename GraphSettings:: template VertAssocCont
             <typename Graph::PVertex,bool>::Type vset(getVertNo());
     for(Iterator i=beg;i!=end;++i ) vset[*i]=true;
-    for(typename Graph::PEdge e=getEdge(type );e;e=getEdgeNext(e,type ))
-        if (vset.hasKey(getEdgeEnd1(e)) && vset.hasKey(getEdgeEnd2(e)))
+    for(typename Graph::PVertex v=vset.firstKey();v;v=vset.nextKey(v))
+        for(typename Graph::PEdge e=getEdge(v,type );e;e=getEdgeNext(v,e,type ))
+            if ((this->getEdgeEnd(e,v)>=v ) && vset.hasKey(this->getEdgeEnd(e,v)))
+//    for(typename Graph::PEdge e=getEdge(type );e;e=getEdgeNext(e,type ))
+//        if (vset.hasKey(getEdgeEnd1(e)) && vset.hasKey(getEdgeEnd2(e)))
             { *out=e; ++out; ++ licze; }
     return licze;
 }
@@ -513,12 +516,68 @@ int Subgraph< Graph,VChooser,EChooser >::getEdgeNo(
     return getEdges( blackHole,vert1,vert2,mask );
 }
 
+template< class Graph, class VChooser, class EChooser > template< class OutputIterator,class VChooser2 >
+int Subgraph< Graph,VChooser,EChooser >::getVerts(OutputIterator out, VChooser2 ch) const
+{   int licz=0;
+    for(typename Subgraph< Graph,VChooser,EChooser >::PVertex v=this->getVert();v;v=this->getVertNext(v))
+        if (ch(v,*this))
+            {  *out=v; ++out; ++licz;   }
+    return licz;
+}
+
+template< class Graph, class VChooser, class EChooser > template< class VChooser2 >
+Set< typename Subgraph< Graph,VChooser,EChooser >::PVertex >
+Subgraph< Graph,VChooser,EChooser >::getVertSet(VChooser2 ch)    const
+{
+    Set<typename  Subgraph< Graph,VChooser,EChooser >::PVertex> s;
+    this->getVerts(setInserter(s),ch);
+    return s;
+}
+
+template< class Graph, class VChooser, class EChooser > template< class OutputIterator,class EChooser2 >
+int Subgraph< Graph,VChooser,EChooser >::getEdges(OutputIterator out, EChooser2 ch) const
+{   int licz=0;
+    for(typename Subgraph< Graph,VChooser,EChooser >::PEdge e=this->getEdge();e;e=this->getEdgeNext(e))
+        if (ch(e,*this))
+            {  *out=e; ++out; ++licz;   }
+    return licz;
+}
+
+template< class Graph, class VChooser, class EChooser > template< class EChooser2 >
+Set< typename Subgraph< Graph,VChooser,EChooser >::PEdge >
+Subgraph< Graph,VChooser,EChooser >::getEdgeSet(EChooser2 ch)    const
+{
+    Set<typename  Subgraph< Graph,VChooser,EChooser >::PEdge> s;
+    this->getEdges(setInserter(s),ch);
+    return s;
+}
+
+template< class Graph, class VChooser, class EChooser >
+template< class OutputV,class OutputE,class VChooser2,class EChooser2 >
+std::pair<int,int> Subgraph< Graph,VChooser,EChooser >::getChosen(std::pair<OutputV,OutputE> out,std::pair<VChooser2,EChooser2> chs,bool chosenends) const
+{   int vlicz=this->getVerts(out.first,chs.first), elicz;
+    if (!chosenends) elicz=this->getEdges(out.second,chs.second);
+    else elicz=this->getEdges(out.second,(edgeFirstEndChoose(chs.first) && edgeSecondEndChoose(chs.first))&&chs.second);
+    return std::make_pair(vlicz,elicz);
+}
+
+template< class Graph, class VChooser, class EChooser >
+template<class VChooser2,class EChooser2 >
+std::pair<Set<typename Subgraph< Graph,VChooser,EChooser >::PVertex>,Set<typename Subgraph< Graph,VChooser,EChooser >::PEdge> >
+Subgraph< Graph,VChooser,EChooser >::getChosenSets(std::pair<VChooser2,EChooser2> chs,bool chosenends) const
+{   Set<typename Subgraph< Graph,VChooser,EChooser >::PVertex> sv;
+    Set<typename Subgraph< Graph,VChooser,EChooser >::PEdge> se;
+    this->getChosen(std::make_pair(setInserter(sv),setInserter(se)),chs,chosenends);
+    return std::make_pair(sv,se);
+}
+
+
 template< class Graph, class VChooser, class EChooser > template <class Cont>
 void
-Subgraph< Graph,VChooser,EChooser >::getAdj(Cont& cont) const
+Subgraph< Graph,VChooser,EChooser >::getAdj(Cont& cont,EdgeType mask) const
 {
     std::pair<PVertex,PVertex> ends;
-    for(PEdge e=getEdge();e;e=getEdgeNext(e))
+    for(PEdge e=getEdge(mask);e;e=getEdgeNext(e,mask))
     {   ends=getEdgeEnds(e);
         cont(ends.first,ends.second)=true;
         if (getEdgeType(e)==Undirected)

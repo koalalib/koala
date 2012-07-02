@@ -319,6 +319,16 @@ class DAGCritPathPar : public ShortPathStructs {
     };
 
 
+    template <class DType> struct UnitLengthEdges {
+        struct  ValType {
+            typedef DType DistType;
+            DistType length;
+        };
+
+        template <class T> ValType operator[](T e) { ValType res; res.length=(DType)1; return res; }
+    };
+
+
     template <class GraphType, class VertContainer, class EdgeContainer>
     static typename EdgeContainer::ValType::DistType
     critPathLength (
@@ -671,6 +681,17 @@ class FloydPar : public PathStructs {
         VertLabs() : vPrev(0), ePrev(0),
                     distance(DefaultStructs :: template NumberTypeBounds<DType>::plusInfty()) {}
     };
+
+
+    template <class DType> struct UnitLengthEdges {
+        struct  ValType {
+            typedef DType DistType;
+            DistType length;
+        };
+
+        template <class T> ValType operator[](T e) { ValType res; res.length=(DType)1; return res; }
+    };
+
 
     // wlasciwa procedura: odleglosc miedzy para wierzcholkow
     template <class GraphType, class TwoDimVertContainer, class EdgeContainer>

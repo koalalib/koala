@@ -46,11 +46,6 @@ struct EmptyEdgeInfo {};
 std::istream& operator>>(std::istream& is,EmptyEdgeInfo arg) { return is; }
 std::ostream& operator<<(std::ostream& os,EmptyEdgeInfo arg) { return os; }
 
-
-//template< class VertInfo, class EdgeInfo, EdgeType > class Graph;
-//template< class VertInfo, class EdgeInfo, EdgeType > class Vertex;
-//template< class VertInfo, class EdgeInfo, EdgeType > class Edge;
-
 template< class VertInfo, class EdgeInfo, class Settings> class Graph;
 template< class VertInfo, class EdgeInfo, class Settings> class Vertex;
 template< class VertInfo, class EdgeInfo, class Settings> class Edge;
@@ -870,104 +865,6 @@ template <class Map1, class Map>
 Std2Linker<Std1AssocLinker<Map1>,Std1AssocLinker<Map> > stdLink(Map1& tab1, Map& tab)
 { return Std2Linker<Std1AssocLinker<Map1>,Std1AssocLinker<Map> >(Std1AssocLinker<Map1>(tab1),Std1AssocLinker<Map>(tab)); }
 
-
-class RelClosure {
-    public:
-
-    template <class Cont>
-    static void empty(Cont& cont, int size)
-    {   for(int i=0;i<size;++i) for(int j=0;j<size;++j)  cont[i][j]=false;  }
-
-    template <class Cont, class Iter>
-    static void empty(Cont& cont, Iter beg,Iter end)
-    {   for(Iter i=beg;i!=end;++i) for(Iter j=beg;j!=end;++j)  cont(*i,*j)=false;  }
-
-    template <class Cont>
-    static void total(Cont& cont, int size)
-    {   for(int i=0;i<size;++i) for(int j=0;j<size;++j)  cont[i][j]=true;   }
-
-    template <class Cont,class Iter>
-    static void total(Cont& cont, Iter beg,Iter end)
-    {   for(Iter i=beg;i!=end;++i) for(Iter j=beg;j!=end;++j)  cont(*i,*j)=true; }
-
-    template <class Cont1, class Cont2, class Cont3>
-    static void reland(Cont1& cont1, Cont2& cont2,Cont3& res,int size)
-    {   for(int i=0;i<size;++i) for(int j=0;j<size;++j)  res[i][j]=cont1[i][j] && cont2[i][j];  }
-
-    template <class Cont1, class Cont2, class Cont3,class Iter>
-    static void reland(Cont1& cont1, Cont2& cont2,Cont3& res,Iter beg, Iter end)
-    {   for(Iter i=beg;i!=end;++i) for(Iter j=beg;j!=end;++j)  res(*i,*j)=cont1(*i,*j) && cont2(*i,*j);  }
-
-    template <class Cont1, class Cont2, class Cont3>
-    static void relor(Cont1& cont1, Cont2& cont2,Cont3& res,int size)
-    {   for(int i=0;i<size;++i) for(int j=0;j<size;++j)  res[i][j]=cont1[i][j] || cont2[i][j];  }
-
-    template <class Cont1, class Cont2, class Cont3,class Iter>
-    static void relor(Cont1& cont1, Cont2& cont2,Cont3& res,Iter beg, Iter end)
-    {   for(Iter i=beg;i!=end;++i) for(Iter j=beg;j!=end;++j)  res(*i,*j)=cont1(*i,*j) || cont2(*i,*j);  }
-
-    template <class Cont1, class Cont2, class Cont3>
-    static void relxor(Cont1& cont1, Cont2& cont2,Cont3& res,int size)
-    {   for(int i=0;i<size;++i) for(int j=0;j<size;++j)  res[i][j]=(cont1[i][j] != cont2[i][j]);    }
-
-    template <class Cont1, class Cont2, class Cont3,class Iter>
-    static void relxor(Cont1& cont1, Cont2& cont2,Cont3& res,Iter beg, Iter end)
-    {   for(Iter i=beg;i!=end;++i) for(Iter j=beg;j!=end;++j)  res(*i,*j)=cont1(*i,*j) != cont2(*i,*j);  }
-
-    template <class Cont1, class Cont2>
-    static void relnot(Cont1& cont1, Cont2& res,int size)
-    {   for(int i=0;i<size;++i) for(int j=0;j<size;++j)  res[i][j]=!cont1[i][j];    }
-
-    template <class Cont1, class Cont2, class Iter>
-    static void relnot(Cont1& cont1, Cont2& res,Iter beg, Iter end)
-    {   for(Iter i=beg;i!=end;++i) for(Iter j=beg;j!=end;++j)  res(*i,*j)=!cont1(*i,*j);  }
-
-    template <class Cont>
-    static void reflexive(Cont& cont, int size)
-    {   for(int i=0;i<size;++i) cont[i][i]=true;    }
-
-    template <class Cont, class Iter>
-    static void reflexive(Cont& cont,Iter beg, Iter end)
-    {   for(Iter i=beg;i!=end;++i) cont(*i,*i)=true; }
-
-    template <class Cont>
-    static void symmetric(Cont& cont, int size)
-    {   for(int i=0;i<size-1;++i) for(int j=i+1;j<size;++j)  cont[i][j]=cont[j][i]=cont[i][j] || cont[j][i];    }
-
-    template <class Cont,class Iter>
-    static void symmetric(Cont& cont,Iter beg, Iter end)
-    {   for(Iter i=beg;i!=end;++i) for(Iter j=i;j!=end;++j)
-            if (i!=j) cont(*i,*j)=cont(*j,*i)= cont(*i,*j)||cont(*j,*i);    }
-
-    template <class Cont>
-    static void transitive(Cont& cont,int size)
-    {   for(int k=0;k<size;++k) for(int i=0;i<size;++i) for(int j=0;j<size;++j)
-            cont[i][j]=cont[i][j] || (cont[i][k] && cont[k][j]);
-    }
-
-    template <class Cont, class Iter>
-    static void transitive(Cont& cont,Iter beg, Iter end)
-    {   for(Iter k=beg;k!=end;++k) for(Iter i=beg;i!=end;++i) for(Iter j=beg;j!=end;++j)
-            cont(*i,*j)=
-                cont(*i,*j) || (cont(*i,*k) && cont(*k,*j));
-    }
-
-    template <class Cont>
-    static void print(Cont& cont, int size,std::ostream& out)
-    {   for(int i=0;i<size;++i)
-        {   for(int j=0;j<size;++j)  out<< (cont[i][j] ? 1 : 0) << ' ';
-            out << '\n';
-        }
-    }
-
-    template <class Cont,class Iter>
-    static void print(Cont& cont, Iter beg, Iter end,std::ostream& out)
-    {   for(Iter i=beg;i!=end;++i)
-        {   for(Iter j=beg;j!=end;++j)  out<< (cont(*i,*j) ? 1 : 0) << ' ';
-            out << '\n';
-        }
-    }
-};
 
 }
 

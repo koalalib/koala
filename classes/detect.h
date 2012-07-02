@@ -944,9 +944,7 @@ class IsItPar : public SearchStructs {
                 if (explore(g,dir,blackHole,blackHole)==-1) return false;
                 g.getEdges(tab);
                 for(int i=0;i<m;i++)
-                {   g.chEdgeType(tab[i],Directed);
-                    if (dir[tab[i]]==EdDirIn) g.revertEdge(tab[i]);
-                }
+                    g.ch2Dir(tab[i],(dir[tab[i]]==EdDirOut) ? g.getEdgeEnd1(tab[i]) : g.getEdgeEnd2(tab[i]));
                 return true;
             }
 
