@@ -5,6 +5,9 @@
 #include "Koala/base/def_struct.h"
 #include "Koala/graph/graph.h"
 #include "Koala/graph/subgraph.h"
+#include "Koala/classes/create.h"
+#include "Koala/io/text.h"
+
 
 
 
@@ -12,97 +15,146 @@ using namespace std;
 using namespace Koala;
 
 
-bool tab[10][10],ttab[10][10]={{1,1},{1}},tttab[10][10]={{0,1},{1,1}};
-bool (*wtab)[10]=tab;
-vector<vector<bool> > vec;
-vector<bool> tab2[10];
-vector<bool> *wtab2=tab2;
+Graph<char,string> g1;
+Graph<string,char> lg1;
 
-class FunInterf {
-    public:
 
-    bool (*tab)[10];
-    FunInterf(bool (*wsk)[10]) : tab(wsk) {}
-    bool& operator()(int a,int b) const { return tab[a][b]; }
-};
+    Vertex<char,string> *A=g1.addVert('A');
+    Vertex<char,string> *B=g1.addVert('B');
+    Vertex<char,string> *C=g1.addVert('C');
+    Vertex<char,string> *D=g1.addVert('D');
 
-#define rel loctab
+string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,EdgeDirection dir)
+{   char tab[2]={0,0};
+    tab[0]=u->info;
+    string su=tab;
+    if (dir==EdLoop) return su;
+    tab[0]=v->info;
+    string sv=tab;
+    if (dir==EdUndir) tab[0]='-';
+    if (dir==EdDirOut) tab[0]='>';
+    string s=tab;
+    return su+s+sv;
+}
+
+vector<vector<int> > vec(2);
+
+int itab[]={0,1};
+int& f(int i,int j)
+{
+    return vec[i][j];
+}
 
 int main()
-{   vec.resize(10); for(int i=0;i<10;i++) vec[i].resize(10);
-    for(int i=0;i<10;i++) tab2[i].resize(10);
-//    tab3.resize(10);
-    cout << boolalpha;
+{   string strN="N";
 
-    int a,b;
-    a=10; b=20;
-    bool loctab[100][100];
 
-    int cont[5]={0,1,2,3,4};
-    FunInterf interf(tab),iinterf(ttab),iiinterf(tttab);
-    (FunInterf(tab))(2,3)=true;
+    g1.addArch(A,B,"AB");
+    g1.addArch(B,C,"BC");
+//    g1.addArch(C,A,"CA");
+//    g1.addArch(D,C,"DC");
+    g1.addLoop(B,"*B");
+    g1.addLoop(C,"*C");
 
-    cout<< "\nempty:\n";
-    RelClosure::empty(interf,cont,cont+5);
-    RelClosure::print(interf,cont,cont+5,cout);
 
-    cout<< "\ntotal:\n";
-    RelClosure::empty(interf,cont,cont+5);
-    RelClosure::total(interf,cont,cont+5);
-    RelClosure::print(interf,cont,cont+5,cout);
 
-    cout<< "\nand:\n";
-    RelClosure::empty(interf,cont,cont+5);
-    RelClosure::reland(iinterf,iiinterf,interf,cont,cont+5);
-    RelClosure::print(interf,cont,cont+5,cout);
 
-    cout<< "\nor:\n";
-    RelClosure::empty(interf,cont,cont+5);
-    RelClosure::relor(iinterf,iiinterf,interf,cont,cont+5);
-    RelClosure::print(interf,cont,cont+5,cout);
+//    g1.neg(Directed,strN);
 
-    cout<< "\nxor:\n";
-    RelClosure::empty(interf,cont,cont+5);
-    RelClosure::relxor(iinterf,iiinterf,interf,cont,cont+5);
-    RelClosure::print(interf,cont,cont+5,cout);
+    IO::writeGraphText(g1,cout,IO::RG_EdgeList);
+    cout<<endl<<endl;
 
-    cout<< "\nnot:\n";
-    RelClosure::empty(interf,cont,cont+5);
-    RelClosure::relnot(iinterf,interf,cont,cont+5);
-    RelClosure::print(interf,cont,cont+5,cout);
+    RelDiagram::transClousure(g1,"N");
 
-    cout<< "\nrefl:\n";
-    RelClosure::empty(interf,cont,cont+5);
-    tab[0][1]=tab[0][0]=tab[1][2]=true;
-    RelClosure::reflexive(interf,cont,cont+5);
-    RelClosure::print(interf,cont,cont+5,cout);
+    IO::writeGraphText(g1,cout,IO::RG_EdgeList);
 
-    cout<< "\nsym:\n";
-    RelClosure::empty(interf,cont,cont+5);
-    tab[0][1]=tab[0][0]=tab[1][2]=true;
-    RelClosure::symmetric(interf,cont,cont+5);
-    RelClosure::print(interf,cont,cont+5,cout);
 
-    cout<< "\ntran:\n";
-    RelClosure::empty(interf,cont,cont+5);
-    tab[0][1]=tab[0][0]=tab[1][2]=true;
-    RelClosure::transitive(interf,cont,cont+5);
-    RelClosure::print(interf,cont,cont+5,cout);
+    vec.clear();vec[0].resize(2);vec[1].resize(2);
+    vec[0][1]=1;
+    cout <<'\n'<< vec[0][0] << ' ' << vec[0][1] << '\n' << vec[1][0] << ' ' << vec[1][1] << endl<<endl;
+//    RelDiagram::MatrixForm::inv(f,itab,itab+2);
+    RelDiagram::MatrixForm::inv(vec,2);
+    cout <<'\n'<< vec[0][0] << ' ' << vec[0][1] << '\n' << vec[1][0] << ' ' << vec[1][1];
 
-    cout << "\n-------------\n";
-    Graph<char> g;
-    Graph<char>::PVertex U,V,W;
+    {   cout << "\n****************************\n\n";
+        Graph<char,string> g;
 
-    std::pair<Graph<char>::PVertex,Graph<char>::PVertex> ends;
-    AssocMatrix<Graph<char>::PVertex,bool,AMatrFull> matr;
+        Graph<string,char> lg;
 
-    U=g.addVert('A');V=g.addVert('B'); W=g.addVert('C');
-    g.addArch(U,V);g.addEdge(V,W);g.addLoop(W);
+        AssocTable<std::map<Edge<char,string> *,Vertex<string,char>*> > e2vmap;
+        AssocTable<std::map<Vertex<string,char>*,Edge<char,string> *> > v2emap;
 
-    makeSubgraph(g,make_pair(stdChoose(true),stdChoose(true))).getAdj(matr);
+        Edge<char,string> *e,*f;
 
-    for(ends=matr.firstKey();ends.first;ends=matr.nextKey(ends))
-        cout << "<" << ends.first->info << ',' << ends.second->info << ">\n";
+        Vertex<char,string> *A=g.addVert('A');
+        Vertex<char,string> *B=g.addVert('B');
+        Vertex<char,string> *C=g.addVert('C');
+        Vertex<char,string> *D=g.addVert('D');
+
+        e=g.addEdge(A,B,"AB");
+        f=g.addArch(A,B,"AB");
+        g.addArch(B,C,"BC");
+        g.addLoop(C,"C");
+
+    //    cout <<boolalpha << g.isEdgeEnd(e,B) <<endl;
+
+
+        IO::writeGraphText(g,cout,IO::RG_EdgeList);
+        cout<<endl<<endl;
+
+    //    LineGraph::undir(g,lg,make_pair(stdCast(),stdCast()),stdLink(v2emap ,e2vmap));
+        LineGraph::undir(g,lg,make_pair(stdCast(),stdCast()));
+        IO::writeGraphText(lg,cout,IO::RG_EdgeList);
+
+
+    //    for(Vertex<string,char> *v=lg.getVert();v;v=lg.getVertNext(v))
+    //    {  assert((v2emap[v])->info==v->info); }
+    //    for(Edge<char,string> *e=g.getEdge();e;e=g.getEdgeNext(e))
+    //    {  assert((e2vmap[e])->info==e->info); }
+
+    }
+
+    {   cout << "\n****************************\n\n";
+        Graph<char,string> g;
+
+        Graph<string,char> lg;
+
+        AssocTable<std::map<Edge<char,string> *,Vertex<string,char>*> > e2vmap;
+        AssocTable<std::map<Vertex<string,char>*,Edge<char,string> *> > v2emap;
+
+        Edge<char,string> *e,*f;
+
+        Vertex<char,string> *A=g.addVert('A');
+        Vertex<char,string> *B=g.addVert('B');
+        Vertex<char,string> *C=g.addVert('C');
+        Vertex<char,string> *D=g.addVert('D');
+
+
+        g.addArch(A,B,"AB");
+        g.addEdge(D,C,"DC");
+
+        g.addArch(B,A,"BA");
+//        g.addArch(B,C,"BC");
+
+
+    //    cout <<boolalpha << g.isEdgeEnd(e,B) <<endl;
+
+
+        IO::writeGraphText(g,cout,IO::RG_EdgeList);
+        cout<<endl<<endl;
+
+        LineGraph::dir(g,lg,make_pair(stdCast(),stdCast()),stdLink(v2emap ,e2vmap));
+    //    LineGraph::undir(g,lg,make_pair(stdCast(),stdCast()));
+        IO::writeGraphText(lg,cout,IO::RG_EdgeList);
+
+        for(Vertex<string,char> *v=lg.getVert();v;v=lg.getVertNext(v))
+        {  assert((v2emap[v])->info==v->info); }
+        for(Edge<char,string> *e=g.getEdge();e;e=g.getEdgeNext(e))
+        {  assert((e2vmap[e])->info==e->info); }
+
+        Graph<char,string> g2;
+
+    }
 
     return EXIT_SUCCESS;
 }
