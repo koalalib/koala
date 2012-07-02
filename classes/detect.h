@@ -10,6 +10,17 @@ namespace Koala
 {
 
 
+class IsItAlgsDefaultStructs : public AlgorithmsDefaultSettings {
+    public:
+
+    class LocalGraph {
+        public:
+        typedef Graph<EmptyVertInfo,EmptyVertInfo,DefaultGrSettings<Undirected,false> > Type;
+    };
+
+};
+
+
 template <class DefaultStructs>
 class IsItPar : public SearchStructs {
 
@@ -507,6 +518,21 @@ class IsItPar : public SearchStructs {
 	static bool chordal(const GraphType& g)
 	{
 	    return Chordal::getOrder(g,blackHole,blackHole);
+	}
+
+    template <class GraphType>
+	static bool cochordal(const GraphType& g)
+	{
+	    if (!undir(g,false)) return false;
+	    typename DefaultStructs::LocalGraph::Type cg;
+	    cg.copy(g);cg.neg(Undirected);
+	    return chordal(cg);
+	}
+
+	template <class GraphType>
+	static bool split(const GraphType& g)
+	{
+	    return chordal(g) && cochordal(g);
 	}
 
 //    protected:
@@ -1444,7 +1470,7 @@ class IsItPar : public SearchStructs {
 
 };
 
-class IsIt : public IsItPar<AlgorithmsDefaultSettings> {};
+class IsIt : public IsItPar<IsItAlgsDefaultStructs> {};
 
 }
 #endif

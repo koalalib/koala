@@ -57,7 +57,7 @@ class SearchStructs {
 
 /** visitor's code is called by searching algorithms (BFS, DFS, LexBFS)
  * visitor should inherit from one of:
- * - simple_visitor_tag 
+ * - simple_visitor_tag
  * - simple_preorder_visitor_tag
  * - simple_postorder_visitor_tag
  * - complex_visitor_tag
@@ -1339,7 +1339,7 @@ public:
 
         assert(((mask&Directed)==0)||((mask&Directed)==Directed)); // TODO: LexBFS ma sens dla gr. nieskierowanych, chyba?
 		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size? - spr
-        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(g.getVertNo()+1); //TODO: size? - spr 2n+1 -> n+1
+        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1); //TODO: size? - spr 2n+1 -> n+1 - oj! raczej nie!
 		LexVisitContainer<GraphType, Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > >,Privates::ListBlockListAllocator<LVCNode<GraphType> > >
             cont(allocat,allocat2,g.getVertNo());
 
@@ -1425,7 +1425,7 @@ public:
 		typename GraphType::PVertex u, v;
 		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData(g.getVertNo());
 		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size? - spr
-        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(g.getVertNo()+1); // j.w. 2n+1 -> n + 1
+        Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1); // j.w. 2n+1 -> n + 1 - oj! raczej nie!
 		LexVisitContainer<GraphType, Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > >,Privates::ListBlockListAllocator<LVCNode<GraphType> > >
             cont(allocat,allocat2,g.getVertNo());
 
@@ -1757,6 +1757,31 @@ class BlocksPar : protected SearchStructs
             const GraphType &g, typename GraphType::PVertex src, VertDataMap &vmap,
             EdgeDataMap &emap, CompStore< CompIter,VertIter > out, VertBlockIter viter,
             EdgeType type = EdAll );
+
+
+        template<class GraphType,class Iterator>
+        static int core(const GraphType &g,Iterator out, EdgeType mask=EdAll)
+        {   mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
+            typename DefaultStructs:: template AssocCont<
+                typename GraphType::PVertex, int >::Type degs(g.getVertNo());
+            std::pair<int, typename GraphType::PVertex> LOCALARRAY(buf,2*g.getVertNo());
+            PriQueueInterface< std::pair<int, typename GraphType::PVertex>*,
+                    std::greater<std::pair<int, typename GraphType::PVertex> > > q(buf,2*g.getVertNo());
+            if (!g.getVertNo()) return 0;
+            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+                q.push(std::make_pair(degs[v]=g.deg(v,mask),v));
+            while(!q.empty() && q.top().first<=1)
+            {   if (!degs.hasKey(q.top().second)) { q.pop(); continue; }
+                typename GraphType::PVertex v=q.top().second,u;
+                typename GraphType::PEdge e=g.getEdge(v,mask);
+                degs.delKey(v);q.pop();
+                if (e && degs.hasKey(u=g.getEdgeEnd(e,v))) q.push(std::make_pair(--degs[u],u));
+            }
+            for(typename GraphType::PVertex v=degs.firstKey();v;v=degs.nextKey(v))
+            {   *out=v; ++ out;   }
+            return degs.size();
+        }
+
 } ;
 
 class Blocks : public BlocksPar<AlgorithmsDefaultSettings> {};
