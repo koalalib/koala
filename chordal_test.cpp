@@ -74,12 +74,13 @@ int main() {
 			printf("bad IsChordal answer (%s instead of %s)\n",
 			       rv ? "true" : "false", tests[i].ans ? "true" : "false");
 			};
-//		rv = IsIt::cochordal(g);
-//		if(rv != tests[i].coans) {
-//			printf("bad IsCoChordal answer (%s instead of %s)\n",
-//			       rv ? "true" : "false", tests[i].ans ? "true" : "false");
-//			};
-
+		rv = IsIt::cochordal(g);
+		if(rv != tests[i].coans) {
+			printf("bad IsCoChordal answer (%s instead of %s)\n",
+			       rv ? "true" : "false", tests[i].ans ? "true" : "false");
+			};
+//        printf("\n splittest %s \n",
+//			       IsIt::split(g) ? "true" : "false");
 //		ncq = IsIt::Chordal::maxClique(g, cq);
 //		if(ncq != tests[i].clq) {
 //			printf("bad MaxClique answer (%d instead of %d)\n",
