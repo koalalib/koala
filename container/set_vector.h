@@ -88,14 +88,17 @@ template< typename Element > class Set: protected std::vector< Element > {
         Set< Element > &operator^=( const Set< Element > & );
         // Podzbiór elementów/usunięcie elementów spełniających/nie spełniających podanego
         // predykatu.
-        template< class Funktor > Set< Element > subset( Funktor );
+        template< class Funktor > Set< Element > subset( Funktor ) const;
         template< class Funktor > void truncate( Funktor );
-        template< class Iter > int getElements( Iter );
+        template< class Iter > int getElements( Iter ) const;
 
         Element first() const;
         Element last() const;
         Element next( const Element & ) const;
         Element prev( const Element & ) const;
+
+        //void reserve(int arg) { std::vector< Element >::reserve(arg); }
+        using  std::vector< Element >::reserve;
 } ;
 
 template< class Element > class SetInserter;

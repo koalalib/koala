@@ -1050,7 +1050,7 @@ class IsItPar : public SearchStructs {
             typename DefaultStructs::template AssocCont<typename GraphType::PVertex, IvData>::Type data(g.getVertNo());
 
 
-            Privates::ListBlockListAllocator<Privates::List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > allocat(2*g.getVertNo()+2); //TODO: size?
+            Privates::ListBlockListAllocator<Privates::List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > allocat(g.getVertNo()+2); //TODO: size?
             Privates::ListBlockListAllocator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > allocat2(2*g.getVertNo()+2); //TODO: size?
             Privates::ListBlockListAllocator<typename Sets::Elem> allocat3(2*g.getVertNo()*g.getVertNo()); //TODO: size?
 

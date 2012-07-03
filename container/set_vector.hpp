@@ -254,7 +254,7 @@ template< typename Element > inline
     }
 
 template< typename Element >
-    template< class Funktor > Set< Element > Set< Element >::subset( Funktor fun )
+    template< class Funktor > Set< Element > Set< Element >::subset( Funktor fun ) const
     {
         Set< Element > subs;
         typename std::vector< Element >::const_iterator i = this->begin();
@@ -270,7 +270,7 @@ template< typename Element >
     }
 
 template< typename Element >
-    template< class Iter > int Set< Element >::getElements( Iter out )
+    template< class Iter > int Set< Element >::getElements( Iter out ) const
     {
         typename std::vector< Element >::const_iterator i = this->begin();
         for( ; i != this->end(); i++ )
@@ -295,7 +295,7 @@ template< typename Element > inline
 
 template< typename Element > inline
     Element Set< Element >::prev( const Element &e ) const
-    {   if (!a) return last();
+    {   if (!e) return last();
         unsigned l = 0, r = size() - 1;
         while (l <= r && r < size()) {
             unsigned c = (l + r) >> 1;
@@ -308,7 +308,7 @@ template< typename Element > inline
 
 template< typename Element > inline
     Element Set< Element >::next( const Element &e ) const
-    {   if (!a) return first();
+    {   if (!e) return first();
         unsigned l = 0, r = size() - 1;
         while (l <= r && r < size()) {
             unsigned c = (l + r) >> 1;

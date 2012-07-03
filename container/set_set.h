@@ -82,16 +82,18 @@ template< typename Element > class Set: public std::set< Element > {
         // Podzbiór elementów/usunięcie elementów spełniających/nie spełniających podanego
         // predykatu.
         template <class Funktor>
-            Set<Element> subset( Funktor );
+            Set<Element> subset( Funktor ) const;
         template <class Funktor>
             void truncate( Funktor );
         template <class Iter>
-            int getElements( Iter );
+            int getElements( Iter ) const;
 
         Element first() const;
         Element last() const;
         Element next( const Element & ) const;
         Element prev( const Element & ) const;
+
+        void reserve(int) {}
 } ;
 
 template< class Element > class SetInserter;
@@ -101,7 +103,7 @@ class SetInserter< Set< Element > >: public std::iterator< std::output_iterator_
 {
     protected:
         Set< Element > *container;
-        
+
     public:
         typedef Set< Element > container_type;
         SetInserter( Set< Element > &x ): container( &x ) { }

@@ -190,7 +190,7 @@ template< typename Element > inline
     }
 
 template< typename Element > template< class Funktor >
-    Set< Element > Set< Element >::subset( Funktor fun )
+    Set< Element > Set< Element >::subset( Funktor fun ) const
     {
         Set< Element > subs;
         typename std::set< Element >::const_iterator i = this->begin();
@@ -206,7 +206,7 @@ template< typename Element > template< class Funktor >
     }
 
 template< typename Element > template< class Iter >
-     int Set< Element >::getElements( Iter out )
+     int Set< Element >::getElements( Iter out ) const
      {
          typename std::set< Element >::const_iterator i = this->begin();
          for( ; i != this->end(); i++ )
