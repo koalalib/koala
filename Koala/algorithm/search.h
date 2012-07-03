@@ -1338,7 +1338,7 @@ public:
 //		LexVisitContainer<GraphType, ListDefaultCPPAllocator,ListDefaultCPPAllocator2> cont(allocat,allocat2);
 
         assert(((mask&Directed)==0)||((mask&Directed)==Directed)); // TODO: LexBFS ma sens dla gr. nieskierowanych, chyba?
-		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size? - spr
+		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(g.getVertNo()+1); //TODO: size? - spr
         Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1); //TODO: size? - spr 2n+1 -> n+1 - oj! raczej nie!
 		LexVisitContainer<GraphType, Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > >,Privates::ListBlockListAllocator<LVCNode<GraphType> > >
             cont(allocat,allocat2,g.getVertNo());
@@ -1424,7 +1424,7 @@ public:
 		typename GraphType::PEdge e;
 		typename GraphType::PVertex u, v;
 		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData(g.getVertNo());
-		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size? - spr
+		Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > > allocat(g.getVertNo()+1); //TODO: size? - spr
         Privates::ListBlockListAllocator<LVCNode<GraphType> > allocat2(2*g.getVertNo()+1); // j.w. 2n+1 -> n + 1 - oj! raczej nie!
 		LexVisitContainer<GraphType, Privates::ListBlockListAllocator<Privates::List_iterator<LVCNode<GraphType> > >,Privates::ListBlockListAllocator<LVCNode<GraphType> > >
             cont(allocat,allocat2,g.getVertNo());

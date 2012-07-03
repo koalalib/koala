@@ -62,7 +62,7 @@ void scheduling_coffman()
 		G.addVert("3 "), G.addVert("4 "), G.addVert("5 "), G.addVert("6 "),
         G.addVert("7 "), G.addVert("8 "), G.addVert("9 "), G.addVert("10"),
 		G.addVert("11"), G.addVert("12"), G.addVert("13"), G.addVert("14"),
-		G.addVert("15"), G.addVert("16"), G.addVert("17"), 
+		G.addVert("15"), G.addVert("16"), G.addVert("17"),
 		G.addVert("1 "), G.addVert("2 ")
     };
 
@@ -161,7 +161,7 @@ void scheduling_liu()
 
 	cout << "Lmax = " << Scheduling::precLiu(T, T + N, G, S) << " ";
 	cout << Scheduling::LMax(T, T + N, S) << endl;
-	
+
 
 	for(int m = 0; m < S.getMachNo(); m++)
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
@@ -169,7 +169,7 @@ void scheduling_liu()
     assert(Scheduling::test(T, T + N, G, S,false));
 }
 
-void scheduling_mcnaughton()
+void scheduling_spt()
 {
 	typedef Graph<string, string> GraphType;
 	GraphType G;
@@ -190,9 +190,9 @@ void scheduling_mcnaughton()
 	};
 	Scheduling::Schedule S(3);
 
-	cout << "Cmax = " << Scheduling::mcNaughton(T, T + N, S) << " ";
-	cout << Scheduling::CMax(T, T + N, S) << endl;
-	
+	cout << "SigmaCi = " << Scheduling::spt(T, T + N, S) << " ";
+	cout << Scheduling::SigmaCi(T, T + N, S) << endl;
+
 	for(int m = 0; m < S.getMachNo(); m++)
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
 			cout << "Z" << T[i->task].vertex->info << " " << i->start << " " << i->end << endl;
@@ -219,11 +219,11 @@ void scheduling_hodgson()
 		Scheduling::Task<GraphType>(4, 0, 4, V[4]),
 		Scheduling::Task<GraphType>(2, 0, 18, V[5])
 	};
-	Scheduling::Schedule S(3);
+	Scheduling::Schedule S(1);
 
 	cout << "SigmaUi = " << Scheduling::hodgson(T, T + N, S) << " ";
 	cout << Scheduling::SigmaUi(T, T + N, S) << endl;
-	
+
 	for(int m = 0; m < S.getMachNo(); m++)
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
 			cout << "Z" << T[i->task].vertex->info << " " << i->start << " " << i->end << endl;
@@ -319,7 +319,7 @@ int main()
 	scheduling_coffman();
 	scheduling_hu();
 	scheduling_liu();
-	scheduling_mcnaughton();
+	scheduling_spt();
 	scheduling_hodgson();
 
 	scheduling_list();

@@ -8,7 +8,7 @@ int SchedulingPar<DefaultStructs>::CMax(TaskIterator begin, TaskIterator end, co
 			ans = i->rbegin()->end;
 	return ans;
 }
-	
+
 template <class DefaultStructs>
 template<typename TaskIterator>
 int SchedulingPar<DefaultStructs>::SigmaCi(TaskIterator begin, TaskIterator end, const Schedule &schedule)
@@ -179,8 +179,9 @@ bool SchedulingPar<DefaultStructs>::test(TaskIterator begin, TaskIterator end, c
 	int parts = 0, n = 0;
 	// D³ugoœci zadañ s¹ nieujemne
 	for(TaskIterator iterator = begin; iterator != end; ++iterator, n++)
-		if(iterator->length < 0)
-			return false;
+	{
+	    assert(iterator->length > 0);
+	}
 
 	// Dwa rózne zadania nie s¹ wykonywane jednoczeœnie na jednej maszynie
 	for(typename Schedule::Type::const_iterator i = schedule.machines.begin();
@@ -196,7 +197,7 @@ bool SchedulingPar<DefaultStructs>::test(TaskIterator begin, TaskIterator end, c
 	TaskPart LOCALARRAY(result, n);
 	Pair LOCALARRAY(available, parts);
 	PriQueueInterface<Pair*, compareSecondLast<Pair> > pq(available, parts);
-	
+
 	// To samo zadanie nie jest wykonywane jednoczeœnie na obu maszynach
 	for(typename Schedule::Type::const_iterator i = schedule.machines.begin();i != schedule.machines.end(); ++i)
 		for(typename Schedule::Machine::const_iterator j = i->begin(); j != i->end(); ++j)
@@ -250,7 +251,7 @@ int SchedulingPar<DefaultStructs>::ls(TaskIterator begin, TaskIterator end, cons
 	PriQueueInterface<IntPair*, compareSecondLast<IntPair> > machine(machines, schedule.getMachNo());
 	for(int i = 0; i < schedule.getMachNo(); i++)
 		machine.push(std::make_pair(i, 0));
-	
+
 	int n = 0;
 	for(TaskIterator iterator = begin; iterator != end; ++iterator, n++);
 
@@ -267,7 +268,7 @@ int SchedulingPar<DefaultStructs>::ls(TaskIterator begin, TaskIterator end, cons
 		if(element.degree == 0)
 			candidate.push(Pair(iterator->vertex, element.task.release));
 	}
-	
+
 	int time = 0, out = 0;
 	while(n--)
 	{
@@ -282,7 +283,7 @@ int SchedulingPar<DefaultStructs>::ls(TaskIterator begin, TaskIterator end, cons
 			active.push(Pair(candidate.top().first, tasks[candidate.top().first].index)), candidate.pop();
 
 		typename GraphType::PVertex u, v = active.top().first;
-		
+
 		int stop = time + tasks[v].task.length;
 		schedule.machines[machNo].push_back(TaskPart(active.top().second, time, stop));
 		machine.push(std::make_pair(machNo, stop)), active.pop();
@@ -292,7 +293,7 @@ int SchedulingPar<DefaultStructs>::ls(TaskIterator begin, TaskIterator end, cons
 			Element<Task<GraphType> > &second = tasks[u = DAG.getEdgeEnd(e, v)];
 			if(second.priority < stop)
 				second.priority = stop;
-			
+
 			if(--second.degree == 0)
 				candidate.push(Pair(u, std::max(second.priority, second.task.release)));
 		}
@@ -337,12 +338,12 @@ int SchedulingPar<DefaultStructs>::coffmanGraham(TaskIterator begin, TaskIterato
 		while(!active.empty())
 		{
 			typename VertexList::iterator smallest = active.begin();
-			std::list<int> &candidate = candidates[tasks[*smallest].second];
+			int index = tasks[*smallest].second;
 			for(typename VertexList::iterator iterator = ++(active.begin()); iterator != active.end(); ++iterator)
 			{
 				std::list<int> &next = candidates[tasks[*iterator].second];
-				if(!std::lexicographical_compare(candidate.begin(), candidate.end(), next.begin(), next.end()))
-					smallest = iterator, candidate = next;
+				if(!std::lexicographical_compare(candidates[index].begin(), candidates[index].end(), next.begin(), next.end()))
+					smallest = iterator, index = tasks[*smallest].second;
 			}
 
 			for(typename GraphType::PEdge e = DAG.getEdge(*smallest, EdDirIn); e; e = DAG.getEdgeNext(*smallest, e, EdDirIn))
@@ -351,7 +352,7 @@ int SchedulingPar<DefaultStructs>::coffmanGraham(TaskIterator begin, TaskIterato
 			order[--i] = tasks[*smallest].first, active.erase(smallest), label++;
 		}
 	}
-	
+
 	int out = SchedulingPar<DefaultStructs>::ls(order, order + n, DAG, schedule);
 	for(typename Schedule::Type::iterator i = schedule.machines.begin(); i != schedule.machines.end(); ++i)
 		for(typename Schedule::Machine::iterator j = i->begin(); j != i->end(); ++j)
@@ -587,42 +588,36 @@ int SchedulingPar<DefaultStructs>::hu(TaskIterator begin, TaskIterator end, cons
 
 template <class DefaultStructs>
 template<typename TaskIterator>
-int SchedulingPar<DefaultStructs>::mcNaughton(TaskIterator begin, TaskIterator end, Schedule &schedule)
+int SchedulingPar<DefaultStructs>::spt(TaskIterator begin, TaskIterator end, Schedule &schedule)
 {
-	int out = 0, n = 0, length = 0;
+	int n = 0;
+	for(TaskIterator iterator = begin; iterator != end; ++iterator, n++);
+
+	int LOCALARRAY(tasks, n);
+	Scheduling::sortSPT(begin, end, tasks);
+
+	int LOCALARRAY(length, n);
+	n = 0;
 	for(TaskIterator iterator = begin; iterator != end; ++iterator, n++)
+		length[n] = iterator->length;
+
+	typename Schedule::Type::iterator iter = schedule.machines.begin() + (n % schedule.getMachNo() ?
+		schedule.getMachNo() - n % schedule.getMachNo() : 0);
+	int out = 0;
+	for(int i = 0; i < n; i++)
 	{
-		out += iterator->length;
-		if(length < iterator->length)
-			length = iterator->length;
+		int time = iter->empty() ? 0 : iter->back().end;
+		iter->push_back(TaskPart(tasks[i], time, time + length[tasks[i]])), out += time + length[tasks[i]];
+		if(++iter == schedule.machines.end())
+			iter = schedule.machines.begin();
 	}
-
-	out = std::max((out + n - 1) / n, length), n = 0;
-	int index = 0, time = 0;
-	for(TaskIterator iterator = begin; iterator != end; ++iterator, n++)
-		if(time + iterator->length < out)
-		{
-			schedule.machines[index].push_back(TaskPart(n, time, time + iterator->length));
-			time += iterator->length;
-		}
-		else if(time + iterator->length == out)
-		{
-			schedule.machines[index++].push_back(TaskPart(n, time, out)), time = 0;
-		}
-		else
-		{
-			schedule.machines[index++].push_back(TaskPart(n, time, out, 1));
-			time = time + iterator->length - out;
-			schedule.machines[index].push_back(TaskPart(n, 0, time));
-		}
-
 	return out;
 }
 
 template <class DefaultStructs>
 template<typename TaskIterator>
 int SchedulingPar<DefaultStructs>::hodgson(TaskIterator begin, TaskIterator end, Schedule &schedule)
-{
+{   assert(schedule.getMachNo()==1);
 	typedef std::pair<int, int> Pair;
 
 	int n = 0;
@@ -635,27 +630,27 @@ int SchedulingPar<DefaultStructs>::hodgson(TaskIterator begin, TaskIterator end,
 	n = 0;
 	for(TaskIterator iterator = begin; iterator != end; ++iterator, n++)
 		info[n] = HodgsonElement(n, iterator->length, iterator->duedate);
-	
+
 	Pair LOCALARRAY(actives, n);
 	PriQueueInterface<Pair*, compareSecondFirst<Pair> > active(actives, n);
 
 	int out = 0, sum = 0;
 	for(int i = 0; i < n; i++)
 	{
-		HodgsonElement &element = info[tasks[i]]; 
+		HodgsonElement &element = info[tasks[i]];
 		sum += element.length;
 		active.push(Pair(element.index, element.length));
-		if(sum > info[active.top().first].duedate)
+		if(sum > element.duedate)
 		{
 			sum -= active.top().second, info[active.top().first].late = 1, out++;
 			active.pop();
 		}
 	}
-	
+
 	int time = 0;
 	for(int i = 0; i < n; i++)
 	{
-		HodgsonElement &element = info[tasks[i]]; 
+		HodgsonElement &element = info[tasks[i]];
 		if(!element.late)
 			schedule.machines[0].push_back(TaskPart(element.index, time, time + element.length)), time += element.length;
 	}

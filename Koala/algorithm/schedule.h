@@ -137,9 +137,9 @@ namespace Koala
 		template<typename GraphType, typename TaskIterator>
 		static int hu(TaskIterator, TaskIterator, const GraphType&, Schedule&);
 
-		//P|pmtn|Cmax – algorytm McNaughtona
+		//P||SigmaCi
 		template<typename TaskIterator>
-		static int mcNaughton(TaskIterator, TaskIterator, Schedule&);
+		static int spt(TaskIterator, TaskIterator, Schedule&);
 
 		//1||SigmaUi – algorytm Hodgsona
 		template<typename TaskIterator>

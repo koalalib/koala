@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-//#define KOALA_SET_ON_VECTOR
+#define KOALA_SET_ON_VECTOR
 
 #include "Koala/base/def_struct.h"
 #include "Koala/container/joinsets.h"
@@ -39,7 +39,8 @@ int main()
     int tab[]={3,0,3,4,7,7};
     int tab2[5];
 
-
+    Set<int> sset;
+    sset.reserve(5);
 
     PriQueueInterface<int*,std::less<int> > q(tab,4);
 

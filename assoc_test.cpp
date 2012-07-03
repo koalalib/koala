@@ -247,5 +247,13 @@ int main() {
 
     std::cout << "\n\n" << AssocArrayVectIntSwitch<AssocArray<Vert*,std::string,VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >  >::isAAVI();
 
+    cout << "\n\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n";
+
+    std::map<int,char> icmap;
+
+    const AssocTabInterface<std::map<int,char> > iicmap=assocTabInterf(icmap);
+
+    iicmap.size();
+
 }
 
