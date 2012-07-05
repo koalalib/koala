@@ -2,7 +2,7 @@
 #define DEF_WEIGHTS_H
 
 #include "../base/def_struct.h"
-#include "../graph/graph.h"
+//#include "../graph/graph.h"
 #include "../graph/subgraph.h"
 #include "search.h"
 #include "../container/joinsets.h"
@@ -62,7 +62,7 @@ class DijkstraPar : public ShortPathStructs {
     distances (
         const GraphType & g,
         VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        const EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {   assert(start);
@@ -130,7 +130,7 @@ class DijkstraPar : public ShortPathStructs {
     static int
         getPath(
         const GraphType& g,
-        VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
+        const VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
         typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(end);
@@ -160,7 +160,7 @@ class DijkstraPar : public ShortPathStructs {
     static PathLengths<typename EdgeContainer::ValType::DistType>
         findPath(
         const GraphType& g,
-        EdgeContainer& edgeTab,
+        const EdgeContainer& edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters,bool useHeap=false)
     {   assert(start && end);
@@ -187,7 +187,7 @@ class DijkstraPar : public ShortPathStructs {
     static PathLengths<typename EdgeContainer::ValType::DistType>
         findPath2(
         const GraphType& g,
-        EdgeContainer& edgeTab,
+        const EdgeContainer& edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters)
     {   return findPath(g,edgeTab,start,end,iters,true); }
@@ -240,7 +240,7 @@ class DijkstraPar : public ShortPathStructs {
     distances2 (
         const GraphType & g,
         VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        const EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {   assert(start);
@@ -325,7 +325,7 @@ class DAGCritPathPar : public ShortPathStructs {
             DistType length;
         };
 
-        template <class T> ValType operator[](T e) { ValType res; res.length=(DType)1; return res; }
+        template <class T> ValType operator[](T e) const { ValType res; res.length=(DType)1; return res; }
     };
 
 
@@ -334,7 +334,7 @@ class DAGCritPathPar : public ShortPathStructs {
     critPathLength (
         const GraphType & g,
         VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        const EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {
@@ -403,7 +403,7 @@ class DAGCritPathPar : public ShortPathStructs {
     static int
         getPath(
         GraphType& g,
-        VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
+        const VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
         typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(end);
@@ -430,7 +430,7 @@ class DAGCritPathPar : public ShortPathStructs {
     static PathLengths<typename EdgeContainer::ValType::DistType>
         findPath(
         const GraphType& g,
-        EdgeContainer& edgeTab,
+        const EdgeContainer& edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters)
     {
@@ -483,7 +483,7 @@ class BellmanFordPar : public ShortPathStructs {
     distances (
         const GraphType & g,
         VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        const EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {   assert(start);
@@ -609,7 +609,7 @@ class BellmanFordPar : public ShortPathStructs {
     static PathLengths<typename EdgeContainer::ValType::DistType>
         findPath(
         const GraphType& g,
-        EdgeContainer& edgeTab,
+        const EdgeContainer& edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(start && end);
@@ -643,7 +643,7 @@ class FloydPar : public PathStructs {
     template <class GraphType, class TwoDimVertContainer, class VIter, class EIter>
     static int
         getOutPathFromMatrix(const GraphType& g,
-            TwoDimVertContainer& vertMatrix, // dwuwymiarowa tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
+            const TwoDimVertContainer& vertMatrix, // dwuwymiarowa tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
             OutPath<VIter,EIter> iters,
             typename GraphType::PVertex start,
             typename GraphType::PVertex end)
@@ -689,7 +689,7 @@ class FloydPar : public PathStructs {
             DistType length;
         };
 
-        template <class T> ValType operator[](T e) { ValType res; res.length=(DType)1; return res; }
+        template <class T> ValType operator[](T e) const { ValType res; res.length=(DType)1; return res; }
     };
 
 
@@ -699,7 +699,7 @@ class FloydPar : public PathStructs {
     distances (
         const GraphType & g,
         TwoDimVertContainer& vertMatrix, // dwuwymiarowa tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
-        EdgeContainer& edgeTab) // i tablica dlugosci krawedzi
+        const EdgeContainer& edgeTab) // i tablica dlugosci krawedzi
     // i tak liczymy odleglosci pomiedzy wszystkimi parami
     {
         const typename EdgeContainer::ValType::DistType
@@ -768,7 +768,7 @@ class FloydPar : public PathStructs {
     static int
         getPath(
         const GraphType& g,
-        TwoDimVertContainer& vertMatrix, // tablica asoc. - rezultat poprzedniej funkcji
+        const TwoDimVertContainer& vertMatrix, // tablica asoc. - rezultat poprzedniej funkcji
         typename GraphType::PVertex start,
         typename GraphType::PVertex end,
         PathStructs::OutPath<VIter,EIter> iters)
@@ -812,7 +812,7 @@ class KruskalPar {
     static Result<typename EdgeContainer::ValType::WeightType>
     getForest(
         const GraphType & g,
-        EdgeContainer& edgeTab,
+        const EdgeContainer& edgeTab,
         Iter out,
         VertCompContainer& asets,
         int edgeNo, //ujemne oznacza maksymalnie duzo
@@ -870,7 +870,7 @@ class KruskalPar {
     static Result<typename EdgeContainer::ValType::WeightType>
     getMinForest(
         const GraphType & g,
-        EdgeContainer& edgeTab,
+        const EdgeContainer& edgeTab,
         Iter out,
         VertCompContainer& asets,
         int edgeNo=-1) //ujemne oznacza maksymalnie duzo
@@ -881,7 +881,7 @@ class KruskalPar {
 
     template <class GraphType, class EdgeContainer, class Iter>
     static Result<typename EdgeContainer::ValType::WeightType>
-    getMinForest(const GraphType & g,EdgeContainer& edgeTab,Iter out)
+    getMinForest(const GraphType & g,const EdgeContainer& edgeTab,Iter out)
     {
         return getMinForest(g,edgeTab,out,blackHole);
     }
@@ -891,7 +891,7 @@ class KruskalPar {
     static Result<typename EdgeContainer::ValType::WeightType>
     getMaxForest(
         const GraphType & g,
-        EdgeContainer& edgeTab,
+        const EdgeContainer& edgeTab,
         Iter out,
         VertCompContainer& asets,
         int edgeNo=-1) //ujemne oznacza maksymalnie duzo
@@ -903,7 +903,7 @@ class KruskalPar {
 
     template <class GraphType, class EdgeContainer, class Iter>
     static Result<typename EdgeContainer::ValType::WeightType>
-    getMaxForest(const GraphType & g,EdgeContainer& edgeTab,Iter out)
+    getMaxForest(const GraphType & g,const EdgeContainer& edgeTab,Iter out)
     {
         return getMaxForest(g,edgeTab,out,blackHole);
     }

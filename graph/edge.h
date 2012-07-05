@@ -18,6 +18,8 @@ protected:
 
 namespace Privates {
 
+//template <class T> struct DummyVar;
+
 template<class VertInfo, class EdgeInfo, class Settings>
 class NormalParalLink {
     protected:
@@ -38,6 +40,10 @@ struct EmptyParalLink {
                 { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
             Edge<VertInfo,EdgeInfo,Settings>* &pParal()
                 { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
+//            DummyVar<Edge<VertInfo,EdgeInfo,Settings>*> nParal()
+//                { return DummyVar<Edge<VertInfo,EdgeInfo,Settings>*>(); }
+//            DummyVar<Edge<VertInfo,EdgeInfo,Settings>*> pParal()
+//                { return DummyVar<Edge<VertInfo,EdgeInfo,Settings>*>(); }
 };
 
 template<class VertInfo, class EdgeInfo, class Settings, bool Present>

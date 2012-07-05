@@ -35,6 +35,7 @@ class AdjMatrix<VertInfo , EdgeInfo , Settings,true> {
 
         void clear() { dirs.clear(); undirs.clear(); }
         void defrag() { dirs.defrag(); undirs.defrag(); }
+        void reserve(int size) { dirs.reserve(size); undirs.reserve(size); }
         void add(  Koala::Edge< VertInfo,EdgeInfo,Settings > * );
         void delVert(Koala::Vertex< VertInfo,EdgeInfo,Settings > * u)
         {   if (Settings::EdAllow & EdUndir) undirs.delInd(u);
@@ -64,6 +65,7 @@ class AdjMatrix<VertInfo , EdgeInfo , Settings,false> {
         void defrag() {}
         void add( void* ) {}
         void delVert(void* ) {}
+        void reserve(int) { }
         Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >& vald(void* ,void*)
             { return *(Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >*)(_KoalaEmptyEdgePoiner); }
         Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >& valund(void* ,void*)

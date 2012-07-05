@@ -17,8 +17,6 @@
 #include "../base/def_struct.h"
 
 
-#ifndef KOALA_GRAPH_PARAMS_DEFINED
-
 namespace Koala {
 
 template <EdgeType edAllow, bool adjMatrixAllowed>
@@ -74,7 +72,6 @@ class DefaultGrSettings {
 
 }
 
-#endif
 
 #include "adjmatrix.h"
 #include "vertex.h"
@@ -109,6 +106,7 @@ class SubgraphBase
 
 namespace Privates {
 
+
 template <EdgeType EdgeAllow>
 class EdgeCounterLoop
 {   protected:
@@ -123,6 +121,7 @@ class EdgeCounterLoop<0>
 {   protected:
 
     int & no() const { return _KoalaEmptyVertDegree; }
+//    DummyVar<int> no() const { return DummyVar<int>(); }
 };
 
 template <EdgeType EdgeAllow>
@@ -142,6 +141,7 @@ class EdgeCounterDir<0>
 {   protected:
 
     int & no() const { return _KoalaEmptyVertDegree; }
+//    DummyVar<int> no() const { return DummyVar<int>(); }
 };
 
 template <EdgeType EdgeAllow>
@@ -158,6 +158,7 @@ class EdgeCounterUndir<0>
 {   protected:
 
     int & no() const { return _KoalaEmptyVertDegree; }
+//    DummyVar<int> no() const { return DummyVar<int>(); }
 };
 
 }
@@ -397,6 +398,19 @@ class Graph: public SubgraphBase,
         template <class OutIter> int getIndEdges(OutIter,const Set<PVertex>&, EdgeType = EdAll ) const;
         Set< PEdge > getIndEdgeSet(const Set<PVertex>&, EdgeType = EdAll ) const;
 
+        // krawedzie danego typu  wyprowadzajace poza dany zbior wierzcholkow
+        template <class Iterator,class OutIter> int getOutEdges(OutIter,Iterator, Iterator, EdgeDirection = EdDirOut ) const;
+        template <class Iterator> Set< PEdge > getOutEdgeSet(Iterator beg, Iterator end, EdgeDirection = EdDirOut ) const;
+        template <class OutIter> int getOutEdges(OutIter,const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
+        Set< PEdge > getOutEdgeSet(const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
+
+
+        // ... i ich drugie konce
+        template <class Iterator,class OutIter> int getOutEnds(OutIter,Iterator, Iterator, EdgeDirection = EdDirOut ) const;
+        template <class Iterator> Set< PVertex > getOutEndSet(Iterator beg, Iterator end, EdgeDirection = EdDirOut ) const;
+        template <class OutIter> int getOutEnds(OutIter,const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
+        Set< PVertex > getOutEndSet(const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
+
 
         // Usuwamy wierzchołek z grafu.
         inline void del( PVertex, bool = true );
@@ -557,6 +571,7 @@ class Graph: public SubgraphBase,
         inline bool defragAdjMatrix();
         // czy ten typ grafu obsluguje macierz sasiedztwa
         static bool allowedAdjMatrix() { return Settings::AdjMatrixAllowed; }
+        inline void reserveAdjMatrix(int);
 
     // ??
         const Graph< VertInfo,EdgeInfo,Settings > *getRootPtr() const { return this; }

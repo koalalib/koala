@@ -1757,6 +1757,90 @@ Graph< VertInfo,EdgeInfo,Settings >::getIndEdgeSet(const Set<typename Graph< Ver
     return res;
 }
 
+template< class VertInfo, class EdgeInfo, class Settings > template <class Iterator, class OutIter>
+int Graph< VertInfo,EdgeInfo,Settings >::getOutEdges(OutIter out,Iterator beg, Iterator end, EdgeDirection dir) const
+{   int licze=0;
+    dir&=(~EdLoop);
+    typename Settings:: template VertAssocCont
+            <typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,bool>::Type vset(getVertNo());
+    for(Iterator i=beg;i!=end;++i ) vset[*i]=true;
+    for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=vset.firstKey();v;v=vset.nextKey(v))
+        for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(v,dir );e;e=getEdgeNext(v,e,dir ))
+            if (!vset.hasKey(getEdgeEnd(e,v)))
+//    for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(type );e;e=getEdgeNext(e,type ))
+//        if (vset.hasKey(getEdgeEnd1(e)) && vset.hasKey(getEdgeEnd2(e)))
+            { *out=e; ++out; ++ licze; }
+    return licze;
+}
+
+template< class VertInfo, class EdgeInfo, class Settings > template <class Iterator>
+Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge>
+Graph< VertInfo,EdgeInfo,Settings >::getOutEdgeSet(Iterator beg, Iterator end, EdgeDirection dir ) const
+{
+    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> res;
+    getOutEdges(setInserter(res),beg,end,dir);
+    return res;
+}
+
+template< class VertInfo, class EdgeInfo, class Settings > template <class OutIter>
+int Graph< VertInfo,EdgeInfo,Settings >::getOutEdges(OutIter out,const Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>& vset, EdgeDirection dir ) const
+{
+    return getOutEdges(out,vset.begin(),vset.end(),dir);
+}
+
+template< class VertInfo, class EdgeInfo, class Settings >
+Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge>
+Graph< VertInfo,EdgeInfo,Settings >::getOutEdgeSet(const Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>& vset, EdgeDirection dir ) const
+{
+    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> res;
+    getOutEdges(setInserter(res),vset.begin(),vset.end(),dir);
+    return res;
+}
+
+
+template< class VertInfo, class EdgeInfo, class Settings > template <class Iterator, class OutIter>
+int Graph< VertInfo,EdgeInfo,Settings >::getOutEnds(OutIter out,Iterator beg, Iterator end, EdgeDirection dir) const
+{   int liczv=0;
+    dir&=(~EdLoop);
+    typename Settings:: template VertAssocCont
+            <typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,bool>::Type vset(getVertNo());
+    for(Iterator i=beg;i!=end;++i ) vset[*i]=true;
+    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex LOCALARRAY(tabv,getEdgeNo(dir));
+    for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=vset.firstKey();v;v=vset.nextKey(v))
+        for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(v,dir );e;e=getEdgeNext(v,e,dir ))
+            if (!vset.hasKey(getEdgeEnd(e,v)))
+                tabv[liczv++]=getEdgeEnd(e,v);
+    Settings::sort( tabv,tabv + liczv );
+    liczv = std::unique( tabv,tabv + liczv ) - tabv;
+    for(int i=0;i<liczv;i++)
+    {   *out=tabv[i]; ++out; }
+    return liczv;
+}
+
+template< class VertInfo, class EdgeInfo, class Settings > template <class Iterator>
+Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>
+Graph< VertInfo,EdgeInfo,Settings >::getOutEndSet(Iterator beg, Iterator end, EdgeDirection dir ) const
+{
+    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> res;
+    getOutEnds(setInserter(res),beg,end,dir);
+    return res;
+}
+
+template< class VertInfo, class EdgeInfo, class Settings > template <class OutIter>
+int Graph< VertInfo,EdgeInfo,Settings >::getOutEnds(OutIter out,const Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>& vset, EdgeDirection dir ) const
+{
+    return getOutEnds(out,vset.begin(),vset.end(),dir);
+}
+
+template< class VertInfo, class EdgeInfo, class Settings >
+Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>
+Graph< VertInfo,EdgeInfo,Settings >::getOutEndSet(const Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>& vset, EdgeDirection dir ) const
+{
+    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> res;
+    getOutEnds(setInserter(res),vset.begin(),vset.end(),dir);
+    return res;
+}
+
 
 template< class VertInfo, class EdgeInfo, class Settings > template <class Iterator>
 int Graph< VertInfo,EdgeInfo,Settings >::delIndEdges(Iterator beg, Iterator end, EdgeType type )
@@ -2293,6 +2377,13 @@ inline bool Graph< VertInfo,EdgeInfo,Settings >::defragAdjMatrix()
     if (!pAdj) return false;
     pAdj->defrag();
     return true;
+}
+
+template< class VertInfo, class EdgeInfo, class Settings >
+inline void Graph< VertInfo,EdgeInfo,Settings >::reserveAdjMatrix(int size)
+{
+    if (!pAdj) return;
+    pAdj->reserve(size);
 }
 
 template< class VertInfo, class EdgeInfo, class Settings >

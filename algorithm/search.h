@@ -18,6 +18,71 @@ namespace Koala {
  * ------------------------------------------------------------------------- */
 
 
+struct PathStructs {
+    // Do odczytu sciezki miedzy wierzcholkiem a korzeniem, gdy droga wyznaczona jest w postaci
+    // tablicy asocjacyjnej PVertex -> rekord z polami vPrev, ePrev (wierzcholek poprzedni i krawedz do niego).
+    // Przydatne w roznych algorytmach najkrotszej sciezki
+    // Uzytkownik podaje, gdzie wpisac wierzcholki i krawedzie najkrotszej sciezki
+    template <class VIter, class EIter> struct OutPath {
+            VIter vertIter;
+            EIter edgeIter;
+
+            OutPath(VIter av, EIter ei) : vertIter(av), edgeIter(ei) {}
+        };
+        // funkcja tworzaca, analogia make_pair
+    template <class VIter, class EIter>
+    static OutPath<VIter,EIter> outPath(VIter av, EIter ei) { return OutPath<VIter,EIter>(av,ei); }
+
+};
+
+
+struct ShortPathStructs : public PathStructs {
+
+    template <class GraphType, class VertContainer, class VIter, class EIter>
+    static int
+        getOutPath(const GraphType& g,
+            const VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
+            OutPath<VIter,EIter> iters,
+            typename GraphType::PVertex end,
+            typename GraphType::PVertex start=0) // ew. wczesniejszy punkt koncowy sciezki
+        {   assert(end);
+            typename GraphType::PVertex u,v=vertTab[end].vPrev;
+            typename GraphType::PEdge  e=vertTab[end].ePrev;
+            typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
+            typename GraphType::PEdge LOCALARRAY(tabE,g.getVertNo());
+            int len=0;
+
+            if (end!=start) for(;v;len++)
+               { tabV[len]=v; tabE[len]=e; e=vertTab[v].ePrev; v=(v==start) ? 0 : vertTab[v].vPrev; }
+
+            for(int i=len-1;i>=0;i--)
+                { *iters.vertIter=tabV[i];*iters.edgeIter=tabE[i];++iters.vertIter;++iters.edgeIter; }
+            *iters.vertIter=end;++iters.vertIter;
+            return len;
+    }
+
+    template <class GraphType, class VertContainer,class Iter>
+    static int getUsedEdges(const GraphType &g,const VertContainer& vertTab,Iter iter)
+    {   int l=0;
+        if (vertTab.empty()) return 0;
+        for(typename VertContainer::KeyType v=vertTab.firstKey();;v=vertTab.nextKey(v))
+        {   typename GraphType::PEdge e;
+            if (v && (e=vertTab[v].ePrev)) {*iter=e; ++iter; l++; }
+            if (v==vertTab.lastKey()) break;
+        }
+        return l;
+    }
+
+    template <class GraphType, class VertContainer>
+    static Set<typename GraphType::PEdge> getUsedEdgesSet(const GraphType &g,const VertContainer& vertTab)
+    {   Set<typename GraphType::PEdge> res;
+        getUsedEdges(g,vertTab,setInserter(res));
+        return res;
+    }
+
+};
+
+
 class SearchStructs {
 
     public:

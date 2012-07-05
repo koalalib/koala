@@ -72,14 +72,14 @@ void JoinableSets< ITEM,AssocContainer >::resize( unsigned int n )
 }
 
 template< class ITEM, class AssocContainer > template< class Iter >
-int JoinableSets< ITEM,AssocContainer >::getElements( Iter iter )
+int JoinableSets< ITEM,AssocContainer >::getElements( Iter iter ) const
 {
     mapa.getKeys( iter );
     return siz;
 }
 
 template< class ITEM, class AssocContainer > template <class Iter>
-int  JoinableSets< ITEM,AssocContainer >::getSetIds( Iter iter )
+int  JoinableSets< ITEM,AssocContainer >::getSetIds( Iter iter ) const
 {
     for( int i = 0; i < siz; i++ )
         if (bufor[i].parent == bufor + i)
@@ -92,7 +92,7 @@ int  JoinableSets< ITEM,AssocContainer >::getSetIds( Iter iter )
 
 template< class ITEM, class AssocContainer > template <class Iter>
 int JoinableSets< ITEM,AssocContainer >::getSet(
-    typename JoinableSets< ITEM >::Repr s, Iter iter )
+    typename JoinableSets< ITEM >::Repr s, Iter iter ) const
 {
     if (!s) return 0;
     s = getSetId( s );
@@ -105,20 +105,20 @@ int JoinableSets< ITEM,AssocContainer >::getSet(
 }
 
 template< class ITEM, class AssocContainer > template <class Iter>
-int  JoinableSets< ITEM,AssocContainer >::getSet( const ITEM &i, Iter iter )
+int  JoinableSets< ITEM,AssocContainer >::getSet( const ITEM &i, Iter iter ) const
 {
     return getSet( getSetId( i ),iter );
 }
 
 template< class ITEM, class AssocContainer >
-int JoinableSets< ITEM,AssocContainer >::size( typename JoinableSets< ITEM >::Repr s )
+int JoinableSets< ITEM,AssocContainer >::size( typename JoinableSets< ITEM >::Repr s ) const
 {
     if (!s) return 0;
     return getSetId( s )->size;
 }
 
 template< class ITEM, class AssocContainer >
-int  JoinableSets< ITEM,AssocContainer >::size( const ITEM &i )
+int  JoinableSets< ITEM,AssocContainer >::size( const ITEM &i ) const
 {
     typename JoinableSets< ITEM >::Repr s = getSetId( i );
     return (s) ? s->size : 0;
@@ -143,7 +143,7 @@ JoinableSets< ITEM,AssocContainer >::makeSinglet( const ITEM &i )
 
 template< class ITEM, class AssocContainer >
 typename JoinableSets< ITEM >::Repr
-JoinableSets< ITEM,AssocContainer >::getSetId( const ITEM &i )
+JoinableSets< ITEM,AssocContainer >::getSetId( const ITEM &i ) const
 {
     if (!mapa.hasKey( i )) return 0;
     return getSetId( mapa[i] );
@@ -151,7 +151,7 @@ JoinableSets< ITEM,AssocContainer >::getSetId( const ITEM &i )
 
 template< class ITEM, class AssocContainer >
 typename JoinableSets<ITEM>::Repr
-JoinableSets< ITEM,AssocContainer >::getSetId( typename JoinableSets< ITEM >::Repr s)
+JoinableSets< ITEM,AssocContainer >::getSetId( typename JoinableSets< ITEM >::Repr s) const
 {
     if (!s) return 0;
     typename JoinableSets< ITEM >::Repr p;
@@ -211,7 +211,7 @@ JoinableSets< ITEM,AssocContainer >::join(
 }
 
 template< typename Element, typename Cont >
-std::ostream &operator<<( std::ostream &is, JoinableSets< Element,Cont > &s )
+std::ostream &operator<<( std::ostream &is,const JoinableSets< Element,Cont > &s )
 {
     is << "{";
     int l = s.getSetNo();

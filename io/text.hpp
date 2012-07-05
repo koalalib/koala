@@ -208,7 +208,7 @@ namespace Privates {
  */
 template<class Graph, class VMap, class EMap>
 bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf,
-                  VMap& vmap, EMap& emap) {
+                  const VMap& vmap,const EMap& emap) {
 	unsigned int i;
 	EdgeDirection flags;
 	typename Graph::PEdge e;
@@ -269,7 +269,7 @@ bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
  */
 template<class Graph, class VMap, class EMap>
 bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf,
-                  VMap& vmap, EMap& emap) {
+                  const VMap& vmap,const EMap& emap) {
 	unsigned int idx,i=0;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u;
@@ -312,7 +312,7 @@ bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
  */
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format, std::pair<bool,bool> printinf,
-                    VMap& vmap, EMap& emap) {
+                    const VMap& vmap,const EMap& emap) {
 	switch(format) {
 		case RG_VertexLists:	return Privates::writeGraphVL(g, out, printinf,vmap,emap);
 		case RG_EdgeList:	return Privates::writeGraphEL(g, out, printinf,vmap,emap);

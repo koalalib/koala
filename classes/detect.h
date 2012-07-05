@@ -535,128 +535,6 @@ class IsItPar : public SearchStructs {
 	    return chordal(g) && cochordal(g);
 	}
 
-//    protected:
-//
-//	    class CoChordal : public Chordal {
-//        public:
-//
-//        template<class Graph>
-//        static bool CoChordalTest(const Graph &g) {
-//            if (!undir(g,false)) return false;
-//            int i, m, n, p, ui, vi;
-//            int x, px, xp, pxp;
-//            bool fail;
-//            n = g.getVertNo();
-//            m = g.getEdgeNo(EdUndir);
-//
-//            int LOCALARRAY(parent, n);
-//            int LOCALARRAY(postOrd, n);
-//            int LOCALARRAY(RNp, n + 1);
-//            int LOCALARRAY(RN2, n + m);
-//            typename Graph::PEdge e;
-//            typename Graph::PVertex u, v;
-//            typename Graph::PVertex LOCALARRAY(pi, n);
-//            std::pair<int, int> LOCALARRAY(RN, n + m);
-//            typename DefaultStructs::template AssocCont<typename Graph::PVertex, int>::Type vidx(n);
-//
-//            for(i = 0, v = g.getVert(); v != NULL; v = g.getVertNext(v))
-//                pi[i++] = v;
-//            Privates::CoLexBFS::order2(g, n, pi, EdUndir, pi);
-//            std::reverse(pi, pi + n);
-//
-//            for(i = 0; i < n; i++) vidx[pi[i]] = i;
-//
-//            // let RN(x) be its neighbors to the right
-//            for(ui = 0, p = 0; ui < n; ui++) {
-//                u = pi[ui];
-//                RNp[ui] = p;
-//                for(e = g.getEdge(u, EdUndir );
-//                    e != NULL;
-//                    e = g.getEdgeNext(u, e)) {
-//                    v = g.getEdgeEnd(e, u);
-//                    vi = vidx[v];
-//                    if(vi <= ui) continue;
-//                    RN[p++] = std::make_pair(ui, vi);
-//                    };
-//                };
-//            RNp[n] = p;
-//
-//            Chordal::RadixSort(RN, p, n, RNp, RN2);
-//
-//            // let parent(x) be the leftmost non-neighbour to the right in pi
-//            for(i = 0; i < n; i++) {
-//                if(RNp[i] < RNp[i + 1]) {
-//                    if(RN2[RNp[i]] > i + 1) parent[i] = i + 1;
-//                    else {
-//                        int j = RNp[i];
-//                        while(j < RNp[i + 1] - 1) {
-//                            if(RN2[j] + 1 < RN2[j + 1]) {
-//                                parent[i] = RN2[j] + 1;
-//                                break;
-//                                };
-//                            j++;
-//                            };
-//                        if(j == RNp[i + 1] - 1)
-//                            parent[i] = RN2[j] + 1;
-//                        };
-//                    if(parent[i] >= n) parent[i] = -1;
-//                } else {
-//                    if(i < n - 1) parent[i] = i + 1;
-//                    else parent[i] = -1;
-//                    };
-//                };
-//
-//            fail = false;
-//
-//            // let T be the the defined by the parent pointers
-//            Chordal::SemiPostOrderTree(parent, n, postOrd);
-//
-//            // for each vertex in T in postorder
-//            for(i = 0; i < n; i++) {
-//                x = postOrd[i];
-//                //check that RN(parent(x)) sub RN(x)
-//                xp = RNp[x];
-//                if(parent[x] < 0) continue;
-//                px = parent[x];
-//                pxp = RNp[px];
-//
-//                for(; xp < RNp[x + 1] && pxp < RNp[px + 1];) {
-//                    if(RN2[xp] == RN2[pxp]) {	// match
-//                        xp++;
-//                        pxp++;
-//                        continue;
-//                    } else if(RN2[xp] < RN2[pxp]) {	// mismatch
-//                        xp++;
-//                        continue;
-//                    } else {			// mismatch
-//                        fail = true;
-//                        break;
-//                        };
-//                    };
-//                if(pxp < RNp[parent[x] + 1]) fail = true;
-//
-//                if(fail) return false;
-//                };
-//
-//            return true;
-//            };
-//
-//	    };
-//
-//    public:
-//
-//    template <class GraphType>
-//	static bool cochordal(const GraphType& g)
-//	{
-//	    return CoChordal::CoChordalTest(g);
-//	}
-//
-//    template <class GraphType>
-//	static bool split(const GraphType& g)
-//	{
-//	    return chordal(g)&& cochordal(g);
-//	}
-
 
     class Comparability {
 
@@ -1010,25 +888,31 @@ class IsItPar : public SearchStructs {
             {   return std::max(a.left,b.left)<= std::min(a.right,b.right); }
 
         template<class GraphType,class Iter,class IterOut, class VInfoGen, class EInfoGen>
-        static void segs2graph(GraphType &g,Iter begin, Iter end,IterOut out,VInfoGen vinfo, EInfoGen einfo)
-        {   int licz=0,i=0,j=0;
+        static typename GraphType::PVertex
+        segs2graph(GraphType &g,Iter begin, Iter end,IterOut out,VInfoGen vinfo, EInfoGen einfo)
+        {   typename GraphType::PVertex res=0,tmp;
+            int licz=0,i=0,j=0;
             Iter it;
             for(it=begin;it!=end;++it)
             {   assert((*it).left<(*it).right); licz++;    }
+            if (!licz) return 0;
             typename GraphType::PVertex LOCALARRAY(tabv,licz);
             for(it=begin;it!=end;++it)
-                tabv[i++]=g.addVert(vinfo(i));
+            {   tmp=tabv[i++]=g.addVert(vinfo(i));
+                if (!res) res=tmp;
+            }
             for(i=0, it=begin;it!=end;++it,++i)
             {   Iter it2=it;it2++;j=i+1;
                 for(;it2!=end;++it2,j++) if (touch(*it,*it2)) g.addEdge(tabv[i],tabv[j],einfo(i,j),EdUndir);
             }
             for(i=0;i<licz;i++)
             { *out=tabv[i]; ++out;  }
+            return res;
         }
 
         template<class GraphType,class Iter,class IterOut>
-        static void segs2graph(GraphType &g,Iter begin, Iter end,IterOut out)
-        {  segs2graph(g,begin,end,out,
+        static typename GraphType::PVertex segs2graph(GraphType &g,Iter begin, Iter end,IterOut out)
+        {  return segs2graph(g,begin,end,out,
                             ConstFunctor<typename GraphType::VertInfoType>(),
                             ConstFunctor<typename GraphType::EdgeInfoType>());
         }
@@ -1172,16 +1056,7 @@ class IsItPar : public SearchStructs {
                     return m_data[id].first.front().value;
                     };
 
-            //	void dump() {
-            //		for(int i = 0; i < m_data.size(); i++) {
-            //			typename Entry::iterator it;
-            //			printf("%d:", i);
-            //			for(it = m_data[i].first.begin(); it != m_data[i].first.end(); ++it) {
-            //				printf(" %d", it->value);
-            //				};
-            //			printf("\n");
-            //			};
-            //		};
+
 
 //            private:
                 // para: lista dla v + wskaŸnik na g³owê v na innych listach
