@@ -14,7 +14,7 @@ Graph<char,string> g1;
     Vertex<char,string> *A=g1.addVert('A');
     Vertex<char,string> *B=g1.addVert('B');
     Vertex<char,string> *C=g1.addVert('C');
-//    Vertex<char,string> *D=g1.addVert('D');
+    Vertex<char,string> *D=g1.addVert('D');
 
 string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,EdgeDirection dir)
 {   char tab[2]={0,0};
@@ -82,19 +82,27 @@ int main() {
     IO::writeGraphText(g1,cout,IO::RG_EdgeList);
     cout<< endl<<endl;
 
+    g1.addArch(A,D,"A>D");
+    #define mask EdDirIn
 
-    std::pair<int,int> intp=g1.findParals(make_pair(tabE,tabE2),EdUndir);
-    for(int i=0;i<intp.first;i++) cout << tabE[i]->info << '\n';
-    cout<< endl<<endl;
-    for(int i=0;i<intp.second;i++) cout << tabE2[i]->info << '\n';
+    vset=A; vset+=B;
+    for(int i=0;i<g1.getOutEnds(tabV,vset,mask);i++) cout << tabV[i]->info << ' ';
+    cout << endl;
+    for(int i=0;i<g1.getOutEnds(tabV,vset.begin(),vset.end(),mask);i++) cout << tabV[i]->info << ' ';
+    cout << endl << g1.getOutEndSet(vset.begin(),vset.end(),mask) << '\t' << g1.getOutEndSet(vset,mask);
 
-    g1.getEdges(tabE3);g1.getEdges(tabE3+g1.getEdgeNo());
-    cout<< endl<<endl<<g1.delAllParals2(tabE3,tabE3+2*g1.getEdgeNo(),EdUndir)<<endl;
-
-    intp=g1.findParals(make_pair(tabE,tabE2),EdUndir);
-    for(int i=0;i<intp.first;i++) cout << tabE[i]->info << '\n';
-    cout<< endl<<endl;
-    for(int i=0;i<intp.second;i++) cout << tabE2[i]->info << '\n';
+//    std::pair<int,int> intp=g1.findParals(make_pair(tabE,tabE2),EdUndir);
+//    for(int i=0;i<intp.first;i++) cout << tabE[i]->info << '\n';
+//    cout<< endl<<endl;
+//    for(int i=0;i<intp.second;i++) cout << tabE2[i]->info << '\n';
+//
+//    g1.getEdges(tabE3);g1.getEdges(tabE3+g1.getEdgeNo());
+//    cout<< endl<<endl<<g1.delAllParals2(tabE3,tabE3+2*g1.getEdgeNo(),EdUndir)<<endl;
+//
+//    intp=g1.findParals(make_pair(tabE,tabE2),EdUndir);
+//    for(int i=0;i<intp.first;i++) cout << tabE[i]->info << '\n';
+//    cout<< endl<<endl;
+//    for(int i=0;i<intp.second;i++) cout << tabE2[i]->info << '\n';
 
 //    Edge<char,string> *tab[50]={e,0,e};
 //    vset=A;vset+=B;

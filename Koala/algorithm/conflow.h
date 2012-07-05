@@ -7,7 +7,7 @@
 #include <cassert>
 #include <limits>
 #include "../base/def_struct.h"
-#include "../graph/graph.h"
+//#include "../graph/graph.h"
 #include "../graph/subgraph.h"
 #include "../algorithm/search.h"
 
@@ -835,7 +835,7 @@ class FlowPar : public PathStructs {
     template <class GraphType, class EdgeContainer>
     static bool testFlow (
         const GraphType & g,
-        EdgeContainer& edgeTab,
+        const EdgeContainer& edgeTab,
         typename GraphType::PVertex S, typename GraphType::PVertex T)
     {   const typename EdgeContainer::ValType::CapacType Zero
                     = DefaultStructs:: template NumberTypeBounds
@@ -1031,7 +1031,7 @@ class FlowPar : public PathStructs {
 
     template <class GraphType, class EdgeContainer, class VertContainer>
     static bool
-    transship (GraphType & g, EdgeContainer& edgeTab, VertContainer& vertTab)
+    transship (GraphType & g, EdgeContainer& edgeTab,const VertContainer& vertTab)
     {
         const typename EdgeContainer::ValType::CapacType Zero
                     = DefaultStructs:: template NumberTypeBounds
@@ -1086,7 +1086,7 @@ class FlowPar : public PathStructs {
 
     template <class GraphType, class EdgeContainer, class VertContainer>
     static typename EdgeContainer::ValType::CostType
-    minCostTransship (GraphType & g, EdgeContainer& edgeTab, VertContainer& vertTab)
+    minCostTransship (GraphType & g, EdgeContainer& edgeTab,const VertContainer& vertTab)
     {
         const typename EdgeContainer::ValType::CapacType Zero
                     = DefaultStructs:: template NumberTypeBounds
@@ -1254,7 +1254,7 @@ class Flow : public FlowPar<FlowAlgsDefaultStructs> {};
 
 
 
-class ConnectParAlgsDefaultStructs : public FlowAlgsDefaultStructs {
+class ConnectAlgsDefaultStructs : public FlowAlgsDefaultStructs {
     public:
 
     template <class A, class B> class LocalGraph {
@@ -1354,7 +1354,7 @@ class ConnectPar : public PathStructs {
             if (edgeTab[e].flow) paths[e]=0;
         for(int i=0;i<res;i++) paths[g.addArch(end,start)]=-1;
             EulerPar<DefaultStructs>:: template getCycle(
-                makeSubgraph(g,std::make_pair(stdChoose(true),assocKeyChoose(assocTabInterf(paths)))),
+                makeSubgraph(g,std::make_pair(stdChoose(true),extAssocKeyChoose(&(paths)))),
                 start,outPath(blackHole,euler),EdDirOut);
         int r=0;
         for(int i=0;i<paths.size();i++)
@@ -1362,7 +1362,7 @@ class ConnectPar : public PathStructs {
         int l=0;
         for(r=0;r<res;r++)
         {   int j=BFSPar<DefaultStructs>:: template getPath(
-                makeSubgraph(g,std::make_pair(stdChoose(true),assocChoose(assocTabInterf(paths),r))),
+                makeSubgraph(g,std::make_pair(stdChoose(true),extAssocChoose(&(paths),r))),
                 start,end,outPath(vout,eout),EdDirOut);
             l+=j + ((vertsoutflag)?1:0); *liter=l; ++liter;
             if (!isBlackHole(iters.edgeIter))
@@ -1553,7 +1553,7 @@ class ConnectPar : public PathStructs {
 
 };
 
-class Connect : public ConnectPar<ConnectParAlgsDefaultStructs> {};
+class Connect : public ConnectPar<ConnectAlgsDefaultStructs> {};
 
 
 }

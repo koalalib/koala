@@ -44,23 +44,23 @@ class JoinableSets
 
         void resize( unsigned int );
 
-        int size() { return siz; }
-        bool empty() { return siz == 0; }
-        bool operator!() { return empty(); }
+        int size() const { return siz; }
+        bool empty() const { return siz == 0; }
+        bool operator!() const { return empty(); }
         void clear() { resize( 0 ); }
-        int getSetNo() { return part_no; }
-        template< class Iter > int getElements( Iter );
+        int getSetNo() const { return part_no; }
+        template< class Iter > int getElements( Iter ) const;
 
-        template< class Iter > int getSetIds( Iter );
-        template< class Iter > int getSet( typename JoinableSets< ITEM >::Repr, Iter );
-        template< class Iter > int getSet( const ITEM &, Iter );
+        template< class Iter > int getSetIds( Iter ) const;
+        template< class Iter > int getSet( typename JoinableSets< ITEM >::Repr, Iter ) const;
+        template< class Iter > int getSet( const ITEM &, Iter ) const;
 
-        int size( typename JoinableSets< ITEM >::Repr );
-        int size( const ITEM & );
+        int size( typename JoinableSets< ITEM >::Repr ) const;
+        int size( const ITEM & ) const;
 
         typename JoinableSets< ITEM >::Repr makeSinglet( const ITEM & );
-        typename JoinableSets<ITEM>::Repr getSetId( const ITEM & );
-        typename JoinableSets<ITEM>::Repr getSetId(typename JoinableSets< ITEM >::Repr );
+        typename JoinableSets<ITEM>::Repr getSetId( const ITEM & ) const;
+        typename JoinableSets<ITEM>::Repr getSetId(typename JoinableSets< ITEM >::Repr ) const;
         typename JoinableSets<ITEM>::Repr join(
             typename JoinableSets< ITEM >::Repr, typename JoinableSets< ITEM >::Repr );
         typename JoinableSets< ITEM >::Repr join( const ITEM &, const ITEM & );
@@ -71,7 +71,7 @@ class JoinableSets
 } ;
 
 template< typename Element, typename Cont >
-std::ostream &operator<<( std::ostream &, JoinableSets< Element,Cont > & );
+std::ostream &operator<<( std::ostream &,const JoinableSets< Element,Cont > & );
 
 
 template <class T>

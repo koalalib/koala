@@ -164,7 +164,7 @@ class Subgraph: public SubgraphBase
         int mu( EdgeDirection = EdUndir ) const;
         std::pair< typename Graph::PEdge,int > maxMu( EdgeDirection = EdUndir ) const;
 
-
+//  TODO: brakuje:
 //        template<class IterOut1, class IterOut2, class Iterator >
 //            std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,Iterator,Iterator, EdgeType = EdUndir ) const;
 //        template<class IterOut1, class IterOut2, class Iterator >
@@ -178,6 +178,16 @@ class Subgraph: public SubgraphBase
 //        template<class IterOut1, class IterOut2 >
 //            std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>, EdgeType = EdUndir ) const;
 
+
+//        template <class Iterator,class OutIter> int getOutEdges(OutIter,Iterator, Iterator, EdgeDirection = EdDirOut ) const;
+//        template <class Iterator> Set< PEdge > getOutEdgeSet(Iterator beg, Iterator end, EdgeDirection = EdDirOut ) const;
+//        template <class OutIter> int getOutEdges(OutIter,const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
+//        Set< PEdge > getOutEdgeSet(const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
+//
+//        template <class Iterator,class OutIter> int getOutEnds(OutIter,Iterator, Iterator, EdgeDirection = EdDirOut ) const;
+//        template <class Iterator> Set< PVertex > getOutEndSet(Iterator beg, Iterator end, EdgeDirection = EdDirOut ) const;
+//        template <class OutIter> int getOutEnds(OutIter,const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
+//        Set< PVertex > getOutEndSet(const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
 
 
         template <class Iterator,class OutIter> int getIndEdges(OutIter,Iterator, Iterator, EdgeType = EdAll ) const;

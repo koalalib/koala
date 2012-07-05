@@ -26,7 +26,7 @@ Vert *A=new Vert("Ala"),*B=new Vert("Basia"),*C=new Vert("Celina"),*D=new Vert("
 Vert* vtab[4]={A,B,C,D};
 
 template <class Cont>
-void t(Cont /*AssocArray<Vert*,std::string>*/ & arr)
+void t(const Cont /*AssocArray<Vert*,std::string>*/ & arr)
 {   std::cout << "size:" << arr.size() << std::endl;
     for(Vert* k=arr.firstKey();k;k=arr.nextKey(k)) std::cout << "(" << k->name << "," << arr[k] << ")";
     std::cout << std::endl;
@@ -35,7 +35,7 @@ void t(Cont /*AssocArray<Vert*,std::string>*/ & arr)
 }
 
 template <class A, class B, AssocMatrixType aType, class D, class E>
-void t(AssocMatrix<A,B,aType,D,E>& m)
+void t(const AssocMatrix<A,B,aType,D,E>& m)
 {  std::cout << "size:" << m.size();
    for(std::pair<Vert*,Vert*> k=m.firstKey();k.first || k.second;k=m.nextKey(k)) std::cout<< "(" << k.first->name <<","<< k.second->name<<"):" <<m(k.first,k.second)<<" ";
    std::cout << std::endl;
@@ -53,6 +53,7 @@ int main() {
     BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > > bufor[10];
     std::map<int,std::string> mapa;
     AssocTabInterface<std::map<int,std::string> > amap=mapa;
+//    AssocTabInterface<std::map<int,std::string> > aaa=assocTabInterf(mapa);
 
 
 
@@ -85,9 +86,10 @@ int main() {
     AssocArray<Vert*,std::string> a3;
     a3=a;
 
-    AssocTable<AssocArray<Vert*,std::string> > ax(20);
-    ax.reserve(30);
-    ax.capacity();
+
+//    AssocTable<AssocArray<Vert*,std::string> > ax(20);
+//    ax.reserve(30);
+//    ax.capacity();
 
     std::cout << "\n----------------\n";
 
@@ -137,6 +139,9 @@ int main() {
     t(m);
     m1.defrag();
     t(m1);
+
+    const AssocMatrix<Vert*,std::string,AMatrClTriangle> cm=m;
+    t(m);
 
     std::cout << "\nMatrixy2:\n";
     AssocMatrix<Vert*,std::string,AMatrClTriangle,std::vector< BlockOfAssocMatrix< std::string > >
@@ -249,11 +254,54 @@ int main() {
 
     cout << "\n\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n";
 
-    std::map<int,char> icmap;
+#define TYPE AssocArray<Vert*,std::string>
+//#define TYPE AssocTable<std::map<Vert*,std::string> >
+//#define TYPE AssocTable<BiDiHashMap<Vert*,std::string> >
 
-    const AssocTabInterface<std::map<int,char> > iicmap=assocTabInterf(icmap);
+    TYPE  aaa;
+    aaa[A]="Ala";aaa[C]="celina";
+    const TYPE   cona=aaa;
+    t(cona);
+    cona[D]="A";
+    aaa[D]="A";
+    t(cona);
+    t(aaa);
+    aaa.delKey(D);
+//    cona.delKey(D);
+    cout<< aaa << endl<<endl;
 
-    iicmap.size();
+    std::map<Vert*,std::string> ama;
+    ama[D]="AAA";
+    const std::map<Vert*,std::string> cama=ama;
+    cout << assocTabInterf(cama);
+
+    //assocInserter(assocTabInterf(ama))=std::make_pair(A,"AAA");
+    t(assocTabInterf(ama));
+
+    cout << endl<<endl;
+    aaa=cona;
+    t(cona);
+    delete C;
+    t(aaa);
+    t(cona);
+
+//    AssocMatrix<Vert*,std::string,AMatrFull> mmm;
+//    mmm(C,D)="CD";
+//    const AssocMatrix<Vert*,std::string,AMatrFull> conm=mmm;
+//    t(mmm);
+//    t(conm);
+//    mmm(A,C)="AC";
+//    conm(A,C)="AC";
+//    cout << endl;
+//    t(mmm);
+//    cout << "\nconst " <<endl;
+//    t(conm);
+//    mmm.delKey(A,C);
+////    conm.delKey(A,C);
+//    t(mmm);
+//    t(conm);
+//
+//    cout << mmm;
 
 }
 

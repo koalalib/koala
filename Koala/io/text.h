@@ -128,17 +128,17 @@ namespace Privates {
 template<class V>
 class EmptyMap {
 public:
-	V &operator[](unsigned int)	{ return m_dummy; };
-	V m_dummy;
+	V &operator[](unsigned int) const	{ return m_dummy; };
+	mutable V m_dummy;
 	};
 
 class EmptyMap2 {
 public:
     template <class T>
-        bool hasKey(T) { return false; }
+        bool hasKey(T) const { return false; }
     template <class T>
-        int &operator[](T)	{ return m_dummy; };
-	int m_dummy;
+        int &operator[](T)	const { return m_dummy; };
+	mutable int m_dummy;
 	};
 
 }
@@ -193,7 +193,7 @@ bool readGraphText(Graph &g, const char *desc, RG_Format format) {
 
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format,
-                    std::pair<bool,bool> printinf, VMap& vmap, EMap& emap);
+                    std::pair<bool,bool> printinf,const VMap& vmap,const EMap& emap);
 
 template<class Graph>
 bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format,
@@ -206,7 +206,7 @@ bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format,
 
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::string &out, RG_Format format,
-                    std::pair<bool,bool> printinf,VMap& vmap, EMap& emap) {
+                    std::pair<bool,bool> printinf,const VMap& vmap,const EMap& emap) {
 	bool rv;
 	std::ostringstream s;
 	rv = writeGraphText(g, s, format,printinf,vmap,emap);
@@ -226,7 +226,7 @@ bool writeGraphText(const Graph &g, std::string &out, RG_Format format,
 
 template<class Graph,class VMap, class EMap>
 bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format format,
-                    std::pair<bool,bool> printinf,VMap& vmap, EMap& emap)
+                    std::pair<bool,bool> printinf,const VMap& vmap,const EMap& emap)
 {
 	bool rv;
 	const char *o;

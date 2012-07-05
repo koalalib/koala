@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "Koala/base/def_struct.h"
+#include "Koala/algorithm/search.h"
 #include "Koala/graph/graph.h"
 
 // To tylko proba ... algorytmu na tablicy asocjacyjnej z lokalnym buforem (bez new)

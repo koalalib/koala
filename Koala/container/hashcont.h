@@ -883,69 +883,79 @@ private:
 
 
 
-template <class T> class AssocTabInterface;
+template <class T> class AssocTabConstInterface;
 
-template< class K, class V> class AssocTabInterface< BiDiHashMap< K,V > >
+template< class K, class V> class AssocTabConstInterface< BiDiHashMap< K,V > >
 {
     public:
-        AssocTabInterface( BiDiHashMap< K,V > &acont ): cont( acont ) {}
+        AssocTabConstInterface(const BiDiHashMap< K,V > &acont ): cont( acont ) {}
 
         typedef K KeyType;
         typedef V ValType;
 
-        bool hasKey( K arg ) { return cont.find( arg ) != cont.end(); }
-        ValType* valPtr(K arg)
-        {   typename BiDiHashMap< K,V >::iterator i=cont.find( arg );
-            if (i==cont.end()) return NULL; else return &cont[arg];
+        bool hasKey( K arg ) const { return cont.find( arg ) != cont.end(); }
+
+        K firstKey() const;
+        K lastKey() const;
+        K prevKey( K )const ;
+        K nextKey( K )const ;
+
+        V operator[]( K arg )
+        {   typename BiDiHashMap< K,V >::const_iterator i;
+              i=cont.find(arg);
+              if (i==cont.end()) return V(); else return i->second;
         }
+        unsigned size() const { return cont.size(); }
+        bool empty() const { return this->size() == 0; }
+        template< class Iterator > int getKeys( Iterator ) const;
+        int capacity () const { return std::numeric_limits<int>::max(); }
+
+
+        const BiDiHashMap< K,V > &cont;
+
+        protected:
+
+        BiDiHashMap< K,V >& _cont() { return const_cast<BiDiHashMap< K,V >&>( cont ); }
+        void reserve(int n)	{ _cont().resize(n); }
+        void clear() { _cont().clear(); }
         bool delKey( K );
+        ValType* valPtr(K arg)
+        {   typename BiDiHashMap< K,V >::iterator i=_cont().find( arg );
+            if (i==_cont().end()) return NULL; else return _cont().operator[](arg);
+        }
+        V &get( K arg ) { return (_cont())[arg]; }
 
-        K firstKey();
-        K lastKey();
-        K prevKey( K );
-        K nextKey( K );
-
-        V &operator[]( K arg ) { return cont[arg]; }
-        unsigned size() { return cont.size(); }
-        bool empty() { return this->size() == 0; }
-        void clear() { cont.clear(); }
-        void reserve(int n)	{ cont.resize(n); }
-        template< class Iterator > int getKeys( Iterator );
-        int capacity () { return std::numeric_limits<int>::max(); }
-
-
-        BiDiHashMap< K,V > &cont;
 } ;
 
 template< class K, class V >
-bool AssocTabInterface< BiDiHashMap< K,V > >::delKey( K arg )
+bool AssocTabConstInterface< BiDiHashMap< K,V > >::delKey( K arg )
 {
-    typename BiDiHashMap< K,V >::iterator pos = cont.find( arg );
-    if (pos == cont.end()) return false;
-    cont.erase( pos );
+    typename BiDiHashMap< K,V >::iterator pos = _cont().find( arg );
+    if (pos == _cont().end()) return false;
+    _cont().erase( pos );
     return true;
 }
 
 template< class K, class V >
-K AssocTabInterface< BiDiHashMap< K,V > >::firstKey()
+K AssocTabConstInterface< BiDiHashMap< K,V > >::firstKey() const
 {
     if (cont.begin() == cont.end()) return (K)0;
     return cont.begin()->first;
 }
 
 template< class K, class V >
-K AssocTabInterface< BiDiHashMap< K,V > >::lastKey()
+K AssocTabConstInterface< BiDiHashMap< K,V > >::lastKey() const
 {
-    typename BiDiHashMap< K,V >::iterator pos;
+    typename BiDiHashMap< K,V >::const_iterator pos;
     if (cont.begin() == (pos = cont.end())) return (K)0;
     pos--;
     return pos->first;
 }
 
 template< class K, class V >
-K AssocTabInterface< BiDiHashMap< K,V > >::prevKey( K arg )
+K AssocTabConstInterface< BiDiHashMap< K,V > >::prevKey( K arg ) const
 {   if (!arg) return lastKey();
-    typename BiDiHashMap< K,V >::iterator pos = cont.find( arg );
+    typename BiDiHashMap< K,V >::const_iterator pos = cont.find( arg );
     assert( pos != cont.end() );
     if (pos == cont.begin()) return (K)0;
     pos--;
@@ -953,9 +963,9 @@ K AssocTabInterface< BiDiHashMap< K,V > >::prevKey( K arg )
 }
 
 template< class K, class V >
-K AssocTabInterface< BiDiHashMap< K,V > >::nextKey( K arg )
+K AssocTabConstInterface< BiDiHashMap< K,V > >::nextKey( K arg ) const
 {   if (!arg) return firstKey();
-    typename BiDiHashMap< K,V >::iterator pos = cont.find( arg );
+    typename BiDiHashMap< K,V >::const_iterator pos = cont.find( arg );
     assert( pos != cont.end() );
     pos++;
     if (pos == cont.end()) return (K)0;
@@ -963,7 +973,7 @@ K AssocTabInterface< BiDiHashMap< K,V > >::nextKey( K arg )
 }
 
 template< class K, class V > template <class Iterator>
-int AssocTabInterface< BiDiHashMap< K,V > >::getKeys( Iterator iter )
+int AssocTabConstInterface< BiDiHashMap< K,V > >::getKeys( Iterator iter ) const
 {
     for( K key = firstKey(); key; key = nextKey( key ) )
     {
@@ -974,68 +984,73 @@ int AssocTabInterface< BiDiHashMap< K,V > >::getKeys( Iterator iter )
 }
 
 
-template< class K, class V> class AssocTabInterface< HashMap< K,V > >
+template< class K, class V> class AssocTabConstInterface< HashMap< K,V > >
 {
     public:
-        AssocTabInterface( HashMap< K,V > &acont ): cont( acont ) {}
+        AssocTabConstInterface( HashMap< K,V > &acont ): cont( acont ) {}
 
         typedef K KeyType;
         typedef V ValType;
 
-        bool hasKey( K arg ) { return cont.find( arg ) != cont.end(); }
-        ValType* valPtr(K arg)
-        {   typename HashMap< K,V >::iterator i=cont.find( arg );
-            if (i==cont.end()) return NULL; else return &cont[arg];
-        }
+        bool hasKey( K arg ) const { return cont.find( arg ) != cont.end(); }
 
-        bool delKey( K );
-
-        K firstKey();
-        K lastKey();
-        K prevKey( K );
-        K nextKey( K );
+        K firstKey() const;
+        K lastKey() const;
+        K prevKey( K ) const;
+        K nextKey( K ) const;
 
         V &operator[]( K arg ) { return cont[arg]; }
-        unsigned size() { return cont.size(); }
-        bool empty() { return this->size() == 0; }
-        void clear() { cont.clear(); }
-        void reserve(int n)	{ cont.resize(n); }
-        int capacity () { return std::numeric_limits<int>::max(); }
-        template< class Iterator > int getKeys( Iterator );
+        unsigned size() const { return cont.size(); }
+        bool empty() const { return this->size() == 0; }
+        int capacity () const { return std::numeric_limits<int>::max(); }
+        template< class Iterator > int getKeys( Iterator ) const;
 
 
-        HashMap< K,V > &cont;
+        const HashMap< K,V > &cont;
+
+        protected:
+
+        HashMap< K,V >& _cont() { return const_cast<HashMap< K,V >&>( cont ); }
+        ValType* valPtr(K arg)
+        {   typename HashMap< K,V >::iterator i=_cont().find( arg );
+            if (i==_cont().end()) return NULL; else return _cont().operator[](arg);
+        }
+        void reserve(int n)	{ _cont().resize(n); }
+        bool delKey( K );
+        void clear() { _cont().clear(); }
+        V &get( K arg ) { return (_cont())[arg]; }
+
 } ;
 
 template< class K, class V >
-bool AssocTabInterface< HashMap< K,V > >::delKey( K arg )
+bool AssocTabConstInterface< HashMap< K,V > >::delKey( K arg )
 {
-    typename HashMap< K,V >::iterator pos = cont.find( arg );
-    if (pos == cont.end()) return false;
-    cont.erase( pos );
+    typename HashMap< K,V >::iterator pos = _cont().find( arg );
+    if (pos == _cont().end()) return false;
+    _cont().erase( pos );
     return true;
 }
 
 template< class K, class V >
-K AssocTabInterface< HashMap< K,V > >::firstKey()
+K AssocTabConstInterface< HashMap< K,V > >::firstKey() const
 {
     if (cont.begin() == cont.end()) return (K)0;
     return cont.begin()->first;
 }
 
 template< class K, class V >
-K AssocTabInterface< HashMap< K,V > >::lastKey()
+K AssocTabConstInterface< HashMap< K,V > >::lastKey() const
 {
-    typename HashMap< K,V >::iterator pos;
+    typename HashMap< K,V >::const_iterator pos;
     if (cont.begin() == (pos = cont.end())) return (K)0;
     pos--;
     return pos->first;
 }
 
 template< class K, class V >
-K AssocTabInterface< HashMap< K,V > >::prevKey( K arg )
+K AssocTabConstInterface< HashMap< K,V > >::prevKey( K arg ) const
 {   if (!arg) return lastKey();
-    typename HashMap< K,V >::iterator pos = cont.find( arg );
+    typename HashMap< K,V >::const_iterator pos = cont.find( arg );
     assert( pos != cont.end() );
     if (pos == cont.begin()) return (K)0;
     pos--;
@@ -1043,9 +1058,9 @@ K AssocTabInterface< HashMap< K,V > >::prevKey( K arg )
 }
 
 template< class K, class V >
-K AssocTabInterface< HashMap< K,V > >::nextKey( K arg )
+K AssocTabConstInterface< HashMap< K,V > >::nextKey( K arg ) const
 {   if (!arg) return firstKey();
-    typename HashMap< K,V >::iterator pos = cont.find( arg );
+    typename HashMap< K,V >::const_iterator pos = cont.find( arg );
     assert( pos != cont.end() );
     pos++;
     if (pos == cont.end()) return (K)0;
@@ -1053,7 +1068,7 @@ K AssocTabInterface< HashMap< K,V > >::nextKey( K arg )
 }
 
 template< class K, class V > template <class Iterator>
-int AssocTabInterface< HashMap< K,V > >::getKeys( Iterator iter )
+int AssocTabConstInterface< HashMap< K,V > >::getKeys( Iterator iter ) const
 {
     for( K key = firstKey(); key; key = nextKey( key ) )
     {

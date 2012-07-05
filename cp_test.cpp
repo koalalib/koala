@@ -60,7 +60,7 @@ int main() {
     Graph<InfoV2,InfoE2> g2,g2p;
 
     AssocArray<Vertex<InfoV1,InfoE1>*,Vertex<InfoV2,InfoE2>* > m12;
-    AssocTabInterface<AssocArray<Vertex<InfoV1,InfoE1>*,Vertex<InfoV2,InfoE2>* > > am12=m12;
+//    AssocTabInterface<AssocArray<Vertex<InfoV1,InfoE1>*,Vertex<InfoV2,InfoE2>* > > am12=m12;
     map<Vertex<InfoV2,InfoE2>*,Vertex<InfoV1,InfoE1>* > m21;
     AssocTabInterface< map<Vertex<InfoV2,InfoE2>*,Vertex<InfoV1,InfoE1>* > > am21=m21;
 
@@ -83,7 +83,7 @@ int main() {
     Vertex<InfoV2,InfoE2>* A2=g2.addVert(),*B2=g2.addVert();
     g2.addArch(A2,B2);
     g2.substitute(B2,g1,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(&vtrans),stdCast(false))
-            , make_pair(stdLink(am21,am12),stdLink(an21,an12)));
+            , make_pair(stdLink(am21,m12),stdLink(an21,an12)));
 
     g2p.copy(g1);
     std::cout << "copy\n";
@@ -97,7 +97,8 @@ int main() {
     std::map<Vertex<InfoV1,InfoE1>*,Vertex<InfoV2,InfoE2>* > saa;
     AssocArray<Vertex<InfoV1,InfoE1>*,Vertex<InfoV2,InfoE2>* > aa,aa2;
     aa2=aa;
-    assocKeyChoose(assocTabInterf(aa));
+    assocKeyChoose((aa));
+    extAssocChoose((&aa),(Vertex<InfoV2,InfoE2>*) 0);
     stdChoose(Set<int*>());
 
     Graph<InfoV2,InfoE2> g2b=g2;
