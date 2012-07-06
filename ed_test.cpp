@@ -67,29 +67,33 @@ int main() {
 
     cout <<boolalpha;
 //    for(int i=0;i<g1.getConEdges(tabE,tabV3,tabV3+5,tabV,tabV+5,EdAll);i++) cout << tabE[i]->info << '\n';
-    g1.addLoop(B,"*B");
+//    g1.addLoop(B,"*B");
     g1.addArch(B,A,"B>A");
-    g1.addLoop(A,"*A");
+//    g1.addLoop(A,"*A");
     g1.addArch(B,C,"B>C");
-    g1.addEdge(B,C,"B-C");
+//    g1.addEdge(B,C,"B-C");
     g1.addEdge(B,A,"B-A");
-    g1.addEdge(A,B,"A-B");
-    g1.addEdge(C,B,"C-B");
-    g1.addArch(C,B,"C>B");
+//    g1.addEdge(A,B,"A-B");
+    //g1.addEdge(C,B,"C-B");
+//    g1.addArch(C,B,"C>B");
     g1.addLoop(B,"*B");
     g1.addArch(C,B,"C>B");
-    g1.addArch(B,C,"B>C");
+//    g1.addArch(B,C,"B>C");
     IO::writeGraphText(g1,cout,IO::RG_EdgeList);
     cout<< endl<<endl;
 
-    g1.addArch(A,D,"A>D");
+//    g1.addArch(A,D,"A>D");
     #define mask EdDirIn
-
     vset=A; vset+=B;
-    for(int i=0;i<g1.getOutEnds(tabV,vset,mask);i++) cout << tabV[i]->info << ' ';
-    cout << endl;
-    for(int i=0;i<g1.getOutEnds(tabV,vset.begin(),vset.end(),mask);i++) cout << tabV[i]->info << ' ';
-    cout << endl << g1.getOutEndSet(vset.begin(),vset.end(),mask) << '\t' << g1.getOutEndSet(vset,mask);
+//    int res=g1.getIncEdges(tabE,vset.begin(),vset.end(),EdDirOut,EdUndir);
+//    cout << res<<endl;
+//    for(int i=0;i<res;i++) cout << tabE[i]->info << endl;
+    for(int i=0;i<g1.getIncVerts(tabV,vset,EdDirIn,Directed);i++) cout << tabV[i]->info << ' ';
+//    g1.getIncVerts(tabV,vset.begin(),vset.end(),mask,mask);
+//    g1.getIncVertSet(vset.begin(),vset.end(),mask,mask);
+//    g1.getIncVertSet(vset,mask,mask);
+
+
 
 //    std::pair<int,int> intp=g1.findParals(make_pair(tabE,tabE2),EdUndir);
 //    for(int i=0;i<intp.first;i++) cout << tabE[i]->info << '\n';
@@ -117,18 +121,18 @@ int main() {
 //    cout << endl <<endl;
 //    cout << "\n-------\n";
 //    eset.clear();
-//    g1.getIndEdges(setInserter(eset),tabV,tabV+5,mask);
+//    g1.getIncEdges(setInserter(eset),tabV,tabV+5,mask);
 //    cout << eset << endl;
 //
 //
-//    cout << g1.getIndEdgeSet(tabV,tabV+5,mask) << endl;
+//    cout << g1.getIncEdgeSet(tabV,tabV+5,mask) << endl;
 //
 //
 //    eset.clear();
-//    g1.getIndEdges(setInserter(eset),vset,mask);
+//    g1.getIncEdges(setInserter(eset),vset,mask);
 //    cout << eset << endl;
 //
-//    cout << g1.getIndEdgeSet(vset,mask) << endl;
+//    cout << g1.getIncEdgeSet(vset,mask) << endl;
 //    cout << "\n-------\n";
 //        eset.clear();
 //    makeSubgraph(g1,make_pair(stdChoose(true),stdChoose(true))).getIndEdges(setInserter(eset),tabV,tabV+5,mask);

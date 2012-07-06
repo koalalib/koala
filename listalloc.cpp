@@ -56,10 +56,10 @@ int main() {
 //    all1.deallocate(p1);all2.deallocate(p3);
 //    cout << *p3;
 
-    Privates::ListDefaultCPPAllocator all;
+    Privates::DefaultCPPAllocator all;
 
 
-    Privates::ListBlockListAllocator<int> ball(40);
+    Privates::BlockListAllocator<Privates::ListNode<int> > ball(40);
 
 //    ListBlockListAllocator<int> ball2(100);
 //    ball2=ball;
@@ -69,9 +69,9 @@ int main() {
 //	List<int> l(all);
 
     ball.allocate<Privates::ListNode<int> >();
-    Privates::List<int,Privates::ListBlockListAllocator<int> > l,l2;
+    Privates::List<int,Privates::BlockListAllocator<Privates::ListNode<int> > > l,l2;
     l.init(ball);
-	Privates::List<int,Privates::ListBlockListAllocator<int> >::iterator it;
+	Privates::List<int,Privates::BlockListAllocator<Privates::ListNode<int> > >::iterator it;
 	for(j = 0; j < 19; j++) {
 		l.clear();
 		for(i = 0; i < j; i++) l.push_back(17 - i);
@@ -80,7 +80,7 @@ int main() {
 			printf("%d ", *it);
 			};
 		printf("\n");
-		Privates::List<int,Privates::ListBlockListAllocator<int> > l2;
+		Privates::List<int,Privates::BlockListAllocator<Privates::ListNode<int> > > l2;
 		l2=l;
         cout << l2;
 

@@ -59,6 +59,6 @@ int main() {
                             "," << sg.getEdgeEnds(res.first).second->info.name << "}";
                     else std::cout << "NULL";
     std::cout<< '\n' << sg.mu(mask) << ' ' << sg.mu(res.first,mask);
-    std::cout <<sg.getParals(Koala::blackHole,sg.getEdge(E,E),mask);
+    std::cout <<sg.getParals(blackHole,sg.getEdge(E,E),mask);
     return 0;
 }

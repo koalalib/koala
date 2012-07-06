@@ -96,7 +96,7 @@ int main() {
         Koala::BellmanFord::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); bfTest();
-        res=Koala::BellmanFord::findPath(g,edgeCont,U,V,Koala::BellmanFord::outPath(Koala::blackHole,tabE));
+        res=Koala::BellmanFord::findPath(g,edgeCont,U,V,Koala::BellmanFord::outPath(blackHole,tabE));
         std::cout<<"Odleglosc: "<< res.length<<std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";
@@ -106,7 +106,7 @@ int main() {
     // ... interesowala go tylko odleglosc, nie chcialo mu sie zakladac kontenera asoc. dla wierzcholkow
     std::cout<< std::endl;
     bfTest();
-    std::cout<< "Odleglosc: "<< Koala::BellmanFord::distances(g,Koala::blackHole,edgeCont,U,V);
+    std::cout<< "Odleglosc: "<< Koala::BellmanFord::distances(g,blackHole,edgeCont,U,V);
 
     return 0;
 }

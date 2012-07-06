@@ -6,6 +6,7 @@
 #include "../graph/subgraph.h"
 #include "search.h"
 #include "../container/joinsets.h"
+#include "../container/heap.h"
 
 
 
@@ -20,9 +21,9 @@ namespace Koala {
 //A tak wyobrazam sobie wszystkie nasze algorytmy - spokrewnione procedury i uzywane struktury
 //zamykamy w jednej klasie. Same procedury sa szablonami jej metod statycznych.
 
+enum DijkstraVersion { DijSimple, DijHeap, DijFibonHeap };
 
-
-template <class DefaultStructs>
+template <DijkstraVersion ver, class DefaultStructs>
 class DijkstraPar : public ShortPathStructs {
 // namespace Dijkstra { - druga mozliwosc, wtedy mozna by pozbyc sie staticow
 
@@ -64,45 +65,15 @@ class DijkstraPar : public ShortPathStructs {
         VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
         const EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
-    // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
-    {   assert(start);
-        const typename EdgeContainer::ValType::DistType Zero=
-            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
-        const typename EdgeContainer::ValType::DistType PlusInfty=
-            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
-
-        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab, Q(g.getVertNo());
-        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
-                    vertTab=
-                BlackHoleSwitch<VertContainer,typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
-
-        typename GraphType::PVertex U,V;
-
-        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
-
-        Q[start].vPrev=0;Q[start].ePrev=0;
-        Q[start].distance=Zero;
-
-        while(!Q.empty()){
-            typename EdgeContainer::ValType::DistType
-                    d=PlusInfty,nd;
-            for(V=Q.firstKey();V;V=Q.nextKey(V)) if (Q[V].distance<d) d=Q[U=V].distance;
-//            vertTab[U]=Q[U];
-            Q[U].copy(vertTab[U]);
-            Q.delKey(U);
-            if (U==end) return vertTab[end].distance;
-
-            for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirOut|Koala::EdUndir);
-                E;E=g.getEdgeNext(U,E,Koala::EdDirOut|Koala::EdUndir))
-                    if (!vertTab.hasKey(V=g.getEdgeEnd(E,U)))
-                        if ((nd=vertTab[U].distance+edgeTab[E].length)<Q[V].distance)
-                    { Q[V].distance=nd; Q[V].ePrev=E; Q[V].vPrev=U; }
+    {
+        switch (ver) {
+            case DijSimple : return distancesSimple (g,avertTab,edgeTab,start,end);
+            case DijHeap : return distancesHeap<GraphType,VertContainer,EdgeContainer,BinomHeap,Privates::BinomHeapNode>
+                (g,avertTab,edgeTab,start,end);
+            case DijFibonHeap : return distancesHeap<GraphType,VertContainer,EdgeContainer,FibonHeap,Privates::FibonHeapNode>
+                (g,avertTab,edgeTab,start,end);
+            default: assert(0);
         }
-
-        return end ? PlusInfty : Zero;
     }
 
 
@@ -162,7 +133,7 @@ class DijkstraPar : public ShortPathStructs {
         const GraphType& g,
         const EdgeContainer& edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
-        ShortPathStructs::OutPath<VIter,EIter> iters,bool useHeap=false)
+        ShortPathStructs::OutPath<VIter,EIter> iters)
     {   assert(start && end);
         const typename EdgeContainer::ValType::DistType PlusInfty=
             DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
@@ -171,8 +142,7 @@ class DijkstraPar : public ShortPathStructs {
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab(g.getVertNo());
 
-        if (!useHeap) dist=distances(g,vertTab,edgeTab,start,end);
-        else dist=distances2(g,vertTab,edgeTab,start,end);
+        dist=distances(g,vertTab,edgeTab,start,end);
 
         if (PlusInfty==dist)
             return PathLengths<typename EdgeContainer::ValType::DistType> (dist,-1); // end nieosiagalny
@@ -182,62 +152,12 @@ class DijkstraPar : public ShortPathStructs {
         // dlugosc najkr. siezki i jej liczba krawedzi
     }
 
-    // Dijkstra na kopcu
-    template <class GraphType, class EdgeContainer, class VIter, class EIter>
-    static PathLengths<typename EdgeContainer::ValType::DistType>
-        findPath2(
-        const GraphType& g,
-        const EdgeContainer& edgeTab,
-        typename GraphType::PVertex start, typename GraphType::PVertex end,
-        ShortPathStructs::OutPath<VIter,EIter> iters)
-    {   return findPath(g,edgeTab,start,end,iters,true); }
-
-
-// Dijkstra na kopcu
 
     protected:
 
-    template< typename Pair > struct Cmp        {            bool operator() ( Pair a, Pair b )
-            {   return a.second > b.second || (a.second == b.second && a.first < b.first); }        } ;
-
-    template <class Key, class Container>
-    class Queue : public Container {
-
-        private:
-
-            PriQueueInterface<std::pair<Key,typename Container::ValType::DistType>*,
-                Cmp<std::pair<Key,typename Container::ValType::DistType> > > q;
-
-        public:
-
-            Queue(std::pair<Key,typename Container::ValType::DistType>* wsk,int max) : q(wsk,max) {}
-
-            void setDist(Key v,typename Container::ValType::DistType d)
-            {  (this->operator[](v)).distance=d;
-                q.push(std::make_pair(v,d));
-            }
-
-            typename Container::ValType::DistType getDist(Key v)
-            {
-                if (!this->hasKey(v)) return
-                    DefaultStructs::template NumberTypeBounds<typename Container::ValType::DistType>
-                                    ::plusInfty();
-                else return (this->operator[](v)).distance;
-            }
-
-            std::pair<Key,typename Container::ValType::DistType> min()
-            {
-                std::pair<Key,typename Container::ValType::DistType> res;
-                while (!this->hasKey( (res=q.top()).first)) q.pop();
-                return res;
-            }
-    };
-
-    public:
-
     template <class GraphType, class VertContainer, class EdgeContainer>
     static typename EdgeContainer::ValType::DistType
-    distances2 (
+    distancesSimple (
         const GraphType & g,
         VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
         const EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
@@ -250,29 +170,24 @@ class DijkstraPar : public ShortPathStructs {
             DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
 
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
-
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab, Q(g.getVertNo());
         typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
                     vertTab=
                 BlackHoleSwitch<VertContainer,typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
 
-        std::pair<typename GraphType::PVertex, typename EdgeContainer::ValType::DistType> LOCALARRAY(qbufor,2*g.getEdgeNo()+2);
-        Queue<typename GraphType::PVertex, typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type> Q(qbufor,2*g.getEdgeNo()+1);
-
         typename GraphType::PVertex U,V;
 
         if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
 
         Q[start].vPrev=0;Q[start].ePrev=0;
-        Q.setDist(start,Zero);
+        Q[start].distance=Zero;
 
         while(!Q.empty()){
-            typename EdgeContainer::ValType::DistType d,nd;
-            std::pair<typename GraphType::PVertex,typename EdgeContainer::ValType::DistType> res=Q.min();
-            U=res.first; d=res.second;
+            typename EdgeContainer::ValType::DistType
+                    d=PlusInfty,nd;
+            for(V=Q.firstKey();V;V=Q.nextKey(V)) if (Q[V].distance<d) d=Q[U=V].distance;
 //            vertTab[U]=Q[U];
             Q[U].copy(vertTab[U]);
             Q.delKey(U);
@@ -281,16 +196,98 @@ class DijkstraPar : public ShortPathStructs {
             for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirOut|Koala::EdUndir);
                 E;E=g.getEdgeNext(U,E,Koala::EdDirOut|Koala::EdUndir))
                     if (!vertTab.hasKey(V=g.getEdgeEnd(E,U)))
-                        if ((nd=vertTab[U].distance+edgeTab[E].length)<Q.getDist(V))
-                            { Q.setDist(V,nd); Q[V].ePrev=E; Q[V].vPrev=U; }
+                        if ((nd=vertTab[U].distance+edgeTab[E].length)<Q[V].distance)
+                    { Q[V].distance=nd; Q[V].ePrev=E; Q[V].vPrev=U; }
         }
 
         return end ? PlusInfty : Zero;
     }
 
+    // Dijkstra na kopcu
+
+    template< typename Container > struct Cmp        {            Container *cont;
+            Cmp(Container& acont) : cont(&acont) {}
+
+            template <class T> bool operator()  ( T a, T b ) const
+            {   return cont->operator[](a).distance<cont->operator[](b).distance; }        } ;
+
+    template < typename Container >
+    static Cmp<Container> makeCmp(Container& acont) { return Cmp<Container>(acont); }
+
+    template <class DType, class GraphType> struct VertLabsQue : public  VertLabs <DType,GraphType>
+    {
+        void* repr;
+        VertLabsQue() : VertLabs<DType,GraphType>(), repr(0) {}
+    };
+
+
+    template <class GraphType, class VertContainer, class EdgeContainer,
+        template <class X,class Y,class Z> class Heap, template <class XX> class Block>
+    static typename EdgeContainer::ValType::DistType
+    distancesHeap (
+        const GraphType & g,
+        VertContainer& avertTab, // tablica asocjacyjna z VertLabs poszczegolnych wierzcholkow
+        const EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        typename GraphType::PVertex start, typename GraphType::PVertex end=0)
+    // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
+    {    assert(start);
+        const typename EdgeContainer::ValType::DistType Zero=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
+        const typename EdgeContainer::ValType::DistType PlusInfty=
+            DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
+
+        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
+        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                VertLabsQue<typename EdgeContainer::ValType::DistType ,GraphType> >::Type Q(g.getVertNo());
+        typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
+                    vertTab=
+                BlackHoleSwitch<VertContainer,typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
+
+        typename GraphType::PVertex U,V;
+
+        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+
+        Privates::BlockListAllocator<Block<typename GraphType::PVertex> > alloc(g.getVertNo());
+        Heap<typename GraphType::PVertex,Cmp<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                VertLabsQue<typename EdgeContainer::ValType::DistType ,GraphType> >::Type>,
+                Privates::BlockListAllocator< Block<typename GraphType::PVertex> > > heap(&alloc,makeCmp(Q));
+
+        Q[start].vPrev=0;Q[start].ePrev=0;
+        Q[start].distance=Zero;
+        Q[start].repr=heap.push(start);
+
+        while(!Q.empty()){
+            typename EdgeContainer::ValType::DistType d,nd;
+//            for(V=Q.firstKey();V;V=Q.nextKey(V)) if (Q[V].distance<d) d=Q[U=V].distance;
+            U=heap.top(); d=Q[U].distance;
+//            vertTab[U]=Q[U];
+            Q[U].copy(vertTab[U]);
+            heap.del(( Block<typename GraphType::PVertex>*)Q[U].repr);
+            Q.delKey(U);
+            if (U==end) return vertTab[end].distance;
+
+            for(typename GraphType::PEdge E=g.getEdge(U,Koala::EdDirOut|Koala::EdUndir);
+                E;E=g.getEdgeNext(U,E,Koala::EdDirOut|Koala::EdUndir))
+                    if (!vertTab.hasKey(V=g.getEdgeEnd(E,U)))
+                        if ((nd=vertTab[U].distance+edgeTab[E].length)<Q[V].distance)
+                        {   if (Q[V].repr) heap.del(( Block<typename GraphType::PVertex>*)
+                                                                                                Q[V].repr);
+                            Q[V].distance=nd; Q[V].ePrev=E; Q[V].vPrev=U;
+                            Q[V].repr=heap.push(V);
+                        }
+        }
+
+        return end ? PlusInfty : Zero;
+    }
+
+
 };
 
-class Dijkstra : public DijkstraPar<AlgorithmsDefaultSettings> {};
+template <DijkstraVersion ver=DijSimple>
+class Dijkstra : public DijkstraPar<ver,AlgorithmsDefaultSettings> {};
 
 
 

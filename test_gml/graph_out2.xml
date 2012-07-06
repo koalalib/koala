@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
-    <key id="k12A6" for="all" attr.name="EE" />
-    <key id="k4ED0" for="all" attr.name="EDG" />
-    <key id="k1E67" for="all" attr.name="NN" />
-    <key id="k72B8" for="all" attr.name="VRT" />
+    <key id="k754B" for="all" attr.name="EE" />
+    <key id="k1ABA" for="all" attr.name="EDG" />
+    <key id="k7E6E" for="all" attr.name="NN" />
+    <key id="k4FCF" for="all" attr.name="VRT" />
     <graph id="test" edgedefault="undirected">
         <node id="n003E7748">
-            <data key="k1E67">10</data>
+            <data key="k7E6E">10</data>
         </node>
         <node id="n003E77B0">
-            <data key="k1E67">11</data>
+            <data key="k7E6E">11</data>
         </node>
         <node id="n003E7818">
-            <data key="k1E67">12</data>
+            <data key="k7E6E">12</data>
         </node>
         <node id="n003E7880">
-            <data key="k1E67">13</data>
+            <data key="k7E6E">13</data>
         </node>
         <node id="n003E7908">
-            <data key="k1E67">14</data>
+            <data key="k7E6E">14</data>
         </node>
         <node id="n003E7990">
-            <data key="k1E67">15</data>
+            <data key="k7E6E">15</data>
         </node>
         <edge id="e003E27D0" source="n003E7748" target="n003E7818">
-            <data key="k12A6">20</data>
+            <data key="k754B">20</data>
         </edge>
         <edge id="e003E7A10" source="n003E7818" target="n003E7908">
-            <data key="k12A6">24</data>
+            <data key="k754B">24</data>
         </edge>
         <edge id="e003E7A50" source="n003E7748" target="n003E77B0">
-            <data key="k12A6">21</data>
+            <data key="k754B">21</data>
         </edge>
         <edge id="e003E7A90" source="n003E77B0" target="n003E7880">
-            <data key="k12A6">22</data>
+            <data key="k754B">22</data>
         </edge>
         <edge id="e003E7AD0" source="n003E7880" target="n003E7818">
-            <data key="k12A6">23</data>
+            <data key="k754B">23</data>
         </edge>
         <edge id="e003E7B10" source="n003E7880" target="n003E7990">
-            <data key="k12A6">25</data>
+            <data key="k754B">25</data>
         </edge>
         <edge id="e003E7B50" source="n003E7990" target="n003E7908">
-            <data key="k12A6">26</data>
+            <data key="k754B">26</data>
         </edge>
     </graph>
 </graphml>

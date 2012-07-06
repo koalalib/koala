@@ -86,7 +86,7 @@ int main() {
         Koala::DAGCritPath::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); dijTest();
-        res=Koala::DAGCritPath::findPath(g,edgeCont,U,V,Koala::DAGCritPath::outPath(Koala::blackHole,tabE));
+        res=Koala::DAGCritPath::findPath(g,edgeCont,U,V,Koala::DAGCritPath::outPath(blackHole,tabE));
         std::cout<<"Odleglosc: "<< res.length<<std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";
@@ -95,7 +95,7 @@ int main() {
 
     std::cout<< std::endl;
     dijTest();
-    std::cout<< "Odleglosc: "<< Koala::DAGCritPath::critPathLength(g,Koala::blackHole,edgeCont,U,V)<<":";
+    std::cout<< "Odleglosc: "<< Koala::DAGCritPath::critPathLength(g,blackHole,edgeCont,U,V)<<":";
 
     return 0;
 }

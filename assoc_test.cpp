@@ -50,7 +50,7 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
 
 int main() {
 
-    BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > > bufor[10];
+    Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > > bufor[10];
     std::map<int,std::string> mapa;
     AssocTabInterface<std::map<int,std::string> > amap=mapa;
 //    AssocTabInterface<std::map<int,std::string> > aaa=assocTabInterf(mapa);
@@ -59,7 +59,7 @@ int main() {
 
     AssocArray<Vert*,std::string> a(5,(int*)bufor);
     BlockOfAssocMatrix< std::string > matbuf[100];
-    BlockOfBlockList< BlockOfAssocArray< Vert*,int > > indbuf[100];
+    Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > indbuf[100];
 
     Vert * tab[5];
 
@@ -165,10 +165,10 @@ int main() {
 
     std::cout << "\nMatrixy3:\n";
     AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
-         ,AssocArray<Vert*,int,VectorInterface< BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > >
+         ,AssocArray<Vert*,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > >
         lpm(4,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
-         ,AssocArray<Vert*,int,VectorInterface< BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::BufType)matbuf,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
-         ,AssocArray<Vert*,int,VectorInterface< BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::IndBufType)indbuf);
+         ,AssocArray<Vert*,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::BufType)matbuf,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
+         ,AssocArray<Vert*,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::IndBufType)indbuf);
 
 
     lpm(A,B)="Wpis skasowany";
@@ -224,7 +224,7 @@ int main() {
     std::cout << "\n***Locals***\n";
 
 
-    AssocArray<Vert*,std::string,VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >
+    AssocArray<Vert*,std::string,VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >
         vitab(3,bufor);
 
 
@@ -250,7 +250,7 @@ int main() {
     vitab[D]="Dagmara";
     t(vitab);
 
-    std::cout << "\n\n" << AssocArrayVectIntSwitch<AssocArray<Vert*,std::string,VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >  >::isAAVI();
+    std::cout << "\n\n" << AssocArrayVectIntSwitch<AssocArray<Vert*,std::string,VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >  >::isAAVI();
 
     cout << "\n\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n";
 

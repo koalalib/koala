@@ -93,7 +93,7 @@ int main() {
         int l;
         for(Koala::Graph<OpisV,OpisE>::PVertex v_end=g.getVert();v_end;v_end=g.getVertNext(v_end)){
             std::cout<< std::endl;
-            l=Koala::Floyd::getPath(g,twoDimVertCont,v_start,v_end,Koala::Floyd::outPath(Koala::blackHole,tabE));
+            l=Koala::Floyd::getPath(g,twoDimVertCont,v_start,v_end,Koala::Floyd::outPath(blackHole,tabE));
             std::cout << v_start->info.name << v_end->info.name << ":" << l;
             if(l>0) std::cout<< ", ";
             for(int i=0;i<l;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
@@ -110,7 +110,7 @@ int main() {
         int l;
         for(Koala::Graph<OpisV,OpisE>::PVertex v_end=g.getVert();v_end;v_end=g.getVertNext(v_end)){
             std::cout<< std::endl;
-            l=Koala::Floyd::getPath(g,twoDimVertCont,v_start,v_end,Koala::Floyd::outPath(tabV,Koala::blackHole));
+            l=Koala::Floyd::getPath(g,twoDimVertCont,v_start,v_end,Koala::Floyd::outPath(tabV,blackHole));
             std::cout << v_start->info.name << v_end->info.name << ":" << l;
             if(l>=0) std::cout<< ", ";
             for(int i=0;i<=l;i++) std::cout<< tabV[i]->info.name;

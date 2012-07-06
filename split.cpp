@@ -12,9 +12,9 @@ void PrintSubsets(const GraphType & g, EdgeDirection mask = EdUndir) {
 	typename GraphType::PEdge e;
 	typename GraphType::PVertex u, v;
 
-	Koala::Privates::ListBlockListAllocator<Koala::Privates::List_iterator<LexBFS::LVCNode<GraphType> > > allocat(2*g.getVertNo()+1); //TODO: size?
-	Koala::Privates::ListBlockListAllocator<LexBFS::LVCNode<GraphType> > allocat2(2*g.getVertNo()+1); //TODO: size?
-	LexBFS::LexVisitContainer<GraphType, Koala::Privates::ListBlockListAllocator<Koala::Privates::List_iterator<LexBFS::LVCNode<GraphType> > >,Koala::Privates::ListBlockListAllocator<LexBFS::LVCNode<GraphType> > > cont(allocat,allocat2,g.getVertNo());
+	Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<Koala::Privates::List_iterator<LexBFS::LVCNode<GraphType> > > > allocat(2*g.getVertNo()+1); //TODO: size?
+	Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<LexBFS::LVCNode<GraphType> > > allocat2(2*g.getVertNo()+1); //TODO: size?
+	LexBFS::LexVisitContainer<GraphType, Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<Koala::Privates::List_iterator<LexBFS::LVCNode<GraphType> > > >,Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<LexBFS::LVCNode<GraphType> > > > cont(allocat,allocat2,g.getVertNo());
 	typename AlgorithmsDefaultSettings::template AssocCont<typename GraphType::PVertex, int>::Type visited;
 
 

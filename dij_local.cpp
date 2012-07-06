@@ -42,7 +42,7 @@ class DijDefault2 {
 
     template <class A, class B> class AssocCont {
         public:
-        typedef AssocArray<A,B,VectorInterface<BlockOfBlockList< BlockOfAssocArray< A,B > >*> > Type;
+        typedef AssocArray<A,B,VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< A,B > >*> > Type;
 //        typedef AssocTable < BiDiHashMap<A,B> > Type;
 //            typedef PseudoAssocArray<A,B,AssocTable<std::map<A,int> > > Type;
 
@@ -108,10 +108,10 @@ class DijkstraPar : public ShortPathStructs {
 
         int bufsize=AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::isAAVI() ? g.getVertNo():0;
-        BlockOfBlockList< BlockOfAssocArray< typename GraphType::PVertex,
+        Privates::BlockOfBlockList< BlockOfAssocArray< typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> > >
                     LOCALARRAY(buforl,(isBlackHole(avertTab) ? bufsize: 0));
-        BlockOfBlockList< BlockOfAssocArray< typename GraphType::PVertex,
+        Privates::BlockOfBlockList< BlockOfAssocArray< typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> > >
                     LOCALARRAY(buforQ,bufsize);
         {
@@ -196,7 +196,7 @@ class DijkstraPar : public ShortPathStructs {
             DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
 
         typename EdgeContainer::ValType::DistType dist;
-        BlockOfBlockList< BlockOfAssocArray< typename GraphType::PVertex,
+        Privates::BlockOfBlockList< BlockOfAssocArray< typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> > >
                     LOCALARRAY(bufor,(AssocArrayVectIntSwitch<typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::isAAVI() ? g.getVertNo():0));
@@ -315,7 +315,7 @@ int main() {
         Koala::Dijkstra::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); dijTest();
-        res=Koala::Dijkstra::findPath(g,edgeCont,U,V,Koala::Dijkstra::outPath(Koala::blackHole,tabE));
+        res=Koala::Dijkstra::findPath(g,edgeCont,U,V,Koala::Dijkstra::outPath(blackHole,tabE));
         std::cout<<"Odleglosc: "<< res.length<<std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";
@@ -325,6 +325,6 @@ int main() {
     // ... interesowala go tylko odleglosc, nie chcialo mu sie zakladac kontenera asoc. dla wierzcholkow
     std::cout<< std::endl;
     dijTest();
-    std::cout<< "Odleglosc: "<< Koala::Dijkstra::distances(g,Koala::blackHole,edgeCont,U,V)<<":";
+    std::cout<< "Odleglosc: "<< Koala::Dijkstra::distances(g,blackHole,edgeCont,U,V)<<":";
 
 }

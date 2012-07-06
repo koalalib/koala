@@ -151,15 +151,15 @@ int main()
 
     cout << cout << "\n\nLocals:\n\n";
     JSPartDesrc< Vert* > buf1[20];
-    BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc< Vert* > * > > buf2[20];
+    Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc< Vert* > * > > buf2[20];
     JoinableSets<Vert*, AssocArray<Vert*, JSPartDesrc<Vert*>*,
-        VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > >
+        VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > >
             locjset(4,(JoinableSetsVectIntSwitch<JoinableSets<Vert*,
                         AssocArray<Vert*, JSPartDesrc<Vert*>*,
-                            VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > > >::BufType)
+                            VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > > >::BufType)
                         buf1,(JoinableSetsVectIntSwitch<JoinableSets<Vert*,
                               AssocArray<Vert*, JSPartDesrc<Vert*>*,
-                                VectorInterface<BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > > >::MapBufType)
+                                VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > > >::MapBufType)
                         buf2);
 
     locjset.resize(0);

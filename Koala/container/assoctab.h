@@ -8,6 +8,7 @@
 #include <iostream>
 #include <limits>
 #include "localarray.h"
+#include "privates.h"
 
 namespace Koala
 {
@@ -151,76 +152,6 @@ template< class T > AssocTable< T > assocTab( const T & cont)
 
 
 /* ------------------------------------------------------------------------- *
- * BlockList< Element,Container >
- *
- *
- * ------------------------------------------------------------------------- */
-
-template <class Container> class VectorInterface;
-
-template< class Element > struct BlockOfBlockList
-{
-    public:
-        Element blob;
-        int prev, next;
-} ;
-
-
-namespace Privates {
-
-template <class T> class BlockListVectInerfTest {};
-
-template <class T> class BlockListVectInerfTest<VectorInterface<T> >
-{   public:
-    BlockListVectInerfTest(bool) {}
-    private:
-    BlockListVectInerfTest(const BlockListVectInerfTest<VectorInterface<T> >&) {}
-};
-
-}
-
-
-template< class Element, class Container = std::vector< BlockOfBlockList< Element > > >
-class BlockList : protected Privates::BlockListVectInerfTest<Container>
-{
-    protected:
-        int siz, first, last, ffree;
-        Container cont;
-
-    public:
-        typedef Element ElementType;
-        typedef BlockOfBlockList< Element > BlockType;
-
-        BlockList( int = 0 );
-        BlockList( const BlockList< Element,Container > & );
-        BlockList< Element,Container > &operator=(
-            const BlockList< Element,Container > & );
-
-        // tylko dla Container==VectorInterface<BlockOfBlockList< Element > *>
-        BlockList(BlockOfBlockList< Element >* wsk, int asize)
-        :   cont(wsk,asize) ,siz( 0 ),first( -1 ),last( -1 ),ffree( -1 ),
-            Privates::BlockListVectInerfTest<Container>(true)
-        { cont.clear(); }
-
-        bool ready( int );
-        void clear();
-        int size() { return siz; }
-        bool empty() { return !siz; }
-        void reserve( int arg ) { cont.reserve( arg ); }
-        bool full() { return ffree == -1; }
-        int capacity() { return cont.capacity(); }
-        int firstPos()  { return first; }
-        int lastPos()   { return last; }
-        int nextPos( int );
-        int prevPos( int );
-        Element &operator[]( int i ) { return cont[i].blob; }
-        int newPos( int = -1 );
-        void delPos( int );
-        void defrag();
-        bool test();
-};
-
-/* ------------------------------------------------------------------------- *
  * AssocContBase
  *
  *
@@ -289,11 +220,18 @@ template< class Klucz > class KluczTest
  * ------------------------------------------------------------------------- */
 
 
-template< class Klucz, class Elem, class Container = std::vector< BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > > >
+template <class Klucz, class Elem>
+struct AssocArrayInternalTypes {
+
+    typedef Privates::BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > BlockType;
+};
+
+
+template< class Klucz, class Elem, class Container = std::vector< typename AssocArrayInternalTypes<Klucz,Elem>::BlockType > >
 class AssocArray: public AssocContBase, protected Privates::KluczTest< Klucz >
 {
     protected:
-        mutable BlockList< BlockOfAssocArray< Klucz,Elem >,Container > tab;
+        mutable Privates::BlockList< BlockOfAssocArray< Klucz,Elem >,Container > tab;
 
         virtual void DelPosCommand( int pos ) { tab.delPos( pos ); }
         virtual AssocContReg &getReg( int pos ) { return tab[pos].assocReg; }
@@ -301,7 +239,6 @@ class AssocArray: public AssocContBase, protected Privates::KluczTest< Klucz >
     public:
         typedef Klucz KeyType;
         typedef Elem ValType;
-        typedef BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > BlockType;
 
         AssocArray( int asize = 0,void* p=0 ): tab( asize ) { }
         AssocArray( const AssocArray< Klucz,Elem,Container > & );
@@ -310,7 +247,7 @@ class AssocArray: public AssocContBase, protected Privates::KluczTest< Klucz >
             const AssocArray< Klucz,Elem,Container > & );
 
         // tylko dla Container==VectorInterface<BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > >*>
-        AssocArray(int asize , BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > >* wsk ): tab(wsk, asize )
+        AssocArray(int asize , typename AssocArrayInternalTypes<Klucz,Elem>::BlockType* wsk ): tab(wsk, asize )
         { }
 
         int size() const { return tab.size(); }
@@ -347,26 +284,25 @@ struct AssocArrayVectIntSwitch
 };
 
 template <class K, class E>
-struct AssocArrayVectIntSwitch<AssocArray<K,E,VectorInterface<BlockOfBlockList< BlockOfAssocArray< K,E > >*> > >
+struct AssocArrayVectIntSwitch<AssocArray<K,E,VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< K,E > >*> > >
 {
-    typedef BlockOfBlockList< BlockOfAssocArray< K,E > >* BufType;
+    typedef Privates::BlockOfBlockList< BlockOfAssocArray< K,E > >* BufType;
     static bool isAAVI() { return true; }
 };
 
 
 
 
-template< class Klucz, class Elem, class AssocCont, class Container = std::vector< BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > > >
+template< class Klucz, class Elem, class AssocCont, class Container = std::vector< typename AssocArrayInternalTypes<Klucz,Elem>::BlockType > >
 class PseudoAssocArray
 {
     protected:
-        mutable BlockList< BlockOfAssocArray< Klucz,Elem >,Container > tab;
+        mutable Privates::BlockList< BlockOfAssocArray< Klucz,Elem >,Container > tab;
         AssocCont assocTab;
 
     public:
         typedef Klucz KeyType;
         typedef Elem ValType;
-        typedef BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > BlockType;
 
         PseudoAssocArray( int asize = 0,void* p=0 ): tab( asize ), assocTab(asize) { }
 
@@ -469,10 +405,18 @@ template< class Elem > struct BlockOfAssocMatrix
  *
  * ------------------------------------------------------------------------- */
 
+template <class Klucz, class Elem>
+struct AssocMatrixInternalTypes {
+
+    typedef BlockOfAssocMatrix< Elem > BlockType;
+    typedef Privates::BlockOfBlockList< BlockOfAssocArray< Klucz,int > > IndexBlockType;
+
+};
+
 
 template< class Klucz, class Elem, AssocMatrixType aType,
-          class Container = std::vector< BlockOfAssocMatrix< Elem > >,
-          class IndexContainer = AssocArray<Klucz,int,std::vector< BlockOfBlockList< BlockOfAssocArray< Klucz,int > > > > >
+          class Container = std::vector< typename AssocMatrixInternalTypes<Klucz,Elem>::BlockType >,
+          class IndexContainer = AssocArray<Klucz,int,std::vector< typename AssocMatrixInternalTypes<Klucz,Elem>::IndexBlockType > > >
 class AssocMatrix: public AssocMatrixAddr< aType >
 {
     private:
@@ -482,7 +426,7 @@ class AssocMatrix: public AssocMatrixAddr< aType >
                 AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > *owner;
 
                 AssocIndex( int = 0 );
-                AssocIndex( int, BlockOfBlockList< BlockOfAssocArray< Klucz,int > >*);
+                AssocIndex( int, typename AssocMatrixInternalTypes<Klucz,Elem>::IndexBlockType*);
                 int klucz2pos( Klucz );
                 Klucz pos2klucz( int );
                 virtual void DelPosCommand( int );
@@ -517,8 +461,8 @@ class AssocMatrix: public AssocMatrixAddr< aType >
         AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > &operator=(
             const AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > & );
 
-        AssocMatrix( int asize, BlockOfAssocMatrix< Elem >* contBuf,
-                    BlockOfBlockList< BlockOfAssocArray< Klucz,int > >* indBuf ):
+        AssocMatrix( int asize, typename AssocMatrixInternalTypes<Klucz,Elem>::BlockType* contBuf,
+                    typename AssocMatrixInternalTypes<Klucz,Elem>::IndexBlockType* indBuf ):
             index( asize,indBuf),siz( 0 ),first( -1 ),last( -1 ),
             bufor(contBuf,AssocMatrixAddr< aType >::bufLen( asize ))
         {
@@ -585,10 +529,10 @@ struct AssocMatrixVectIntSwitch
 
 template <class K, class E,AssocMatrixType aType>
 struct AssocMatrixVectIntSwitch<AssocMatrix<K,E,aType,VectorInterface< BlockOfAssocMatrix< E > *>,
-       AssocArray<K,int,VectorInterface< BlockOfBlockList< BlockOfAssocArray< K,int > >* > > > >
+       AssocArray<K,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< K,int > >* > > > >
 {
     typedef BlockOfAssocMatrix< E >* BufType;
-    typedef BlockOfBlockList< BlockOfAssocArray< K,int > >* IndBufType;
+    typedef Privates::BlockOfBlockList< BlockOfAssocArray< K,int > >* IndBufType;
     static bool isAMVI() { return true; }
 };
 

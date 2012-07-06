@@ -67,13 +67,13 @@ class AdjMatrix<VertInfo , EdgeInfo , Settings,false> {
         void delVert(void* ) {}
         void reserve(int) { }
         Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >& vald(void* ,void*)
-            { return *(Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >*)(_KoalaEmptyEdgePoiner); }
+            { return *(Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >*)(&blackHole); }
         Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >& valund(void* ,void*)
-            { return *(Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >*)(_KoalaEmptyEdgePoiner); }
+            { return *(Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >*)(&blackHole); }
         Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >* undirspresentValPtr(void*,void*)
-            { return (Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >*)(_KoalaEmptyEdgePoiner);}
+            { return (Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >*)(&blackHole);}
         Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >* dirspresentValPtr(void*,void*)
-            { return (Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >*)(_KoalaEmptyEdgePoiner);}
+            { return (Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >*)(&blackHole);}
 };
 
 
@@ -88,7 +88,7 @@ void AdjMatrix<VertInfo, EdgeInfo,Settings,true>::add
 	edge->pParal() = pole.last;
 	edge->nParal() = NULL;
 	if(edge->pParal())
-	    edge->pParal()->nParal() = edge;
+	    ((typename Graph<VertInfo,EdgeInfo,Settings>::PEdge)edge->pParal())->nParal() = edge;
 	else
 	    pole.first = edge;
 	pole.last = edge;
@@ -101,7 +101,7 @@ void AdjMatrix<VertInfo, EdgeInfo,Settings,true>::add
 	edge->pParal() = pole.last;
 	edge->nParal() = NULL;
 	if(edge->pParal())
-	    edge->pParal()->nParal() = edge;
+	    ((typename Graph<VertInfo,EdgeInfo,Settings>::PEdge)edge->pParal())->nParal() = edge;
 	else
 	    pole.first = edge;
 	pole.last = edge;

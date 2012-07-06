@@ -26,17 +26,17 @@ template<class VertInfo, class EdgeInfo, class Settings>
 struct EmptyVertLink {
 
             EmptyVertLink() {}
-            Edge<VertInfo,EdgeInfo,Settings>* &getFirst()
-                { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
-            Edge<VertInfo,EdgeInfo,Settings>* &getLast()
-                { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
-            int& getDegree() { return _KoalaEmptyVertDegree; }
+//            Edge<VertInfo,EdgeInfo,Settings>* &getFirst()
+//                { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
+//            Edge<VertInfo,EdgeInfo,Settings>* &getLast()
+//                { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
+//            int& getDegree() { return _KoalaEmptyVertDegree; }
 
-//            DummyVar< Edge<VertInfo,EdgeInfo,Settings>* > getFirst()
-//                { return DummyVar< Edge<VertInfo,EdgeInfo,Settings>* >(); }
-//            DummyVar< Edge<VertInfo,EdgeInfo,Settings>* > getLast()
-//                { return DummyVar< Edge<VertInfo,EdgeInfo,Settings>* >(); }
-//            DummyVar< int > getDegree() { return DummyVar< int >(); }
+            DummyVar< Edge<VertInfo,EdgeInfo,Settings>* > getFirst()
+                { return DummyVar< Edge<VertInfo,EdgeInfo,Settings>* >(); }
+            DummyVar< Edge<VertInfo,EdgeInfo,Settings>* > getLast()
+                { return DummyVar< Edge<VertInfo,EdgeInfo,Settings>* >(); }
+            DummyVar< int > getDegree() { return DummyVar< int >(); }
 
 };
 
