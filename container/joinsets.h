@@ -20,6 +20,14 @@ template< class Klucz > struct JSPartDesrc
 template <class Container> class VectorInterface;
 
 
+template <class ITEM>
+struct JoinableSetsInternalTypes {
+
+    typedef Privates::BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc< ITEM > * > > AssocBlockType;
+    typedef JSPartDesrc< ITEM >  BufElementType;
+};
+
+
 template< class ITEM, class AssocContainer = AssocArray< ITEM,JSPartDesrc< ITEM > * > >
 class JoinableSets
 {
@@ -38,7 +46,7 @@ class JoinableSets
         ~JoinableSets() { resize( 0 ); }
 
         JoinableSets( unsigned int n, JSPartDesrc< ITEM > * buf,
-                        BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc< ITEM > * > >* mapbuf ) :
+                      typename JoinableSetsInternalTypes<ITEM>::AssocBlockType * mapbuf ) :
                 mapa(n,mapbuf), siz(0), bufor(buf), part_no(0), maxsize(n)
         { }
 
@@ -84,10 +92,10 @@ struct JoinableSetsVectIntSwitch
 
 template <class ITEM>
 struct JoinableSetsVectIntSwitch< JoinableSets<ITEM, AssocArray<ITEM, JSPartDesrc<ITEM>*,
-            VectorInterface<BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc<ITEM>* > >*> > > >
+            VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc<ITEM>* > >*> > > >
 {
     typedef JSPartDesrc< ITEM > * BufType;
-    typedef BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc< ITEM > * > >* MapBufType;
+    typedef Privates::BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc< ITEM > * > >* MapBufType;
     static bool isJSVI() { return true; }
 };
 

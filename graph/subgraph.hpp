@@ -264,46 +264,6 @@ Subgraph< Graph,VChooser,EChooser >::maxMu( EdgeDirection reltype) const
 }
 
 
-template< class Graph, class VChooser, class EChooser > template <class Iterator, class OutIter>
-int Subgraph< Graph,VChooser,EChooser >::getIndEdges(OutIter out,Iterator beg, Iterator end, EdgeType type ) const
-{   int licze=0;
-    typename GraphSettings:: template VertAssocCont
-            <typename Graph::PVertex,bool>::Type vset(getVertNo());
-    for(Iterator i=beg;i!=end;++i ) vset[*i]=true;
-    for(typename Graph::PVertex v=vset.firstKey();v;v=vset.nextKey(v))
-        for(typename Graph::PEdge e=getEdge(v,type );e;e=getEdgeNext(v,e,type ))
-            if ((this->getEdgeEnd(e,v)>=v ) && vset.hasKey(this->getEdgeEnd(e,v)))
-//    for(typename Graph::PEdge e=getEdge(type );e;e=getEdgeNext(e,type ))
-//        if (vset.hasKey(getEdgeEnd1(e)) && vset.hasKey(getEdgeEnd2(e)))
-            { *out=e; ++out; ++ licze; }
-    return licze;
-}
-
-template< class Graph, class VChooser, class EChooser > template <class Iterator>
-Set<typename Graph::PEdge>
-Subgraph< Graph,VChooser,EChooser >::getIndEdgeSet(Iterator beg, Iterator end, EdgeType type ) const
-{
-    Set<typename Graph::PEdge> res;
-    getIndEdges(setInserter(res),beg,end,type);
-    return res;
-}
-
-template< class Graph, class VChooser, class EChooser > template <class OutIter>
-int Subgraph< Graph,VChooser,EChooser >::getIndEdges(OutIter out,const Set<typename Graph::PVertex>& vset, EdgeType type ) const
-{
-    return getIndEdges(out,vset.begin(),vset.end(),type);
-}
-
-template< class Graph, class VChooser, class EChooser >
-Set<typename Graph::PEdge>
-Subgraph< Graph,VChooser,EChooser >::getIndEdgeSet(const Set<typename Graph::PVertex>& vset, EdgeType type ) const
-{
-    Set<typename Graph::PEdge> res;
-    getIndEdges(setInserter(res),vset.begin(),vset.end(),type);
-    return res;
-}
-
-
 template< class Graph, class VChooser, class EChooser >
 Subgraph< Graph,VChooser,EChooser > makeSubgraph(
     const Graph &g, const std::pair< VChooser,EChooser > &chs )

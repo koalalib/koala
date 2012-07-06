@@ -178,22 +178,20 @@ class Subgraph: public SubgraphBase
 //        template<class IterOut1, class IterOut2 >
 //            std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>, EdgeType = EdUndir ) const;
 
-
-//        template <class Iterator,class OutIter> int getOutEdges(OutIter,Iterator, Iterator, EdgeDirection = EdDirOut ) const;
-//        template <class Iterator> Set< PEdge > getOutEdgeSet(Iterator beg, Iterator end, EdgeDirection = EdDirOut ) const;
-//        template <class OutIter> int getOutEdges(OutIter,const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
-//        Set< PEdge > getOutEdgeSet(const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
+//        template <class Iterator,class OutIter>
+//            int getIncEdges(OutIter,Iterator, Iterator, EdgeDirection = EdAll,EdgeType=Loop ) const;
+//        template <class Iterator>
+//            Set< PEdge > getIncEdgeSet(Iterator beg, Iterator end, EdgeDirection = EdAll,EdgeType=Loop ) const;
+//        template <class OutIter>
+//            int getIncEdges(OutIter,const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
+//        Set< PEdge > getIncEdgeSet(const Set<PVertex>&, EdgeDirection = EdAll, EdgeType=Loop ) const;
 //
-//        template <class Iterator,class OutIter> int getOutEnds(OutIter,Iterator, Iterator, EdgeDirection = EdDirOut ) const;
-//        template <class Iterator> Set< PVertex > getOutEndSet(Iterator beg, Iterator end, EdgeDirection = EdDirOut ) const;
-//        template <class OutIter> int getOutEnds(OutIter,const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
-//        Set< PVertex > getOutEndSet(const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
-
-
-        template <class Iterator,class OutIter> int getIndEdges(OutIter,Iterator, Iterator, EdgeType = EdAll ) const;
-        template <class Iterator> Set< typename Graph::PEdge > getIndEdgeSet(Iterator beg, Iterator end, EdgeType = EdAll ) const;
-        template <class OutIter> int getIndEdges(OutIter,const Set<typename Graph::PVertex>&, EdgeType = EdAll ) const;
-        Set< typename Graph::PEdge > getIndEdgeSet(const Set<typename Graph::PVertex>&, EdgeType = EdAll ) const;
+//
+//        // ... i ich drugie konce
+//        template <class Iterator,class OutIter> int getIncVerts(OutIter,Iterator, Iterator, EdgeDirection = EdAll,EdgeType=Loop ) const;
+//        template <class Iterator> Set< PVertex > getIncVertSet(Iterator beg, Iterator end, EdgeDirection = EdAll,EdgeType=Loop ) const;
+//        template <class OutIter> int getIncVerts(OutIter,const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
+//        Set< PVertex > getIncVertSet(const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
 
 
 

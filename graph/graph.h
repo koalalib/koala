@@ -111,6 +111,8 @@ template <EdgeType EdgeAllow>
 class EdgeCounterLoop
 {   protected:
 
+    typedef int& NoType;
+
     mutable int n;
     int & no() const { return n; }
     EdgeCounterLoop(): n(0) {}
@@ -120,8 +122,10 @@ template <>
 class EdgeCounterLoop<0>
 {   protected:
 
-    int & no() const { return _KoalaEmptyVertDegree; }
-//    DummyVar<int> no() const { return DummyVar<int>(); }
+    typedef DummyVar<int> NoType;
+
+//    int & no() const { return _KoalaEmptyVertDegree; }
+    DummyVar<int> no() const { return DummyVar<int>(); }
 };
 
 template <EdgeType EdgeAllow>
@@ -130,6 +134,8 @@ class EdgeCounterDir;
 template <>
 class EdgeCounterDir<EdDirIn|EdDirOut>
 {   protected:
+
+    typedef int& NoType;
 
     mutable int n;
     int & no() const { return n; }
@@ -140,13 +146,17 @@ template <>
 class EdgeCounterDir<0>
 {   protected:
 
-    int & no() const { return _KoalaEmptyVertDegree; }
-//    DummyVar<int> no() const { return DummyVar<int>(); }
+    typedef DummyVar<int> NoType;
+
+//    int & no() const { return _KoalaEmptyVertDegree; }
+    DummyVar<int> no() const { return DummyVar<int>(); }
 };
 
 template <EdgeType EdgeAllow>
 class EdgeCounterUndir
 {   protected:
+
+    typedef int& NoType;
 
     mutable int n;
     int & no() const { return n; }
@@ -157,8 +167,10 @@ template <>
 class EdgeCounterUndir<0>
 {   protected:
 
-    int & no() const { return _KoalaEmptyVertDegree; }
-//    DummyVar<int> no() const { return DummyVar<int>(); }
+    typedef DummyVar<int> NoType;
+
+//    int & no() const { return _KoalaEmptyVertDegree; }
+    DummyVar<int> no() const { return DummyVar<int>(); }
 };
 
 }
@@ -392,24 +404,21 @@ class Graph: public SubgraphBase,
             std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>, EdgeType = EdUndir ) const;
 
 
-        // krawedzie danego typu indukowane przez dany zbior wierzcholkow
-        template <class Iterator,class OutIter> int getIndEdges(OutIter,Iterator, Iterator, EdgeType = EdAll ) const;
-        template <class Iterator> Set< PEdge > getIndEdgeSet(Iterator beg, Iterator end, EdgeType = EdAll ) const;
-        template <class OutIter> int getIndEdges(OutIter,const Set<PVertex>&, EdgeType = EdAll ) const;
-        Set< PEdge > getIndEdgeSet(const Set<PVertex>&, EdgeType = EdAll ) const;
-
-        // krawedzie danego typu  wyprowadzajace poza dany zbior wierzcholkow
-        template <class Iterator,class OutIter> int getOutEdges(OutIter,Iterator, Iterator, EdgeDirection = EdDirOut ) const;
-        template <class Iterator> Set< PEdge > getOutEdgeSet(Iterator beg, Iterator end, EdgeDirection = EdDirOut ) const;
-        template <class OutIter> int getOutEdges(OutIter,const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
-        Set< PEdge > getOutEdgeSet(const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
+        // krawedzie danego typu incydentne z danym zbiorem wierzcholkow
+        template <class Iterator,class OutIter>
+            int getIncEdges(OutIter,Iterator, Iterator, EdgeDirection = EdAll,EdgeType=Loop ) const;
+        template <class Iterator>
+            Set< PEdge > getIncEdgeSet(Iterator beg, Iterator end, EdgeDirection = EdAll,EdgeType=Loop ) const;
+        template <class OutIter>
+            int getIncEdges(OutIter,const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
+        Set< PEdge > getIncEdgeSet(const Set<PVertex>&, EdgeDirection = EdAll, EdgeType=Loop ) const;
 
 
         // ... i ich drugie konce
-        template <class Iterator,class OutIter> int getOutEnds(OutIter,Iterator, Iterator, EdgeDirection = EdDirOut ) const;
-        template <class Iterator> Set< PVertex > getOutEndSet(Iterator beg, Iterator end, EdgeDirection = EdDirOut ) const;
-        template <class OutIter> int getOutEnds(OutIter,const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
-        Set< PVertex > getOutEndSet(const Set<PVertex>&, EdgeDirection = EdDirOut ) const;
+        template <class Iterator,class OutIter> int getIncVerts(OutIter,Iterator, Iterator, EdgeDirection = EdAll,EdgeType=Loop ) const;
+        template <class Iterator> Set< PVertex > getIncVertSet(Iterator beg, Iterator end, EdgeDirection = EdAll,EdgeType=Loop ) const;
+        template <class OutIter> int getIncVerts(OutIter,const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
+        Set< PVertex > getIncVertSet(const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
 
 
         // Usuwamy wierzchołek z grafu.
@@ -521,8 +530,8 @@ class Graph: public SubgraphBase,
         int delAllParals(EdgeType = EdUndir );
 
 
-        template <class Iterator> int delIndEdges(Iterator, Iterator, EdgeType = EdAll );
-        int delIndEdges(const Set<PVertex>&, EdgeType = EdAll );
+        template <class Iterator> int delIncEdges(Iterator, Iterator, EdgeDirection = EdAll, EdgeType=Loop );
+        int delIncEdges(const Set<PVertex>&, EdgeDirection = EdAll, EdgeType=Loop );
 
 
         // dopelnienia podgrafu indukowanego na zadanych wierzcholkach
@@ -611,9 +620,15 @@ class Graph: public SubgraphBase,
 
         PVertex first_vert, last_vert;
         PEdge first_edge, last_edge;
-        int& no_loop_edge() const { return this->Privates::EdgeCounterLoop<Settings::EdAllow & Loop>::no(); }
-        int& no_dir_edge() const { return this->Privates::EdgeCounterDir<Settings::EdAllow & (EdDirIn|EdDirOut)>::no(); }
-        int& no_undir_edge() const { return this->Privates::EdgeCounterUndir<Settings::EdAllow & Undirected>::no(); }
+//        int&
+        typename Privates::EdgeCounterLoop<Settings::EdAllow & Loop>::NoType
+            no_loop_edge() const { return this->Privates::EdgeCounterLoop<Settings::EdAllow & Loop>::no(); }
+//        int&
+        typename Privates::EdgeCounterDir<Settings::EdAllow & (EdDirIn|EdDirOut)>::NoType
+            no_dir_edge() const { return this->Privates::EdgeCounterDir<Settings::EdAllow & (EdDirIn|EdDirOut)>::no(); }
+//        int&
+        typename Privates::EdgeCounterUndir<Settings::EdAllow & Undirected>::NoType
+            no_undir_edge() const { return this->Privates::EdgeCounterUndir<Settings::EdAllow & Undirected>::no(); }
         int no_vert;
 
         inline PVertex attach( PVertex );
