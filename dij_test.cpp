@@ -36,7 +36,7 @@ struct VLab {
 Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex, VLab> > vertCont;
 //            Koala::Dijkstra::VertLabs<int, Koala::Graph<OpisV,OpisE> > > > vertCont;
 
-Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Dijkstra<>::EdgeLabs<int> > > edgeCont;
+Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Dijkstra::EdgeLabs<int> > > edgeCont;
 
 
 void dijTest()
@@ -60,7 +60,7 @@ int main() {
     g.makeAdjMatrix();
     dijTest();
 
-    std::cout<< "Odleglosc: "<< Koala::Dijkstra<>::distances(g,vertCont,edgeCont,U,V)<<":";
+    std::cout<< "Odleglosc: "<< Koala::Dijkstra::distances(g,vertCont,edgeCont,U,V)<<":";
 //       - mozna i bez ostatniego arg. - liczymy z U do wszystkich
     std::cout << "\nE:" << vertCont[E].distance << " F:" << vertCont[F].distance << std::endl;
 
@@ -71,7 +71,7 @@ int main() {
 
         std::cout<< std::endl;
 //        l=Koala::Dijkstra::getOutPath(g,vertCont,Koala::Dijkstra::outPath(tabV,tabE),V,F);
-        l=Koala::Dijkstra<>::getPath(g,vertCont,V,Koala::Dijkstra<>::outPath(tabV,tabE));
+        l=Koala::Dijkstra::getPath(g,vertCont,V,Koala::Dijkstra::outPath(tabV,tabE));
         std::cout<<"Liczba krawedzi: "<<l<<std::endl;
         for(int i=0;i<=l;i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;i<l;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
@@ -84,10 +84,10 @@ int main() {
     // ten sam graf raz jeszcze, szukamy sciezki od nowa
 
     if (V) {
-        Koala::Dijkstra<>::PathLengths<int> res;
+        Koala::Dijkstra::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); dijTest();
-        res=Koala::Dijkstra<>::findPath(g,edgeCont,U,V,Koala::Dijkstra<>::outPath(tabV,tabE));
+        res=Koala::Dijkstra::findPath(g,edgeCont,U,V,Koala::Dijkstra::outPath(tabV,tabE));
         std::cout<<"Odleglosc: "<< res.length<<std::endl;
         for(int i=0;i<=res.edgeNo;i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
@@ -99,10 +99,10 @@ int main() {
     // ten sam graf raz jeszcze, kogos nie interesowala sekwencja wierzcholkow
 
     if (V) {
-        Koala::Dijkstra<>::PathLengths<int> res;
+        Koala::Dijkstra::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); dijTest();
-        res=Koala::Dijkstra<>::findPath(g,edgeCont,U,V,Koala::Dijkstra<>::outPath(blackHole,tabE));
+        res=Koala::Dijkstra::findPath(g,edgeCont,U,V,Koala::Dijkstra::outPath(blackHole,tabE));
         std::cout<<"Odleglosc: "<< res.length<<std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";
@@ -112,14 +112,14 @@ int main() {
     // ... interesowala go tylko odleglosc, nie chcialo mu sie zakladac kontenera asoc. dla wierzcholkow
     std::cout<< std::endl;
     dijTest();
-    std::cout<< "Odleglosc: "<< Koala::Dijkstra<>::distances(g,blackHole,edgeCont,U,V)<<":";
+    std::cout<< "Odleglosc: "<< Koala::Dijkstra::distances(g,blackHole,edgeCont,U,V)<<":";
 
     std::cout << "\n\n Dijkstra z kolejka priorytetowa\n\n";
 
 
     dijTest();
 
-    std::cout<< "Odleglosc: "<< Koala::Dijkstra<Koala::DijHeap>::distances(g,vertCont,edgeCont,U,V)<<":";
+    std::cout<< "Odleglosc: "<< Koala::DijkstraHeap::distances(g,vertCont,edgeCont,U,V)<<":";
 //       - mozna i bez ostatniego arg. - liczymy z U do wszystkich
     std::cout << "\nE:" << vertCont[E].distance << " F:" << vertCont[F].distance << std::endl;
 
@@ -130,7 +130,7 @@ int main() {
 
         std::cout<< std::endl;
 //        l=Koala::Dijkstra::getOutPath(g,vertCont,Koala::Dijkstra::outPath(tabV,tabE),V,F);
-        l=Koala::Dijkstra<Koala::DijHeap>::getPath(g,vertCont,V,Koala::Dijkstra<Koala::DijHeap>::outPath(tabV,tabE));
+        l=Koala::DijkstraHeap::getPath(g,vertCont,V,Koala::DijkstraHeap::outPath(tabV,tabE));
         std::cout<<"Liczba krawedzi: "<<l<<std::endl;
         for(int i=0;i<=l;i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;i<l;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
@@ -143,10 +143,10 @@ int main() {
     // ten sam graf raz jeszcze, szukamy sciezki od nowa
 
     if (V) {
-        Koala::Dijkstra<Koala::DijHeap>::PathLengths<int> res;
+        Koala::DijkstraHeap::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); dijTest();
-        res=Koala::Dijkstra<Koala::DijHeap>::findPath(g,edgeCont,U,V,Koala::Dijkstra<Koala::DijHeap>::outPath(tabV,tabE));
+        res=Koala::DijkstraHeap::findPath(g,edgeCont,U,V,Koala::DijkstraHeap::outPath(tabV,tabE));
         std::cout<<"Odleglosc: "<< res.length<<std::endl;
         for(int i=0;i<=res.edgeNo;i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
@@ -158,10 +158,10 @@ int main() {
     // ten sam graf raz jeszcze, kogos nie interesowala sekwencja wierzcholkow
 
     if (V) {
-        Koala::Dijkstra<Koala::DijHeap>::PathLengths<int> res;
+        Koala::DijkstraHeap::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); dijTest();
-        res=Koala::Dijkstra<Koala::DijHeap>::findPath(g,edgeCont,U,V,Koala::Dijkstra<Koala::DijHeap>::outPath(blackHole,tabE));
+        res=Koala::DijkstraHeap::findPath(g,edgeCont,U,V,Koala::DijkstraHeap::outPath(blackHole,tabE));
         std::cout<<"Odleglosc: "<< res.length<<std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";
@@ -171,7 +171,7 @@ int main() {
     // ... interesowala go tylko odleglosc, nie chcialo mu sie zakladac kontenera asoc. dla wierzcholkow
     std::cout<< std::endl;
     dijTest();
-    std::cout<< "Odleglosc: "<< Koala::Dijkstra<Koala::DijHeap>::distances(g,blackHole,edgeCont,U,V)<<":";
+    std::cout<< "Odleglosc: "<< Koala::DijkstraHeap::distances(g,blackHole,edgeCont,U,V)<<":";
 
 
     std::cout << "\n\n Dijkstra z Fibonaczim\n\n";
@@ -179,7 +179,7 @@ int main() {
 
     dijTest();
 
-    std::cout<< "Odleglosc: "<< Koala::Dijkstra<Koala::DijFibonHeap>::distances(g,vertCont,edgeCont,U,V)<<":";
+    std::cout<< "Odleglosc: "<< Koala::DijkstraFibon::distances(g,vertCont,edgeCont,U,V)<<":";
 //       - mozna i bez ostatniego arg. - liczymy z U do wszystkich
     std::cout << "\nE:" << vertCont[E].distance << " F:" << vertCont[F].distance << std::endl;
 
@@ -190,7 +190,7 @@ int main() {
 
         std::cout<< std::endl;
 //        l=Koala::Dijkstra::getOutPath(g,vertCont,Koala::Dijkstra::outPath(tabV,tabE),V,F);
-        l=Koala::Dijkstra<Koala::DijFibonHeap>::getPath(g,vertCont,V,Koala::Dijkstra<Koala::DijFibonHeap>::outPath(tabV,tabE));
+        l=Koala::DijkstraFibon::getPath(g,vertCont,V,Koala::DijkstraFibon::outPath(tabV,tabE));
         std::cout<<"Liczba krawedzi: "<<l<<std::endl;
         for(int i=0;i<=l;i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;i<l;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
@@ -203,10 +203,10 @@ int main() {
     // ten sam graf raz jeszcze, szukamy sciezki od nowa
 
     if (V) {
-        Koala::Dijkstra<Koala::DijFibonHeap>::PathLengths<int> res;
+        Koala::DijkstraFibon::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); dijTest();
-        res=Koala::Dijkstra<Koala::DijFibonHeap>::findPath(g,edgeCont,U,V,Koala::Dijkstra<Koala::DijFibonHeap>::outPath(tabV,tabE));
+        res=Koala::DijkstraFibon::findPath(g,edgeCont,U,V,Koala::DijkstraFibon::outPath(tabV,tabE));
         std::cout<<"Odleglosc: "<< res.length<<std::endl;
         for(int i=0;i<=res.edgeNo;i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
@@ -218,10 +218,10 @@ int main() {
     // ten sam graf raz jeszcze, kogos nie interesowala sekwencja wierzcholkow
 
     if (V) {
-        Koala::Dijkstra<Koala::DijFibonHeap>::PathLengths<int> res;
+        Koala::DijkstraFibon::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); dijTest();
-        res=Koala::Dijkstra<Koala::DijFibonHeap>::findPath(g,edgeCont,U,V,Koala::Dijkstra<Koala::DijFibonHeap>::outPath(blackHole,tabE));
+        res=Koala::DijkstraFibon::findPath(g,edgeCont,U,V,Koala::DijkstraFibon::outPath(blackHole,tabE));
         std::cout<<"Odleglosc: "<< res.length<<std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";
@@ -231,7 +231,7 @@ int main() {
     // ... interesowala go tylko odleglosc, nie chcialo mu sie zakladac kontenera asoc. dla wierzcholkow
     std::cout<< std::endl;
     dijTest();
-    std::cout<< "Odleglosc: "<< Koala::Dijkstra<Koala::DijFibonHeap>::distances(g,blackHole,edgeCont,U,V)<<":";
+    std::cout<< "Odleglosc: "<< Koala::DijkstraFibon::distances(g,blackHole,edgeCont,U,V)<<":";
 
 
     return 0;

@@ -21,10 +21,12 @@ namespace Koala {
 //A tak wyobrazam sobie wszystkie nasze algorytmy - spokrewnione procedury i uzywane struktury
 //zamykamy w jednej klasie. Same procedury sa szablonami jej metod statycznych.
 
-enum DijkstraVersion { DijSimple, DijHeap, DijFibonHeap };
+
+enum DijkstraVersion { DijkstraSimple, DijkstraHeap, DijkstraFibonHeap };
+
 
 template <DijkstraVersion ver, class DefaultStructs>
-class DijkstraPar : public ShortPathStructs {
+class DijkstraBasePar : public ShortPathStructs {
 // namespace Dijkstra { - druga mozliwosc, wtedy mozna by pozbyc sie staticow
 
     // wszystkie rodzaje nietrywialnych struktur uzywanych wewnatrz procedur okreslamy tutaj, aby w razie
@@ -67,10 +69,10 @@ class DijkstraPar : public ShortPathStructs {
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     {
         switch (ver) {
-            case DijSimple : return distancesSimple (g,avertTab,edgeTab,start,end);
-            case DijHeap : return distancesHeap<GraphType,VertContainer,EdgeContainer,BinomHeap,Privates::BinomHeapNode>
+            case DijkstraSimple : return distancesSimple (g,avertTab,edgeTab,start,end);
+            case DijkstraHeap : return distancesHeap<GraphType,VertContainer,EdgeContainer,BinomHeap,Privates::BinomHeapNode>
                 (g,avertTab,edgeTab,start,end);
-            case DijFibonHeap : return distancesHeap<GraphType,VertContainer,EdgeContainer,FibonHeap,Privates::FibonHeapNode>
+            case DijkstraFibonHeap : return distancesHeap<GraphType,VertContainer,EdgeContainer,FibonHeap,Privates::FibonHeapNode>
                 (g,avertTab,edgeTab,start,end);
             default: assert(0);
         }
@@ -286,8 +288,20 @@ class DijkstraPar : public ShortPathStructs {
 
 };
 
-template <DijkstraVersion ver=DijSimple>
-class Dijkstra : public DijkstraPar<ver,AlgorithmsDefaultSettings> {};
+
+template<class DefaultStructs>
+class DijkstraPar : public DijkstraBasePar<DijkstraSimple,DefaultStructs> {};
+
+template<class DefaultStructs>
+class DijkstraHeapPar : public DijkstraBasePar<DijkstraHeap,DefaultStructs> {};
+
+template<class DefaultStructs>
+class DijkstraFibonPar : public DijkstraBasePar<DijkstraFibonHeap,DefaultStructs> {};
+
+
+class Dijkstra : public DijkstraPar<AlgorithmsDefaultSettings> {};
+class DijkstraHeap : public DijkstraHeapPar<AlgorithmsDefaultSettings> {};
+class DijkstraFibon : public DijkstraFibonPar<AlgorithmsDefaultSettings> {};
 
 
 

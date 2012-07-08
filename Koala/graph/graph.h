@@ -175,6 +175,10 @@ class EdgeCounterUndir<0>
 
 }
 
+
+#include "grbase.h"
+
+
 /* ------------------------------------------------------------------------- *
  * Graph< VertInfo,EdgeInfo,EdAllow >
  *
@@ -186,6 +190,7 @@ class EdgeCounterUndir<0>
 
 template< class VertInfo = EmptyVertInfo, class EdgeInfo = EmptyVertInfo, class Settings = DefaultGrSettings<EdAll,true> >
 class Graph: public SubgraphBase,
+    public ConstGraphBase<Graph<VertInfo,EdgeInfo,Settings> >,
     protected Privates::EdgeCounterLoop<Settings::EdAllow & Loop>,
     protected Privates::EdgeCounterDir<Settings::EdAllow & (EdDirIn|EdDirOut)>,
     protected Privates::EdgeCounterUndir<Settings::EdAllow & Undirected>
