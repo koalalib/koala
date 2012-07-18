@@ -153,7 +153,8 @@ template<class KeyType>
 class Int32Hash {
 public:
 	size_t operator ()(KeyType key, size_t m) const {
-		return ((uint64_t)(uint32_t)(((uint32_t)key) * 2654435769u) * m) >> 32;
+		// explicit pointer truncation in 64bit
+		return ((uint64_t)(uint32_t)(((uint32_t)(size_t)key) * 2654435769u) * m) >> 32;
 		};
 	};
 

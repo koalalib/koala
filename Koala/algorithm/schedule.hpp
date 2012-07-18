@@ -57,19 +57,20 @@ template <class DefaultStructs>
 template<typename TaskIterator>
 int SchedulingPar<DefaultStructs>::SigmaUi(TaskIterator begin, TaskIterator end, const Schedule &schedule)
 {
-	int n = 0;
+	int i, n = 0;
 	for(TaskIterator iterator = begin; iterator != end; ++iterator, n++);
 
 	int LOCALARRAY(finish, n);
-	for(int i = 0; i < n; i++)
+	for(i = 0; i < n; i++)
 		finish[i] = 0;
 
-	for(typename Schedule::Type::const_iterator i = schedule.machines.begin(); i != schedule.machines.end(); ++i)
-		for(typename Schedule::Machine::const_iterator j = i->begin(); j != i->end(); ++j)
+	for(typename Schedule::Type::const_iterator it = schedule.machines.begin(); it != schedule.machines.end(); ++it)
+		for(typename Schedule::Machine::const_iterator j = it->begin(); j != it->end(); ++j)
 			if(finish[j->task] < j->end)
 				finish[j->task] = j->end;
 
-	int ans = 0, i = 0;
+	int ans = 0;
+	i = 0;
 	for(TaskIterator iterator = begin; iterator != end; ++iterator, i++)
 		ans += (finish[i] > iterator->duedate);
 	return ans;
@@ -79,19 +80,20 @@ template <class DefaultStructs>
 template<typename TaskIterator>
 int SchedulingPar<DefaultStructs>::LMax(TaskIterator begin, TaskIterator end,  const Schedule &schedule)
 {
-	int n = 0;
+	int i, n = 0;
 	for(TaskIterator iterator = begin; iterator != end; ++iterator, n++);
 
 	int LOCALARRAY(finish, n);
-	for(int i = 0; i < n; i++)
+	for(i = 0; i < n; i++)
 		finish[i] = 0;
 
-	for(typename Schedule::Type::const_iterator i = schedule.machines.begin(); i != schedule.machines.end(); ++i)
-		for(typename Schedule::Machine::const_iterator j = i->begin(); j != i->end(); ++j)
+	for(typename Schedule::Type::const_iterator it = schedule.machines.begin(); it != schedule.machines.end(); ++it)
+		for(typename Schedule::Machine::const_iterator j = it->begin(); j != it->end(); ++j)
 			if(finish[j->task] < j->end)
 				finish[j->task] = j->end;
 
-	int i = 0, ans = AlgorithmsDefaultSettings::NumberTypeBounds<int>::minusInfty();
+	i = 0;
+	int ans = AlgorithmsDefaultSettings::NumberTypeBounds<int>::minusInfty();
 	for(TaskIterator iterator = begin; iterator != end; ++iterator, i++)
 	{
 		int value = finish[i] - iterator->duedate;

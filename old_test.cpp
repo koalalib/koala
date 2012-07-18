@@ -42,37 +42,37 @@ int main() {
 	GraphI::PVertex v2 = graph.addVert();
 //	graph.testGraph();
 	GraphI::PEdge e1 = graph.addEdge(v1,v2,Undirected);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 //	graph.testGraph();
 	cout << graph.getEdgeNo() << " " << graph.getEdgeNo(Undirected) <<endl;
 	e1 = graph.addEdge(v1,v2,10);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 	e1 = graph.addEdge(v1,v2);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 
 	printf("Loop\n");
 	e1 = graph.addLoop(v1);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 	e1 = graph.addLoop(v1);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 	e1 = graph.addLoop(v1);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 
 	printf("Dir out\n");
 	e1 = graph.addArch(v1,v2);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 	e1 = graph.addArch(v1,v2);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 	e1 = graph.addArch(v1,v2);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 
 	printf("Dir in\n");
 	e1 = graph.addArch(v2,v1);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 	e1 = graph.addArch(v2,v1);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 	e1 = graph.addArch(v2,v1);
-	printf("%d\n",e1);
+	printf("%p\n",e1);
 
 	printf("TEST\n");
 //	graph.testGraph();
@@ -80,13 +80,13 @@ int main() {
 	printf("Szukanie krawedzi\n");
 	e1 = graph.getEdgePrev(v1,NULL,EdLoop|EdDirIn);
 	while(e1) {
-		printf("%d %d\n",e1, graph.getEdgeType(e1));
+		printf("%p %d\n",e1, graph.getEdgeType(e1));
 		e1 = graph.getEdgePrev(v1,e1,EdAll);
 	}
 	printf("KONIEC\n");
 	e1 = graph.getEdge(v1,v1);
 	while(e1) {
-		printf("%d %d\n",e1, graph.getEdgeType(e1));
+		printf("%p %d\n",e1, graph.getEdgeType(e1));
 		e1 = graph.getEdgeNext(v1,v1,e1);
 	}
 
@@ -99,7 +99,7 @@ int main() {
 	GraphI::PVertex wierzcholki[30];
 	int len_wer = graph.getVerts(wierzcholki);
 	for(int i=0; i<len_wer; i++)
-		printf("%d %d\n",i,wierzcholki[i]);
+		printf("%d %p\n",i,wierzcholki[i]);
 
 	graph.getNeighSet(v1);
     return 0;

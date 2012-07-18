@@ -80,7 +80,7 @@ template <class T> class AssocTabInterface : public AssocTabConstInterface<T>
 
         void reserve(int arg) { AssocTabConstInterface<T>::reserve(arg); }
         void clear() { AssocTabConstInterface<T>::clear(); }
-        bool delKey( KeyType arg) { AssocTabConstInterface<T>::delKey(arg); }
+        bool delKey( KeyType arg) { return AssocTabConstInterface<T>::delKey(arg); }
         ValType* valPtr(KeyType arg) { return AssocTabConstInterface< T>::valPtr(arg); }
         ValType &operator[]( KeyType arg ) { return AssocTabConstInterface< T>::get(arg); }
         ValType operator[]( KeyType arg ) const { return AssocTabConstInterface< T>::operator[](arg); }

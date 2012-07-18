@@ -69,7 +69,7 @@ int main()
     IO::writeGraphText(g1,cout,IO::RG_EdgeList);
 
 
-    vec.clear();vec[0].resize(2);vec[1].resize(2);
+    vec.clear(); vec.resize(2); vec[0].resize(2);vec[1].resize(2);
     vec[0][1]=1;
     cout <<'\n'<< vec[0][0] << ' ' << vec[0][1] << '\n' << vec[1][0] << ' ' << vec[1][1] << endl<<endl;
 //    RelDiagram::MatrixForm::inv(f,itab,itab+2);

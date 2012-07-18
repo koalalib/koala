@@ -4,7 +4,7 @@
 #include "../base/def_struct.h"
 //#include "../graph/graph.h"
 #include "../graph/subgraph.h"
-#include "search.h"
+#include "../algorithm/search.h"
 #include "../container/joinsets.h"
 #include "../container/heap.h"
 
@@ -74,7 +74,7 @@ class DijkstraBasePar : public ShortPathStructs {
                 (g,avertTab,edgeTab,start,end);
             case DijkstraFibonHeap : return distancesHeap<GraphType,VertContainer,EdgeContainer,FibonHeap,Privates::FibonHeapNode>
                 (g,avertTab,edgeTab,start,end);
-            default: assert(0);
+            default: assert(0); return typename EdgeContainer::ValType::DistType();
         }
     }
 
@@ -759,10 +759,10 @@ class FloydPar : public PathStructs {
                  //if (vertMatrix(Vi,Vl).distance < inf) mozna tak albo tak jak ponizej
                  if (inf!=vertMatrix(Vi,Vl).distance)
                     for(typename GraphType::PVertex Vj=g.getVert();Vj;Vj=g.getVertNext(Vj))
-                        if (vertMatrix(Vl,Vj).distance < inf && ((nd=vertMatrix(Vi,Vl).distance+vertMatrix(Vl,Vj).distance) < vertMatrix(Vi,Vj).distance))
+                        if (inf > vertMatrix(Vl,Vj).distance && ((nd=vertMatrix(Vi,Vl).distance+vertMatrix(Vl,Vj).distance) < vertMatrix(Vi,Vj).distance))
                             { vertMatrix(Vi,Vj).distance=nd; vertMatrix(Vi,Vj).ePrev=vertMatrix(Vl,Vj).ePrev; vertMatrix(Vi,Vj).vPrev=vertMatrix(Vl,Vj).vPrev; }
                 //sprawdzenie czy nie ma cykli ujemnych
-                if (vertMatrix(Vi,Vi).distance < zero)
+                if (zero > vertMatrix(Vi,Vi).distance)
                     { existNegCycle=true; break; }
             }
 
