@@ -1472,7 +1472,7 @@ Graph< VertInfo,EdgeInfo,Settings >::copy(
 
 template< class VertInfo, class EdgeInfo, class Settings > template< class ExtGraph >
 typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-Graph< VertInfo,EdgeInfo,Settings >::substitute( PVertex vert, ExtGraph &graph )
+Graph< VertInfo,EdgeInfo,Settings >::substitute(typename GraphType::PVertex vert, ExtGraph &graph )
 {
     return substitute( vert,graph,std::make_pair( stdChoose( true ),
              stdChoose( true ) ),std::make_pair( stdCast( false ),stdCast( false ) ),

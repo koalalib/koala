@@ -538,7 +538,7 @@ int ConstGraphMethods< GraphType>::getClNeighNo(
 
 template< class GraphType>
 bool ConstGraphMethods< GraphType>::areParallel(
-    typename ConstGraphMethods< GraphType>::PEdge e1, ConstGraphMethods< GraphType>::PEdge e2, EdgeDirection reltype ) const
+    typename ConstGraphMethods< GraphType>::PEdge e1, typename ConstGraphMethods< GraphType>::PEdge e2, EdgeDirection reltype ) const
 {
     if(!(e1 && e2 && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir))) return false;
     std::pair<PVertex,PVertex > ends1 = self.getEdgeEnds( e1 ),ends2 = self.getEdgeEnds( e2 );
@@ -597,7 +597,7 @@ template< class GraphType>
 std::pair< typename ConstGraphMethods< GraphType>::PEdge,int >
 ConstGraphMethods< GraphType>::maxMu( EdgeDirection reltype) const
 {
-    std::pair< PEdge,int > res(0,0);
+    std::pair< PEdge,int > res((PEdge)0,0);
     if (!(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir) || !self.getEdgeNo(EdAll)) return res;
     Parals3 LOCALARRAY(edges,self.root().getEdgeNo(EdAll));
     int i=0,l=0;

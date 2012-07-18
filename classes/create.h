@@ -604,8 +604,8 @@ class RelDiagramPar {
                                 >matr(u,v).distance) g.addArch(u,v,einfo);
         for(typename Graph::PEdge e=g.getEdge(Directed|Undirected);e;e=g.getEdgeNext(e,Directed|Undirected))
             if ((g.getEdgeType(e)==Undirected)||
-                ((g.getEdgeType(e)==Directed)&& matr(g.getEdgeEnd2(e),g.getEdgeEnd1(e)).distance
-                    <DefaultStructs::template NumberTypeBounds<int>::plusInfty()))
+                ((g.getEdgeType(e)==Directed)&& DefaultStructs::template NumberTypeBounds<int>::plusInfty()
+		    > matr(g.getEdgeEnd2(e),g.getEdgeEnd1(e)).distance))
             {
                 if (!g.getEdge(g.getEdgeEnd1(e),EdLoop)) g.addLoop(g.getEdgeEnd1(e),einfo);
                 if (!g.getEdge(g.getEdgeEnd2(e),EdLoop)) g.addLoop(g.getEdgeEnd2(e),einfo);

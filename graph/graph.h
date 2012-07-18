@@ -209,7 +209,7 @@ class Graph: public SubgraphBase,
     public ConstGraphMethods<Graph<VertInfo,EdgeInfo,Settings> >
 {
     public:
-        friend class Edge< VertInfo,EdgeInfo,Settings >;
+        friend class Koala::Edge< VertInfo,EdgeInfo,Settings >;
 
         typedef typename GraphInternalTypes< Graph<VertInfo,EdgeInfo,Settings> >::Vertex Vertex;
         typedef typename GraphInternalTypes< Graph<VertInfo,EdgeInfo,Settings> >::PVertex PVertex;
@@ -239,7 +239,7 @@ class Graph: public SubgraphBase,
         // Suma grafów.
         Graph< VertInfo,EdgeInfo,Settings > &operator+=( const Graph< VertInfo,EdgeInfo,Settings > & );
         // Przenosimy wszystkie wierzchołki i krawędzie do naszego grafu.
-        PVertex move( Graph< VertInfo,EdgeInfo,Settings > & );
+        typename GraphType::PVertex move( Graph< VertInfo,EdgeInfo,Settings > & );
 
 
         static EdgeType allowedEdgeTypes() { return Settings::EdAllow ; }
@@ -252,8 +252,8 @@ class Graph: public SubgraphBase,
         // Ostatni wierzchołek grafu.
 //        inline PVertex getVertLast() const;
         // Następny i poprzedni wierzchołek w grafie.
-        inline PVertex getVertNext( PVertex ) const;
-        inline PVertex getVertPrev( PVertex ) const;
+        inline typename GraphType::PVertex getVertNext( PVertex ) const;
+        inline typename GraphType::PVertex getVertPrev( PVertex ) const;
         // Zbiór wierzchołków grafu.
 //        Set< PVertex > getVertSet() const;
 //        // Kopiujemy wierzchołki grafu do iteratora.
@@ -274,8 +274,8 @@ class Graph: public SubgraphBase,
         // Ostatnia krawędź podanego typu.
 //        inline PEdge getEdgeLast( EdgeType = EdAll )const;
         // Następna i poprzednia krawędź podanego typu.
-        inline PEdge getEdgeNext( PEdge,EdgeType = EdAll ) const;
-        inline PEdge getEdgePrev( PEdge,EdgeType = EdAll ) const;
+        inline typename GraphType::PEdge getEdgeNext( PEdge,EdgeType = EdAll ) const;
+        inline typename GraphType::PEdge getEdgePrev( PEdge,EdgeType = EdAll ) const;
         // Zbiór krawędzi podanego typu.
 //        Set< PEdge > getEdgeSet( EdgeType = EdAll ) const;
         // Kopiujemy krawędzie podanego typu do iteratora.
@@ -304,9 +304,9 @@ class Graph: public SubgraphBase,
         // Ostatnia krawędź incydentna z wierzchołkiem.
 //        inline PEdge getEdgeLast( PVertex, EdgeDirection = EdAll ) const;
         // Następna krawędź incydentna z wierzchołkiem.
-        PEdge getEdgeNext( PVertex, PEdge, EdgeDirection = EdAll ) const;
+        typename GraphType::PEdge getEdgeNext( PVertex, PEdge, EdgeDirection = EdAll ) const;
         // Poprzednia krawędź incydentna z wierzchołkiem.
-        PEdge getEdgePrev( PVertex, PEdge, EdgeDirection = EdAll ) const;
+        typename GraphType::PEdge getEdgePrev( PVertex, PEdge, EdgeDirection = EdAll ) const;
         // Zbiór krawędzi incydentnych z wierzchołkiem.
 //        Set< PEdge > getEdgeSet( PVertex, EdgeDirection = EdAll ) const;
         // Kopiujemy krawędzie incydentne z wierzchołkiem do iteratora.
@@ -321,9 +321,9 @@ class Graph: public SubgraphBase,
         // Ostatnia krawędź łącząca parę wierzchołków.
 //        inline PEdge getEdgeLast( PVertex, PVertex, EdgeDirection = EdAll )const;
         // Następna krawędź łącząca parę wierzchołków.
-        PEdge getEdgeNext( PVertex, PVertex, PEdge, EdgeDirection = EdAll ) const;
+        typename GraphType::PEdge getEdgeNext( PVertex, PVertex, PEdge, EdgeDirection = EdAll ) const;
         // Poprzednia krawędź łącząca parę wierzchołków.
-        PEdge getEdgePrev( PVertex, PVertex, PEdge, EdgeDirection = EdAll ) const;
+        typename GraphType::PEdge getEdgePrev( PVertex, PVertex, PEdge, EdgeDirection = EdAll ) const;
         // Zbiór krawędzi łączących parę wierzchołków.
 //        Set< PEdge > getEdgeSet( PVertex, PVertex, EdgeDirection = EdAll ) const;
         // Kopiujemy krawędzie łączące parę wierzchołków do iteratora.
@@ -349,10 +349,10 @@ class Graph: public SubgraphBase,
         // Typ krawędzi.
         inline EdgeType getEdgeType( PEdge ) const;
 //        inline EdgeType getType( PEdge ) const;
-        inline std::pair< PVertex,PVertex > getEdgeEnds( PEdge ) const;
+        inline std::pair< typename GraphType::PVertex,typename GraphType::PVertex > getEdgeEnds( PEdge ) const;
 //        inline std::pair< PVertex,PVertex > getEnds( PEdge ) const;
-        inline PVertex getEdgeEnd1( PEdge ) const;
-        inline PVertex getEdgeEnd2( PEdge ) const;
+        inline typename GraphType::PVertex getEdgeEnd1( PEdge ) const;
+        inline typename GraphType::PVertex getEdgeEnd2( PEdge ) const;
         // Informacja o tym, czy wierzchołek jest incydentny z krawędzią.
 //        inline bool isEdgeEnd( PEdge, PVertex ) const;
 //        inline bool isEnd( PEdge, PVertex ) const;
@@ -465,19 +465,19 @@ class Graph: public SubgraphBase,
 
     // Operacje na wierzchołkach grafu
         // Dodajemy nowy wierzchołek do grafu (z etykietą).
-        inline PVertex addVert( const VertInfo & = VertInfo() );
+        inline typename GraphType::PVertex addVert( const VertInfo & = VertInfo() );
         // Etykieta wierzchołka.
 
 
     // Operacje na krawędziach grafu
         // Dodajemy nową krawędź do grafu (bez etykiety).
-        inline PEdge addEdge( PVertex, PVertex, EdgeDirection = EdUndir );
+        inline typename GraphType::PEdge addEdge( PVertex, PVertex, EdgeDirection = EdUndir );
         // Dodajemy nową krawędź do grafu (z etykietą).
-        inline PEdge addEdge( PVertex, PVertex, const EdgeInfo &, EdgeDirection = EdUndir );
+        inline typename GraphType::PEdge addEdge( PVertex, PVertex, const EdgeInfo &, EdgeDirection = EdUndir );
         // Dodajemy nowy łuk do grafu (z etykietą).
-        inline PEdge addArch( PVertex, PVertex, const EdgeInfo & = EdgeInfo() );
+        inline typename GraphType::PEdge addArch( PVertex, PVertex, const EdgeInfo & = EdgeInfo() );
         // Dodajemy nową pętlę do grafu (bez etykiety).
-        inline PEdge addLoop( PVertex, const EdgeInfo & = EdgeInfo() );
+        inline typename GraphType::PEdge addLoop( PVertex, const EdgeInfo & = EdgeInfo() );
 
 
         // Przenosimy krawędź w inne miejsce.
@@ -488,7 +488,7 @@ class Graph: public SubgraphBase,
         int ch2Undir(PVertex, EdgeDirection=EdDirIn|EdDirOut);
         int ch2Undir(PVertex,PVertex, EdgeDirection=EdDirIn|EdDirOut);
         template <class Iterator> int ch2Undir(Iterator,Iterator);
-        inline int ch2Undir(const Set<PEdge>&);
+        inline int ch2Undir(const Set<typename GraphType::PEdge>&);
         int ch2Undir();
 
         // Zmieniamy kierunek krawędzi skierowanej
@@ -497,7 +497,7 @@ class Graph: public SubgraphBase,
         int revert(PVertex,PVertex, EdgeDirection=EdDirIn|EdDirOut);
         template <class Iterator> int revert(Iterator,Iterator);
         template <class Iterator> int revert2(Iterator,Iterator);
-        inline int revert(const Set<PEdge>&);
+        inline int revert(const Set<typename GraphType::PEdge>&);
         int revert();
 
         // zmiana krawedzi nieskierowanej na luk w danym kierunku
@@ -506,7 +506,7 @@ class Graph: public SubgraphBase,
         int ch2Dir(PVertex,PVertex,EdgeDirection=EdDirOut);
 
         // Zmieniamy krawędź nieskierowana w dwa łuki.
-        inline PEdge ch2Archs( PEdge );
+        inline typename GraphType::PEdge ch2Archs( PEdge );
         int ch2Archs(PVertex);
         int ch2Archs(PVertex,PVertex);
         template< class Iterator > int ch2Archs( Iterator begin, Iterator end );
@@ -515,18 +515,18 @@ class Graph: public SubgraphBase,
 
 
         // ustawienie nowego wierzcholka na srodku istniejacej krawedzi
-        PVertex putVert( PEdge,const VertInfo & = VertInfo() );
+        typename GraphType::PVertex putVert( PEdge,const VertInfo & = VertInfo() );
         // .. i zdjecie wierzcholka z krawedzi, po czym pozostaje jedna krawedz
-        PEdge pickVert( PVertex, const EdgeInfo & = EdgeInfo() );
+        typename GraphType::PEdge pickVert( PVertex, const EdgeInfo & = EdgeInfo() );
 
 
         // sklejanie grupy wierzcholkow w jeden wierzcholek docelowy (mozna wybrac ten wierzcholek sposrod sklejanej grupy)
-        inline PVertex glue( PVertex, PVertex, bool makeloops = false );
-        template< class Iterator > PVertex glue(
+        inline typename GraphType::PVertex glue( PVertex, PVertex, bool makeloops = false );
+        template< class Iterator > typename GraphType::PVertex glue(
             Iterator, Iterator, bool makeloops = false, PVertex = NULL );
-        template< class Iterator > PVertex glue2(
+        template< class Iterator > typename GraphType::PVertex glue2(
             Iterator, Iterator, bool makeloops = false, PVertex = NULL );
-        inline PVertex glue(
+        inline typename GraphType::PVertex glue(
             const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> &,
             bool makeloops = false, PVertex = NULL );
 
@@ -535,19 +535,19 @@ class Graph: public SubgraphBase,
         int delParals(PEdge,EdgeDirection = EdUndir);
         template< class Iterator > int delParals(Iterator begin,Iterator end,PEdge,EdgeDirection = EdUndir);
         template< class Iterator > int delParals2(Iterator begin,Iterator end,PEdge,EdgeDirection = EdUndir);
-        inline int delParals(const Set<PEdge>&,PEdge,EdgeDirection = EdUndir);
+        inline int delParals(const Set<typename GraphType::PEdge>&,PEdge,EdgeDirection = EdUndir);
 
 
         template<class Iterator > int delAllParals(Iterator,Iterator, EdgeType = EdUndir );
         template<class Iterator > int delAllParals2(Iterator,Iterator, EdgeType = EdUndir );
-        int delAllParals(const Set<PEdge>&, EdgeType = EdUndir );
+        int delAllParals(const Set<typename GraphType::PEdge>&, EdgeType = EdUndir );
         int delAllParals(PVertex, EdgeType = EdUndir );
         int delAllParals(PVertex,PVertex, EdgeType = EdUndir );
         int delAllParals(EdgeType = EdUndir );
 
 
         template <class Iterator> int delIncEdges(Iterator, Iterator, EdgeDirection = EdAll, EdgeType=Loop );
-        int delIncEdges(const Set<PVertex>&, EdgeDirection = EdAll, EdgeType=Loop );
+        int delIncEdges(const Set<typename GraphType::PVertex>&, EdgeDirection = EdAll, EdgeType=Loop );
 
 
         // dopelnienia podgrafu indukowanego na zadanych wierzcholkach
@@ -561,28 +561,28 @@ class Graph: public SubgraphBase,
 
 
         // Kopiujemy wierzchołki i krawędzie do innego grafu.
-        template< class ExtGraph > PVertex copy( const ExtGraph & );
+        template< class ExtGraph > typename GraphType::PVertex copy( const ExtGraph & );
         template< class ExtGraph, class VChooser, class EChooser >
-            PVertex copy( const ExtGraph &, std::pair< VChooser,EChooser > );
+            typename GraphType::PVertex copy( const ExtGraph &, std::pair< VChooser,EChooser > );
         template< class ExtGraph, class VChooser, class EChooser, class VCaster,
             class ECaster >
-            PVertex copy( const ExtGraph &, std::pair< VChooser,EChooser >,
+            typename GraphType::PVertex copy( const ExtGraph &, std::pair< VChooser,EChooser >,
                 std::pair< VCaster,ECaster > );
         template< class ExtGraph, class VChooser, class EChooser, class VCaster,
             class ECaster, class VLinker, class ELinker >
-            PVertex copy( ExtGraph &, std::pair< VChooser,EChooser >,
+            typename GraphType::PVertex copy( ExtGraph &, std::pair< VChooser,EChooser >,
                 std::pair< VCaster,ECaster >, std::pair< VLinker,ELinker > );
         // Wstawiamy do grafu inny graf zamiast wierzchołka.
-        template< class ExtGraph > PVertex substitute( PVertex, ExtGraph & );
+        template< class ExtGraph > typename GraphType::PVertex substitute( typename GraphType::PVertex, ExtGraph & );
         template< class ExtGraph, class VChooser, class EChooser >
-            PVertex substitute( PVertex, ExtGraph &, std::pair< VChooser,EChooser > );
+            typename GraphType::PVertex substitute( PVertex, ExtGraph &, std::pair< VChooser,EChooser > );
         template< class ExtGraph, class VChooser, class EChooser, class VCaster,
             class ECaster >
-            PVertex substitute( PVertex, ExtGraph &, std::pair< VChooser,EChooser >,
+            typename GraphType::PVertex substitute( PVertex, ExtGraph &, std::pair< VChooser,EChooser >,
                 std::pair< VCaster,ECaster > );
         template< class ExtGraph, class VChooser, class EChooser, class VCaster,
             class ECaster, class VLinker, class ELinker >
-            PVertex substitute( PVertex, ExtGraph &, std::pair< VChooser,EChooser >,
+            typename GraphType::PVertex substitute( typename GraphType::PVertex, ExtGraph &, std::pair< VChooser,EChooser >,
                 std::pair< VCaster,ECaster >, std::pair< VLinker,ELinker > );
 
     // Operacje na macierzy sąsiedztwa
@@ -622,13 +622,13 @@ class Graph: public SubgraphBase,
             no_undir_edge() const { return this->Privates::EdgeCounterUndir<Settings::EdAllow & Undirected>::no(); }
         int no_vert;
 
-        inline PVertex attach( PVertex );
-        inline PVertex detach( PVertex );
-        inline PEdge attach( PEdge, PVertex, PVertex, EdgeDirection );
-        PEdge attach_undir( PEdge, PVertex, PVertex );
-        PEdge attach_dir( PEdge, PVertex, PVertex );
-        PEdge attach_loop( PEdge, PVertex );
-        PEdge detach( PEdge );
+        inline typename GraphType::PVertex attach( PVertex );
+        inline typename GraphType::PVertex detach( PVertex );
+        inline typename GraphType::PEdge attach( PEdge, PVertex, PVertex, EdgeDirection );
+        typename GraphType::PEdge attach_undir( PEdge, PVertex, PVertex );
+        typename GraphType::PEdge attach_dir( PEdge, PVertex, PVertex );
+        typename GraphType::PEdge attach_loop( PEdge, PVertex );
+        typename GraphType::PEdge detach( PEdge );
 } ;
 
 #include "graph.hpp"
