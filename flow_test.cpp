@@ -299,7 +299,9 @@ int main() {
     bool vflag=true;
     Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists,std::make_pair(true,true));
     int itab[20];
+
     int p=Koala::Connect::vertDisjPaths(g,S,T,Koala::Connect::outPath(tabV,tabE),itab,vflag);
+
     cout << p << endl;
     for(int i=0;i<=p;i++) cout << itab[i] << ' ';
     cout <<  endl;

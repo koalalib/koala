@@ -61,7 +61,7 @@ void searchTest_()
 
 
 void searchTest()
-{  
+{
     vertCont.clear();
     g.clear();
     A=g.addVert(OpisV("A"));
@@ -113,9 +113,9 @@ void searchTest2()
 }
 
 
-
 int main() {
 
+{
 
     searchTest();
     int licz;
@@ -125,10 +125,10 @@ int main() {
 
     std::cout<<std::endl;
     std::cout <<Koala::Blocks::split(g,blackHole,blackHole,Koala::SearchStructs::compStore(blackHole,blackHole),
-                                   blackHole,EdAll)<<std::endl;
+                                   blackHole)<<std::endl;
 
     int compno = Koala::Blocks::splitComp(g,C,vertCont,edgeCont,Koala::SearchStructs::compStore(comptab[0],tabV),
-                                   comptab[1],EdAll);
+                                   comptab[1]);
     std::cout << compno<<endl;
     for(int i=0;i<compno;i++)
     {   cout << comptab[0][i] << ':';
@@ -150,10 +150,54 @@ int main() {
     std::cout << std::endl;
     for(EE=g.getEdge();EE;EE=g.getEdgeNext(EE))
         std::cout << " {" << EE->getEnds().first->info.name << EE->getEnds().second->info.name << "}:" << edgeCont[EE];
-
+}
+{
     searchTest();
-    std::cout<<"\n"<<Koala::Blocks::split(g,blackHole,blackHole,Koala::SearchStructs::compStore(comptab[0],tabV),
-                                   comptab[1],EdAll);
+    int licz;
+
+
+    int comptab[2][100];
+    Koala::SearchStructs::VectCompStore<Koala::Graph<OpisV,OpisE>::PVertex> vec;
+
+    std::cout<<std::endl;
+
+    int compno = Koala::Blocks::splitComp(g,C,vertCont,edgeCont,vec.input(),comptab[1]);
+    std::cout << "\nsize:" <<vec.size()<<endl;
+    for(int i=0;i<vec.size();i++)
+    {
+        for(int j=0;j<vec.size(i);j++) cout << vec[i][j]->info.name << " ";
+        cout << endl;
+    }
+//    std::cout << endl;
+//    for(int i=0;i<compno;i++)
+//    {   cout << comptab[1][i] << ':';
+//        for(int j=comptab[1][i];j<comptab[1][i+1];j++) cout << '(' << tabE[j]->getEnds().first->info.name << tabE[j]->getEnds().second->info.name << ')';
+//        cout << endl;
+//    }
+    std::cout << std::endl;
+    for(W=g.getVert();W;W=g.getVertNext(W))
+        {   std::cout << W->info.name << "-" << vertCont[W].blockNo << ':';
+            for(int j=0;j<vertCont[W].blockNo;j++) std::cout<< comptab[1][vertCont[W].firstBlock+j] << ' ';
+            std::cout << std::endl;
+        }
+    std::cout << std::endl;
+    for(EE=g.getEdge();EE;EE=g.getEdgeNext(EE))
+        std::cout << " {" << EE->getEnds().first->info.name << EE->getEnds().second->info.name << "}:" << edgeCont[EE];
+
+}
+
+    std::cout << "\n\n------------\n\n";
+    searchTest();//g.addEdge(I,A);
+    Koala::SearchStructs::VectCompStore<Koala::Graph<OpisV,OpisE>::PVertex> vec;
+
+    std::cout << vec.size() << std::endl;
+    std::cout<<"\n"<<Koala::SCC::get(g,vec.input(),blackHole) << "\n\n";
+    for(int i=0;i<vec.size();i++)
+    {
+        for(int j=0;j<vec.size(i);j++) cout << vec[i][j]->info.name << " ";
+        cout << endl;
+    }
+
 
 
     return 0;

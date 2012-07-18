@@ -1011,11 +1011,10 @@ template< class GraphType, class VertDataMap, class EdgeDataMap,
     class CompIter, class VertIter, class VertBlockIter >
 int BlocksPar <DefaultStructs >::split(
     const GraphType &g, VertDataMap &vertMap, EdgeDataMap &edgeMap,
-    CompStore< CompIter,VertIter > blocks, VertBlockIter vertBlocks,
-    EdgeType mask )
+    CompStore< CompIter,VertIter > blocks, VertBlockIter vertBlocks)
 {
     int rv;
-    if (mask & (EdDirIn | EdDirOut)) mask |= EdDirOut | EdDirIn;
+    const EdgeType mask =EdAll;
     typename DefaultStructs:: template AssocCont<
             typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited(g.getVertNo());
     typename GraphType::PEdge LOCALARRAY( stbuf,g.getEdgeNo() + 1 );    // TODO: size?
@@ -1039,10 +1038,10 @@ template< class GraphType, class VertDataMap, class EdgeDataMap,
 int BlocksPar  <DefaultStructs >::splitComp(
     const GraphType &g, typename GraphType::PVertex u, VertDataMap &vertMap,
     EdgeDataMap &edgeMap, CompStore< CompIter,VertIter > blocks,
-    VertBlockIter vertBlocks, EdgeType mask )
+    VertBlockIter vertBlocks)
 {
     int rv;
-    if (mask & (EdDirIn | EdDirOut)) mask |= EdDirOut | EdDirIn;
+    const EdgeType mask =EdAll;//if (mask & (EdDirIn | EdDirOut)) mask |= EdDirOut | EdDirIn;
     typename DefaultStructs:: template AssocCont<
             typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited(g.getVertNo());
     typename GraphType::PEdge LOCALARRAY( stbuf,g.getEdgeNo() + 1 );    // TODO: size?

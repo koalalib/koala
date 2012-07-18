@@ -3,6 +3,7 @@
 #include "Koala/base/def_struct.h"
 #include "Koala/graph/graph.h"
 #include "Koala/graph/subgraph.h"
+#include "Koala/algorithm/search.h"
 #include "Koala/io/text.h"
 
 
@@ -68,16 +69,18 @@ int main() {
     cout <<boolalpha;
 //    for(int i=0;i<g1.getConEdges(tabE,tabV3,tabV3+5,tabV,tabV+5,EdAll);i++) cout << tabE[i]->info << '\n';
 //    g1.addLoop(B,"*B");
-    g1.addArch(B,A,"B>A");
+    e=g1.addArch(B,A,"B>A");
 //    g1.addLoop(A,"*A");
     g1.addArch(B,C,"B>C");
 //    g1.addEdge(B,C,"B-C");
-    g1.addEdge(B,A,"B-A");
+    f=g1.addEdge(B,A,"B-A");
 //    g1.addEdge(A,B,"A-B");
     //g1.addEdge(C,B,"C-B");
 //    g1.addArch(C,B,"C>B");
-    g1.addLoop(B,"*B");
+    g1.addLoop(B,"*B");g1.addLoop(B,"*B");g1.addLoop(B,"*B");
     g1.addArch(C,B,"C>B");
+    g1.addArch(C,B,"C>B");
+    g1.addEdge(A,B,"A-B");
 //    g1.addArch(B,C,"B>C");
     IO::writeGraphText(g1,cout,IO::RG_EdgeList);
     cout<< endl<<endl;
@@ -93,8 +96,34 @@ int main() {
 //    g1.getIncVertSet(vset.begin(),vset.end(),mask,mask);
 //    g1.getIncVertSet(vset,mask,mask);
 
+    std::cout << "\n\n!!!!!!!!!!!!!!\n\n";
 
+    cout << g1.getChosenSets(std::make_pair(stdChoose(true),stdChoose(false))).first  << ' ' << g1.getEdgeEnds(g1.getEdge()).first;
+    cout <<endl << boolalpha << g1.getIncVertSet(vset);
+    vset+=C;vset+=D;
+    cout << endl << (makeSubgraph(g1,std::make_pair(stdChoose(true),edgeTypeChoose(Directed))).getEdgeNo(B,C,EdAll) );
 
+    std::cout << "\n\n!!!!!!!!!!!!!!\n\n";
+    IO::writeGraphText(g1,cout,IO::RG_EdgeList);
+    cout << endl << endl;
+//    IO::writeGraphText(makeSubgraph(makeRevView(g1),std::make_pair(stdChoose(vset),stdChoose(true))),cout,IO::RG_EdgeList);
+    IO::writeGraphText(makeSubgraph(makeRevView(g1),std::make_pair(stdChoose(vset),stdChoose(true))),cout,IO::RG_EdgeList);
+    cout << endl << endl;
+    cout << "\n!:"<<makeRevView(g1).getEdgeNo(Directed) << endl;
+
+    AssocArray<Vertex<char,string>*,bool> vset2;
+    vset2[A];vset2[B];vset2[C];vset2[D];
+    std::cout << "\n\n-------------\n\n";
+    cout << makeSubgraph(makeRevView(g1),std::make_pair(assocKeyChoose(vset2),stdChoose(true))).getEdges(blackHole,EdAll);
+    std::cout << "\n\n!!!\n\n";
+    IO::writeGraphText(makeSubgraph(makeRevView(g1),std::make_pair(assocKeyChoose(vset2),stdChoose(true))),cout,IO::RG_EdgeList);//.getEdgeNo(Directed);
+    g1.clearEdges();
+    cout << g1.addArch(B,A);g1.addArch(D,C);g1.addEdge(C,B);g1.addLoop(B);
+    cout << endl << BFS::getPath(makeRevView(g1),A,D,BFS::outPath(blackHole,blackHole));
+    cout << endl << makeRevView(g1).getEdge(A,EdDirOut);
+
+//    std::cout << "\n\n!!!!!!!!!!!!!!\n\n";
+//
 //    std::pair<int,int> intp=g1.findParals(make_pair(tabE,tabE2),EdUndir);
 //    for(int i=0;i<intp.first;i++) cout << tabE[i]->info << '\n';
 //    cout<< endl<<endl;
@@ -107,6 +136,8 @@ int main() {
 //    for(int i=0;i<intp.first;i++) cout << tabE[i]->info << '\n';
 //    cout<< endl<<endl;
 //    for(int i=0;i<intp.second;i++) cout << tabE2[i]->info << '\n';
+//
+//    cout << g1.findParals(make_pair(tabE,tabE2),A,B,EdUndir).first;
 
 //    Edge<char,string> *tab[50]={e,0,e};
 //    vset=A;vset+=B;

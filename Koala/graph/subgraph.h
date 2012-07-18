@@ -20,24 +20,42 @@ namespace Koala
  *
  * ------------------------------------------------------------------------- */
 
+template < class Graph, class VChooser, class EChooser  > class Subgraph;
+
+template < class Graph, class VChooser, class EChooser  >
+struct GraphInternalTypes<Subgraph< Graph, VChooser, EChooser> > {
+        typedef typename Graph::Vertex Vertex;
+        typedef typename Graph::PVertex PVertex;
+        typedef typename Graph::Edge Edge;
+        typedef typename Graph::PEdge PEdge;
+        typedef typename Graph::VertInfoType VertInfoType;
+        typedef typename Graph::EdgeInfoType EdgeInfoType;
+        typedef typename Graph::GraphSettings GraphSettings;
+
+};
+
+
+
 template< class Graph, class VChooser, class EChooser >
-class Subgraph: public SubgraphBase
+class Subgraph: public SubgraphBase,
+                public ConstGraphMethods<Subgraph< Graph, VChooser, EChooser>  >
 {
     public:
 
          mutable VChooser vchoose;
          mutable EChooser echoose;
 
-        typedef typename Graph::Vertex Vertex;
-        typedef typename Graph::PVertex PVertex;
-        typedef typename Graph::Edge Edge;
-        typedef typename Graph::PEdge PEdge;
+        typedef typename GraphInternalTypes<Subgraph< Graph, VChooser, EChooser> >::Vertex Vertex;
+        typedef typename GraphInternalTypes<Subgraph< Graph, VChooser, EChooser> >::PVertex PVertex;
+        typedef typename GraphInternalTypes<Subgraph< Graph, VChooser, EChooser> >::Edge Edge;
+        typedef typename GraphInternalTypes<Subgraph< Graph, VChooser, EChooser> >::PEdge PEdge;
+        typedef typename GraphInternalTypes<Subgraph< Graph, VChooser, EChooser> >::VertInfoType VertInfoType;
+        typedef typename GraphInternalTypes<Subgraph< Graph, VChooser, EChooser> >::EdgeInfoType EdgeInfoType;
+        typedef typename GraphInternalTypes<Subgraph< Graph, VChooser, EChooser> >::GraphSettings GraphSettings;
+
         typedef Subgraph< Graph,VChooser,EChooser > GraphType;
         typedef typename Graph::RootGrType RootGrType;
         typedef Graph ParentGrType;
-        typedef typename Graph::VertInfoType VertInfoType;
-        typedef typename Graph::EdgeInfoType EdgeInfoType;
-        typedef typename Graph::GraphSettings GraphSettings;
 
     // Konstruktory
         Subgraph() {}
@@ -47,7 +65,7 @@ class Subgraph: public SubgraphBase
         Subgraph( std::pair< VChooser,EChooser > );
 
     // ??
-        EdgeType allowedEdgeTypes() const { return root().allowedEdgeTypes(); }
+        static EdgeType allowedEdgeTypes() { return ParentGrType::allowedEdgeTypes(); }
         void plug(const Graph &g ) { SubgraphBase::link( &g ); }
         bool unplug() { return SubgraphBase::unlink(); }
         void setChoose( const std::pair< VChooser,EChooser > & );
@@ -59,171 +77,374 @@ class Subgraph: public SubgraphBase
         bool good( PEdge, bool = false ) const;
 
 
-        int getVertNo() const { return getVerts( blackHole ); }
-        PVertex getVert() const { return getVertNext( 0 ); }
-        PVertex getVertLast() const { return getVertPrev( 0 ); }
+        int getVertNo() const;
         PVertex getVertNext( PVertex ) const;
         PVertex getVertPrev( PVertex ) const;
-        template< class OutputIterator > int getVerts( OutputIterator ) const;
-        Set< PVertex > getVertSet() const;
-        template< class OutputIterator,class VChooser2 > int getVerts(OutputIterator out, VChooser2 ch) const;
-        template< class VChooser2> Set< PVertex > getVertSet(VChooser2 ch)    const;
-        PVertex vertByNo( int ) const;
-        int vertPos( PVertex ) const;
-
-
 
         int getEdgeNo( EdgeDirection = EdAll ) const;
-        PEdge getEdge( EdgeDirection mask = EdAll ) const { return getEdgeNext( 0,mask ); }
-        PEdge getEdgeLast( EdgeDirection mask = EdAll ) const { return getEdgePrev( 0,mask ); }
         PEdge getEdgeNext( PEdge, EdgeDirection = EdAll ) const;
         PEdge getEdgePrev( PEdge, EdgeDirection = EdAll ) const;
-        template <class OutputIterator> int getEdges(
-            OutputIterator, EdgeDirection = EdAll ) const;
-        template< class OutputIterator,class EChooser2 > int getEdges(OutputIterator out, EChooser2 ch) const;
-        template< class EChooser2> Set< PEdge > getEdgeSet(EChooser2 ch)    const;
-        PEdge edgeByNo( int ) const;
-        int edgePos( PEdge ) const;
-        template< class OutputV,class OutputE,class VChooser2,class EChooser2 >
-            std::pair<int,int> getChosen(std::pair<OutputV,OutputE>,std::pair<VChooser2,EChooser2>,bool =true) const;
-        template<class VChooser2,class EChooser2 >
-            std::pair<Set<PVertex>,Set<PEdge> >getChosenSets(std::pair<VChooser2,EChooser2>,bool =true) const;
 
-
-        PEdge getEdge( PVertex, EdgeDirection = EdAll ) const;
-        PEdge getEdgeLast( PVertex, EdgeDirection = EdAll ) const;
         PEdge getEdgeNext( PVertex, PEdge, EdgeDirection = EdAll ) const;
         PEdge getEdgePrev( PVertex, PEdge, EdgeDirection = EdAll ) const;
-        Set< PEdge > getEdgeSet( PVertex, EdgeDirection = EdAll ) const;
-        template< class OutputIterator > int getEdges(
-            OutputIterator, PVertex, EdgeDirection = EdAll ) const;
         int getEdgeNo( PVertex, EdgeDirection = EdAll) const;
 
-
-
-        PEdge getEdge( PVertex, PVertex, EdgeDirection = EdAll ) const;
-        PEdge getEdgeLast( PVertex, PVertex, EdgeDirection = EdAll ) const;
         PEdge getEdgeNext( PVertex, PVertex, PEdge, EdgeDirection = EdAll ) const;
         PEdge getEdgePrev( PVertex, PVertex, PEdge, EdgeDirection = EdAll ) const;
-        Set< PEdge > getEdgeSet( PVertex, PVertex, EdgeDirection = EdAll ) const;
-        template< class OutputIterator > int getEdges(
-            OutputIterator, PVertex, PVertex, EdgeDirection = EdAll ) const;
         int getEdgeNo( PVertex, PVertex, EdgeDirection = EdAll ) const;
 
 
-        template <class Cont>
-            void getAdj(Cont &,EdgeType mask=EdAll) const;
-
-
-        VertInfoType getVertInfo( PVertex v ) const { return root().getVertInfo(v); }
 //        inline void setVertInfo( PVertex, const VertInfo & = VertInfo() ) const;
-        EdgeInfoType getEdgeInfo( PEdge e ) const { return root().getEdgeInfo(e); }
 //        inline void setEdgeInfo( PEdge, const EdgeInfo & = EdgeInfo() ) const;
 
-
-
         EdgeType getEdgeType( PEdge e ) const { return up().getEdgeType(e); }
-        EdgeType getType( PEdge e ) const { return up().getType(e); }
-        std::pair< typename Graph::PVertex,typename Graph::PVertex >
-            getEdgeEnds( PEdge edge ) const { return up().getEdgeEnds(edge); }
-        std::pair< typename Graph::PVertex,typename Graph::PVertex >
-            getEnds( PEdge edge ) const { return up().getEnds(edge); }
+        std::pair< PVertex,PVertex > getEdgeEnds( PEdge edge ) const { return up().getEdgeEnds(edge); }
         PVertex getEdgeEnd1( PEdge edge ) const { return up().getEdgeEnd1(edge); }
         PVertex getEdgeEnd2( PEdge edge ) const { return up().getEdgeEnd2(edge); }
-        bool isEdgeEnd( PEdge edge, PVertex vert ) const { return root().isEnd( edge,vert ); }
-        bool isEnd( PEdge edge, PVertex vert ) const { return root().isEnd( edge,vert ); }
-        typename Graph::PVertex getEdgeEnd( PEdge, PVertex ) const;
-        typename Graph::PVertex getEnd( PEdge, PVertex ) const;
-        EdgeDirection getEdgeDir( PEdge, PVertex ) const;
-//        inline bool incid(PEdge,PEdge) const;
+        EdgeDirection getEdgeDir( PEdge edge, PVertex v) const { return up().getEdgeDir(edge,v); }
 
+    protected:
 
-        int deg( PVertex, EdgeDirection = EdAll ) const;
-        std::pair< PVertex,int > minDeg( EdgeDirection = EdAll ) const;
-        std::pair< PVertex,int > maxDeg( EdgeDirection = EdAll ) const;
-        int Delta( EdgeDirection = EdAll ) const;
-        int delta( EdgeDirection = EdAll ) const;
+        template <class T>
+        static bool isEdgeTypeChooser(const T& x, Koala::EdgeDirection& val) { return false; }
+        static bool isEdgeTypeChooser(const EdgeTypeChooser&  x, Koala::EdgeDirection& val) { val=x.mask; return true; }
 
-
-
-        template< class OutputIterator > int getNeigh(
-            OutputIterator, PVertex, EdgeDirection = EdAll ) const;
-        Set< PVertex > getNeighSet( PVertex, EdgeDirection = EdAll ) const;
-        int getNeighNo( PVertex, EdgeDirection = EdAll ) const;
-        Set< typename Graph::PVertex > getClNeighSet(
-            PVertex, EdgeDirection = EdAll ) const;
-        template< class OutputIterator > int getClNeigh(
-            OutputIterator, PVertex, EdgeDirection = EdAll ) const;
-        int getClNeighNo( PVertex, EdgeDirection = EdAll ) const;
-
-
-        bool areParallel( PEdge, PEdge, EdgeDirection = EdUndir ) const;
-        template< class OutputIterator > int getParals( OutputIterator, typename Graph::PEdge, EdgeDirection = EdUndir ) const;
-        Set<typename Graph::PEdge> getParalSet(typename Graph::PEdge, EdgeDirection = EdUndir) const;
-        int mu( typename Graph::PEdge, EdgeDirection = EdUndir ) const;
-        int mu( EdgeDirection = EdUndir ) const;
-        std::pair< typename Graph::PEdge,int > maxMu( EdgeDirection = EdUndir ) const;
-
-//  TODO: brakuje:
-//        template<class IterOut1, class IterOut2, class Iterator >
-//            std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,Iterator,Iterator, EdgeType = EdUndir ) const;
-//        template<class IterOut1, class IterOut2, class Iterator >
-//            std::pair<int,int> findParals2(std::pair<IterOut1,IterOut2>,Iterator,Iterator, EdgeType = EdUndir ) const;
-//        template<class IterOut1, class IterOut2 >
-//            std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,const Set<PEdge>&, EdgeType = EdUndir ) const;
-//        template<class IterOut1, class IterOut2 >
-//            std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,PVertex, EdgeType = EdUndir ) const;
-//        template<class IterOut1, class IterOut2 >
-//            std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,PVertex,PVertex, EdgeType = EdUndir ) const;
-//        template<class IterOut1, class IterOut2 >
-//            std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>, EdgeType = EdUndir ) const;
-
-//        template <class Iterator,class OutIter>
-//            int getIncEdges(OutIter,Iterator, Iterator, EdgeDirection = EdAll,EdgeType=Loop ) const;
-//        template <class Iterator>
-//            Set< PEdge > getIncEdgeSet(Iterator beg, Iterator end, EdgeDirection = EdAll,EdgeType=Loop ) const;
-//        template <class OutIter>
-//            int getIncEdges(OutIter,const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
-//        Set< PEdge > getIncEdgeSet(const Set<PVertex>&, EdgeDirection = EdAll, EdgeType=Loop ) const;
-//
-//
-//        // ... i ich drugie konce
-//        template <class Iterator,class OutIter> int getIncVerts(OutIter,Iterator, Iterator, EdgeDirection = EdAll,EdgeType=Loop ) const;
-//        template <class Iterator> Set< PVertex > getIncVertSet(Iterator beg, Iterator end, EdgeDirection = EdAll,EdgeType=Loop ) const;
-//        template <class OutIter> int getIncVerts(OutIter,const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
-//        Set< PVertex > getIncVertSet(const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
-
-
-
-        protected:
-
-            struct Parals3 {
-            typename Graph::PVertex v1,v2;
-            EdgeDirection direct;
-            typename Graph::PEdge edge;
-
-            Parals3(typename Graph::PVertex av1,typename Graph::PVertex av2,
-                    EdgeDirection adirect,
-                    typename Graph::PEdge aedge) :
-                    v1(av1), v2(av2), direct(adirect), edge(aedge) {}
-            Parals3() {}
-        };
-
-        struct Parals3cmp {
-            bool operator()(Parals3 a, Parals3 b)
-            {
-                return (a.v1 < b.v1) ||
-                (a.v1 == b.v1 && a.v2 < b.v2) ||
-                (a.v1 == b.v1 && a.v2 == b.v2 && a.direct < b.direct );
-            }
-
-        };
+        template <class T>
+        static bool isBoolChooser(const T& x, bool& val) { return false; }
+        static bool isBoolChooser(const BoolChooser&  x, bool& val) { val=x.val; return true; }
 
 };
 
 template< class Graph, class VChooser, class EChooser >
 Subgraph< Graph,VChooser,EChooser > makeSubgraph(
      const Graph &, const std::pair< VChooser,EChooser > & );
+
+
+
+template < class Graph > class UndirView;
+
+template < class Graph  >
+struct GraphInternalTypes<UndirView< Graph> > {
+        typedef typename Graph::Vertex Vertex;
+        typedef typename Graph::PVertex PVertex;
+        typedef typename Graph::Edge Edge;
+        typedef typename Graph::PEdge PEdge;
+        typedef typename Graph::VertInfoType VertInfoType;
+        typedef typename Graph::EdgeInfoType EdgeInfoType;
+        typedef typename Graph::GraphSettings GraphSettings;
+
+};
+
+
+
+template< class Graph >
+class UndirView: public SubgraphBase,
+                public ConstGraphMethods<UndirView< Graph> >
+{
+    public:
+
+        typedef typename GraphInternalTypes<UndirView< Graph> >::Vertex Vertex;
+        typedef typename GraphInternalTypes<UndirView< Graph> >::PVertex PVertex;
+        typedef typename GraphInternalTypes<UndirView< Graph> >::Edge Edge;
+        typedef typename GraphInternalTypes<UndirView< Graph> >::PEdge PEdge;
+        typedef typename GraphInternalTypes<UndirView< Graph> >::VertInfoType VertInfoType;
+        typedef typename GraphInternalTypes<UndirView< Graph> >::EdgeInfoType EdgeInfoType;
+        typedef typename GraphInternalTypes<UndirView< Graph> >::GraphSettings GraphSettings;
+
+        typedef UndirView< Graph> GraphType;
+        typedef typename Graph::RootGrType RootGrType;
+        typedef Graph ParentGrType;
+
+    // Konstruktory
+//        UndirView() {}
+        UndirView(const Graph & g) { SubgraphBase::link( &g ); };
+
+    // ??
+        static EdgeType allowedEdgeTypes()
+        { return (((~EdLoop)&ParentGrType::allowedEdgeTypes()) ? Undirected :0 )
+                 | ((EdLoop&ParentGrType::allowedEdgeTypes()) ? EdLoop : 0 ); }
+        const RootGrType* getRootPtr() const { return parent ? (( const ParentGrType*)parent)->getRootPtr() : NULL; }
+        const ParentGrType* getParentPtr() const { return (const ParentGrType*)parent; }
+        const ParentGrType &up() const { const ParentGrType *res = getParentPtr(); assert( res ); return *res; }
+        const RootGrType &root() const { const RootGrType *res = getRootPtr(); assert( res ); return *res; }
+        bool good( PVertex, bool = false ) const { return true; }
+        bool good( PEdge, bool = false ) const { return true; }
+
+
+        int getVertNo() const { return up().getVertNo(); }
+        PVertex getVertNext( PVertex v) const { return up().getVertNext(v); }
+        PVertex getVertPrev( PVertex v) const { return up().getVertPrev(v); }
+
+        int getEdgeNo( EdgeDirection mask = EdAll ) const { return up().getEdgeNo(transl(mask)); }
+        PEdge getEdgeNext( PEdge e, EdgeDirection mask = EdAll ) const { return up().getEdgeNext(e,transl(mask)); }
+        PEdge getEdgePrev( PEdge e, EdgeDirection mask = EdAll ) const { return up().getEdgePrev(e,transl(mask)); }
+
+        PEdge getEdgeNext( PVertex v, PEdge e, EdgeDirection mask= EdAll ) const
+        { return up().getEdgeNext(v,e,transl(mask)); }
+        PEdge getEdgePrev( PVertex v, PEdge e, EdgeDirection mask= EdAll ) const
+        { return up().getEdgePrev(v,e,transl(mask)); }
+        int getEdgeNo( PVertex v, EdgeDirection mask= EdAll) const { return up().getEdgeNo(v,transl(mask)); }
+
+        PEdge getEdgeNext( PVertex v, PVertex u, PEdge e, EdgeDirection mask= EdAll ) const
+        { return up().getEdgeNext(v,u,e,transl(mask)); }
+        PEdge getEdgePrev( PVertex v, PVertex u, PEdge e, EdgeDirection mask= EdAll ) const
+        { return up().getEdgePrev(v,u,e,transl(mask)); }
+        int getEdgeNo( PVertex v, PVertex u, EdgeDirection mask= EdAll ) const { return up().getEdgeNo(v,u,transl(mask)); }
+
+
+        EdgeType getEdgeType( PEdge e ) const { return (up().getEdgeType(e)==EdLoop) ? EdLoop : EdUndir; }
+        std::pair< PVertex,PVertex > getEdgeEnds( PEdge edge ) const { return up().getEdgeEnds(edge); }
+        PVertex getEdgeEnd1( PEdge edge ) const { return up().getEdgeEnd1(edge); }
+        PVertex getEdgeEnd2( PEdge edge ) const { return up().getEdgeEnd2(edge); }
+        EdgeDirection getEdgeDir( PEdge edge, PVertex v) const
+        { EdgeDirection dir= up().getEdgeDir(edge,v); return (dir==EdNone||dir==EdLoop) ? dir : EdUndir; }
+
+    protected:
+
+        static EdgeDirection transl(EdgeDirection mask)
+        { return ((mask&EdLoop) ? EdLoop : 0) | ((mask&EdUndir) ? (Directed|Undirected) : 0); }
+
+
+};
+
+template< class Graph>
+UndirView< Graph> makeUndirView( const Graph & g)
+{
+    return UndirView< Graph>( g );
+}
+
+
+
+
+template < class Graph > class RevView;
+
+template < class Graph  >
+struct GraphInternalTypes<RevView< Graph> > {
+        typedef typename Graph::Vertex Vertex;
+        typedef typename Graph::PVertex PVertex;
+        typedef typename Graph::Edge Edge;
+        typedef typename Graph::PEdge PEdge;
+        typedef typename Graph::VertInfoType VertInfoType;
+        typedef typename Graph::EdgeInfoType EdgeInfoType;
+        typedef typename Graph::GraphSettings GraphSettings;
+
+};
+
+
+template< class Graph>
+class RevView: public SubgraphBase,
+                public ConstGraphMethods<RevView< Graph> >
+{
+    public:
+
+        typedef typename GraphInternalTypes<RevView< Graph> >::Vertex Vertex;
+        typedef typename GraphInternalTypes<RevView< Graph> >::PVertex PVertex;
+        typedef typename GraphInternalTypes<RevView< Graph> >::Edge Edge;
+        typedef typename GraphInternalTypes<RevView< Graph> >::PEdge PEdge;
+        typedef typename GraphInternalTypes<RevView< Graph> >::VertInfoType VertInfoType;
+        typedef typename GraphInternalTypes<RevView< Graph> >::EdgeInfoType EdgeInfoType;
+        typedef typename GraphInternalTypes<RevView< Graph> >::GraphSettings GraphSettings;
+
+        typedef RevView< Graph> GraphType;
+        typedef typename Graph::RootGrType RootGrType;
+        typedef Graph ParentGrType;
+
+    // Konstruktory
+//        RevView() {}
+        RevView(const Graph & g) { SubgraphBase::link( &g ); };
+
+    // ??
+        static EdgeType allowedEdgeTypes()  { return ParentGrType::allowedEdgeTypes(); }
+        const RootGrType* getRootPtr() const { return parent ? (( const ParentGrType*)parent)->getRootPtr() : NULL; }
+        const ParentGrType* getParentPtr() const { return (const ParentGrType*)parent; }
+        const ParentGrType &up() const { const ParentGrType *res = getParentPtr(); assert( res ); return *res; }
+        const RootGrType &root() const { const RootGrType *res = getRootPtr(); assert( res ); return *res; }
+        bool good( PVertex, bool = false ) const { return true; }
+        bool good( PEdge, bool = false ) const { return true; }
+
+
+        int getVertNo() const { return up().getVertNo(); }
+        PVertex getVertNext( PVertex v) const { return up().getVertNext(v); }
+        PVertex getVertPrev( PVertex v) const { return up().getVertPrev(v); }
+
+        int getEdgeNo( EdgeDirection mask = EdAll ) const { return up().getEdgeNo(mask); }
+        PEdge getEdgeNext( PEdge e, EdgeDirection mask = EdAll ) const
+        {   return up().getEdgeNext(e,(mask));   }
+        PEdge getEdgePrev( PEdge e, EdgeDirection mask = EdAll ) const
+        {   return up().getEdgePrev(e,(mask)); }
+
+        PEdge getEdgeNext( PVertex v, PEdge e, EdgeDirection mask= EdAll ) const
+//        { return up().getEdgeNext(v,e,transl(mask)); }
+        { return getNext(v,e,transl(mask)); }
+        PEdge getEdgePrev( PVertex v, PEdge e, EdgeDirection mask= EdAll ) const
+//        { return up().getEdgePrev(v,e,transl(mask)); }
+        { return getPrev(v,e,transl(mask)); }
+        int getEdgeNo( PVertex v, EdgeDirection mask= EdAll) const { return up().getEdgeNo(v,transl(mask)); }
+
+        PEdge getEdgeNext( PVertex v, PVertex u, PEdge e, EdgeDirection mask= EdAll ) const
+//        { return up().getEdgeNext(v,u,e,transl(mask)); }
+        { return getNext(v,u,e,transl(mask)); }
+        PEdge getEdgePrev( PVertex v, PVertex u, PEdge e, EdgeDirection mask= EdAll ) const
+//        { return up().getEdgePrev(v,u,e,transl(mask)); }
+        { return getPrev(v,u,e,transl(mask)); }
+        int getEdgeNo( PVertex v, PVertex u, EdgeDirection mask= EdAll ) const { return up().getEdgeNo(v,u,transl(mask)); }
+
+
+        EdgeType getEdgeType( PEdge e ) const { return up().getEdgeType(e); }
+
+        std::pair< PVertex,PVertex > getEdgeEnds( PEdge edge ) const
+        {   std::pair< PVertex,PVertex > res=up().getEdgeEnds(edge);
+            switch (up().getEdgeType(edge))
+            {
+                case Loop :
+                case Undirected : return res;
+                default : return std::make_pair(res.second,res.first);
+            }
+        }
+
+        PVertex getEdgeEnd1( PEdge edge ) const
+        {   std::pair< PVertex,PVertex > res=up().getEdgeEnds(edge);
+            switch (up().getEdgeType(edge))
+            {
+                case Loop :
+                case Undirected : return res.first;
+                default : return res.second;
+            }
+        }
+
+        PVertex getEdgeEnd2( PEdge edge ) const
+        {   std::pair< PVertex,PVertex > res=up().getEdgeEnds(edge);
+            switch (up().getEdgeType(edge))
+            {
+                case Loop :
+                case Undirected : return res.second;
+                default : return res.first;
+            }
+        }
+
+        EdgeDirection getEdgeDir( PEdge edge, PVertex v) const
+        {   EdgeDirection dir= up().getEdgeDir(edge,v);
+            switch (dir)
+            {
+                case EdDirIn: return EdDirOut;
+                case EdDirOut: return EdDirIn;
+                default : return dir;
+            }
+        }
+
+    protected:
+
+        static EdgeDirection transl(EdgeDirection mask)
+        {   EdgeDirection dirmask= mask&Directed;
+            switch (dirmask)
+            {
+                case Directed:
+                case 0 : break;
+                case EdDirIn : dirmask=EdDirOut; break;
+                case EdDirOut : dirmask=EdDirIn; break;
+            }
+            return (mask&(~Directed)) | dirmask;
+        }
+
+        static EdgeDirection nextDir(EdgeDirection dir)
+        {   switch (dir)
+            {
+                case EdLoop: return EdUndir;
+                case EdUndir: return EdDirOut;
+                case EdDirOut: return EdDirIn;
+            }
+            return EdNone;
+        }
+
+        static EdgeDirection prevDir(EdgeDirection dir)
+        {   switch (dir)
+            {
+                case EdDirIn: return EdDirOut;
+                case EdDirOut: return EdUndir;
+                case EdUndir: return EdLoop;
+            }
+            return EdNone;
+        }
+
+        PEdge getNext(PVertex vert, PEdge edge, EdgeDirection direct ) const
+        {
+            if (!vert || !direct) return NULL;
+            if (edge && !this->isEdgeEnd( edge,vert )) return NULL;
+            EdgeDirection type = up().getEdgeDir( edge,vert );
+            EdgeDirection nexttype = (type == EdNone) ? EdLoop : nextDir(type);
+            PEdge res;
+            if (edge && (type & direct)) res = up().getEdgeNext(vert,edge,type);
+            else res = 0;
+            if (res) return res;
+            switch (nexttype)
+            {
+                case EdLoop:
+                    if (direct & EdLoop) res = up().getEdgeNext(vert,(PEdge)0,EdLoop);
+                    if (res) return res;
+                case EdUndir:
+                    if (direct & EdUndir) res = up().getEdgeNext(vert,(PEdge)0,EdUndir);
+                    if (res) return res;
+                case EdDirOut:
+                    if (direct & EdDirOut) res = up().getEdgeNext(vert,(PEdge)0,EdDirOut);
+                    if (res) return res;
+                case EdDirIn:
+                    if (direct & EdDirIn) res = up().getEdgeNext(vert,(PEdge)0,EdDirIn);
+            }
+            return res;
+        }
+
+        PEdge getPrev(PVertex vert, PEdge edge, EdgeDirection direct ) const
+        {
+            if (!vert || !direct) return NULL;
+            if (edge && !this->isEdgeEnd( edge,vert )) return NULL;
+            EdgeDirection type = up().getEdgeDir( edge,vert );
+            EdgeDirection nexttype = (type == EdNone) ? EdDirIn : prevDir(type);
+            PEdge res;
+            if (edge && (type & direct)) res = up().getEdgePrev(vert,edge,type);
+            else res = 0;
+            if (res) return res;
+            switch (nexttype)
+            {
+                case EdDirIn:
+                    if (direct & EdDirIn) res = up().getEdgePrev(vert,(PEdge)0,EdDirIn);
+                    if (res) return res;
+                case EdDirOut:
+                    if (direct & EdDirOut) res = up().getEdgePrev(vert,(PEdge)0,EdDirOut);
+                    if (res) return res;
+                case EdUndir:
+                    if (direct & EdUndir) res = up().getEdgePrev(vert,(PEdge)0,EdUndir);
+                    if (res) return res;
+                case EdLoop:
+                    if (direct & EdLoop) res = up().getEdgePrev(vert,(PEdge)0,EdLoop);
+                    if (res) return res;
+            }
+            return res;
+        }
+
+        PEdge getPrev(PVertex vert1, PVertex vert2, PEdge edge, EdgeDirection direct ) const
+        {
+            do
+                edge = getPrev( vert1,edge,direct );
+            while (edge && up().getEdgeEnd( edge,vert1 ) != vert2);
+        }
+
+
+        PEdge getNext(PVertex vert1, PVertex vert2, PEdge edge, EdgeDirection direct ) const
+        {
+            do
+                edge = getNext( vert1,edge,direct );
+            while (edge && up().getEdgeEnd( edge,vert1 ) != vert2);
+        }
+
+};
+
+template< class Graph>
+RevView< Graph> makeRevView( const Graph & g)
+{
+    return RevView< Graph>( g );
+}
+
+
 
 #include "subgraph.hpp"
 

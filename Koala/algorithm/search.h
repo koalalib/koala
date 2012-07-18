@@ -113,6 +113,33 @@ class SearchStructs {
 
         template< class CIter, class VIter >
         static CompStore< CIter,VIter > compStore( CIter, VIter );
+
+
+        template <class T>
+        class VectCompStore {
+            private:
+                std::vector<int> idx;
+                std::vector<T> data;
+            public:
+                void clear() { idx.clear(); data.clear(); }
+                int size()
+                {
+                    if (idx.empty()) return 0;
+                    return idx.size()-1;
+                }
+                int size(int i)
+                {   assert(i>=0 && i<=this->size()-1);
+                    return idx[i+1]-idx[i];
+                }
+                T* operator[](int i)
+                {   assert(i>=0 && i<=this->size()-1);
+                    return &data[idx[i]];
+                }
+
+                CompStore<std::back_insert_iterator<std::vector<int> >,std::back_insert_iterator<std::vector<T> > >
+                    input() { return compStore(std::back_inserter(idx),std::back_inserter(data)); }
+        };
+
 } ;
 
 /* ------------------------------------------------------------------------- *
@@ -581,6 +608,7 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
             const GraphType &g, CompStore< CompIter,VertIter > out,
 	    EdgeDirection dir, VertContainer &visited );
 
+
 	/** split graph into components
 	 * @param[in] g graph to split
 	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
@@ -591,6 +619,8 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
         static int getComponents(
             const GraphType &g, CompStore< CompIter,VertIter > out,
             EdgeDirection dir = EdUndir | EdDirOut | EdDirIn );
+
+
 } ;
 
 /*
@@ -1196,6 +1226,7 @@ class SCCPar: protected SearchStructs
         static int get(
             const GraphType &g, CompStore< CompIter,VertIter > out, CompMap & vtoc);
 
+
         template< class GraphType, class CompMap, class PairIter >
         static int connections(const GraphType &, CompMap &, PairIter );
 } ;
@@ -1324,14 +1355,14 @@ class BlocksPar : protected SearchStructs
 	 * @param[out] emap ???
 	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
 	 * @param[out] viter ???
-	 * @param[in] type type of edges to consider
 	 * @return number of components
 	 */
         template< class GraphType, class VertDataMap, class EdgeDataMap,
             class CompIter, class VertIter, class VertBlockIter >
         static int split(
             const GraphType &g, VertDataMap &, EdgeDataMap &,
-            CompStore< CompIter,VertIter > out, VertBlockIter, EdgeType type = EdAll );
+            CompStore< CompIter,VertIter > out, VertBlockIter );
+
 
 	/** split a component containing given vertex into blocks
 	 * @param[in] g graph to split
@@ -1340,20 +1371,18 @@ class BlocksPar : protected SearchStructs
 	 * @param[out] emap ???
 	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
 	 * @param[out] viter ???
-	 * @param[in] type type of edges to consider
 	 * @return number of components
 	 */
         template< class GraphType, class VertDataMap, class EdgeDataMap,
             class CompIter, class VertIter, class VertBlockIter >
         static int splitComp(
             const GraphType &g, typename GraphType::PVertex src, VertDataMap &vmap,
-            EdgeDataMap &emap, CompStore< CompIter,VertIter > out, VertBlockIter viter,
-            EdgeType type = EdAll );
+            EdgeDataMap &emap, CompStore< CompIter,VertIter > out, VertBlockIter viter);
 
 
         template<class GraphType,class Iterator>
-        static int core(const GraphType &g,Iterator out, EdgeType mask=EdAll)
-        {   mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
+        static int core(const GraphType &g,Iterator out)
+        {   const EdgeType mask=EdAll;//mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
             typename DefaultStructs:: template AssocCont<
                 typename GraphType::PVertex, int >::Type degs(g.getVertNo());
             std::pair<int, typename GraphType::PVertex> LOCALARRAY(buf,2*g.getVertNo());
@@ -1443,11 +1472,9 @@ private:
 			};
 		};
 
-public:
-
     template<class GraphType>
 	static std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
-    ends(const GraphType &g,EdgeType mask=Undirected)
+    ends(const GraphType &g,EdgeType mask)//=Undirected
     {
         EdgeDirection symmask = mask | ((mask&(EdDirIn|EdDirOut)) ? EdDirIn|EdDirOut : 0);
         bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
@@ -1481,27 +1508,66 @@ public:
         else return std::pair<typename GraphType::PVertex,typename GraphType::PVertex>(x,x) ;
     }
 
+
+public:
+
+    template<class GraphType>
+	static std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
+    ends(const GraphType &g)
+    {
+        return ends(g,EdUndir|EdLoop);
+    }
+
+
+    template<class GraphType>
+	static std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
+    dirEnds(const GraphType &g)
+    {
+        return ends(g,EdDirOut|EdLoop);
+    }
+
+
 	/** test if graph has an Eulerian cycle
 	 * @param[in] g graph
 	 * @param[in] mask type of edges to consider
 	 * @return true if it has, false otherwise */
 	template<class GraphType>
-	static bool hasCycle(const GraphType &g,
-			     EdgeType mask = Undirected) {
-		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+	static bool hasCycle(const GraphType &g) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 		return res.first!=0 && res.first==res.second;
 	};
+
+	/** test if graph has an Eulerian cycle
+	 * @param[in] g graph
+	 * @param[in] mask type of edges to consider
+	 * @return true if it has, false otherwise */
+	template<class GraphType>
+	static bool hasDirCycle(const GraphType &g) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
+		return res.first!=0 && res.first==res.second;
+	};
+
 
 	/** test if graph has an Eulerian path
 	 * @param[in] g graph
 	 * @param[in] mask type of edges to consider
 	 * @return true if it has, false otherwise */
 	template<class GraphType>
-	static bool hasPath(const GraphType &g,
-			    EdgeType mask = Undirected) {
-        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+	static bool hasPath(const GraphType &g) {
+        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 		return res.first!=0 && res.first!=res.second;
     };
+
+	/** test if graph has an Eulerian path
+	 * @param[in] g graph
+	 * @param[in] mask type of edges to consider
+	 * @return true if it has, false otherwise */
+	template<class GraphType>
+	static bool hasDirPath(const GraphType &g) {
+        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
+		return res.first!=0 && res.first!=res.second;
+    };
+
 
 	/** test if graph has an Eulerian path starting at vertex u
 	 * @param[in] g graph
@@ -1510,13 +1576,27 @@ public:
 	 * @return true if it has, false otherwise */
 	template<class GraphType>
 	static bool hasPath(const GraphType &g,
-			    typename GraphType::PVertex u,
-			    EdgeType mask = Undirected) {
+			    typename GraphType::PVertex u) {
         assert(u);
-		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
-		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
-		return (res.first==u ||(!dir && res.second==u));
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
+//		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
+		return (res.first==u ||(/* !dir &&*/ res.second==u));
 		};
+
+	/** test if graph has an Eulerian path starting at vertex u
+	 * @param[in] g graph
+	 * @param[in] u starting vertex
+	 * @param[in] mask type of edges to consider
+	 * @return true if it has, false otherwise */
+	template<class GraphType>
+	static bool hasDirPath(const GraphType &g,
+			    typename GraphType::PVertex u) {
+        assert(u);
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
+//		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
+		return res.first==u;// ||(!dir && res.second==u));
+		};
+
 
 	/** test if graph has an Eulerian cycle containing vertex u
 	 * @param[in] g graph
@@ -1525,11 +1605,23 @@ public:
 	 * @return true if it has, false otherwise */
 	template<class GraphType>
 	static bool hasCycle(const GraphType &g,
-			    typename GraphType::PVertex u,
-			    EdgeType mask = Undirected) {
+			    typename GraphType::PVertex u) {
         assert(u);
-		return hasCycle(g,mask) && g.deg(u,mask);
+		return hasCycle(g) && g.deg(u,EdUndir|EdLoop);
 		};
+
+	/** test if graph has an Eulerian cycle containing vertex u
+	 * @param[in] g graph
+	 * @param[in] u given vertex
+	 * @param[in] mask type of edges to consider
+	 * @return true if it has, false otherwise */
+	template<class GraphType>
+	static bool hasDirCycle(const GraphType &g,
+			    typename GraphType::PVertex u) {
+        assert(u);
+		return hasDirCycle(g) && g.deg(u,EdDirOut|EdLoop);
+		};
+
 
 	/** get Eulerian cycle
 	 * @param[in] g graph
@@ -1540,16 +1632,35 @@ public:
 		 class VertIter,
 		 class EdgeIter>
 	static bool getCycle(const GraphType &g,
-			    OutPath<VertIter, EdgeIter> out,
-			    EdgeType mask = Undirected) {
-		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+			    OutPath<VertIter, EdgeIter> out) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 		if (res.first==0 || res.first!=res.second) return false;
 		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdUndir|EdLoop);
 		eulerEngine<GraphType>(res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
 		};
+
+	/** get Eulerian cycle
+	 * @param[in] g graph
+	 * @param[out] out found cycle
+	 * @param[in] mask type of edges to consider
+	 * @return true if graph has an Eulerian cycle, false otherwise */
+	template<class GraphType,
+		 class VertIter,
+		 class EdgeIter>
+	static bool getDirCycle(const GraphType &g,
+			    OutPath<VertIter, EdgeIter> out) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
+		if (res.first==0 || res.first!=res.second) return false;
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdDirOut|EdLoop);
+		eulerEngine<GraphType>(res.first, NULL, state);
+		eulerResult(state, out);
+		return true;
+		};
+
 
 	/** get Eulerian cycle
 	 * @param[in] g graph
@@ -1562,17 +1673,39 @@ public:
 		 class EdgeIter>
 	static bool getCycle(const GraphType &g,
 			    typename GraphType::PVertex prefstart,
-			    OutPath<VertIter, EdgeIter> out,
-			    EdgeType mask = Undirected) {
+			    OutPath<VertIter, EdgeIter> out) {
 
-		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 		if (res.first==0 || res.first!=res.second) return false;
 		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
-		eulerEngine<GraphType>(g.getEdge(prefstart,mask) ? prefstart : res.first, NULL, state);
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdUndir|EdLoop);
+		eulerEngine<GraphType>(g.getEdge(prefstart,EdUndir|EdLoop) ? prefstart : res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
         };
+
+	/** get Eulerian cycle
+	 * @param[in] g graph
+	 * @param[in] prefstart preferred starting vertex
+	 * @param[out] out found cucle
+	 * @param[in] mask type of edges to consider
+	 * @return true if graph has an Eulerian cycle, false otherwise */
+	template<class GraphType,
+		 class VertIter,
+		 class EdgeIter>
+	static bool getDirCycle(const GraphType &g,
+			    typename GraphType::PVertex prefstart,
+			    OutPath<VertIter, EdgeIter> out) {
+
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
+		if (res.first==0 || res.first!=res.second) return false;
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdDirOut|EdLoop);
+		eulerEngine<GraphType>(g.getEdge(prefstart,EdDirOut|EdLoop) ? prefstart : res.first, NULL, state);
+		eulerResult(state, out);
+		return true;
+        };
+
 
 
 	/** get Eulerian path
@@ -1584,12 +1717,31 @@ public:
 		 class VertIter,
 		 class EdgeIter>
 	static bool getPath(const GraphType &g,
-			   OutPath<VertIter, EdgeIter> out,
-			   EdgeType mask = Undirected) {
-		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+			   OutPath<VertIter, EdgeIter> out) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 		if (res.first==0 || res.first==res.second) return false;
 		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdUndir|EdLoop);
+		eulerEngine<GraphType>(res.first, NULL, state);
+		eulerResult(state, out);
+		return true;
+		};
+
+
+	/** get Eulerian path
+	 * @param[in] g graph
+	 * @param[out] out found path
+	 * @param[in] mask type of edges to consider
+	 * @return true if graph has an Eulerian cycle, false otherwise */
+	template<class GraphType,
+		 class VertIter,
+		 class EdgeIter>
+	static bool getDirPath(const GraphType &g,
+			   OutPath<VertIter, EdgeIter> out) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
+		if (res.first==0 || res.first==res.second) return false;
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdDirOut|EdLoop);
 		eulerEngine<GraphType>(res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
@@ -1607,14 +1759,13 @@ public:
 		 class EdgeIter>
 	static bool getPath(const GraphType &g,
 			    typename GraphType::PVertex prefstart,
-			   OutPath<VertIter, EdgeIter> out,
-			   EdgeType mask = Undirected) {
-		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,mask);
+			   OutPath<VertIter, EdgeIter> out) {
+		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 		if (res.first==0 || res.first==res.second) return false;
 		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, mask);
-		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
-		eulerEngine<GraphType>((prefstart==res.second && !dir) ? res.second : res.first, NULL, state);
+		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdUndir|EdLoop);
+//		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
+		eulerEngine<GraphType>((prefstart==res.second) ? res.second : res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
 		};
