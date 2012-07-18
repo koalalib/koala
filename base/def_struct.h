@@ -48,6 +48,7 @@ struct EmptyEdgeInfo {};
 std::istream& operator>>(std::istream& is,EmptyEdgeInfo arg) { return is; }
 std::ostream& operator<<(std::ostream& os,EmptyEdgeInfo arg) { return os; }
 
+template< class GraphType> struct GraphInternalTypes;
 template< class VertInfo, class EdgeInfo, class Settings> class Graph;
 template< class VertInfo, class EdgeInfo, class Settings> class Vertex;
 template< class VertInfo, class EdgeInfo, class Settings> class Edge;

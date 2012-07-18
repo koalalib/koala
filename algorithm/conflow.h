@@ -1353,9 +1353,9 @@ class ConnectPar : public PathStructs {
         for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
             if (edgeTab[e].flow) paths[e]=0;
         for(int i=0;i<res;i++) paths[g.addArch(end,start)]=-1;
-            EulerPar<DefaultStructs>:: template getCycle(
-                makeSubgraph(g,std::make_pair(stdChoose(true),extAssocKeyChoose(&(paths)))),
-                start,outPath(blackHole,euler),EdDirOut);
+            EulerPar<DefaultStructs>:: template getDirCycle(
+                makeSubgraph(g,std::make_pair(stdChoose(true),edgeTypeChoose(Directed) && extAssocKeyChoose(&(paths)))),
+                start,outPath(blackHole,euler));
         int r=0;
         for(int i=0;i<paths.size();i++)
             if (paths[euler[i]]!=-1) paths[euler[i]]=r; else r++;

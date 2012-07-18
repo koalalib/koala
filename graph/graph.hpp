@@ -91,13 +91,13 @@ Graph< VertInfo,EdgeInfo,Settings >::~Graph()
 }
 
 template< class VertInfo, class EdgeInfo, class Settings >
-inline int Graph< VertInfo,EdgeInfo,Settings >::getVertNo() const
+int Graph< VertInfo,EdgeInfo,Settings >::getVertNo() const
 {
     return this->no_vert;
 }
 
 template< class VertInfo, class EdgeInfo, class Settings >
-inline int Graph< VertInfo,EdgeInfo,Settings >::getEdgeNo( EdgeType direct ) const
+int Graph< VertInfo,EdgeInfo,Settings >::getEdgeNo( EdgeType direct ) const
 {
     int ans = 0;
     if (direct & EdLoop) ans += this->no_loop_edge();
@@ -184,12 +184,12 @@ void Graph< VertInfo,EdgeInfo,Settings >::delVert( PVertex vert, bool force )
     if (!vert) return;
     if (force)
     {
-        PEdge edge = getEdge( vert );
+        PEdge edge = this->getEdge( vert );
         while (edge)
         {
             detach( edge );
             delete edge;
-            edge = getEdge( vert );
+            edge = this->getEdge( vert );
         }
     }
     if (detach( vert )) delete vert;
@@ -201,31 +201,11 @@ inline void Graph< VertInfo,EdgeInfo,Settings >::del( PVertex vert, bool force )
     this->delVert( vert,force );
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::VertInfoType
-Graph< VertInfo,EdgeInfo,Settings >::getVertInfo( PVertex vert ) const
-{
-    return vert->getInfo();
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline void Graph< VertInfo,EdgeInfo,Settings >::setVertInfo( PVertex vert, const VertInfo &info ) const
 {
     vert->setInfo( info );
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-Graph< VertInfo,EdgeInfo,Settings >::getVert() const
-{
-    return this->first_vert;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-Graph< VertInfo,EdgeInfo,Settings >::getVertLast() const
-{
-    return this->last_vert;
 }
 
 template< class VertInfo, class EdgeInfo, class Settings >
@@ -244,34 +224,7 @@ Graph< VertInfo,EdgeInfo,Settings >::getVertPrev( PVertex vert ) const
     return vert->prev;
 }
 
-template< class VertInfo,class EdgeInfo , class Settings>
-Set< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex >
-Graph< VertInfo,EdgeInfo,Settings >::getVertSet() const
-{
-    Set< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex > ans;
-    PVertex vert = this->first_vert;
-    while (vert)
-    {
-        ans.add( vert );
-        vert = vert->next;
-    }
-    return ans;
-}
 
-template< class VertInfo, class EdgeInfo, class Settings > template< class OutputIterator >
-int Graph< VertInfo,EdgeInfo,Settings >::getVerts( OutputIterator out ) const
-{
-    int ans = 0;
-    PVertex vert = this->first_vert;
-    while (vert)
-    {
-        *out = vert;
-        ++out;
-        ++ans;
-        vert = vert->next;
-    }
-    return ans;
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
@@ -328,12 +281,6 @@ Graph< VertInfo,EdgeInfo,Settings >::addLoop( PVertex vert, const EdgeInfo &info
     return tmp_edge;
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::EdgeInfoType
-Graph< VertInfo,EdgeInfo,Settings >::getEdgeInfo( PEdge edge ) const
-{
-    return edge->getInfo();
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline void Graph< VertInfo,EdgeInfo,Settings >::setEdgeInfo( PEdge edge, const EdgeInfo& info ) const
@@ -353,23 +300,6 @@ inline void Graph< VertInfo,EdgeInfo,Settings >::delEdge( PEdge edge )
     this->del( edge );
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
-Graph< VertInfo,EdgeInfo,Settings >::getEdge( EdgeType direct ) const
-{
-    PEdge edge = this->first_edge;
-    while (edge && !((int)edge->type & direct)) edge = edge->next;
-    return edge;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
-Graph< VertInfo,EdgeInfo,Settings >::getEdgeLast( EdgeType direct ) const
-{
-    PEdge tmp_edge = this->last_edge;
-    while (tmp_edge && !((int)tmp_edge->type & direct)) tmp_edge = tmp_edge->prev;
-    return tmp_edge;
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
@@ -377,7 +307,11 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgeNext(
     PEdge edge, EdgeType direct ) const
 {
     PEdge tmp_edge = edge ? edge->next : this->first_edge;
-    while (tmp_edge && !((int)tmp_edge->type & direct)) tmp_edge = tmp_edge->next;
+    while (tmp_edge && !(tmp_edge->type & direct))
+    {   tmp_edge = tmp_edge->next;
+
+    }
+
     return tmp_edge;
 }
 
@@ -390,36 +324,6 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgePrev( PEdge edge, EdgeType direct ) 
     return tmp_edge;
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge >
-Graph< VertInfo,EdgeInfo,Settings >::getEdgeSet( EdgeType direct ) const
-{
-    Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge > ans;
-    PEdge edge = this->first_edge;
-    while (edge)
-    {
-        if (edge->type & direct) ans.add( edge );
-        edge = edge->next;
-    }
-    return ans;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template< class OutputIterator >
-int Graph< VertInfo,EdgeInfo,Settings >::getEdges( OutputIterator out, EdgeType direct ) const
-{
-    int ans = 0;
-    PEdge edge = this->first_edge;
-    while (edge) {
-        if (edge->type & direct)
-        {
-            *out = edge;
-            ++out;
-            ++ans;
-        }
-        edge = edge->next;
-    }
-    return ans;
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline EdgeType Graph< VertInfo,EdgeInfo,Settings >::getEdgeType( PEdge edge ) const
@@ -427,25 +331,6 @@ inline EdgeType Graph< VertInfo,EdgeInfo,Settings >::getEdgeType( PEdge edge ) c
     return edge->getType();
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-inline EdgeType Graph< VertInfo,EdgeInfo,Settings >::getType( PEdge edge ) const
-{
-    return edge->getType();
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
-Graph< VertInfo,EdgeInfo,Settings >::getEdge( PVertex vert, EdgeDirection direct ) const
-{
-    return getEdgeNext( vert,NULL,direct );
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
-Graph< VertInfo,EdgeInfo,Settings >::getEdgeLast( PVertex vert, EdgeDirection direct ) const
-{
-    return getEdgePrev( vert,NULL,direct );
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
@@ -453,7 +338,7 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgeNext(
     PVertex vert, PEdge edge, EdgeDirection direct ) const
 {
     if (!vert || !direct) return NULL;
-    if (edge && !isEdgeEnd( edge,vert )) return NULL;
+    if (edge && !this->isEdgeEnd( edge,vert )) return NULL;
     EdgeDirection type = getEdgeDir( edge,vert );
     EdgeDirection nexttype = (type == EdNone) ? EdLoop : type << 1;
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge res;
@@ -485,7 +370,7 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgePrev(
     PVertex vert, PEdge edge, EdgeDirection direct ) const
 {
     if (!vert || !direct) return NULL;
-    if (edge && !isEdgeEnd( edge,vert )) return NULL;
+    if (edge && !this->isEdgeEnd( edge,vert )) return NULL;
     EdgeDirection type = getEdgeDir( edge,vert );
     EdgeDirection nexttype = (type == EdNone) ? EdDirOut : type >> 1;
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge res;
@@ -512,35 +397,6 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgePrev(
     return res;
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge >
-Graph< VertInfo,EdgeInfo,Settings >::getEdgeSet( PVertex vert, EdgeDirection direct ) const
-{
-    Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge > ans;
-    PEdge edge = this->getEdge( vert,direct );
-    while (edge)
-    {
-        ans.add( edge );
-        edge = this->getEdgeNext( vert,edge,direct );
-    }
-    return ans;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template< class OutputIterator >
-int Graph< VertInfo,EdgeInfo,Settings >::getEdges(
-    OutputIterator out, PVertex vert, EdgeDirection direct ) const
-{
-    int ans = 0;
-    PEdge edge = this->getEdge( vert,direct );
-    while (edge)
-    {
-        *out = edge;
-        ++out;
-        ++ans;
-        edge = this->getEdgeNext( vert,edge,direct );
-    }
-    return ans;
-}
 
 template< class VertInfo,class EdgeInfo , class Settings >
 inline int Graph< VertInfo,EdgeInfo,Settings >::getEdgeNo( PVertex vert, EdgeDirection direct ) const
@@ -557,21 +413,6 @@ inline int Graph< VertInfo,EdgeInfo,Settings >::getEdgeNo( PVertex vert, EdgeDir
     return ans;
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
-Graph< VertInfo,EdgeInfo,Settings >::getEdge(
-    PVertex vert1, PVertex vert2, EdgeDirection direct ) const
-{
-    return getEdgeNext( vert1,vert2,NULL,direct );
-}
-
-template< class VertInfo,class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
-Graph< VertInfo,EdgeInfo,Settings >::getEdgeLast(
-    PVertex vert1, PVertex vert2, EdgeDirection direct ) const
-{
-    return getEdgePrev( vert1,vert2,NULL,direct );
-}
 
 template< class VertInfo,class EdgeInfo , class Settings>
 typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
@@ -579,7 +420,7 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgeNext(
     PVertex vert1, PVertex vert2, PEdge edge, EdgeDirection direct ) const
 {
     if (!vert1 || !vert2) return NULL;
-    if (edge && (!isEdgeEnd( edge,vert1 ) || !isEdgeEnd( edge,vert2 ))) return NULL;
+    if (edge && (!this->isEdgeEnd( edge,vert1 ) || !this->isEdgeEnd( edge,vert2 ))) return NULL;
     if (vert1 == vert2)
         if (direct & EdLoop) return getEdgeNext( vert1,edge,EdLoop );
         else return 0;
@@ -634,7 +475,7 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgeNext(
 
     do
         edge = getEdgeNext( vert1,edge,direct );
-    while (edge && getEdgeEnd( edge,vert1 ) != vert2);
+    while (edge && this->getEdgeEnd( edge,vert1 ) != vert2);
     return edge;
 }
 
@@ -644,7 +485,7 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgePrev(
     PVertex vert1, PVertex vert2, PEdge edge, EdgeDirection direct ) const
 {
     if (!vert1 || !vert2) return NULL;
-    if (edge && (!isEdgeEnd( edge,vert1 ) || !isEdgeEnd( edge,vert2 ))) return NULL;
+    if (edge && (!this->isEdgeEnd( edge,vert1 ) || !this->isEdgeEnd( edge,vert2 ))) return NULL;
     if (vert1 == vert2)
         if (direct & EdLoop) return getEdgePrev( vert1,edge,EdLoop );
         else return 0;
@@ -700,40 +541,10 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgePrev(
 
     do
         edge = getEdgePrev( vert1,edge,direct );
-    while (edge && getEdgeEnd( edge,vert1 ) != vert2);
+    while (edge && this->getEdgeEnd( edge,vert1 ) != vert2);
     return edge;
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge >
-Graph< VertInfo,EdgeInfo,Settings >::getEdgeSet(
-    PVertex vert1, PVertex vert2, EdgeDirection direct ) const
-{
-    Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge > ans;
-    PEdge edge = this->getEdge( vert1,vert2,direct );
-    while (edge)
-    {
-        ans.add( edge );
-        edge = this->getEdgeNext( vert1,vert2,edge,direct );
-    }
-    return ans;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template< class OutputIterator >
-int Graph< VertInfo,EdgeInfo,Settings >::getEdges(
-    OutputIterator out, PVertex vert1, PVertex vert2, EdgeDirection direct ) const
-{
-    int ans = 0;
-    PEdge edge = this->getEdge( vert1,vert2,direct );
-    while (edge)
-    {
-        *out = edge;
-        ++out;
-        ++ans;
-        edge = this->getEdgeNext( vert1,vert2,edge,direct );
-    }
-    return ans;
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::getEdgeNo(
@@ -750,84 +561,15 @@ int Graph< VertInfo,EdgeInfo,Settings >::getEdgeNo(
                ((direct & EdDirOut) ? pAdj->vald( vert1,vert2 ).degree : 0) +
                ((direct & EdUndir) ? pAdj->valund( vert2,vert1 ).degree : 0);
     int ans = 0;
-    PEdge tmp_edge = getEdge( vert1,vert2,direct );
+    PEdge tmp_edge = this->getEdge( vert1,vert2,direct );
     while (tmp_edge)
     {
-        if (getEdgeEnd( tmp_edge,vert1 ) == vert2) ++ans;
+        if (this->getEdgeEnd( tmp_edge,vert1 ) == vert2) ++ans;
         tmp_edge = getEdgeNext( vert1,tmp_edge,direct );
     }
     return ans;
 }
 
-
-template< class VertInfo, class EdgeInfo, class Settings > template< class OutputIterator,class VChooser >
-int Graph< VertInfo,EdgeInfo,Settings >::getVerts(OutputIterator out, VChooser ch) const
-{   int licz=0;
-    for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=this->getVert();v;v=this->getVertNext(v))
-        if (ch(v,*this))
-            {  *out=v; ++out; ++licz;   }
-    return licz;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template< class VChooser >
-Set< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex >
-Graph< VertInfo,EdgeInfo,Settings >::getVertSet(VChooser ch)    const
-{
-    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> s;
-    this->getVerts(setInserter(s),ch);
-    return s;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template< class OutputIterator,class EChooser >
-int Graph< VertInfo,EdgeInfo,Settings >::getEdges(OutputIterator out, EChooser ch) const
-{   int licz=0;
-    for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=this->getEdge();e;e=this->getEdgeNext(e))
-        if (ch(e,*this))
-            {  *out=e; ++out; ++licz;   }
-    return licz;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template< class EChooser >
-Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge >
-Graph< VertInfo,EdgeInfo,Settings >::getEdgeSet(EChooser ch)    const
-{
-    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> s;
-    this->getEdges(setInserter(s),ch);
-    return s;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings>
-template< class OutputV,class OutputE,class VChooser,class EChooser >
-std::pair<int,int> Graph< VertInfo,EdgeInfo,Settings >::getChosen(std::pair<OutputV,OutputE> out,std::pair<VChooser,EChooser> chs,bool chosenends) const
-{   int vlicz=this->getVerts(out.first,chs.first), elicz;
-    if (!chosenends) elicz=this->getEdges(out.second,chs.second);
-    else elicz=this->getEdges(out.second,(edgeFirstEndChoose(chs.first) && edgeSecondEndChoose(chs.first))&&chs.second);
-    return std::make_pair(vlicz,elicz);
-}
-
-template< class VertInfo, class EdgeInfo, class Settings>
-template<class VChooser,class EChooser >
-std::pair<Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>,Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> >
-Graph< VertInfo,EdgeInfo,Settings >::getChosenSets(std::pair<VChooser,EChooser> chs,bool chosenends) const
-{   Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> sv;
-    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> se;
-    this->getChosen(std::make_pair(setInserter(sv),setInserter(se)),chs,chosenends);
-    return std::make_pair(sv,se);
-}
-
-
-template< class VertInfo, class EdgeInfo, class Settings > template <class Cont>
-void
-Graph< VertInfo,EdgeInfo,Settings >::getAdj(Cont& cont,EdgeType mask) const
-{
-    std::pair<PVertex,PVertex> ends;
-    for(PEdge e=getEdge(mask);e;e=getEdgeNext(e,mask))
-    {   ends=getEdgeEnds(e);
-        cont(ends.first,ends.second)=true;
-        if (getEdgeType(e)==Undirected)
-            cont(ends.second,ends.first)=true;
-    }
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,
@@ -838,14 +580,6 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgeEnds( PEdge edge ) const
     return edge->getEnds();
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-inline std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,
-    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex >
-Graph< VertInfo,EdgeInfo,Settings >::getEnds( PEdge edge ) const
-{   if (!edge) return std::make_pair((typename Graph< VertInfo,EdgeInfo,Settings >::PVertex)0,
-                                     (typename Graph< VertInfo,EdgeInfo,Settings >::PVertex)0);
-    return edge->getEnds();
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
@@ -861,237 +595,11 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgeEnd2( PEdge edge ) const
     return edge->getEnd2();
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-inline bool Graph< VertInfo,EdgeInfo,Settings >::isEdgeEnd( PEdge edge, PVertex vert ) const
-{   if (!edge) return false;
-    return edge->isEnd(vert);
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline bool Graph< VertInfo,EdgeInfo,Settings >::isEnd( PEdge edge, PVertex vert ) const
-{   if (!edge) return false;
-    return edge->isEnd(vert);
-}
-
-template< class VertInfo,class EdgeInfo , class Settings>
-inline typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-Graph< VertInfo,EdgeInfo,Settings >::getEdgeEnd( PEdge edge, PVertex vert ) const
-{   if(!edge) return (typename Graph< VertInfo,EdgeInfo,Settings >::PVertex)0;
-    return edge->getEnd(vert);
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-Graph< VertInfo,EdgeInfo,Settings >::getEnd( PEdge edge, PVertex vert ) const
-{   if(!edge) return (typename Graph< VertInfo,EdgeInfo,Settings >::PVertex)0;
-    return edge->getEnd(vert);
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline EdgeDirection Graph< VertInfo,EdgeInfo,Settings >::getEdgeDir( PEdge edge, PVertex vert ) const
 {
     if (!edge) return EdNone; else return edge->getDir(vert);
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline bool Graph< VertInfo,EdgeInfo,Settings >::incid( PEdge edge1, PEdge edge2 ) const
-{
-    return edge1 && edge2 && (isEdgeEnd(edge1,getEdgeEnd1(edge2))|| isEdgeEnd(edge1,getEdgeEnd2(edge2)));
-}
-
-
-template< class VertInfo, class EdgeInfo, class Settings >
-Set< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex >
-Graph< VertInfo,EdgeInfo,Settings >::getNeighSet( PVertex vert, EdgeDirection direct ) const
-{
-    Set< PVertex > ans;
-    PEdge edge = getEdge( vert,direct );
-    while (edge)
-    {
-        ans.add( getEdgeEnd( edge,vert ) );
-        edge = getEdgeNext( vert,edge,direct );
-    }
-    return ans;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template< class OutputIterator >
-int Graph< VertInfo,EdgeInfo,Settings >::getNeigh(
-    OutputIterator out, PVertex vert, EdgeDirection direct ) const
-{
-    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-        LOCALARRAY( ans,getEdgeNo( vert,direct) );
-    int size = 0, res = 0;
-    PEdge edge = getEdge( vert,direct );
-    while (edge)
-    {
-        ans[size++] = getEdgeEnd( edge,vert );
-        edge = getEdgeNext( vert,edge,direct );
-    }
-    Settings::sort( ans,ans+size );
-    for( int i = 0; i < size; i++)
-        if (i == 0 || ans[i - 1] != ans[i])
-        {
-            *out = ans[i];
-            ++out;
-            ++res;
-        }
-    return res;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline int Graph< VertInfo,EdgeInfo,Settings >::getNeighNo( PVertex vert, EdgeDirection direct ) const
-{
-    return getNeigh( blackHole,vert,direct );
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-Set< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex >
-Graph< VertInfo,EdgeInfo,Settings >::getClNeighSet( PVertex vert, EdgeDirection direct ) const
-{
-    Set< PVertex > ans = getNeighSet( vert,direct );
-    ans.add( (PVertex)vert );
-    return ans;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template< class OutputIterator >
-int Graph< VertInfo,EdgeInfo,Settings >::getClNeigh(
-    OutputIterator out, PVertex vert, EdgeDirection direct ) const
-{
-    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-        LOCALARRAY( ans,getEdgeNo( vert,direct ) + 1 );
-    ans[0] = vert;
-    int size = 1, res = 0;
-    PEdge edge = getEdge( vert,direct );
-    while (edge)
-    {
-        ans[size++] = getEdgeEnd( edge,vert );
-        edge = getEdgeNext( vert,edge,direct );
-    }
-    Settings::sort( ans,ans+size );
-    for( int i = 0; i < size; i++)
-        if (i == 0 || ans[i - 1] != ans[i])
-        {
-            *out = ans[i];
-            ++out;
-            ++res;
-        }
-    return res;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline int Graph< VertInfo,EdgeInfo,Settings >::getClNeighNo( PVertex vert, EdgeDirection direct ) const
-{
-    return getClNeigh( blackHole,vert,direct );
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-int Graph< VertInfo,EdgeInfo,Settings >::deg( PVertex vert, EdgeDirection direct ) const
-{
-    int ans = 0;
-    if (direct & EdLoop)
-        ans += 2 * vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,Settings,EdLoop&Settings::EdAllow>::getDegree();
-    if (direct & EdUndir)
-        ans += vert->Privates::VertLinkEdUndir<VertInfo,EdgeInfo,Settings,EdUndir&Settings::EdAllow>::getDegree();
-    if (direct & EdDirIn)
-        ans += vert->Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,Settings,EdDirIn&Settings::EdAllow>::getDegree();
-    if (direct & EdDirOut)
-        ans += vert->Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,Settings,EdDirOut&Settings::EdAllow>::getDegree();
-    return ans;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,int >
-Graph< VertInfo,EdgeInfo,Settings >::minDeg( EdgeDirection direct ) const
-{
-    std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,int > res( 0,-1 );
-    if (!getVertNo()) return res;
-    res.first = getVert();
-    res.second = deg( res.first,direct );
-    int degree;
-    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex vert = getVertNext( res.first );
-    for( ; vert; vert = getVertNext( vert ) )
-        if ((degree = deg( vert,direct )) < res.second)
-            res = std::make_pair( vert,degree );
-    return res;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,int >
-Graph< VertInfo,EdgeInfo,Settings >::maxDeg( EdgeDirection direct ) const
-{
-    std::pair<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,int > res( 0,-1 );
-    if (!getVertNo()) return res;
-    res.first = getVert();
-    res.second = deg( res.first,direct );
-    int degree;
-    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex vert = getVertNext( res.first );
-    for( ; vert; vert = getVertNext( vert ))
-        if ((degree = deg( vert,direct )) > res.second)
-            res = std::make_pair( vert,degree );
-    return res;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline int Graph< VertInfo,EdgeInfo,Settings >::Delta( EdgeDirection direct ) const
-{
-    return std::max( 0,maxDeg( direct ).second );
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline int Graph< VertInfo,EdgeInfo,Settings >::delta( EdgeDirection direct ) const
-{
-    return std::max( 0,minDeg( direct ).second );
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-Graph< VertInfo,EdgeInfo,Settings >::vertByNo( int idx ) const
-{
-    PVertex tmp_vert = first_vert;
-    while (idx && tmp_vert)
-    {
-        tmp_vert = tmp_vert->next;
-        --idx;
-    }
-    return tmp_vert;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
-Graph< VertInfo,EdgeInfo,Settings >::edgeByNo( int idx ) const
-{
-    PEdge tmp_edge = first_edge;
-    while (idx && tmp_edge)
-    {
-        tmp_edge = tmp_edge->next;
-        --idx;
-    }
-    return tmp_edge;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-int Graph< VertInfo,EdgeInfo,Settings >::vertPos( PVertex vert ) const
-{
-    int idx = 0;
-    PVertex tmp_vert = first_vert;
-    while (tmp_vert && tmp_vert != vert)
-    {
-        tmp_vert = tmp_vert->next;
-        ++idx;
-    }
-    return tmp_vert ? idx : -1;
-}
-
-template< class VertInfo,class EdgeInfo , class Settings>
-int Graph< VertInfo,EdgeInfo,Settings >::edgePos( PEdge edge ) const {
-    int idx = 0;
-    PEdge tmp_edge = first_edge;
-    while (tmp_edge && tmp_edge != edge)
-    {
-        tmp_edge = tmp_edge->next;
-        ++idx;
-    }
-    return tmp_edge ? idx : -1;
 }
 
 
@@ -1133,7 +641,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::ch2Undir(PVertex vert,EdgeDirection dir)
 {   dir&=Directed;
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(vert,dir) );
-    int size=getEdges(buf,vert,dir);
+    int size=this->getEdges(buf,vert,dir);
     return ch2Undir(buf,buf+size);
 }
 
@@ -1141,7 +649,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::ch2Undir(PVertex vert1,PVertex vert2,EdgeDirection dir)
 {   dir&=Directed;
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(vert1,dir) );
-    int size=getEdges(buf,vert1,vert2,dir);
+    int size=this->getEdges(buf,vert1,vert2,dir);
     return ch2Undir(buf,buf+size);
 }
 
@@ -1149,7 +657,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::ch2Undir()
 {
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(Directed) );
-    int size=getEdges(buf,Directed);
+    int size=this->getEdges(buf,Directed);
     return ch2Undir(buf,buf+size);
 }
 
@@ -1170,7 +678,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::revert(PVertex vert,EdgeDirection dir)
 {   dir&=Directed;
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(vert,dir) );
-    int size=getEdges(buf,vert,dir);
+    int size=this->getEdges(buf,vert,dir);
     return revert(buf,buf+size);
 }
 
@@ -1178,7 +686,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::revert(PVertex vert1,PVertex vert2,EdgeDirection dir)
 {   dir&=Directed;
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(vert1,dir) );
-    int size=getEdges(buf,vert1,vert2,dir);
+    int size=this->getEdges(buf,vert1,vert2,dir);
     return revert(buf,buf+size);
 }
 
@@ -1217,7 +725,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::revert()
 {
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(Directed) );
-    int size=getEdges(buf,Directed);
+    int size=this->getEdges(buf,Directed);
     return revert(buf,buf+size);
 }
 
@@ -1237,7 +745,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::ch2Dir(PVertex v, EdgeDirection dir)
 {
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(v,Undirected) );
-    int size=getEdges(buf,v,Undirected),licz=0;
+    int size=this->getEdges(buf,v,Undirected),licz=0;
     for(int i=0;i<size;i++) ch2Dir(buf[i],v,dir);
     return size;
 }
@@ -1246,7 +754,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::ch2Dir(PVertex v,PVertex u, EdgeDirection dir)
 {
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(v,Undirected) );
-    int size=getEdges(buf,v,u,Undirected),licz=0;
+    int size=this->getEdges(buf,v,u,Undirected),licz=0;
     for(int i=0;i<size;i++) ch2Dir(buf[i],v,dir);
     return size;
 }
@@ -1303,7 +811,7 @@ template< class VertInfo,class EdgeInfo , class Settings>
 int Graph< VertInfo,EdgeInfo,Settings >::delEdges( EdgeType direct )
 {
     int res = 0;
-    typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = getEdge( direct ), enext;
+    typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = this->getEdge( direct ), enext;
     while (e)
     {
         enext = getEdgeNext( e,direct );
@@ -1319,7 +827,7 @@ int Graph< VertInfo,EdgeInfo,Settings >::delEdges( PVertex vert, EdgeDirection d
 {
     int res = 0;
     if (!vert) return 0;
-    typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = getEdge( vert,direct ), enext;
+    typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = this->getEdge( vert,direct ), enext;
     while (e)
     {
         enext = getEdgeNext( vert,e,direct );
@@ -1336,7 +844,7 @@ int Graph<VertInfo,EdgeInfo,Settings>::delEdges(
 {
     int res = 0;
     if (!vert1 || !vert2) return 0;
-    typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = getEdge( vert1,vert2,direct );
+    typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = this->getEdge( vert1,vert2,direct );
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge enext;
     while (e)
     {
@@ -1415,7 +923,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::ch2Archs()
 {
     int res = getEdgeNo( Undirected );
-    typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = getEdge( Undirected ),enext;
+    typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = this->getEdge( Undirected ),enext;
     for( ; e; e = enext )
     {
         enext = getEdgeNext( e,Undirected );
@@ -1428,7 +936,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::ch2Archs(PVertex v)
 {
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(v,EdUndir) );
-    int size=getEdges(buf,v,EdUndir);
+    int size=this->getEdges(buf,v,EdUndir);
     return ch2Archs(buf,buf+size);
 }
 
@@ -1437,30 +945,8 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::ch2Archs(PVertex v,PVertex u)
 {
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(v,EdUndir) );
-    int size=getEdges(buf,v,u,EdUndir);
+    int size=this->getEdges(buf,v,u,EdUndir);
     return ch2Archs(buf,buf+size);
-}
-
-
-template< class VertInfo, class EdgeInfo, class Settings >
-bool Graph< VertInfo,EdgeInfo,Settings >::areParallel(
-    PEdge e1, PEdge e2, EdgeDirection reltype ) const
-{
-    if(!(e1 && e2 && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir))) return false;
-    std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,
-        typename Graph< VertInfo,EdgeInfo,Settings >::PVertex > ends1 = getEdgeEnds( e1 ),
-        ends2 = getEdgeEnds( e2 );
-    if (e1 == e2) return true;
-    else if (e1->type == Loop) return e2->type == Loop && ends1.first == ends2.first;
-    else if (e2->type == Loop) return false;
-    else if ((e1->type == Undirected && e2->type == Undirected)
-        || (e1->type != e2->type && reltype == EdUndir)
-        || (e1->type == Directed && e2->type == Directed
-            && (reltype == EdUndir || reltype == EdDirIn)))
-        return (ends1.first == ends2.first && ends1.second == ends2.second)
-                || (ends1.second == ends2.first && ends1.first == ends2.second);
-    else return e1->type == e2->type && ends1.first == ends2.first
-        && ends1.second == ends2.second;
 }
 
 template< class VertInfo, class EdgeInfo, class Settings > template< class Iterator >
@@ -1484,7 +970,7 @@ int Graph< VertInfo,EdgeInfo,Settings >::delParals(
 {   if (!edge) return 0;
     int res = 0;
     for( Iterator i = begin; i != end; i++ )
-        if (*i && *i!=edge && areParallel(*i,edge,reltype))
+        if (*i && *i!=edge && this->areParallel(*i,edge,reltype))
             { del(*i); res++; }
     return res;
 }
@@ -1500,165 +986,11 @@ template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::delParals(PEdge edge, EdgeDirection reltype)
 {   if (!edge) return 0;
     std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex, typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>
-        ends=getEnds(edge);
+        ends=this->getEnds(edge);
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,std::min(getEdgeNo(ends.first),getEdgeNo(ends.second)) );
-    int size=getEdges(buf,ends.first,ends.second);
+    int size=this->getEdges(buf,ends.first,ends.second);
     return delParals(buf,buf+size,edge,reltype);
 }
-
-
-template< class VertInfo, class EdgeInfo, class Settings >
-template< class IterOut1, class IterOut2, class Iterator  >
-std::pair<int,int> Graph< VertInfo,EdgeInfo,Settings >::findParals2(
-        std::pair<IterOut1,IterOut2> out,Iterator begin,Iterator end, EdgeType relType) const
-{
-    int size = 0;
-    for( Iterator iter = begin; iter != end; iter++ ) size++;
-    typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,size );
-    size = 0;
-    for( Iterator iter = begin; iter != end; iter++ ) if (*iter) buf[size++] = *iter;
-    Settings::sort( buf,buf + size );
-    size = std::unique( buf,buf + size ) - buf;
-    return findParals(out, buf,buf + size,relType );
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-template< class IterOut1, class IterOut2, class Iterator  >
-std::pair<int,int> Graph< VertInfo,EdgeInfo,Settings >::findParals(
-        std::pair<IterOut1,IterOut2> out,Iterator begin,Iterator end, EdgeType reltype) const
-{
-    std::pair< int,int > res(0,0);
-    if (!(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)) return std::make_pair(-1,-1);
-    int size = 0;
-    for( Iterator iter = begin; iter != end; iter++ ) size++;
-    if (!size) return res;
-    Parals3 LOCALARRAY(edges,size);
-    int i=0;
-    for( Iterator iter = begin; iter != end; iter++ )
-    {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=*iter;
-        typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v1=std::min(getEdgeEnd1(e),getEdgeEnd2(e)),
-                                                            v2=std::max(getEdgeEnd1(e),getEdgeEnd2(e));
-        edges[i++]=Parals3(v1,v2,getEdgeDir(e,v1),e);
-    }
-    Settings::sort(edges,edges+size,Parals3cmp());
-    for(i=0;i<size;i++)
-    {
-        if (i==0 || !areParallel(edges[i-1].edge,edges[i].edge,reltype))
-        {
-            *out.first=edges[i].edge; ++out.first; res.first++;
-        }
-        else
-        {
-            *out.second=edges[i].edge; ++out.second; res.second++;
-        }
-    }
-    return res;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-template< class IterOut1, class IterOut2  >
-std::pair<int,int> Graph< VertInfo,EdgeInfo,Settings >::findParals(
-        std::pair<IterOut1,IterOut2> out,const Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge>& eset, EdgeType relType) const
-{
-    return findParals(out, eset.begin(),eset.end(),relType );
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-template< class IterOut1, class IterOut2  >
-std::pair<int,int> Graph< VertInfo,EdgeInfo,Settings >::findParals(
-        std::pair<IterOut1,IterOut2> out,PVertex vert, EdgeType relType) const
-{   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(vert,EdAll) );
-    int size=getEdges(buf,vert,EdAll);
-    return findParals(out, buf,buf+size,relType );
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-template< class IterOut1, class IterOut2  >
-std::pair<int,int> Graph< VertInfo,EdgeInfo,Settings >::findParals(
-        std::pair<IterOut1,IterOut2> out,PVertex vert1, PVertex vert2,EdgeType relType) const
-{   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,std::min(getEdgeNo(vert1,EdAll),getEdgeNo(vert2,EdAll)) );
-    int size=getEdges(buf,vert1,vert2,EdAll);
-    return findParals(out, buf,buf+size,relType );
-}
-
-
-template< class VertInfo, class EdgeInfo, class Settings >
-template< class IterOut1, class IterOut2  >
-std::pair<int,int> Graph< VertInfo,EdgeInfo,Settings >::findParals(
-        std::pair<IterOut1,IterOut2> out, EdgeType relType) const
-{   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(EdAll) );
-    getEdges(buf,EdAll);
-    return findParals(out, buf,buf+getEdgeNo(EdAll),relType );
-}
-
-
-
-
-template< class VertInfo, class EdgeInfo, class Settings > template <class OutputIterator>
-int Graph< VertInfo,EdgeInfo,Settings >::getParals(  OutputIterator iter, PEdge edge, EdgeDirection reltype) const
-{
-    if (!edge || !(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)) return 0;
-    int licz=0;
-    std::pair<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>
-            ends=getEdgeEnds(edge);
-    for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(ends.first,ends.second,EdAll);e;
-                e=getEdgeNext(ends.first,ends.second,e,EdAll))
-        if (e!=edge && areParallel(e,edge,reltype))
-        {   *iter=e;
-            ++iter;
-            licz++;
-        }
-    return licz;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge >
-Graph< VertInfo,EdgeInfo,Settings >::getParalSet(PEdge edge, EdgeDirection reltype) const
-{
-    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge > res;
-    getParals(setInserter(res),edge,reltype);
-    return res;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline int Graph< VertInfo,EdgeInfo,Settings >::mu( PEdge edge, EdgeDirection reltype) const
-{
-    if (!(edge && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir))) return 0;
-    return getParals(blackHole,edge,reltype)+1;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-inline int Graph< VertInfo,EdgeInfo,Settings >::mu( EdgeDirection reltype) const
-{
-    return maxMu(reltype).second;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge,int >
-Graph< VertInfo,EdgeInfo,Settings >::maxMu( EdgeDirection reltype) const
-{
-    std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge,int > res(0,0);
-    if (!(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir) || !getEdgeNo(EdAll)) return res;
-    Parals3 LOCALARRAY(edges,getEdgeNo(EdAll));
-    int i=0,l=0;
-    typename Graph< VertInfo,EdgeInfo,Settings >::PEdge edge;
-    for (typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(EdAll); e; e=getEdgeNext(e,EdAll) )
-        edges[i++]=Parals3(std::min(e->getEnd1(),e->getEnd2()),
-                           std::max(e->getEnd1(),e->getEnd2()),
-                           getEdgeDir(e,std::min(e->getEnd1(),e->getEnd2())),e);
-    Settings::sort(edges,edges+i,Parals3cmp());
-    for(i=0;i<getEdgeNo(EdAll);i++)
-    {
-        if (i==0 || !areParallel(edges[i-1].edge,edges[i].edge,reltype))
-        {
-            l=1; edge=edges[i].edge;
-        }
-        else l++;
-        if (l>res.second) res=std::make_pair(edge,l);
-    }
-    return res;
-}
-
 
 
 template< class VertInfo, class EdgeInfo, class Settings >
@@ -1698,14 +1030,14 @@ int Graph< VertInfo,EdgeInfo,Settings >::delAllParals(
 template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::delAllParals(PVertex vert, EdgeType relType)
 {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(vert,EdAll) );
-    int size=getEdges(buf,vert,EdAll);
+    int size=this->getEdges(buf,vert,EdAll);
     return delAllParals(buf,buf+size,relType );
 }
 
 template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::delAllParals(PVertex vert1, PVertex vert2,EdgeType relType)
 {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,std::min(getEdgeNo(vert1,EdAll),getEdgeNo(vert2,EdAll)) );
-    int size=getEdges(buf,vert1,vert2,EdAll);
+    int size=this->getEdges(buf,vert1,vert2,EdAll);
     return delAllParals(buf,buf+size,relType );
 }
 
@@ -1713,108 +1045,20 @@ int Graph< VertInfo,EdgeInfo,Settings >::delAllParals(PVertex vert1, PVertex ver
 template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::delAllParals(EdgeType relType)
 {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,getEdgeNo(EdAll) );
-    getEdges(buf,EdAll);
+    this->getEdges(buf,EdAll);
     return delAllParals(buf,buf+getEdgeNo(EdAll),relType );
 }
-
-
-template< class VertInfo, class EdgeInfo, class Settings > template <class Iterator, class OutIter>
-int Graph< VertInfo,EdgeInfo,Settings >::getIncEdges(OutIter out,Iterator beg, Iterator end, EdgeDirection type,EdgeType kind ) const
-{   int licze=0;
-    typename Settings:: template VertAssocCont
-            <typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,bool>::Type vset(getVertNo());
-    for(Iterator i=beg;i!=end;++i ) vset[*i]=true;
-    for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=vset.firstKey();v;v=vset.nextKey(v))
-        for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(v,type );e;e=getEdgeNext(v,e,type ))
-            if (    ((kind&Loop) && ( ((getEdgeDir(e,getEdgeEnd(e,v))&type)==0) || getEdgeEnd(e,v)>=v )
-                        && vset.hasKey(getEdgeEnd(e,v))) ||
-                    ((kind&(Directed|Undirected))  && !vset.hasKey(getEdgeEnd(e,v)))    )
-//    for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(type );e;e=getEdgeNext(e,type ))
-//        if (vset.hasKey(getEdgeEnd1(e)) && vset.hasKey(getEdgeEnd2(e)))
-            { *out=e; ++out; ++ licze; }
-    return licze;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template <class Iterator>
-Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge>
-Graph< VertInfo,EdgeInfo,Settings >::getIncEdgeSet(Iterator beg, Iterator end, EdgeDirection type,EdgeType kind ) const
-{
-    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> res;
-    getIncEdges(setInserter(res),beg,end,type,kind);
-    return res;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template <class OutIter>
-int Graph< VertInfo,EdgeInfo,Settings >::
-getIncEdges(OutIter out,const Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>& vset, EdgeDirection type,EdgeType kind ) const
-{
-    return getIncEdges(out,vset.begin(),vset.end(),type,kind);
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge>
-Graph< VertInfo,EdgeInfo,Settings >::getIncEdgeSet(const Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>& vset, EdgeDirection type,EdgeType kind ) const
-{
-    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> res;
-    getIncEdges(setInserter(res),vset.begin(),vset.end(),type,kind);
-    return res;
-}
-
-
-template< class VertInfo, class EdgeInfo, class Settings > template <class Iterator, class OutIter>
-int Graph< VertInfo,EdgeInfo,Settings >::getIncVerts(OutIter out,Iterator beg, Iterator end, EdgeDirection type,EdgeType kind) const
-{   int liczv=0;
-    typename Settings:: template VertAssocCont
-            <typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,bool>::Type vset(getVertNo());
-    for(Iterator i=beg;i!=end;++i ) vset[*i]=true;
-    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex LOCALARRAY(tabv,2*getEdgeNo(type));
-    for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=vset.firstKey();v;v=vset.nextKey(v))
-        for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(v,type );e;e=getEdgeNext(v,e,type ))
-            if (    ((kind&Loop) && vset.hasKey(getEdgeEnd(e,v))) ||
-                    ((kind&(Directed|Undirected))  && !vset.hasKey(getEdgeEnd(e,v)))    )
-                    tabv[liczv++]=getEdgeEnd(e,v);
-    Settings::sort( tabv,tabv + liczv );
-    liczv = std::unique( tabv,tabv + liczv ) - tabv;
-    for(int i=0;i<liczv;i++)
-    {   *out=tabv[i]; ++out; }
-    return liczv;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template <class Iterator>
-Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>
-Graph< VertInfo,EdgeInfo,Settings >::getIncVertSet(Iterator beg, Iterator end, EdgeDirection type,EdgeType kind ) const
-{
-    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> res;
-    getIncVerts(setInserter(res),beg,end,type,kind);
-    return res;
-}
-
-template< class VertInfo, class EdgeInfo, class Settings > template <class OutIter>
-int Graph< VertInfo,EdgeInfo,Settings >::getIncVerts(OutIter out,const Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>& vset, EdgeDirection type,EdgeType kind ) const
-{
-    return getIncVerts(out,vset.begin(),vset.end(),type,kind);
-}
-
-template< class VertInfo, class EdgeInfo, class Settings >
-Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>
-Graph< VertInfo,EdgeInfo,Settings >::getIncVertSet(const Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>& vset, EdgeDirection type,EdgeType kind) const
-{
-    Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> res;
-    getIncVerts(setInserter(res),vset.begin(),vset.end(),type,kind);
-    return res;
-}
-
 
 template< class VertInfo, class EdgeInfo, class Settings > template <class Iterator>
 int Graph< VertInfo,EdgeInfo,Settings >::delIncEdges(Iterator beg, Iterator end, EdgeDirection type, EdgeType kind )
 {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY(tab,getEdgeNo(type));
-    return delEdges(tab,tab+getIncEdges(tab,beg,end,type,kind));
+    return delEdges(tab,tab+this->getIncEdges(tab,beg,end,type,kind));
 }
 
 template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::delIncEdges(const Set<typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>& vset, EdgeDirection type, EdgeType kind )
 {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY(tab,getEdgeNo(type));
-    return delEdges(tab,tab+getIncEdges(tab,vset,type,kind));
+    return delEdges(tab,tab+this->getIncEdges(tab,vset,type,kind));
 }
 
 
@@ -1828,8 +1072,8 @@ void Graph< VertInfo,EdgeInfo,Settings >::neg(Iterator beg, Iterator end, EdgeTy
     for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u=vset.firstKey();u;u=vset.nextKey(u))
     {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e;
         if (type&EdLoop)
-        {   if (getEdge(u,EdLoop))
-            { while (e=getEdge(u,EdLoop)) delEdge(e); }
+        {   if (this->getEdge(u,EdLoop))
+            { while (e=this->getEdge(u,EdLoop)) delEdge(e); }
             else addLoop(u,infoGen(*this,u,u,EdLoop));
         }
     }
@@ -1843,13 +1087,13 @@ void Graph< VertInfo,EdgeInfo,Settings >::neg(Iterator beg, Iterator end, EdgeTy
         typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( ebuf,getEdgeNo(type & (~EdLoop)));
 
         for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=vset.firstKey();v;v=vset.nextKey(v))
-            for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(v,type & (~EdLoop) );e;e=getEdgeNext(v,e,type & (~EdLoop) ))
-                if ((getEdgeEnd(e,v)>v ) && vset.hasKey(getEdgeEnd(e,v)) )
+            for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=this->getEdge(v,type & (~EdLoop) );e;e=getEdgeNext(v,e,type & (~EdLoop) ))
+                if ((this->getEdgeEnd(e,v)>v ) && vset.hasKey(this->getEdgeEnd(e,v)) )
     //    for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(type & (~EdLoop));e;e=getEdgeNext(e,type & (~EdLoop)))
     //        if (vset.hasKey(getEdgeEnd1(e)) && vset.hasKey(getEdgeEnd2(e)))
             {   ebuf[elicz++]=e;
-                if ((type&Directed) && getType(e)==Directed) dirs(getEdgeEnd1(e),getEdgeEnd2(e))=1;
-                if ((type&Undirected) && getType(e)==Undirected) undirs(getEdgeEnd1(e),getEdgeEnd2(e))=1;
+                if ((type&Directed) && this->getType(e)==Directed) dirs(getEdgeEnd1(e),getEdgeEnd2(e))=1;
+                if ((type&Undirected) && this->getType(e)==Undirected) undirs(getEdgeEnd1(e),getEdgeEnd2(e))=1;
             }
         for(int i=0;i<elicz;i++) delEdge(ebuf[i]);
         if (type&Directed)
@@ -1868,17 +1112,17 @@ void Graph< VertInfo,EdgeInfo,Settings >::neg(Iterator beg, Iterator end, EdgeTy
             {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e;
                 if (type&Directed)
                 {
-                    bool uvflag=getEdge(u,v,EdDirOut), vuflag=getEdge(v,u,EdDirOut);
-                    while (e=getEdge(u,v,EdDirOut)) delEdge(e);
-                    while (e=getEdge(v,u,EdDirOut)) delEdge(e);
+                    bool uvflag=this->getEdge(u,v,EdDirOut), vuflag=this->getEdge(v,u,EdDirOut);
+                    while (e=this->getEdge(u,v,EdDirOut)) delEdge(e);
+                    while (e=this->getEdge(v,u,EdDirOut)) delEdge(e);
 
                     if (!uvflag) addArch(u,v,infoGen(*this,u,v,EdDirOut));
                     if (!vuflag) addArch(v,u,infoGen(*this,v,u,EdDirOut));
                 }
                 if (type&Undirected)
                 {
-                    bool undflag=getEdge(u,v,EdUndir);
-                    while (e=getEdge(v,u,EdUndir)) delEdge(e);
+                    bool undflag=this->getEdge(u,v,EdUndir);
+                    while (e=this->getEdge(v,u,EdUndir)) delEdge(e);
                     if (!undflag) addEdge(u,v,infoGen(*this,u,v,EdUndir));
                 }
             }
@@ -1900,10 +1144,10 @@ void Graph< VertInfo,EdgeInfo,Settings >::neg(const Set<PVertex>& vset, EdgeType
 template< class VertInfo, class EdgeInfo, class Settings > template <class EdInfoGen>
 void Graph< VertInfo,EdgeInfo,Settings >::neg(EdgeType type, EdInfoGen infoGen)
 {
-    if (type&EdLoop) for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=getVert();v;v=getVertNext(v))
+    if (type&EdLoop) for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=this->getVert();v;v=getVertNext(v))
     {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e;
-        if (getEdge(v,EdLoop))
-        { while (e=getEdge(v,EdLoop)) delEdge(e); }
+        if (this->getEdge(v,EdLoop))
+        { while (e=this->getEdge(v,EdLoop)) delEdge(e); }
         else addLoop(v,infoGen(*this,v,v,EdLoop));
     }
     if (!pAdj)
@@ -1912,40 +1156,40 @@ void Graph< VertInfo,EdgeInfo,Settings >::neg(EdgeType type, EdInfoGen infoGen)
             dirs((type & Directed) ? getVertNo() : 0);
         typename Settings:: template AdjMatrixUndirEdges <typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,char >::Type
             undirs((type & Undirected) ? getVertNo() : 0);
-        for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(type & (~EdLoop));e;e=getEdgeNext(e,type & (~EdLoop)))
+        for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=this->getEdge(type & (~EdLoop));e;e=getEdgeNext(e,type & (~EdLoop)))
         {
-            if ((type&Directed) && getType(e)==Directed) dirs(getEdgeEnd1(e),getEdgeEnd2(e))=1;
-            if ((type&Undirected) && getType(e)==Undirected) undirs(getEdgeEnd1(e),getEdgeEnd2(e))=1;
+            if ((type&Directed) && this->getType(e)==Directed) dirs(getEdgeEnd1(e),getEdgeEnd2(e))=1;
+            if ((type&Undirected) && this->getType(e)==Undirected) undirs(getEdgeEnd1(e),getEdgeEnd2(e))=1;
         }
         delEdges(type & (~EdLoop));
         if (type&Directed)
-            for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u=getVert();u;u=getVertNext(u))
-                for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=getVert();v;v=getVertNext(v))
+            for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u=this->getVert();u;u=getVertNext(u))
+                for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=this->getVert();v;v=getVertNext(v))
                     if (u!=v && !dirs.hasKey(u,v)) addArch(u,v,infoGen(*this,u,v,EdDirOut));
         if (type&Undirected)
-            for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u=getVert();u!=getVertLast();u=getVertNext(u))
+            for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u=this->getVert();u!=this->getVertLast();u=getVertNext(u))
                 for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=getVertNext(u);v;v=getVertNext(v))
                     if (!undirs.hasKey(u,v)) addEdge(u,v,infoGen(*this,u,v,EdUndir));
     }
     else
     {
-        for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u=getVert();u;u=getVertNext(u))
+        for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u=this->getVert();u;u=getVertNext(u))
             for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=getVertNext(u);v;v=getVertNext(v))
             if (u!=v)
             {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e;
                 if (type&Directed)
                 {
-                    bool uvflag=getEdge(u,v,EdDirOut), vuflag=getEdge(v,u,EdDirOut);
-                    while (e=getEdge(u,v,EdDirOut)) delEdge(e);
-                    while (e=getEdge(v,u,EdDirOut)) delEdge(e);
+                    bool uvflag=this->getEdge(u,v,EdDirOut), vuflag=this->getEdge(v,u,EdDirOut);
+                    while (e=this->getEdge(u,v,EdDirOut)) delEdge(e);
+                    while (e=this->getEdge(v,u,EdDirOut)) delEdge(e);
 
                     if (!uvflag) addArch(u,v,infoGen(*this,u,v,EdDirOut));
                     if (!vuflag) addArch(v,u,infoGen(*this,v,u,EdDirOut));
                 }
                 if (type&Undirected)
                 {
-                    bool undflag=getEdge(u,v,EdUndir);
-                    while (e=getEdge(v,u,EdUndir)) delEdge(e);
+                    bool undflag=this->getEdge(u,v,EdUndir);
+                    while (e=this->getEdge(v,u,EdUndir)) delEdge(e);
                     if (!undflag) addEdge(u,v,infoGen(*this,u,v,EdUndir));
                 }
             }
@@ -1982,7 +1226,7 @@ Graph< VertInfo,EdgeInfo,Settings >::pickVert( PVertex vert, const EdgeInfo & in
     int no;
     typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
         LOCALARRAY( neig,getEdgeNo( vert,EdDirIn | EdDirOut | EdUndir ) );
-    no = getNeigh( neig,vert,EdDirIn | EdDirOut | EdUndir );
+    no = this->getNeigh( neig,vert,EdDirIn | EdDirOut | EdUndir );
     if (!(no == 0 || no == 1 || no == 2)) return 0;
     if (no == 0)
     {
@@ -2048,12 +1292,12 @@ Graph< VertInfo,EdgeInfo,Settings >::glue(
         if (res != (*i) && (*i) != 0)
         {
             typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e, enext;
-            for( e = getEdge( (*i),EdLoop ); e; e = enext )
+            for( e = this->getEdge( (*i),EdLoop ); e; e = enext )
             {
                 enext = getEdgeNext( (*i),e,EdLoop );
                 moveEdge( e,res,res,EdLoop );
             }
-            for( e = getEdge( (*i),EdDirIn | EdDirOut | EdUndir ); e; e = enext )
+            for( e = this->getEdge( (*i),EdDirIn | EdDirOut | EdUndir ); e; e = enext )
             {
                 enext = getEdgeNext( (*i),e,EdDirIn | EdDirOut | EdUndir );
                 std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,
@@ -2086,7 +1330,7 @@ typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
 Graph< VertInfo,EdgeInfo,Settings >::move( Graph< VertInfo,EdgeInfo,Settings > &graph )
 {
     if (&graph == this) return 0;
-    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex res = getVertLast();
+    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex res = this->getVertLast();
     if (graph.pAdj) graph.pAdj->clear();
     if (pAdj) {
         typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = graph.first_edge;
@@ -2172,7 +1416,7 @@ Graph< VertInfo,EdgeInfo,Settings >::copy(
     ExtGraph &graph,std::pair< VChooser,EChooser > choosers,
     std::pair< VCaster,ECaster > casters, std::pair< VLinker,ELinker > linkers )
 {
-    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex res = getVertLast();
+    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex res = this->getVertLast();
     if ((void*)&graph == (void*)this)
     {
         Graph< VertInfo,EdgeInfo,Settings > gr;
@@ -2185,9 +1429,9 @@ Graph< VertInfo,EdgeInfo,Settings >::copy(
     typename Settings:: template ExtVertAssocCont <NPVertex,PVertex>
             ::Type  ptr( graph.getVertNo() );
 
-    for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=getVert();v;v=getVertNext(v))
+    for(typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v=this->getVert();v;v=getVertNext(v))
     {    linkers.first( v,(NPVertex)NULL );   }
-    for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge();e;e=getEdgeNext(e))
+    for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=this->getEdge();e;e=getEdgeNext(e))
     {    linkers.second( e,(NPEdge)NULL );   }
 
 
@@ -2273,7 +1517,7 @@ Graph< VertInfo,EdgeInfo,Settings >::substitute(
     for( ; v; v = getVertNext( v ) )
     {
         typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
-            e = getEdge( vert,EdDirIn | EdDirOut | EdUndir );
+            e = this->getEdge( vert,EdDirIn | EdDirOut | EdUndir );
         for( ; e; e = getEdgeNext( vert,e,EdDirIn | EdDirOut | EdUndir ) )
         {
             std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,
