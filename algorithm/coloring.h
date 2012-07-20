@@ -1,5 +1,5 @@
-#ifndef __COLORING__H__
-#define __COLORING__H__
+#ifndef KOALA__COLORING__H__
+#define KOALA__COLORING__H__
 
 /* ------------------------------------------------------------------------- *
  * coloring.h
@@ -8,7 +8,7 @@
  * ------------------------------------------------------------------------- */
 
 #include "../base/def_struct.h"
-#include "../graph/subgraph.h"
+#include "../graph/view.h"
 #include "search.h"
 #include <algorithm>
 #include <cassert>

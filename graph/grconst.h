@@ -3,6 +3,7 @@
 
 template <class GraphType> class ConstGraphMethods;
 
+template< class GraphType> struct GraphInternalTypes;
 template < class GraphType >
 struct GraphInternalTypes<ConstGraphMethods<GraphType> > {
         typedef typename GraphInternalTypes<GraphType>::Vertex Vertex;
@@ -16,6 +17,8 @@ struct GraphInternalTypes<ConstGraphMethods<GraphType> > {
 
 
 
+// Klasa wprowadzajaca poprzez mechanizm CRTP metody operujace na strukturze typu const GraphType do tejze struktury
+// Wykorzystywana do wzbogacania interfejsu Graph, Subgraph oraz widokow na graf
 template <class GraphType>
 class ConstGraphMethods {
     public:
@@ -34,10 +37,11 @@ class ConstGraphMethods {
         struct Parals3 {
             PVertex v1,v2;
             EdgeDirection direct;
+            int nr;
             PEdge edge;
 
-            Parals3(PVertex av1,PVertex av2,EdgeDirection adirect,PEdge aedge) :
-                    v1(av1), v2(av2), direct(adirect), edge(aedge) {}
+            Parals3(PVertex av1,PVertex av2,EdgeDirection adirect,int anr, PEdge aedge) :
+                    v1(av1), v2(av2), direct(adirect), nr(anr), edge(aedge) {}
             Parals3() {}
         };
 
@@ -47,7 +51,7 @@ class ConstGraphMethods {
                 return (a.v1 < b.v1) ||
                 (a.v1 == b.v1 && a.v2 < b.v2) ||
                 (a.v1 == b.v1 && a.v2 == b.v2 && a.direct < b.direct ) ||
-                (a.v1 == b.v1 && a.v2 == b.v2 && a.direct == b.direct && a.edge<b.edge);
+                (a.v1 == b.v1 && a.v2 == b.v2 && a.direct == b.direct && a.nr<b.nr);
             }
 
         };
@@ -58,112 +62,212 @@ class ConstGraphMethods {
     ConstGraphMethods(const ConstGraphMethods&) : self((const GraphType&)*this) {}
     ConstGraphMethods& operator=(const ConstGraphMethods&) { return *this;}
 
-        inline int getVertNo() const { return self.getVertNo(); }
+
+//    Uwaga: metody, ktore musza byc dostarczane przez GraphType:
+//         int getVertNo() const;
+//         PVertex getVertNext( PVertex ) const;
+//         PVertex getVertPrev( PVertex ) const;
+//         int getEdgeNo( EdgeDirection  = EdAll ) const;
+//         PEdge getEdgeNext( PEdge , EdgeDirection  = EdAll ) const;
+//         PEdge getEdgePrev( PEdge , EdgeDirection  = EdAll ) const;
+//         int getEdgeNo( PVertex , EdgeDirection  = EdAll) const;
+//         PEdge getEdgeNext( PVertex , PEdge , EdgeDirection  = EdAll ) const;
+//         PEdge getEdgePrev( PVertex , PEdge , EdgeDirection  = EdAll ) const;
+//         int getEdgeNo( PVertex , PVertex , EdgeDirection = EdAll ) const;
+//         PEdge getEdgeNext( PVertex , PVertex , PEdge , EdgeDirection  = EdAll ) const;
+//         PEdge getEdgePrev( PVertex , PVertex , PEdge , EdgeDirection  = EdAll ) const;
+//         EdgeType getEdgeType( PEdge  ) const;
+//         std::pair< PVertex,PVertex > getEdgeEnds( PEdge ) const;
+//         PVertex getEdgeEnd1( PEdge ) const;
+//         PVertex getEdgeEnd2( PEdge  ) const;
+//         EdgeDirection getEdgeDir( PEdge , PVertex);
+
+//    Uwaga: zasady ogolne obslugi zbiorow wierz/krawedzi struktury grafowej. Zestaw metod postaci:
+//    int get...No(... arg ...) - dlugosc listy
+//    template <class Iter> int get...(...) - zapis na podany iterator calej listy, zwraca jej dlugosc
+//    Set<Element> get...Set(...) - wszystkie elementy listy zwracane w formie zbioru
+//    Jesli te elementy struktury sa zorganizowane w liste, poruszamy sie po niej uzywajac dodatkowo
+//    Element get...(...) - pierwszy element listy, NULL w przypadku listy pustej
+//    Element get...Last(...) - ostatni element listy, NULL w przypadku listy pustej
+//    Element get...Next(... arg ...) - kolejny po arg element listy, NULL jesli arg byl ostatni
+//    Element get...Prev(... arg ...) - poprzedni po arg element listy, NULL jesli arg byl pierwszy
+//        Natomiast zbior wejsciowy pobieramy z zakresu miedzy dwoma iteratorami lub przez Set
+
+
+
+        // Lista wierzcholkow grafu
+        inline int getVertNo() const { return self.getVertNo(); }  // Liczba wierzcho³ków (rz¹d grafu).
         inline PVertex getVertNext( PVertex v) const { return self.getVertNext(v); }
         inline PVertex getVertPrev( PVertex v) const { return self.getVertPrev(v); }
+    PVertex getVert() const { return self.getVertNext( (PVertex)0 ); }
+    PVertex getVertLast() const { return self.getVertPrev( (PVertex)0 ); }
+    template< class OutputIterator > int getVerts( OutputIterator ) const;
+    Set< PVertex > getVertSet() const;
 
+        // Liczba krawêdzi typu zawartego w podanej masce
         inline int getEdgeNo( EdgeDirection mask = EdAll ) const { return self.getEdgeNo(mask); }
         inline PEdge getEdgeNext( PEdge e, EdgeDirection mask = EdAll ) const { return self.getEdgeNext(e,mask); }
         inline PEdge getEdgePrev( PEdge e, EdgeDirection mask = EdAll ) const { return self.getEdgePrev(e,mask); }
+    template <class OutputIterator> int getEdges(OutputIterator, EdgeDirection = EdAll ) const;
+    Set< PEdge > getEdgeSet( EdgeType = EdAll ) const;
+    PEdge getEdge( EdgeDirection mask = EdAll ) const { return self.getEdgeNext( (PEdge)0,mask ); }
+    PEdge getEdgeLast( EdgeDirection mask = EdAll ) const { return self.getEdgePrev( (PEdge)0,mask ); }
 
+    // lista krawedzi sasiednich do v o orientacji wzgledem v zawartej w masce
         inline int getEdgeNo( PVertex v, EdgeDirection mask = EdAll) const { return self.getEdgeNo(v,mask); }
         inline PEdge getEdgeNext( PVertex v, PEdge e, EdgeDirection mask = EdAll ) const { return self.getEdgeNext(v,e,mask); }
         inline PEdge getEdgePrev( PVertex v, PEdge e, EdgeDirection mask = EdAll ) const { return self.getEdgePrev(v,e,mask); }
+    PEdge getEdge( PVertex vert, EdgeDirection mask= EdAll ) const { return self.getEdgeNext( vert,(PEdge)0,mask );}
+    PEdge getEdgeLast( PVertex vert, EdgeDirection mask = EdAll ) const { return self.getEdgePrev( vert,(PEdge)0,mask );}
+    template< class OutputIterator > int getEdges(OutputIterator, PVertex, EdgeDirection = EdAll ) const;
+    Set< PEdge > getEdgeSet( PVertex, EdgeDirection = EdAll ) const;
 
+
+    // lista krawedzi laczacych podane wierzcholki w sposob zawarty w masce
         inline int getEdgeNo( PVertex u, PVertex v, EdgeDirection mask = EdAll ) const { return self.getEdgeNo(u,v,mask); }
         inline PEdge getEdgeNext( PVertex u, PVertex v, PEdge e, EdgeDirection mask = EdAll ) const { return self.getEdgeNext(u,v,e,mask); }
         inline PEdge getEdgePrev( PVertex u, PVertex v, PEdge e, EdgeDirection mask = EdAll ) const { return self.getEdgePrev(u,v,e,mask); }
-
-        inline EdgeType getEdgeType( PEdge e ) const { return self.getEdgeType(e); }
-        inline std::pair< PVertex,PVertex >
-            getEdgeEnds( PEdge edge ) const { return self.getEdgeEnds(edge); }
-        inline PVertex getEdgeEnd1( PEdge edge ) const { return self.getEdgeEnd1(edge); }
-        inline PVertex getEdgeEnd2( PEdge edge ) const { return self.getEdgeEnd2(edge); }
-        inline EdgeDirection getEdgeDir( PEdge edge, PVertex v) const { return self.getEdgeDir(edge,v); }
-
-
-    PVertex getVert() const { return self.getVertNext( (PVertex)0 ); }
-    PVertex getVertLast() const { return self.getVertPrev( (PVertex)0 ); }
-    PEdge getEdge( EdgeDirection mask = EdAll ) const { return self.getEdgeNext( (PEdge)0,mask ); }
-    PEdge getEdgeLast( EdgeDirection mask = EdAll ) const { return self.getEdgePrev( (PEdge)0,mask ); }
-    PEdge getEdge( PVertex vert, EdgeDirection mask= EdAll ) const { return self.getEdgeNext( vert,(PEdge)0,mask );}
-    PEdge getEdgeLast( PVertex vert, EdgeDirection mask = EdAll ) const { return self.getEdgePrev( vert,(PEdge)0,mask );}
     PEdge getEdge( PVertex vert1, PVertex vert2, EdgeDirection mask = EdAll ) const
     { return self.getEdgeNext( vert1,vert2,(PEdge)0,mask ); }
     PEdge getEdgeLast( PVertex vert1, PVertex vert2, EdgeDirection mask = EdAll ) const
     { return self.getEdgePrev( vert1,vert2,(PEdge)0,mask ); }
+    Set< PEdge > getEdgeSet( PVertex, PVertex, EdgeDirection = EdAll ) const;
+    template< class OutputIterator > int getEdges(OutputIterator, PVertex, PVertex, EdgeDirection = EdAll ) const;
 
-
-    template< class OutputIterator > int getVerts( OutputIterator ) const;
-    Set< PVertex > getVertSet() const;
+    // zbior wierzcholkow/krawedzi spelniajacych podany chooser
     template< class OutputIterator,class VChooser2 > int getVerts(OutputIterator out, VChooser2 ch) const;
     template< class VChooser2> Set< PVertex > getVertSet(VChooser2 ch)    const;
 
-
-    PVertex vertByNo( int ) const;
-    int vertPos( PVertex ) const;
-    PEdge edgeByNo( int ) const;
-    int edgePos( PEdge ) const;
-
-
-    template <class OutputIterator> int getEdges(OutputIterator, EdgeDirection = EdAll ) const;
     template< class OutputIterator,class EChooser2 > int getEdges(OutputIterator out, EChooser2 ch) const;
-    template< class OutputIterator > int getEdges(OutputIterator, PVertex, EdgeDirection = EdAll ) const;
-    template< class OutputIterator > int getEdges(OutputIterator, PVertex, PVertex, EdgeDirection = EdAll ) const;
-
-
-    Set< PEdge > getEdgeSet( EdgeType = EdAll ) const;
     template< class EChooser2> Set< PEdge > getEdgeSet(EChooser2 ch)    const;
-    Set< PEdge > getEdgeSet( PVertex, EdgeDirection = EdAll ) const;
-    Set< PEdge > getEdgeSet( PVertex, PVertex, EdgeDirection = EdAll ) const;
 
-
+    // podobnie, ale podajemy pare chooserow (dla wierzcholka i krawedzi). Parametr bool=true - krawedz ma spelniac nie tylko swoj chooser, ale takze oba konce chooser dla wierzcholkow
     template< class OutputV,class OutputE,class VChooser2,class EChooser2 >
         std::pair<int,int> getChosen(std::pair<OutputV,OutputE>,std::pair<VChooser2,EChooser2>,bool =true) const;
     template<class VChooser2,class EChooser2 >
         std::pair<Set<PVertex>,Set<PEdge> >getChosenSets(std::pair<VChooser2,EChooser2>,bool =true) const;
 
-
-    template <class Cont> void getAdj(Cont &,EdgeType mask=EdAll) const;
-
-
-    VertInfoType getVertInfo( PVertex v ) const { assert(v); return v->getInfo(); }
-    EdgeInfoType getEdgeInfo( PEdge e ) const { assert(e); return e->getInfo(); }
-    bool isEdgeEnd( PEdge edge, PVertex vert ) const { return ((!edge) ?  false: edge->isEnd(vert)); }
-    bool isEnd( PEdge edge, PVertex vert ) const { return (!edge) ?  false : edge->isEnd(vert); }
-    EdgeType getType( PEdge e ) const { return self.getEdgeType(e); }
-    std::pair<PVertex,PVertex > getEnds( PEdge edge ) const { return self.getEdgeEnds(edge); }
-    PVertex getEdgeEnd( PEdge edge, PVertex vert) const { return (!edge) ?  0 : edge->getEnd(vert);}
-    PVertex getEnd( PEdge edge, PVertex vert) const  { return (!edge) ?  0 : edge->getEnd(vert);}
-    inline bool incid( PEdge edge1, PEdge edge2 ) const
-    {   return edge1 && edge2 && (isEdgeEnd(edge1,self.getEdgeEnd1(edge2))|| isEdgeEnd(edge1,self.getEdgeEnd2(edge2))); }
+            // Wierzcho³ek/krawedz o podanym numerze.
+    PVertex vertByNo( int ) const;
+    PEdge edgeByNo( int ) const;
+    // Numer wierzcho³ka/krawedzi, -1 w razie braku
+    int vertPos( PVertex ) const;
+    int edgePos( PEdge ) const;
 
 
+        // typ krawedzi
+        inline EdgeType getEdgeType( PEdge e ) const { return self.getEdgeType(e); }
+    EdgeType getType( PEdge e ) const { return self.getEdgeType(e); }         // synonim poprzedniej
+
+        // wierzcholki koncowe krawedzi
+        inline std::pair< PVertex,PVertex >
+            getEdgeEnds( PEdge edge ) const { return self.getEdgeEnds(edge); }
+    std::pair<PVertex,PVertex > getEnds( PEdge edge ) const { return self.getEdgeEnds(edge); }   // synonim poprzedniej
+        inline PVertex getEdgeEnd1( PEdge edge ) const { return self.getEdgeEnd1(edge); }
+        inline PVertex getEdgeEnd2( PEdge edge ) const { return self.getEdgeEnd2(edge); }
+
+        // orientacja krawedzi wzgledem jej konca
+        inline EdgeDirection getEdgeDir( PEdge edge, PVertex v) const
+        {
+            return self.getEdgeDir(edge,v);
+        }
+    // czy wierzcholek jest koncem krawedzi
+    bool isEdgeEnd( PEdge edge, PVertex vert ) const
+    { if (!edge) return false;
+        return edge->isEnd(vert); }
+    bool isEnd( PEdge edge, PVertex vert ) const
+    { if (!edge) return false;
+        return edge->isEnd(vert); }// synonim
+    // drugi koniec krawedzi
+    PVertex getEdgeEnd( PEdge edge, PVertex vert) const
+    {  assert(edge); // TODO: throw
+        return edge->getEnd(vert);}
+    PVertex getEnd( PEdge edge, PVertex vert) const
+    { assert(edge); // TODO: throw
+        return edge->getEnd(vert);} // synonim
+
+    inline bool incid( PEdge edge1, PEdge edge2 ) const // czy krawedzie sa incydentne
+    {   if (!edge2) return false;
+        return (isEdgeEnd(edge1,self.getEdgeEnd1(edge2))|| isEdgeEnd(edge1,self.getEdgeEnd2(edge2)));
+    }
+
+
+    // pobranie pol info
+    VertInfoType getVertInfo( PVertex v ) const
+    {   assert(v); // TODO: throw
+        return v->getInfo();
+    }
+    EdgeInfoType getEdgeInfo( PEdge e ) const
+    {   assert(e); // TODO: throw
+        return e->getInfo();
+    }
+
+
+    // sasiedztwo "otwarte" tj. wierzcholki widoczne z danego v poprzez krawedzie o orientacji wzgledem v zgodnej z maska
+    template< class OutputIterator > int getNeighs(OutputIterator, PVertex, EdgeDirection = EdAll ) const;
+    Set< PVertex > getNeighSet( PVertex, EdgeDirection = EdAll ) const;
+    int getNeighNo( PVertex, EdgeDirection = EdAll ) const;
+    // sasiedztwo "domkniete" tj. jw. ale v jest zawsze dolaczany
+    Set< PVertex > getClNeighSet(PVertex, EdgeDirection = EdAll ) const;
+    template< class OutputIterator > int getClNeighs(OutputIterator, PVertex, EdgeDirection = EdAll ) const;
+    int getClNeighNo( PVertex, EdgeDirection = EdAll ) const;
+
+    // stopien wierzcholka, uwzgledniamy krawedzie wychodzace z vert w sposob okreslony maska. Roznica w porownaniu z getEdgeNo(vert,direct) - petle jesli zliczane, to podwojnie
     inline int deg( PVertex vert, EdgeDirection direct = EdAll ) const
     {   return self.getEdgeNo( vert,direct ) + ((direct & EdLoop) ? self.getEdgeNo( vert,EdLoop ): 0);  }
+    // maks/min stopien
     inline int Delta( EdgeDirection direct= EdAll ) const
     {   return std::max( 0,this->maxDeg( direct ).second );   }
     inline int delta( EdgeDirection direct= EdAll ) const
     {   return std::max( 0,this->minDeg( direct ).second );  }
+    // j.w. ale zwracany jest takze wierzcholek realizujacy ekstremum. (NULL,-1) przy braku wierzcholkow
     std::pair< PVertex,int > minDeg( EdgeDirection = EdAll ) const;
     std::pair< PVertex,int > maxDeg( EdgeDirection = EdAll ) const;
 
 
-    template< class OutputIterator > int getNeigh(OutputIterator, PVertex, EdgeDirection = EdAll ) const;
-    Set< PVertex > getNeighSet( PVertex, EdgeDirection = EdAll ) const;
-    int getNeighNo( PVertex, EdgeDirection = EdAll ) const;
-    Set< PVertex > getClNeighSet(PVertex, EdgeDirection = EdAll ) const;
-    template< class OutputIterator > int getClNeigh(OutputIterator, PVertex, EdgeDirection = EdAll ) const;
-    int getClNeighNo( PVertex, EdgeDirection = EdAll ) const;
+    // zapis "macierzy sasiedztwa" z uwglednieniem krawedzi typu zawartego w masce do 2-wym. tablicy assocjacyjnej (PVertex,PVertex)-> cos konwertowalne z bool
+    template <class Cont> void getAdj(Cont &,EdgeType mask=EdAll) const;
 
 
+        // Informacja o tym, czy krawêdzie s¹ równoleg³e.
+        // rownoleglosc: 3 typy relacji rownowaznosci, okreslane maska bitowa
+        // zawsze krawedz jest rownolegla do tak samo skierowanej krawedzi tego samego typu
+        //reltype - dopuszczalne tylko jednobitowe: EdDirIn, EdDirOut lub EdUndir (taki jest sens parametru maski we wszystkich metodach dot. rownoleglosci)
+        //EdDirOut - luk nieskierowany jest rownolegly tylko do tak samo jak on skierowanego luku o tych samych koncach
+        //EdDirIn - jest on takze rownolegly do odwrotnie skierowanego luku o tych samych koncach
+        //EdUndir - jest on takze rownolegly do krawedzi nieskierowanej o tych samych koncach
     bool areParallel( PEdge, PEdge, EdgeDirection = EdUndir ) const;
+    // zbior krawedzi rownoleglych do zadanej z wykluczeniem jej samej
     template< class OutputIterator > int getParals( OutputIterator, PEdge, EdgeDirection = EdUndir ) const;
     Set<PEdge> getParalSet(PEdge, EdgeDirection = EdUndir) const;
+    // liczba krawedzi rownoleglych do danej wliczajac ja sama
     int mu(PEdge, EdgeDirection = EdUndir ) const;
+    // jej maks. wartosc po wszystkich krawedziach
     int mu( EdgeDirection = EdUndir ) const;
+    // jw. wraz z krawedzia realizujaca to ekstremum
     std::pair< PEdge,int > maxMu( EdgeDirection = EdUndir ) const;
 
+    // rozdziela dany zbior krawedzi na dwa. W pierwszym jest po jednym reprezentancie z kazdej klasy relacji rownoleglosci. Drugi to pozostale krawedzie z tego zbioru
+    template<class IterOut1, class IterOut2, class Iterator >
+        std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,Iterator,Iterator, EdgeType = EdUndir ) const;
+    // wersja odporna na ew. powtorzenia - ignorowane w ciagu wejsciowym
+    template<class IterOut1, class IterOut2, class Iterator >
+        std::pair<int,int> findParals2(std::pair<IterOut1,IterOut2>,Iterator,Iterator, EdgeType = EdUndir ) const;
+    template<class IterOut1, class IterOut2 >
+        std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,const Set<PEdge>&, EdgeType = EdUndir ) const;
+    // zbiorem wejsciowym sa wszystkie krawedzie przy wierzcholku
+    template<class IterOut1, class IterOut2 >
+        std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,PVertex, EdgeType = EdUndir ) const;
+    // zbiorem wejsciowym sa wszystkie krawedzie miedzy para wierzcholkow
+    template<class IterOut1, class IterOut2 >
+        std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,PVertex,PVertex, EdgeType = EdUndir ) const;
+    // zbiorem wejsciowym sa wszystkie krawedzie
+    template<class IterOut1, class IterOut2 >
+        std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>, EdgeType = EdUndir ) const;
+
+
+    // zbior krawedzi wychodzacych z ktoregos z wierzcholkow z podanego zbioru w sposob podany pierwsza maska
+    // druga maska filtruje, czy maja to byc krawedzie prowadzace do tego zbioru (Loop), poza ten zbior (ustawiony bit inny niz Loop), czy wszystkie (ustawiony Loop i ktorys inny)
     template <class Iterator,class OutIter>
         int getIncEdges(OutIter,Iterator, Iterator, EdgeDirection = EdAll,EdgeType=Loop ) const;
     template <class Iterator>
@@ -173,24 +277,12 @@ class ConstGraphMethods {
     Set< PEdge > getIncEdgeSet(const Set<PVertex>&, EdgeDirection = EdAll, EdgeType=Loop ) const;
 
 
+    // Podobnie j.w. ale tym razem pobieramy drugie konce (tj. wierzcholki) od takich krawedzi.
     template <class Iterator,class OutIter> int getIncVerts(OutIter,Iterator, Iterator, EdgeDirection = EdAll,EdgeType=Loop ) const;
     template <class Iterator> Set< PVertex > getIncVertSet(Iterator beg, Iterator end, EdgeDirection = EdAll,EdgeType=Loop ) const;
     template <class OutIter> int getIncVerts(OutIter,const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
     Set< PVertex > getIncVertSet(const Set<PVertex>&, EdgeDirection = EdAll,EdgeType=Loop ) const;
 
-
-    template<class IterOut1, class IterOut2, class Iterator >
-        std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,Iterator,Iterator, EdgeType = EdUndir ) const;
-    template<class IterOut1, class IterOut2, class Iterator >
-        std::pair<int,int> findParals2(std::pair<IterOut1,IterOut2>,Iterator,Iterator, EdgeType = EdUndir ) const;
-    template<class IterOut1, class IterOut2 >
-        std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,const Set<PEdge>&, EdgeType = EdUndir ) const;
-    template<class IterOut1, class IterOut2 >
-        std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,PVertex, EdgeType = EdUndir ) const;
-    template<class IterOut1, class IterOut2 >
-        std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>,PVertex,PVertex, EdgeType = EdUndir ) const;
-    template<class IterOut1, class IterOut2 >
-        std::pair<int,int> findParals(std::pair<IterOut1,IterOut2>, EdgeType = EdUndir ) const;
 
 };
 
@@ -456,9 +548,10 @@ ConstGraphMethods< GraphType>::minDeg( EdgeDirection direct ) const
 
 
 template< class GraphType> template< class OutputIterator >
-int ConstGraphMethods< GraphType>::getNeigh(
+int ConstGraphMethods< GraphType>::getNeighs(
     OutputIterator out, PVertex vert, EdgeDirection direct ) const
 {
+    assert(vert); // TODO: throw
     PVertex LOCALARRAY( ans,self.root().getEdgeNo( vert,direct ) );
     int size = 0, res = 0;
     PEdge edge = this->getEdge( vert,direct );
@@ -484,7 +577,7 @@ ConstGraphMethods< GraphType>::getNeighSet(
     PVertex vert, EdgeDirection mask ) const
 {
     Set< PVertex > res;
-    this->getNeigh( setInserter( res ),vert,mask );
+    this->getNeighs( setInserter( res ),vert,mask );
     return res;
 }
 
@@ -492,7 +585,7 @@ template< class GraphType>
 int ConstGraphMethods< GraphType>::getNeighNo(
     PVertex vert, EdgeDirection mask ) const
 {
-    return this->getNeigh( blackHole,vert,mask );
+    return this->getNeighs( blackHole,vert,mask );
 }
 
 template< class GraphType>
@@ -506,9 +599,9 @@ ConstGraphMethods< GraphType>::getClNeighSet(
 }
 
 template< class GraphType> template< class OutputIterator >
-int ConstGraphMethods< GraphType>::getClNeigh(
+int ConstGraphMethods< GraphType>::getClNeighs(
     OutputIterator out, PVertex vert, EdgeDirection direct ) const
-{
+{   assert(vert); // TODO: throw
     PVertex LOCALARRAY( ans,self.root().getEdgeNo( vert,direct ) + 1 );
     ans[0] = vert;
     int size = 1, res = 0;
@@ -533,14 +626,14 @@ template< class GraphType>
 int ConstGraphMethods< GraphType>::getClNeighNo(
     PVertex vert, EdgeDirection direct ) const
 {
-    return this->getClNeigh( blackHole,vert,direct );
+    return this->getClNeighs( blackHole,vert,direct );
 }
 
 template< class GraphType>
 bool ConstGraphMethods< GraphType>::areParallel(
     typename ConstGraphMethods< GraphType>::PEdge e1, typename ConstGraphMethods< GraphType>::PEdge e2, EdgeDirection reltype ) const
 {
-    if(!(e1 && e2 && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir))) return false;
+    assert(e1 && e2 && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)); //TODO: throw
     std::pair<PVertex,PVertex > ends1 = self.getEdgeEnds( e1 ),ends2 = self.getEdgeEnds( e2 );
     if (e1 == e2) return true;
     else if (self.getEdgeType(e1) == Loop) return self.getEdgeType(e2) == Loop && ends1.first == ends2.first;
@@ -559,7 +652,7 @@ bool ConstGraphMethods< GraphType>::areParallel(
 template< class GraphType> template <class OutputIterator>
 int ConstGraphMethods< GraphType>::getParals(  OutputIterator iter, PEdge edge, EdgeDirection reltype) const
 {
-    if (!edge || !(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)) return 0;
+    assert(edge && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)); //TODO: throw
     int licz=0;
     std::pair<PVertex,PVertex> ends=self.getEdgeEnds(edge);
     for(PEdge e=this->getEdge(ends.first,ends.second,EdAll);e;e=self.getEdgeNext(ends.first,ends.second,e,EdAll))
@@ -583,7 +676,7 @@ ConstGraphMethods< GraphType>::getParalSet( typename ConstGraphMethods<GraphType
 template< class GraphType>
 inline int ConstGraphMethods< GraphType>::mu( PEdge edge, EdgeDirection reltype) const
 {
-    if (!(edge && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir))) return 0;
+
     return this->getParals(blackHole,edge,reltype)+1;
 }
 
@@ -596,16 +689,16 @@ inline int ConstGraphMethods< GraphType>::mu( EdgeDirection reltype) const
 template< class GraphType>
 std::pair< typename ConstGraphMethods< GraphType>::PEdge,int >
 ConstGraphMethods< GraphType>::maxMu( EdgeDirection reltype) const
-{
+{   assert((reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)); //TODO: throw
     std::pair< PEdge,int > res((PEdge)0,0);
-    if (!(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir) || !self.getEdgeNo(EdAll)) return res;
+    if ( !self.getEdgeNo(EdAll)) return res;
     Parals3 LOCALARRAY(edges,self.root().getEdgeNo(EdAll));
-    int i=0,l=0;
+    int i=0,l=0,nr=0;
     PEdge edge;
     for (PEdge e=this->getEdge(EdAll); e; e=self.getEdgeNext(e,EdAll) )
-        edges[i++]=Parals3(std::min(self.getEdgeEnd1(e),self.getEdgeEnd2(e)),
-                           std::max(self.getEdgeEnd1(e),self.getEdgeEnd2(e)),
-                           self.getEdgeDir(e,std::min(self.getEdgeEnd1(e),self.getEdgeEnd2(e))),e);
+    {   std::pair<PVertex,PVertex> ends=pairMinMax(self.getEdgeEnd1(e), self.getEdgeEnd2(e));
+        edges[i++]=Parals3(ends.first,ends.second,self.getEdgeDir(e,ends.first),nr++,e);
+    }
     GraphSettings::sort(edges,edges+i,Parals3cmp());
     for(i=0;i<self.getEdgeNo(EdAll);i++)
     {
@@ -629,8 +722,6 @@ int ConstGraphMethods< GraphType>::getIncEdges(OutIter out,Iterator beg, Iterato
             if (    ((kind&Loop) && ( ((self.getEdgeDir(e,this->getEdgeEnd(e,v))&type)==0) || this->getEdgeEnd(e,v)>=v )
                         && vset.hasKey(this->getEdgeEnd(e,v))) ||
                     ((kind&(Directed|Undirected))  && !vset.hasKey(this->getEdgeEnd(e,v)))    )
-//    for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=getEdge(type );e;e=getEdgeNext(e,type ))
-//        if (vset.hasKey(getEdgeEnd1(e)) && vset.hasKey(getEdgeEnd2(e)))
             { *out=e; ++out; ++ licze; }
     return licze;
 }
@@ -723,16 +814,16 @@ std::pair<int,int> ConstGraphMethods< GraphType>::findParals(
         std::pair<IterOut1,IterOut2> out,Iterator begin,Iterator end, EdgeType reltype) const
 {
     std::pair< int,int > res(0,0);
-    if (!(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)) return std::make_pair(-1,-1);
+    assert ((reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)); //TODO: throw
     int size = 0;
     for( Iterator iter = begin; iter != end; iter++ ) size++;
     if (!size) return res;
     Parals3 LOCALARRAY(edges,size);
-    int i=0;
+    int i=0,nr=0;
     for( Iterator iter = begin; iter != end; iter++ )
     {   PEdge e=*iter;
-        PVertex v1=std::min(getEdgeEnd1(e),getEdgeEnd2(e)),v2=std::max(getEdgeEnd1(e),getEdgeEnd2(e));
-        edges[i++]=Parals3(v1,v2,self.getEdgeDir(e,v1),e);
+        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> vv=pairMinMax(getEdgeEnd1(e),getEdgeEnd2(e));
+        edges[i++]=Parals3(vv.first,vv.second,self.getEdgeDir(e,vv.first),nr++,e);
     }
     GraphSettings::sort(edges,edges+size,Parals3cmp());
     for(i=0;i<size;i++)

@@ -18,7 +18,6 @@ protected:
 
 namespace Privates {
 
-//template <class T> struct DummyVar;
 
 template<class VertInfo, class EdgeInfo, class Settings>
 class NormalParalLink {
@@ -36,10 +35,6 @@ template<class VertInfo, class EdgeInfo, class Settings>
 struct EmptyParalLink {
 
             EmptyParalLink() {}
-//            Edge<VertInfo,EdgeInfo,Settings>* &nParal()
-//                { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
-//            Edge<VertInfo,EdgeInfo,Settings>* &pParal()
-//                { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
             DummyVar<Edge<VertInfo,EdgeInfo,Settings>*> nParal()
                 { return DummyVar<Edge<VertInfo,EdgeInfo,Settings>*>(); }
             DummyVar<Edge<VertInfo,EdgeInfo,Settings>*> pParal()
@@ -59,7 +54,7 @@ struct ParalLink<VertInfo,EdgeInfo,Settings,false> : public EmptyParalLink<VertI
 
 }
 
-
+// Klasa krawedzi glownej struktury grafu
 template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, class Settings = DefaultGrSettings<EdAll,true> >
 class Edge : public EdgeConst,
              public Settings::template EdgeAdditData<VertInfo,EdgeInfo,Settings>,
@@ -73,23 +68,29 @@ public:
 
 	EdgeInfo info; ///< Additional user information in the edge.
 
+    // zwracaja wierzcholki koncowe krawedzi
     std::pair<Vertex<VertInfo,EdgeInfo,Settings>*, Vertex<VertInfo,EdgeInfo,Settings>*>
         getEnds() { return std::make_pair(vert[0].vert, vert[1].vert); }
-
     Vertex<VertInfo,EdgeInfo,Settings>* getEnd1() { return vert[0].vert; }
     Vertex<VertInfo,EdgeInfo,Settings>* getEnd2() { return vert[1].vert; }
-    bool isEnd(Vertex<VertInfo,EdgeInfo,Settings>* v) { return vert[0].vert == v || vert[1].vert == v; }
+    // czy podany wierzcholek jest koncem krawedzi
+    bool isEnd(Vertex<VertInfo,EdgeInfo,Settings>* v)
+    {   if(!v) return false;
+        return vert[0].vert == v || vert[1].vert == v;
+    }
 
+    // zwroc drugi koniec krawedzi
     Vertex<VertInfo,EdgeInfo,Settings>* getEnd(Vertex<VertInfo,EdgeInfo,Settings>* v)
-    {
+    {   assert(v); // TODO: throw
         if (vert[0].vert == v) return vert[1].vert;
         if (vert[1].vert == v) return vert[0].vert;
         return NULL;
     }
 
+    // sposob orientacji krawedzi wzgledem jej podanego konca
     EdgeDirection getDir(Vertex<VertInfo,EdgeInfo,Settings>* v)
     {
-        if (!v || !isEnd( v )) return EdNone;
+        if (!isEnd( v )) return EdNone;
         switch (type)
         {
             case Loop:
@@ -107,11 +108,15 @@ public:
     void setInfo(const EdgeInfo& info) { this->info=info; }
 
 private:
+
 	struct EdgeLink {
 		Vertex<VertInfo,EdgeInfo,Settings> *vert;
 		Edge *next, *prev;
 		EdgeLink(): vert(NULL), next(NULL), prev(NULL) {}
-	};
+	} vert[2]; // powiazania do list krawedzi tego samego rodzaju przy wierzcholku koncowym tej krawedzi
+	//0==U==out; 1==V==in;
+
+    // klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
 	/** Standard constructor. */
 	Edge();
 	/** Constructor sets info variable. */
@@ -123,9 +128,8 @@ private:
 
 	~Edge() {}
 
-	Edge *next, *prev;
-	EdgeLink vert[2]; //0==U==out; 1==V==in;
-    EdgeType type;
+	Edge *next, *prev; // powiazania na liscie wszystkich krawedzi grafu
+    EdgeType type; // typ krawedzi
 };
 
 #include "edge.hpp"

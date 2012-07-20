@@ -1,4 +1,6 @@
-// TODO: nieaktualny opis formatow!
+
+// TODO: sprawdzic aktualnosc opisu formatow po zmianach
+
 /* functions:
  *
  * readGraphText(graph, text, format, [vertexmap, [edgemap]])

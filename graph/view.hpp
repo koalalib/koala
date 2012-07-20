@@ -26,30 +26,6 @@ void Subgraph< Graph,VChooser,EChooser >::setChoose(
     echoose = chs.second;
 }
 
-template< class Graph, class VChooser, class EChooser >
-const typename Subgraph< Graph,VChooser,EChooser >::RootGrType
-*Subgraph< Graph,VChooser,EChooser >::getRootPtr() const
-{
-    return parent ? (( const ParentGrType*)parent)->getRootPtr() : NULL;
-}
-
-template< class Graph, class VChooser, class EChooser >
-const typename Subgraph< Graph,VChooser,EChooser >::ParentGrType
-&Subgraph< Graph,VChooser,EChooser >::up() const
-{
-    const ParentGrType *res = getParentPtr();
-    assert( res );
-    return *res;
-}
-
-template< class Graph, class VChooser, class EChooser >
-const typename Subgraph< Graph,VChooser,EChooser >::RootGrType
-&Subgraph< Graph,VChooser,EChooser >::root() const
-{
-    const RootGrType *res = getRootPtr();
-    assert( res );
-    return *res;
-}
 
 template< class Graph, class VChooser, class EChooser >
 bool Subgraph< Graph,VChooser,EChooser >::good( PVertex vert, bool deep ) const
@@ -106,8 +82,6 @@ Subgraph< Graph,VChooser,EChooser >::getEdgeNext(
 {
     do
         e = up().getEdgeNext( vert,e,mask );
-//    while (e && !(vchoose( up().getEdgeEnd1(e),up() )
-//        && vchoose( up().getEdgeEnd2(e),up() ) && echoose( e,up() )));
     while (e && !(vchoose( e->getEnd(vert),up() ) && echoose( e,up() )));
 
     return e;
@@ -186,7 +160,6 @@ Subgraph< Graph,VChooser,EChooser >::getEdgeNext(
     do
         e = up().getEdgeNext( vert1,vert2,e,mask );
     while (e && !(
-//                  vchoose( up().getEdgeEnd1(e),up() ) && vchoose( up().getEdgeEnd2(e),up() ) &&
                   echoose( e,up() )));
     return e;
 }
@@ -199,7 +172,6 @@ Subgraph< Graph,VChooser,EChooser >::getEdgePrev(
     do
         e = up().getEdgePrev( vert1,vert2,e,mask );
     while (e && !(
-//                  vchoose( up().getEdgeEnd1(e),up() ) && vchoose( up().getEdgeEnd2(e),up() ) &&
                   echoose( e,up() )));
     return e;
 }

@@ -291,7 +291,7 @@ int GraphSearchBase< SearchImpl, DefaultStructs >::scanAttainable(
     EdgeDirection mask, VertContainer &cont )
 {
     int rv;
-    assert( root );
+    assert( root ); // TODO: throw
     mask &= ~EdLoop;
     rv = SearchImpl::visitBase( g,root,cont,
         Visitors::StoreTargetToVertIter< Iter >( comp ),mask,0 );
@@ -350,7 +350,7 @@ int GraphSearchBase< SearchImpl, DefaultStructs >::getPath(
     typename GraphType::PVertex end, OutPath< VertIter,EdgeIter > path,
     EdgeDirection mask )
 {
-    assert( start && end );
+    assert( start && end ); // TODO: throw
     mask &= ~EdLoop;
     VisitedMap< GraphType > tree(g.getVertNo());
     SearchImpl::visitBase( g,start,tree,Visitors::EndVertVisitor( end ),mask,0 );
@@ -710,7 +710,7 @@ int SCCPar <DefaultStructs >::get(
         buf2,g.getVertNo() );
     SCCVisitor< GraphType,CompIter,VertIter,CompMap > visit( state );
     rv = DFSPar<DefaultStructs>::visitAllBase( g,vertCont,visit,EdDirOut | EdUndir );
-    if (rv < 0) return rv;
+    if (rv < 0) return rv; // TODO: a co to za cholera???
     return state.count;
 }
 
@@ -756,7 +756,7 @@ bool DAGAlgsPar <DefaultStructs >::isDAG( const GraphType &g, Iter beg, Iter end
         topord(g.getVertNo());
     int licz = 0;
     for( Iter i = beg; i != end; ++i ) topord[*i] = licz++;
-    assert( topord.size() == g.getVertNo() );
+    assert( topord.size() == g.getVertNo() ); // TODO: throw
     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
         if (topord[g.getEdgeEnd1(e)] > topord[g.getEdgeEnd2(e)]) return false;
     return true;

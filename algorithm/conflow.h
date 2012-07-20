@@ -1,5 +1,5 @@
-#ifndef DEF_FLOWS_H
-#define DEF_FLOWS_H
+#ifndef KOALA_DEF_FLOWS_H
+#define KOALA_DEF_FLOWS_H
 
 #include <vector>
 #include <map>
@@ -8,7 +8,7 @@
 #include <limits>
 #include "../base/def_struct.h"
 //#include "../graph/graph.h"
-#include "../graph/subgraph.h"
+#include "../graph/view.h"
 #include "../algorithm/search.h"
 
 

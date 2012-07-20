@@ -1,5 +1,5 @@
-#ifndef DEF_SEARCH_H
-#define DEF_SEARCH_H
+#ifndef KOALA_DEF_SEARCH_H
+#define KOALA_DEF_SEARCH_H
 
 /* ------------------------------------------------------------------------- *
  * search.h
@@ -7,7 +7,7 @@
  * ------------------------------------------------------------------------- */
 
 #include "../base/def_struct.h"
-#include "../graph/subgraph.h"
+#include "../graph/view.h"
 
 
 namespace Koala {
@@ -22,14 +22,16 @@ struct PathStructs {
     // Do odczytu sciezki miedzy wierzcholkiem a korzeniem, gdy droga wyznaczona jest w postaci
     // tablicy asocjacyjnej PVertex -> rekord z polami vPrev, ePrev (wierzcholek poprzedni i krawedz do niego).
     // Przydatne w roznych algorytmach najkrotszej sciezki
-    // Uzytkownik podaje, gdzie wpisac wierzcholki i krawedzie najkrotszej sciezki
+    // Uzytkownik podaje, pare iteratorow, gdzie wpisac wierzcholki i krawedzie najkrotszej sciezki
     template <class VIter, class EIter> struct OutPath {
             VIter vertIter;
             EIter edgeIter;
 
             OutPath(VIter av, EIter ei) : vertIter(av), edgeIter(ei) {}
         };
+
         // funkcja tworzaca, analogia make_pair
+        // Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
     template <class VIter, class EIter>
     static OutPath<VIter,EIter> outPath(VIter av, EIter ei) { return OutPath<VIter,EIter>(av,ei); }
 
@@ -39,13 +41,15 @@ struct PathStructs {
 struct ShortPathStructs : public PathStructs {
 
     template <class GraphType, class VertContainer, class VIter, class EIter>
-    static int
+    static int // zwraca liczbe krawedzi sciezki
         getOutPath(const GraphType& g,
-            const VertContainer& vertTab, // tablica asoc. z ustawionymi wskaznikami poprzednikow - rezultat poprzedniej funkcji
-            OutPath<VIter,EIter> iters,
-            typename GraphType::PVertex end,
-            typename GraphType::PVertex start=0) // ew. wczesniejszy punkt koncowy sciezki
-        {   assert(end);
+            const VertContainer& vertTab, // tablica asoc. przypisujaca wierzcholkom rekordy z ustawionymi
+            // wskaznikami do poprzedniego wierzcholka (vPrev) i krawedzi don prowadzacej (ePrev, NULL dla korzenia)
+            // W tej formie zwraca wynik wiele procedur tworzacych w grafie drzewo (las) skierowany do korzenia np. Dijkstra, BFS itp
+            OutPath<VIter,EIter> iters, // miejsce gdzie sciezka zostanie zapisana
+            typename GraphType::PVertex end, // sciezka prowadzi "pod prad" tj. od korzenia do tego wierzcholka
+            typename GraphType::PVertex start=0) // ew. wczesniejszy punkt koncowy na sciezce miedzy end a korzeniem
+        {   assert(end); // TODO: throw
             typename GraphType::PVertex u,v=vertTab[end].vPrev;
             typename GraphType::PEdge  e=vertTab[end].ePrev;
             typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
@@ -61,8 +65,12 @@ struct ShortPathStructs : public PathStructs {
             return len;
     }
 
+    // Zapisuje na podany iterator wszystkie krawedzie nalezace do drzewa (lasu) tj. uzyte jako wartosci pol ePrev
+    // Zwraca ich liczbe
     template <class GraphType, class VertContainer,class Iter>
-    static int getUsedEdges(const GraphType &g,const VertContainer& vertTab,Iter iter)
+    static int getUsedEdges(const GraphType &g,
+                            const VertContainer& vertTab // ten sam sens, co wyzej
+                            ,Iter iter)
     {   int l=0;
         if (vertTab.empty()) return 0;
         for(typename VertContainer::KeyType v=vertTab.firstKey();;v=vertTab.nextKey(v))
@@ -74,6 +82,7 @@ struct ShortPathStructs : public PathStructs {
     }
 
     template <class GraphType, class VertContainer>
+    // jw. ale zwraca zbior krawedzi
     static Set<typename GraphType::PEdge> getUsedEdgesSet(const GraphType &g,const VertContainer& vertTab)
     {   Set<typename GraphType::PEdge> res;
         getUsedEdges(g,vertTab,setInserter(res));
@@ -86,12 +95,14 @@ struct ShortPathStructs : public PathStructs {
 class SearchStructs {
 
     public:
+        // Struktura wartosci przypisywanej wierzcholkowi w procedurach przeszukiwania grafu
         template< class GraphType > struct VisitVertLabs
         {
-            typename GraphType::PVertex vPrev;
-            typename GraphType::PEdge ePrev;
+            typename GraphType::PVertex vPrev; // rodzic danego wierzcholka w drzewie (lesie), NULL dla korzenia
+            typename GraphType::PEdge ePrev; // krawedz prowadzaca do rodzica
 
-            int distance, component;
+            int distance, // odleglosc od korzenia (liczba krawedzi)
+                component;  // numer skladowej spojnosci (od 0)
 
             VisitVertLabs(
                 typename GraphType::PVertex vp = 0,
@@ -99,10 +110,13 @@ class SearchStructs {
                 int dist = std::numeric_limits<int>::max(),
                 int comp = -1 );
 
-//            template< class Rec > void get( Rec &r );
         } ;
 
-
+//        Para iteratorow wyjsciowych do kodowania ciagu ciagow (zazwyczaj wierzcholki/kraw)
+//        kolejne elementy kolejnych ciagow wysylane sa na vertIter
+//        na compIter wyrzucane sa inty: pozycje (numeracja od 0) poczatkow kolejnych ciagow
+//        oraz na koniec sumaryczna dlugosc wszystkich ciagow
+//        (a wiec lacznie o 1 wiecej liczb, niz ilosc ciagow)
         template< class CIter, class VIter > struct CompStore
         {
             CIter compIter;
@@ -111,31 +125,39 @@ class SearchStructs {
             CompStore( CIter ac, VIter av ): vertIter( av ), compIter( ac ) { }
         } ;
 
+        // Funkcja tworzaca, analogia make_pair
+        // Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
         template< class CIter, class VIter >
         static CompStore< CIter,VIter > compStore( CIter, VIter );
 
-
-        template <class T>
+//        CompStore moze wspolpracowac z dowolnymi sekwencyjnymi kontenerami, ale ponizsza struktura
+//        ulatwia obrobke takich danych
+        template <class T> // typ elementu ciagow skladowych
         class VectCompStore {
             private:
                 std::vector<int> idx;
                 std::vector<T> data;
             public:
                 void clear() { idx.clear(); data.clear(); }
-                int size()
+                int size() const // liczba zebranych ciagow
                 {
                     if (idx.empty()) return 0;
                     return idx.size()-1;
                 }
-                int size(int i)
-                {   assert(i>=0 && i<=this->size()-1);
+                int size(int i) const // dlugosc i-tego ciagu
+                {   assert(i>=0 && i<=this->size()-1); //TODO: throw
                     return idx[i+1]-idx[i];
                 }
-                T* operator[](int i)
-                {   assert(i>=0 && i<=this->size()-1);
+                T* operator[](int i) // wskaznik poczatku i-tego ciagu
+                {   assert(i>=0 && i<=this->size()-1); //TODO: throw
+                    return &data[idx[i]];
+                }
+                const T* operator[](int i) const // wskaznik poczatku i-tego ciagu
+                {   assert(i>=0 && i<=this->size()-1); //TODO: throw
                     return &data[idx[i]];
                 }
 
+                //Dla pustego obiektu umiesczamy wywolanie funkcji w miejsu compStore a pozniej przetwarzamy zebrane ciagi
                 CompStore<std::back_insert_iterator<std::vector<int> >,std::back_insert_iterator<std::vector<T> > >
                     input() { return compStore(std::back_inserter(idx),std::back_inserter(data)); }
         };
@@ -146,6 +168,8 @@ class SearchStructs {
  * Visitors
  *
  * ------------------------------------------------------------------------- */
+
+// Ocet jeden wie, co tu sie dzieje :-)
 
 /** visitor's code is called by searching algorithms (BFS, DFS, LexBFS)
  * visitor should inherit from one of:
@@ -495,25 +519,36 @@ class Visitors: public SearchStructs {
 
 };
 
+
+// Ogolna implementacja przeszukiwania grafu roznymi strategiami (DFS, BFS, LexBFS)
+// Strategie dostarcza metoda visitBase z klasy SearchImpl
+// DefaultStructs dostarcza wytycznych dla wewnetrznych procedur por. np. AlgorithmsDefaultSettings z def_struct.h
 template< class SearchImpl, class DefaultStructs >
 class GraphSearchBase: public ShortPathStructs, public SearchStructs
 {
-    public:
+    protected:
 
+        // Typowy kontener dla wierzcholkow uzyteczny w tych procedurach
+        // mapa PVertex -> VisitVertLabs< GraphType >
         template< class GraphType >
         class VisitedMap: public DefaultStructs:: template AssocCont<
             typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type
             {   public:
-                VisitedMap(int asize) :
+                VisitedMap(int asize) : // inicjujemy przewidywanym potrzebnym rozmiarem
                     DefaultStructs:: template AssocCont<typename GraphType::PVertex, VisitVertLabs< GraphType > >
                         ::Type ( asize) {}
             } ;
+    public:
 
 	/** visit all vertices in a graph
 	 * @param[in] g graph containing vertices to visit
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visited container to store data (np. map PVertex -> VisitVertLabs), BlackHole niedozwolony
+	 Postac lasu przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component zawiera numer skladowej lasu
 	 * @param[in] visitor visitor called for each vertex
-	 * @param[in] dir direction of edges to consider
+	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
+        zgodnych z maska, a pozostale kraw. ignorowane. Mozna
+	 sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
 	 * @return number of components
 	 */
         template< class GraphType, class VertContainer, class Visitor >
@@ -523,9 +558,11 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	/** visit all vertices in the same component as a given vertex
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
-	 * @param[out] out iterator to write vertices to
-	 * @param[in] dir direction of edges to consider
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[out] out iterator to write visited vertices to
+	 * @param[in] dir direction of edges to consider + uwaga jak wyzej, ponadto bit petli ignorowany
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs) , BlackHole niedozwolony
+	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component=0
 	 * @return number of visited vertices
 	 */
         template< class GraphType, class VertContainer, class Iter >
@@ -534,10 +571,11 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
             EdgeDirection, VertContainer & );
 
 	/** visit all vertices in the same component as a given vertex
+	Tzn. dziala jak wyzej, ale na wlasnej wewnetrznej mapie wierzcholkow
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
 	 * @param[out] out iterator to write vertices to
-	 * @param[in] dir direction of edges to consider
+	 * @param[in] dir direction of edges to consider + uwaga jak wyzej, ponadto bit petli ignorowany
 	 * @return number of visited vertices
 	 */
         template< class GraphType, class VertIter >
@@ -547,10 +585,13 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 
 	/** visit all vertices in a graph
 	 * @param[in] g graph containing vertices to visit
-	 * @param[out] out iterator to write vertices to
-	 * @param[in] dir direction of edges to consider
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
-	 * @return number of visited vertices
+	 * @param[out] out iterator to write visited vertices to
+	 * @param[in] dir direction of edges to consider, petle ignorowane a maska
+        jest symetryzowana tj. jesli krawedzie skierowane sa przejezdne, to w obie strony
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
+	 	 Postac lasu przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component zawiera numer skladowej lasu
+	 * @return number of components
 	 */
         template< class GraphType, class VertContainer, class VertIter >
         static int scan(
@@ -558,16 +599,17 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 
 	/** visit all vertices in a graph
 	 * @param[in] g graph containing vertices to visit
-	 * @param[out] out iterator to write vertices to
+	 * @param[out] out iterator to write vertices to, petle ignorowane a maska
+        jest symetryzowana tj. jesli krawedzie skierowane sa przejezdne, to w obie strony
 	 * @param[in] dir direction of edges to consider
-	 * @return number of visited vertices
+	 * @return number of components
 	 */
         template< class GraphType, class VertIter >
         static int scan(
             const GraphType &g, VertIter out,
             EdgeDirection dir = EdDirOut | EdUndir | EdDirIn );
 
-	/** TODO */
+	/** Liczba cyklomatyczna podgrafu zlozonego z krawedzi zgodnych z maska */
         template< class GraphType>
         static int cyclNo(
             const GraphType &, EdgeDirection = EdAll );
@@ -575,6 +617,10 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	/** return all vertices in the same component as a given vertex
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
+	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
+        zgodnych z maska, a pozostale kraw. ignorowane. Mozna
+	 sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem, pod prad lub w obie strony,
+	 ponadto bit petli ignorowany
 	 * @return set of vertices in the component
 	 */
         template< class GraphType >
@@ -587,8 +633,11 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	 * @param[in] src starting vertex
 	 * @param[in] dest target vertex
 	 * @param[out] path found path
-	 * @param[in] dir direction of edges to consider
-	 * @return length of the path
+	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
+        zgodnych z maska, a pozostale kraw. ignorowane. Mozna
+	 sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem, pod prad lub w obie strony,
+	  petle ignorowane
+	 * @return length of the path, -1 gdy nie ma polaczenia
 	 */
         template< class GraphType, class VertIter, class EdgeIter >
         static int getPath(
@@ -599,8 +648,11 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	/** split graph into components
 	 * @param[in] g graph to split
 	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
-	 * @param[in] dir direction of edges to consider
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] dir direction of edges to consider, petle ignorowane a maska
+        jest symetryzowana tj. jesli krawedzie skierowane sa przejezdne, to w obie strony
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), blackHole niedozwolony
+	 Postac lasu przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component zawiera numer skladowej lasu
 	 * @return number of components
 	 */
         template< class GraphType, class VertContainer, class CompIter, class VertIter >
@@ -610,9 +662,11 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 
 
 	/** split graph into components
+	Tzn. jak wyzej, tylko dziala na wewnetrznej lokalnej mapie
 	 * @param[in] g graph to split
 	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
-	 * @param[in] dir direction of edges to consider
+	 * @param[in] dir direction of edges to consider, petle ignorowane a maska
+        jest symetryzowana tj. jesli krawedzie skierowane sa przejezdne, to w obie strony
 	 * @return number of components
 	 */
         template< class GraphType, class CompIter, class VertIter >
@@ -645,6 +699,7 @@ struct DFSParamBlock: public SearchStructs
  */
 
 template< class SearchImpl, class DefaultStructs >
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class DFSBase: public GraphSearchBase< SearchImpl , DefaultStructs >
 {
     private:
@@ -657,11 +712,15 @@ class DFSBase: public GraphSearchBase< SearchImpl , DefaultStructs >
 	/** visit all vertices in the same component as a given vertex
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
+	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component jest ustawiane na compid
 	 * @param[in] visitor visitor called for each vertex
-	 * @param[in] dir direction of edges to consider
+	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
+        zgodnych z maska, a pozostale kraw. ignorowane. Mozna
+	 sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
 	 * @param[in] compid component identifier (give 0 if don't know)
-	 * @return number of visited vertices
+	 * @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
 	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int dfsVisitBase(
@@ -674,17 +733,22 @@ class DFSBase: public GraphSearchBase< SearchImpl , DefaultStructs >
  */
 
 template <class DefaultStructs >
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class DFSPar: public DFSBase< DFSPar<DefaultStructs >, DefaultStructs >
 {
     public:
 	/** visit all vertices in the same component as a given vertex
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
+	 	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component jest ustawiane na compid
 	 * @param[in] visitor visitor called for each vertex
-	 * @param[in] dir direction of edges to consider
+	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
+        zgodnych z maska, a pozostale kraw. ignorowane. Mozna
+	 sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
 	 * @param[in] compid component identifier (give 0 if don't know)
-	 * @return number of visited vertices
+	 * @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
 	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int visitBase(
@@ -692,7 +756,7 @@ class DFSPar: public DFSBase< DFSPar<DefaultStructs >, DefaultStructs >
             Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
-
+// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
 class DFS : public DFSPar<AlgorithmsDefaultSettings> {};
 
 /*
@@ -700,6 +764,7 @@ class DFS : public DFSPar<AlgorithmsDefaultSettings> {};
  */
 
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class DFSPreorderPar: public DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStructs >
 {
     private:
@@ -717,11 +782,15 @@ class DFSPreorderPar: public DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStr
 	/** visit all vertices in the same component as a given vertex
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
+	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component jest ustawiane na compid
 	 * @param[in] visitor visitor called for each vertex
-	 * @param[in] dir direction of edges to consider
+	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
+        zgodnych z maska, a pozostale kraw. ignorowane. Mozna
+	 sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
 	 * @param[in] compid component identifier (give 0 if don't know)
-	 * @return number of visited vertices
+	 * @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
 	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int visitBase(
@@ -729,6 +798,7 @@ class DFSPreorderPar: public DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStr
             Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
+// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
 class DFSPreorder : public DFSPreorderPar<AlgorithmsDefaultSettings> {};
 
 /*
@@ -736,6 +806,7 @@ class DFSPreorder : public DFSPreorderPar<AlgorithmsDefaultSettings> {};
  */
 
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class DFSPostorderPar: public DFSBase< DFSPostorderPar<DefaultStructs >, DefaultStructs >
 {
     private:
@@ -753,11 +824,15 @@ class DFSPostorderPar: public DFSBase< DFSPostorderPar<DefaultStructs >, Default
 	/** visit all vertices in the same component as a given vertex
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
+	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component jest ustawiane na compid
 	 * @param[in] visitor visitor called for each vertex
-	 * @param[in] dir direction of edges to consider
+	 * @param[in] dir direction of edges to considertzn. przegladany jest podgraf zlozony z krawedzi
+        zgodnych z maska, a pozostale kraw. ignorowane. Mozna
+	 sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
 	 * @param[in] compid component identifier (give 0 if don't know)
-	 * @return number of visited vertices
+	 * @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
 	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int visitBase(
@@ -765,6 +840,7 @@ class DFSPostorderPar: public DFSBase< DFSPostorderPar<DefaultStructs >, Default
             Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
+// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
 class DFSPostorder: public DFSPostorderPar<AlgorithmsDefaultSettings> {};
 
 /*
@@ -772,6 +848,7 @@ class DFSPostorder: public DFSPostorderPar<AlgorithmsDefaultSettings> {};
  */
 
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class BFSPar: public GraphSearchBase< BFSPar<DefaultStructs >, DefaultStructs >
 {
     private:
@@ -784,11 +861,15 @@ class BFSPar: public GraphSearchBase< BFSPar<DefaultStructs >, DefaultStructs >
 	/** visit all vertices in the same component as a given vertex
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
+	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component jest ustawiane na compid
 	 * @param[in] visitor visitor called for each vertex
-	 * @param[in] dir direction of edges to consider
+	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
+        zgodnych z maska, a pozostale kraw. ignorowane. Mozna
+	 sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
 	 * @param[in] compid component identifier (give 0 if don't know)
-	 * @return number of visited vertices
+	 * @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
 	 */
         template< class GraphType, class VertContainer, class Visitor >
         static int visitBase(
@@ -796,6 +877,7 @@ class BFSPar: public GraphSearchBase< BFSPar<DefaultStructs >, DefaultStructs >
             Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
+// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
 class BFS: public BFSPar<AlgorithmsDefaultSettings> {};
 
 /*
@@ -805,6 +887,7 @@ class BFS: public BFSPar<AlgorithmsDefaultSettings> {};
 
 
 template<class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class LexBFSPar: public GraphSearchBase<LexBFSPar<DefaultStructs>,
 					 DefaultStructs> {
 public:
@@ -932,16 +1015,27 @@ public:
 			};
 		};
 
+    protected:
+
+    template<class GraphType>
+	struct OrderData {
+		typename GraphType::PVertex v;
+		int vertId;	// kogo jest s¹siadem (numer s¹siada w porz¹dku)
+		int orderId;	// numer w porz¹dku
+		};
+
     public:
 
 	/** visit all vertices in the same component as a given vertex
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs)
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
+	 	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component jest ustawiane na component
 	 * @param[in] visitor visitor called for each vertex
-	 * @param[in] dir direction of edges to consider
+	 * @param[in] dir direction of edges to consider, LexBFS akceptuje tylko maski symetryczne
 	 * @param[in] compid component identifier (give 0 if don't know)
-	 * @return number of visited vertices
+	 * @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
 	 */
 	template<class GraphType,
 		 class VertContainer,
@@ -959,7 +1053,7 @@ public:
 //        DefaultCPPAllocator2 allocat2;
 //		LexVisitContainer<GraphType, DefaultCPPAllocator,DefaultCPPAllocator2> cont(allocat,allocat2);
 
-        assert(((mask&Directed)==0)||((mask&Directed)==Directed)); // TODO: LexBFS ma sens dla gr. nieskierowanych, chyba?
+        assert(((mask&Directed)==0)||((mask&Directed)==Directed)); // TODO: throw
 		Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<LVCNode<GraphType> > > > allocat(g.getVertNo()+1); //TODO: size? - spr
         Privates::BlockListAllocator<Privates::ListNode<LVCNode<GraphType> > > allocat2(2*g.getVertNo()+1); //TODO: size? - spr 2n+1 -> n+1 - oj! raczej nie!
 		LexVisitContainer<GraphType, Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<LVCNode<GraphType> > > >,Privates::BlockListAllocator<Privates::ListNode<LVCNode<GraphType> > > >
@@ -1016,20 +1110,11 @@ public:
 		};
 
 
-
-	template<class GraphType>
-	struct OrderData {
-		typename GraphType::PVertex v;
-		int vertId;	// kogo jest s¹siadem (numer s¹siada w porz¹dku)
-		int orderId;	// numer w porz¹dku
-		};
-
-
 	/** order vertices with LexBFS order, starting with a given sequence
 	 * @param[in] g graph
 	 * @param[in] in number of vertices in table tab
 	 * @param[in] tab table containing initial order of vertices
-	 * @param[in] mask direction of edges to consider
+	 * @param[in] mask direction of edges to consider, LexBFS akceptuje tylko maski symetryczne
 	 * @param[out] out iterator to write ordered vertices
 	 * @return number of vertices written to out
 	 */
@@ -1053,7 +1138,7 @@ public:
 
 		bmask &= ~EdLoop;
 //		if(bmask & EdDirOut) bmask &= ~EdDirIn; //TODO: watpliwe
-        assert(((bmask&Directed)==0)||((bmask&Directed)==Directed)); // TODO: LexBFS ma sens dla gr. nieskierowanych, chyba?
+        assert(((bmask&Directed)==0)||((bmask&Directed)==Directed)); // TODO: throw
 
 		n = g.getVertNo();
 		assert(in == n);
@@ -1151,6 +1236,7 @@ public:
 	};
 
 
+// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
 class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
 
 
@@ -1158,7 +1244,9 @@ class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
  * Cheriyan/Mehlhorn/Gabow algorithm
  */
 
+// Wyszukiwanie skladowych silnie spojnych grafu skierowanego
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class SCCPar: protected SearchStructs
 {
     protected:
@@ -1216,52 +1304,65 @@ class SCCPar: protected SearchStructs
         } ;
 
     public:
-	/** split graph into strongly connected components
+	/** split graph into strongly connected components, uwzglednia krawedzie wszystkich typow
 	 * @param[in] g graph to split
 	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
-	 * @param[out] vtoc map (PVertex -> int indexOfItsComponent(zero based))
+	 * @param[out] vtoc map (PVertex -> int indexOfItsComponent(zero based)), lub BlackHole
 	 * @return number of components
 	 */
         template< class GraphType, class CompIter, class VertIter, class CompMap >
         static int get(
             const GraphType &g, CompStore< CompIter,VertIter > out, CompMap & vtoc);
 
-
+//    Korzysta z mapy CompMap z poprzedniej procedury. Wyrzuca na iterator wartosci std::pair<int,int> - wszystkie
+//    pary numerow skladowych silnie spojnych, ktore sa polaczone choc jednym bezposrednim lukiem. Zwraca dlugos
+//    ciagu wynikowego
         template< class GraphType, class CompMap, class PairIter >
         static int connections(const GraphType &, CompMap &, PairIter );
 } ;
 
+// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
 class SCC : public SCCPar<AlgorithmsDefaultSettings> {};
 
-
+// Procedury na digrafach acykliczych
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class DAGAlgsPar: protected SearchStructs
 {
     public:
+
+        // wyrzuca na iterator wierzcholki grafu w porzadku topologicznym
         template< class GraphType, class VertIter >
         static void topOrd( const GraphType &, VertIter );
 
+        // sprawdza, czy graf jest DAGiem korzystajac z podanego para iteratorow ciagu wierzcholkow z wyjscia poprzedniej procedury
         template< class GraphType, class Iter >
         static bool isDAG( const GraphType &, Iter, Iter );
 
+        // sprawdza, czy graf jest DAGiem, samodzielna
         template< class GraphType >
         static bool isDAG( const GraphType & );
 
+        // wyrzuca na iterator wszystkie luki przechodnie DAGa, zwraca dlugosc ciagu
         template< class GraphType, class Iter >
         static int transEdges(const GraphType &, Iter);
 
+        // usuwa luki przechodnie DAGa
         template< class GraphType>
         static void makeHasse(GraphType & );
 
 } ;
 
+// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
 class DAGAlgs : public DAGAlgsPar<AlgorithmsDefaultSettings> {};
 
 /*
  * Blocks -- biconnected components
  */
 
+//Wykrywanie skladowych 2-spojnych (blokow) grafu
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class BlocksPar : protected SearchStructs
 {
     protected:
@@ -1343,19 +1444,21 @@ class BlocksPar : protected SearchStructs
             State &, VertBlockList *, VertMap &, VertBlockIter & );
 
     public:
-        struct VertData {
-            int blockNo;
-            int firstBlock;
+        struct VertData { // wynikowa etykieta wierzcholka
+            int blockNo;    // w ilu blokach lezy ten wierzcholek
+            int firstBlock; // pozycja pierwszego w sekwencji numerow blokow (por. viter nizej) bloku zawierajacego
+            // ten wierzcholek (jego pozostale bloki wystepuja kolejno za nim)
             VertData( int b = 0, int f = -1 ): blockNo( b ), firstBlock( f ) { }
         } ;
 
 	/** split graph into blocks
-	 * @param[in] g graph to split
-	 * @param[out] vmap ???
-	 * @param[out] emap ???
+	 * @param[in] g graph to split, uwzglednia wszystkie krawedzie traktujac luki jak nieskierowane
+	 * @param[out] vmap mapa PVertex->VertData powiazana z ciagiem zapisanym na viter (lub BlackHole)
+	 * @param[out] emap mapa PEdge->int - w ktorym bloku znajduje sie dana krawedz (lub BlackHole)
 	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
-	 * @param[out] viter ???
-	 * @return number of components
+        CompStore do ktorego zapisuje sie ciagi wierzcholkow z kolejnych blokow
+	 * @param[out] viter Iterator na ktory wypisywana jest ciag numerow blokow (byc moze z powtorzeniami) - por. VertData
+	 * @return number of biconnected components
 	 */
         template< class GraphType, class VertDataMap, class EdgeDataMap,
             class CompIter, class VertIter, class VertBlockIter >
@@ -1365,13 +1468,14 @@ class BlocksPar : protected SearchStructs
 
 
 	/** split a component containing given vertex into blocks
-	 * @param[in] g graph to split
+	 * @param[in] g graph to split, uwzglednia wszystkie krawedzie traktujac luki jak nieskierowane
 	 * @param[in] src given vertex
-	 * @param[out] vmap ???
-	 * @param[out] emap ???
+	 * @param[out] vmap mapa PVertex->VertData powiazana z ciagiem zapisanym na viter (lub BlackHole)
+	 * @param[out] emap mapa PEdge->int - w ktorym bloku znajduje sie dana krawedz (lub BlackHole)
 	 * @param[out] out pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
-	 * @param[out] viter ???
-	 * @return number of components
+	         CompStore do ktorego zapisuje sie ciagi wierzcholkow z kolejnych blokow
+	 * @param[out] viter Iterator na ktory wypisywana jest ciag numerow blokow (byc moze z powtorzeniami) - por. VertData
+	 * @return number of biconnected components in a component containing given vertex
 	 */
         template< class GraphType, class VertDataMap, class EdgeDataMap,
             class CompIter, class VertIter, class VertBlockIter >
@@ -1379,10 +1483,11 @@ class BlocksPar : protected SearchStructs
             const GraphType &g, typename GraphType::PVertex src, VertDataMap &vmap,
             EdgeDataMap &emap, CompStore< CompIter,VertIter > out, VertBlockIter viter);
 
-
+        // wyrzuca na iterator ciag wierzcholkow tworzacych rdzen grafu tj. podgraf pozostajacy po sukcesywnym
+        // usuwaniu wierzcholkow stopnia < 2. Zwraca dlugosc sekwencji
         template<class GraphType,class Iterator>
         static int core(const GraphType &g,Iterator out)
-        {   const EdgeType mask=EdAll;//mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
+        {   const EdgeType mask=EdAll;
             typename DefaultStructs:: template AssocCont<
                 typename GraphType::PVertex, int >::Type degs(g.getVertNo());
             std::pair<int, typename GraphType::PVertex> LOCALARRAY(buf,2*g.getVertNo());
@@ -1405,6 +1510,7 @@ class BlocksPar : protected SearchStructs
 
 } ;
 
+// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
 class Blocks : public BlocksPar<AlgorithmsDefaultSettings> {};
 
 /*
@@ -1412,6 +1518,7 @@ class Blocks : public BlocksPar<AlgorithmsDefaultSettings> {};
  */
 
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class EulerPar: public PathStructs, protected SearchStructs {
 private:
 	template<class GraphType>
@@ -1511,7 +1618,13 @@ private:
 
 public:
 
+    // Uwaga: wersje bez dir uwzgledniaja jedynie podgraf zlozony z petli i krawedzi nieskierowanych ignorujac reszte
+    // Wersje z dir uwzgledniaja jedynie podgraf zlozony z petli i lukow ignorujac reszte
+
     template<class GraphType>
+    // para zawierajaca 2 razy ten sam wierzcholek - jesli graf ma nieskierowany cykl Eulera
+    // para zawierajaca 2 rozne wierzcholki - konce nieskierowanej sciezki Eulera - jesli ta istnieje
+    // (NULL,NULL) w przciwnym razie
 	static std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
     ends(const GraphType &g)
     {
@@ -1520,6 +1633,9 @@ public:
 
 
     template<class GraphType>
+    // para zawierajaca 2 razy ten sam wierzcholek - jesli graf ma skierowany cykl Eulera
+    // para zawierajaca 2 rozne wierzcholki - konce skierowanej sciezki Eulera - jesli ta istnieje
+    // (NULL,NULL) w przciwnym razie
 	static std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
     dirEnds(const GraphType &g)
     {
@@ -1527,9 +1643,8 @@ public:
     }
 
 
-	/** test if graph has an Eulerian cycle
+	/** test if graph has an undirected Eulerian cycle
 	 * @param[in] g graph
-	 * @param[in] mask type of edges to consider
 	 * @return true if it has, false otherwise */
 	template<class GraphType>
 	static bool hasCycle(const GraphType &g) {
@@ -1537,9 +1652,8 @@ public:
 		return res.first!=0 && res.first==res.second;
 	};
 
-	/** test if graph has an Eulerian cycle
+	/** test if graph has a directed Eulerian cycle
 	 * @param[in] g graph
-	 * @param[in] mask type of edges to consider
 	 * @return true if it has, false otherwise */
 	template<class GraphType>
 	static bool hasDirCycle(const GraphType &g) {
@@ -1548,9 +1662,8 @@ public:
 	};
 
 
-	/** test if graph has an Eulerian path
+	/** test if graph has an undirected Eulerian path
 	 * @param[in] g graph
-	 * @param[in] mask type of edges to consider
 	 * @return true if it has, false otherwise */
 	template<class GraphType>
 	static bool hasPath(const GraphType &g) {
@@ -1558,9 +1671,8 @@ public:
 		return res.first!=0 && res.first!=res.second;
     };
 
-	/** test if graph has an Eulerian path
+	/** test if graph has a directed Eulerian path
 	 * @param[in] g graph
-	 * @param[in] mask type of edges to consider
 	 * @return true if it has, false otherwise */
 	template<class GraphType>
 	static bool hasDirPath(const GraphType &g) {
@@ -1569,7 +1681,7 @@ public:
     };
 
 
-	/** test if graph has an Eulerian path starting at vertex u
+	/** test if graph has an undirected Eulerian path starting at vertex u
 	 * @param[in] g graph
 	 * @param[in] u starting vertex
 	 * @param[in] mask type of edges to consider
@@ -1577,13 +1689,13 @@ public:
 	template<class GraphType>
 	static bool hasPath(const GraphType &g,
 			    typename GraphType::PVertex u) {
-        assert(u);
+        assert(u); // TODO: throw
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 //		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
 		return (res.first==u ||(/* !dir &&*/ res.second==u));
 		};
 
-	/** test if graph has an Eulerian path starting at vertex u
+	/** test if graph has an directed Eulerian path starting at vertex u
 	 * @param[in] g graph
 	 * @param[in] u starting vertex
 	 * @param[in] mask type of edges to consider
@@ -1591,14 +1703,14 @@ public:
 	template<class GraphType>
 	static bool hasDirPath(const GraphType &g,
 			    typename GraphType::PVertex u) {
-        assert(u);
+        assert(u); // TODO: throw
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
 //		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
 		return res.first==u;// ||(!dir && res.second==u));
 		};
 
 
-	/** test if graph has an Eulerian cycle containing vertex u
+	/** test if graph has an undirected Eulerian cycle containing vertex u
 	 * @param[in] g graph
 	 * @param[in] u given vertex
 	 * @param[in] mask type of edges to consider
@@ -1606,11 +1718,11 @@ public:
 	template<class GraphType>
 	static bool hasCycle(const GraphType &g,
 			    typename GraphType::PVertex u) {
-        assert(u);
+        assert(u); // TODO: throw
 		return hasCycle(g) && g.deg(u,EdUndir|EdLoop);
 		};
 
-	/** test if graph has an Eulerian cycle containing vertex u
+	/** test if graph has an directed Eulerian cycle containing vertex u
 	 * @param[in] g graph
 	 * @param[in] u given vertex
 	 * @param[in] mask type of edges to consider
@@ -1618,15 +1730,14 @@ public:
 	template<class GraphType>
 	static bool hasDirCycle(const GraphType &g,
 			    typename GraphType::PVertex u) {
-        assert(u);
+        assert(u); // TODO: throw
 		return hasDirCycle(g) && g.deg(u,EdDirOut|EdLoop);
 		};
 
 
-	/** get Eulerian cycle
+	/** get undirected Eulerian cycle
 	 * @param[in] g graph
 	 * @param[out] out found cycle
-	 * @param[in] mask type of edges to consider
 	 * @return true if graph has an Eulerian cycle, false otherwise */
 	template<class GraphType,
 		 class VertIter,
@@ -1642,10 +1753,9 @@ public:
 		return true;
 		};
 
-	/** get Eulerian cycle
+	/** get directed Eulerian cycle
 	 * @param[in] g graph
 	 * @param[out] out found cycle
-	 * @param[in] mask type of edges to consider
 	 * @return true if graph has an Eulerian cycle, false otherwise */
 	template<class GraphType,
 		 class VertIter,
@@ -1662,11 +1772,11 @@ public:
 		};
 
 
-	/** get Eulerian cycle
+	/** get undirected Eulerian cycle
 	 * @param[in] g graph
-	 * @param[in] prefstart preferred starting vertex
+	 * @param[in] prefstart preferred starting vertex, ale jesli cykl E. nie
+	  przechodzi przez ten wierzcholek, preferencja bedzie zignorowana
 	 * @param[out] out found cucle
-	 * @param[in] mask type of edges to consider
 	 * @return true if graph has an Eulerian cycle, false otherwise */
 	template<class GraphType,
 		 class VertIter,
@@ -1684,11 +1794,11 @@ public:
 		return true;
         };
 
-	/** get Eulerian cycle
+	/** get directed Eulerian cycle
 	 * @param[in] g graph
-	 * @param[in] prefstart preferred starting vertex
+	 * @param[in] prefstart preferred starting vertex, ale jesli cykl E. nie
+	  przechodzi przez ten wierzcholek, preferencja bedzie zignorowana
 	 * @param[out] out found cucle
-	 * @param[in] mask type of edges to consider
 	 * @return true if graph has an Eulerian cycle, false otherwise */
 	template<class GraphType,
 		 class VertIter,
@@ -1708,11 +1818,10 @@ public:
 
 
 
-	/** get Eulerian path
+	/** get undirected Eulerian path
 	 * @param[in] g graph
 	 * @param[out] out found path
-	 * @param[in] mask type of edges to consider
-	 * @return true if graph has an Eulerian cycle, false otherwise */
+	 * @return true if graph has an Eulerian path, false otherwise */
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
@@ -1728,11 +1837,10 @@ public:
 		};
 
 
-	/** get Eulerian path
+	/** get directed Eulerian path
 	 * @param[in] g graph
 	 * @param[out] out found path
-	 * @param[in] mask type of edges to consider
-	 * @return true if graph has an Eulerian cycle, false otherwise */
+	 * @return true if graph has an Eulerian path, false otherwise */
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
@@ -1748,12 +1856,13 @@ public:
 		};
 
 
-	/** get Eulerian path
+	/** get undirected Eulerian path
 	 * @param[in] g graph
-	 * @param[in] prefstart preferred starting vertex
+	 * @param[in] prefstart preferred starting vertex, ale jesli sciezka E. nie
+	  zaczyna sie od tego wierzcholka, preferencja bedzie zignorowana
 	 * @param[out] out found path
 	 * @param[in] mask type of edges to consider
-	 * @return true if graph has an Eulerian cycle, false otherwise */
+	 * @return true if graph has an Eulerian path, false otherwise */
 	template<class GraphType,
 		 class VertIter,
 		 class EdgeIter>
@@ -1772,6 +1881,7 @@ public:
 
 };
 
+// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
 class Euler : public EulerPar<AlgorithmsDefaultSettings> {};
 
 #include "../algorithm/search.hpp"

@@ -219,47 +219,35 @@ template< typename Element > template< class Iter >
 
 template< typename Element >
     Element Set< Element >::first() const
-    {   if (this->size()==0) return (Element)0;
-//        assert( this->size() );
+    {   if (this->size()==0) return this->badValue();//(Element)0;
         return *this->begin();
     }
 
 template< typename Element >
     Element Set< Element >::last() const
-    {   if (this->size()==0) return (Element)0;
-//        assert( this->size() );
+    {   if (this->size()==0) return this->badValue();//(Element)0;;
         return *(--this->end());
     }
 
 template< typename Element >
     Element Set< Element >::next( const Element &a ) const
-    {   if (!a) return first();
+    {   if (this->isBad(a)) return first();
         typename std::set< Element >::const_iterator i = this->find( a );
-        assert( i != this->end() );
+        assert( i != this->end() ); // TODO: throw
         i++;
-        assert( i != this->end() );
+        assert( i != this->end() ); // TODO: throw
         return *i;
     }
 
 template< typename Element >
     Element Set< Element >::prev( const Element &a ) const
-    {   if (!a) return last();
-        typename std::set< Element >::iterator i = this->find( a );
-        assert( i != this->end() && i != this->begin() );
+    {   if (this->isBad(a)) return last();
+        typename std::set< Element >::const_iterator i = this->find( a );
+        assert( i != this->end() && i != this->begin() ); // TODO: throw
         i--;
         return *i;
     }
 
-//template< typename Element >
-//    SetInserter< Set< Element > > &SetInserter< Set< Element > >::operator=( const Element &value )
-//    {
-//        (*container) += value;
-//        return *this;
-//    }
 
-template< typename Element >
-SetInserter< Set< Element > > setInserter( Set< Element > &x )
-{
-    return SetInserter< Set< Element > >( x );
-}
+
 
