@@ -8,8 +8,6 @@ namespace Koala {
 
 namespace Privates {
 
-//template <class T> struct DummyVar;
-
 template<class VertInfo, class EdgeInfo, class Settings>
 struct NormalVertLink {
             Edge<VertInfo,EdgeInfo,Settings> *first, *last;
@@ -26,11 +24,6 @@ template<class VertInfo, class EdgeInfo, class Settings>
 struct EmptyVertLink {
 
             EmptyVertLink() {}
-//            Edge<VertInfo,EdgeInfo,Settings>* &getFirst()
-//                { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
-//            Edge<VertInfo,EdgeInfo,Settings>* &getLast()
-//                { return *(Edge<VertInfo,EdgeInfo,Settings>**)(&_KoalaEmptyEdgePoiner); }
-//            int& getDegree() { return _KoalaEmptyVertDegree; }
 
             DummyVar< Edge<VertInfo,EdgeInfo,Settings>* > getFirst()
                 { return DummyVar< Edge<VertInfo,EdgeInfo,Settings>* >(); }
@@ -91,7 +84,7 @@ struct VertLinkEdLoop<VertInfo,EdgeInfo,Settings,0> : public EmptyVertLink<VertI
 }
 
 
-
+// Klasa wierzcholka glownej struktury grafu
 template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, class Settings = DefaultGrSettings<EdAll,true> >
 class Vertex :
     private Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,Settings,EdDirIn&Settings::EdAllow>,
@@ -110,14 +103,14 @@ public:
     void setInfo(const VertInfo& info) { this->info=info; }
 
 private:
-
+    	// klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
 
 	/** Standard constructor*/
 	Vertex();
 	/** Constructor sets info variable */
 	Vertex(const VertInfo &);
 
-	// klasa niekopiowalna
+
 	Vertex(const Vertex& X) {}
 	Vertex& operator=(const Vertex& X) {}
 

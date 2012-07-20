@@ -48,5 +48,7 @@ int main() {
     std::cout << std::boolalpha << g.hasAdjMatrix();
     std::cout << '\n' << g.getEdgeNo(Koala::EdDirOut|Koala::EdDirIn);
 
+    g.neg();
+
     return 0;
 }

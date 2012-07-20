@@ -285,6 +285,7 @@ int main() {
     t(aaa);
     t(cona);
 
+    cout << "\n" << pairMinMax(5,5).first << ' ' << pairMinMax(4,5).second;
 //    AssocMatrix<Vert*,std::string,AMatrFull> mmm;
 //    mmm(C,D)="CD";
 //    const AssocMatrix<Vert*,std::string,AMatrFull> conm=mmm;

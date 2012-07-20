@@ -1,5 +1,5 @@
-#ifndef DEF_STRUCT_H
-#define DEF_STRUCT_H
+#ifndef KOALA_DEF_STRUCT_H
+#define KOALA_DEF_STRUCT_H
 
 #include <limits>
 #include <cassert>
@@ -19,12 +19,14 @@
 #include "../container/set.h"
 
 
+//Glowne procedury biblioteki leza w namespace Koala
+//Procedury wejscia/wyjscia w Koala::IO
+//Pewne wewnetrzne mechanizmy, w ktorych uzytkownik grzebac nie powinien zamykamy w podnamespaceach Privates
 namespace Koala {
 
-typedef unsigned char EdgeType;
-typedef unsigned char EdgeDirection;
+typedef unsigned char EdgeType; // mozliwe typy krawedzi grafu
+typedef unsigned char EdgeDirection; // ... i ich orientacje wzgledem wierzcholka
 
-//do not change constans
 static const EdgeDirection EdNone = 0x00; ///< Edge direction is not specified.
 static const EdgeDirection EdLoop = 0x01; ///< Edge is a loop.
 static const EdgeDirection EdUndir = 0x02; ///< Edge is undirected
@@ -32,15 +34,14 @@ static const EdgeDirection EdDirIn = 0x04; ///< Edge is directed in a vertex.
 static const EdgeDirection EdDirOut = 0x08; ///< Edge is directed out of a vertex.
 static const EdgeDirection EdAll = 0x0F; ///< All directions are included.
 
-static const EdgeDirection AdjMatrixAllowed = 0x10;
-
 static const EdgeType Detached=0x0;
 static const EdgeType Loop=0x1;
 static const EdgeType Undirected=0x2;
 static const EdgeType Directed=0xC;
 
-
+// Domyslne struktury (puste) pola info z krawedzi/wierzcholka
 struct EmptyVertInfo {};
+// ich operatory odczytu/zapisu ze strumienia (na potrzeby formatu tekstowego grafu z modulu text.h)
 std::istream& operator>>(std::istream& is,EmptyVertInfo arg) { return is; }
 std::ostream& operator<<(std::ostream& os,EmptyVertInfo arg) { return os; }
 
@@ -48,18 +49,24 @@ struct EmptyEdgeInfo {};
 std::istream& operator>>(std::istream& is,EmptyEdgeInfo arg) { return is; }
 std::ostream& operator<<(std::ostream& os,EmptyEdgeInfo arg) { return os; }
 
-template< class GraphType> struct GraphInternalTypes;
+
+// W glownej strukturze grafu wierzcholki i krawedzie maja pole publiczne (dane skojarzone z wierz/kraw)
+// typu Vert/EdgeInfo. Klasa Settings dostarcza wytycznych parametryzujacych wewnetrzne procedury grafu
 template< class VertInfo, class EdgeInfo, class Settings> class Graph;
 template< class VertInfo, class EdgeInfo, class Settings> class Vertex;
 template< class VertInfo, class EdgeInfo, class Settings> class Edge;
 
 
+//Wytyczne parametryzujace dzialanie algorytmow biblioteki. Z reguly klasy z procedurami maja postac
+//NazwaPar<DefaultStructs> oraz pochodna klase Nazwa dzialajaca z ustawieniem DefaultStructs=AlgorithmsDefaultSettings
 class AlgorithmsDefaultSettings {
     public:
 
+    // typ klasy tablicy asocjacyjnej przypisujacej np. wierz/kraw wartosci typu B
     template <class A, class B> class AssocCont {
         public:
         typedef AssocArray<A,B> Type;
+// TODO: nie usuwac komentarzy (przykladowe uzycia)
 //        typedef AssocTable < BiDiHashMap<A,B> > Type;
 //            typedef PseudoAssocArray<A,B,AssocTable<std::map<A,int> > > Type;
 
@@ -79,11 +86,12 @@ class AlgorithmsDefaultSettings {
         static bool isZero(T arg) {return arg==zero(); }
     };
 
-
+    // wybrany do uzytku wewnetrznego algorytm sortowania tablic
     template <class Iterator>
     static void sort ( Iterator first, Iterator last )
     { std::make_heap(first,last); std::sort_heap(first,last);}
 
+    // ... i to samo z dostarczonym porownywaczem
     template <class Iterator, class Comp>
     static void sort ( Iterator first, Iterator last, Comp comp )
     { std::make_heap(first,last,comp); std::sort_heap(first,last,comp);}
@@ -91,8 +99,8 @@ class AlgorithmsDefaultSettings {
 };
 
 
-//Przydatny funktor domyslny tam, gdzie metoda chce dostac funktor generujacy jakies info dla
-// wierzcholka lub krawedzi
+//Przydatny funktor domyslny tam, gdzie jakas metoda chce dostac np. funktor generujacy  info dla
+// wierzcholka lub krawedzi. Zwraca wartosc podana w argumencie konstruktora. Dziala dla liczb argumentow 0-6
 template <class T> class ConstFunctor {
     const T val;
     public:
@@ -106,43 +114,47 @@ template <class T> class ConstFunctor {
     template <class A, class B, class C,class D, class E, class F> T operator() (A,B,C,D,E,F) { return val; }
 };
 
+// funkcja tworzaca powyzszy funktor
 template <class T>
 ConstFunctor<T> constFun(const T& a=T()) { return ConstFunctor<T>(a); }
 
-//Jesli metoda chce iterator do zapisu ciagu, a nas sam ciag nie interesuje, tylko inne efekty uboczne procedury
+//Jesli metoda chce dostac argument wyjsciowy (np. iterator do zapisu ciagu, tablice asocjacyjna)
+// a nas te wartosci nie interesuja, tylko inne efekty uboczne procedury
+// Uniwersalna zaslepka w wielu procedurach biblioteki, pozwala uniknac zbednych przeciazen nazw z roznymi
+// zestawami parametrow
 struct BlackHole : public std::iterator<std::output_iterator_tag,void,void,void,void> {
     template <class T>
-    BlackHole& operator=(T) { return *this; }
-    BlackHole& operator* () { return *this; }
-    BlackHole& operator++() { return *this; }
-    BlackHole operator++ (int) { return *this; }
+    BlackHole& operator=(T)  { return *this; }
+    BlackHole& operator* ()  { return *this; }
+    BlackHole& operator++()  { return *this; }
+    BlackHole operator++ (int)  { return *this; }
     BlackHole() {}
 
-    // rowniez moze sluzyc jako zaslepka dla nie interesujacego nas kontenera asocjacyjnego wymaganego w procedurze
+    // BlackHole rowniez moze sluzyc jako zaslepka dla nie interesujacego nas kontenera asocjacyjnego wymaganego w procedurze
+    // te metody nigdy nie powinny byc wykonane, sa potrzebne jedynie by kod sie kompilowal
     template <class T>
         BlackHole& operator[](T) { assert(0); return *this; }
     template <class T, class R>
         BlackHole& operator()(T,R) { assert(0); return *this; }
+    // BlackHole "potrafi" przekonwertowac sie na dowolny typ - uwaga j.w.
     template <class T>
         operator T() { assert(0); return T(); }
 
 };
 
+// makra blackHole mozna uzyawc jak zmiennej globalnej typu BlackHole
 #define blackHole   (   (  *((Koala::BlackHole*)(&std::cout)) )  )
-//int _KoalaEmptyVertDegree=0;
-//void* _KoalaEmptyEdgePoiner=0;
 
-//extern BlackHole blackHole;
-//extern int _KoalaEmptyVertDegree;
-//extern void* _KoalaEmptyEdgePoiner;
-
-
+// sprawdzanie w szablonie, czy argument jest typu BlackHole
 template <class T> bool isBlackHole(const T&) { return false; }
 bool isBlackHole(const BlackHole&) { return true; }
 
+// Jesli szablon procedury dostal BlackHole zamiast argumentu (kontenera), a procedura potrzebuje do dzialania
+// tego kontenera - tworzy go sobie sama lokalnie. Ta klasa pozwala sprawdzic, czy taki przypadek zaszedl i przelaczyc
+// kontener na odpowiednio: dostarczony lub lokalny (nie bedacy BlackHolem).
 template <class Cont1, class Cont2> struct BlackHoleSwitch {
-    typedef Cont1 Type;
-    static Cont1& get(Cont1& a, Cont2& b) { return a; }
+    typedef Cont1 Type; // typ kontenera, na ktorym bedziemy dzialac
+    static Cont1& get(Cont1& a, Cont2& b) { return a; } // i referencja do niego
 };
 
 template <class Cont2> struct BlackHoleSwitch<BlackHole, Cont2 > {
@@ -151,31 +163,25 @@ template <class Cont2> struct BlackHoleSwitch<BlackHole, Cont2 > {
 };
 
 
-template <class T>
-struct DummyVar {
-
-    DummyVar<T> operator=(const T& arg) const
-    {
-        assert(arg==0);
-        return *this;
-    }
-
-    operator T() const { return 0; }
-};
+// Choosery sa strukturami funkcyjnymi zwracajacymi true/false (poprzez operator()(Element,const Graph&) ) dla wierzcholkow/krawedzi grafu. Sluza np.
+// w procedurach wybierania podgrafow, kopiowania podgrafow ... W kodzie powinno sie je tworzyc ich "funkcjami twozacymi"
 
 
-// te choosery mozna stosowac dla wierzcholkow i krawedzi
-struct BoolChooser {
+// Choosery uniwersalne tj. mozna stosowac dla wierzcholkow i krawedzi
+
+struct BoolChooser { // zwraca ustalona wartosc true lub false
     bool val;
-    typedef BoolChooser ChoosersSelfType;
+    typedef BoolChooser ChoosersSelfType; // kazdy chooser ma swoj wlasny typ zdefiniowany jako ChoosersSelfType
     BoolChooser(bool arg=false) : val(arg) {}
-    template<class Elem, class Graph> bool operator()(Elem*,const Graph&) const { return val;}
+    template<class Elem, class Graph> bool operator()(Elem*,const Graph&) const { return val;} // glowny operator choosera, testujacy prawdziwosc jego predykatu
 };
 
+// jego funkcja tworzaca
+// TODO: sprawdzic, czy rozne przeciazenia funkcji tworzacych nie wywoluja niejednoznacznosci w rozstrzyganiu przeciazen
 BoolChooser stdChoose(bool arg) { return BoolChooser(arg); }
 
 
-template<class Elem> struct ValChooser {
+template<class Elem> struct ValChooser { // sprawdza, czy testowany element to podana (ustalona) wartosc
     Elem val;
     typedef ValChooser<Elem> ChoosersSelfType;
     ValChooser(Elem arg) : val(arg) {}
@@ -187,7 +193,7 @@ template <class Elem>
 ValChooser<Elem> stdValChoose(Elem arg) { return ValChooser<Elem>(arg); }
 
 
-template<class Elem> struct SetChooser {
+template<class Elem> struct SetChooser { // sprawdza, czy testowany element jest w podanym zbiorze (Koala::Set)
     Koala::Set<Elem*> set;
     typedef SetChooser<Elem> ChoosersSelfType;
     SetChooser(const Koala::Set<Elem*>&  arg=Koala::Set<Elem*>()) : set(arg) {}
@@ -199,7 +205,7 @@ template <class Elem>
 SetChooser<Elem> stdChoose(const Koala::Set<Elem*>& arg) { return SetChooser<Elem>(arg); }
 
 
-template <class Iter> struct ContainerChooser {
+template <class Iter> struct ContainerChooser { // sprawdza, czy testowany element jest w przedziale miedzy podanymi iteratorami - uzywa STLowego find
     Iter begin, end;
     typedef ContainerChooser<Iter> ChoosersSelfType;
     ContainerChooser(Iter abegin=Iter(), Iter aend=Iter()) : begin(abegin), end(aend) {}
@@ -211,8 +217,9 @@ template <class Iter>
 ContainerChooser<Iter> stdChoose(Iter begin,Iter end)
     {return ContainerChooser<Iter>(begin,end); }
 
-// jesli ktos chce choosera na podstawie wlasnego obiektu lub zwyklej funkcji
-template <class Obj> struct ObjChooser {
+
+template <class Obj> struct ObjChooser { // sprawdza wartosc podanego obiektu funkcyjnego dla testowanego elementu
+    // TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
     mutable Obj funktor;
     typedef ObjChooser<Obj> ChoosersSelfType;
     ObjChooser(Obj arg=Obj()) : funktor(arg) {}
@@ -220,11 +227,11 @@ template <class Obj> struct ObjChooser {
 	{ return (bool)funktor(elem,graph); }
 };
 
-template <class Obj>
+template <class Obj> // liera F w nazwie - dla chooserow dzialajaych z funktorami
 ObjChooser<Obj> stdFChoose(Obj arg) { return ObjChooser<Obj>(arg); }
 
-// te choosery juz zagladaja do konkretnych pol rekordow info
-template <class Info, class T> struct FieldValChooser {
+// te choosery juz zagladaja do konkretnych pol rekordow info wierz/kraw
+template <class Info, class T> struct FieldValChooser { // test, czy pole w info ma podana wartosc
 	T Info::* wsk;
 	T val;
     typedef FieldValChooser<Info,T> ChoosersSelfType;
@@ -237,7 +244,7 @@ template <class Info, class T>
 FieldValChooser<Info,T> fieldChoose(T Info::* wsk,T arg)
     { return FieldValChooser<Info,T>(wsk,arg); }
 
-template <class Info, class T> struct FieldValChooserL {
+template <class Info, class T> struct FieldValChooserL { // test, czy pole w info jest mniejsze od podanej wartosci
 	T Info::* wsk;
 	T val;
     typedef FieldValChooserL<Info,T> ChoosersSelfType;
@@ -250,7 +257,7 @@ template <class Info, class T>
 FieldValChooserL<Info,T> fieldChooseL(T Info::* wsk,T arg)
     { return FieldValChooserL<Info,T>(wsk,arg); }
 
-template <class Info, class T> struct FieldValChooserG {
+template <class Info, class T> struct FieldValChooserG { // test, czy pole w info jest wieksze od podanej wartosci
 	T Info::* wsk;
 	T val;
     typedef FieldValChooserG<Info,T> ChoosersSelfType;
@@ -263,7 +270,7 @@ template <class Info, class T>
 FieldValChooserG<Info,T> fieldChooseG(T Info::* wsk,T arg)
     { return FieldValChooserG<Info,T>(wsk,arg); }
 
-template <class Info, class T> struct FielBoolChooser {
+template <class Info, class T> struct FielBoolChooser { // test, czy pole w info ma wartosc prawda (jego typ musi byc konwertowalny do bool)
 	T Info::* wsk;
     typedef FielBoolChooser<Info,T> ChoosersSelfType;
 	FielBoolChooser(T Info::* arg=0) : wsk(arg){}
@@ -275,6 +282,7 @@ template <class Info, class T>
 FielBoolChooser<Info,T> fieldChoose(T Info::* wsk) { return FielBoolChooser<Info,T>(wsk); }
 
 // wlasny obiekt lub funkcja, ktora ma sie wykonywac dla konkretnego pola z info
+// TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
 template <class Info, class T, class Obj> struct FieldObjChooser {
 	T Info::* wsk;
 	mutable Obj funktor;
@@ -289,7 +297,7 @@ FieldObjChooser<Info,T,Obj> fieldFChoose(T Info::*wsk, Obj obj)
     { return FieldObjChooser<Info,T,Obj>(wsk,obj); }
 
 
-template <class Info, class T, class Z> struct FieldSetChooser {
+template <class Info, class T, class Z> struct FieldSetChooser { // test, czy podane pole w info ma wartosc z danego zbioru (Koala::Set)
 	T Info::* wsk;
 	Koala::Set<Z> set;
     typedef FieldSetChooser<Info,T,Z> ChoosersSelfType;
@@ -303,7 +311,7 @@ FieldSetChooser<Info,T,Z> fieldChoose(T Info::*wsk,const Koala::Set<Z>& set)
     { return FieldSetChooser<Info,T,Z>(wsk,set); }
 
 
-template <class Info, class T, class Iter> struct FieldContainerChooser {
+template <class Info, class T, class Iter> struct FieldContainerChooser {  // sprawdza, czy testowany element jest w przedziale miedzy podanymi iteratorami - uzywa STLowego find
 	T Info::* wsk;
 	Iter begin, end;
     typedef FieldContainerChooser<Info,T,Iter> ChoosersSelfType;
@@ -318,7 +326,7 @@ FieldContainerChooser<Info,T,Iter> fieldChoose(T Info::*wsk, Iter b, Iter e)
 
 
 // choosery decydujace na podstawie wartosci przypisanej elementowi w podanej tablicy asocjacyjnej
-template<class Cont> struct AssocHasChooser {
+template<class Cont> struct AssocHasChooser { // test, czy element jest kluczem znajdujacym sie w tablicy
     Cont cont;
     typedef AssocHasChooser<Cont> ChoosersSelfType;
     AssocHasChooser(const Cont& arg=Cont()) : cont(arg) {}
@@ -331,7 +339,8 @@ AssocHasChooser<Cont> assocKeyChoose(const Cont& arg)
 { return AssocHasChooser<Cont>(arg); }
 
 
-template<class Cont> struct AssocBoolChooser {
+template<class Cont> struct AssocBoolChooser {  // test, czy element jest kluczem znajdujacym sie w tablicy,
+//    a przypisana w niej wartosc odpowiada true (typ wartosci musi byc konwertowalny do bool)
     Cont cont;
     typedef AssocBoolChooser<Cont> ChoosersSelfType;
     AssocBoolChooser(const Cont& arg=Cont()) : cont(arg) {}
@@ -343,7 +352,8 @@ template <class Cont>
 AssocBoolChooser<Cont> assocChoose(const Cont& arg) { return AssocBoolChooser<Cont>(arg); }
 
 
-template<class Cont> struct AssocValChooser {
+template<class Cont> struct AssocValChooser { // test, czy element jest kluczem znajdujacym sie w tablicy,
+//    a przypisana w niej wartosc jest rowna zadanej
     Cont cont;
     typename Cont::ValType val;
     typedef typename Cont::ValType SelfValType;
@@ -357,7 +367,8 @@ template <class Cont>
 AssocValChooser<Cont> assocChoose(const Cont& arg, typename Cont::ValType val)
     { return AssocValChooser<Cont>(arg,val); }
 
-template<class Cont> struct AssocValChooserL {
+template<class Cont> struct AssocValChooserL { // test, czy element jest kluczem znajdujacym sie w tablicy,
+//    a przypisana w niej wartosc jest mniejsza od zadanej
     Cont cont;
     typename Cont::ValType val;
     typedef typename Cont::ValType SelfValType;
@@ -371,7 +382,8 @@ template <class Cont>
 AssocValChooserL<Cont> assocChooseL(const Cont& arg, typename Cont::ValType val)
     { return AssocValChooserL<Cont>(arg,val); }
 
-template<class Cont> struct AssocValChooserG {
+template<class Cont> struct AssocValChooserG { // test, czy element jest kluczem znajdujacym sie w tablicy,
+//    a przypisana w niej wartosc jest wieksza od zadanej
     Cont cont;
     typename Cont::ValType val;
     typedef typename Cont::ValType SelfValType;
@@ -385,7 +397,8 @@ template <class Cont>
 AssocValChooserG<Cont> assocChooseG(const Cont& arg, typename Cont::ValType val)
     { return AssocValChooserG<Cont>(arg,val); }
 
-template<class Cont> struct AssocSetChooser {
+template<class Cont> struct AssocSetChooser { // test, czy element jest kluczem znajdujacym sie w tablicy,
+//    a przypisana w niej wartosc jest elementem podanego zbioru (Koala::Set)
     Cont cont;
     Koala::Set<typename Cont::ValType> set;
     typedef AssocSetChooser<Cont> ChoosersSelfType;
@@ -401,7 +414,8 @@ AssocSetChooser<Cont> assocChoose(const Cont& arg,const Koala::Set<typename Cont
     { return AssocSetChooser<Cont>(arg,set); }
 
 
-template <class Cont, class Iter> struct AssocContainerChooser {
+template <class Cont, class Iter> struct AssocContainerChooser { // test, czy element jest kluczem znajdujacym sie w tablicy,
+//    a przypisana w niej wartosc lezy w przedziale miedzy podanymi iteratorami - uzywa STLowego find
     Iter begin, end;
     Cont cont;
     typedef AssocContainerChooser<Cont,Iter> ChoosersSelfType;
@@ -416,7 +430,8 @@ AssocContainerChooser<Cont,Iter> assocChoose(const Cont& cont, Iter begin,Iter e
     {return AssocContainerChooser<Cont,Iter>(cont,begin,end); }
 
 
-template <class Cont, class Obj> struct AssocObjChooser {
+template <class Cont, class Obj> struct AssocObjChooser { // sprawdza wartosc podanemgo obiektu funkcyjnego przypisana w tablicy asocjacyjnej testowanemu elementowi
+    // TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
     mutable Obj funktor;
     Cont cont;
     typedef AssocObjChooser<Cont,Obj> ChoosersSelfType;
@@ -428,7 +443,9 @@ template <class Cont, class Obj> struct AssocObjChooser {
 template <class Cont, class Obj>
 AssocObjChooser<Cont,Obj> assocFChoose(const Cont& cont, Obj arg) { return AssocObjChooser<Cont,Obj>(cont,arg); }
 
-// ... i tablica asocjacyjna jest poza chooserem - przekazywana przez wskaznik
+// Wszystkie choosery operujace na tablicach asocjacyjnych maja wersje dzialajace z zewnetrzna tablica
+// podawana przez wskaznik. Unikamy kopiowania tablic, uzywajac trzeba uwazac, by tablica wciaz zyla
+// przez caly czas zycia choosera. Funkcje tworzace maja przedrostek ext i pobieraja adres tablicy
 
 template<class Cont> struct AssocHasChooser<Cont*> {
     const Cont *cont;
@@ -530,6 +547,7 @@ AssocContainerChooser<Cont*,Iter> extAssocChoose(const Cont* cont, Iter begin,It
 
 
 template <class Cont, class Obj> struct AssocObjChooser<Cont*,Obj> {
+    // TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
     mutable Obj funktor;
     const Cont* cont;
     typedef AssocObjChooser<Cont*,Obj> ChoosersSelfType;
@@ -542,7 +560,8 @@ template <class Cont, class Obj>
 AssocObjChooser<Cont*,Obj> extAssocFChoose(const Cont* cont, Obj arg) { return AssocObjChooser<Cont*,Obj>(cont,arg); }
 
 
-// choosery operacji logicznych na prostszych chooserach
+// Predykaty chooserow mozna laczyc operatorami logicznymi.
+// Choosery operacji logicznych na prostszych chooserach
 template <class Ch1, class Ch2> struct OrChooser {
 	Ch1 ch1;
 	Ch2 ch2;
@@ -555,6 +574,7 @@ template <class Ch1, class Ch2> struct OrChooser {
 template <class  Ch1, class Ch2>
 OrChooser<Ch1,Ch2> orChoose(Ch1 a, Ch2 b) { return OrChooser<Ch1,Ch2>(a,b); }
 
+// w kodzie funkcje tworzace zlozonych chooserow mozna zastapic odpowiednimi operatorami logicznymi
 template <class  Ch1, class Ch2>
 OrChooser<typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType>
     operator||(Ch1 a, Ch2 b) { return OrChooser<Ch1,Ch2>(a,b); }
@@ -610,8 +630,8 @@ NotChooser<typename Ch1::ChoosersSelfType>
     operator!(Ch1 a) { return NotChooser<Ch1>(a); }
 
 
-// choosery dla wierzcholkow
-struct VertDegValChooser {
+// choosery dow wybierania wierzcholkow
+struct VertDegValChooser { // testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma podana wartosc
     int deg;
     Koala::EdgeDirection type;
     typedef VertDegValChooser ChoosersSelfType;
@@ -624,7 +644,7 @@ struct VertDegValChooser {
 VertDegValChooser vertDegChoose(int adeg, Koala::EdgeDirection atype=Koala::EdAll)
 { return VertDegValChooser(adeg,atype); }
 
-struct VertDegValChooserL {
+struct VertDegValChooserL { // testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc mniejsza od zadanej
     int deg;
     Koala::EdgeDirection type;
     typedef VertDegValChooserL ChoosersSelfType;
@@ -637,7 +657,7 @@ struct VertDegValChooserL {
 VertDegValChooserL vertDegChooseL(int adeg, Koala::EdgeDirection atype=Koala::EdAll)
 { return VertDegValChooserL(adeg,atype); }
 
-struct VertDegValChooserG {
+struct VertDegValChooserG { // testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc wieksza od zadanej
     int deg;
     Koala::EdgeDirection type;
     typedef VertDegValChooserG ChoosersSelfType;
@@ -650,7 +670,7 @@ struct VertDegValChooserG {
 VertDegValChooserG vertDegChooseG(int adeg, Koala::EdgeDirection atype=Koala::EdAll)
 { return VertDegValChooserG(adeg,atype); }
 
-template <class Int> struct VertDegSetChooser {
+template <class Int> struct VertDegSetChooser { // testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc z podanego zbioru
     Koala::Set<Int> set;
     Koala::EdgeDirection type;
     typedef VertDegSetChooser<Int> ChoosersSelfType;
@@ -666,7 +686,8 @@ VertDegSetChooser<Int> vertDegChoose(const Koala::Set<Int>& aset, Koala::EdgeDir
 { return VertDegSetChooser<Int>(aset,atype); }
 
 
-template <class Iter> struct VertDegContainerChooser {
+template <class Iter> struct VertDegContainerChooser { // testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc
+    // z zakresu miedzy podanymi iteratorami - uzywa STLowego find
     Iter begin,end;
     Koala::EdgeDirection typ;
     typedef VertDegContainerChooser<Iter> ChoosersSelfType;
@@ -681,7 +702,8 @@ template <class Iter>
 VertDegContainerChooser<Iter> vertDegChoose(Iter begin, Iter end, Koala::EdgeDirection atype=Koala::EdAll)
 { return VertDegContainerChooser<Iter>(begin,end,atype); }
 
-// decyzja podejmowana na podstawie wartosci funkcji lub obiektu funktora policzonego na stopniu wierzcholka
+// decyzja podejmowana na podstawie wartosci obiektu funktora policzonego na stopniu wierzcholka
+// TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
 template <class Obj> struct VertDegFunctorChooser {
     mutable Obj funktor;
     Koala::EdgeDirection typ;
@@ -697,11 +719,12 @@ template <class Obj>
 VertDegFunctorChooser<Obj> vertDegFChoose(Obj afun, Koala::EdgeDirection atype=Koala::EdAll)
 { return VertDegFunctorChooser<Obj>(afun,atype); }
 
-// choosery dla krawedzi
-struct EdgeTypeChooser {
+// choosery do wybierania krawedzi
+struct EdgeTypeChooser { // testuje, czy typ krawedzi spelnia podana maske
     Koala::EdgeDirection mask;
     typedef EdgeTypeChooser ChoosersSelfType;
-    EdgeTypeChooser(Koala::EdgeDirection amask=Koala::EdAll) : mask(amask) {}
+    EdgeTypeChooser(Koala::EdgeDirection amask=Koala::EdAll) : mask(amask)
+    {  mask|=( mask& Directed) ? Directed : 0;    }
     template <class Graph>
     bool operator()(typename Graph::PEdge e, const Graph& g) const
     { return bool(g.getType(e) & mask); }
@@ -709,89 +732,96 @@ struct EdgeTypeChooser {
 
 EdgeTypeChooser edgeTypeChoose(Koala::EdgeDirection mask) { return EdgeTypeChooser(mask); }
 
-// choosery dla krawedzi sprawdzajace warunki dla jej koncow
-template <class Ch> struct EdgeFirstEndChooser {
+// choosery zlozone dla krawedzi, sprawdzajace warunkek definiowany dla wierzcholka sa prawda dla jej koncow
+
+template <class Ch> struct EdgeFirstEndChooser { // test pierwszego konca krawedzi
     Ch ch;
     typedef EdgeFirstEndChooser<Ch> ChoosersSelfType;
     EdgeFirstEndChooser(Ch funktor=Ch()) : ch(funktor) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, const Graph& g) const
-    { return ch(g.getEdgeEnds(e).first,g); }
+    { return ch(g.getEdgeEnd1(e),g); }
 };
 
 template <class Ch>
 EdgeFirstEndChooser<Ch> edgeFirstEndChoose(Ch ch) { return EdgeFirstEndChooser<Ch>(ch); }
 
 
-template <class Ch> struct EdgeSecondEndChooser {
+template <class Ch> struct EdgeSecondEndChooser { // test drugiego konca krawedzi
     Ch ch;
     typedef EdgeSecondEndChooser<Ch> ChoosersSelfType;
     EdgeSecondEndChooser(Ch funktor=Ch()) : ch(funktor) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, const Graph& g) const
-    { return ch(g.getEdgeEnds(e).second,g); }
+    { return ch(g.getEdgeEnd2(e),g); }
 };
 
 template <class Ch>
 EdgeSecondEndChooser<Ch> edgeSecondEndChoose(Ch ch) { return EdgeSecondEndChooser<Ch>(ch); }
 
-// ... i na podstawie tego, ile sposrod koncow spelnia warunek
-template <class Ch> struct Edge0EndChooser {
+
+template <class Ch> struct Edge0EndChooser { // test, czy zaden koniec nie spelnia warunku
     Ch ch;
     typedef Edge0EndChooser<Ch> ChoosersSelfType;
     Edge0EndChooser(Ch funktor=Ch()) : ch(funktor) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, const Graph& g) const
-    { return !ch(g.getEdgeEnds(e).first,g) && !ch(g.getEdgeEnds(e).second,g); }
+    { return !ch(g.getEdgeEnd1(e),g) && !ch(g.getEdgeEnd2(e),g); }
 };
 
 template <class Ch>
 Edge0EndChooser<Ch> edge0EndChoose(Ch ch) { return Edge0EndChooser<Ch>(ch); }
 
 
-template <class Ch> struct Edge1EndChooser {
+template <class Ch> struct Edge1EndChooser { // test, czy jeden koniec spelnia warunkek
     Ch ch;
     typedef Edge1EndChooser<Ch> ChoosersSelfType;
     Edge1EndChooser(Ch funktor=Ch()) : ch(funktor) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, const Graph& g) const
-    { return ch(g.getEdgeEnds(e).first,g) != ch(g.getEdgeEnds(e).second,g); }
+    { return ch(g.getEdgeEnd1(e),g) != ch(g.getEdgeEnd2(e),g); }
 };
 
 template <class Ch>
 Edge1EndChooser<Ch> edge1EndChoose(Ch ch) { return Edge1EndChooser<Ch>(ch); }
 
 
-template <class Ch> struct Edge2EndChooser {
+template <class Ch> struct Edge2EndChooser { // test, czy oba konice spelniaja warunkek
     Ch ch;
     typedef Edge2EndChooser<Ch> ChoosersSelfType;
     Edge2EndChooser(Ch funktor=Ch()) : ch(funktor) {}
     template <class Graph>
     bool operator()(typename Graph::PEdge e, const Graph& g) const
-    { return ch(g.getEdgeEnds(e).first,g) && ch(g.getEdgeEnds(e).second,g); }
+    { return ch(g.getEdgeEnd1(e),g) && ch(g.getEdgeEnd2(e),g); }
 };
 
 template <class Ch>
 Edge2EndChooser<Ch> edge2EndChoose(Ch ch) { return Edge2EndChooser<Ch>(ch); }
 
 
-// caster zwyklego rzutowania miedzy dwoma strukturami info
+//Castery to funktory ustalajace wartosci pol info w nowych wierz/kraw tworzonych podczas np. kopiowania grafow.
+//Wartosci te powstaja (w rozny sposob) na podstawie inf oryginalnych
+
+// caster zwyklego rzutowania miedzy dwoma strukturami
 struct StdCaster {
     template <class InfoDest, class InfoSour>
 	void operator()(InfoDest& dest,InfoSour sour) { dest=(InfoDest)sour; }
 };
 
+// i jego funkcja tworzaca
 StdCaster stdCast() {return StdCaster(); }
 
-// caster ustawiajacy wartosc domyslna i ignorujacy drugi parametr
+// caster ustawiajacy wartosc domyslna i ignorujacy oryginalny parametr
 struct NoCastCaster {
     template <class InfoDest, class InfoSour>
 	void operator()(InfoDest& dest,InfoSour sour) { dest=InfoDest(); }
 };
 
+// funkcja tworzaca - dopuszczalny jedynie argument false
 NoCastCaster stdCast(bool arg) { assert(!arg); return NoCastCaster(); }
 
-// wyliczenie wartosci nowego info poprzez wlasna funkcje lub funktor
+// wyliczenie wartosci nowego info poprzez podany funktor
+// TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
 template <class Fun> struct ObjCaster {
     mutable Fun funktor;
     ObjCaster(Fun afun=Fun()) : funktor(afun) {}
@@ -802,7 +832,11 @@ template <class Fun> struct ObjCaster {
 template <class Funktor>
 ObjCaster<Funktor> stdCast(Funktor f) { return ObjCaster<Funktor>(f); }
 
-// polowki pelnego linkera, dzialaja w jedna strone
+
+//Linkery dzialajace np. podczas kopiowania grafow, wiaza nowo tworzone wierzch/kraw. z ich oryginalami,
+//przez co mozna latwo sprawdzic, ktory element odpowiada ktoremu
+
+// polowki pelnego linkera, tworza powiazanie  w jedna strone
 
 // tylko false jest dopuszczalne - brak polaczenia
 struct Std1NoLinker {
@@ -810,14 +844,16 @@ struct Std1NoLinker {
     template <class Dest,class Sour>
         void operator()(Dest*,Sour*) {}
 };
-// ustawia wskaznik na dolaczany obiekt w srodku struktury info obiektu docelowego
+
+// ustawia wskaznik na dolaczany obiekt w srodku struktury info obiektu docelowego (o ile nie byl on NULLem)
 template <class Info, class T> struct Std1FieldLinker {
     T Info::* pt;
 	Std1FieldLinker(T Info::* awsk=0) : pt(awsk) {}
 	template <class Dest, class Sour>
         void operator()(Dest* wsk, Sour* w) {  if (pt && wsk) wsk->info.*pt=(T) w; }
 };
-// dopisuje powiazania do zewnetrznej! tablicy asocjacyjnej podanej w funkcji tworzacej stdLink
+
+// dopisuje powiazania do zewnetrznej! tablicy asocjacyjnej podanej w funkcji tworzacej stdLink (o ile argument nie byl NULLem)
 template <class Map> struct Std1AssocLinker{
     Map& map;
     Std1AssocLinker(Map& amap) : map(amap) {}
@@ -825,7 +861,7 @@ template <class Map> struct Std1AssocLinker{
         void operator()(Dest* wsk, Sour* w) {   if (wsk) map[wsk]=w; }
 };
 
-// pelny linker, zawiera obiekty laczace nowy element ze starym i odwrotnie
+// pelny linker, zawiera obiekty laczace (polowki linkera - j.w.) nowy element ze starym i odwrotnie
 template <class Link1, class Link2> struct Std2Linker {
         mutable Link1 dest2sour;
         mutable Link2 sour2dest;
@@ -834,7 +870,7 @@ template <class Link1, class Link2> struct Std2Linker {
             void operator()(Dest* wsk, Sour* w) { dest2sour(wsk,w); sour2dest(w,wsk); }
 };
 
-// i jego funkcje tworzace
+// funkcje tworzace polowki linkera - raczej do uzytku wewnetrznego
 
 Std1NoLinker stdLink(bool a1) { return Std1NoLinker(a1); }
 
@@ -845,6 +881,9 @@ Std1FieldLinker<Info1,T1> stdLink(T1 Info1:: *awsk1)
 template <class Map1>
 Std1AssocLinker<Map1> stdLink(Map1& tab1)
 { return Std1AssocLinker<Map1>(tab1); }
+
+// funkcje tworzace pelny linker, argumenty podaja wymagany sposob polaczenia elementow nowych z oryginalami (pierwszy argument) i odwrotnie (drugi)
+// argument bool moze byc tylko false (brak polaczenia)
 
 Std2Linker<Std1NoLinker,Std1NoLinker> stdLink(bool a1, bool a2)
 { return Std2Linker<Std1NoLinker,Std1NoLinker>(Std1NoLinker(a1),Std1NoLinker(a2)); }

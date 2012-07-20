@@ -33,7 +33,7 @@ K AssocTabConstInterface<std::map< K,V > >::prevKey( K arg ) const
 {
     if (!arg) return lastKey();
     typename std::map< K,V >::const_iterator pos = cont.find( arg );
-    assert( pos != cont.end() );
+    assert( pos != cont.end() ); // TODO: throw
     if (pos == cont.begin()) return (K)0;
     pos--;
     return pos->first;
@@ -44,7 +44,7 @@ K AssocTabConstInterface<std::map< K,V > >::nextKey( K arg ) const
 {
     if (!arg) return firstKey();
     typename std::map< K,V >::const_iterator pos = cont.find( arg );
-    assert( pos != cont.end() );
+    assert( pos != cont.end() ); // TODO: throw
     pos++;
     if (pos == cont.end()) return (K)0;
     return pos->first;
@@ -185,7 +185,7 @@ Klucz AssocArray< Klucz,Elem,Container >::nextKey( Klucz v )  const
 {
     if (!v) return firstKey();
     int x;
-    assert((x = keyPos( v )) != -1);
+    assert((x = keyPos( v )) != -1); // TODO: throw
     if ((x = tab.nextPos( x )) == -1) return 0;
     return tab[x].key;
 }
@@ -195,7 +195,7 @@ Klucz AssocArray< Klucz,Elem,Container >::prevKey( Klucz v )  const
 {
     if (!v) return lastKey();
     int x;
-    assert((x = keyPos( v )) != -1);
+    assert((x = keyPos( v )) != -1); // TODO: throw
     if ((x = tab.prevPos( x )) == -1) return 0;
     return tab[x].key;
 }
@@ -203,7 +203,7 @@ Klucz AssocArray< Klucz,Elem,Container >::prevKey( Klucz v )  const
 template< class Klucz, class Elem, class Container >
 Elem &AssocArray< Klucz,Elem,Container >::operator[]( Klucz v )
 {
-    assert( v );
+    assert( v ); // TODO: throw
     int x = keyPos( v );
     if (x == -1)
     {
@@ -219,7 +219,7 @@ Elem &AssocArray< Klucz,Elem,Container >::operator[]( Klucz v )
 template< class Klucz, class Elem, class Container >
 Elem AssocArray< Klucz,Elem,Container >::operator[]( Klucz v ) const
 {
-    assert( v );
+    assert( v ); // TODO: throw
     int x = keyPos( v );
     if (x == -1) return Elem();
     return tab[x].val;
@@ -288,7 +288,7 @@ Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::nextKey( Klucz v )  co
 {
     if (!v) return firstKey();
     int x;
-    assert((x = keyPos( v )) != -1);
+    assert((x = keyPos( v )) != -1); // TODO: throw
     if ((x = tab.nextPos( x )) == -1) return 0;
     return tab[x].key;
 }
@@ -298,7 +298,7 @@ Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::prevKey( Klucz v )  co
 {
     if (!v) return lastKey();
     int x;
-    assert((x = keyPos( v )) != -1);
+    assert((x = keyPos( v )) != -1); // TODO: throw
     if ((x = tab.prevPos( x )) == -1) return 0;
     return tab[x].key;
 }
@@ -306,7 +306,7 @@ Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::prevKey( Klucz v )  co
 template< class Klucz, class Elem, class AssocCont,class Container >
 Elem &PseudoAssocArray< Klucz,Elem,AssocCont,Container >::operator[]( Klucz v )
 {
-    assert( v );
+    assert( v ); // TODO: throw
     int x = keyPos( v );
     if (x == -1)
     {
@@ -319,7 +319,7 @@ Elem &PseudoAssocArray< Klucz,Elem,AssocCont,Container >::operator[]( Klucz v )
 template< class Klucz, class Elem, class AssocCont,class Container >
 Elem PseudoAssocArray< Klucz,Elem,AssocCont,Container >::operator[]( Klucz v ) const
 {
-    assert( v );
+    assert( v ); // TODO: throw
     int x = keyPos( v );
     if (x == -1) return Elem();
     return tab[x].val;
@@ -367,7 +367,7 @@ inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrFull >::key( Klucz u, Kluc
 template< class Klucz >
 inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrFull >::key( std::pair< Klucz,Klucz> k ) const
 {
-    return key( k.first,k.second );
+    return k;
 }
 
 inline int AssocMatrixAddr< AMatrNoDiag >::wsp2pos( std::pair< int,int > w ) const
@@ -392,7 +392,7 @@ inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrNoDiag >::key( Klucz u, Kl
 template< class Klucz >
 inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrNoDiag >::key( std::pair< Klucz,Klucz > k ) const
 {
-    return key( k.first,k.second );
+    return k;
 }
 
 inline int AssocMatrixAddr< AMatrClTriangle >::wsp2pos( std::pair< int,int > w ) const
@@ -416,14 +416,14 @@ inline std::pair< int,int > AssocMatrixAddr< AMatrClTriangle >::pos2wsp( int pos
 template< class Klucz >
 inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrClTriangle >::key( Klucz u, Klucz v ) const
 {
-    return std::pair< Klucz,Klucz >( std::min( u,v ),std::max( u,v ) );
+    return (pairMinMax( u,v ) );
 }
 
 template< class Klucz >
 inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrClTriangle >::key(
     std::pair< Klucz,Klucz > k ) const
 {
-    return key( k.first,k.second );
+    return pairMinMax( k.first,k.second );
 }
 
 inline int AssocMatrixAddr< AMatrTriangle >::wsp2pos( std::pair< int,int > w ) const
@@ -447,14 +447,14 @@ inline std::pair< int,int > AssocMatrixAddr< AMatrTriangle >::pos2wsp( int pos )
 template< class Klucz >
 inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrTriangle >::key( Klucz u, Klucz v ) const
 {
-    return std::pair< Klucz,Klucz >( std::min( u,v ),std::max( u,v ) );
+    return (pairMinMax( u,v ) );
 }
 
 template< class Klucz >
 inline std::pair< Klucz,Klucz > AssocMatrixAddr< AMatrTriangle >::key(
     std::pair< Klucz,Klucz > k ) const
 {
-    return key( k.first,k.second );
+    return pairMinMax( k.first,k.second );
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
@@ -655,7 +655,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 Elem &AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::operator()(
     Klucz u, Klucz v )
 {
-    assert( u && v && AssocMatrixAddr< aType >::correctPos( u,v ) );
+    assert( u && v && AssocMatrixAddr< aType >::correctPos( u,v ) ); // TODO: throw
     std::pair< int,int > wsp =
         std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
     if (wsp.first == -1)
@@ -687,7 +687,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 Elem AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::operator()(
     Klucz u, Klucz v ) const
 {
-    assert( u && v && AssocMatrixAddr< aType >::correctPos( u,v ) );
+    assert( u && v && AssocMatrixAddr< aType >::correctPos( u,v ) ); // TODO: throw
     std::pair< int,int > wsp =
         std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
     if (wsp.first == -1 || wsp.second == -1) return Elem();
@@ -700,8 +700,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 Elem* AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::valPtr(
     Klucz u, Klucz v )
 {
-    if (!u || !v) return NULL;
-    if (!AssocMatrixAddr< aType >::correctPos( u,v )) return NULL;
+    assert( u && v && AssocMatrixAddr< aType >::correctPos( u,v ) ); // TODO: throw
     std::pair< int,int > wsp =
         std::pair<int,int>( index.klucz2pos( u ),index.klucz2pos( v ) );
     if (wsp.first == -1 || wsp.second == -1) return NULL;
@@ -737,12 +736,12 @@ std::pair< Klucz,Klucz >
 AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::nextKey( Klucz u, Klucz v ) const
 {
     if (!u || !v) return firstKey();
-    assert( AssocMatrixAddr< aType >::correctPos( u,v ));
+    assert( AssocMatrixAddr< aType >::correctPos( u,v )); // TODO: throw
     std::pair< int,int > wsp =
         std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
-    assert( wsp.first != -1 && wsp.second != -1 );
+    assert( wsp.first != -1 && wsp.second != -1 );  // TODO: throw
     int x = AssocMatrixAddr< aType >::wsp2pos( wsp );
-    assert( bufor[x].present() );
+    assert( bufor[x].present() ); // TODO: throw
     x = bufor[x].next;
     if (x == -1) return std::pair< Klucz,Klucz >( (Klucz)0,(Klucz)0 );
     wsp = AssocMatrixAddr< aType >::pos2wsp( x );
@@ -764,12 +763,12 @@ std::pair< Klucz,Klucz >
 AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::prevKey( Klucz u, Klucz v )  const
 {
     if (!u || !v) return lastKey();
-    assert( AssocMatrixAddr< aType >::correctPos( u,v ));
+    assert( AssocMatrixAddr< aType >::correctPos( u,v )); // TODO: throw
     std::pair< int,int > wsp =
         std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
-    assert( wsp.first != -1 && wsp.second != -1);
+    assert( wsp.first != -1 && wsp.second != -1); // TODO: throw
     int x = AssocMatrixAddr< aType >::wsp2pos( wsp );
-    assert( bufor[x].present() );
+    assert( bufor[x].present() );   // TODO: throw
     x = bufor[x].prev;
     if (x == -1) return std::pair< Klucz,Klucz >( (Klucz)0,(Klucz)0 );
     wsp = AssocMatrixAddr< aType >::pos2wsp( x );

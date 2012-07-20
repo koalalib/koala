@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include "Koala/graph/graph.h"
-#include "Koala/graph/subgraph.h"
+#include "Koala/graph/view.h"
 
 
 //przyklad uzycia, w tej wersji zawartosc obu struktur jest dla Dijkstry nieistotna

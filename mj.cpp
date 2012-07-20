@@ -4,7 +4,7 @@
 
 
 #include"Koala/graph/graph.h"
-#include"Koala/graph/subgraph.h"
+#include"Koala/graph/view.h"
 #include "Koala/algorithm/search.h"
 
 using namespace std;

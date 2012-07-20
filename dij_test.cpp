@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include "Koala/graph/graph.h"
-#include "Koala/graph/subgraph.h"
+#include "Koala/graph/view.h"
 #include "Koala/algorithm/weights.h"
 
 
@@ -60,6 +60,7 @@ int main() {
 
     g.makeAdjMatrix();
     dijTest();
+
 
     std::cout<< "Odleglosc: "<< Koala::Dijkstra::distances(g,vertCont,edgeCont,U,V)<<":";
 //       - mozna i bez ostatniego arg. - liczymy z U do wszystkich

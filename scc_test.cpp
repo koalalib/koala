@@ -31,7 +31,7 @@ struct OpisE {
 };
 
 Koala::Graph<OpisV,OpisE> g;
-Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,G,H,I,V,U,W,tabV[10];
+Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,G,H,I,V,U,W,tabV[10],tabV2[10];
 Koala::Graph<OpisV,OpisE>::PEdge tabE[10], EE;
 int comptab[2][10];
 
@@ -96,7 +96,8 @@ int main() {
     int cc=Koala::SCC::connections(g,vertCont,conns);
     cout << cc << '\n';
     for(int i=0;i<cc;i++) cout << '(' << conns[i].first << ',' << conns[i].second << ") ";
-
+    cout << "\n-------------\n" << Koala::SCC::get(g,Koala::SearchStructs::compStore(comptab[1],tabV2),blackHole) << endl;
+    for(int i=0;i<=compno;i++) cout << comptab[1][i] << ' '; cout << endl;
 //    int res;
 //    searchTest();
 //    Koala::DAGAlgs::topOrd(g,tabV);

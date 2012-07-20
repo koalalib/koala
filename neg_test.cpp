@@ -2,7 +2,7 @@
 #include <string>
 #include "Koala/base/def_struct.h"
 #include "Koala/graph/graph.h"
-#include "Koala/graph/subgraph.h"
+#include "Koala/graph/view.h"
 #include "Koala/io/text.h"
 
 

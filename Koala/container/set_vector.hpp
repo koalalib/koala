@@ -283,19 +283,19 @@ template< typename Element >
 
 template< typename Element > inline
     Element Set< Element >::first() const
-    {   if (size()==0) return (Element)0;
+    {   if (size()==0) return this->badValue(); //(Element)0;
         return *begin();
     }
 
 template< typename Element > inline
    Element Set< Element >::last() const
-   {   if (size()==0) return (Element)0;
+   {   if (size()==0) return this->badValue(); //(Element)0;
        return *std::vector< Element >::rbegin();
    }
 
 template< typename Element > inline
     Element Set< Element >::prev( const Element &e ) const
-    {   if (!e) return last();
+    {   if (this->isBad(e)) return last();
         unsigned l = 0, r = size() - 1;
         while (l <= r && r < size()) {
             unsigned c = (l + r) >> 1;
@@ -308,7 +308,7 @@ template< typename Element > inline
 
 template< typename Element > inline
     Element Set< Element >::next( const Element &e ) const
-    {   if (!e) return first();
+    {   if (this->isBad(e)) return first();
         unsigned l = 0, r = size() - 1;
         while (l <= r && r < size()) {
             unsigned c = (l + r) >> 1;
@@ -319,15 +319,3 @@ template< typename Element > inline
         return this->at( l + 1 );
     }
 
-//template< class Element >
-//SetInserter< Set< Element > >:: &operator=( const Element &value )
-//{
-//    (*container) += value;
-//    return *this;
-//}
-
-template< class Element >
-SetInserter< Set< Element > > setInserter( Set< Element > &x )
-{
-    return SetInserter< Set< Element > >( x );
-}

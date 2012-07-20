@@ -124,8 +124,6 @@ int main() {
     int comptab[2][100];
 
     std::cout<<std::endl;
-    std::cout <<Koala::Blocks::split(g,blackHole,blackHole,Koala::SearchStructs::compStore(blackHole,blackHole),
-                                   blackHole)<<std::endl;
 
     int compno = Koala::Blocks::splitComp(g,C,vertCont,edgeCont,Koala::SearchStructs::compStore(comptab[0],tabV),
                                    comptab[1]);

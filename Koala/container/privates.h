@@ -36,7 +36,8 @@ template <class T> class BlockListVectInerfTest<VectorInterface<T> >
 };
 
 
-
+// Struktura alokatora wolnych blokow (lista) typu Element zorganizowanych w kontenerze w rodzaju tablicy
+// Pomocna w AssocArray i alokatorach
 template< class Element, class Container = std::vector< BlockOfBlockList< Element > > >
 class BlockList : protected BlockListVectInerfTest<Container>
 {
@@ -54,6 +55,8 @@ class BlockList : protected BlockListVectInerfTest<Container>
             const BlockList< Element,Container > & );
 
         // tylko dla Container==VectorInterface<BlockOfBlockList< Element > *>
+        // BlockList moze tez dzialac na dostarczonej z zewnatrz tablicy ustalonego rozmiaru, na ktorej operuje wowczas
+        // poprzez VectorInterface, wylapujac bledy ew. przepelnienia
         BlockList(BlockOfBlockList< Element >* wsk, int asize)
         :   cont(wsk,asize) ,siz( 0 ),first( -1 ),last( -1 ),ffree( -1 ),
             Privates::BlockListVectInerfTest<Container>(true)
@@ -78,7 +81,7 @@ class BlockList : protected BlockListVectInerfTest<Container>
 };
 
 
-
+    // Domyslny alokator pamieci uzywajacy new
     class DefaultCPPAllocator {
     public:
         template<class T> T *allocate()			{ return new T(); };
@@ -89,25 +92,17 @@ class BlockList : protected BlockListVectInerfTest<Container>
 
 
 
-
-    template <class T> struct ListNode;
-    template <class T>	struct BaseListNode {
-            ListNode<T> *next;
-            ListNode<T> *prev;
-            };
-    template <class T>	struct ListNode: public BaseListNode<T> {
-            T elem;
-            };
-
+    // ten alokator potrafi dostarczac jedynie zmiennych typu Element, operuje
+    // na tworzonej na poczatku tablicy o podnym rozmiarze
+    // Poprzez BlockList kontroluje przepelnienia
     template <class Element>
     class BlockListAllocator
     {
 
         private:
-//            typedef ListNode<T> Element;
+
             BlockOfBlockList< Element >* wsk;
             BlockList<Element,VectorInterface<BlockOfBlockList< Element > *> > *manager;
-    //        mutable int licz;
 
             BlockListAllocator(const BlockListAllocator& ){}
             const BlockListAllocator& operator=(const BlockListAllocator&) {}
@@ -127,7 +122,7 @@ class BlockList : protected BlockListVectInerfTest<Container>
 
 
         public:
-            BlockListAllocator(int n)  // : licz(0)
+            BlockListAllocator(int n)
             {   wsk=new BlockOfBlockList< Element >[n];
                 manager=new BlockList<Element,VectorInterface<BlockOfBlockList< Element > *> >(wsk,n);
             }
@@ -145,6 +140,15 @@ class BlockList : protected BlockListVectInerfTest<Container>
     };
 
 
+
+    template <class T> struct ListNode;
+    template <class T>	struct BaseListNode {
+            ListNode<T> *next;
+            ListNode<T> *prev;
+            };
+    template <class T>	struct ListNode: public BaseListNode<T> {
+            T elem;
+            };
 
     /*
      * List_iterator

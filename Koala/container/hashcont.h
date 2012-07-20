@@ -1,5 +1,5 @@
-#ifndef __HASHCONTAINERS__H__
-#define __HASHCONTAINERS__H__
+#ifndef KOALA__HASHCONTAINERS__H__
+#define KOALA__HASHCONTAINERS__H__
 
 #include<stddef.h>
 #include<new>
@@ -957,7 +957,7 @@ template< class K, class V >
 K AssocTabConstInterface< BiDiHashMap< K,V > >::prevKey( K arg ) const
 {   if (!arg) return lastKey();
     typename BiDiHashMap< K,V >::const_iterator pos = cont.find( arg );
-    assert( pos != cont.end() );
+    assert( pos != cont.end() ); // TODO: throw
     if (pos == cont.begin()) return (K)0;
     pos--;
     return pos->first;
@@ -967,7 +967,7 @@ template< class K, class V >
 K AssocTabConstInterface< BiDiHashMap< K,V > >::nextKey( K arg ) const
 {   if (!arg) return firstKey();
     typename BiDiHashMap< K,V >::const_iterator pos = cont.find( arg );
-    assert( pos != cont.end() );
+    assert( pos != cont.end() );// TODO: throw
     pos++;
     if (pos == cont.end()) return (K)0;
     return pos->first;
@@ -1052,7 +1052,7 @@ template< class K, class V >
 K AssocTabConstInterface< HashMap< K,V > >::prevKey( K arg ) const
 {   if (!arg) return lastKey();
     typename HashMap< K,V >::const_iterator pos = cont.find( arg );
-    assert( pos != cont.end() );
+    assert( pos != cont.end() );// TODO: throw
     if (pos == cont.begin()) return (K)0;
     pos--;
     return pos->first;
@@ -1062,7 +1062,7 @@ template< class K, class V >
 K AssocTabConstInterface< HashMap< K,V > >::nextKey( K arg ) const
 {   if (!arg) return firstKey();
     typename HashMap< K,V >::const_iterator pos = cont.find( arg );
-    assert( pos != cont.end() );
+    assert( pos != cont.end() );// TODO: throw
     pos++;
     if (pos == cont.end()) return (K)0;
     return pos->first;

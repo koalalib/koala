@@ -187,4 +187,10 @@ int main()
 
 //    cout << "\n" << (constFun(3.14))('a',"ala",45);
 
+    cout << endl << endl;
+    Set<int> iset,iset2;
+    iset+=2;iset+=0;iset+=3;
+    iset2+=2;iset2+=0;iset2+=7;
+    cout << (iset*iset2);
+
 }

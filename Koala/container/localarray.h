@@ -34,8 +34,9 @@
 #ifndef KOALA_LOCALTABLE_H
 #define KOALA_LOCALTABLE_H
 
+#ifndef KOALA_STACK_THRESHOLD
 #define KOALA_STACK_THRESHOLD		8192
-
+#endif
 
 #include<new>
 #include<stdio.h>
@@ -93,7 +94,7 @@ public:
 	static void HeapKiller(void *ptr, size_t ) {
 		delete[] (T *)ptr;
 		};
-	
+
 	size_t GetSize()	{ return m_size; };
 
 private:

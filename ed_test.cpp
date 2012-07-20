@@ -2,7 +2,7 @@
 #include <string>
 #include "Koala/base/def_struct.h"
 #include "Koala/graph/graph.h"
-#include "Koala/graph/subgraph.h"
+#include "Koala/graph/view.h"
 #include "Koala/algorithm/search.h"
 #include "Koala/io/text.h"
 
@@ -118,6 +118,11 @@ int main() {
     std::cout << "\n\n!!!\n\n";
     IO::writeGraphText(makeSubgraph(makeRevView(g1),std::make_pair(assocKeyChoose(vset2),stdChoose(true))),cout,IO::RG_EdgeList);//.getEdgeNo(Directed);
     g1.clearEdges();
+    UndirView<Graph<char,string> > undg;
+//    IO::writeGraphText(undg,cout,IO::RG_EdgeList);
+    undg.plug(g1);
+    IO::writeGraphText(undg,cout,IO::RG_EdgeList);
+
     cout << g1.addArch(B,A);g1.addArch(D,C);g1.addEdge(C,B);g1.addLoop(B);
     cout << endl << BFS::getPath(makeRevView(g1),A,D,BFS::outPath(blackHole,blackHole));
     cout << endl << makeRevView(g1).getEdge(A,EdDirOut);

@@ -1,5 +1,5 @@
-#ifndef DEF_SCHEDULING_H
-#define DEF_SCHEDULING_H
+#ifndef KOALA_DEF_SCHEDULING_H
+#define KOALA_DEF_SCHEDULING_H
 
 #include <algorithm>
 #include <cstdlib>

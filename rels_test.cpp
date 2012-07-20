@@ -4,7 +4,7 @@
 #include <vector>
 #include "Koala/base/def_struct.h"
 #include "Koala/graph/graph.h"
-#include "Koala/graph/subgraph.h"
+#include "Koala/graph/view.h"
 #include "Koala/classes/create.h"
 #include "Koala/io/text.h"
 
@@ -63,6 +63,8 @@ int main()
 
     IO::writeGraphText(g1,cout,IO::RG_EdgeList);
     cout<<endl<<endl;
+
+
 
     RelDiagram::transClousure(g1,"N");
 

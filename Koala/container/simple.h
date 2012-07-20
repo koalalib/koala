@@ -1,5 +1,5 @@
-#ifndef SIMPLE_STRUCTS_H
-#define SIMPLE_STRUCTS_H
+#ifndef KOALA_SIMPLE_STRUCTS_H
+#define KOALA_SIMPLE_STRUCTS_H
 
 #include <limits>
 #include <cassert>
@@ -9,8 +9,41 @@
 #include <functional>
 
 
+//Proste interfejsy udajace kontenery stosu, vectora, kolejki FIFO i kolejki priorytetowej z elementami typu T
+// Interfejs wzorowany na STLu
+//Dzialaja dostarczonej w konstruktorze na zewnetrznej tablicy gotowych elementow typu T o podanym rozmiarze
+//(np. tablica statyczna, dynamiczna new lub LOCALARRAY). Ew. przekraczanie zakresow testowane assertami.
+// Interfejsy sa obiektami niekopiowalnymi.
+//Przydatne wewnatrz procedur
+
+
 namespace Koala {
 
+
+// tworzy pare z min. i max. podanych elementow
+template <class T>
+std::pair<T,T> pairMinMax(T a, T b)
+{
+    std::pair<T,T> res;
+    if (a<=b) { res.first=a; res.second=b; }
+    else { res.first=b; res.second=a; }
+    return res;
+}
+
+template <class T>
+std::pair<T,T> pairMinMax(std::pair<T,T> arg)
+{
+    return pairMinMax(arg.first,arg.second);
+}
+
+//TODO: przewidywano interfejsy innych typow, niz tylko dzialajace na buforze tablicowym, stad deklaracja ogolna
+//i specjalizacja klas dla T*. Jednak raczej pozostaniemy przy tablicach. Nalezy zamienic te szablony np. na
+//template <class T> class StackInterface<T> (bez specjalizacji). Wymaga modyfikacji deklaracji we wszystkich modulach
+//biblioteki korzystajacych z tych interfejsow!
+
+//TODO: uczynic obiektami niekopiowalnymi (prywatne puste konstruktor kopiujacy i operator =)
+
+// TODO: assert -> throw. 2 typy wyjatkow: przekroczenie zakresu danych kontenera i przekroczenie maks. pojemnosci
 
 template <class Container> class StackInterface;
 
@@ -18,12 +51,16 @@ template <class T> class StackInterface<T*> {
     T* buf;
     int siz,maxsize;
 
+    StackInterface(const StackInterface<T*>&) {}
+    StackInterface<T*>& operator=(const StackInterface<T*>&) {return *this;}
+
     public:
         typedef T ElemType;
 
         StackInterface(T* bufor, int max) : buf(bufor), maxsize(max), siz(0) {}
         int size() { return siz; }
         bool empty() { return siz==0; }
+        bool operator!() const { return empty(); }
         void push(const T& val) { assert(siz<maxsize); buf[siz++]=val; }
         void pop() { assert(siz); siz--; }
         T& top() { assert(siz); return buf[siz-1]; }
@@ -37,16 +74,20 @@ template <class T> class QueueInterface<T*> {
     T* buf;
     int beg,end,maxsize;
 
+    QueueInterface(const QueueInterface<T*>&) {}
+    QueueInterface<T*>& operator=(const QueueInterface<T*>&) {return *this;}
+
     int prev(int x) { return (x) ? x-1 : maxsize; }
     int next(int x) { return (x==maxsize) ? 0 : x+1; }
     public:
         typedef T ElemType;
 
-        // wymaga elementu nadmiarowego!
+        // Uwaga: wymaga elementu nadmiarowego tj. bufora o jeden dluzszego, niz maksymalny rozmiar
         QueueInterface(T* bufor, int max) : buf(bufor), maxsize(max), beg(0), end(0) {}
 
         int size() { return (beg<=end) ? end-beg : maxsize+1-(beg-end); }
         bool empty() { return beg==end; }
+        bool operator!() const { return empty(); }
         void push(const T& val) { buf[end]=val; end=next(end); assert(end!=beg); }
         void pop() { assert(beg!=end); beg=next(beg); }
         T& front() { assert(!empty()); return buf[beg]; }
@@ -62,11 +103,13 @@ template <class T> class VectorInterface<T*> {
     T *start,*limit;
     int siz;
 
+    VectorInterface(const VectorInterface<T*>&) {}
+    VectorInterface<T*>& operator=(const VectorInterface<T*>&) {return *this;}
+
     public:
     typedef T value_type;
 
     VectorInterface(T* bufor, int max) : start(bufor), limit(bufor+max), siz(0) {}
-//    void link(T* newbuf, int newmax) { start=newbuf; limit=start+newmax; siz=0; }
 
     T* begin() { return start ; }
     T* end()   { return start+siz ; }
@@ -74,6 +117,7 @@ template <class T> class VectorInterface<T*> {
     int max_size() { return limit-start; }
     int capacity() { return limit-start ; }
     bool empty() { return siz==0 ; }
+    bool operator!() const { return empty(); }
     void reserve(int arg) { assert(arg<=max_size()); }
     void resize(int arg) {   assert(arg<=max_size()); while(siz<arg) push_back(T()); }
 
@@ -115,10 +159,14 @@ template <class T> class VectorInterface<T*> {
 
 template <class Container, class Comp> class PriQueueInterface;
 
+// TODO: po usunieciu specjalizacji dac wartosc domyslna Comp=std::less<T>
 template <class T, class Comp> class PriQueueInterface<T*,Comp> {
     T* buf;
     int siz,maxsize;
     Comp comp;
+
+    PriQueueInterface(const PriQueueInterface<T*,Comp>&) {}
+    const PriQueueInterface<T*,Comp>& operator=(const PriQueueInterface<T*,Comp>&) {return *this; }
 
     public:
         typedef T ElemType;
@@ -129,6 +177,7 @@ template <class T, class Comp> class PriQueueInterface<T*,Comp> {
         { assert(siz>=0 && siz<=maxsize); std::make_heap(buf,end,comp); }
         int size() { return siz; }
         bool empty() { return siz==0; }
+        bool operator!() const { return empty(); }
         void push(const T& val) { assert(siz<maxsize); buf[siz++]=val; std::push_heap(buf,buf+siz,comp); }
         void pop() { assert(siz); std::pop_heap(buf,buf+siz,comp); siz--; }
         T top() { assert(siz); return buf[0]; }

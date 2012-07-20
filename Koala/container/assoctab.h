@@ -10,10 +10,16 @@
 #include "localarray.h"
 #include "privates.h"
 
+//tablice asocjacyjne w Koali uzywaja jako kluczy typow wskaznikowych, klucz NULL ma specjalne znaczenie i jest zabroniony
+
 namespace Koala
 {
 
+//Klasa wrapper dostarczajaca wspolnego interfejsu koalowej tablicy asocjacyjnej dla zewnetrznego stalego kontenera.
+//Wprowadzajac do biblioteki nowy typ takiego kontenera nalezy dlan zdefiniowac AssocTabConstInterface
 template< class Container > class AssocTabConstInterface;
+
+// interfejs do kontenera nie-stalego, jest tworzony automatycznie na podstawie metod z AssocTabConstInterface
 template< class Container > class AssocTabInterface;
 
 
@@ -24,49 +30,71 @@ template< class Container > class AssocTabInterface;
  *
  * ------------------------------------------------------------------------- */
 
-
+// wrapper dla stl-owej mapy, podobna postac powinny miec wszystkie takie wrappery
+// K - typ kluczy, V - typ wartosci przypisywanych
 template< class K, class V > class AssocTabConstInterface< std::map< K,V > >
 {
     public:
+        // konstruktor pobiera oryginalna mape, ktorej sluzy za interfejs
         AssocTabConstInterface( const std::map< K,V > &acont ): cont( acont ) {}
 
-        typedef K KeyType;
-        typedef V ValType;
+        typedef K KeyType;  // typ klucza tablicy
+        typedef V ValType;  // typ przypisywanych wartosci
 
-        bool hasKey( K arg ) const { return cont.find( arg ) != cont.end(); }
+        bool hasKey( K arg ) const // test, czy mapa zawiera dany klucz
+        { return cont.find( arg ) != cont.end(); }
 
+        // metody do iterowania po kolejnych kluczach tablicy. Zwracaja 0 gdy odpowiedniego klucza nie ma
         K firstKey() const;
         K lastKey() const;
-        K prevKey( K ) const;
+        K prevKey( K ) const; // mozna podac 0, by uzyskac ostatni/pierwszy klucz
         K nextKey( K ) const;
 
-        V operator[]( K arg ) const
-            { typename std::map< K,V >::const_iterator i;
-              i=cont.find(arg);
-              if (i==cont.end()) return V(); else return i->second;
+        V operator[]( K arg ) const // wartosc przypisana danemu kluczowi, wartosc domyslna typu ValType przy braku klucza w tablicy
+            {   assert(arg); // TODO: throw
+                typename std::map< K,V >::const_iterator i;
+                i=cont.find(arg);
+                if (i==cont.end()) return V(); else return i->second;
             }
         unsigned size() const { return cont.size(); }
         bool empty() const { return this->size() == 0; }
-        template< class Iterator > int getKeys( Iterator ) const;
+        bool operator!() const { return empty(); }
+        template< class Iterator > int getKeys( Iterator ) const; // zapisuje klucze tablicy pod zadany iterator
 
-        const std::map< K,V > &cont;
-        int capacity () const { return std::numeric_limits<int>::max(); }
+        const std::map< K,V > &cont; // referencja do oryginalnego kontenera, na ktorym operuje wrapper
+        int capacity () const { return std::numeric_limits<int>::max(); } //  pojemnosc kontenera
 
         protected:
+            // metody dzialajace na nie-stalym obiekcie, uzywane do tworzenia metod w AssocTabInterface
 
-        std::map< K,V >& _cont() { return const_cast<std::map< K,V >&>( cont ); }
+        std::map< K,V >& _cont() { return const_cast<std::map< K,V >&>( cont ); } // nie-stala ref. na oryginalny obiekt
 
-        void reserve(int) {  }
+        void reserve(int) {  } // rezerwowanie pojemnosci kontenera docelowego
         void clear() { _cont().clear(); }
-        bool delKey( K );
-        ValType* valPtr(K arg)
-        {   typename std::map<K,V>::iterator i=_cont().find( arg );
+        bool delKey( K ); // usuwanie klucza, zwraca true jesli klucz byl
+        V &get( K arg ) // referencja na wartosc przypisana do arg, wpis z wartoscia domyslna typu ValType jest tworzony jesli klucza nie bylo
+        {   assert(arg); // TODO: throw
+            return (_cont())[arg];
+        }
+        ValType* valPtr(K arg) // wskaznik do wartosci przypisanej do arg, NULL w razie braku klucza
+        {   assert(arg); // TODO: throw
+            typename std::map<K,V>::iterator i=_cont().find( arg );
             if (i==_cont().end()) return NULL; else return &(_cont())[arg];
         }
-        V &get( K arg ) { return (_cont())[arg]; }
+
 } ;
 
 
+//Funkcja tworzaca wrapper do podanego kontenera
+template< class T >
+AssocTabConstInterface< T > assocTabInterf(const T &cont )
+{
+    return AssocTabConstInterface< T >( cont );
+}
+
+
+
+// wrapper do kontenera asocjacyjnego nie-stalego, metody tworzone sa na podstawie metod chronionych z AssocTabConstInterface
 template <class T> class AssocTabInterface : public AssocTabConstInterface<T>
 {   public:
 
@@ -74,30 +102,20 @@ template <class T> class AssocTabInterface : public AssocTabConstInterface<T>
         typedef typename AssocTabConstInterface<T>::ValType ValType;
 
 
-        T & cont;
+        T & cont; // referencja do oryginalnego kontenera
 
+        // W konstruktorze podajemy oryginalny kontener
         AssocTabInterface( T &acont ): AssocTabConstInterface<T>(acont), cont( acont )  {}
 
         void reserve(int arg) { AssocTabConstInterface<T>::reserve(arg); }
         void clear() { AssocTabConstInterface<T>::clear(); }
         bool delKey( KeyType arg) { return AssocTabConstInterface<T>::delKey(arg); }
         ValType* valPtr(KeyType arg) { return AssocTabConstInterface< T>::valPtr(arg); }
-        ValType &operator[]( KeyType arg ) { return AssocTabConstInterface< T>::get(arg); }
         ValType operator[]( KeyType arg ) const { return AssocTabConstInterface< T>::operator[](arg); }
+
+        // w przypadku obiektu nie-stalego zwraca referencje do przypisanej kluczowi wartosci. Nowy klucz dostaje wartosc domyslna typu ValType
+        ValType &operator[]( KeyType arg ) { return AssocTabConstInterface< T>::get(arg); }
 };
-
-
-//template< class T >
-//const AssocTabInterface< T >& assocTabInterf( T &cont )
-//{
-//    return AssocTabInterface< T >( cont );
-//}
-
-template< class T >
-AssocTabConstInterface< T > assocTabInterf(const T &cont )
-{
-    return AssocTabConstInterface< T >( cont );
-}
 
 
 
@@ -107,12 +125,17 @@ AssocTabConstInterface< T > assocTabInterf(const T &cont )
  *
  * ------------------------------------------------------------------------- */
 
+
+// Opakowanie dla kontenera asocjacyjnego typu spoza Koali, udostepnia taki kontener w polu cont, jednoczesnie
+// operujac na nim metodami z AssocTabInterface. Typ tworzony automatycznie na podstawie AssocTabConstInterface
 template< class T > class AssocTable
 {
     public:
         T cont;
 
         AssocTable(): cont(), inter( cont ) { }
+
+        // konstruktory kopiujace i operatory przypisania
         AssocTable( const T &acont ): cont( acont ), inter( cont ) { }
         AssocTable( const AssocTable< T > &X ): cont( X.cont ), inter( cont ) {}
         AssocTable< T > &operator=( const AssocTable< T > & );
@@ -132,24 +155,31 @@ template< class T > class AssocTable
         ValType operator[]( KeyType arg) const { return ((AssocTabConstInterface< T >&)inter).operator[](arg); }
         unsigned size()  const { return inter.size(); }
         bool empty()  const { return inter.empty(); }
+        bool operator!() const { return empty(); }
         void clear() { inter.clear(); }
 
         template< class Iterator > int getKeys( Iterator iter)  const { return inter.getKeys( iter ); }
 
         // nieobowiazkowe, moze byc nieobslugiwane przez niektore kontenery
-        int capacity ()  const  { return inter.capacity(); }
+        int capacity ()  const  { return inter.capacity(); } //
         void reserve(int n) { inter.reserve(n); }
         AssocTable(int n,void* p=0): cont(), inter( cont ) { inter.reserve(n); }
 
     private:
-        AssocTabInterface< T > inter;
+        AssocTabInterface< T > inter; // interfejs na pole cont
 };
 
+// Funkcja tworzaca kopie podanego kontenera opakowana w AssocTable
 template< class T > AssocTable< T > assocTab( const T & cont)
 {
     return AssocTable<T>( cont );
 }
 
+
+//Klasy pomocnicze dla szybkich tablic asocjacyjnych (AssocArray). Klucz musi byc typem wskaznikowym zawierajacym
+//pole AssocKeyContReg assocReg. Kontener dziedziczy po klasie abstrakcyjnej AssocContBase - wowczas obiekt zawierajacy assocReg
+//w chwili smierci automatycznie wypisuje klucze bedace wskazaniami na niego ze wszystkich takich kontenerow.
+//W Koali glownie wykorzystywane dla tablic asocj. wierz/krawedzi
 
 /* ------------------------------------------------------------------------- *
  * AssocContBase
@@ -184,6 +214,7 @@ struct AssocContReg
  *
  * ------------------------------------------------------------------------- */
 
+// Pole publiczne assocReg tego typu powinny miec obiekty, wskazniki na ktore moga byc kluczami w AssocArray
 class AssocKeyContReg: public AssocContReg
 {
     public:
@@ -205,6 +236,7 @@ template< class Klucz, class Elem > struct BlockOfAssocArray
 
 namespace Privates {
 
+// test czy Klucz jest wskaznikiem zawierajacym pole AssocKeyContReg assocReg - tylko wowczas kompiluje sie konstruktor domyslny
 template< class Klucz > class KluczTest
 {
     public:
@@ -226,7 +258,8 @@ struct AssocArrayInternalTypes {
     typedef Privates::BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > BlockType;
 };
 
-
+// Szybka tablica asocjacyjna np. dla wierz/kraw
+// Wiekszosc interfejsu jak w innych tabl. assocjacyjnych
 template< class Klucz, class Elem, class Container = std::vector< typename AssocArrayInternalTypes<Klucz,Elem>::BlockType > >
 class AssocArray: public AssocContBase, protected Privates::KluczTest< Klucz >
 {
@@ -240,18 +273,23 @@ class AssocArray: public AssocContBase, protected Privates::KluczTest< Klucz >
         typedef Klucz KeyType;
         typedef Elem ValType;
 
-        AssocArray( int asize = 0,void* p=0 ): tab( asize ) { }
+        AssocArray( int asize = 0,void* p=0 ): tab( asize ) // asize - rozmiar poczatkowy, drugi arg. ignorowany
+         { }
         AssocArray( const AssocArray< Klucz,Elem,Container > & );
 
         AssocArray< Klucz,Elem,Container > &operator=(
             const AssocArray< Klucz,Elem,Container > & );
 
         // tylko dla Container==VectorInterface<BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > >*>
+        // pozwala zorganizowac AssocArray bez uzywania pamieci dynamicznej, na zewnetrznej, dostarczonej w konstruktorze tablicy
+        // TODO: sprawdzic niekopiowalnosc tablicy w tym przypadku
+        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
         AssocArray(int asize , typename AssocArrayInternalTypes<Klucz,Elem>::BlockType* wsk ): tab(wsk, asize )
         { }
 
         int size() const { return tab.size(); }
         bool empty() const { return tab.empty(); }
+        bool operator!() const { return empty(); }
         void reserve( int arg ) { tab.reserve( arg ); }
         int capacity() const { return tab.capacity(); }
         bool hasKey( Klucz v ) const { return keyPos( v ) != -1; }
@@ -259,7 +297,7 @@ class AssocArray: public AssocContBase, protected Privates::KluczTest< Klucz >
         {   int x=keyPos(v);
             if (x==-1) return NULL; else return &tab[x].val;
         }
-        int keyPos( Klucz ) const;
+        int keyPos( Klucz ) const; // pozycja klucza w wewnetrznym indeksie tablicy, -1 w razie jego braku
         bool delKey( Klucz );
         Klucz firstKey() const ;
         Klucz lastKey() const ;
@@ -267,7 +305,7 @@ class AssocArray: public AssocContBase, protected Privates::KluczTest< Klucz >
         Klucz prevKey( Klucz ) const ;
         Elem &operator[]( Klucz );
         Elem operator[]( Klucz ) const;
-        void defrag();
+        void defrag(); // porzadkowanie indeksu kontenera, wszystkie klucze uzyskuja kolejne numery poczatkowe
         void clear();
 
         template< class Iterator > int getKeys( Iterator )  const ;
@@ -275,7 +313,8 @@ class AssocArray: public AssocContBase, protected Privates::KluczTest< Klucz >
         ~AssocArray() { clear(); }
 } ;
 
-
+// Test w kodzie szablonu, czy typ kontenera to AssocArray zorganizowany na zewnwetrznej tablicy.
+// TODO: rozwazyc usuniecie w finalnej wersji biblioteki
 template <class T>
 struct AssocArrayVectIntSwitch
 {
@@ -284,15 +323,19 @@ struct AssocArrayVectIntSwitch
 };
 
 template <class K, class E>
-struct AssocArrayVectIntSwitch<AssocArray<K,E,VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< K,E > >*> > >
+struct AssocArrayVectIntSwitch<AssocArray<K,E,VectorInterface<typename AssocArrayInternalTypes<K,E>::BlockType*> > >
 {
-    typedef Privates::BlockOfBlockList< BlockOfAssocArray< K,E > >* BufType;
+    typedef typename AssocArrayInternalTypes<K,E>::BlockType* BufType;
     static bool isAAVI() { return true; }
 };
 
 
 
+// Kontener udajacy AssocArray np. dla kluczy nie wspolpracujacych z tym kontenerem. Uzywa dodatkowego
+// wewnetrznego kontenera typu AssocCont (mapa: Klucz->int). Nie oferuje automatycznego wypisywania kluczy bedacych
+// wskaznikami na znikajace obiekty
 
+// TODO: sprawdzic, czy ponizsza AssocMatrix nadal dziala wyposazona w indeks tego typu
 template< class Klucz, class Elem, class AssocCont, class Container = std::vector< typename AssocArrayInternalTypes<Klucz,Elem>::BlockType > >
 class PseudoAssocArray
 {
@@ -308,6 +351,7 @@ class PseudoAssocArray
 
         int size() const { return tab.size(); }
         bool empty() const  { return tab.empty(); }
+        bool operator!() const { return empty(); }
         void reserve( int arg ) { tab.reserve( arg ); assocTab.reserve(arg); }
         int capacity() const { return tab.capacity(); }
         bool hasKey( Klucz v ) const { return keyPos( v ) != -1; }
@@ -333,7 +377,18 @@ class PseudoAssocArray
 
 
 
-enum AssocMatrixType { AMatrFull, AMatrNoDiag, AMatrTriangle, AMatrClTriangle };
+// Typy pomocnicze 2-wymiarowych tablic asocjacyjnych (oba wymiary tego samego typu)
+
+enum AssocMatrixType {
+    AMatrFull, // pelna tablica 2-wymiarowa
+    AMatrNoDiag, // tablica 2-wymiarowa nie akceptujaca kluczy o obu wspolrzednych rownych (kluczami sa tylko 2-elementowe pary)
+    AMatrTriangle, // tablica traktujaca klucze jako pary nieuporzadkowane tj. klucz (a,b) jest utozsamiany z (b,a)
+    AMatrClTriangle  // j.w. ale dopusza sie klucze "jednoelementowe" tj. postaci (a,a)
+};
+
+
+// klasa wspomagajaca operowanie na kluczach tablic 2-wymiarowych
+// Uzywana wewnatrz tego kontenera
 template< AssocMatrixType > class AssocMatrixAddr;
 
 /* ------------------------------------------------------------------------- *
@@ -345,11 +400,13 @@ template< AssocMatrixType > class AssocMatrixAddr;
 template <> class AssocMatrixAddr< AMatrFull >
 {
     public:
-        static int bufLen( int n ) { return n * n; }
-        inline int wsp2pos( std::pair< int,int > ) const ;
-        inline std::pair< int,int > pos2wsp( int )  const ;
+        static int bufLen( int n ) { return n * n; } // dlugosc wewnetrznego bufora dla podanej liczby kluczy
+        inline int wsp2pos( std::pair< int,int > ) const ; // przerabia pare numerow elementow klucza (w indeksie kluczy) na pozycje bufora wewnetrznego
+        inline std::pair< int,int > pos2wsp( int )  const ; // ... i odwrotnie
 
-        template< class T > bool correctPos( T, T )  const { return true; }
+        template< class T > bool correctPos( T, T )  const { return true; } // test, czy klucz danej postaci jest akceptowany przez ten typ tablicy
+
+        // przerabia klucz 2-wymiarowy (tj. pare kluczy) na postac standardowa dla danego typu tablicy
         template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz, Klucz )  const ;
         template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > )  const ;
 } ;
@@ -417,6 +474,8 @@ struct AssocMatrixInternalTypes {
 template< class Klucz, class Elem, AssocMatrixType aType,
           class Container = std::vector< typename AssocMatrixInternalTypes<Klucz,Elem>::BlockType >,
           class IndexContainer = AssocArray<Klucz,int,std::vector< typename AssocMatrixInternalTypes<Klucz,Elem>::IndexBlockType > > >
+// Container - typ wewnetrznego bufora - tablicy przechowujacej opakowany ciag wartosci przypisanych roznym parom kluczy
+// IndexContainer - typ indeksu tj. tablicy asocjacyjnej przypisujacej pojedynczym kluczom ich liczby wystapien we wpisach oraz (rozne) numery.
 class AssocMatrix: public AssocMatrixAddr< aType >
 {
     private:
@@ -425,23 +484,27 @@ class AssocMatrix: public AssocMatrixAddr< aType >
             public:
                 AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > *owner;
 
-                AssocIndex( int = 0 );
+                AssocIndex( int = 0 ); // rozmiar poczatkowy
+                // umozliwia stworzenie indeksu dzialajacego w zewnetrznym buforze tablicowym
+                // Dziala, gdy IndexContainer to AssocArray oparta na VectorInterface
+                // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
                 AssocIndex( int, typename AssocMatrixInternalTypes<Klucz,Elem>::IndexBlockType*);
-                int klucz2pos( Klucz );
-                Klucz pos2klucz( int );
+
+                int klucz2pos( Klucz ); // konwersja klucza na jego numer, -1 w razie braku
+                Klucz pos2klucz( int ); // i odwrotnie
                 virtual void DelPosCommand( int );
 
                 friend class AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >;
         };
 
-        mutable AssocIndex index;
+        mutable AssocIndex index; // wewnetrzny indeks pojedynczych kluczy (mapa: Klucz->int)
 
         friend class AssocIndex;
 
-        mutable Container bufor;
-        int siz, first, last;
+        mutable Container bufor; // glowny bufor z wartosciami
+        int siz, first, last; // wartosci przypisane parom (kluczom) sa w buforze powiazane w liste 2-kierunkowa
 
-        void delPos( std::pair< int,int >  );
+        void delPos( std::pair< int,int >  ); // usuniecie wpisu dla kluczy o podanych numerach
 
     protected:
         struct DefragMatrixPom
@@ -451,16 +514,18 @@ class AssocMatrix: public AssocMatrixAddr< aType >
         } ;
 
     public:
-        typedef Klucz KeyType;
-        typedef Elem ValType;
-//        typedef BlockOfAssocMatrix< Elem > BlockType;
-//        typedef BlockOfBlockList< BlockOfAssocArray< Klucz,int > > IndexBlockType;
+        typedef Klucz KeyType; // typ klucza
+        typedef Elem ValType; // typ wartosci przypisywanej parze (tj. kluczowi 2-wymiarowemu)
 
-        AssocMatrix( int = 0,void* p=0, void* q=0 );
+        AssocMatrix( int = 0,void* p=0, void* q=0 );  // pierwszy arg. - poczatkowy rozmiar (tj. pojemnosc indeksu pojedynczych kluczy), dalsze arg. ignorowane
         AssocMatrix( const AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > & );
         AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > &operator=(
             const AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > & );
 
+        // Umozliwia dzialanie tablicy w 2 zewnetrznych buforach tablicowych (bufora i indeksu)
+        // Wowczas Container i IndexContainer powinny opierac sie na VectorInterface
+        // TODO: sprawdzic czy nadal dziala i czy kontener jest wtedy nieprzepisywalny.
+        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
         AssocMatrix( int asize, typename AssocMatrixInternalTypes<Klucz,Elem>::BlockType* contBuf,
                     typename AssocMatrixInternalTypes<Klucz,Elem>::IndexBlockType* indBuf ):
             index( asize,indBuf),siz( 0 ),first( -1 ),last( -1 ),
@@ -471,54 +536,64 @@ class AssocMatrix: public AssocMatrixAddr< aType >
             index.owner = this;
         }
 
+        // operowanie na indeksie zawierajacym pojedyncze klucze
         bool hasInd( Klucz v ) const { return index.hasKey( v ); }
-        bool delInd( Klucz );
+        bool delInd( Klucz ); // usuwa takze wszystkie wpisy zawierajace argument jako jeden z elementow pary kluczy
         Klucz firstInd() const { return index.firstKey(); }
         Klucz lastInd() const { return index.lastKey(); }
         Klucz nextInd( Klucz v )const  { return index.nextKey( v ); }
         Klucz prevInd( Klucz v ) const { return index.prevKey( v ); }
         int indSize() const { return index.size(); }
 
+        // zapis do zewnetrznej mapy (Klucz->ValType) wartosci wszystkich wpisow dla kluczy 2-wymiarowych zawierajacych argument na pierwszej pozycji
         template< class Elem2, class ExtCont > int slice1(Klucz, ExtCont & ) const;
+        // ... i drugiej pozycji
         template< class Elem2, class ExtCont > int slice2(Klucz, ExtCont & ) const;
 
+        //W operacjach dzialajacych na kluczach 2-wymiarowych mozna poslugiwac sie para kluczy lub jej dwoma wspolrzednymi
+
+        // czy wpis dla danej pary kluczy jest w tablicy
         bool hasKey( Klucz, Klucz ) const;
         bool hasKey( std::pair< Klucz,Klucz > k ) const { return hasKey( k.first,k.second ); }
 
+        // usun wspis, zwraca false jesli klucza nie bylo
         bool delKey( Klucz, Klucz );
         bool delKey( std::pair< Klucz,Klucz > k ) { return delKey( k.first,k.second ); }
 
+        // referencja do wartosc przypisanej kluczowi 2-wymiarowemu, jesli klucza nie bylo - tworzona jest wartosc domyslna typu ValType
         Elem &operator()( Klucz, Klucz );
         Elem &operator()( std::pair< Klucz,Klucz > k ) { return operator()( k.first,k.second ); }
+
+        // wartosc przypisana kluczowi 2-wymiarowemu, jesli klucza nie bylo - wartosc domyslna typu ValType
         Elem operator()( Klucz, Klucz ) const ;
         Elem operator()( std::pair< Klucz,Klucz > k ) const { return operator()( k.first,k.second ); }
 
-//        Elem getVal ( Klucz, Klucz ) const;
-//        Elem getVal ( std::pair< Klucz,Klucz > k ) const { return getVal( k.first,k.second ); }
-//        Elem& getVal ( Klucz a, Klucz b) { return this->operator()( a,b ); }
-//        Elem& getVal ( std::pair< Klucz,Klucz > k )  { return this->operator()( k.first,k.second ); }
-
-
+        // wskaznik do wartosci przypisanej kluczowi 2-wymiarowemu, NULL w razie braku wpisu
         Elem* valPtr( Klucz, Klucz );
-        std::pair< Klucz,Klucz > firstKey() const ;
-        std::pair< Klucz,Klucz > lastKey() const ;
-        std::pair< Klucz,Klucz > nextKey( Klucz, Klucz ) const ;
-        std::pair< Klucz,Klucz > nextKey( std::pair< Klucz,Klucz > ) const ;
+        Elem* valPtr( std::pair< Klucz,Klucz > k ) { return valPtr(k.first,k.second); }
 
-        std::pair< Klucz,Klucz > prevKey( Klucz, Klucz ) const ;
+        // iterowanie po kolejnych kluczach 2-wymiarowych zawartych w tablicy
+        std::pair< Klucz,Klucz > firstKey() const ; // dla tablicy pustej zwraca dwa zera
+        std::pair< Klucz,Klucz > lastKey() const ;  // dla tablicy pustej zwraca dwa zera
+        std::pair< Klucz,Klucz > nextKey( Klucz, Klucz ) const ; // dla pary zerowej zwraca pierwszy klucz
+        std::pair< Klucz,Klucz > nextKey( std::pair< Klucz,Klucz > ) const ;
+        std::pair< Klucz,Klucz > prevKey( Klucz, Klucz ) const ; // dla pary zerowej zwraca ostatni klucz
         std::pair< Klucz,Klucz > prevKey( std::pair< Klucz,Klucz > ) const ;
 
-        int size()  const { return siz; }
+        int size()  const { return siz; } // liczba wpisow
         bool empty()  const { return !siz; }
+        bool operator!() const { return empty(); }
         void clear();
-        void reserve( int );
+        void reserve( int ); // zaalokowuje pamiec na podana liczbe kluczy (1-wymiarowych)
 
-        void defrag();
+        void defrag(); // porzadkowanie macierzy
 
-        template< class Iterator > int getKeys( Iterator )  const ;
+        template< class Iterator > int getKeys( Iterator )  const ; // zapis par (kluczy 2-wymiarowych) na podany iterator, zwraca rozmiar tablicy
 };
 
 
+// Klasa testujaca, czy typ T jest macierza asocjacyjna zorganizowana na zewnetrznych buforach tablicowych
+// TODO: rozwazyc usuniecie w finalnej wersji biblioteki
 template <class T>
 struct AssocMatrixVectIntSwitch
 {
@@ -528,17 +603,13 @@ struct AssocMatrixVectIntSwitch
 };
 
 template <class K, class E,AssocMatrixType aType>
-struct AssocMatrixVectIntSwitch<AssocMatrix<K,E,aType,VectorInterface< BlockOfAssocMatrix< E > *>,
-       AssocArray<K,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< K,int > >* > > > >
+struct AssocMatrixVectIntSwitch<AssocMatrix<K,E,aType,VectorInterface< typename AssocMatrixInternalTypes<K,E>::BlockType *>,
+       AssocArray<K,int,VectorInterface< typename AssocMatrixInternalTypes<K,E>::IndexBlockType* > > > >
 {
-    typedef BlockOfAssocMatrix< E >* BufType;
-    typedef Privates::BlockOfBlockList< BlockOfAssocArray< K,int > >* IndBufType;
+    typedef typename AssocMatrixInternalTypes<K,E>::BlockType * BufType;
+    typedef typename AssocMatrixInternalTypes<K,E>::IndexBlockType * IndBufType;
     static bool isAMVI() { return true; }
 };
-
-
-template<class Klucz, class Elem, AssocMatrixType aType, class C,class IC >
-std::ostream &operator<<(std::ostream &out,const AssocMatrix< Klucz,Elem,aType,C,IC > & cont );
 
 
 /* ------------------------------------------------------------------------- *
@@ -547,6 +618,8 @@ std::ostream &operator<<(std::ostream &out,const AssocMatrix< Klucz,Elem,aType,C
  *
  * ------------------------------------------------------------------------- */
 
+
+// iterator wstawiajacy do podanego przez adres kontenera asocjacyjnego pary (klucz, wartosc)
 template< class T >
 class AssocInserter: public std::iterator< std::output_iterator_tag,void,void,void,void >
 {
@@ -564,6 +637,7 @@ class AssocInserter: public std::iterator< std::output_iterator_tag,void,void,vo
         AssocInserter< T > operator++( int ) { return *this; }
 };
 
+// ... i jego funkcja tworzaca dla podanego kontenera
 template< class T >
 AssocInserter< T > assocInserter( T &x ) { return AssocInserter< T >( x ); }
 
@@ -573,23 +647,28 @@ AssocInserter< T > assocInserter( T &x ) { return AssocInserter< T >( x ); }
  *
  * ------------------------------------------------------------------------- */
 
+// iterator wstawiajacy do podanego przez adres kontenera asocjacyjnego klucze, ktorym przypisywane sa wartosci
+// wyznaczane (na podstawie kluzca) zadanym funktorem
+// TODO: sprawdzic, czy dziala ze zwyklymi funkcjami C  pobierajacymi argument przez wartosc, referencje lub const ref
 template< class T, class Fun >
 class AssocFunktorInserter: public std::iterator< std::output_iterator_tag,void,void,void,void >
 {
     protected:
         T* container;
-        Fun funktor;
-//        Koala::AssocTabInterface< T > test;
+        mutable Fun funktor;
 
     public:
         typedef T container_type;
         typedef Fun FunktorType;
-        AssocFunktorInserter( T &x, Fun f ): container( &x ), funktor( f )/*, test( x )*/ { }
+        AssocFunktorInserter( T &x, Fun f ): container( &x ), funktor( f ){ }
         template< class K > AssocFunktorInserter< T,Fun > &operator=( const K & );
         AssocFunktorInserter< T,Fun > &operator*() { return *this; }
         AssocFunktorInserter< T,Fun > &operator++() { return *this; }
         AssocFunktorInserter< T,Fun > operator++( int ) { return *this; }
 } ;
+
+// ... i jego funkcja tworzaca dla podanego kontenera i funktora (typu KeyType -> ValType)
+template< class T, class F > AssocFunktorInserter< T,F > assocInserter( T &, F );
 
 
 namespace Privates {
@@ -614,7 +693,8 @@ namespace Privates {
 
 };
 
-template< class T, class F > AssocFunktorInserter< T,F > assocInserter( T &, F );
+
+// wypisywanie do strumienia wszystkich wpisow w podanych tablicach asocjacyjnych, dziala jesli typ wartosci takze obsluguje <<
 
 template< typename T > std::ostream &operator<<(
     std::ostream &out, const AssocTabConstInterface< T > & cont )
@@ -631,6 +711,10 @@ template< class K, class V,class C > std::ostream &operator<<(
 template< typename K, typename V, typename A, typename C  > std::ostream &operator<<(
     std::ostream &out, const PseudoAssocArray< K,V,A,C > & cont )
     {   return Privates::printAssoc(out,cont);  }
+
+template<class Klucz, class Elem, AssocMatrixType aType, class C,class IC >
+std::ostream &operator<<(std::ostream &out,const AssocMatrix< Klucz,Elem,aType,C,IC > & cont );
+
 
 
 #include "assoctab.hpp"

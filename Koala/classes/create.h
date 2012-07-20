@@ -509,15 +509,17 @@ class Creator{
 
 #include "create.hpp"
 
-
+// domyslne wytyczne dla procedur dzialan na relacjach
 class RelDiagramAlgsDefaultStructs : public AlgorithmsDefaultSettings {
     public:
 
+    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B. Kluczami sa pary uporzadkowane o roznych elementach
     template <class A, class B> class TwoDimNoDiagAssocCont {
         public:
         typedef AssocMatrix<A,B,AMatrNoDiag> Type;
     };
 
+    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B. Kluczami sa dowolne pary uporzadkowane
     template <class A, class B> class TwoDimFullAssocCont {
         public:
         typedef AssocMatrix<A,B,AMatrFull> Type;
@@ -527,19 +529,24 @@ class RelDiagramAlgsDefaultStructs : public AlgorithmsDefaultSettings {
 };
 
 
+// Operacje na grafie traktowanym jak diagram relacji w zbiorze wierzcholkow
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class RelDiagramPar {
     public:
 
     template <class Graph>
     static void repair(Graph& g)
+    // doprowadza diagram do zwyklej postaci, bez krawedzi nieskierowanych ani rownoleglych
     {   g.ch2Archs();g.delAllParals(EdDirOut);  }
 
     template <class Graph>
+    // wpisz relacje pusta na istniejacych wierzcholkach
     static void empty(Graph& g)
     {   g.clearEdges(); }
 
     template <class Graph>
+    // wpisz relacje kazdy z kazdym na istniejacych wierzcholkach. Mozna podac pole info wprowadzanych krawedzi
     static void total(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
     {
         g.clearEdges();
@@ -553,26 +560,20 @@ class RelDiagramPar {
     }
 
     template <class Graph>
+    // zamienia w relacje odwrotna
     static void inv(Graph& g)
     {   g.revert(); }
 
     template <class Graph>
+    // przeprowadza domkniecie zwrotne. Mozna podac pole info wprowadzanych krawedzi
     static void reflClousure(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
     {
         for(typename Graph::PVertex u=g.getVert();u;u=g.getVertNext(u))
             if (!g.getEdge(u,EdLoop)) g.addLoop(u,einfo);
     }
 
-    template <class Cont>
-    static void symmClousure(Cont& cont, int size)
-    {   for(int i=0;i<size-1;++i) for(int j=i+1;j<size;++j)  cont[i][j]=cont[j][i]=cont[i][j] || cont[j][i];    }
-
-    template <class Cont,class Iter>
-    static void symmClousure(Cont& cont,Iter beg, Iter end)
-    {   for(Iter i=beg;i!=end;++i) for(Iter j=i;j!=end;++j)
-            if (i!=j) cont(*i,*j)=cont(*j,*i)= cont(*i,*j)||cont(*j,*i);    }
-
     template <class Graph>
+    // przeprowadza domkniecie symetryczne. Mozna podac pole info wprowadzanych krawedzi
     static void symmClousure(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
     {   typename DefaultStructs::template TwoDimNoDiagAssocCont<typename Graph::PVertex,bool> :: Type matr(g.getVertNo());
         typename Graph::PEdge e,enext;
@@ -592,6 +593,7 @@ class RelDiagramPar {
 
 
     template <class Graph>
+    // przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
     static void transClousure(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
     {   typename DefaultStructs::template TwoDimFullAssocCont<typename Graph::PVertex, typename FloydPar<DefaultStructs>
                         ::template VertLabs<int,Graph> > :: Type matr(g.getVertNo());
@@ -613,6 +615,11 @@ class RelDiagramPar {
     }
 
     struct MatrixForm {
+//    Oferuje te same operacje na relacjach reprezentowanych inaczej niz przez graf.
+//    Wersje 2-argumentowe: kontener obslugiwany jak tablica 2-wymiarowa o wartosciach konwertowalnych z bool
+//        indeksowana od 0 kolejnymi liczbami. Parametr size podaje liczbe elementow
+//    Wersje 3-argumentowe: kontener o wartosciach konwertowalnych z bool i dostepie przez 2-argumentowy
+//        operator(), iteratory podaja zakres przedzialu elementow
 
         template <class Cont>
         static void empty(Cont& cont, int size)
@@ -655,6 +662,15 @@ class RelDiagramPar {
         {   for(Iter i=beg;i!=end;++i) cont(*i,*i)=true; }
 
         template <class Cont>
+        static void symmClousure(Cont& cont, int size)
+        {   for(int i=0;i<size-1;++i) for(int j=i+1;j<size;++j)  cont[i][j]=cont[j][i]=cont[i][j] || cont[j][i];    }
+
+        template <class Cont,class Iter>
+        static void symmClousure(Cont& cont,Iter beg, Iter end)
+        {   for(Iter i=beg;i!=end;++i) for(Iter j=i;j!=end;++j)
+                if (i!=j) cont(*i,*j)=cont(*j,*i)= cont(*i,*j)||cont(*j,*i);    }
+
+        template <class Cont>
         static void transClousure(Cont& cont,int size)
         {   for(int k=0;k<size;++k) for(int i=0;i<size;++i) for(int j=0;j<size;++j)
                 cont[i][j]=cont[i][j] || (cont[i][k] && cont[k][j]);
@@ -672,13 +688,15 @@ class RelDiagramPar {
 };
 
 
+// wersja dzialajaca na DefaultStructs=RelDiagramAlgsDefaultStructs
 class RelDiagram : public RelDiagramPar<RelDiagramAlgsDefaultStructs> {};
 
 
-
+// Kreator linegrafow
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class LineGraphPar {
-    public:
+        protected:
 
         template <class Graph>
         static bool open(const Graph& g,typename Graph::PEdge e,typename Graph::PVertex v, typename Graph::PEdge f)
@@ -693,17 +711,25 @@ class LineGraphPar {
                         && (g.getEdgeDir(e,v)!=EdDirOut) && (g.getEdgeDir(f,v)!=EdDirIn);
             }
 
+        public:
+
+//        Dopisuje do lg nieskierowany graf krawedziowy tworzony na podstawie g.
+//        Para casterow wyznacza infa nowych wierzcholkow na podstawie inf oryginalnych krawedzi
+//        i infa nowych krawedzi na podstawie inf wierzcholkow, w ktorych stykaly sie oryginalne krawedzie
+//        Linker laczy krawedzie g z odpowiadajacymi im wierzcholkami w lg
+//      Zwraca pierwszy utworzony wierzcholek
         template <class GraphIn,class GraphOut,class VCaster, class ECaster,class VLinker>
         static typename GraphOut::PVertex undir(const GraphIn& g,GraphOut& lg,
                                                 std::pair< VCaster,ECaster > casters,VLinker linker)
         {   typename DefaultStructs::template AssocCont<typename GraphIn::PEdge,typename GraphOut::PVertex>
                 :: Type e2vtab(g.getEdgeNo());
-            typename GraphOut::PVertex res=0;
+            typename GraphOut::PVertex res=lg.getVertLast();
+            for(typename GraphOut::PVertex v=lg.getVert();v;v=lg.getVertNext(v))
+                linker(v,(typename GraphIn::PEdge)NULL);
             for(typename GraphIn::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
             {   typename GraphOut::VertInfoType vinfo;
                 casters.first(vinfo,g.getEdgeInfo(e));
                 linker(e2vtab[e]=lg.addVert(vinfo),e);
-                if (!res && g.getEdgeNo()) res=lg.getVertLast();
             }
 
             for(typename GraphIn::PVertex v=g.getVert();v;v=g.getVertNext(v))
@@ -715,31 +741,38 @@ class LineGraphPar {
                                 casters.second(einfo,g.getVertInfo(v));
                                 lg.addEdge(e2vtab[e],e2vtab[f],einfo);
                             }
-            return res;
+            return lg.getVertNext(res);
         }
 
-
+        // jw. bez linkerow
         template <class GraphIn,class GraphOut,class VCaster, class ECaster>
         static typename GraphOut::PVertex undir(const GraphIn& g,GraphOut& lg,
                                                 std::pair< VCaster,ECaster > casters)
         {   return undir(g,lg,casters,stdLink( false,false ));  }
 
+        // jw. ale tylko tworzy linegraph
         template <class GraphIn,class GraphOut>
         static typename GraphOut::PVertex undir(const GraphIn& g,GraphOut& lg)
         {   return undir(g,lg,std::make_pair(stdCast( false ),stdCast( false )),stdLink( false,false ));  }
 
 
+//        Dopisuje do lg skierowany graf krawedziowy tworzony na podstawie g.
+//        Para casterow wyznacza infa nowych wierzcholkow na podstawie inf oryginalnych krawedzi
+//        i infa nowych lukow na podstawie inf wierzcholkow, w ktorych stykaly sie oryginalne krawedzie
+//        Linker laczy krawedzie g z odpowiadajacymi im wierzcholkami w lg
+//      Zwraca pierwszy utworzony wierzcholek
         template <class GraphIn,class GraphOut,class VCaster, class ECaster,class VLinker>
         static typename GraphOut::PVertex dir(const GraphIn& g,GraphOut& lg,
                                                 std::pair< VCaster,ECaster > casters,VLinker linker)
         {   typename DefaultStructs::template AssocCont<typename GraphIn::PEdge,typename GraphOut::PVertex>
                 :: Type e2vtab(g.getEdgeNo());
-            typename GraphOut::PVertex res=0;
+            typename GraphOut::PVertex res=lg.getVertLast();
+            for(typename GraphOut::PVertex v=lg.getVert();v;v=lg.getVertNext(v))
+                linker(v,(typename GraphIn::PEdge)NULL);
             for(typename GraphIn::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
             {   typename GraphOut::VertInfoType vinfo;
                 casters.first(vinfo,g.getEdgeInfo(e));
                 linker(e2vtab[e]=lg.addVert(vinfo),e);
-                if (!res && g.getEdgeNo()) res=lg.getVertLast();
             }
 
             for(typename GraphIn::PVertex v=g.getVert();v;v=g.getVertNext(v))
@@ -750,15 +783,17 @@ class LineGraphPar {
                                 casters.second(einfo,g.getVertInfo(v));
                                 lg.addArch(e2vtab[e],e2vtab[f],einfo);
                             }
-            return res;
+            return lg.getVertNext(res);
         }
 
 
+        // jw. bez linkerow
         template <class GraphIn,class GraphOut,class VCaster, class ECaster>
         static typename GraphOut::PVertex dir(const GraphIn& g,GraphOut& lg,
                                                 std::pair< VCaster,ECaster > casters)
         {   return dir(g,lg,casters,stdLink( false,false ));  }
 
+        // jw. ale tylko tworzy linegraph
         template <class GraphIn,class GraphOut>
         static typename GraphOut::PVertex dir(const GraphIn& g,GraphOut& lg)
         {   return dir(g,lg,std::make_pair(stdCast( false ),stdCast( false )),stdLink( false,false ));  }
@@ -766,7 +801,7 @@ class LineGraphPar {
 
 };
 
-
+// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
 class LineGraph : public LineGraphPar<AlgorithmsDefaultSettings> {};
 
 
