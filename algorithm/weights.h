@@ -860,7 +860,7 @@ class KruskalPar {
             res.edgeNo=0; res.weight=DefaultStructs:: template NumberTypeBounds
                                     <typename EdgeContainer::ValType::WeightType>::zero();
 
-            sets.clear(); sets.resize(g.getVertNo());
+            sets.resize(g.getVertNo());
             if (g.getVertNo()==0) return res;
             for(typename GraphType::PVertex v = g.getVert(); v ; v = g.getVertNext(v)) sets.makeSinglet(v);
 

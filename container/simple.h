@@ -41,7 +41,6 @@ std::pair<T,T> pairMinMax(std::pair<T,T> arg)
 //template <class T> class StackInterface<T> (bez specjalizacji). Wymaga modyfikacji deklaracji we wszystkich modulach
 //biblioteki korzystajacych z tych interfejsow!
 
-//TODO: uczynic obiektami niekopiowalnymi (prywatne puste konstruktor kopiujacy i operator =)
 
 // TODO: assert -> throw. 2 typy wyjatkow: przekroczenie zakresu danych kontenera i przekroczenie maks. pojemnosci
 

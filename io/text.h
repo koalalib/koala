@@ -1,5 +1,5 @@
 
-// TODO: sprawdzic aktualnosc opisu formatow po zmianach
+// TODO: uaktualnic opisu formatow po zmianach
 
 /* functions:
  *
@@ -119,8 +119,11 @@ namespace IO {
 
 
 enum RG_Format {
-	RG_VertexLists,
-	RG_EdgeList
+	RG_VertexLists=0,
+	RG_EdgeList=1,
+	RG_VInfo = 2,
+	RG_EInfo = 4,
+	RG_Info = 6
 	};
 
 
@@ -194,41 +197,38 @@ bool readGraphText(Graph &g, const char *desc, RG_Format format) {
 
 
 template<class Graph, class VMap, class EMap>
-bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format,
-                    std::pair<bool,bool> printinf,const VMap& vmap,const EMap& emap);
+bool writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vmap,const EMap& emap);
 
 template<class Graph>
-bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format,
-                    std::pair<bool,bool> printinf=std::make_pair(true,true))
+bool writeGraphText(const Graph &g, std::ostream &out, int format)
 {
     Privates::EmptyMap2 em;
-    return writeGraphText(g,out,format,printinf,em,em);
+    return writeGraphText(g,out,format,em,em);
 }
 
 
 template<class Graph, class VMap, class EMap>
-bool writeGraphText(const Graph &g, std::string &out, RG_Format format,
-                    std::pair<bool,bool> printinf,const VMap& vmap,const EMap& emap) {
+bool writeGraphText(const Graph &g, std::string &out, int format,
+                    const VMap& vmap,const EMap& emap) {
 	bool rv;
 	std::ostringstream s;
-	rv = writeGraphText(g, s, format,printinf,vmap,emap);
+	rv = writeGraphText(g, s, format,vmap,emap);
 	out = s.str();
 	return rv;
 	};
 
 
 template<class Graph>
-bool writeGraphText(const Graph &g, std::string &out, RG_Format format,
-                    std::pair<bool,bool> printinf=std::make_pair(true,true))
+bool writeGraphText(const Graph &g, std::string &out, int format)
 {
     Privates::EmptyMap2 em;
-    writeGraphText(g,out,format,printinf,em,em);
+    writeGraphText(g,out,format,em,em);
 
 }
 
 template<class Graph,class VMap, class EMap>
-bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format format,
-                    std::pair<bool,bool> printinf,const VMap& vmap,const EMap& emap)
+bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int format,
+                    const VMap& vmap,const EMap& emap)
 {
 	bool rv;
 	const char *o;
@@ -238,7 +238,7 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format
 
 	if(out == NULL || maxlength == 0) return false;
 
-	rv = writeGraphText(g, s, format, printinf,vmap,emap);
+	rv = writeGraphText(g, s, format, vmap,emap);
 	if(!rv) return false;
 
 	str = s.str();
@@ -250,11 +250,10 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format
 	};
 
 template<class Graph>
-bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, RG_Format format,
-                    std::pair<bool,bool> printinf=std::make_pair(true,true))
+bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int format)
 {
     Privates::EmptyMap2 em;
-    return writeGraphText(g,out,maxlength,format,printinf,em,em);
+    return writeGraphText(g,out,maxlength,format,em,em);
 }
 
 

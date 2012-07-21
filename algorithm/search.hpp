@@ -310,10 +310,9 @@ int GraphSearchBase< SearchImpl, DefaultStructs >::scanAttainable(
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer,
     class VertIter >
 int GraphSearchBase< SearchImpl, DefaultStructs >::scan(
-    const GraphType &g, VertIter iter, EdgeDirection mask, VertContainer &tree )
-{
-    mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
-    mask &= ~EdLoop;
+    const GraphType &g, VertIter iter, EdgeDirection mask, VertContainer &tree, bool sym )
+{   mask &= ~EdLoop;
+    if (sym) mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
     return visitAllBase( g,tree,
         Visitors::StoreTargetToVertIter< VertIter >( iter ),mask );
 }
