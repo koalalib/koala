@@ -68,17 +68,18 @@ int main() {
 
 
     std::pair<bool,bool> form =std::make_pair(false,false);
+    RG_Format eform = (RG_Format)(((form.first) ? RG_VInfo : 0)+((form.second) ? RG_EInfo : 0));
 
     cout << writeGraphText(g, cout, RG_VertexLists);
     cout << endl;
-    cout << writeGraphText(g, cout, RG_VertexLists,form);
+    cout << writeGraphText(g, cout, (RG_Format)(RG_VertexLists|eform));
     cout << endl;cout << endl;
 
-    cout << writeGraphText(g, text, 10000, RG_EdgeList,std::make_pair(true,true));
+    cout << writeGraphText(g, text, 10000, RG_EdgeList|RG_Info);
     cout << "text=" << text << "text"<<endl;
     g.clear();
     cout << readGraphText(g, text, RG_EdgeList);
-    cout << writeGraphText(g, cout, RG_VertexLists,std::make_pair(true,true));
+    cout << writeGraphText(g, cout, RG_VertexLists|RG_Info);
     cout << endl;cout << endl;
 
 
@@ -89,7 +90,7 @@ int main() {
 
 	writeGraphText(g, cout, RG_EdgeList);
 	cout << endl << endl;
-    writeGraphText(g, cout, RG_EdgeList,form);
+    writeGraphText(g, cout, RG_EdgeList+eform);
 	cout << endl;cout << endl;
 
 	cout << "\n----------------\n";
@@ -97,13 +98,13 @@ int main() {
     v2int[g.getVertNext(g.getVert())]=99;
     e2int[g.getEdge(EdLoop)]=102;
 
-	writeGraphText(g, cout, RG_EdgeList,std::make_pair(true,true),v2int,e2int);
+	writeGraphText(g, cout, RG_EdgeList|RG_Info,v2int,e2int);
 	ofstream pliko("plik.txt");
 //	writeGraphText(g, pliko, RG_VertexLists,form,v2int,e2int);
-	writeGraphText(g, pliko, RG_EdgeList,form);
+	writeGraphText(g, pliko, RG_EdgeList+eform);
 //	pliko << '\n';
 //	writeGraphText(g, pliko, RG_VertexLists,std::make_pair(true,true),v2int,e2int);
-	writeGraphText(g, pliko, RG_EdgeList,std::make_pair(true,true));
+	writeGraphText(g, pliko, RG_EdgeList|RG_Info);
 	pliko.close();
 	cout << "\n----------------\n";
 

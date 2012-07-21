@@ -100,7 +100,7 @@ int main() {
     Koala::STRATEGY::visitAllBase(g,vertCont,Visitors::EndVertVisitor(G),EdAll);
     Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll,vertCont);
     Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll);
-    Koala::STRATEGY::scan(g,blackHole,EdAll,vertCont);
+    Koala::STRATEGY::scan(g,blackHole,EdAll,vertCont,true);
     Koala::STRATEGY::scan(g,blackHole,EdAll);
     Koala::STRATEGY::cyclNo(g,EdAll);
     Koala::STRATEGY::getAttainableSet(g,A,EdAll);

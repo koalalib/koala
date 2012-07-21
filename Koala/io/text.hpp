@@ -189,7 +189,7 @@ bool readGraphEL(Graph &g, std::istream &strm,
 template<typename Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, std::istream &strm, RG_Format format,
 		   VMap &vertexMap, EMap &edgeMap) {
-	switch(format) {
+	switch(format & (~RG_Info)) {
 		case RG_VertexLists:	return Privates::readGraphVL(g, strm, vertexMap, edgeMap);
 		case RG_EdgeList:	return Privates::readGraphEL(g, strm, vertexMap, edgeMap);
 		};
@@ -311,11 +311,11 @@ bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
  * @return true on success, false otherwise
  */
 template<class Graph, class VMap, class EMap>
-bool writeGraphText(const Graph &g, std::ostream &out, RG_Format format, std::pair<bool,bool> printinf,
+bool writeGraphText(const Graph &g, std::ostream &out, int format,
                     const VMap& vmap,const EMap& emap) {
-	switch(format) {
-		case RG_VertexLists:	return Privates::writeGraphVL(g, out, printinf,vmap,emap);
-		case RG_EdgeList:	return Privates::writeGraphEL(g, out, printinf,vmap,emap);
+	switch(format & (~RG_Info)) {
+		case RG_VertexLists:	return Privates::writeGraphVL(g, out, std::make_pair((bool)(format&RG_VInfo),(bool)(format&RG_EInfo)),vmap,emap);
+		case RG_EdgeList:	return Privates::writeGraphEL(g, out, std::make_pair((bool)(format&RG_VInfo),(bool)(format&RG_EInfo)),vmap,emap);
 		};
 	return false;
 	};

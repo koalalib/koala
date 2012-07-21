@@ -315,7 +315,7 @@ int main() {
 
 //    g.makeAdjMatrix();
     dijTest();
-    Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists,std::make_pair(true,true));
+    Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
     cout << "\n***=\n" << boolalpha;
 //    cout << Koala::Flow::usedCap(g,edgeCont,g.getEdge(B,C),B,true) << '\n';
 

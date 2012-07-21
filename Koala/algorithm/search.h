@@ -521,7 +521,7 @@ class Visitors: public SearchStructs {
 
 
 // Ogolna implementacja przeszukiwania grafu roznymi strategiami (DFS, BFS, LexBFS)
-// Strategie dostarcza metoda visitBase z klasy SearchImpl
+// Strategie dostarcza metoda visitBase z klasy SearchImpl, ktora odwiedza wierzcholki stosownie do swojej klasy
 // DefaultStructs dostarcza wytycznych dla wewnetrznych procedur por. np. AlgorithmsDefaultSettings z def_struct.h
 template< class SearchImpl, class DefaultStructs >
 class GraphSearchBase: public ShortPathStructs, public SearchStructs
@@ -540,10 +540,12 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
             } ;
     public:
 
-	/** visit all vertices in a graph
+            typedef SearchImpl SearchStrategy;
+
+	/** visit all vertices in a graph tj. w kolejnosci zgodnej ze strategia SearchImpl
 	 * @param[in] g graph containing vertices to visit
-	 * @param[in] visited container to store data (np. map PVertex -> VisitVertLabs), BlackHole niedozwolony
-	 Postac lasu przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+	 * @param[in] visited container to store data (np. map PVertex -> VisitVertLabs), BlackHole niedozwolony.
+	 Po wykonaniu postac lasu przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component zawiera numer skladowej lasu
 	 * @param[in] visitor visitor called for each vertex
 	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
@@ -555,13 +557,13 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
         static int visitAllBase(
             const GraphType &g, VertContainer &visited, Visitor visitor, EdgeDirection dir);
 
-	/** visit all vertices in the same component as a given vertex
+	/** visit all vertices in the same component as a given vertex tj. w kolejnosci zgodnej ze strategia SearchImpl
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
-	 * @param[out] out iterator to write visited vertices to
+	 * @param[out] out iterator to write visited vertices to tj. w kolejnosci zgodnej ze strategia SearchImpl
 	 * @param[in] dir direction of edges to consider + uwaga jak wyzej, ponadto bit petli ignorowany
 	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs) , BlackHole niedozwolony
-	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+	 Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component=0
 	 * @return number of visited vertices
 	 */
@@ -574,7 +576,7 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	Tzn. dziala jak wyzej, ale na wlasnej wewnetrznej mapie wierzcholkow
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
-	 * @param[out] out iterator to write vertices to
+	 * @param[out] out iterator to write vertices to tj. w kolejnosci zgodnej ze strategia SearchImpl
 	 * @param[in] dir direction of edges to consider + uwaga jak wyzej, ponadto bit petli ignorowany
 	 * @return number of visited vertices
 	 */
@@ -585,21 +587,23 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 
 	/** visit all vertices in a graph
 	 * @param[in] g graph containing vertices to visit
-	 * @param[out] out iterator to write visited vertices to
-	 * @param[in] dir direction of edges to consider, petle ignorowane a maska
-        jest symetryzowana tj. jesli krawedzie skierowane sa przejezdne, to w obie strony
+	 * @param[out] out iterator to write visited vertices to tj. w kolejnosci zgodnej ze strategia SearchImpl
+	 * @param[in] dir direction of edges to consider, petle ignorowane
 	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-	 	 Postac lasu przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+	 	 Po wykonaniu postac lasu przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component zawiera numer skladowej lasu
+    * @param[in] sym dla true maska
+        jest symetryzowana tj. jesli krawedzie skierowane sa przejezdne, to w obie strony
 	 * @return number of components
 	 */
         template< class GraphType, class VertContainer, class VertIter >
         static int scan(
-            const GraphType &g, VertIter out, EdgeDirection dir, VertContainer &visited);
+            const GraphType &g, VertIter out, EdgeDirection dir, VertContainer &visited, bool sym=true);
 
 	/** visit all vertices in a graph
 	 * @param[in] g graph containing vertices to visit
-	 * @param[out] out iterator to write vertices to, petle ignorowane a maska
+	 * @param[out] out iterator to write vertices to, tj. w kolejnosci zgodnej ze strategia SearchImpl
+        Petle ignorowane a maska
         jest symetryzowana tj. jesli krawedzie skierowane sa przejezdne, to w obie strony
 	 * @param[in] dir direction of edges to consider
 	 * @return number of components
@@ -651,7 +655,7 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	 * @param[in] dir direction of edges to consider, petle ignorowane a maska
         jest symetryzowana tj. jesli krawedzie skierowane sa przejezdne, to w obie strony
 	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), blackHole niedozwolony
-	 Postac lasu przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+	 Po wykonaniu postac lasu przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component zawiera numer skladowej lasu
 	 * @return number of components
 	 */
@@ -713,7 +717,7 @@ class DFSBase: public GraphSearchBase< SearchImpl , DefaultStructs >
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
 	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+	 Po wykonaniu  postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component jest ustawiane na compid
 	 * @param[in] visitor visitor called for each vertex
 	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
@@ -741,7 +745,7 @@ class DFSPar: public DFSBase< DFSPar<DefaultStructs >, DefaultStructs >
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
 	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-	 	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+	 	 Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component jest ustawiane na compid
 	 * @param[in] visitor visitor called for each vertex
 	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
@@ -783,7 +787,7 @@ class DFSPreorderPar: public DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStr
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
 	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+	 Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component jest ustawiane na compid
 	 * @param[in] visitor visitor called for each vertex
 	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
@@ -825,7 +829,7 @@ class DFSPostorderPar: public DFSBase< DFSPostorderPar<DefaultStructs >, Default
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
 	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+	 Po wykonaniu  postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component jest ustawiane na compid
 	 * @param[in] visitor visitor called for each vertex
 	 * @param[in] dir direction of edges to considertzn. przegladany jest podgraf zlozony z krawedzi
@@ -862,7 +866,7 @@ class BFSPar: public GraphSearchBase< BFSPar<DefaultStructs >, DefaultStructs >
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
 	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+	 Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component jest ustawiane na compid
 	 * @param[in] visitor visitor called for each vertex
 	 * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
@@ -1030,7 +1034,7 @@ public:
 	 * @param[in] g graph containing vertices to visit
 	 * @param[in] src given vertex
 	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-	 	 Postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+	 	 Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component jest ustawiane na component
 	 * @param[in] visitor visitor called for each vertex
 	 * @param[in] dir direction of edges to consider, LexBFS akceptuje tylko maski symetryczne

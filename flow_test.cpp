@@ -226,7 +226,7 @@ int main() {
 
     g.makeAdjMatrix();
     dijTest();
-    Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists,std::make_pair(true,true));
+    Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
     cout << "\n***=\n";
 //    cout << Koala::Flow::usedCap(g,edgeCont,g.getEdge(B,C),B,true) << '\n';
 
@@ -238,7 +238,7 @@ int main() {
     for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
         {   char buf[20]; sprintf(buf," %d",edgeCont[ePt].flow); ePt->info.name.append(buf); }
 
-    Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists,std::make_pair(true,true));
+    Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
 
     cout << "\n***\n" << boolalpha;
     cout << Koala::Flow::maxFlow(g,edgeCont,S,T) << '\n';
@@ -297,7 +297,7 @@ int main() {
     cout << "\n\n&&&&&&&&&&&&&&&&\n\n";
     dijTest3();
     bool vflag=true;
-    Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists,std::make_pair(true,true));
+    Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
     int itab[20];
 
     int p=Koala::Connect::vertDisjPaths(g,S,T,Koala::Connect::outPath(tabV,tabE),itab,vflag);
@@ -317,7 +317,7 @@ int main() {
     cout << endl;
 //    for(int i=0;i<20;i++) if (tabV[i]) cout << tabV[i]->info;
 //    cout << endl;
-    Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists,std::make_pair(true,true));
+    Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
 
     cout << "\n\n^^^^^^^^^^^^^^\n\n";
     dijTest3();

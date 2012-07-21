@@ -38,7 +38,7 @@ int main() {
 			 "2(2) 0\n"
 			 "3(3)@0 1 *3(0)\n", RG_VertexLists, verts,edges);
 
-    writeGraphText(g,std::cout,RG_VertexLists); std::cout << "***\n";
+    writeGraphText(g,std::cout,RG_VertexLists|RG_Info); std::cout << "***\n";
 
 	for(i = 0, v = g.getVert(); v != NULL; v = g.getVertNext(v)) verts2[i++] = v;
 	if(verts[0] != verts2[3] || verts[1] != verts2[0]) {
@@ -46,7 +46,7 @@ int main() {
 		rv |= false;
 		};
 
-	writeGraphText(g, buf, 65536, RG_VertexLists);
+	writeGraphText(g, buf, 65536, RG_VertexLists|RG_Info);
 	rv |= Test("VertexLists", buf,
             "4\n"
 		   "0(0) 2 -1(101) >2(102)\n"
@@ -61,7 +61,7 @@ int main() {
 //		   "2(2) 0\n"
 //		   "3(3) 0\n");
 //
-	writeGraphText(g, buf, 65536, RG_EdgeList);
+	writeGraphText(g, buf, 65536, RG_EdgeList|RG_Info);
 	rv |= Test("EdgeList", buf,
             "4 4\n"
 		   "0 - 1(101)\n"
