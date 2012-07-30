@@ -1532,13 +1532,6 @@ inline bool Graph< VertInfo,EdgeInfo,Settings >::delAdjMatrix()
     return true;
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-inline bool Graph< VertInfo,EdgeInfo,Settings >::defragAdjMatrix()
-{
-    if (!pAdj) return false;
-    pAdj->defrag();
-    return true;
-}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline void Graph< VertInfo,EdgeInfo,Settings >::reserveAdjMatrix(int size)

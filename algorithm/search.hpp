@@ -456,7 +456,7 @@ template< class GraphType, class VertContainer, class Visitor >
 int DFSPar<DefaultStructs >::visitBase(
     const GraphType &g, typename GraphType::PVertex start, VertContainer &cont,
     Visitor visit, EdgeDirection mask, int component )
-{
+{   if (DefaultStructs::ReserveOutAssocCont) cont.reserve(g.getVertNo());
     return DFSBase< DFSPar<DefaultStructs >, DefaultStructs >:: template dfsVisitBase< GraphType,VertContainer,Visitor >( g,start,cont,visit,
         mask,component );
 }
@@ -489,7 +489,7 @@ template< class GraphType, class VertContainer, class Visitor >
 int DFSPreorderPar <DefaultStructs >::visitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
-{
+{   if (DefaultStructs::ReserveOutAssocCont) visited.reserve(g.getVertNo());
     return dfsPreVisitBase< GraphType,VertContainer,Visitor >( g,start,visited,
         visit,mask,component,visit );
 }
@@ -523,7 +523,7 @@ template< class GraphType, class VertContainer, class Visitor >
 int DFSPostorderPar <DefaultStructs >::visitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
-{
+{   if (DefaultStructs::ReserveOutAssocCont) visited.reserve(g.getVertNo());
     return dfsPostVisitBase< GraphType,VertContainer,Visitor >( g,start,
         visited,visit,mask,component,visit );
 }
@@ -582,7 +582,7 @@ template< class GraphType, class VertContainer, class Visitor >
 int BFSPar <DefaultStructs >::visitBase(
     const GraphType &g, typename GraphType::PVertex start,
     VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
-{
+{   if (DefaultStructs::ReserveOutAssocCont) visited.reserve(g.getVertNo());
     return bfsDoVisit< GraphType,VertContainer,Visitor >( g,start,visited,
         visit,mask,component );
 }
@@ -703,6 +703,7 @@ int SCCPar <DefaultStructs >::get(
     int rv;
     typename DefaultStructs:: template AssocCont<
             typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type vertCont(g.getVertNo());
+    if (DefaultStructs::ReserveOutAssocCont) compMap.reserve(g.getVertNo());
     typename GraphType::PVertex LOCALARRAY( buf1,g.getVertNo() + 1 );   //TODO: size?
     typename GraphType::PVertex LOCALARRAY( buf2,g.getVertNo() + 1 );   //TODO: size?
     SCCState< GraphType,CompIter,VertIter,CompMap > state( out,compMap,buf1,
@@ -1016,6 +1017,10 @@ int BlocksPar <DefaultStructs >::split(
     const EdgeType mask =EdAll;
     typename DefaultStructs:: template AssocCont<
             typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited(g.getVertNo());
+    if (DefaultStructs::ReserveOutAssocCont)
+    {
+            vertMap.reserve(g.getVertNo());edgeMap.reserve(g.getEdgeNo());
+    }
     typename GraphType::PEdge LOCALARRAY( stbuf,g.getEdgeNo() + 1 );    // TODO: size?
     VertBlockList LOCALARRAY( vertBlockList,g.getEdgeNo() * 2 + g.getVertNo() );    // TODO: size?
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap > state(
@@ -1043,6 +1048,10 @@ int BlocksPar  <DefaultStructs >::splitComp(
     const EdgeType mask =EdAll;//if (mask & (EdDirIn | EdDirOut)) mask |= EdDirOut | EdDirIn;
     typename DefaultStructs:: template AssocCont<
             typename GraphType::PVertex, VisitVertLabs< GraphType > >::Type visited(g.getVertNo());
+    if (DefaultStructs::ReserveOutAssocCont)
+    {
+            vertMap.reserve(g.getVertNo());edgeMap.reserve(g.getEdgeNo());
+    }
     typename GraphType::PEdge LOCALARRAY( stbuf,g.getEdgeNo() + 1 );    // TODO: size?
     VertBlockList LOCALARRAY( vertBlockList,g.getEdgeNo() * 2 + g.getVertNo() );    // TODO: size?
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap > state(

@@ -497,7 +497,7 @@ ConstGraphMethods< GraphType>::getChosenSets(std::pair<VChooser2,EChooser2> chs,
 template< class GraphType>  template <class Cont>
 void
 ConstGraphMethods< GraphType>::getAdj(Cont& cont,EdgeType mask) const
-{
+{   if (GraphSettings::ReserveOutAssocCont) cont.reserve(self.getVertNo());
     std::pair<PVertex,PVertex> ends;
     for(PEdge e=this->getEdge(mask);e;e=self.getEdgeNext(e,mask))
     {   ends=self.getEdgeEnds(e);

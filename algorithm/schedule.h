@@ -21,7 +21,7 @@ namespace Koala
 			typename GraphType::PVertex vertex;
 
 			Task(typename GraphType::PVertex _vertex = 0) : length(1), release(0),
-				duedate(AlgorithmsDefaultSettings::NumberTypeBounds<int>::plusInfty()), vertex(_vertex) { }
+				duedate(AlgsDefaultSettings::NumberTypeBounds<int>::plusInfty()), vertex(_vertex) { }
 
 			Task(int _length, int _release, int _duedate, typename GraphType::PVertex _vertex = 0)
 				: length(_length), release(_release), duedate(_duedate), vertex(_vertex) { }
@@ -240,7 +240,7 @@ namespace Koala
 		};
 	};
 
-	class Scheduling : public SchedulingPar<AlgorithmsDefaultSettings> {};
+	class Scheduling : public SchedulingPar<AlgsDefaultSettings> {};
 
 	#include "schedule.hpp"
 }

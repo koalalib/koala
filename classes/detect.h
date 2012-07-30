@@ -1,6 +1,7 @@
 #ifndef KOALA_DETECTOR_H
 #define KOALA_DETECTOR_H
 
+#include "..\container\simple.h"
 #include "..\graph\graph.h"
 #include "..\algorithm\search.h"
 #include "..\container\joinsets.h"
@@ -9,29 +10,40 @@
 namespace Koala
 {
 
-
-class IsItAlgsDefaultStructs : public AlgorithmsDefaultSettings {
+// Domyslne wytyczne dla IsItPar
+class IsItAlgsDefaultSettings : public AlgsDefaultSettings {
     public:
 
+    // typ grafu pomocniczego tworzonego wewnatrz procedur
     class LocalGraph {
         public:
-        typedef Graph<EmptyVertInfo,EmptyVertInfo,DefaultGrSettings<Undirected,false> > Type;
+        typedef Graph<EmptyVertInfo,EmptyVertInfo,GrDefaultSettings<Undirected,false> > Type;
     };
 
 };
 
 
+//Algorytmy rozpoznawania rodzin grafow. Dla rodziny family jest metoda rozpoznajaca bool family(const& graph).
+//Jesli family ma sens takze dla multigrafow, bool family(const& graph, bool allowmulti) gdzie flaga bool podaje
+//czy zezwalay na krawedzie rownolegle i petle. Jesli dla klasy family sa jakies szczegolne procedury (tylko dla grafow tego typu),
+//wprowadza sie dodatkowo podklase Family z metodami realizujacymi te funkcje.
+
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class IsItPar : public SearchStructs {
 
 	public:
 
+
+    // Generalnie zaklada sie, ze poprawny (dla IsItPar) graf wejsciowy nie ma petli ani lukow oraz n>0
+    // Ta metoda jest wyjatkiem, sprawdza czy n=0
     template <class GraphType>
 	static bool zero(const GraphType& g)
 	{
 	    return !g.getVertNo();
 	}
 
+    // czy graf jest prosty (tj. nie ma krawedzi rownoleglych)
     template <class GraphType>
 	static bool undir(const GraphType& g,bool allowmulti=false)
 	{   if (allowmulti) return g.getVertNo()>0 && g.getEdgeNo(EdDirIn|EdDirOut)==0; // undir
@@ -39,15 +51,13 @@ class IsItPar : public SearchStructs {
 	    if (!g.getVertNo() || g.getEdgeNo(EdDirIn|EdDirOut|EdLoop)) return false;
 	    std::pair<typename GraphType::PVertex,typename GraphType::PVertex>  LOCALARRAY(tabE,g.getEdgeNo());
 	    for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-	    {
-	        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> pair=g.getEdgeEnds(e);
-	        tabE[i++]=std::make_pair(std::min(pair.first,pair.second),std::max(pair.first,pair.second));
-	    }
+	        tabE[i++]=pairMinMax(g.getEdgeEnds(e));
 	    DefaultStructs::sort( tabE,tabE + g.getEdgeNo() );
 	    for(i=1;i<g.getEdgeNo();i++) if (tabE[i-1]==tabE[i]) return false;
 	    return true;
 	}
 
+    // czy spojny
     template <class GraphType>
 	static bool connected(const GraphType& g, bool allowmulti=false)
 	{
@@ -55,19 +65,21 @@ class IsItPar : public SearchStructs {
 	    return BFSPar<DefaultStructs>::scanAttainable(g,g.getVert(),blackHole)==g.getVertNo();
 	}
 
+    // czy bezkrawedziowy
 	template <class GraphType>
 	static bool empty(const GraphType& g)
 	{
 	    return g.getVertNo() && !g.getEdgeNo();
 	}
 
-
+    // klika
 	template <class GraphType>
 	static bool clique(const GraphType& g)
 	{
 	    return (g.getEdgeNo()==g.getVertNo()*(g.getVertNo()-1)/2) && undir(g,false);
 	}
 
+    // suma rozlacznych klik
 	template <class GraphType>
 	static bool cliques(const GraphType& g)
 	{   if (!undir(g,false)) return false;
@@ -77,24 +89,28 @@ class IsItPar : public SearchStructs {
 	    return e==g.getEdgeNo();
 	}
 
+    // drzewo
 	template <class GraphType>
 	static bool tree(const GraphType& g)
 	{
 	    return connected(g,true) && (g.getVertNo()-1==g.getEdgeNo());
 	}
 
+    // las
 	template <class GraphType>
 	static bool forest(const GraphType& g)
 	{
 	    return undir(g,true) && !BFSPar<DefaultStructs>::cyclNo(g);
 	}
 
+    // regularny
 	template <class GraphType>
 	static bool regular(const GraphType& g,bool allowmulti=false)
 	{
 	    if (!undir(g,allowmulti)) return false;
-	    int deg=g.deg(g.getVert());
-	    for(typename GraphType::PVertex v=g.getVertNext(g.getVert());v;v=g.getVertNext(v))
+	    typename GraphType::PVertex v=g.getVert();
+	    int deg=g.deg(v);
+	    for(v=g.getVertNext(v);v;v=g.getVertNext(v))
             if (g.deg(v)!=deg) return false;
         return true;
 	}
@@ -102,6 +118,7 @@ class IsItPar : public SearchStructs {
     class Path {
         public:
 
+        // Konce podanej sciezki, (NULL,NULL) w razie bledu
         template <class GraphType>
         static std::pair<typename GraphType::PVertex,typename GraphType::PVertex> getEnds(const GraphType& g)
         {   std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
@@ -113,16 +130,17 @@ class IsItPar : public SearchStructs {
                 {
                     case 0: return make_pair(v,v);
                     case 1: if (!res.first) res.first=v;
-                            else    {
-                                        if (!res.second) { res.second=v; return res; }
-                                        else return null;
-                                    }
+                            else    if (!res.second) res.second=v;
+                                    else return null;
+
                     case 2: break;
                     default : return null;
                 }
+            return res;
         }
     };
 
+    // sciezka
     template <class GraphType>
 	static bool path(const GraphType& g)
 	{
@@ -132,6 +150,7 @@ class IsItPar : public SearchStructs {
     class Caterpillar {
         public:
 
+        // Konce grzbietu gasienicy, (NULL,NULL) w razie bledu
         template <class GraphType>
         static std::pair<typename GraphType::PVertex,typename GraphType::PVertex> getSpineEnds(const GraphType& g)
         {   std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
@@ -143,36 +162,42 @@ class IsItPar : public SearchStructs {
         }
     };
 
+    // gasienica
     template <class GraphType>
 	static bool caterpillar(const GraphType& g)
 	{
 	    return Caterpillar::getSpineEnds(g).first;
 	}
 
+    // cykl,
 	template <class GraphType>
 	static bool cycle(const GraphType& g,bool allowmulti=false)
 	{
 	    return connected(g,allowmulti) && g.deg(g.getVert())==2 && regular(g,true);
 	}
 
+    // zbior niezalezny krawedzi
 	template <class GraphType>
 	static bool matching(const GraphType& g)
 	{
 	    return undir(g,true) && g.Delta()<=1;
 	}
 
+    // podkubiczny
 	template <class GraphType>
 	static bool subcubic(const GraphType& g,bool allowmulti=false)
 	{
 	    return undir(g,allowmulti) && g.Delta()<=3;
 	}
 
+    // kubiczny
 	template <class GraphType>
 	static bool cubic(const GraphType& g,bool allowmulti=false)
 	{
 	    return  g.getVert() && g.deg(g.getVert())==3 && regular(g,allowmulti);
 	}
 
+    // graf o wszystkich skladowych 2-spojnych bedacych klikami
 	template <class GraphType>
 	static bool block(const GraphType& g)
 	{   if (!undir(g,false)) return false;
@@ -183,6 +208,7 @@ class IsItPar : public SearchStructs {
 	}
 
 	template <class GraphType>
+	// maks. liczba cyklomatyczna skladowej 2-spojnej grafu prostego. -1 w razie bledu.
 	static int almostTree(const GraphType& g)
 	{   if (!undir(g,false)) return -1;
 	    int LOCALARRAY(comptab,g.getVertNo()+g.getEdgeNo()+1);
@@ -200,8 +226,9 @@ class IsItPar : public SearchStructs {
         public:
 
         template <class GraphType,class Iter>
+        // wypisuje na iterator wierzcholki jednej partycji grafu dwudzielnego. Zwraca licznosc partycji (-1 w razie bledu)
         static int getPart(const GraphType& g,Iter out,bool allowmulti=false)
-        {   if (!undir(g,allowmulti) || g.getEdgeNo(EdLoop)) return -1;
+        {   if ((!undir(g,allowmulti)) || g.getEdgeNo(EdLoop)) return -1;
             typename DefaultStructs:: template AssocCont<
                     typename GraphType::PVertex, SearchStructs::VisitVertLabs<GraphType > >
                             ::Type vertCont(g.getVertNo());
@@ -212,11 +239,15 @@ class IsItPar : public SearchStructs {
             }
             int licz=0;
             for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-                if (vertCont[v].distance^1) { licz++; *out=v; ++out; }
+                if ((vertCont[v].distance&1)==0) { licz++; if (!isBlackHole(out)) {*out=v; ++out; } }
             return licz;
         }
+
+        // TODO: rozwazyc static int maxStable(const Graph &g, Iter out)
     };
 
+
+    // czy dwudzielny
     template <class GraphType>
 	static bool bipartite(const GraphType& g,bool allowmulti=false)
 	{
@@ -225,28 +256,19 @@ class IsItPar : public SearchStructs {
 
     class CompBipartite {
         public:
-
+        // wypisuje na iterator wierzcholki jednej partycji grafu pelnego dwudzielnego. Zwraca licznosc partycji (-1 w razie bledu)
         template <class GraphType,class Iter>
         static int getPart(const GraphType& g,Iter out)
-        {   if (!undir(g,false) || g.getEdgeNo(EdLoop)) return -1;
-            typename DefaultStructs:: template AssocCont<
-                    typename GraphType::PVertex, SearchStructs::VisitVertLabs<GraphType > >
-                            ::Type vertCont(g.getVertNo());
-            BFSPar<DefaultStructs>::scan(g,blackHole,EdUndir,vertCont);
-            for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-            {   std::pair<typename GraphType::PVertex,typename GraphType::PVertex> ends=g.getEdgeEnds(e);
-                if ((vertCont[ends.first].distance &1)==(vertCont[ends.second].distance &1)) return -1;
-            }
-            int licz=0;
-            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-                if (vertCont[v].distance^1) licz++;
+        {   typename GraphType::PVertex LOCALARRAY(tabE,g.getVertNo());
+            int licz=Bipartite::getPart(g,tabE,false);
+            if (licz==-1) return -1;
             if (licz*(g.getVertNo()-licz)!=g.getEdgeNo(EdUndir)) return -1;
-            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-                if (vertCont[v].distance^1) { *out=v; ++out; };
+            if (!isBlackHole(out)) for(int i=0;i<licz;i++) { *out=tabE[i]; ++out; };
             return licz;
         }
     };
 
+    // czy pelny dwudzielny
     template <class GraphType>
 	static bool compBipartite(const GraphType& g)
 	{
@@ -258,7 +280,8 @@ class IsItPar : public SearchStructs {
         public:
 
         template <class GraphType, class Iter,class VIter>
-        static int getParts(const GraphType& g,Iter iter,VIter viter)
+        // wyrzuca na out ciagi wierzcholkow tworzacych partycje grafu pelnego M-dzielnego. Zwraca liczbe partycji M lub -1 w razie bledu
+        static int getParts(const GraphType& g,CompStore< Iter,VIter > out)
         {
             if (!undir(g,false)) return -1;
             typename DefaultStructs:: template AssocCont<
@@ -269,7 +292,7 @@ class IsItPar : public SearchStructs {
             for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
             {   for(i=0;i<g.getVertNo();i++) tabC[i]=1;
                 for(typename GraphType::PEdge e=g.getEdge(v,EdUndir);e;e=g.getEdgeNext(v,e,EdUndir))
-                if (colors.hasKey(g.getEdgeEnd(e,v))) tabC[colors[g.getEdgeEnd(e,v)]]=0;
+                    if (colors.hasKey(g.getEdgeEnd(e,v))) tabC[colors[g.getEdgeEnd(e,v)]]=0;
                 for(i=0;!tabC[i];i++);
                 maxc=std::max(maxc,colors[v]=i);
             }
@@ -279,26 +302,32 @@ class IsItPar : public SearchStructs {
             if (licz!=g.getEdgeNo(EdUndir)) return -1;
 
             licz=0;
-            for(i=0;i<=maxc;i++) { *iter=licz; ++iter; licz+=tabC[i];  }
-            *iter=g.getVertNo(); ++iter;
-
-            for(i=0;i<=maxc;i++)
-               for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) if (colors[v]==i)
-               { *viter=v; ++viter; }
+            if (!isBlackHole(out.compIter))
+            {
+                for(i=0;i<=maxc;i++) { *out.compIter=licz; ++out.compIter; licz+=tabC[i];  }
+                *out.compIter=g.getVertNo(); ++out.compIter;
+            }
+            if (!isBlackHole(out.vertIter))
+                for(i=0;i<=maxc;i++)
+                    for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+                        if (colors[v]==i)
+                            { *out.vertIter=v; ++out.vertIter; }
             return maxc+1;
         }
     };
 
+    // czy pelny M-dzielny dla pewnego M>0
     template <class GraphType>
 	static bool compMPartite(const GraphType& g)
 	{
-	    return CompMPartite::getParts(g,blackHole,blackHole)!=-1;
+	    return CompMPartite::getParts(g,compStore(blackHole,blackHole))!=-1;
 	}
 
 /* M. Habib, R. McConnel, C. Paul, L.Viennot
  * Lex-BFS and Partition Refinement, with Applications to Transitive
  * Orientation, Interval Graph Recognition and Consecutive Ones Testing
  */
+    // Obsluga chordali
     class Chordal {
     protected:
 
@@ -363,8 +392,10 @@ class IsItPar : public SearchStructs {
 
         public:
 
-        template<class Graph, class VIter1, class VIter2>
-        static bool getOrder(const Graph &g,VIter1 oiter, VIter2 riter) {
+        template<class Graph, class VIter2>
+        // wyrzuca na iterator odwrotny perf. ellimination order chordal grafu tj. porzadek doklejania nowych wierzcholkow za podkliki
+        // false gdy graf nie byl chordal
+        static bool getOrder(const Graph &g,VIter2 riter) {
             if (!undir(g,false)) return false;
             int i, m, n, p, ui, vi;
             int x, px, xp, pxp;
@@ -442,14 +473,13 @@ class IsItPar : public SearchStructs {
                 if(fail) return false;
                 };
 
-            if (!isBlackHole(oiter))
-                for(int i=0;i<g.getVertNo();i++) { *oiter=pi[i];++oiter;}
             if (!isBlackHole(riter))
                 for(int i=g.getVertNo()-1;i>=0;i--) { *riter=pi[i];++riter;}
 
             return true;
         };
 
+        // TODO: masakra! uproscic
         template<class Graph, class VIter, class VIterOut, class QIter,class QTEIter>
         static int maxCliques(const Graph &g,VIter begin, VIter end, CompStore< QIter,VIterOut > out,QTEIter qte)
         {   int i,j,licze=0,res,no;
@@ -504,10 +534,12 @@ class IsItPar : public SearchStructs {
         template<class Graph, class VIterOut, class QIter,class QTEIter>
         static int maxCliques(const Graph &g,CompStore< QIter,VIterOut > out, QTEIter qte)
         {   typename Graph::PVertex LOCALARRAY(vbuf,g.getVertNo());
-            if (!getOrder(g,blackHole,vbuf)) return -1;
+            if (!getOrder(g,vbuf)) return -1;
             return maxCliques(g,vbuf,vbuf+g.getVertNo(),out,qte);
         }
 
+
+    // TODO: rozwazyc static int maxStable(const Graph &g, Iter out)
 
     };
 
@@ -517,18 +549,32 @@ class IsItPar : public SearchStructs {
     template <class GraphType>
 	static bool chordal(const GraphType& g)
 	{
-	    return Chordal::getOrder(g,blackHole,blackHole);
+	    return Chordal::getOrder(g,blackHole);
 	}
 
+    // czy graf jest dopelnieniem chordala
     template <class GraphType>
 	static bool cochordal(const GraphType& g)
 	{
-	    if (!undir(g,false)) return false;
+	    if (!undir(g,true) || g.getEdgeNo(Loop)>0) return false;
 	    typename DefaultStructs::LocalGraph::Type cg;
-	    cg.copy(g);cg.neg(Undirected);
+	    typename DefaultStructs:: template TwoDimTriangleAssocCont<
+            typename GraphType::PVertex, bool >::Type matr(g.getVertNo());
+        typename DefaultStructs:: template AssocCont<
+            typename GraphType::PVertex, typename DefaultStructs::LocalGraph::Type::PVertex >::Type vmap(g.getVertNo());
+        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) vmap[v]=cg.addVert();
+        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+            if (matr(g.getEdgeEnds(e))) return false;
+            else matr(g.getEdgeEnds(e))=true;
+        for(typename GraphType::PVertex v=g.getVert();v!=g.getVertLast();v=g.getVertNext(v))
+            for(typename GraphType::PVertex u=g.getVertNext(v);u;u=g.getVertNext(u))
+                if (!matr(u,v)) cg.addEdge(vmap[v],vmap[u]);
+
+//	    cg.copy(g);cg.neg(Undirected);
 	    return chordal(cg);
 	}
 
+    // czy splitgraph
 	template <class GraphType>
 	static bool split(const GraphType& g)
 	{
@@ -768,9 +814,14 @@ class IsItPar : public SearchStructs {
              * The Complexity of Comparability Graph Recognition and Coloring
              * Computing 18, 199-208 (1977)
              */
-
+            // Kompleksowa obsluga comparability grafu
+            // zwraca liczbe chromatyczna lub -1 jesli graf nie byl comparability
+            // dirmap - wysciowa tablica asocjacyjna PVertex->EdgeDirection z przykladowa comparability orientation krawedzi
+            // (kierunek krawedzi miedzy getEdgeEnd1 a getEdgeEnd2). Lub BlackHole.
+            // aheightmap- wysciowa tablica asocjacyjna PVertex->int z optymalnym pokolorowaniem wierzcholkowym. Lub BlackHole.
+            // cliqueiter - iterator wyjsciowy, na ktory zostaje zapisana najwieksza klika
             template<class Graph,class DirMap, class OutMap, class OutIter>
-            static int explore(const Graph &g, DirMap& adirmap,OutMap &aheightmap,OutIter cliqueiter)
+            static int explore(const Graph &g, DirMap& dirmap,OutMap &aheightmap,OutIter cliqueiter)
             {
                 if (!undir(g,false)) return -1;
                 int b,i,m,h,n = g.getVertNo();
@@ -781,14 +832,14 @@ class IsItPar : public SearchStructs {
                     return 1;
                 }
 
-                typename DefaultStructs:: template AssocCont<typename Graph::PEdge,
-                EdgeDirection >::Type localdirmap;
-                typename BlackHoleSwitch<DirMap,typename DefaultStructs::template AssocCont<typename Graph::PEdge,
-                EdgeDirection >::Type >::Type &
-                    dirmap=
-                BlackHoleSwitch<DirMap,typename DefaultStructs:: template AssocCont<typename Graph::PEdge,
-                EdgeDirection >::Type >::get(adirmap,localdirmap);
-                if (isBlackHole(adirmap)) dirmap.reserve(g.getEdgeNo());
+//                typename DefaultStructs:: template AssocCont<typename Graph::PEdge,
+//                EdgeDirection >::Type localdirmap;
+//                typename BlackHoleSwitch<DirMap,typename DefaultStructs::template AssocCont<typename Graph::PEdge,
+//                EdgeDirection >::Type >::Type &
+//                    dirmap=
+//                BlackHoleSwitch<DirMap,typename DefaultStructs:: template AssocCont<typename Graph::PEdge,
+//                EdgeDirection >::Type >::get(adirmap,localdirmap);
+                if (DefaultStructs::ReserveOutAssocCont) dirmap.reserve(g.getEdgeNo());
 
 
                 typename Graph::PVertex LOCALARRAY(idxv, n);
@@ -821,24 +872,30 @@ class IsItPar : public SearchStructs {
                     heightmap=
                 BlackHoleSwitch<OutMap,typename DefaultStructs:: template AssocCont<typename Graph::PVertex,
                 int >::Type >::get(aheightmap,localheightmap);
-                if (isBlackHole(aheightmap)) heightmap.reserve(g.getVertNo());
+                if (isBlackHole(aheightmap)||DefaultStructs::ReserveOutAssocCont) heightmap.reserve(g.getVertNo());
 
 
                 for(i = 0; i < n; i++) heightmap[idxv[i]] = height[i] - 1;
-                for(typename Graph::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e))
-                {
-                    assert(heightmap[g.getEdgeEnds(e).first]!=heightmap[g.getEdgeEnds(e).second]);
-                    if (heightmap[g.getEdgeEnds(e).first]<heightmap[g.getEdgeEnds(e).second]) dirmap[e]=EdDirIn;
-                    else dirmap[e]=EdDirOut;
-                }
+
+                if (!isBlackHole(dirmap))
+                    for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+                    {   // TODO: w finalnej wersji usunac assert
+                        assert(heightmap[g.getEdgeEnd1(e)]!=heightmap[g.getEdgeEnd2(e)]);
+                        if (heightmap[g.getEdgeEnd1(e)]<heightmap[g.getEdgeEnd2(e)]) dirmap[e]=EdDirIn;
+                        else dirmap[e]=EdDirOut;
+                    }
                 if (!isBlackHole(cliqueiter)) GetClique(state, height, b, idxv, cliqueiter);
                 return m;
             };
 
+            // sprawdza, czy graf byl comparability
+            // adirmap - wysciowa tablica asocjacyjna PVertex->EdgeDirection z przykladowa comparability orientation krawedzi
+            // (kierunek krawedzi miedzy getEdgeEnd1 a getEdgeEnd2). Lub BlackHole
             template<class Graph,class DirMap>
             static bool getDirs(const Graph &g, DirMap& adirmap)
             {   return explore(g,adirmap,blackHole,blackHole)!=-1; }
 
+            // sprawdza, czy graf byl comparability. Jesli tak, nadaje krawedziom wlasciwa orientacje
             template<class Graph>
             static bool getDirs(Graph &g)
             {   int m=g.getEdgeNo();
@@ -852,17 +909,21 @@ class IsItPar : public SearchStructs {
                 return true;
             }
 
+            // zwraca liczbe chromatyczna lub -1 jesli graf nie byl comparability
+            // avmap - wysciowa tablica asocjacyjna PVertex->int z optymalnym pokolorowaniem wierzcholkowym. Lub BlackHole.
             template<class Graph,class OutMap>
             static int color(const Graph &g, OutMap& avmap)
             {   return explore(g,blackHole,avmap,blackHole); }
 
 	    /** find a largest clique in a comparability graph
 	     * @param[in] g graph
-	     * @param[out] iter iterator to write clique's vertices
+	     * @param[out] iter iterator to write clique's vertices. Lub BlackHole.
 	     * @return number of vertices in the clique */
             template<class Graph,class OutIter>
             static int maxClique(const Graph &g, OutIter iter)
             {   return explore(g,blackHole,blackHole,iter); }
+
+        // TODO: rozwazyc static int maxStable(const Graph &g, Iter out)
 
     };
 
@@ -872,21 +933,29 @@ class IsItPar : public SearchStructs {
     template <class GraphType>
 	static bool comparability(const GraphType& g)
 	{
-	    return Comparability::explore(g,blackHole,blackHole,blackHole)!=-1;;
+	    return Comparability::explore(g,blackHole,blackHole,blackHole)!=-1;
 	}
 
     class Interval {
 
         public:
 
+            // Struktura reprezentujaca przedzial domkniety na prostej o koncach calkowitych (dopuszczalna dlugosc 0)
             struct Segment {
                 int left, right;
                 Segment(int l=0,int r=1) : left(l), right(r) { /*assert(l<r);*/ }
             };
 
+            // czy dwa takie przedzialy tna sie niepusto
             static bool touch(Segment a, Segment b)
             {   return std::max(a.left,b.left)<= std::min(a.right,b.right); }
 
+        // konwersja zbior przedzialow-> interval graph
+        // pobiera spomiedzy 2 iteratorow ciag przedzialow (struktur typu segment)
+        // dopisuje do danego grafu odpowiadajacy mu graf przeciec (zwraca pierwszy stworzony wierzcholek)
+        // pola info wierzcholkow i krawedzi tworzy funktorami vinfo(int), einfo(int,int) - argumenty to
+        // numery przedzialow w ciagu wejsciowym
+        // na iterator out zwraca sekwencje stworzonych wierzcholkow zgodna z cagiem przedzialow
         template<class GraphType,class Iter,class IterOut, class VInfoGen, class EInfoGen>
         static typename GraphType::PVertex
         segs2graph(GraphType &g,Iter begin, Iter end,IterOut out,VInfoGen vinfo, EInfoGen einfo)
@@ -894,7 +963,8 @@ class IsItPar : public SearchStructs {
             int licz=0,i=0,j=0;
             Iter it;
             for(it=begin;it!=end;++it)
-            {   assert((*it).left<(*it).right); licz++;    }
+            // TODO: throw
+            {   assert((*it).left<=(*it).right); licz++;    }
             if (!licz) return 0;
             typename GraphType::PVertex LOCALARRAY(tabv,licz);
             for(it=begin;it!=end;++it)
@@ -910,6 +980,8 @@ class IsItPar : public SearchStructs {
             return res;
         }
 
+
+        // j.w. ale polom info nadawane sa wartosci domyslne
         template<class GraphType,class Iter,class IterOut>
         static typename GraphType::PVertex segs2graph(GraphType &g,Iter begin, Iter end,IterOut out)
         {  return segs2graph(g,begin,end,out,
@@ -919,7 +991,7 @@ class IsItPar : public SearchStructs {
 
 	/** convert interval graph to its interval representation
 	 * @param[in] g graph
-	 * @param[out] outmap map (PVertex -> Segment)
+	 * @param[out] outmap map (PVertex -> Segment), Lub BlackHole.
 	 * @return true if g is interval, false otherwise */
         template<class GraphType,class IntMap>
         static bool graph2segs(const GraphType &g,IntMap& outmap) {
@@ -978,6 +1050,7 @@ class IsItPar : public SearchStructs {
 
             if(IsUmbrellaFree(g, data, sigma)) {
                 if(!isBlackHole(outmap)) {
+                    if(DefaultStructs::ReserveOutAssocCont) outmap.reserve(g.getVertNo());
 		    CalculateI(g, sigma, data, &IvData::posSigma, &IvData::ip);
                     for(int i=0;i<g.getVertNo();i++) { outmap[sigma[i]] = Segment(i, data[sigma[i]].ip); }
 		    };
@@ -1345,7 +1418,9 @@ class IsItPar : public SearchStructs {
 
 };
 
-class IsIt : public IsItPar<IsItAlgsDefaultStructs> {};
+
+// wersja dzialajaca na DefaultStructs=IsItAlgsDefaultSettings
+class IsIt : public IsItPar<IsItAlgsDefaultSettings> {};
 
 }
 #endif

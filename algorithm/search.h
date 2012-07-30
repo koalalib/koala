@@ -138,7 +138,8 @@ class SearchStructs {
                 std::vector<int> idx;
                 std::vector<T> data;
             public:
-                void clear() { idx.clear(); data.clear(); }
+                VectCompStore() { clear(); }
+                void clear() { idx.clear(); data.clear(); idx.push_back(0); }
                 int size() const // liczba zebranych ciagow
                 {
                     if (idx.empty()) return 0;
@@ -147,6 +148,11 @@ class SearchStructs {
                 int size(int i) const // dlugosc i-tego ciagu
                 {   assert(i>=0 && i<=this->size()-1); //TODO: throw
                     return idx[i+1]-idx[i];
+                }
+                int lenght() const // laczna dlugosc wszystkich ciagow
+                {   int res=0;
+                    for(int i=0;i<size();i++) res+=size(i);
+                    return res;
                 }
                 T* operator[](int i) // wskaznik poczatku i-tego ciagu
                 {   assert(i>=0 && i<=this->size()-1); //TODO: throw
@@ -157,9 +163,41 @@ class SearchStructs {
                     return &data[idx[i]];
                 }
 
-                //Dla pustego obiektu umiesczamy wywolanie funkcji w miejsu compStore a pozniej przetwarzamy zebrane ciagi
+                T* insert(int i) // umieszcza nowy ciag pusty na pozycji i. Zwraca wskaznik jego poczatku
+                {   assert(i>=0 && i<=size()); //TODO: throw
+                    idx.insert(idx.begin()+i,idx[i]);
+                    return operator[](i);
+                }
+
+                void del(int i) // kasuje ciag na pozycji i
+                {   assert(i>=0 && i<=this->size()-1); //TODO: throw
+                    int delta=size(i);
+                    data.erase(data.begin()+idx[i],data.begin()+idx[i+1]);
+                    for(int j=i+1;j<idx.size();j++) idx[j]-=delta;
+                    idx.erase(idx.begin()+i);
+                }
+
+                T* resize(int i, int asize) // zmienia dlugosc i-tego ciagu. Zwraca wskaznik jego poczatku
+                {   assert(i>=0 && i<=this->size()-1 && asize>=0); //TODO: throw
+                    if (asize==size(i)) return this->operator[](i);
+                    if (asize>size(i))
+                    {   int delta=asize-size(i);
+                        data.insert(data.begin()+idx[i+1],delta,T());
+                        for(int j=i+1;j<idx.size();j++) idx[j]+=delta;
+                    } else
+                    {   int delta=size(i)-asize;
+                        data.erase(data.begin()+(idx[i+1]-delta),data.begin()+idx[i+1]);
+                        for(int j=i+1;j<idx.size();j++) idx[j]-=delta;
+                    }
+                    return this->operator[](i);
+                }
+
+                //Umiesczamy wywolanie funkcji w miejsu compStore a pozniej przetwarzamy zebrane ciagi
+                // czysci kontener
                 CompStore<std::back_insert_iterator<std::vector<int> >,std::back_insert_iterator<std::vector<T> > >
-                    input() { return compStore(std::back_inserter(idx),std::back_inserter(data)); }
+                    input() { idx.clear(); data.clear();
+                        return compStore(std::back_inserter(idx),std::back_inserter(data));
+                    }
         };
 
 } ;
@@ -522,7 +560,7 @@ class Visitors: public SearchStructs {
 
 // Ogolna implementacja przeszukiwania grafu roznymi strategiami (DFS, BFS, LexBFS)
 // Strategie dostarcza metoda visitBase z klasy SearchImpl, ktora odwiedza wierzcholki stosownie do swojej klasy
-// DefaultStructs dostarcza wytycznych dla wewnetrznych procedur por. np. AlgorithmsDefaultSettings z def_struct.h
+// DefaultStructs dostarcza wytycznych dla wewnetrznych procedur por. np. AlgsDefaultSettings z def_struct.h
 template< class SearchImpl, class DefaultStructs >
 class GraphSearchBase: public ShortPathStructs, public SearchStructs
 {
@@ -706,7 +744,7 @@ template< class SearchImpl, class DefaultStructs >
 // DefaultStructs - wytyczne dla wewnetrznych procedur
 class DFSBase: public GraphSearchBase< SearchImpl , DefaultStructs >
 {
-    private:
+    protected:
         template< class GraphType, class VertContainer, class Visitor >
         static int dfsDoVisit(
             DFSParamBlock< GraphType,VertContainer,Visitor > &,
@@ -760,8 +798,8 @@ class DFSPar: public DFSBase< DFSPar<DefaultStructs >, DefaultStructs >
             Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class DFS : public DFSPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class DFS : public DFSPar<AlgsDefaultSettings> {};
 
 /*
  * Preorder Depth-First-Search
@@ -771,7 +809,7 @@ template <class DefaultStructs>
 // DefaultStructs - wytyczne dla wewnetrznych procedur
 class DFSPreorderPar: public DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStructs >
 {
-    private:
+    protected:
         template< class GraphType, class VertContainer, class Visitor >
         static int dfsPreVisitBase(
             const GraphType &, typename GraphType::PVertex, VertContainer &,
@@ -802,8 +840,8 @@ class DFSPreorderPar: public DFSBase< DFSPreorderPar<DefaultStructs>, DefaultStr
             Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class DFSPreorder : public DFSPreorderPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class DFSPreorder : public DFSPreorderPar<AlgsDefaultSettings> {};
 
 /*
  * Postorder Depth-First-Search
@@ -813,7 +851,7 @@ template <class DefaultStructs>
 // DefaultStructs - wytyczne dla wewnetrznych procedur
 class DFSPostorderPar: public DFSBase< DFSPostorderPar<DefaultStructs >, DefaultStructs >
 {
-    private:
+    protected:
         template< class GraphType, class VertContainer, class Visitor >
         static int dfsPostVisitBase(
             const GraphType &, typename GraphType::PVertex, VertContainer &,
@@ -844,8 +882,8 @@ class DFSPostorderPar: public DFSBase< DFSPostorderPar<DefaultStructs >, Default
             Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class DFSPostorder: public DFSPostorderPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class DFSPostorder: public DFSPostorderPar<AlgsDefaultSettings> {};
 
 /*
  * Breadth-First-Search
@@ -855,7 +893,7 @@ template <class DefaultStructs>
 // DefaultStructs - wytyczne dla wewnetrznych procedur
 class BFSPar: public GraphSearchBase< BFSPar<DefaultStructs >, DefaultStructs >
 {
-    private:
+    protected:
         template< class GraphType, class VertContainer, class Visitor >
         static int bfsDoVisit(
             const GraphType &, typename GraphType::PVertex, VertContainer &,
@@ -881,8 +919,8 @@ class BFSPar: public GraphSearchBase< BFSPar<DefaultStructs >, DefaultStructs >
             Visitor visitor, EdgeDirection dir, int compid);
 } ;
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class BFS: public BFSPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class BFS: public BFSPar<AlgsDefaultSettings> {};
 
 /*
  * lexicographical Breadth-First-Search
@@ -1057,6 +1095,7 @@ public:
 //        DefaultCPPAllocator2 allocat2;
 //		LexVisitContainer<GraphType, DefaultCPPAllocator,DefaultCPPAllocator2> cont(allocat,allocat2);
 
+        if (DefaultStructs::ReserveOutAssocCont) visited.reserve(g.getVertNo());
         assert(((mask&Directed)==0)||((mask&Directed)==Directed)); // TODO: throw
 		Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<LVCNode<GraphType> > > > allocat(g.getVertNo()+1); //TODO: size? - spr
         Privates::BlockListAllocator<Privates::ListNode<LVCNode<GraphType> > > allocat2(2*g.getVertNo()+1); //TODO: size? - spr 2n+1 -> n+1 - oj! raczej nie!
@@ -1240,8 +1279,8 @@ public:
 	};
 
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class LexBFS: public LexBFSPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class LexBFS: public LexBFSPar<AlgsDefaultSettings> {};
 
 
 /*
@@ -1325,8 +1364,8 @@ class SCCPar: protected SearchStructs
         static int connections(const GraphType &, CompMap &, PairIter );
 } ;
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class SCC : public SCCPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class SCC : public SCCPar<AlgsDefaultSettings> {};
 
 // Procedury na digrafach acykliczych
 template <class DefaultStructs>
@@ -1357,8 +1396,8 @@ class DAGAlgsPar: protected SearchStructs
 
 } ;
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class DAGAlgs : public DAGAlgsPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class DAGAlgs : public DAGAlgsPar<AlgsDefaultSettings> {};
 
 /*
  * Blocks -- biconnected components
@@ -1507,15 +1546,15 @@ class BlocksPar : protected SearchStructs
                 degs.delKey(v);q.pop();
                 if (e && degs.hasKey(u=g.getEdgeEnd(e,v))) q.push(std::make_pair(--degs[u],u));
             }
-            for(typename GraphType::PVertex v=degs.firstKey();v;v=degs.nextKey(v))
+            if (!isBlackHole(out)) for(typename GraphType::PVertex v=degs.firstKey();v;v=degs.nextKey(v))
             {   *out=v; ++ out;   }
             return degs.size();
         }
 
 } ;
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class Blocks : public BlocksPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class Blocks : public BlocksPar<AlgsDefaultSettings> {};
 
 /*
  * Eulerian cycle and path
@@ -1524,7 +1563,7 @@ class Blocks : public BlocksPar<AlgorithmsDefaultSettings> {};
 template <class DefaultStructs>
 // DefaultStructs - wytyczne dla wewnetrznych procedur
 class EulerPar: public PathStructs, protected SearchStructs {
-private:
+protected:
 	template<class GraphType>
 	struct EulerState {
 		const GraphType &g;
@@ -1590,7 +1629,9 @@ private:
         EdgeDirection symmask = mask | ((mask&(EdDirIn|EdDirOut)) ? EdDirIn|EdDirOut : 0);
         bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
         assert(!(dir && (mask&EdUndir)));
-        std::pair<typename GraphType::PVertex,typename GraphType::PVertex> zero((typename GraphType::PVertex)0,(typename GraphType::PVertex)0),res((typename GraphType::PVertex)0,(typename GraphType::PVertex)0);
+        std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
+                    zero((typename GraphType::PVertex)0,(typename GraphType::PVertex)0),
+                    res((typename GraphType::PVertex)0,(typename GraphType::PVertex)0);
         typename GraphType::PVertex x;
         int licz=0;
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
@@ -1885,8 +1926,8 @@ public:
 
 };
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class Euler : public EulerPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class Euler : public EulerPar<AlgsDefaultSettings> {};
 
 #include "../algorithm/search.hpp"
 

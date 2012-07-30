@@ -55,7 +55,7 @@ struct ParalLink<VertInfo,EdgeInfo,Settings,false> : public EmptyParalLink<VertI
 }
 
 // Klasa krawedzi glownej struktury grafu
-template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, class Settings = DefaultGrSettings<EdAll,true> >
+template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, class Settings = GrDefaultSettings<EdAll,true> >
 class Edge : public EdgeConst,
              public Settings::template EdgeAdditData<VertInfo,EdgeInfo,Settings>,
              public Privates::ParalLink<VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed>

@@ -8,6 +8,68 @@ namespace IO {
 
 namespace Privates {
 
+namespace OperTestSubSpace {
+
+class OperTest {
+    public:
+    int tab[5];
+    OperTest() {}
+
+    OperTest(std::ostream& os) {}
+    OperTest(std::istream& os) {}
+};
+
+
+template <class T>
+OperTest operator<<(OperTest arg1,T arg) { return OperTest();}
+
+template <class T>
+OperTest operator>>(OperTest arg1,T arg) { return OperTest();}
+
+template <class T>
+char makeOper(const T& arg) { return 'a';}
+
+OperTest makeOper(const OperTest&) { return OperTest(); }
+
+template <class T>
+struct PrivHasOperOut {
+
+    enum { res= (sizeof(makeOper(*((std::ostream*)0)<<  *((T*)0) ))==1) };
+};
+
+template <class T>
+struct PrivHasOperIn {
+
+    enum { res= (sizeof(makeOper( *((std::istream*)0)>>  (*((T*)0)) ))==1) };
+};
+
+
+}
+
+template <class T>
+class HasOperOut : public OperTestSubSpace::PrivHasOperOut<T> {};
+
+template <class T>
+class HasOperIn : public OperTestSubSpace::PrivHasOperIn<T> {};
+
+template <bool> struct ReadWriteHlp {
+    template <class A, class B>
+    static void write(A& a,B& b) {  }
+
+    template <class A, class B>
+    static bool read(A& a,B& b) {  return true; }
+};
+
+template<>
+struct ReadWriteHlp<true> {
+    template <class A, class B>
+    static void write(A& a,B& b) { a << b; }
+
+    template <class A, class B>
+    static bool read(A& a,B& b) {  return (bool)(a >> b); }
+};
+
+
 /** move object info in '(info)' format from input stream to string stream
  * and strip parentheses
  * @param[in] strm stream to read from
@@ -89,7 +151,7 @@ bool readGraphVL(Graph &g, std::istream &strm,
 		if(it == idxToPtr.end()) return false;
 		else u = it->second;
 
-		if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (u->info))) return false;
+		if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::VertInfoType >::res>::read(ostrm,u->info)) return false;
 		if(readOutputId(strm, ix)) vertexMap[ix] = u;
 
 		if(!(bool)(strm >> m)) return false;
@@ -109,7 +171,7 @@ bool readGraphVL(Graph &g, std::istream &strm,
 			if ((u == v) != (dir == EdLoop)) return false;
 			e = g.addEdge(u, v, dir);
 
-			if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (e->info))) return false;
+			if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::EdgeInfoType >::res>::read(ostrm,e->info)) return false;
 			if(readOutputId(strm, ix)) edgeMap[ix] = e;
 			};
 		};
@@ -162,14 +224,14 @@ bool readGraphEL(Graph &g, std::istream &strm,
 			if ((u == v)!= (dir== EdLoop)) return false;
 			e = g.addEdge(u, v, dir);
 
-			if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (e->info))) return false;
+			if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::EdgeInfoType >::res>::read(ostrm,e->info)) return false;
 			if(readOutputId(strm, ix)) edgeMap[ix] = e;
 			};
         for(id=0;id<n;id++) {
             strm >> iu; if (iu!=id) return false;
             it = idxToPtr.find(id);
             u = it->second;
-            if(readObjectInfo(strm, ostrm) && !(bool)(ostrm >> (u->info))) return false;
+            if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::VertInfoType >::res>::read(ostrm,u->info)) return false;
 			if(readOutputId(strm, ix)) vertexMap[ix] = u;
 		};
 	return true;
@@ -225,7 +287,8 @@ bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 
 	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
 		out << ptrToIdx[u];
-		if (printinf.first) out << '(' << u->info << ')';
+		if (printinf.first && HasOperOut<typename Graph::VertInfoType >::res)
+		{ out << '('; ReadWriteHlp<HasOperOut<typename Graph::VertInfoType >::res>::write(out,u->info); out << ')'; }
 		if (vmap.hasKey(u)) out << '@' << vmap[u];
 
 		for(i = 0, e = g.getEdge(u, flags); e != NULL; e = g.getEdgeNext(u, e, flags)) {
@@ -248,7 +311,10 @@ bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 			else if(g.getType(e) == Loop) out << '*';
 			else out << '>';
 			out << ptrToIdx[v];
-			if (printinf.second) out << '(' << e->info << ')';
+//			if (printinf.second) out << '(' << e->info << ')';
+            if (printinf.second && HasOperOut<typename Graph::EdgeInfoType >::res)
+            { out << '('; ReadWriteHlp<HasOperOut<typename Graph::EdgeInfoType >::res>::write(out,e->info); out << ')'; }
+
 			if (emap.hasKey(e)) out << '@' << emap[e];
 			used.insert(e);
 			};
@@ -286,14 +352,19 @@ bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 		else if(g.getType(e) == Directed) out << ">";
 		else out << "*";
 		out << ' ' << ptrToIdx[vs.second];
-		if (printinf.second) out << "(" << e->info << ")";
+//		if (printinf.second) out << "(" << e->info << ")";
+		if (printinf.second && HasOperOut<typename Graph::EdgeInfoType >::res)
+		{ out << '('; ReadWriteHlp<HasOperOut<typename Graph::EdgeInfoType >::res>::write(out,e->info); out << ')'; }
+
 		if (emap.hasKey(e)) out << '@' << emap[e];
 		out << "\n";
 		};
 
 	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
 		out << ptrToIdx[u];
-		if (printinf.first) out << '(' << u->info << ")";
+//		if (printinf.first) out << '(' << u->info << ")";
+		if (printinf.first && HasOperOut<typename Graph::VertInfoType >::res)
+		{ out << '('; ReadWriteHlp<HasOperOut<typename Graph::VertInfoType >::res>::write(out,u->info); out << ')'; }
 		if (vmap.hasKey(u)) out << '@' << vmap[u];
 		out <<"\n";
 		};

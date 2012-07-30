@@ -278,6 +278,7 @@ public:
 
 
 	void resize(size_t size) {
+//		std::cout << "\nresize\n";
 		if(size == m_size) return;
 		if(!empty()) {
 			HashSet<KeyType, HashFunction, Allocator> other(size);
@@ -287,6 +288,11 @@ public:
 			free(true);
 			initialize(size);
 			};
+		};
+
+    void reserve(size_t size) {
+		if(size > m_size) this->resize(size);
+//		std::cout << "\nreserve\n";
 		};
 
 
@@ -844,6 +850,11 @@ public:
 			};
 		};
 
+    void reserve(size_t size) {
+		if(size > this->slots()) this->resize(size);
+//		std::cout << "\nreserve\n";
+		};
+
 
 	void swap(BiDiHashMap &other) {
 		baseType::swap((baseType &)other);
@@ -885,14 +896,21 @@ private:
 
 
 template <class T> class AssocTabConstInterface;
+namespace Privates {
 
-template< class K, class V> class AssocTabConstInterface< BiDiHashMap< K,V > >
+    template <class T> class AssocTabTag;
+
+}
+
+template< class K, class V> class AssocTabConstInterface< BiDiHashMap< K,V > >: public Privates::AssocTabTag<K>
 {
     public:
         AssocTabConstInterface(const BiDiHashMap< K,V > &acont ): cont( acont ) {}
 
         typedef K KeyType;
         typedef V ValType;
+
+        typedef BiDiHashMap< K,V > OriginalType;
 
         bool hasKey( K arg ) const { return cont.find( arg ) != cont.end(); }
 
@@ -917,7 +935,7 @@ template< class K, class V> class AssocTabConstInterface< BiDiHashMap< K,V > >
         protected:
 
         BiDiHashMap< K,V >& _cont() { return const_cast<BiDiHashMap< K,V >&>( cont ); }
-        void reserve(int n)	{ _cont().resize(n); }
+        void reserve(int n)	{ _cont().reserve(n); }
         void clear() { _cont().clear(); }
         bool delKey( K );
         ValType* valPtr(K arg)
@@ -985,13 +1003,15 @@ int AssocTabConstInterface< BiDiHashMap< K,V > >::getKeys( Iterator iter ) const
 }
 
 
-template< class K, class V> class AssocTabConstInterface< HashMap< K,V > >
+template< class K, class V> class AssocTabConstInterface< HashMap< K,V > > : public Privates::AssocTabTag<K>
 {
     public:
         AssocTabConstInterface( HashMap< K,V > &acont ): cont( acont ) {}
 
         typedef K KeyType;
         typedef V ValType;
+
+        typedef HashMap< K,V > OriginalType;
 
         bool hasKey( K arg ) const { return cont.find( arg ) != cont.end(); }
 
@@ -1016,7 +1036,7 @@ template< class K, class V> class AssocTabConstInterface< HashMap< K,V > >
         {   typename HashMap< K,V >::iterator i=_cont().find( arg );
             if (i==_cont().end()) return NULL; else return _cont().operator[](arg);
         }
-        void reserve(int n)	{ _cont().resize(n); }
+        void reserve(int n)	{ _cont().reserve(n); }
         bool delKey( K );
         void clear() { _cont().clear(); }
         V &get( K arg ) { return (_cont())[arg]; }

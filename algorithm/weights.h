@@ -64,7 +64,7 @@ class DijkstraBasePar : public ShortPathStructs {
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
 
         typename GraphType::PVertex U,V;
-        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
 
         Q[start].vPrev=0;Q[start].ePrev=0;
         Q[start].distance=Zero;
@@ -128,7 +128,7 @@ class DijkstraBasePar : public ShortPathStructs {
 
 
     template <class GraphType, class VertContainer, class EdgeContainer,
-        template <class Key,class Comparator,class Allocator> class Heap, template <class T> class Block>
+        template <class Key,class Comparator,class Allocator> class Heap, template <class _Key> class Block>
     static typename EdgeContainer::ValType::DistType
     distancesOnHeap (
         const GraphType & g,
@@ -154,7 +154,7 @@ class DijkstraBasePar : public ShortPathStructs {
 
         typename GraphType::PVertex U,V;
 
-        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
 
         Privates::BlockListAllocator<Block<typename GraphType::PVertex> > alloc(g.getVertNo());
         Heap<typename GraphType::PVertex,Cmp<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
@@ -206,7 +206,7 @@ class DijkstraHeapBasePar : public DijkstraBasePar<DefaultStructs> {
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {
         return DijkstraBasePar<DefaultStructs>::template distancesOnHeap
-                <GraphType,VertContainer,EdgeContainer,BinomHeap,Privates::BinomHeapNode>
+                <GraphType,VertContainer,EdgeContainer,BinomHeap,BinomHeapNode>
                 (g,avertTab,edgeTab,start,end);
     }
 
@@ -228,7 +228,7 @@ class DijkstraFibonBasePar : public DijkstraBasePar<DefaultStructs> {
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {
         return DijkstraBasePar<DefaultStructs>::template distancesOnHeap
-                <GraphType,VertContainer,EdgeContainer,FibonHeap,Privates::FibonHeapNode>
+                <GraphType,VertContainer,EdgeContainer,FibonHeap,FibonHeapNode>
                 (g,avertTab,edgeTab,start,end);
     }
 
@@ -300,10 +300,10 @@ template <class DefaultStructs>
 class DijkstraFibonPar : public DijkstraMainPar<DefaultStructs,DijkstraFibonBasePar<DefaultStructs> > {};
 
 
-// wersje dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class Dijkstra : public DijkstraPar<AlgorithmsDefaultSettings> {};
-class DijkstraHeap : public DijkstraHeapPar<AlgorithmsDefaultSettings> {};
-class DijkstraFibon : public DijkstraFibonPar<AlgorithmsDefaultSettings> {};
+// wersje dzialajaca na DefaultStructs=AlgsDefaultSettings
+class Dijkstra : public DijkstraPar<AlgsDefaultSettings> {};
+class DijkstraHeap : public DijkstraHeapPar<AlgsDefaultSettings> {};
+class DijkstraFibon : public DijkstraFibonPar<AlgsDefaultSettings> {};
 
 
 // najdluzsze sciezki w DAGu z wagami na krawedziach
@@ -377,7 +377,7 @@ class DAGCritPathPar : public ShortPathStructs {
         typename EdgeContainer::ValType::DistType nd;
         int ibeg,iend;
 
-        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
 
         if (start)
         {
@@ -475,8 +475,8 @@ class DAGCritPathPar : public ShortPathStructs {
 
 };
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class DAGCritPath : public DAGCritPathPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class DAGCritPath : public DAGCritPathPar<AlgsDefaultSettings> {};
 
 
 
@@ -540,7 +540,7 @@ class BellmanFordPar : public ShortPathStructs {
                                         <typename EdgeContainer::ValType::DistType> ::minusInfty();
         typename EdgeContainer::ValType::DistType nd;
 
-        if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
 
         bool existNegCycle = false;
 
@@ -660,8 +660,8 @@ class BellmanFordPar : public ShortPathStructs {
 
 };
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class BellmanFord : public BellmanFordPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class BellmanFord : public BellmanFordPar<AlgsDefaultSettings> {};
 
 
 //algorytm liczy najkrotsza sciezke pomiedzy kazda para wierzcholków zostal zaproponowany przez Floyda i oparty na twierdzeniu Warshalla)
@@ -746,6 +746,8 @@ class FloydPar : public PathStructs {
         for(typename GraphType::PEdge E=g.getEdge(Koala::EdLoop|Koala::EdUndir);E;E=g.getEdgeNext(E, Koala::EdLoop|Koala::EdUndir))
             if (edgeTab[E].length < zero) return false;
 
+        if (DefaultStructs::ReserveOutAssocCont) vertMatrix.reserve(g.getVertNo());
+
         //inicjalizacja - ustawiam wartosci poczatkowe odleglosci w tablicy asocjacyjnej
         for(typename GraphType::PVertex U=g.getVert();U;U=g.getVertNext(U))
             for(typename GraphType::PVertex V=g.getVert();V;V=g.getVertNext(V))
@@ -808,8 +810,8 @@ class FloydPar : public PathStructs {
     }
 };
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class Floyd : public FloydPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class Floyd : public FloydPar<AlgsDefaultSettings> {};
 
 
 // najlzejsze lub najciezsze lasy w grafie
@@ -927,8 +929,8 @@ class KruskalPar {
 
 };
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class Kruskal : public KruskalPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class Kruskal : public KruskalPar<AlgsDefaultSettings> {};
 
 }
 

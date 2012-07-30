@@ -232,6 +232,7 @@ template< typename Element >
 template< typename Element >
     Element Set< Element >::next( const Element &a ) const
     {   if (this->isBad(a)) return first();
+        if (a==this->last()) return this->badValue();
         typename std::set< Element >::const_iterator i = this->find( a );
         assert( i != this->end() ); // TODO: throw
         i++;
@@ -242,6 +243,7 @@ template< typename Element >
 template< typename Element >
     Element Set< Element >::prev( const Element &a ) const
     {   if (this->isBad(a)) return last();
+        if (a==this->first()) return this->badValue();
         typename std::set< Element >::const_iterator i = this->find( a );
         assert( i != this->end() && i != this->begin() ); // TODO: throw
         i--;

@@ -16,28 +16,36 @@
 namespace Koala {
 
 
-
-class FlowAlgsDefaultStructs : public AlgorithmsDefaultSettings {
+// Domyslne wytyczne dla procedur przeplywowych
+template <bool FF=false, // czy do wyznaczania maks. przeplywu uzywac FulkersonaForda, czy MKM
+        bool costFF=true> // czy do wyznaczania najtanszego przeplywu uzywac sciezek powiekszajacych (pseudowielomianowa),
+        // czy cykli z min. srednia dlugoscia (wielomianowa)
+class FlowAlgsDefaultSettings : public AlgsDefaultSettings {
     public:
 
-    static bool useFulkersonFord() { return false; };
-    static bool useCostFulkersonFord() { return true; };
+    enum { useFulkersonFord=FF  };
+    enum { useCostFulkersonFord=costFF };
 };
 
 
+//Algorytmy znajdowania przeplywu, najwiekszego przeplywu, najtanszego przeplywu, rozciec, transhipments itd.
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class FlowPar : public PathStructs {
 
     public:
 
+    // rekord z danymi (in-out) opisujacy krawedz
     template <class DType, class CType=DType> struct EdgeLabs {
 
-        typedef DType CapacType;
-        typedef CType CostType;
+        typedef DType CapacType; // typ liczbowy przepustowosci luku i objetosci przeplywu
+        typedef CType CostType; // typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
 
-        CapacType capac,flow;
-        CostType cost;
+        CapacType capac, // przepustowosc (dana wejsciowa)
+                    flow;   // wartosc znalezionego przeplywu w kierunku getEdgeEnd1->getEdgeEnd2
+        CostType cost;  // koszt jednostkowy przeplywu przez luk (dana wejsciowa)
 
+        // agrs: przepustowosc i koszt krawedzi
         EdgeLabs(CapacType arg=DefaultStructs:: template NumberTypeBounds<CapacType>::zero(),
                  CostType arg2=DefaultStructs:: template NumberTypeBounds<CostType>::zero()) :
                                 capac(arg), cost(arg2),
@@ -45,41 +53,93 @@ class FlowPar : public PathStructs {
             {}
     };
 
+    // j.w. ale nadaje domyslne jednostkowe przepustowosci i koszty
+    template <class DType, class CType=DType> struct UnitEdgeLabs : public EdgeLabs<DType,CType> {
 
+        UnitEdgeLabs(DType arg=(DType)1, CType arg2=(CType)1) : EdgeLabs<DType,CType>(arg,arg2)
+            {}
+    };
+
+    // rekord wynikowy opisujacy rozciecie krawedziowe w grafie miedzy para wierzcholkow
     template <class CapacType> struct EdgeCut {
 
-            CapacType capac;
-            int vertNo,edgeNo;
+            CapacType capac; // typ liczbowy przepustowosci luku i objetosci przeplywu
+            int vertNo; // liczba wierzcholkow osiagalnych z poczatkowego po usunieciu rozciecia
+            int edgeNo; // liczba krawedzi rozciecia
 
             EdgeCut() : capac(DefaultStructs:: template NumberTypeBounds<CapacType>::zero()),
                         vertNo(0), edgeNo(0)
             {}
     };
 
+    // j.w. ale podaje rowniez 2 wierzcholki - z obu czesci rozcietego grafu
+    template <class GraphType, class CapacType> struct EdgeCut2 : public EdgeCut<CapacType> {
 
-    template <class GraphType, class CapacType> struct EdgeCut2 {
-
-            CapacType capac;
             typename GraphType::PVertex first, second;
-            int vertNo,edgeNo;
-
-            EdgeCut2() : capac(DefaultStructs:: template NumberTypeBounds<CapacType>::zero()),
-                         vertNo(0), edgeNo(0)
-            {}
     };
 
 
-//    protected:
+    // "krawedz" drzewa Gomory-Hu
+    template <class GraphType,class CType>
+    struct GHTreeEdge {
+        typedef CType CapacType; // typ liczbowy przepustowosci luku
+
+        typename GraphType::PVertex first,second; // koncowki krawedzi
+        CapacType capac; // przepustowosc "krawedzi"
+
+        // args: oba wierzcholki koncowe i przepustowosc
+        GHTreeEdge(typename GraphType::PVertex f=0,typename GraphType::PVertex s=0,
+                   CapacType c=DefaultStructs:: template NumberTypeBounds<CapacType>::zero()) :
+            first(f), second(s), capac(c)
+        {}
+    };
+
+    // Transshipment - uogolnienie przeplywu (por. Schrijver)
+
+    // rekord wejsciowy opisujacy wierzcholek dla wyszukiwania transhipmentow
+    template <class DType> struct TrsVertLoss {
+
+        typedef DType CapacType;  // typ liczbowy przepustowosci luku i objetosci przeplywu
+        CapacType hi,lo; // maksymalny i minimalny dopuszczalny przy danym wierzcholku laczny wyplyw
+        //(dopuszczalne dodatnie i ujemne np. przeplyw to trans. z hi=lo=0 wszedzie poza zrodlem i ujsciem)
+
+        TrsVertLoss(CapacType alo=DefaultStructs:: template NumberTypeBounds<CapacType>::zero(),
+                 CapacType ahi=DefaultStructs:: template NumberTypeBounds<CapacType>::zero())
+                    : hi(ahi) , lo(alo) {}
+    };
+
+    // rekord  opisujacy krawedz dla wyszukiwania transhipmentow
+    template <class DType,class CType=DType> struct TrsEdgeLabs {
+
+        typedef DType CapacType; // typ liczbowy przepustowosci luku i objetosci przeplywu
+        typedef CType CostType; // typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
+        CapacType hi,lo; // wymagane gorne i dolne ograniczenie na wielkosc przeplywu przez ta krawedz.
+            //Dla nieskierowanych wymaga sie lo=0
+            // TODO: sprawdzic, czy moga byc ujemne dla lukow
+        CapacType flow; // wartosc znalezionego przeplywu (transship.) w kierunku getEdgeEnd1->getEdgeEnd2
+        CostType cost; // koszt jednostkowy przeplywu dla luku, jesli wymagany to wymagany nieujemny z wyjatkiem petli
+
+        TrsEdgeLabs(CapacType alo=DefaultStructs:: template NumberTypeBounds<CapacType>::zero(),
+                  CapacType ahi=DefaultStructs:: template NumberTypeBounds<CapacType>::zero(),
+                  CostType c=DefaultStructs:: template NumberTypeBounds<CostType>::zero())
+                    : hi(ahi) , lo(alo), cost(c) {}
+    };
+
+
+
+// TODO: w ostatecznej wersji   protected: (ale na razie wystepuje w testach)
     public:
 
 
+    // rekord pomocniczy opisujacy wierzcholek
     template <class GraphType,class CapacType> struct VertLabs {
 
-        int distance,backdist;
+        int distance,backdist; // do BFS w sieci tymczasowej
         typename GraphType::PVertex vPrev;
         typename GraphType::PEdge  ePrev;
-        CapacType mass, inPot, outPot;
-        bool used;
+
+        CapacType mass, inPot, outPot; // potencjaly przesylu (na uzytek maxFlowMKM)
+        bool used; // czy wierzcholek jest w sieci warstwowej (na uzytek maxFlowMKM)
 
         VertLabs(typename GraphType::PVertex pv=0,typename GraphType::PEdge pe=0,
                  int d=std::numeric_limits<int>::max(), int bd=std::numeric_limits<int>::max())
@@ -94,14 +154,16 @@ class FlowPar : public PathStructs {
 
     protected:
 
-
+    // przepustowosc uzyteczna krawedzi w sieci tymczasowej z danymi przeplywami
     template <class GraphType, class EdgeContainer>
     static typename EdgeContainer::ValType::CapacType
     usedCap (
         const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        EdgeContainer& edgeTab,
         typename GraphType::PEdge e,
-        typename GraphType::PVertex v, bool out)
+        typename GraphType::PVertex v,
+        bool out // czy chodzi o przejscie wzdluz e od v czy do v
+        )
     {
         EdgeDirection dir=g.getEdgeDir(e,v);
         assert(dir!=EdNone && dir!=EdLoop);
@@ -117,11 +179,12 @@ class FlowPar : public PathStructs {
     }
 
 
+    // zwiekszanie przeplywu przez krawedz e od delta w kierunku od v lub do v (zmienna out)
     template <class GraphType, class EdgeContainer>
     static void
     addFlow (
         const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        EdgeContainer& edgeTab,
         typename GraphType::PEdge e,
         typename GraphType::PVertex v,
         typename EdgeContainer::ValType::CapacType delta, bool out)
@@ -147,6 +210,9 @@ class FlowPar : public PathStructs {
     }
 
 
+    // BFS w sieci tymczasowej przy danych przepustowosciach i przeplywie
+    // Sekwencja wyjsciowa wierzcholkow idzie na iter
+    // Poruszamy sie "do przodu" lub "do tylu" (out) odpowiednio uzywajac pol distance lub backdistance rekodru
     template <class GraphType, class VertContainer, class EdgeContainer,class Iter>
     static bool BFSFlow(
     const GraphType &g, EdgeContainer &edgeTab, VertContainer &visited,
@@ -197,7 +263,9 @@ class FlowPar : public PathStructs {
         return false;
     }
 
-
+    // pomocnicza dla maxFlowMKM
+    // identyfikacja wierzcholkow warstw miedzy first a last sieci tymczasowej (pola used, distance, backdistane)
+    // zwraca: czy jest przejscie first->last
     template <class GraphType, class VertContainer, class EdgeContainer, class Iter>
     static bool layers(
          const GraphType &g, EdgeContainer &edgeTab, VertContainer &visited,
@@ -220,7 +288,8 @@ class FlowPar : public PathStructs {
         return true;
     }
 
-
+    // pomocnicza dla maxFlowMKM
+    // wyznaczanie potencjalow przeplywu wierzcholkow w sieci warstwowej miedzy ends
     template <class GraphType, class VertContainer, class EdgeContainer>
     static void findPot(
             const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
@@ -256,7 +325,8 @@ class FlowPar : public PathStructs {
         }
     }
 
-
+    // na uzytek maxFlowMKM
+    // przepchniecie przeplywu z wierzcholka v do przodu lub do tylu
     template <class GraphType, class VertContainer, class EdgeContainer>
     static void push(
     const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
@@ -289,7 +359,7 @@ class FlowPar : public PathStructs {
 
     }
 
-
+    // na uzytek maxFlowMKM
     template<class GraphType, class VertContainer, class EdgeContainer>
     static typename EdgeContainer::ValType::CapacType
     onevert( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
@@ -333,16 +403,16 @@ class FlowPar : public PathStructs {
         return minpot;
     }
 
-
+    // na uzytek MKM, znajduje maksymalny (ale nie przekraczajacy limit) przeplyw miedzy start a end
     template <class GraphType, class EdgeContainer,class VertContainer>
     static typename EdgeContainer::ValType::CapacType
     layerFlow (
         const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        EdgeContainer& edgeTab,
         VertContainer& vertTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         typename EdgeContainer::ValType::CapacType limit)
-    {   assert(start);
+    {   assert(start); // TODO: throw
         assert(end);
         assert(start!=end);
         typename GraphType::PVertex LOCALARRAY(buf,g.getVertNo());
@@ -367,14 +437,20 @@ class FlowPar : public PathStructs {
     }
 
 
+   // Znajdowanie maksymalnego (ale nie przekraczajacego limit) przeplywu miedzy start a end
+   // Algorytm MKM
+    // Zwraca wielkosc przeplywu
     template <class GraphType, class EdgeContainer>
     static typename EdgeContainer::ValType::CapacType
     maxFlowMKM (
-        const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        const GraphType & g, // badany graf
+        EdgeContainer& edgeTab, // tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac (wymagane nieujemne)
+                                // wyniki zwracane do pol flow
         typename GraphType::PVertex start, typename GraphType::PVertex end,
-        typename EdgeContainer::ValType::CapacType limit)
-    {   assert(start);
+        typename EdgeContainer::ValType::CapacType limit // gorny limit wielkosci znalezionego przeplywu
+        )
+    {   // TODO: throw
+        assert(start);
         assert(end);
         assert(start!=end);
         const typename EdgeContainer::ValType::CapacType PlusInfty
@@ -392,7 +468,8 @@ class FlowPar : public PathStructs {
 
         for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         {
-            edgeTab[e].flow=Zero; assert(edgeTab[e].capac>=Zero);
+            edgeTab[e].flow=Zero;
+            assert(edgeTab[e].capac>=Zero);// TODO: throw
         }
         if (limit==Zero) return Zero;
         while (Zero!=(add=layerFlow(g,edgeTab,vertTab,start,end,limit-res)))
@@ -403,14 +480,19 @@ class FlowPar : public PathStructs {
     }
 
 
+   // Znajdowanie maksymalnego (ale nie przekraczajacego limit) przeplywu miedzy start a end
+   // Algorytm FulkersonaFodra
+    // Zwraca wielkosc przeplywu
     template <class GraphType, class EdgeContainer>
     static typename EdgeContainer::ValType::CapacType
     maxFlowFF (
-        const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        const GraphType & g,// badany graf
+        EdgeContainer& edgeTab, // tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac (wymagane nieujemne)
+                                // wyniki zwracane do pol flow
         typename GraphType::PVertex start, typename GraphType::PVertex end,
-        typename EdgeContainer::ValType::CapacType limit)
-    {   assert(start);
+        typename EdgeContainer::ValType::CapacType limit)// gorny limit wielkosci znalezionego przeplywu
+    {   // TODO: throw
+        assert(start);
         assert(end);
         assert(start!=end);
         const typename EdgeContainer::ValType::CapacType Zero
@@ -427,7 +509,7 @@ class FlowPar : public PathStructs {
         for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         {
             edgeTab[e].flow=Zero;
-            assert(edgeTab[e].capac>=Zero);
+            assert(edgeTab[e].capac>=Zero); // TODO: throw
         }
 
         while (res<limit && BFSFlow(g,edgeTab,vertTab,start,end,true,blackHole))
@@ -442,7 +524,7 @@ class FlowPar : public PathStructs {
         return res;
     }
 
-
+    // podobna do usedCap na uzytek przeplywow z kosztem
     template <class GraphType, class EdgeContainer>
     static typename EdgeContainer::ValType::CapacType
     usedCapCost (
@@ -474,6 +556,7 @@ class FlowPar : public PathStructs {
     }
 
 
+    // koszt jednostkowy przeplywu przez krawedz od danej koncowki w sieci tymczasowej
     template <class GraphType, class EdgeContainer>
     static typename EdgeContainer::ValType::CostType
     costFlow (
@@ -501,6 +584,7 @@ class FlowPar : public PathStructs {
     }
 
 
+    // pomocnicza etykieta wierzcholka na uzytek alg. Dijkstry w sieci tymczasowej
     template <class GraphType,class CostType> struct VertLabsCost {
 
         CostType distance,pot;
@@ -513,6 +597,7 @@ class FlowPar : public PathStructs {
     };
 
 
+    // Korekta kosztu luku na uzytek Dijkstry z potencjalami wierzcholkow (nowe koszty nie wprowadzaja ujemnych cykli)
     template <class GraphType, class EdgeContainer, class VertContainer>
     static typename EdgeContainer::ValType::CostType
     costFlowDij (
@@ -523,13 +608,16 @@ class FlowPar : public PathStructs {
     {   return costFlow(g,edgeTab,e,v)+vertTab[v].pot-vertTab[g.getEdgeEnd(e,v)].pot; }
 
 
+    // Dijkstra w sieci tymczasowej z kosztami lukow skorygowanymi przez potencjaly wierzcholkow
+    // Zwraca: czy istnieje przejscie start->end
+    // TODO: rozwazyc przejscie na kopce
     template <class GraphType, class VertContainer, class EdgeContainer>
     static bool DijkstraFlow (
         const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        EdgeContainer& edgeTab,
         VertContainer& vertTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end)
-    {   assert(start && end && start!=end);
+    {   assert(start && end && start!=end); // TODO: throw
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabsCost<GraphType, typename EdgeContainer::ValType::CostType> >::Type Q(g.getVertNo());
         typename GraphType::PVertex U,V;
@@ -561,14 +649,17 @@ class FlowPar : public PathStructs {
         }
         bool res=DefaultStructs:: template NumberTypeBounds
                                         <typename EdgeContainer::ValType::CostType> ::plusInfty()>vertTab[end].distance;
+        // powrot do "prawdziwego" dystansu - usuniecie wkladu potencjalow
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
             vertTab[v].distance+=vertTab[v].pot-vertTab[start].pot;
+        // nowe potencjaly wierzcholkow na uzytek kolejnej iteracji procedury
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
             vertTab[v].pot=vertTab[v].distance;
         return res;
     }
 
 
+    // pomocniczza etykieta wierzcholka dla minMeanCycle
     template <class GraphType,class CostType> struct CycLabs {
 
         CostType dist;
@@ -580,7 +671,8 @@ class FlowPar : public PathStructs {
              {}
     };
 
-
+    // znajdowanie w sieci tymczasowej cyklu o najmniejszej sredniej dlugosci krawedzi
+    // TODO: nie testowane, sprawdzic!
     template <class GraphType, class EdgeContainer, class EIter, class VIter>
     static int minMeanCycle (
         const GraphType & g,
@@ -604,7 +696,7 @@ class FlowPar : public PathStructs {
         typename GraphType::PEdge LOCALARRAY(eBuf,g.getVertNo()+1);
         int n=g.getVertNo();
         // TODO: chyba zbedne:
-        for(int i=0;i<n*n+n;i++) buf[i]=CycLabs< GraphType, typename EdgeContainer::ValType::CostType>();
+        //for(int i=0;i<n*n+n;i++) buf[i]=CycLabs< GraphType, typename EdgeContainer::ValType::CostType>();
 
         CycLabs< GraphType, typename EdgeContainer::ValType::CostType> *buf2=buf;
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
@@ -749,17 +841,19 @@ class FlowPar : public PathStructs {
 //        return vertTab[end].distance < inf;
 //    }
 
-
+    // znajdowanie przeplywu start->end o maksymalnej objetosci (ale nie przekraczajacej limitu val) i najmniejszym koszcie
+    // procedura pseudowielomianowa (sciezki powiekszajace typu FulkersonFord)
+    // zwraca pare wielkosc przeplywu
     template <class GraphType, class EdgeContainer>
-    static std::pair<typename EdgeContainer::ValType::CostType,
-                     typename EdgeContainer::ValType::CapacType>
+    static typename EdgeContainer::ValType::CapacType
     minCostFlowFF (
-        const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        const GraphType & g, // badany graf
+        EdgeContainer& edgeTab, // tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac i cost (wymagane nieujemne)
+                                // wyniki zwracane do pol flow
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         typename EdgeContainer::ValType::CapacType val=
                     DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::plusInfty())
+                    <typename EdgeContainer::ValType::CapacType>::plusInfty()) // limit wielkosci przeplywu
     {
         const typename EdgeContainer::ValType::CapacType Zero
                     = DefaultStructs:: template NumberTypeBounds
@@ -769,8 +863,8 @@ class FlowPar : public PathStructs {
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabsCost<GraphType, typename EdgeContainer::ValType::CostType> >::Type vertTab(g.getVertNo());
         typename EdgeContainer::ValType::CapacType res=Zero;
-        typename EdgeContainer::ValType::CostType res2=DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CostType>::zero();
+//        typename EdgeContainer::ValType::CostType res2=DefaultStructs:: template NumberTypeBounds
+//                    <typename EdgeContainer::ValType::CostType>::zero();
         typename GraphType::PVertex LOCALARRAY(vTab,g.getVertNo());
         typename GraphType::PEdge LOCALARRAY(eTab,g.getVertNo());
 
@@ -785,16 +879,16 @@ class FlowPar : public PathStructs {
             if ((res+=delta)==val) break;
             vertTab.clear();
         }
-        return std::make_pair(res2,res);
+        return res;
     }
 
 
+    // procedura o interfejsie j.w. ale wielomianowa
     template <class GraphType, class EdgeContainer>
-    static std::pair<typename EdgeContainer::ValType::CostType,
-                     typename EdgeContainer::ValType::CapacType>
+    static typename EdgeContainer::ValType::CostType
     minCostFlowGT (
         const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        EdgeContainer& edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         typename EdgeContainer::ValType::CapacType val=
                     DefaultStructs:: template NumberTypeBounds
@@ -809,8 +903,8 @@ class FlowPar : public PathStructs {
 
 
         typename EdgeContainer::ValType::CapacType res=Zero;
-        typename EdgeContainer::ValType::CostType res2=DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CostType>::zero();
+//        typename EdgeContainer::ValType::CostType res2=DefaultStructs:: template NumberTypeBounds
+//                    <typename EdgeContainer::ValType::CostType>::zero();
         typename GraphType::PVertex LOCALARRAY(vTab,g.getVertNo());
         typename GraphType::PEdge LOCALARRAY(eTab,g.getVertNo());
 
@@ -825,351 +919,8 @@ class FlowPar : public PathStructs {
 
             for(int i=0;i<len;i++) addFlow(g,edgeTab,eTab[i],vTab[i],delta,true);
         }
-        return std::make_pair(res2,res);
-    }
-
-
-    public:
-
-
-    template <class GraphType, class EdgeContainer>
-    static bool testFlow (
-        const GraphType & g,
-        const EdgeContainer& edgeTab,
-        typename GraphType::PVertex S, typename GraphType::PVertex T)
-    {   const typename EdgeContainer::ValType::CapacType Zero
-                    = DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::zero();
-        assert(S && T && S!=T);
-        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-            if (std::max(edgeTab[e].flow,-edgeTab[e].flow)<Zero ||
-                std::max(edgeTab[e].flow,-edgeTab[e].flow)>edgeTab[e].capac) return false;
-        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-        if (v!=S && v!=T)
-        {   typename EdgeContainer::ValType::CapacType sum=Zero;
-            for(typename GraphType::PEdge e=g.getEdge(v,EdDirIn);e;e=g.getEdgeNext(v,e,EdDirIn))
-                sum-=edgeTab[e].flow;
-            for(typename GraphType::PEdge e=g.getEdge(v,EdDirOut);e;e=g.getEdgeNext(v,e,EdDirOut))
-                sum+=edgeTab[e].flow;
-            for(typename GraphType::PEdge e=g.getEdge(v,EdUndir);e;e=g.getEdgeNext(v,e,EdUndir))
-            if (g.getEdgeEnd1(e)==v) sum+=edgeTab[e].flow; else sum-=edgeTab[e].flow;
-            if (sum!=Zero) return false;
-        }
-        return true;
-
-    }
-
-
-    template <class GraphType, class EdgeContainer>
-    static typename EdgeContainer::ValType::CapacType
-    maxFlow (
-        const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
-        typename GraphType::PVertex start, typename GraphType::PVertex end,
-        typename EdgeContainer::ValType::CapacType limit=DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::plusInfty())
-    {   assert(start && limit>=DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::zero());
-        if (DefaultStructs::useFulkersonFord()) return maxFlowFF(g,edgeTab,start,end,limit);
-        else return maxFlowMKM(g,edgeTab,start,end,limit);
-    }
-
-
-    template <class GraphType, class EdgeContainer>
-    static std::pair<typename EdgeContainer::ValType::CostType,
-                     typename EdgeContainer::ValType::CapacType>
-    minCostFlow (
-        const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
-        typename GraphType::PVertex start, typename GraphType::PVertex end,
-        typename EdgeContainer::ValType::CapacType val=
-                    DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::plusInfty())
-    {   assert(start);
-        assert(end);
-        assert(start!=end);
-        assert(val>=DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::zero());
-        const typename EdgeContainer::ValType::CapacType Zero
-                    = DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::zero();
-
-
-        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-        {
-            edgeTab[e].flow=Zero;
-            assert(edgeTab[e].capac>=Zero);
-        }
-        for(typename GraphType::PEdge E=g.getEdge(EdDirIn | EdDirOut | EdUndir);E;
-                                            E=g.getEdgeNext(E,EdDirIn | EdDirOut | EdUndir))
-            assert(edgeTab[E].cost >= DefaultStructs:: template NumberTypeBounds
-                            <typename EdgeContainer::ValType::CostType>::zero());
-
-        std::pair<typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType> res;
-        if (DefaultStructs::useCostFulkersonFord()) res= minCostFlowFF(g,edgeTab,start,end,val);
-        else res= minCostFlowGT(g,edgeTab,start,end,val);
-
-        for(typename GraphType::PEdge e=g.getEdge(EdLoop);e;e=g.getEdgeNext(e,EdLoop))
-            if (edgeTab[e].cost<
-                DefaultStructs:: template NumberTypeBounds
-                <typename EdgeContainer::ValType::CostType>::zero())
-                    edgeTab[e].flow=edgeTab[e].capac;
-        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-                res.first+=std::max(edgeTab[e].flow,-edgeTab[e].flow)*edgeTab[e].cost;
         return res;
     }
-
-
-    template <class GraphType, class EdgeContainer, class VIter, class EIter>
-    static EdgeCut<typename EdgeContainer::ValType::CapacType>
-    minEdgeCut (
-        const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
-        typename GraphType::PVertex start, typename GraphType::PVertex end,
-        OutPath<VIter,EIter> iters)
-    {   EdgeCut<typename EdgeContainer::ValType::CapacType> res;
-        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabs<GraphType,typename EdgeContainer::ValType::CapacType> >::Type vertTab(g.getVertNo());
-        res.capac=maxFlow(g,edgeTab,start,end);
-        BFSFlow(g,edgeTab,vertTab,start,end,true,blackHole);
-        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-        if (std::numeric_limits<int>::max()>vertTab[v].distance)
-        {   res.vertNo++;
-            if (!isBlackHole(iters.vertIter)) { *iters.vertIter=v;++iters.vertIter; }
-            for(typename GraphType::PEdge e=g.getEdge(v,EdDirOut|EdUndir);e;e=g.getEdgeNext(v,e,EdDirOut|EdUndir))
-            if (vertTab[g.getEdgeEnd(e,v)].distance==std::numeric_limits<int>::max())
-            {   res.edgeNo++;
-                if (!isBlackHole(iters.edgeIter)) { *iters.edgeIter=e;++iters.edgeIter; }
-            }
-        }
-        return res;
-    }
-
-    template <class GraphType, class EdgeContainer, class VIter, class EIter>
-    static EdgeCut2<GraphType, typename EdgeContainer::ValType::CapacType>
-    minEdgeCut (
-        const GraphType & g,
-        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
-        OutPath<VIter,EIter> iters)
-    {   assert(g.getVertNo()>=2);
-        EdgeCut<typename EdgeContainer::ValType::CapacType> res,buf;
-        typename GraphType::PVertex a,b;
-        typename GraphType::PVertex LOCALARRAY(vres,g.getVertNo()-1);
-        typename GraphType::PVertex LOCALARRAY(vbuf,g.getVertNo()-1);
-        typename GraphType::PEdge LOCALARRAY(eres,g.getEdgeNo());
-        typename GraphType::PEdge LOCALARRAY(ebuf,g.getEdgeNo());
-        res.capac=DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::CapacType>
-                    ::plusInfty();
-
-        for(typename GraphType::PVertex s=g.getVert();s!=g.getVertLast();s=g.getVertNext(s))
-            for(typename GraphType::PVertex t=g.getVertNext(s);t;t=g.getVertNext(t))
-        {
-            if (isBlackHole(iters.vertIter) && isBlackHole(iters.edgeIter))
-                buf=minEdgeCut(g,edgeTab,s,t,outPath(blackHole,blackHole));
-            else if (isBlackHole(iters.vertIter) && !isBlackHole(iters.edgeIter))
-                buf=minEdgeCut(g,edgeTab,s,t,outPath(blackHole,ebuf));
-            else if (!isBlackHole(iters.vertIter) && isBlackHole(iters.edgeIter))
-                buf=minEdgeCut(g,edgeTab,s,t,outPath(vbuf,blackHole));
-            else buf=minEdgeCut(g,edgeTab,s,t,outPath(vbuf,ebuf));
-            if (buf.capac<res.capac)
-            {   res=buf; a=s; b=t;
-                if (!isBlackHole(iters.vertIter)) for(int i=0;i<buf.vertNo;i++) vres[i]=vbuf[i];
-                if (!isBlackHole(iters.edgeIter)) for(int i=0;i<buf.edgeNo;i++) eres[i]=ebuf[i];
-            }
-            if (g.getEdgeNo(EdDirIn|EdDirOut))
-            {
-                if (isBlackHole(iters.vertIter) && isBlackHole(iters.edgeIter))
-                    buf=minEdgeCut(g,edgeTab,t,s,outPath(blackHole,blackHole));
-                else if (isBlackHole(iters.vertIter) && !isBlackHole(iters.edgeIter))
-                    buf=minEdgeCut(g,edgeTab,t,s,outPath(blackHole,ebuf));
-                else if (!isBlackHole(iters.vertIter) && isBlackHole(iters.edgeIter))
-                    buf=minEdgeCut(g,edgeTab,t,s,outPath(vbuf,blackHole));
-                else buf=minEdgeCut(g,edgeTab,t,s,outPath(vbuf,ebuf));
-//                buf=minEdgeCut(g,edgeTab,t,s,outPath(vbuf,ebuf));
-                if (buf.capac<res.capac)
-                {   res=buf; a=t; b=s;
-                    if (!isBlackHole(iters.vertIter)) for(int i=0;i<buf.vertNo;i++) vres[i]=vbuf[i];
-                    if (!isBlackHole(iters.edgeIter)) for(int i=0;i<buf.edgeNo;i++) eres[i]=ebuf[i];
-                }
-            }
-        }
-        if (!isBlackHole(iters.vertIter))
-            for(int i=0;i<res.vertNo;i++) { *iters.vertIter=vres[i]; ++iters.vertIter; }
-        if (!isBlackHole(iters.edgeIter))
-            for(int i=0;i<res.edgeNo;i++) { *iters.edgeIter=eres[i]; ++iters.edgeIter; }
-        EdgeCut2<GraphType,typename EdgeContainer::ValType::CapacType> res2;
-        res2.capac=res.capac; res2.edgeNo=res.edgeNo; res2.vertNo=res.vertNo;
-        res2.first=a; res2.second=b;
-        return res2;
-    }
-
-
-    template <class DType> struct VertLoss {
-
-        typedef DType CapacType;
-        CapacType hi,lo;
-
-        VertLoss(CapacType alo=DefaultStructs:: template NumberTypeBounds<CapacType>::zero(),
-                 CapacType ahi=DefaultStructs:: template NumberTypeBounds<CapacType>::zero())
-                    : hi(ahi) , lo(alo) {}
-    };
-
-
-    template <class DType,class CType=DType> struct EdgeBound {
-
-        typedef DType CapacType;
-        typedef CType CostType;
-        CapacType hi,lo,flow;
-        CostType cost;
-
-        EdgeBound(CapacType alo=DefaultStructs:: template NumberTypeBounds<CapacType>::zero(),
-                  CapacType ahi=DefaultStructs:: template NumberTypeBounds<CapacType>::zero(),
-                  CostType c=DefaultStructs:: template NumberTypeBounds<CostType>::zero())
-                    : hi(ahi) , lo(alo), cost(c) {}
-    };
-
-
-    template <class GraphType, class EdgeContainer, class VertContainer>
-    static bool
-    transship (GraphType & g, EdgeContainer& edgeTab,const VertContainer& vertTab)
-    {
-        const typename EdgeContainer::ValType::CapacType Zero
-                    = DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::zero();
-
-        typename GraphType::PVertex s,t,u,v;
-        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                 typename EdgeContainer::ValType::CapacType >::Type exc(g.getVertNo()+3);
-        typename DefaultStructs:: template AssocCont<typename GraphType::PEdge,
-                 EdgeLabs<typename EdgeContainer::ValType::CapacType > >::Type edgeLabs(2*g.getVertNo()+g.getEdgeNo()+2);
-        typename EdgeContainer::ValType::CapacType sum
-                            =Zero;
-
-        for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir))
-            {   assert(Zero==edgeTab[e].lo); }
-
-        u=g.addVert();
-        for(v=g.getVert();v;v=g.getVertNext(v))
-            if (v!=u) edgeTab[g.addArch(v,u)]=
-                EdgeBound<typename EdgeContainer::ValType::CapacType>(vertTab[v].lo,vertTab[v].hi);
-
-        for(v=g.getVert();v;v=g.getVertNext(v))
-        {   exc[v]=Zero;
-            for(typename GraphType::PEdge e=g.getEdge(v,EdDirIn);e;e=g.getEdgeNext(v,e,EdDirIn))
-                exc[v]+=edgeTab[e].lo;
-            for(typename GraphType::PEdge e=g.getEdge(v,EdDirOut);e;e=g.getEdgeNext(v,e,EdDirOut))
-                exc[v]-=edgeTab[e].lo;
-            if (exc[v]>Zero) sum+=exc[v];
-        }
-
-        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
-            edgeLabs[e].capac=edgeTab[e].hi-edgeTab[e].lo;
-        s=g.addVert(); t=g.addVert();
-        for(v=g.getVert();v;v=g.getVertNext(v)) if (v!=s && v!=t)
-        {   if (exc[v]>Zero) edgeLabs[g.addArch(s,v)].capac=exc[v];
-            else if (exc[v]<Zero) edgeLabs[g.addArch(v,t)].capac=-exc[v];
-        }
-        bool res= maxFlow(g,edgeLabs,s,t)==sum;
-
-        for(typename GraphType::PEdge e=g.getEdge(u);e;e=g.getEdgeNext(u,e)) edgeTab.delKey(e);
-        for(typename GraphType::PEdge e=g.getEdge(s);e;e=g.getEdgeNext(s,e)) edgeTab.delKey(e);
-        for(typename GraphType::PEdge e=g.getEdge(t);e;e=g.getEdgeNext(t,e)) edgeTab.delKey(e);
-        g.delVert(u); g.delVert(s); g.delVert(t);
-        if (!res) return false;
-        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
-            edgeTab[e].flow=edgeLabs[e].flow+edgeTab[e].lo;
-        for(typename GraphType::PEdge e=g.getEdge(EdLoop);e;e=g.getEdgeNext(e,EdLoop))
-            edgeTab[e].flow=edgeTab[e].lo;
-        return true;
-    }
-
-
-    template <class GraphType, class EdgeContainer, class VertContainer>
-    static typename EdgeContainer::ValType::CostType
-    minCostTransship (GraphType & g, EdgeContainer& edgeTab,const VertContainer& vertTab)
-    {
-        const typename EdgeContainer::ValType::CapacType Zero
-                    = DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::zero();
-
-        typename GraphType::PVertex s,t,u,v;
-        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                 typename EdgeContainer::ValType::CapacType >::Type exc(g.getVertNo()+3);
-        typename DefaultStructs:: template AssocCont<typename GraphType::PEdge,
-                 EdgeLabs<typename EdgeContainer::ValType::CapacType > >::Type edgeLabs(2*g.getVertNo()+g.getEdgeNo()+2);
-        typename EdgeContainer::ValType::CapacType sum
-                            =Zero;
-
-        for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir))
-            {   assert(Zero==edgeTab[e].lo); }
-
-        u=g.addVert();
-        for(v=g.getVert();v;v=g.getVertNext(v))
-            if (v!=u) edgeTab[g.addArch(v,u)]=
-                EdgeBound<typename EdgeContainer::ValType::CapacType>(vertTab[v].lo,vertTab[v].hi);
-
-        for(v=g.getVert();v;v=g.getVertNext(v))
-        {   exc[v]=Zero;
-            for(typename GraphType::PEdge e=g.getEdge(v,EdDirIn);e;e=g.getEdgeNext(v,e,EdDirIn))
-                exc[v]+=edgeTab[e].lo;
-            for(typename GraphType::PEdge e=g.getEdge(v,EdDirOut);e;e=g.getEdgeNext(v,e,EdDirOut))
-                exc[v]-=edgeTab[e].lo;
-            if (exc[v]>Zero) sum+=exc[v];
-        }
-
-        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
-        {
-            edgeLabs[e].capac=edgeTab[e].hi-edgeTab[e].lo;
-            edgeLabs[e].cost=edgeTab[e].cost;
-        }
-        s=g.addVert(); t=g.addVert();
-        for(v=g.getVert();v;v=g.getVertNext(v)) if (v!=s && v!=t)
-        {   if (exc[v]>Zero) edgeLabs[g.addArch(s,v)].capac=exc[v];
-            else if (exc[v]<Zero) edgeLabs[g.addArch(v,t)].capac=-exc[v];
-        }
-        if (minCostFlow(g,edgeLabs,s,t,sum).second!=sum) return DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CostType>::plusInfty();
-
-        for(typename GraphType::PEdge e=g.getEdge(u);e;e=g.getEdgeNext(u,e)) edgeTab.delKey(e);
-        for(typename GraphType::PEdge e=g.getEdge(s);e;e=g.getEdgeNext(s,e)) edgeTab.delKey(e);
-        for(typename GraphType::PEdge e=g.getEdge(t);e;e=g.getEdgeNext(t,e)) edgeTab.delKey(e);
-        g.delVert(u); g.delVert(s); g.delVert(t);
-        typename EdgeContainer::ValType::CostType res=DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CostType>::zero();
-        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
-        {
-             edgeTab[e].flow=edgeLabs[e].flow+edgeTab[e].lo;
-             res+=(g.getEdgeType(e)!=Undirected) ? edgeTab[e].flow*edgeTab[e].cost
-                            : std::max(edgeTab[e].flow,-edgeTab[e].flow)*edgeTab[e].cost;
-        }
-        for(typename GraphType::PEdge e=g.getEdge(EdLoop);e;e=g.getEdgeNext(e,EdLoop))
-        {
-            if (edgeTab[e].cost>=DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CostType>::zero())
-                edgeTab[e].flow=edgeTab[e].lo; else edgeTab[e].flow=edgeTab[e].hi;
-                res+=edgeTab[e].flow*edgeTab[e].cost;
-        }
-
-        return res;
-    }
-
-
-    template <class GraphType,class CType>
-    struct GHTreeEdge {
-        typedef CType CapacType;
-
-        typename GraphType::PVertex first,second;
-        CapacType capac;
-
-        GHTreeEdge(typename GraphType::PVertex f=0,typename GraphType::PVertex s=0,
-                   CapacType c=DefaultStructs:: template NumberTypeBounds<CapacType>::zero()) :
-            first(f), second(s), capac(c)
-        {}
-    };
-
-
-    protected:
-
 
     template <class GraphType, class EdgeContainer, class SetContainer>
     static void ghtree(GraphType & g, EdgeContainer& edgeTab, SetContainer& setTab,
@@ -1234,46 +985,424 @@ class FlowPar : public PathStructs {
     }
 
 
+
     public:
 
-
+    // objetosc przeplywu przy wierzcholku v
     template <class GraphType, class EdgeContainer>
-    static void getGHTree(GraphType & g, EdgeContainer& edgeTab,
-                GHTreeEdge<GraphType,typename EdgeContainer::ValType::CapacType>* out)
-    {   assert(g.getVertNo()>1);
+    static typename EdgeContainer::ValType::CapacType vertFlow (
+        const GraphType & g, // badany graf
+        const EdgeContainer& edgeTab, // wejsciowa tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z flow
+        typename GraphType::PVertex v,
+        EdgeDirection type=EdUndir)
+        // type=EdDirOut - objetosc wyplywajaca, type=EdDirIn - objetosc wplywajaca, type=EdUndir - bilans wyplywajacy
+    {
+        assert(v && (type==EdDirOut ||type==EdDirIn ||type==EdUndir)); // TODO: throw
+           const typename EdgeContainer::ValType::CapacType Zero=DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CapacType>::zero();
+            typename EdgeContainer::ValType::CapacType sum=Zero;
+            switch (type)
+            {
+                case EdDirOut:
+                    for(typename GraphType::PEdge e=g.getEdge(v,EdDirOut|EdLoop);e;e=g.getEdgeNext(v,e,EdDirOut|EdLoop))
+                    sum+=edgeTab[e].flow;
+                    for(typename GraphType::PEdge e=g.getEdge(v,EdUndir);e;e=g.getEdgeNext(v,e,EdUndir))
+                    if (g.getEdgeEnd1(e)==v) sum+=std::max(edgeTab[e].flow,Zero); else sum+=std::max(-edgeTab[e].flow,Zero);
+                    return sum;
+               case EdDirIn:
+                    for(typename GraphType::PEdge e=g.getEdge(v,EdDirIn|EdLoop);e;e=g.getEdgeNext(v,e,EdDirIn|EdLoop))
+                    sum+=edgeTab[e].flow;
+                    for(typename GraphType::PEdge e=g.getEdge(v,EdUndir);e;e=g.getEdgeNext(v,e,EdUndir))
+                    if (g.getEdgeEnd2(e)==v) sum+=std::max(edgeTab[e].flow,Zero); else sum+=std::max(-edgeTab[e].flow,Zero);
+                    return sum;
+            }
+            return vertFlow(g,edgeTab,v,EdDirOut)-vertFlow(g,edgeTab,v,EdDirIn);
+//            for(typename GraphType::PEdge e=g.getEdge(v,EdDirIn);e;e=g.getEdgeNext(v,e,EdDirIn))
+//                sum-=edgeTab[e].flow;
+//            for(typename GraphType::PEdge e=g.getEdge(v,EdDirOut);e;e=g.getEdgeNext(v,e,EdDirOut))
+//                sum+=edgeTab[e].flow;
+//            for(typename GraphType::PEdge e=g.getEdge(v,EdUndir);e;e=g.getEdgeNext(v,e,EdUndir))
+//            if (g.getEdgeEnd1(e)==v) sum+=edgeTab[e].flow; else sum-=edgeTab[e].flow;
+//        return sum;
+    }
+
+
+    // sprawdzanie poprawnosci przeplywu S->T
+    template <class GraphType, class EdgeContainer>
+    static bool testFlow (
+        const GraphType & g, // badany graf
+        const EdgeContainer& edgeTab, // wejsciowa tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac i  flow
+        typename GraphType::PVertex S, typename GraphType::PVertex T)
+    {   const typename EdgeContainer::ValType::CapacType Zero
+                    = DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CapacType>::zero();
+        assert(S && T && S!=T); // TODO: throw
+        for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir))
+            if (std::max(edgeTab[e].flow,-edgeTab[e].flow)<Zero ||
+                std::max(edgeTab[e].flow,-edgeTab[e].flow)>edgeTab[e].capac) return false;
+        for(typename GraphType::PEdge e=g.getEdge(Directed|Loop);e;e=g.getEdgeNext(e,Directed|Loop))
+            if (edgeTab[e].flow<Zero ||edgeTab[e].flow>edgeTab[e].capac) return false;
+        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            if (v!=S && v!=T && vertFlow(g,edgeTab,v)!=Zero) return false;
+        return true;
+    }
+
+    // znajduje maksymalny przeplyw start->end (ale nie wiekszy, niz limit)
+    // zwraca jego wielkosc
+    template <class GraphType, class EdgeContainer>
+    static typename EdgeContainer::ValType::CapacType
+    maxFlow (
+        const GraphType & g, // badany graf
+        EdgeContainer& edgeTab, // tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac (wymagane nieujemne)
+                                // wyniki zwracane do pol flow
+        typename GraphType::PVertex start, typename GraphType::PVertex end,
+        typename EdgeContainer::ValType::CapacType limit=DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CapacType>::plusInfty()) // gorny limit wielkosci przeplywu
+    {   // TODO: throw
+        assert(start && end && limit>=DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CapacType>::zero());
+        if (DefaultStructs::useFulkersonFord) return maxFlowFF(g,edgeTab,start,end,limit);
+        else return maxFlowMKM(g,edgeTab,start,end,limit);
+    }
+
+
+    // zwraca koszt podanego przeplywu lub transship.
+    template <class GraphType, class EdgeContainer>
+    static typename EdgeContainer::ValType::CostType
+    flowCost (
+        const GraphType & g,// badany graf
+        const EdgeContainer& edgeTab) // wejsciowa tablica asocjacyjna PEdge->EdgeLabs lub TrsEdgeLabss. Korzystamy z pol flow  i cost
+    {   typename EdgeContainer::ValType::CostType res=DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CostType>::zero();
+                for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+                if (g.getEdgeType(e)==Undirected)
+                    res+=std::max(edgeTab[e].flow,-edgeTab[e].flow)*edgeTab[e].cost;
+                else res+=edgeTab[e].flow*edgeTab[e].cost;
+    }
+
+    // znajduje najtanszy przeplyw start->end o maks. wielkosci (ale nie wiekszy, niz val)
+    // zwraca (jego koszt, wielkosc)
+    template <class GraphType, class EdgeContainer>
+    static std::pair<typename EdgeContainer::ValType::CostType,
+                     typename EdgeContainer::ValType::CapacType>
+    minCostFlow (
+        const GraphType & g,// badany graf
+        EdgeContainer& edgeTab, // tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac  i cost (wymagane nieujemne, z wyjatkiem kosztow petli)
+                                // wyniki zwracane do pol flow
+        typename GraphType::PVertex start, typename GraphType::PVertex end,
+        typename EdgeContainer::ValType::CapacType val=// gorny limit wielkosci szukanego przeplywu
+                    DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CapacType>::plusInfty())
+    {   // TODO: throw
+        assert(start);
+        assert(end);
+        assert(start!=end);
+        assert(val>=DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CapacType>::zero());
+        const typename EdgeContainer::ValType::CapacType Zero
+                    = DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CapacType>::zero();
+
+
+        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+        {
+            edgeTab[e].flow=Zero;
+            // TODO: throw
+            assert(edgeTab[e].capac>=Zero);
+        }
+        for(typename GraphType::PEdge E=g.getEdge(EdDirIn | EdDirOut | EdUndir);E;
+                                            E=g.getEdgeNext(E,EdDirIn | EdDirOut | EdUndir))
+            // TODO: throw
+            assert(edgeTab[E].cost >= DefaultStructs:: template NumberTypeBounds
+                            <typename EdgeContainer::ValType::CostType>::zero());
+
+        std::pair<typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType> res;
+        if (DefaultStructs::useCostFulkersonFord) res.second= minCostFlowFF(g,edgeTab,start,end,val);
+        else res.second= minCostFlowGT(g,edgeTab,start,end,val);
+
+        // dla petli o ujemnym koszcie przeplyw jest ustalany na przepustowosc
+        for(typename GraphType::PEdge e=g.getEdge(EdLoop);e;e=g.getEdgeNext(e,EdLoop))
+            if (edgeTab[e].cost<
+                DefaultStructs:: template NumberTypeBounds
+                <typename EdgeContainer::ValType::CostType>::zero())
+                    edgeTab[e].flow=edgeTab[e].capac;
+        // wyliczanie kosztu
+        res.first=flowCost(g,edgeTab);
+        return res;
+    }
+
+    // znajdowanie minimalnego (pod wzgledem objetosci) rozciecia krawedziowego start-end
+    template <class GraphType, class EdgeContainer, class VIter, class EIter>
+    static EdgeCut<typename EdgeContainer::ValType::CapacType>
+    minEdgeCut (
+        const GraphType & g, // badany graf
+        EdgeContainer& edgeTab, // wejsciowa tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac
+        typename GraphType::PVertex start, typename GraphType::PVertex end, // wierzcholki miedzy ktorymi rozcinamy
+        OutPath<VIter,EIter> iters) // para iteratorow na wierzcholki i krawedzie wynikowe (por. opis EdgeCut)
+    {
+        EdgeCut<typename EdgeContainer::ValType::CapacType> res;
+        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                VertLabs<GraphType,typename EdgeContainer::ValType::CapacType> >::Type vertTab(g.getVertNo());
+        res.capac=maxFlow(g,edgeTab,start,end);
+        BFSFlow(g,edgeTab,vertTab,start,end,true,blackHole);
+        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+        if (std::numeric_limits<int>::max()>vertTab[v].distance)
+        {   res.vertNo++;
+            if (!isBlackHole(iters.vertIter)) { *iters.vertIter=v;++iters.vertIter; }
+            for(typename GraphType::PEdge e=g.getEdge(v,EdDirOut|EdUndir);e;e=g.getEdgeNext(v,e,EdDirOut|EdUndir))
+            if (vertTab[g.getEdgeEnd(e,v)].distance==std::numeric_limits<int>::max())
+            {   res.edgeNo++;
+                if (!isBlackHole(iters.edgeIter)) { *iters.edgeIter=e;++iters.edgeIter; }
+            }
+        }
+        return res;
+    }
+
+    // j.w. ale szuka najmniejszego rozciecia miedzy kazda para wierzcholkow (zwracane w polach first, second)
+    template <class GraphType, class EdgeContainer, class VIter, class EIter>
+    static EdgeCut2<GraphType, typename EdgeContainer::ValType::CapacType>
+    minEdgeCut (
+        const GraphType & g,
+        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        OutPath<VIter,EIter> iters)
+    {   assert(g.getVertNo()>=2); // TODO: throw
+        EdgeCut<typename EdgeContainer::ValType::CapacType> res,buf;
+        typename GraphType::PVertex a,b;
+        typename GraphType::PVertex LOCALARRAY(vres,g.getVertNo()-1);
+        typename GraphType::PVertex LOCALARRAY(vbuf,g.getVertNo()-1);
+        typename GraphType::PEdge LOCALARRAY(eres,g.getEdgeNo());
+        typename GraphType::PEdge LOCALARRAY(ebuf,g.getEdgeNo());
+        res.capac=DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::CapacType>
+                    ::plusInfty();
+
+        for(typename GraphType::PVertex s=g.getVert();s!=g.getVertLast();s=g.getVertNext(s))
+            for(typename GraphType::PVertex t=g.getVertNext(s);t;t=g.getVertNext(t))
+        {
+            if (isBlackHole(iters.vertIter) && isBlackHole(iters.edgeIter))
+                buf=minEdgeCut(g,edgeTab,s,t,outPath(blackHole,blackHole));
+            else if (isBlackHole(iters.vertIter) && !isBlackHole(iters.edgeIter))
+                buf=minEdgeCut(g,edgeTab,s,t,outPath(blackHole,ebuf));
+            else if (!isBlackHole(iters.vertIter) && isBlackHole(iters.edgeIter))
+                buf=minEdgeCut(g,edgeTab,s,t,outPath(vbuf,blackHole));
+            else buf=minEdgeCut(g,edgeTab,s,t,outPath(vbuf,ebuf));
+            if (buf.capac<res.capac)
+            {   res=buf; a=s; b=t;
+                if (!isBlackHole(iters.vertIter)) for(int i=0;i<buf.vertNo;i++) vres[i]=vbuf[i];
+                if (!isBlackHole(iters.edgeIter)) for(int i=0;i<buf.edgeNo;i++) eres[i]=ebuf[i];
+            }
+            if (g.getEdgeNo(EdDirIn|EdDirOut))
+            {
+                if (isBlackHole(iters.vertIter) && isBlackHole(iters.edgeIter))
+                    buf=minEdgeCut(g,edgeTab,t,s,outPath(blackHole,blackHole));
+                else if (isBlackHole(iters.vertIter) && !isBlackHole(iters.edgeIter))
+                    buf=minEdgeCut(g,edgeTab,t,s,outPath(blackHole,ebuf));
+                else if (!isBlackHole(iters.vertIter) && isBlackHole(iters.edgeIter))
+                    buf=minEdgeCut(g,edgeTab,t,s,outPath(vbuf,blackHole));
+                else buf=minEdgeCut(g,edgeTab,t,s,outPath(vbuf,ebuf));
+//                buf=minEdgeCut(g,edgeTab,t,s,outPath(vbuf,ebuf));
+                if (buf.capac<res.capac)
+                {   res=buf; a=t; b=s;
+                    if (!isBlackHole(iters.vertIter)) for(int i=0;i<buf.vertNo;i++) vres[i]=vbuf[i];
+                    if (!isBlackHole(iters.edgeIter)) for(int i=0;i<buf.edgeNo;i++) eres[i]=ebuf[i];
+                }
+            }
+        }
+        if (!isBlackHole(iters.vertIter))
+            for(int i=0;i<res.vertNo;i++) { *iters.vertIter=vres[i]; ++iters.vertIter; }
+        if (!isBlackHole(iters.edgeIter))
+            for(int i=0;i<res.edgeNo;i++) { *iters.edgeIter=eres[i]; ++iters.edgeIter; }
+        EdgeCut2<GraphType,typename EdgeContainer::ValType::CapacType> res2;
+        res2.capac=res.capac; res2.edgeNo=res.edgeNo; res2.vertNo=res.vertNo;
+        res2.first=a; res2.second=b;
+        return res2;
+    }
+
+    // szuka transship. w grafie o podanych warunkach na wierzcholki i krawedzie
+    // zwraca false w razie braku
+    template <class GraphType, class EdgeContainer, class VertContainer>
+    static bool
+    transship (GraphType & g, // badany graf
+               EdgeContainer& edgeTab, //  tablica asocjacyjna PEdge->TrsEdgeLabs. Korzystamy z pol wejsciowych hi i lo, wyniki trafiaja do flow
+               const VertContainer& vertTab //  wejsciowa tablica asocjacyjna PVertex->TrsVertLoss.
+               )
+    {
+        const typename EdgeContainer::ValType::CapacType Zero
+                    = DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CapacType>::zero();
+
+        typename GraphType::PVertex s,t,u,v;
+        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                 typename EdgeContainer::ValType::CapacType >::Type exc(g.getVertNo()+3);
+        typename DefaultStructs:: template AssocCont<typename GraphType::PEdge,
+                 EdgeLabs<typename EdgeContainer::ValType::CapacType > >::Type edgeLabs(2*g.getVertNo()+g.getEdgeNo()+2);
+        typename EdgeContainer::ValType::CapacType sum
+                            =Zero;
+
+        for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir))
+            {   assert(Zero==edgeTab[e].lo); // TODO: throw
+            }
+
+        if (DefaultStructs::ReserveOutAssocCont) edgeTab.reserve(g.getEdgeNo()+g.getVertNo());
+
+        u=g.addVert();
+        for(v=g.getVert();v;v=g.getVertNext(v))
+            if (v!=u) edgeTab[g.addArch(v,u)]=
+                TrsEdgeLabs<typename EdgeContainer::ValType::CapacType>(vertTab[v].lo,vertTab[v].hi);
+
+        for(v=g.getVert();v;v=g.getVertNext(v))
+        {   exc[v]=Zero;
+            for(typename GraphType::PEdge e=g.getEdge(v,EdDirIn);e;e=g.getEdgeNext(v,e,EdDirIn))
+                exc[v]+=edgeTab[e].lo;
+            for(typename GraphType::PEdge e=g.getEdge(v,EdDirOut);e;e=g.getEdgeNext(v,e,EdDirOut))
+                exc[v]-=edgeTab[e].lo;
+            if (exc[v]>Zero) sum+=exc[v];
+        }
+
+        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
+            edgeLabs[e].capac=edgeTab[e].hi-edgeTab[e].lo;
+        s=g.addVert(); t=g.addVert();
+        for(v=g.getVert();v;v=g.getVertNext(v)) if (v!=s && v!=t)
+        {   if (exc[v]>Zero) edgeLabs[g.addArch(s,v)].capac=exc[v];
+            else if (exc[v]<Zero) edgeLabs[g.addArch(v,t)].capac=-exc[v];
+        }
+        bool res= maxFlow(g,edgeLabs,s,t)==sum;
+
+        for(typename GraphType::PEdge e=g.getEdge(u);e;e=g.getEdgeNext(u,e)) edgeTab.delKey(e);
+        for(typename GraphType::PEdge e=g.getEdge(s);e;e=g.getEdgeNext(s,e)) edgeTab.delKey(e);
+        for(typename GraphType::PEdge e=g.getEdge(t);e;e=g.getEdgeNext(t,e)) edgeTab.delKey(e);
+        g.delVert(u); g.delVert(s); g.delVert(t);
+        if (!res) return false;
+        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
+            edgeTab[e].flow=edgeLabs[e].flow+edgeTab[e].lo;
+        for(typename GraphType::PEdge e=g.getEdge(EdLoop);e;e=g.getEdgeNext(e,EdLoop))
+            edgeTab[e].flow=edgeTab[e].lo;
+        return true;
+    }
+
+    // szuka najtanszego transship. w grafie o podanych warunkach na wierzcholki i krawedzie
+    // zwraca jego koszt lub nieskonczonosc w razie braku
+    template <class GraphType, class EdgeContainer, class VertContainer>
+    static typename EdgeContainer::ValType::CostType
+    minCostTransship (GraphType & g, // badany graf
+                      EdgeContainer& edgeTab, //  tablica asocjacyjna PEdge->TrsEdgeLabs. Korzystamy z pol wejsciowych hi, lo i cost; wyniki trafiaja do flow
+                      const VertContainer& vertTab) //  wejsciowa tablica asocjacyjna PVertex->TrsVertLoss.
+    {
+        const typename EdgeContainer::ValType::CapacType Zero
+                    = DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CapacType>::zero();
+
+        typename GraphType::PVertex s,t,u,v;
+        typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                 typename EdgeContainer::ValType::CapacType >::Type exc(g.getVertNo()+3);
+        typename DefaultStructs:: template AssocCont<typename GraphType::PEdge,
+                 EdgeLabs<typename EdgeContainer::ValType::CapacType > >::Type edgeLabs(2*g.getVertNo()+g.getEdgeNo()+2);
+        typename EdgeContainer::ValType::CapacType sum
+                            =Zero;
+
+        for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir))
+            {   assert(Zero==edgeTab[e].lo); // TODO: throw
+            }
+
+        if (DefaultStructs::ReserveOutAssocCont) edgeTab.reserve(g.getEdgeNo()+g.getVertNo());
+
+        u=g.addVert();
+        for(v=g.getVert();v;v=g.getVertNext(v))
+            if (v!=u) edgeTab[g.addArch(v,u)]=
+                TrsEdgeLabs<typename EdgeContainer::ValType::CapacType>(vertTab[v].lo,vertTab[v].hi);
+
+        for(v=g.getVert();v;v=g.getVertNext(v))
+        {   exc[v]=Zero;
+            for(typename GraphType::PEdge e=g.getEdge(v,EdDirIn);e;e=g.getEdgeNext(v,e,EdDirIn))
+                exc[v]+=edgeTab[e].lo;
+            for(typename GraphType::PEdge e=g.getEdge(v,EdDirOut);e;e=g.getEdgeNext(v,e,EdDirOut))
+                exc[v]-=edgeTab[e].lo;
+            if (exc[v]>Zero) sum+=exc[v];
+        }
+
+        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
+        {
+            edgeLabs[e].capac=edgeTab[e].hi-edgeTab[e].lo;
+            edgeLabs[e].cost=edgeTab[e].cost;
+        }
+        s=g.addVert(); t=g.addVert();
+        for(v=g.getVert();v;v=g.getVertNext(v)) if (v!=s && v!=t)
+        {   if (exc[v]>Zero) edgeLabs[g.addArch(s,v)].capac=exc[v];
+            else if (exc[v]<Zero) edgeLabs[g.addArch(v,t)].capac=-exc[v];
+        }
+        if (minCostFlow(g,edgeLabs,s,t,sum).second!=sum) return DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CostType>::plusInfty();
+
+        for(typename GraphType::PEdge e=g.getEdge(u);e;e=g.getEdgeNext(u,e)) edgeTab.delKey(e);
+        for(typename GraphType::PEdge e=g.getEdge(s);e;e=g.getEdgeNext(s,e)) edgeTab.delKey(e);
+        for(typename GraphType::PEdge e=g.getEdge(t);e;e=g.getEdgeNext(t,e)) edgeTab.delKey(e);
+        g.delVert(u); g.delVert(s); g.delVert(t);
+        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
+             edgeTab[e].flow=edgeLabs[e].flow+edgeTab[e].lo;
+//             res+=(g.getEdgeType(e)!=Undirected) ? edgeTab[e].flow*edgeTab[e].cost
+//                            : std::max(edgeTab[e].flow,-edgeTab[e].flow)*edgeTab[e].cost;
+        for(typename GraphType::PEdge e=g.getEdge(EdLoop);e;e=g.getEdgeNext(e,EdLoop))
+            if (edgeTab[e].cost>=DefaultStructs:: template NumberTypeBounds
+                    <typename EdgeContainer::ValType::CostType>::zero())
+                edgeTab[e].flow=edgeTab[e].lo; else edgeTab[e].flow=edgeTab[e].hi;
+//                res+=edgeTab[e].flow*edgeTab[e].cost;
+
+        return flowCost(g,edgeTab);
+    }
+
+    // znajduje drzewo Gomory-Hu grafu
+    template <class GraphType, class EdgeContainer, class IterOut>
+    static void getGHTree(GraphType & g, // badany graf nieskierowany
+                          EdgeContainer& edgeTab, // tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac (wymagane nieujemne)
+                IterOut out) // iterator wyjsciowy, na ktory wyrzucamy struktury GHTreeEdge "krawedzi" drzewa
+    {   assert(g.getVertNo()>1); // TODO: throw
+        GHTreeEdge<GraphType,typename EdgeContainer::ValType::CapacType> LOCALARRAY(buf,g.getVertNo());
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 Set<typename GraphType::PVertex> >::Type setMap(g.getVertNo());
         Set<typename GraphType::PVertex> V=g.getVertSet(),R=V;
-        ghtree(g,edgeTab,setMap,V,R,out);
+        // TODO: if (DefaultStructs::ReserveOutAssocCont) edgeTab.reserve(???);
+        ghtree(g,edgeTab,setMap,V,R,buf);
+        for(int i=0;i<g.getVertNo()-1;i++) { *out=buf[i]; ++out; }
     }
 
 
 };
 
-class Flow : public FlowPar<FlowAlgsDefaultStructs> {};
+
+// wersja dzialajaca na DefaultStructs=FlowAlgsDefaultSettings
+template <bool FF, bool costFF>
+class FlowFl : public FlowPar<FlowAlgsDefaultSettings<FF, costFF> > {};
+
+// i z domyslnymi flagami wyboru algorytmow
+class Flow : public FlowFl<false,true> {};
 
 
 
-class ConnectAlgsDefaultStructs : public FlowAlgsDefaultStructs {
+// Domyslne wytyczne dla procedur badania spojnosci grafu
+class ConnectAlgsDefaultSettings : public FlowAlgsDefaultSettings<false, true> {
     public:
 
+    // typ pomocniczej sieci lokalnej
     template <class A, class B> class LocalGraph {
         public:
-        typedef Graph<A,B,DefaultGrSettings<EdDirIn|EdDirOut,false> > Type;
-//              typedef Graph<A,B> Type; // wersja bez trzeciego par. szablonu grafu
+        typedef Graph<A,B,GrDefaultSettings<EdDirIn|EdDirOut,false> > Type;
+
     };
 
 };
 
+
+// Procedury badania spojnosci grafu (bez wag na wierz/kraw)
 template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
 class ConnectPar : public PathStructs {
 
     public:
 
+    // rekord wyjsciowy opisujacy rozciecie krawedziowe w grafie
     template <class GraphType> struct EdgeCut {
 
-            typename GraphType::PVertex first, second;
-            int edgeNo;
+            typename GraphType::PVertex first, second; // dwa wierzcholki po obu stronach rozciecia
+            int edgeNo; // liczba krawedzi
 
             EdgeCut() {}
     };
@@ -1289,100 +1418,7 @@ class ConnectPar : public PathStructs {
             {}
     };
 
-    public:
-
-    template <class GraphType, class EIter>
-    static int
-    minEdgeCut (
-        const GraphType & g,
-        typename GraphType::PVertex start, typename GraphType::PVertex end, EIter iter)
-    {   typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
-                                    typename FlowPar<DefaultStructs>:: template EdgeLabs<int> >::Type
-                                        edgeLabs(g.getEdgeNo());
-        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeLabs[e].capac=1;
-        return FlowPar<DefaultStructs>::minEdgeCut(g,edgeLabs,start,end,
-                                        FlowPar<DefaultStructs>::outPath(blackHole,iter)).capac;
-    }
-
-
-    template <class GraphType, class EIter>
-    static EdgeCut<GraphType>
-    minEdgeCut (const GraphType & g, EIter iter)
-    {   EdgeCut<GraphType> res;
-        typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
-                                    typename FlowPar<DefaultStructs>:: template EdgeLabs<int> >::Type
-                                        edgeLabs(g.getEdgeNo());
-        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeLabs[e].capac=1;
-        typename FlowPar<DefaultStructs>:: template EdgeCut2<GraphType,int> res2
-                =FlowPar<DefaultStructs>:: template minEdgeCut(g,edgeLabs,
-                                    FlowPar<DefaultStructs>::template outPath(blackHole,iter));
-        res.edgeNo=res2.capac; res.first=res2.first; res.second=res2.second;
-        return res;
-    }
-
-
-    template <class GraphType, class VIter, class EIter, class LenIter>
-    static int
-    edgeDisjPaths( GraphType & g,
-                  typename GraphType::PVertex start, typename GraphType::PVertex end,
-                  OutPath< VIter,EIter > iters, LenIter liter,bool vertsoutflag=false)
-    {   typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
-                                    typename FlowPar<DefaultStructs>:: template EdgeLabs<int> >::Type
-                                        edgeTab(g.getEdgeNo());
-        typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
-                            std::pair<typename GraphType::PVertex,typename GraphType::PVertex> >::Type
-                                        undirs(g.getEdgeNo(EdUndir));
-        typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,int>::Type
-                                        paths(2*g.getEdgeNo());
-        typename GraphType::PEdge LOCALARRAY(euler,2*g.getEdgeNo());
-        typename GraphType::PEdge LOCALARRAY(eout,g.getEdgeNo());
-        typename GraphType::PVertex LOCALARRAY(vout,g.getVertNo());
-
-        *liter=0; ++liter;
-        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
-            edgeTab[e].capac=1;
-        int res=FlowPar<DefaultStructs>:: template maxFlow(g,edgeTab,start,end);
-        if (!res) return 0;
-        for(typename GraphType::PEdge e=edgeTab.firstKey();e;e=edgeTab.nextKey(e))
-            if (g.getEdgeType(e)==Undirected && edgeTab[e].flow)
-            {
-                undirs[e]=g.getEdgeEnds(e);
-                if (edgeTab[e].flow>0) g.moveEdge(e,undirs[e].first,undirs[e].second,EdDirOut);
-                else g.moveEdge(e,undirs[e].second,undirs[e].first,EdDirOut);
-            }
-        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
-            if (edgeTab[e].flow) paths[e]=0;
-        for(int i=0;i<res;i++) paths[g.addArch(end,start)]=-1;
-            EulerPar<DefaultStructs>:: template getDirCycle(
-                makeSubgraph(g,std::make_pair(stdChoose(true),edgeTypeChoose(Directed) && extAssocKeyChoose(&(paths)))),
-                start,outPath(blackHole,euler));
-        int r=0;
-        for(int i=0;i<paths.size();i++)
-            if (paths[euler[i]]!=-1) paths[euler[i]]=r; else r++;
-        int l=0;
-        for(r=0;r<res;r++)
-        {   int j=BFSPar<DefaultStructs>:: template getPath(
-                makeSubgraph(g,std::make_pair(stdChoose(true),extAssocChoose(&(paths),r))),
-                start,end,outPath(vout,eout),EdDirOut);
-            l+=j + ((vertsoutflag)?1:0); *liter=l; ++liter;
-            if (!isBlackHole(iters.edgeIter))
-                for(int k=0;k<j;k++) { *iters.edgeIter=eout[k]; ++iters.edgeIter;}
-            if (!isBlackHole(iters.vertIter))
-                for(int k=0;k<=j;k++) { *iters.vertIter=vout[k]; ++iters.vertIter;}
-        }
-
-        for(typename GraphType::PEdge e=undirs.firstKey();e;e=undirs.nextKey(e))
-            g.moveEdge(e,undirs[e].first,undirs[e].second,EdUndir);
-        l=paths.getKeys(euler);
-        for(int i=0;i<l;i++) if (paths[euler[i]]==-1) g.delEdge(euler[i]);
-
-        return res;
-    }
-
-
-    protected:
-
-
+    // tworzy w ig pomocnicza siec na podstawie g. Mapa images laczy wierzcholki g z parami odpowiednich krawedzi w ig
     template <class GraphType, class ImageType, class Linker>
     static void makeImage(const GraphType& g, ImageType& ig, Linker& images)
     {
@@ -1405,16 +1441,115 @@ class ConnectPar : public PathStructs {
         }
     }
 
-
     public:
 
+    // znajduje najmniejsze rozciecie krawedziowe miedzy start->end
+    // zwraca jego wielkosc, krawedzie sa wypisywane na iter
+    template <class GraphType, class EIter>
+    static int
+    minEdgeCut (
+        const GraphType & g,
+        typename GraphType::PVertex start, typename GraphType::PVertex end, EIter iter)
+    {   typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
+                                    typename FlowPar<DefaultStructs>:: template EdgeLabs<int> >::Type
+                                        edgeLabs(g.getEdgeNo());
+        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeLabs[e].capac=1;
+        return FlowPar<DefaultStructs>::minEdgeCut(g,edgeLabs,start,end,
+                                        FlowPar<DefaultStructs>::outPath(blackHole,iter)).capac;
+    }
 
+    // znajduje najmniejsze rozciecie krawedziowe miedzy para roznych wierzcholkow
+    // krawedzie sa wypisywane na iter
+    template <class GraphType, class EIter>
+    static EdgeCut<GraphType>
+    minEdgeCut (const GraphType & g, EIter iter)
+    {   EdgeCut<GraphType> res;
+        typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
+                                    typename FlowPar<DefaultStructs>:: template EdgeLabs<int> >::Type
+                                        edgeLabs(g.getEdgeNo());
+        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeLabs[e].capac=1;
+        typename FlowPar<DefaultStructs>:: template EdgeCut2<GraphType,int> res2
+                =FlowPar<DefaultStructs>:: template minEdgeCut(g,edgeLabs,
+                                    FlowPar<DefaultStructs>::template outPath(blackHole,iter));
+        res.edgeNo=res2.capac; res.first=res2.first; res.second=res2.second;
+        return res;
+    }
+
+
+    // znajduje najwiekszy zbior krawedziowo rozlaczych sciezek start->end
+    // zwraca ich liczbe
+    template <class GraphType, class VIter, class EIter, class LenIterV, class LenIterE>
+    static int
+    edgeDisjPaths( GraphType & g,// badany graf
+                  typename GraphType::PVertex start, typename GraphType::PVertex end,
+                  OutPath< VIter,EIter > iters, // iteratory wyjsciowe na kolejne wierz/kraw znalezionych sciezek
+                  std::pair<LenIterV,LenIterE> liter) // iteratory na ktore wypisywane sa pozycje poczatkow kolejnych sciezek
+                  // i laczna dlugosc ciagow (por. komentarz przy strukturze CompStore) z search.h
+    {   typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
+                                    typename FlowPar<DefaultStructs>:: template EdgeLabs<int> >::Type
+                                        edgeTab(g.getEdgeNo());
+        typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
+                            std::pair<typename GraphType::PVertex,typename GraphType::PVertex> >::Type
+                                        undirs(g.getEdgeNo(EdUndir));
+        typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,int>::Type
+                                        paths(2*g.getEdgeNo());
+        typename GraphType::PEdge LOCALARRAY(euler,2*g.getEdgeNo());
+        typename GraphType::PEdge LOCALARRAY(eout,g.getEdgeNo());
+        typename GraphType::PVertex LOCALARRAY(vout,g.getVertNo());
+
+        *liter.first=0; ++liter.first;*liter.second=0; ++liter.second;
+        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
+            edgeTab[e].capac=1;
+        int res=FlowPar<DefaultStructs>:: template maxFlow(g,edgeTab,start,end);
+        if (!res) return 0;
+        for(typename GraphType::PEdge e=edgeTab.firstKey();e;e=edgeTab.nextKey(e))
+            if (g.getEdgeType(e)==Undirected && edgeTab[e].flow)
+            {
+                undirs[e]=g.getEdgeEnds(e);
+                if (edgeTab[e].flow>0) g.moveEdge(e,undirs[e].first,undirs[e].second,EdDirOut);
+                else g.moveEdge(e,undirs[e].second,undirs[e].first,EdDirOut);
+            }
+        for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
+            if (edgeTab[e].flow) paths[e]=0;
+        for(int i=0;i<res;i++) paths[g.addArch(end,start)]=-1;
+
+            EulerPar<DefaultStructs>:: template getDirCycle(
+                makeSubgraph(g,std::make_pair(stdChoose(true),edgeTypeChoose(Directed) && extAssocKeyChoose(&(paths)))),
+                start,outPath(blackHole,euler));
+        int r=0;
+        for(int i=0;i<paths.size();i++)
+            if (paths[euler[i]]!=-1) paths[euler[i]]=r; else r++;
+        int lv=0,le=0;
+        for(r=0;r<res;r++)
+        {   int j=BFSPar<DefaultStructs>:: template getPath(
+                makeSubgraph(g,std::make_pair(stdChoose(true),extAssocChoose(&(paths),r))),
+                start,end,outPath(vout,eout),EdDirOut);
+            lv+=j + 1; le+=j; /*((vertsoutflag)?1:0);*/
+            *liter.first=lv; *liter.second=le;++liter.first;++liter.second;
+            if (!isBlackHole(iters.edgeIter))
+                for(int k=0;k<j;k++) { *iters.edgeIter=eout[k]; ++iters.edgeIter;}
+            if (!isBlackHole(iters.vertIter))
+                for(int k=0;k<=j;k++) { *iters.vertIter=vout[k]; ++iters.vertIter;}
+        }
+
+        for(typename GraphType::PEdge e=undirs.firstKey();e;e=undirs.nextKey(e))
+            g.moveEdge(e,undirs[e].first,undirs[e].second,EdUndir);
+        le=paths.getKeys(euler);
+        for(int i=0;i<le;i++) if (paths[euler[i]]==-1) g.delEdge(euler[i]);
+
+        return res;
+    }
+
+    // znajduje najmniejsze rozciecie wierzcholkowe miedzy start->end
+    // zwraca jego wielkosc (-1 w razie braku), wierzcholki sa wypisywane na iter
     template <class GraphType, class VIter>
     static int
     minVertCut (
-        const GraphType & g,
-        typename GraphType::PVertex start, typename GraphType::PVertex end, VIter iter)
-    {   assert(start && end && (start!=end) );
+        const GraphType & g,// badany graf
+        typename GraphType::PVertex start, typename GraphType::PVertex end,
+        VIter iter) // iterator wyjsciowy
+    {   assert(start && end && (start!=end) ); // TODO: throw
+        if (g.getEdge(start,end,EdDirOut|EdUndir)) return -1;
         typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
                 std::pair<typename GraphType::PVertex,typename GraphType::PEdge> >:: Type Image;
         Image ig;
@@ -1432,18 +1567,20 @@ class ConnectPar : public PathStructs {
 
         int res=FlowPar<DefaultStructs>::minEdgeCut(ig,imageFlow,images[start].second,images[end].first,
                                         FlowPar<DefaultStructs>::outPath(blackHole,icut)).edgeNo;
-        for(int i=0;i<res;i++)
+        if (!isBlackHole(iter)) for(int i=0;i<res;i++)
         {   assert(icut[i]->info.first);
             *iter=icut[i]->info.first;++iter;
         }
         return res;
     }
 
-
+    // znajduje najmniejsze rozciecie wierzcholkowe w grafie
+    // zwraca jego wielkosc (-1 w razie braku), wierzcholki sa wypisywane na iter
     template <class GraphType, class VIter>
     static int
     minVertCut (const GraphType & g,VIter iter)
-    {   typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
+    {
+        typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
                 std::pair<typename GraphType::PVertex,typename GraphType::PEdge> >:: Type Image;
         Image ig;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
@@ -1482,7 +1619,7 @@ class ConnectPar : public PathStructs {
                     if (res<best) { best=res; for(int i=0;i<res;i++) bestcut[i]=icut[i];}
                 }
                 if (iv>best+1)
-                {
+                {   if (!isBlackHole(iter))
                     for(int i=0;i<best;i++)
                     {   assert(bestcut[i]->info.first);
                         *iter=bestcut[i]->info.first;++iter;
@@ -1494,13 +1631,17 @@ class ConnectPar : public PathStructs {
         return -1;
     }
 
-
-    template <class GraphType, class VIter, class EIter, class LenIter>
+    // znajduje najwiekszy zbior wewnetrznie wierzcholkowo rozlaczych sciezek start->end
+    // zwraca ich liczbe
+    template <class GraphType, class VIter, class EIter, class LenIterV,class LenIterE>
     static int
-    vertDisjPaths(const GraphType & g,
+    vertDisjPaths(const GraphType & g,// badany graf
                   typename GraphType::PVertex start, typename GraphType::PVertex end,
-                  OutPath< VIter,EIter > iters, LenIter liter,bool vertsoutflag=false)
-    {   assert(start && end && start!=end);
+                  OutPath< VIter,EIter > iters, // iteratory wyjsciowe na kolejne wierz/kraw znalezionych sciezek
+                  std::pair<LenIterV,LenIterE> liter)// iterator na ktory wypisywane sa pozycje poczatkow kolejnych sciezek
+                  // i laczna dlugosc ciagow (por. komentarz przy strukturze CompStore) z search.h
+//                  bool vertsoutflag=false)
+    {   assert(start && end && start!=end);//TODO: throw
         typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
                 std::pair<typename GraphType::PVertex,typename GraphType::PEdge> >:: Type Image;
         Image ig;
@@ -1518,10 +1659,9 @@ class ConnectPar : public PathStructs {
         for(typename Image::PEdge e=ig.getEdge(images[end].second,images[start].first);e;
             e=ig.getEdge(images[end].second,images[start].first)) ig.delEdge(e);
 
-
         int res=edgeDisjPaths(ig,images[start].second,images[end].first,outPath(blackHole,impaths),
-                                                                                    impos,false);
-        *liter=0; ++liter;
+                                                                                std::make_pair(blackHole,impos));
+        *liter.first=0; ++liter.first;*liter.second=0; ++liter.second;
         int vpos=0,epos=0;
         for(int i=0;i<res;i++)
         {   bool ed=true;
@@ -1534,17 +1674,22 @@ class ConnectPar : public PathStructs {
                 ed=!ed;
             }
             *iters.vertIter=end; ++iters.vertIter;++vpos;
-            if (vertsoutflag) { *liter=vpos; ++liter; }
-            else { *liter=epos; ++liter; }
+            /*if (vertsoutflag) */
+            { *liter.first=vpos; ++liter.first; }
+            /*else*/
+            { *liter.second=epos; ++liter.second; }
         }
+        // wszystkie krawedzie start->end sa tez traktowane jako szukane sciezki
         res+=g.getEdgeNo(start,end,EdDirOut|EdUndir);
         for(typename GraphType::PEdge e=g.getEdge(start,end,EdDirOut|EdUndir);e;
                 e=g.getEdgeNext(start,end,e,EdDirOut|EdUndir))
         {   *iters.vertIter=start; ++iters.vertIter;++vpos;
             *iters.edgeIter=e; ++iters.edgeIter;++epos;
             *iters.vertIter=end; ++iters.vertIter;++vpos;
-            if (vertsoutflag) { *liter=vpos; ++liter; }
-            else { *liter=epos; ++liter; }
+//            if (vertsoutflag)
+            { *liter.first=vpos; ++liter.first; }
+//            else
+            { *liter.second=epos; ++liter.second; }
         }
 
         return res;
@@ -1553,7 +1698,8 @@ class ConnectPar : public PathStructs {
 
 };
 
-class Connect : public ConnectPar<ConnectAlgsDefaultStructs> {};
+// wersja dzialajaca na DefaultStructs=ConnectAlgsDefaultSettings
+class Connect : public ConnectPar<ConnectAlgsDefaultSettings> {};
 
 
 }

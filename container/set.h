@@ -6,6 +6,22 @@
 //Wersje na vectorze wlacza zdefiniowanie stalej czasu kompilacji KOALA_SET_ON_VECTOR
 
 
+// TODO: Operatory
+//template< typename Element >
+//    bool operator==( const Set< Element > &, const Set< Element > & );
+//template< typename Element >
+//    bool operator!=( const Set< Element > &, const Set< Element > & );
+//template< typename Element >
+//    Set< Element > operator+( const Set< Element > &, const Set< Element > & );
+//template< typename Element >
+//    Set< Element > operator*( const Set< Element > &, const Set< Element > & );
+//template< typename Element >
+//    Set< Element > operator-( const Set< Element > &, const Set< Element > & );
+//template< typename Element >
+//    Set< Element > operator^( const Set< Element > &, const Set< Element > & );
+//dla Seta powinny miec wspolny kod w set.h, niezalezny od wyboru implementacji Seta (na
+//vectorze lub secie). Po co dublowac kod, ktory i tak jest zrobiony na const_iteratorach?
+
 // TODO: przebadac obie implementacje pod katem efektywnosci np. niepotrzebne kopiowanie kontenerow
 
 #ifndef KOALA__SET__H__
@@ -69,6 +85,24 @@ template< class Element >
 SetInserter< Set< Element > > setInserter( Set< Element > & x)
 {
     return SetInserter< Set< Element > >( x );
+}
+
+// wylicza obraz zbioru w podanym przeksztalceniu
+// niestety sama nie zajdzie dedukcja typu wyniku przy wywolaniu ( trzeba np. imageSet<double>(iset,kwadrat);)
+template <class ValType, class ArgType, class Funktor>
+Set<ValType> imageSet(const Set<ArgType>& arg, Funktor f)
+{   Set<ValType> res;
+    for(ArgType i=arg.first();!arg.isBad(i);i=arg.next(i)) res+=(ValType)f(i);
+    return res;
+}
+
+// wylicza przeciwobraz zbioru w podanym przeksztalceniu i danej dziedzinie
+template <class ValType, class ArgType, class Funktor>
+Set<ArgType> preimageSet(const Set<ValType>& arg, const Set<ArgType>& domain, Funktor f)
+{   Set<ArgType> res;
+    for(ArgType i=domain.first();!domain.isBad(i);i=domain.next(i))
+        if (arg.isElement((ValType)f(i))) res+=i;
+    return res;
 }
 
 }
