@@ -25,7 +25,7 @@ namespace Koala {
 template <EdgeType edAllow, bool adjMatrixAllowed>
 // edAllow - maska okreslajaca dopuszczalne typy krawedzi
 // adjMatrixAllowed - czy jest dopuszczalne tworzenie macierzy sasiedztwa
-class DefaultGrSettings {
+class GrDefaultSettings {
     public:
 
     enum  {  EdAllow=edAllow }; // maska okreslajaca dopuszczalne typy krawedzi
@@ -70,6 +70,9 @@ class DefaultGrSettings {
     template<class VertInfo, class EdgeInfo, class Settings > struct EdgeAdditData {
         AssocKeyContReg assocReg; // - w tej wersji umozliwia korzystanie z AssocArray
     };
+
+    // czy dostosowywac rozmiar pamieci wyjsciowych tablic asocjacyjnych
+    enum { ReserveOutAssocCont=true };
 
 
     // wybrany do uzytku wewnetrznego algorytm sortowania tablic
@@ -234,7 +237,7 @@ struct GraphInternalTypes<Graph< VertInfo,EdgeInfo,Settings> > {
 #include "grconst.h"
 
 
-template< class VertInfo = EmptyVertInfo, class EdgeInfo = EmptyVertInfo, class Settings = DefaultGrSettings<EdAll,true> >
+template< class VertInfo = EmptyVertInfo, class EdgeInfo = EmptyVertInfo, class Settings = GrDefaultSettings<EdAll,true> >
 class Graph: public SubgraphBase,
     protected Privates::EdgeCounterLoop<Settings::EdAllow & Loop>,
     protected Privates::EdgeCounterDir<Settings::EdAllow & (EdDirIn|EdDirOut)>,
@@ -495,8 +498,6 @@ class Graph: public SubgraphBase,
         inline bool delAdjMatrix();
         // Informacja o tym, czy graf ma macierz sąsiedztwa.
         inline bool hasAdjMatrix() const;
-        // porzadkowanie macierzy sasiedztwa
-        inline bool defragAdjMatrix();
         // czy ten typ grafu obsluguje macierz sasiedztwa
         static bool allowedAdjMatrix() { return Settings::AdjMatrixAllowed; }
         // alokacja pamieci na podana liczbe wierzcholkow

@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define KOALA_SET_ON_VECTOR
+//#define KOALA_SET_ON_VECTOR
 
 #include "Koala/base/def_struct.h"
 #include "Koala/container/joinsets.h"
@@ -33,6 +33,9 @@ class Vert  {
 Vert *A=new Vert("Ala"),*B=new Vert("Basia"),*C=new Vert("Celina"),*D=new Vert("Dagmara");
 
 Vert* vtab[4]={A,B,C,D};
+
+double kwadrat(int arg) { return arg*arg; }
+
 
 int main()
 {
@@ -192,5 +195,26 @@ int main()
     iset+=2;iset+=0;iset+=3;
     iset2+=2;iset2+=0;iset2+=7;
     cout << (iset*iset2);
+    cout << "\n!\n";
+    {
+        Set<int> hset;
+        hset+=1;
+        hset+=2;
+        hset+=3;
+        hset+=-1;
+        hset+=-2;
+        hset+=-3;
+        hset+=0;
+        for(int s=hset.first();!hset.isBad(s);s=hset.next(s))
+            cout << s << endl;
+        cout << imageSet<double>(hset,kwadrat);
+
+        Set<double> dset;
+        dset+=4;dset+=5;dset+=6;dset+=7;dset+=8;dset+=9;
+        cout << preimageSet(dset,hset,kwadrat);
+
+    }
+    cout << "\n!\n";
+
 
 }

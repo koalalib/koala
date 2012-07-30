@@ -24,8 +24,8 @@ Koala::Graph<char,OpisE>::PEdge tabE[20];
 Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeLabs<int> >  edgeCont;
 Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::VertLabs<Koala::Graph<char,OpisE>,int> > vertCont;
 
-Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeBound<int> > tedgeCont;
-Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::VertLoss<int> > tvertCont;
+Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::TrsEdgeLabs<int> > tedgeCont;
+Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsVertLoss<int> > tvertCont;
 
 
 void dijTest()
@@ -238,14 +238,14 @@ void transTest()
     S=g.addVert('S');T=g.addVert('T');
 //    F=g.addVert('F');
 
-    tedgeCont[g.addArch(S,A,OpisE(0))]=Koala::Flow::EdgeBound<int>(0,18,3);
-    tedgeCont[g.addArch(S,C,OpisE(50))]=Koala::Flow::EdgeBound<int>(0,20,8);
-    tedgeCont[g.addArch(A,C,OpisE(10))]=Koala::Flow::EdgeBound<int>(0,15,4);
-    tedgeCont[g.addEdge(B,A,OpisE(50))]=Koala::Flow::EdgeBound<int>(0,20,5);
-    tedgeCont[g.addArch(C,B,OpisE(60))]=Koala::Flow::EdgeBound<int>(0,12,8);
-    tedgeCont[g.addArch(B,T,OpisE(30))]=Koala::Flow::EdgeBound<int>(0,14,5);
-    tedgeCont[g.addArch(C,T,OpisE(10))]=Koala::Flow::EdgeBound<int>(0,17,3);
-    tedgeCont[g.addLoop(C,OpisE(10))]=Koala::Flow::EdgeBound<int>(1,10,-1);
+    tedgeCont[g.addArch(S,A,OpisE(0))]=Koala::Flow::TrsEdgeLabs<int>(0,18,3);
+    tedgeCont[g.addArch(S,C,OpisE(50))]=Koala::Flow::TrsEdgeLabs<int>(0,20,8);
+    tedgeCont[g.addArch(A,C,OpisE(10))]=Koala::Flow::TrsEdgeLabs<int>(0,15,4);
+    tedgeCont[g.addEdge(B,A,OpisE(50))]=Koala::Flow::TrsEdgeLabs<int>(0,20,5);
+    tedgeCont[g.addArch(C,B,OpisE(60))]=Koala::Flow::TrsEdgeLabs<int>(0,12,8);
+    tedgeCont[g.addArch(B,T,OpisE(30))]=Koala::Flow::TrsEdgeLabs<int>(0,14,5);
+    tedgeCont[g.addArch(C,T,OpisE(10))]=Koala::Flow::TrsEdgeLabs<int>(0,17,3);
+    tedgeCont[g.addLoop(C,OpisE(10))]=Koala::Flow::TrsEdgeLabs<int>(1,10,-1);
 //    edgeCont[g.addLoop(B,OpisE(10))]=Koala::Flow::EdgeLabs<int>(1,-10);
 
 //    g.addArch(T,F,OpisE(40));
@@ -261,7 +261,7 @@ void transTest()
 
 
     for(Koala::Graph<char,OpisE>::PVertex ePt=g.getVert();ePt;ePt=g.getVertNext(ePt))
-        tvertCont[ePt]=Koala::Flow::VertLoss<int>(0,0);
+        tvertCont[ePt]=Koala::Flow::TrsVertLoss<int>(0,0);
     tvertCont[S].lo=-34;
     tvertCont[S].hi=-31;
     tvertCont[T].lo=31;
@@ -332,7 +332,7 @@ int main() {
 
     cout << "\n***\n" << boolalpha;
     cout << Koala::Flow::maxFlow(g,edgeCont,S,T) << '\n';
-    assert(Koala::Flow::testFlow(g,edgeCont,S,T));
+    assert(Koala::Flow::vertFlow(g,edgeCont,S)==Koala::Flow::maxFlow(g,edgeCont,S,T));
 //    cout << Koala::Flow::layerFlow(g,edgeCont,S,T) << '\n';
     for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         cout << e->info << ": flow=" << edgeCont[e].flow << '\n';

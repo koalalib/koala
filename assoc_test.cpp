@@ -286,23 +286,53 @@ int main() {
     t(cona);
 
     cout << "\n" << pairMinMax(5,5).first << ' ' << pairMinMax(4,5).second;
-//    AssocMatrix<Vert*,std::string,AMatrFull> mmm;
-//    mmm(C,D)="CD";
-//    const AssocMatrix<Vert*,std::string,AMatrFull> conm=mmm;
-//    t(mmm);
-//    t(conm);
-//    mmm(A,C)="AC";
-//    conm(A,C)="AC";
-//    cout << endl;
-//    t(mmm);
-//    cout << "\nconst " <<endl;
-//    t(conm);
-//    mmm.delKey(A,C);
-////    conm.delKey(A,C);
-//    t(mmm);
-//    t(conm);
-//
-//    cout << mmm;
+
+    AssocTable<HashMap<int,std::string> > hmp;
+    hmp[3]="A";hmp[6]="B";;hmp[7]="C";
+    cout << endl << hmp[3] << hmp.size();
+    hmp.reserve(200000);
+    cout << hmp[3] << hmp.size();
+    {
+        cout << "\n!!!!!!!!!!!!!!!!!!1\n\n";
+        std::map<Vert*,std::string> mapa,mapa2;
+        mapa[A]="A";
+        AssocTabConstInterface<std::map<Vert*,std::string> > inf(mapa);
+        AssocTabInterface<std::map<Vert*,std::string> > inf2(mapa),inf3(inf2),inf4(mapa2);
+        inf3[B]="B";
+        inf3=inf;
+        t(inf3);
+        inf4=inf2;
+        t(assocTabInterf(mapa2));
+
+        AssocTable<std::map<Vert*,std::string> > tab,tab2=tab;
+        AssocTable<std::map<int,std::string> > imapa;
+
+        AssocArray<Vert*,std::string>  aa,aa2(aa);
+        aa[B]="BB";
+        aa2=inf;
+        t(aa2);
+
+        PseudoAssocArray<Vert*,std::string,AssocTable<std::map<Vert*,int> > >  pa;
+        pa[B]="BB";
+        PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int> > >  pa2(pa);
+        pa2=pa;
+        aa=pa2;
+        t(aa);
+        AssocTable<BiDiHashMap<Vert*,std::string> > hmapa;
+        hmapa=pa;
+        t(hmapa);
+
+        AssocMatrix<Vert*,std::string,AMatrClTriangle,std::vector< BlockOfAssocMatrix< std::string > >
+         ,PseudoAssocArray<Vert*,int,AssocTable<std::map<Vert*,int> > > > mat,mat2;
+        mat(A,B)="AB";
+        mat2=mat;
+        t(mat2);
+        AssocMatrix<Vert*,std::string,AMatrClTriangle> mat3;
+        mat3=mat;
+        t(mat3);
+
+
+    }
 
 }
 

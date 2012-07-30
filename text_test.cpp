@@ -15,6 +15,10 @@ using namespace Koala::IO;
 
 Graph<char,string>::PEdge tabE[10];
 
+struct Dummy {
+    int a;
+};
+
 int main() {
 	string buf;
 	Graph<char,string> g;
@@ -116,6 +120,31 @@ int main() {
 	readGraphText(g, pliki, RG_EdgeList);
 	pliki.close();
 	writeGraphText(g, cout, RG_VertexLists);
+
+    cout << "\n----------------\n";
+
+#define VT float
+#define ET double
+#define Mask RG_VertexLists
+
+
+    Graph<VT,ET> gr;
+    gr.addVert();gr.addVert();
+    gr.addArch(gr.getVert(),gr.getVertLast());
+    ofstream pliko2("plik2.txt");
+    writeGraphText(gr, cout, Mask|RG_Info );
+	writeGraphText(gr, pliko2, Mask);
+	pliko2.close();
+    cout << endl;
+	ifstream pliki2("plik2.txt");
+	gr.clear();
+	readGraphText(gr, pliki2, Mask);
+	pliki2.close();
+	g.clear();
+//	readGraphText(g, pliki, RG_VertexLists,int2v,int2e);
+	writeGraphText(gr, cout, Mask|RG_Info );
+
+
 
 //    cout << "\n\n" << int2v[99]->info << ' ' << int2e[102]->info;
 //	Graph<> gc; gc.copy(g);

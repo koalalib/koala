@@ -10,11 +10,13 @@
 namespace Koala {
 
 // struktura pomocnicza dla zbiorow zlaczalnych o elementach typu Klucz
-template< class Klucz > struct JSPartDesrc
-{
+template< class Klucz > class JSPartDesrc
+{   template <class K,class Cont> friend class JoinableSets;
+
     JSPartDesrc *parent, *next, *first, *last;
     unsigned int deg, size;
     Klucz key;
+
 } ;
 
 

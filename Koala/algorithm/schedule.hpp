@@ -93,7 +93,7 @@ int SchedulingPar<DefaultStructs>::LMax(TaskIterator begin, TaskIterator end,  c
 				finish[j->task] = j->end;
 
 	i = 0;
-	int ans = AlgorithmsDefaultSettings::NumberTypeBounds<int>::minusInfty();
+	int ans = AlgsDefaultSettings::NumberTypeBounds<int>::minusInfty();
 	for(TaskIterator iterator = begin; iterator != end; ++iterator, i++)
 	{
 		int value = finish[i] - iterator->duedate;

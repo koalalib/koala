@@ -296,6 +296,7 @@ template< typename Element > inline
 template< typename Element > inline
     Element Set< Element >::prev( const Element &e ) const
     {   if (this->isBad(e)) return last();
+        if (e==this->first()) return this->badValue();
         unsigned l = 0, r = size() - 1;
         while (l <= r && r < size()) {
             unsigned c = (l + r) >> 1;
@@ -309,6 +310,7 @@ template< typename Element > inline
 template< typename Element > inline
     Element Set< Element >::next( const Element &e ) const
     {   if (this->isBad(e)) return first();
+        if (e==this->last()) return this->badValue();
         unsigned l = 0, r = size() - 1;
         while (l <= r && r < size()) {
             unsigned c = (l + r) >> 1;

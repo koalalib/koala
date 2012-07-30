@@ -105,9 +105,16 @@ int main() {
 
 
     cout << endl;
-    writeGraphText(g, cout, RG_VertexLists, std::make_pair(false,false));
+    writeGraphText(g, cout, RG_VertexLists);
     cout << "\n!!!!!!!!!!!!!\n" << IsIt::Comparability::getDirs(g) << endl<< endl;
-    writeGraphText(g, cout, RG_VertexLists, std::make_pair(false,false));
+    writeGraphText(g, cout, RG_VertexLists);
+
+    g.clear();g.addVert();g.addVert();g.addEdge(g.getVert(),g.getVertLast());
+//    g.addVert();
+    SearchStructs::VectCompStore<Graph<int, int>::PVertex> out;
+    cout << "\n" << boolalpha << IsIt::CompMPartite::getParts(g,out.input()) << "\n" << IsIt::compMPartite(g);
+    cout << "\n" << out.size() << ' ' << out.size(0);
+    cout  << ' ' << out.size(1);
 
 	return 0;
 	};

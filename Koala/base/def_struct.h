@@ -42,12 +42,12 @@ static const EdgeType Directed=0xC;
 // Domyslne struktury (puste) pola info z krawedzi/wierzcholka
 struct EmptyVertInfo {};
 // ich operatory odczytu/zapisu ze strumienia (na potrzeby formatu tekstowego grafu z modulu text.h)
-std::istream& operator>>(std::istream& is,EmptyVertInfo arg) { return is; }
-std::ostream& operator<<(std::ostream& os,EmptyVertInfo arg) { return os; }
+//std::istream& operator>>(std::istream& is,EmptyVertInfo arg) { return is; }
+//std::ostream& operator<<(std::ostream& os,EmptyVertInfo arg) { return os; }
 
 struct EmptyEdgeInfo {};
-std::istream& operator>>(std::istream& is,EmptyEdgeInfo arg) { return is; }
-std::ostream& operator<<(std::ostream& os,EmptyEdgeInfo arg) { return os; }
+//std::istream& operator>>(std::istream& is,EmptyEdgeInfo arg) { return is; }
+//std::ostream& operator<<(std::ostream& os,EmptyEdgeInfo arg) { return os; }
 
 
 // W glownej strukturze grafu wierzcholki i krawedzie maja pole publiczne (dane skojarzone z wierz/kraw)
@@ -58,8 +58,8 @@ template< class VertInfo, class EdgeInfo, class Settings> class Edge;
 
 
 //Wytyczne parametryzujace dzialanie algorytmow biblioteki. Z reguly klasy z procedurami maja postac
-//NazwaPar<DefaultStructs> oraz pochodna klase Nazwa dzialajaca z ustawieniem DefaultStructs=AlgorithmsDefaultSettings
-class AlgorithmsDefaultSettings {
+//NazwaPar<DefaultStructs> oraz pochodna klase Nazwa dzialajaca z ustawieniem DefaultStructs=AlgsDefaultSettings
+class AlgsDefaultSettings {
     public:
 
     // typ klasy tablicy asocjacyjnej przypisujacej np. wierz/kraw wartosci typu B
@@ -72,6 +72,34 @@ class AlgorithmsDefaultSettings {
 
     };
 
+    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B. Kluczami sa pary uporzadkowane o roznych elementach
+    template <class A, class B> class TwoDimNoDiagAssocCont {
+        public:
+        typedef AssocMatrix<A,B,AMatrNoDiag> Type;
+    };
+
+    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B. Kluczami sa dowolne pary uporzadkowane
+    template <class A, class B> class TwoDimFullAssocCont {
+        public:
+        typedef AssocMatrix<A,B,AMatrFull> Type;
+    };
+
+
+    // j.w. dla kluczy - par nieuporzadkowanych
+    template <class A, class B> class TwoDimTriangleAssocCont {
+        public:
+        typedef AssocMatrix<A,B,AMatrTriangle> Type;
+    };
+
+    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B. Kluczami sa dowolne pary uporzadkowane
+    template <class A, class B> class TwoDimClTriangleAssocCont {
+        public:
+        typedef AssocMatrix<A,B,AMatrClTriangle> Type;
+    };
+
+
+    // czy dostosowywac rozmiar pamieci wyjsciowych tablic asocjacyjnych
+    enum { ReserveOutAssocCont=true };
 
     // Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych
     // w algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda
@@ -139,6 +167,8 @@ struct BlackHole : public std::iterator<std::output_iterator_tag,void,void,void,
     // BlackHole "potrafi" przekonwertowac sie na dowolny typ - uwaga j.w.
     template <class T>
         operator T() { assert(0); return T(); }
+
+    void reserve(int) {}
 
 };
 
@@ -831,6 +861,19 @@ template <class Fun> struct ObjCaster {
 
 template <class Funktor>
 ObjCaster<Funktor> stdCast(Funktor f) { return ObjCaster<Funktor>(f); }
+
+// Caster wpisujacy ustalona wartosc
+template <class T> struct ValueCaster {
+    T val;
+    ValueCaster(T arg=T()) : val(arg) {}
+    template <class InfoDest, class InfoSour>
+	void operator()(InfoDest& dest, InfoSour sour) { dest=(InfoDest)val; }
+};
+
+// funkcja tworzaca - podajemy stala wartosc
+template <class T>
+ValueCaster<T> valCast(T arg=T()) { return ValueCaster<T>(arg); }
+
 
 
 //Linkery dzialajace np. podczas kopiowania grafow, wiaza nowo tworzone wierzch/kraw. z ich oryginalami,

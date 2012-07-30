@@ -509,26 +509,6 @@ class Creator{
 
 #include "create.hpp"
 
-// domyslne wytyczne dla procedur dzialan na relacjach
-class RelDiagramAlgsDefaultStructs : public AlgorithmsDefaultSettings {
-    public:
-
-    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B. Kluczami sa pary uporzadkowane o roznych elementach
-    template <class A, class B> class TwoDimNoDiagAssocCont {
-        public:
-        typedef AssocMatrix<A,B,AMatrNoDiag> Type;
-    };
-
-    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B. Kluczami sa dowolne pary uporzadkowane
-    template <class A, class B> class TwoDimFullAssocCont {
-        public:
-        typedef AssocMatrix<A,B,AMatrFull> Type;
-    };
-
-
-};
-
-
 // Operacje na grafie traktowanym jak diagram relacji w zbiorze wierzcholkow
 template <class DefaultStructs>
 // DefaultStructs - wytyczne dla wewnetrznych procedur
@@ -688,8 +668,8 @@ class RelDiagramPar {
 };
 
 
-// wersja dzialajaca na DefaultStructs=RelDiagramAlgsDefaultStructs
-class RelDiagram : public RelDiagramPar<RelDiagramAlgsDefaultStructs> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class RelDiagram : public RelDiagramPar<AlgsDefaultSettings> {};
 
 
 // Kreator linegrafow
@@ -801,8 +781,8 @@ class LineGraphPar {
 
 };
 
-// wersja dzialajaca na DefaultStructs=AlgorithmsDefaultSettings
-class LineGraph : public LineGraphPar<AlgorithmsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class LineGraph : public LineGraphPar<AlgsDefaultSettings> {};
 
 
 }

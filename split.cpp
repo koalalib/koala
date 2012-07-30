@@ -15,7 +15,7 @@ void PrintSubsets(const GraphType & g, EdgeDirection mask = EdUndir) {
 	Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<Koala::Privates::List_iterator<LexBFS::LVCNode<GraphType> > > > allocat(2*g.getVertNo()+1); //TODO: size?
 	Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<LexBFS::LVCNode<GraphType> > > allocat2(2*g.getVertNo()+1); //TODO: size?
 	LexBFS::LexVisitContainer<GraphType, Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<Koala::Privates::List_iterator<LexBFS::LVCNode<GraphType> > > >,Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<LexBFS::LVCNode<GraphType> > > > cont(allocat,allocat2,g.getVertNo());
-	typename AlgorithmsDefaultSettings::template AssocCont<typename GraphType::PVertex, int>::Type visited;
+	typename AlgsDefaultSettings::template AssocCont<typename GraphType::PVertex, int>::Type visited;
 
 
 	n = g.getVertNo();

@@ -85,7 +85,7 @@ struct VertLinkEdLoop<VertInfo,EdgeInfo,Settings,0> : public EmptyVertLink<VertI
 
 
 // Klasa wierzcholka glownej struktury grafu
-template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, class Settings = DefaultGrSettings<EdAll,true> >
+template<class VertInfo=EmptyVertInfo, class EdgeInfo=EmptyEdgeInfo, class Settings = GrDefaultSettings<EdAll,true> >
 class Vertex :
     private Privates::VertLinkEdDirIn<VertInfo,EdgeInfo,Settings,EdDirIn&Settings::EdAllow>,
     private Privates::VertLinkEdDirOut<VertInfo,EdgeInfo,Settings,EdDirOut&Settings::EdAllow>,

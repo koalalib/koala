@@ -41,7 +41,7 @@ struct InfoE1 {
 
     InfoE1(int n, string aname) : a(n), name(aname) {}
     InfoE1() {}
-};
+} ein1;
 
 struct InfoE2 {
     int b;
@@ -49,7 +49,7 @@ struct InfoE2 {
 
     InfoE2(int n, string aname) : b(n), napis(aname) {}
     InfoE2(){}
-};
+} ein2;
 
 
 int main() {
@@ -82,7 +82,7 @@ int main() {
 
     Vertex<InfoV2,InfoE2>* A2=g2.addVert(),*B2=g2.addVert();
     g2.addArch(A2,B2);
-    g2.substitute(B2,g1,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(&vtrans),stdCast(false))
+    g2.substitute(B2,g1,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(&vtrans),valCast<InfoE2>())
             , make_pair(stdLink(am21,m12),stdLink(an21,an12)));
 
     g2p.copy(g1);

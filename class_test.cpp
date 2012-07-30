@@ -92,7 +92,10 @@ int main() {
 //    g.addEdge(u8,u9);
 //    g.addEdge(u2,u9);g.addEdge(u8,u2);
 
-    cout << IsIt::chordal(g);
+    cout << IsIt::chordal(g) << "\n";
+    IsIt::Chordal::getOrder(g,tabV);
+    for(int i=0;i<g.getVertNo();i++) cout << tabV[i]->info;
+
 
 //	Graph<int, int>::PVertex cq[128], cq2[128];
 //	int ncq;

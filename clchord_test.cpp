@@ -13,7 +13,7 @@ using namespace Koala;
 using namespace Koala::IO;
 using namespace std;
 
-#define TEST_1
+#define TEST_2
 // TEST_ 1-7
 
 int main() {
@@ -100,8 +100,8 @@ int main() {
 	Graph<int, int>::PVertex cq[128], cq2[128];
 	int ncq;
 	if (rv)
-	{ printf("Orders: \n"); IsIt::Chordal::getOrder(g, cq,cq2);
-        for(int i = 0; i < g.getVertNo(); i++) printf("%p\n", cq[i]);
+	{ printf("Orders: \n"); IsIt::Chordal::getOrder(g, cq2);
+//        for(int i = 0; i < g.getVertNo(); i++) printf("%p\n", cq[i]);
         printf("\n");
         for(int i = 0; i < g.getVertNo(); i++) printf("%p\n", cq2[i]);
 	}

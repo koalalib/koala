@@ -1,0 +1,1 @@
+- niech w plikach .hpp kolejnosc metod bedzie zgodna z ich .h

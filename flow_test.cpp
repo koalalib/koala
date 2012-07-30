@@ -22,9 +22,10 @@ Koala::Graph<char,OpisE>::PVertex A,B,C,D,E,F,V,U,S,T,tabV[20],*tabVit;
 Koala::Graph<char,OpisE>::PEdge tabE[20];
 
 Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeLabs<int> > >edgeCont;
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::UnitEdgeLabs<int> > > unitedgeCont;
 
-Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeBound<int> > > tedgeCont;
-Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::VertLoss<int> > > tvertCont;
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::TrsEdgeLabs<int> > > tedgeCont;
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsVertLoss<int> > > tvertCont;
 
 void dijTest()
 {   g.clear();edgeCont.clear();
@@ -249,6 +250,7 @@ int main() {
     dijTest3();
         for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeCont[e].capac=1;
     Koala::Flow::EdgeCut<int> res=Koala::Flow::minEdgeCut(g,edgeCont,S,T,Koala::Flow::outPath(tabV,tabE));
+    Koala::Flow::minEdgeCut(g,unitedgeCont,S,T,Koala::Flow::outPath(blackHole,blackHole));
     cout << res.capac << endl;
     for(int i=0;i<res.vertNo;i++) cout << tabV[i]->info;
     cout << endl;
@@ -296,11 +298,14 @@ int main() {
 
     cout << "\n\n&&&&&&&&&&&&&&&&\n\n";
     dijTest3();
-    bool vflag=true;
+    bool vflag=false;
     Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
     int itab[20];
 
-    int p=Koala::Connect::vertDisjPaths(g,S,T,Koala::Connect::outPath(tabV,tabE),itab,vflag);
+    int p=vflag ?  Koala::Connect::vertDisjPaths(g,S,T,Koala::Connect::outPath(tabV,tabE),
+                                    std::make_pair(itab,blackHole))
+                : Koala::Connect::vertDisjPaths(g,S,T,Koala::Connect::outPath(tabV,tabE),
+                                    std::make_pair(blackHole,itab));
 
     cout << p << endl;
     for(int i=0;i<=p;i++) cout << itab[i] << ' ';

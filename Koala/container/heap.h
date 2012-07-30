@@ -7,24 +7,35 @@
 #include "localarray.h"
 #include "privates.h"
 
+//Kontenery kolejek priorytetowych szybko zlaczalnych dla porownywalnych typow kluczy: dwumianowej i Fibonacziego.
+//
+//TODO: rozwazyc zamiane we wszystkich algorytmach PriQueueInterface -> dwumianowa (mozliwe usprawnienie algorytmow
+//dzieki brakujacej w STL operacji usuwania klucza)
+
 namespace Koala
 {
 
 
-namespace Privates {
+//    Obiekt pomocniczy kolejki 2-mianowej przechowujacy pojedynczy klucz. Klucz wstawiony do kolejki dostaje
+//    reprezentanta bedacego wskaznikiem na obiekt tego typu. Nie uzywany bezposrednio przez uzytkownika.
+//    Reprezentant nie zmienia sie przez caly czas istnienia kolejki, bez wzgledu na jej ew. zmiany
 
     template <class Key>
-    struct BinomHeapNode
-    {
+    class BinomHeapNode
+    {   template <class K, class Comp, class Alloc> friend class BinomHeap;
         BinomHeapNode<Key> *parent, *child, *next;
         unsigned degree;
         Key key;
 
-        Key get() { return key; }
-
-        inline BinomHeapNode(const Key& = Key());
         inline void insert(BinomHeapNode<Key> *);
         bool check() const;
+
+        public:
+
+        inline BinomHeapNode(const Key& = Key());
+
+        // zwraca klucz przechowywany w kontenerze
+        Key get() { return key; }
     };
 
 	template <class Key>
@@ -47,14 +58,19 @@ namespace Privates {
 		return degree == this->degree;
 	}
 
-}
 
+
+//    Kolejka 2-mianowa dla kluczy typu Key porownywanych podanym kompartorem typu Compare. Domyslnie
+//    obiekty dla kluczy sa wewnatrz alokoawne przez new i delete. Mozna jednak uzyc wlasnego alokatora
+//    typu Allocator podajac w konstruktorze wskaznik na alokator (wartosc domyslna 0 - rowniez new i delete).
+//    Zewnetrzny alokator musi zyc przez caly czas istnienia kolejki a jego wskaznika w kontenerze nie mozna
+//    zmienic.
 	template <class Key, class Compare = std::less<Key>,class Allocator=Privates::DefaultCPPAllocator >
 	class BinomHeap
 	{
     public:
-        typedef Privates::BinomHeapNode<Key> Node;
-        typedef Privates::BinomHeapNode<Key> * Repr;
+        typedef BinomHeapNode<Key> Node;
+        typedef BinomHeapNode<Key> * Repr;
 
 	protected:
 		Node *root, *minimum;
@@ -62,26 +78,45 @@ namespace Privates {
 		Compare function;
 		Allocator* allocator;
 	public:
-		inline BinomHeap(const Compare& = Compare());
-		inline BinomHeap(Allocator*,const Compare& = Compare());
+		inline BinomHeap(const Compare& = Compare()); // podajemy komparator, alokacja new/delete
+		inline BinomHeap(Allocator*,const Compare& = Compare()); // podajemy komparator, kolejka powiazana z alokatorem zewnetrznym
+		inline BinomHeap(const BinomHeap<Key, Compare,Allocator>&); // konstruktor kopiujacy, obiekt wiaze sie z tym samym alokatorem, co oryginal
+		BinomHeap<Key, Compare,Allocator>& operator=(const BinomHeap<Key, Compare,Allocator>& X)
+		// operator przypisania nie zmienia ew. alokatora
+		{   if (this==&X) return *this;
+		    clear();
+		    root=minimum=0; nodes=X.nodes; function=X.function;
+		    if (!nodes) return *this;
+            root = copy(X.root, 0);
+
+            Node *A = root, *B = X.root;
+            while(B != X.minimum)
+                A = A->next, B = B->next;
+            minimum = A;
+
+		    return *this;
+		}
 		~BinomHeap();
 
-		Key top() const;
-		Node* push(const Key&);
-		void pop();
+        // metody STLowego kopca maja to samo znaczenie
+		Key top() const; // najmniejszy klucz
+		Node* topRepr() const; // i jego reprezentant
+		Node* push(const Key&); // wstawienie klucza, zwracany wskaznik to jego reprezentant wewnatrz kolejki
+		void pop(); // usun najmniejszy
 
-		void decrease(Node*, const Key&);
-		void del(Node*);
+		void decrease(Node*, const Key&); // zmniejszenie klucza danego wezla, podanie wiekszej wartosci rzuca blad
+		void del(Node*); // usun wezel z kluczem
 
-		void merge(BinomHeap&);
+		void merge(BinomHeap&); // dopisuje klucze z drugiej kolejki, ktora jest czyszczona
 		void clear();
 
 		unsigned size() const;
 		bool empty() const;
 
-		bool check() const;
+		bool check() const; // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
 
 	protected:
+		Node* copy(Node*, Node*);
 
 		inline Node* join(Node*, Node*);
 		inline Node* reverse(Node*);
@@ -91,7 +126,7 @@ namespace Privates {
 		Node* newNode(Key key)
 		{
 		    if (!allocator) return new Node(key);
-		    Node* res=allocator->template allocate<Privates::BinomHeapNode<Key> >();
+		    Node* res=allocator->template allocate<BinomHeapNode<Key> >();
             res->key=key;
 		    return res;
 		}
@@ -109,8 +144,35 @@ namespace Privates {
 
 	template <class Key, class Compare,class Allocator>
 	inline BinomHeap<Key, Compare,Allocator>::BinomHeap(Allocator* all,const Compare &function) : root(0), minimum(0), nodes(0), allocator(all), function(function)
-	{  }
+	{ }
 
+	template <class Key, class Compare,class Allocator>
+	inline BinomHeap<Key, Compare,Allocator>::BinomHeap(const BinomHeap<Key, Compare,Allocator> &other) : root(0), minimum(0), nodes(other.nodes), allocator(other.allocator), function(other.function)
+	{
+	    if (!other.nodes) return;
+		root = copy(other.root, 0);
+
+		Node *A = root, *B = other.root;
+		while(B != other.minimum)
+			A = A->next, B = B->next;
+		minimum = A;
+	}
+
+	template <class Key, class Compare,class Allocator>
+	typename BinomHeap<Key, Compare,Allocator>::Node* BinomHeap<Key, Compare,Allocator>::copy(Node *A, Node *parent)
+	{
+		Node *B = A, *C = newNode(B->key), *D = C;
+		D->parent = parent, D->child = B->child ? copy(B->child, B) : 0;
+		while(B->next)
+		{
+			B = B->next;
+			D = D->next = newNode(B->key);
+			D->parent = parent, D->child = B->child ? copy(B->child, B) : 0;
+		}
+		D->next = 0;
+
+		return C;
+	}
 
 	template <class Key, class Compare,class Allocator>
 	BinomHeap<Key, Compare,Allocator>::~BinomHeap()
@@ -120,9 +182,16 @@ namespace Privates {
 
 	template <class Key, class Compare,class Allocator>
 	Key BinomHeap<Key, Compare,Allocator>::top() const
-	{
+	{   assert(minimum); // TODO: throw
 		return minimum->key;
 	}
+
+	template <class Key, class Compare,class Allocator>
+	typename BinomHeap<Key, Compare,Allocator>::Node* BinomHeap<Key, Compare,Allocator>::topRepr() const
+	{
+		return minimum;
+	}
+
 
 	template <class Key, class Compare,class Allocator>
 	typename BinomHeap<Key, Compare,Allocator>::Node* BinomHeap<Key, Compare,Allocator>::push(const Key &key)
@@ -136,6 +205,10 @@ namespace Privates {
 		root = join(root, A);
 		if(function(A->key, minimum->key))
 			minimum = A;
+
+		while(minimum->parent)
+			minimum = minimum->parent;
+
 		return A;
 	}
 
@@ -178,7 +251,7 @@ namespace Privates {
 	template <class Key, class Compare,class Allocator>
 	void BinomHeap<Key, Compare,Allocator>::decrease(Node *A, const Key &key)
 	{
-		assert(!function(A->key,key));
+		assert(!function(A->key,key)); // TODO: throw
 		if (!function(A->key,key) && !function(key,A->key)) return;
 
 		A->key = key;
@@ -222,11 +295,14 @@ namespace Privates {
 			root = root ? join(root, reverse(start)) : reverse(start);
 		}
 		A->parent = 0, A->next = 0, root = root ? join(root, A) : A;
+
+		while(minimum->parent)
+			minimum = minimum->parent;
 	}
 
 	template <class Key, class Compare,class Allocator>
 	void BinomHeap<Key, Compare,Allocator>::del(Node *A)
-	{
+	{   assert(nodes); // TODO: throw
 		nodes--;
 
 		if(nodes == 0)
@@ -276,7 +352,10 @@ namespace Privates {
 				if(function(B->key, minimum->key))
 					minimum = B;
 		}
+		else while(minimum->parent)
+			minimum = minimum->parent;
 		delNode(A);
+
 	}
 
 	template <class Key, class Compare,class Allocator>
@@ -294,6 +373,9 @@ namespace Privates {
 		else
 			root = heap.root, minimum = heap.minimum, nodes = heap.nodes;
 		heap.root = heap.minimum = 0, heap.nodes = 0;
+
+		while(minimum->parent)
+			minimum = minimum->parent;
 	}
 
 	template <class Key, class Compare,class Allocator>
@@ -301,13 +383,15 @@ namespace Privates {
 	{
 		if(n->next) clear(n->next);
 		if(n->child) clear(n->child);
-		allocator->deallocate(n);
+		//allocator->deallocate(n);
+		delNode(n);
 	}
 
     template <class Key, class Compare,class Allocator>
 	void BinomHeap<Key, Compare,Allocator>::clear()
 	{
 		if(root) clear(root);
+		root=minimum=0; nodes=0;
 	}
 
 	template <class Key, class Compare,class Allocator>
@@ -389,24 +473,26 @@ namespace Privates {
 		return A;
 	}
 
-
-namespace Privates {
+    // Kopiec Fibonacziego, komentarze te same co w 2-mianowym
 
         template <class Key>
-        struct FibonHeapNode
-		{
+        class FibonHeapNode
+		{   template <class K, class Comp, class Alloc> friend class FibonHeap;
+
 			FibonHeapNode<Key> *parent, *child, *previous, *next;
 			unsigned flag;
 			Key key;
 
-			Key get() { return key; }
-
-			FibonHeapNode(const Key& = Key());
 
 			inline void insert(FibonHeapNode<Key>*);
 			inline void remove();
 			bool check() const;
 			void init(const Key& =Key());
+
+			public:
+			Key get() { return key; }
+			FibonHeapNode(const Key& = Key());
+
 		};
 
 	template <class Key>
@@ -452,7 +538,7 @@ namespace Privates {
 		return degree == (flag >> 1);
 	}
 
-}
+
 
 
 	template <class Key, class Compare = std::less<Key>,class Allocator=Privates::DefaultCPPAllocator >
@@ -460,11 +546,11 @@ namespace Privates {
 	{
 	public:
 
-        typedef Privates::FibonHeapNode<Key> Node;
-        typedef Privates::FibonHeapNode<Key> * Repr;
+        typedef FibonHeapNode<Key> Node;
+        typedef FibonHeapNode<Key> * Repr;
 
 	private:
-		Node *root,*degrees[sizeof(unsigned) << 3];
+		Node *root /*,*degrees[sizeof(unsigned) << 3]*/;
 		unsigned nodes;
 		Compare function;
 		Allocator* allocator;
@@ -472,7 +558,7 @@ namespace Privates {
 		Node* newNode(Key key)
 		{
 		    if (!allocator) return new Node(key);
-		    Node* res=allocator->template allocate<Privates::FibonHeapNode<Key> >();
+		    Node* res=allocator->template allocate<FibonHeapNode<Key> >();
             res->init(key);
 		    return res;
 		}
@@ -487,9 +573,21 @@ namespace Privates {
 	public:
 		inline FibonHeap(const Compare& = Compare());
 		inline FibonHeap(Allocator*,const Compare& = Compare());
+		inline FibonHeap(const FibonHeap<Key, Compare,Allocator>&);
+		FibonHeap<Key, Compare,Allocator>& operator=(const FibonHeap<Key, Compare,Allocator>& X)
+		{   if (this==&X) return *this;
+		    clear();
+		    root=0; nodes=X.nodes; function=X.function;
+		    if (!nodes) return *this;
+            root = copy(X.root, 0);
+
+		    return *this;
+
+		}
 		~FibonHeap();
 
 		Key top() const;
+		Node* topRepr() const { return root; }
 		Node* push(const Key&);
 		void pop();
 
@@ -503,18 +601,44 @@ namespace Privates {
 		bool empty() const;
 
 		bool check() const;
+	protected:
+		Node* copy(Node*, Node*);
 	};
 
 	template <class Key, class Compare,class Allocator>
 	inline FibonHeap<Key, Compare,Allocator>::FibonHeap(const Compare &function) : root(0), nodes(0), allocator(0),function(function)
 	{
-		for(int i=0;i<(sizeof(unsigned) << 3);i++) degrees[i]=0;
+//		for(int i=0;i<(sizeof(unsigned) << 3);i++) degrees[i]=0;
 	}
 
 	template <class Key, class Compare,class Allocator>
 	inline FibonHeap<Key, Compare,Allocator>::FibonHeap(Allocator* all, const Compare &function) : root(0), nodes(0), allocator(all),function(function)
 	{
-		for(int i=0;i<(sizeof(unsigned) << 3);i++) degrees[i]=0;
+//		for(int i=0;i<(sizeof(unsigned) << 3);i++) degrees[i]=0;
+	}
+
+	template <class Key, class Compare,class Allocator>
+	inline FibonHeap<Key, Compare,Allocator>::FibonHeap(const FibonHeap<Key, Compare,Allocator> &other) : root(0), nodes(other.nodes), allocator(other.allocator), function(other.function)
+	{   if (!other.nodes) return;
+		root = copy(other.root, 0);
+//		for(int i=0;i<(sizeof(unsigned) << 3);i++) degrees[i]=0;
+	}
+
+
+	template <class Key, class Compare,class Allocator>
+	typename FibonHeap<Key, Compare,Allocator>::Node* FibonHeap<Key, Compare,Allocator>::copy(Node *A, Node *parent)
+	{
+		Node *B = A, *C = newNode(B->key), *D = C, *E;
+		D->parent = parent, D->child = B->child ? copy(B->child, B) : 0;
+		while(B->next != A)
+		{
+			B = B->next;
+			E = D, D = D->next = newNode(B->key), D->previous = E;
+			D->parent = parent, D->child = B->child ? copy(B->child, B) : 0;
+		}
+		D->next = C, C->previous = D;
+
+		return C;
 	}
 
 
@@ -526,7 +650,7 @@ namespace Privates {
 
 	template <class Key, class Compare,class Allocator>
 	Key FibonHeap<Key, Compare,Allocator>::top() const
-	{
+	{   assert(root); // TODO: throw
 		return root->key;
 	}
 
@@ -547,7 +671,7 @@ namespace Privates {
 
 	template <class Key, class Compare,class Allocator>
 	void FibonHeap<Key, Compare,Allocator>::pop()
-	{
+	{   assert(nodes); // TODO: throw
 		nodes--;
 
 		Node *A = root->child, *B;
@@ -568,8 +692,11 @@ namespace Privates {
 			return;
 		}
 
-		Node **degrees = this->degrees, *C;
-		unsigned degree_max = 0, degree=0;
+
+        Node* LOCALARRAY(_degrees,(sizeof(unsigned) << 3));
+        for(int i=0;i<(sizeof(unsigned) << 3);i++) _degrees[i]=0;
+		Node **degrees = _degrees /*this->degrees */, *C;
+		unsigned degree_max = 0, degree = 0;
 		for(A = root->next, B = A->next; A != root; degrees[degree] = A, A = B, B = A->next)
 		{
 			while(degrees[degree = A->flag >> 1])
@@ -607,7 +734,7 @@ namespace Privates {
 	template <class Key, class Compare,class Allocator>
 	void FibonHeap<Key, Compare,Allocator>::decrease(Node *A, const Key &key)
 	{
-		assert(!function(A->key,key));
+		assert(!function(A->key,key)); // TODO: throw
 		if (!function(A->key,key) && !function(key,A->key)) return;
 
 
@@ -704,6 +831,7 @@ namespace Privates {
 	{
 		if(root)
 			clear(root);
+        root=0; nodes=0;
 	}
 
 	template <class Key, class Compare,class Allocator>
@@ -715,8 +843,6 @@ namespace Privates {
 			n->next->previous = n->previous, clear(n->next);
 		delNode(n);
 	}
-
-
 
 	template <class Key, class Compare,class Allocator>
 	unsigned FibonHeap<Key, Compare,Allocator>::size() const

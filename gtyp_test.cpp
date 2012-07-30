@@ -23,9 +23,9 @@ struct OpisE {
 const Koala::EdgeType Allow=Koala::EdDirIn|Koala::EdDirOut;
 const bool AdjAllow=true;
 
-Koala::Graph<OpisV,OpisE,Koala::DefaultGrSettings<Allow,AdjAllow> > g;
-Koala::Graph<OpisV,OpisE,Koala::DefaultGrSettings<Allow,AdjAllow> >::PVertex A,B,C,D,E,F,V,U,tabV[10];
-Koala::Graph<OpisV,OpisE,Koala::DefaultGrSettings<Allow,AdjAllow> >::PEdge tabE[10];
+Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> > g;
+Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> >::PVertex A,B,C,D,E,F,V,U,tabV[10];
+Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> >::PEdge tabE[10];
 
 
 
