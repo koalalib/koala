@@ -301,8 +301,8 @@ class Graph: public SubgraphBase,
 
 
         // ustawianie pol info
-        inline void setVertInfo( PVertex, const VertInfo & = VertInfo() ) const;
-        inline void setEdgeInfo( PEdge, const EdgeInfo & = EdgeInfo() ) const;
+        inline void setVertInfo( PVertex, VertInfo  = VertInfo() ) const;
+        inline void setEdgeInfo( PEdge, EdgeInfo  = EdgeInfo() ) const;
 
 
         // Usuwamy wierzchołek z grafu.
@@ -339,18 +339,18 @@ class Graph: public SubgraphBase,
 
 
         // Dodajemy nowy wierzchołek do grafu (z etykietą info). Zwraca jego wskaznik
-        inline typename GraphType::PVertex addVert( const VertInfo & = VertInfo() );
+        inline typename GraphType::PVertex addVert( VertInfo  = VertInfo() );
 
 
         // Uwaga: proba dodania krawedzi typu niezawartego w allowedEdgeTypes() wywoluje blad
         // Dodajemy nową krawędź do grafu (bez etykiety - wartosc domyslna typu EdgeInfo).
         inline typename GraphType::PEdge addEdge( PVertex, PVertex, EdgeDirection = EdUndir );
         // Dodajemy nową krawędź do grafu (z etykietą).
-        inline typename GraphType::PEdge addEdge( PVertex, PVertex, const EdgeInfo &, EdgeDirection = EdUndir );
+        inline typename GraphType::PEdge addEdge( PVertex, PVertex, EdgeInfo , EdgeDirection = EdUndir );
         // Dodajemy nowy łuk do grafu (z etykietą).
-        inline typename GraphType::PEdge addArch( PVertex, PVertex, const EdgeInfo & = EdgeInfo() );
+        inline typename GraphType::PEdge addArch( PVertex, PVertex,  EdgeInfo  = EdgeInfo() );
         // Dodajemy nową pętlę do grafu (z etykietą)
-        inline typename GraphType::PEdge addLoop( PVertex, const EdgeInfo & = EdgeInfo() );
+        inline typename GraphType::PEdge addLoop( PVertex, EdgeInfo  = EdgeInfo() );
 
 
         // Przenosimy krawędź w inne miejsce z ew. zmiana typu
@@ -404,9 +404,9 @@ class Graph: public SubgraphBase,
 
 
         // ustawienie nowego wierzcholka na srodku istniejacej krawedzi, ktora rozdziela sie na dwie. Podajemy info nowego wierzcholka, ktory jest zwracany
-        typename GraphType::PVertex putVert( PEdge,const VertInfo & = VertInfo() );
+        typename GraphType::PVertex putVert( PEdge, VertInfo  = VertInfo() );
         // Dla wierzcholka o maks. 2 sasiadach - zdjecie wierzcholka , po czym pozostaje jedna nowa (zwracana) krawedz laczaca tych sasiadow
-        typename GraphType::PEdge pickVert( PVertex, const EdgeInfo & = EdgeInfo() );
+        typename GraphType::PEdge pickVert( PVertex,  EdgeInfo  = EdgeInfo() );
 
 
 

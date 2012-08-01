@@ -10,18 +10,6 @@
 namespace Koala
 {
 
-// Domyslne wytyczne dla IsItPar
-class IsItAlgsDefaultSettings : public AlgsDefaultSettings {
-    public:
-
-    // typ grafu pomocniczego tworzonego wewnatrz procedur
-    class LocalGraph {
-        public:
-        typedef Graph<EmptyVertInfo,EmptyVertInfo,GrDefaultSettings<Undirected,false> > Type;
-    };
-
-};
-
 
 //Algorytmy rozpoznawania rodzin grafow. Dla rodziny family jest metoda rozpoznajaca bool family(const& graph).
 //Jesli family ma sens takze dla multigrafow, bool family(const& graph, bool allowmulti) gdzie flaga bool podaje
@@ -479,9 +467,16 @@ class IsItPar : public SearchStructs {
             return true;
         };
 
+        // Tworzy reprezentacje chordala w postaci drzewa jego maksymalnych klik
+        // zwraca liczbe maksymalnych klik
         // TODO: masakra! uproscic
         template<class Graph, class VIter, class VIterOut, class QIter,class QTEIter>
-        static int maxCliques(const Graph &g,VIter begin, VIter end, CompStore< QIter,VIterOut > out,QTEIter qte)
+        static int maxCliques(const Graph &g, // badany graf
+            VIter begin, VIter end, // zakres iteratorow z ktorego pobieramy rev. perf. elim. order jego wierzcholkow
+            // (por. getOrder)
+            CompStore< QIter,VIterOut > out, // wyjsciowe iteratory na ciagi maksymalnych klik
+            QTEIter qte) // wyjsciowe iteratory na pary std::pair<int, int> - pary numerow klik bedacych koncami
+            // "krawedzi" tego drzewa
         {   int i,j,licze=0,res,no;
             VIter vi;
             Set<typename Graph::PVertex> LOCALARRAY(tabs,g.getVertNo());
@@ -510,7 +505,7 @@ class IsItPar : public SearchStructs {
             {   g.getVerts(vbuf);
                 JoinableSets<typename Graph::PVertex, typename DefaultStructs::template AssocCont<typename Graph::PVertex,
                     JSPartDesrc<typename Graph::PVertex> *>::Type > sets;
-                sets.clear(); sets.resize(g.getVertNo());
+                sets.resize(g.getVertNo());
                 for(typename Graph::PVertex v = g.getVert(); v ; v = g.getVertNext(v)) sets.makeSinglet(v);
                 std::pair<int, std::pair<int,int> > LOCALARRAY(edges,res*(res-1)/2);
                 int l=0;
@@ -523,7 +518,7 @@ class IsItPar : public SearchStructs {
                     if(sets.getSetId(vbuf[sno[ends.first]]) != sets.getSetId(vbuf[sno[ends.second]]))
                     {
                         sets.join(vbuf[sno[ends.first]], vbuf[sno[ends.second]]);
-                        *qte = ends; ++qte; edgeNo--;
+                        *qte = pairMinMax(ends); ++qte; edgeNo--;
                     };
                 };
 
@@ -531,12 +526,51 @@ class IsItPar : public SearchStructs {
             return res;
         }
 
+        // j.w. ale samodzielna. Pobiera tylko graf, jesli nie byl chordal, zwraca -1
         template<class Graph, class VIterOut, class QIter,class QTEIter>
         static int maxCliques(const Graph &g,CompStore< QIter,VIterOut > out, QTEIter qte)
         {   typename Graph::PVertex LOCALARRAY(vbuf,g.getVertNo());
             if (!getOrder(g,vbuf)) return -1;
             return maxCliques(g,vbuf,vbuf+g.getVertNo(),out,qte);
         }
+
+        // znajduje najwieksza klike w grafie, zwraca jej rozmiar
+        template<class Graph, class VIter, class VIterOut>
+        static int maxClique(const Graph &g, // badany graf
+            VIter begin, VIter end, // zakres iteratorow z ktorego pobieramy rev. perf. elim. order jego wierzcholkow
+            // (por. getOrder)
+            VIterOut out) // wyjsciow iterator na elementy maksymalnej kliki
+        {   int maxsize=1;
+            typename Graph::PVertex u;
+            typename Graph::PVertex maxv=*begin;
+            typename DefaultStructs:: template AssocCont<
+                typename Graph::PVertex, bool >::Type tabf(g.getVertNo());
+            VIter vi=begin;tabf[maxv]=true;
+            for(++vi;vi!=end;++vi)
+            {   int siz=1;
+                for(typename Graph::PEdge e=g.getEdge(*vi,EdUndir);e;e=g.getEdgeNext(*vi,e,EdUndir))
+                    if (tabf.hasKey(u=g.getEdgeEnd(e,*vi))) siz++;
+                tabf[*vi]=true;
+                if (siz>maxsize) { maxsize=siz; maxv=*vi;}
+            }
+            tabf.clear();
+            for(vi=begin;*vi!=maxv;++vi) tabf[*vi]=true;
+            int licz=0;
+            for(typename Graph::PEdge e=g.getEdge(maxv,EdUndir);e;e=g.getEdgeNext(maxv,e,EdUndir))
+                    if (tabf.hasKey(u=g.getEdgeEnd(e,*vi)))
+                    {   *out=u; ++out; ++licz; }
+            *out=maxv; ++out; ++licz;
+            return licz;
+        }
+
+        // j.w. ale samodzielna. Pobiera tylko graf, jesli nie byl chordal, zwraca -1
+        template<class Graph, class VIterOut>
+        static int maxClique(const Graph &g,VIterOut out)
+        {   typename Graph::PVertex LOCALARRAY(vbuf,g.getVertNo());
+            if (!getOrder(g,vbuf)) return -1;
+            return maxClique(g,vbuf,vbuf+g.getVertNo(),out);
+        }
+
 
 
     // TODO: rozwazyc static int maxStable(const Graph &g, Iter out)
@@ -557,20 +591,22 @@ class IsItPar : public SearchStructs {
 	static bool cochordal(const GraphType& g)
 	{
 	    if (!undir(g,true) || g.getEdgeNo(Loop)>0) return false;
-	    typename DefaultStructs::LocalGraph::Type cg;
-	    typename DefaultStructs:: template TwoDimTriangleAssocCont<
-            typename GraphType::PVertex, bool >::Type matr(g.getVertNo());
-        typename DefaultStructs:: template AssocCont<
-            typename GraphType::PVertex, typename DefaultStructs::LocalGraph::Type::PVertex >::Type vmap(g.getVertNo());
-        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) vmap[v]=cg.addVert();
-        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-            if (matr(g.getEdgeEnds(e))) return false;
-            else matr(g.getEdgeEnds(e))=true;
-        for(typename GraphType::PVertex v=g.getVert();v!=g.getVertLast();v=g.getVertNext(v))
-            for(typename GraphType::PVertex u=g.getVertNext(v);u;u=g.getVertNext(u))
-                if (!matr(u,v)) cg.addEdge(vmap[v],vmap[u]);
+        typename DefaultStructs::template LocalGraph<char,char,Undirected,true >:: Type cg;
 
-//	    cg.copy(g);cg.neg(Undirected);
+//	    typename DefaultStructs::LocalGraph::Type cg;
+//	    typename DefaultStructs:: template TwoDimTriangleAssocCont<
+//            typename GraphType::PVertex, bool >::Type matr(g.getVertNo());
+//        typename DefaultStructs:: template AssocCont<
+//            typename GraphType::PVertex, typename DefaultStructs::LocalGraph::Type::PVertex >::Type vmap(g.getVertNo());
+//        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) vmap[v]=cg.addVert();
+//        for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+//            if (matr(g.getEdgeEnds(e))) return false;
+//            else matr(g.getEdgeEnds(e))=true;
+//        for(typename GraphType::PVertex v=g.getVert();v!=g.getVertLast();v=g.getVertNext(v))
+//            for(typename GraphType::PVertex u=g.getVertNext(v);u;u=g.getVertNext(u))
+//                if (!matr(u,v)) cg.addEdge(vmap[v],vmap[u]);
+
+	    cg.copy(g);cg.neg(Undirected);
 	    return chordal(cg);
 	}
 
@@ -1416,11 +1452,21 @@ class IsItPar : public SearchStructs {
 	    return Interval::graph2segs(g,blackHole);
 	}
 
+    // czy pierwszy
+    template <class GraphType>
+	static bool prime(const GraphType& g)
+	{   if (!undir(g,false)) return false;
+        if (g.getVertNo()<4) return false;
+	    typename ModulesPar<DefaultStructs>::Partition res=
+            ModulesPar<DefaultStructs>::split(g,compStore(blackHole,blackHole),blackHole);
+        return (res.type==ModulesPar<DefaultStructs>::mPrime) && (res.size==g.getVertNo());
+	}
+
 };
 
 
-// wersja dzialajaca na DefaultStructs=IsItAlgsDefaultSettings
-class IsIt : public IsItPar<IsItAlgsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class IsIt : public IsItPar<AlgsDefaultSettings> {};
 
 }
 #endif

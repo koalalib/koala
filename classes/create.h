@@ -696,20 +696,23 @@ class LineGraphPar {
 //        Dopisuje do lg nieskierowany graf krawedziowy tworzony na podstawie g.
 //        Para casterow wyznacza infa nowych wierzcholkow na podstawie inf oryginalnych krawedzi
 //        i infa nowych krawedzi na podstawie inf wierzcholkow, w ktorych stykaly sie oryginalne krawedzie
-//        Linker laczy krawedzie g z odpowiadajacymi im wierzcholkami w lg
+//        Pierwszy Linker laczy krawedzie g z odpowiadajacymi im wierzcholkami w lg
+//         Drugi laczy wierzcholki g z polaczeniami wierzcholkow w lg (ktore zachodza w tych wierzcholkach)
 //      Zwraca pierwszy utworzony wierzcholek
-        template <class GraphIn,class GraphOut,class VCaster, class ECaster,class VLinker>
+        template <class GraphIn,class GraphOut,class VCaster, class ECaster,class VLinker,class ELinker>
         static typename GraphOut::PVertex undir(const GraphIn& g,GraphOut& lg,
-                                                std::pair< VCaster,ECaster > casters,VLinker linker)
+                                                std::pair< VCaster,ECaster > casters,std::pair<VLinker,ELinker> linkers)
         {   typename DefaultStructs::template AssocCont<typename GraphIn::PEdge,typename GraphOut::PVertex>
                 :: Type e2vtab(g.getEdgeNo());
+            typename DefaultStructs::template AssocCont<typename GraphIn::PVertex,char>
+                :: Type vset(g.getVertNo());
             typename GraphOut::PVertex res=lg.getVertLast();
             for(typename GraphOut::PVertex v=lg.getVert();v;v=lg.getVertNext(v))
-                linker(v,(typename GraphIn::PEdge)NULL);
+                linkers.first(v,(typename GraphIn::PEdge)NULL);
             for(typename GraphIn::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
             {   typename GraphOut::VertInfoType vinfo;
                 casters.first(vinfo,g.getEdgeInfo(e));
-                linker(e2vtab[e]=lg.addVert(vinfo),e);
+                linkers.first(e2vtab[e]=lg.addVert(vinfo),e);
             }
 
             for(typename GraphIn::PVertex v=g.getVert();v;v=g.getVertNext(v))
@@ -719,8 +722,11 @@ class LineGraphPar {
                             (!open(g,e,g.getEdgeEnd(e,v),f) ||(g.getEdgeEnd(e,v)>=v) ))
                             {   typename GraphOut::EdgeInfoType einfo;
                                 casters.second(einfo,g.getVertInfo(v));
-                                lg.addEdge(e2vtab[e],e2vtab[f],einfo);
+                                linkers.second(lg.addEdge(e2vtab[e],e2vtab[f],einfo),v);
+                                vset[v];
                             }
+            for(typename GraphIn::PVertex v=g.getVert();v;v=g.getVertNext(v)) if (!vset.hasKey(v))
+                linkers.second((typename GraphOut::PEdge)NULL,v);
             return lg.getVertNext(res);
         }
 
@@ -728,31 +734,34 @@ class LineGraphPar {
         template <class GraphIn,class GraphOut,class VCaster, class ECaster>
         static typename GraphOut::PVertex undir(const GraphIn& g,GraphOut& lg,
                                                 std::pair< VCaster,ECaster > casters)
-        {   return undir(g,lg,casters,stdLink( false,false ));  }
+        {   return undir(g,lg,casters,std::make_pair(stdLink( false,false ),stdLink( false,false )));  }
 
         // jw. ale tylko tworzy linegraph
         template <class GraphIn,class GraphOut>
         static typename GraphOut::PVertex undir(const GraphIn& g,GraphOut& lg)
-        {   return undir(g,lg,std::make_pair(stdCast( false ),stdCast( false )),stdLink( false,false ));  }
+        {   return undir(g,lg,std::make_pair(stdCast( false ),stdCast( false )),std::make_pair(stdLink( false,false ),stdLink( false,false )));  }
 
 
 //        Dopisuje do lg skierowany graf krawedziowy tworzony na podstawie g.
 //        Para casterow wyznacza infa nowych wierzcholkow na podstawie inf oryginalnych krawedzi
 //        i infa nowych lukow na podstawie inf wierzcholkow, w ktorych stykaly sie oryginalne krawedzie
-//        Linker laczy krawedzie g z odpowiadajacymi im wierzcholkami w lg
+//        Pierwszy Linker laczy krawedzie g z odpowiadajacymi im wierzcholkami w lg
+//         Drugi laczy wierzcholki g z polaczeniami wierzcholkow w lg (ktore zachodza w tych wierzcholkach)
 //      Zwraca pierwszy utworzony wierzcholek
-        template <class GraphIn,class GraphOut,class VCaster, class ECaster,class VLinker>
+        template <class GraphIn,class GraphOut,class VCaster, class ECaster,class VLinker, class ELinker>
         static typename GraphOut::PVertex dir(const GraphIn& g,GraphOut& lg,
-                                                std::pair< VCaster,ECaster > casters,VLinker linker)
+                                                std::pair< VCaster,ECaster > casters,std::pair<VLinker,ELinker > linkers)
         {   typename DefaultStructs::template AssocCont<typename GraphIn::PEdge,typename GraphOut::PVertex>
                 :: Type e2vtab(g.getEdgeNo());
+            typename DefaultStructs::template AssocCont<typename GraphIn::PVertex,char>
+                :: Type vset(g.getVertNo());
             typename GraphOut::PVertex res=lg.getVertLast();
             for(typename GraphOut::PVertex v=lg.getVert();v;v=lg.getVertNext(v))
-                linker(v,(typename GraphIn::PEdge)NULL);
+                linkers.first(v,(typename GraphIn::PEdge)NULL);
             for(typename GraphIn::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
             {   typename GraphOut::VertInfoType vinfo;
                 casters.first(vinfo,g.getEdgeInfo(e));
-                linker(e2vtab[e]=lg.addVert(vinfo),e);
+                linkers.first(e2vtab[e]=lg.addVert(vinfo),e);
             }
 
             for(typename GraphIn::PVertex v=g.getVert();v;v=g.getVertNext(v))
@@ -761,8 +770,11 @@ class LineGraphPar {
                         if (openDir(g,e,v,f))
                             {   typename GraphOut::EdgeInfoType einfo;
                                 casters.second(einfo,g.getVertInfo(v));
-                                lg.addArch(e2vtab[e],e2vtab[f],einfo);
+                                linkers.second(lg.addArch(e2vtab[e],e2vtab[f],einfo),v);
+                                vset[v];
                             }
+            for(typename GraphIn::PVertex v=g.getVert();v;v=g.getVertNext(v)) if (!vset.hasKey(v))
+                linkers.second((typename GraphOut::PEdge)NULL,v);
             return lg.getVertNext(res);
         }
 
@@ -771,12 +783,12 @@ class LineGraphPar {
         template <class GraphIn,class GraphOut,class VCaster, class ECaster>
         static typename GraphOut::PVertex dir(const GraphIn& g,GraphOut& lg,
                                                 std::pair< VCaster,ECaster > casters)
-        {   return dir(g,lg,casters,stdLink( false,false ));  }
+        {   return dir(g,lg,casters,std::make_pair(stdLink( false,false ),stdLink( false,false )));  }
 
         // jw. ale tylko tworzy linegraph
         template <class GraphIn,class GraphOut>
         static typename GraphOut::PVertex dir(const GraphIn& g,GraphOut& lg)
-        {   return dir(g,lg,std::make_pair(stdCast( false ),stdCast( false )),stdLink( false,false ));  }
+        {   return dir(g,lg,std::make_pair(stdCast( false ),stdCast( false )),std::make_pair(stdLink( false,false ),stdLink( false,false )));  }
 
 
 };
@@ -784,6 +796,541 @@ class LineGraphPar {
 // wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 class LineGraph : public LineGraphPar<AlgsDefaultSettings> {};
 
+
+
+// Caster zlozony z jednego castera 3-argumentowego i dwoch 2-argumentowych
+template <class TwoArg, class FirstArg, class SecondArg> struct ComplexCaster {
+    mutable TwoArg twoarg;
+    mutable FirstArg firstarg;
+    mutable SecondArg secondarg;
+    ComplexCaster(TwoArg t=TwoArg(),FirstArg f=FirstArg(),SecondArg s=SecondArg())
+        : twoarg(t), firstarg(f), secondarg(s) {}
+
+    // jesli podano oba argumenty, zastosuj twoarg
+    template <class InfoDest, class InfoSour1,class InfoSour2>
+	void operator()(InfoDest& dest,InfoSour1 sour1,InfoSour2 sour2)
+    { twoarg(dest,sour1,sour2);  }
+
+    // jesli podano pierwszy argument, zastosuj firstarg
+    template <class InfoDest, class InfoSour1>
+	void operator()(InfoDest& dest,InfoSour1 sour1,Koala::BlackHole b)
+    { firstarg(dest,sour1);  }
+
+    // jesli podano drugi argument, zastosuj secondarg
+    template <class InfoDest, class InfoSour1>
+	void operator()(InfoDest& dest,Koala::BlackHole b,InfoSour1 sour2)
+    { secondarg(dest,sour2);  }
+};
+
+// funkcja tworzaca - podajemy castery skladowe
+template <class TwoArg, class FirstArg, class SecondArg>
+ComplexCaster<TwoArg, FirstArg,SecondArg> complexCast(TwoArg t,FirstArg f,SecondArg s)
+{ return ComplexCaster<TwoArg, FirstArg,SecondArg>(t,f,s); }
+
+
+
+// Kreator iloczynow grafow
+template <class DefaultStructs>
+// DefaultStructs - wytyczne dla wewnetrznych procedur
+class ProductPar {
+    public:
+
+//    Dopisuje iloczyn    kartezjanski
+//    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. cast to para casterow 3-argumentowych.
+//    cast.first tworzy obiekt info nowego wierzcholka na podstawie dwoch inf wierzcholkow zrodlowych
+//    cast.second tworzy obiekt info nowej krawedzi na podstawie dwoch inf krawedzi zrodlowych
+//    (w przypadku braku odpowiedniego argumentu w wywolaniu wstawiany jest blackHole)
+//    link to para linkerow laczacych elementy grafow zrodlowych z wynikiem
+//    link.first.first - przywiazuje do wierzcholka wynikowego wierzcholek pierwszego grafu lub NULL w razie braku
+//    link.first.second - przywiazuje do wierzcholka wynikowego wierzcholek drugiego grafu lub NULL w razie braku
+//    link.second.first - przywiazuje do krawedzi wynikowej krawedz pierwszego grafu lub NULL w razie braku
+//    link.second.second - przywiazuje do krawedzi wynikowej krawedz drugiego grafu lub NULL w razie braku
+    template <class Graph1,class Graph2,class Graph,class VCaster,class ECaster,class VLinker,class ELinker >
+    static typename Graph::PVertex cart(const Graph1& g1,const Graph2& g2,Graph& g,
+                                            std::pair<VCaster,ECaster> cast,std::pair<VLinker,ELinker> link)
+    {   typename Graph::PVertex res=g.getVertLast();
+        int n1=g1.getVertNo(),n2=g2.getVertNo();
+        for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            { link.first.first()(v,(typename Graph1::PVertex)0);link.first.second()(v,(typename Graph2::PVertex)0); }
+        for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+            { link.second.first()(e,(typename Graph1::PEdge)0);link.second.second()(e,(typename Graph2::PEdge)0); }
+        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(g1.getVertNo());
+        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(g2.getVertNo());
+        int l=0;
+        for(typename Graph1::PVertex v=g1.getVert();v;v=g1.getVertNext(v),l++) indv1[v]=l;
+        l=0;
+        for(typename Graph2::PVertex v=g2.getVert();v;v=g2.getVertNext(v),l++) indv2[v]=l;
+        typename Graph::PVertex LOCALARRAY (tabv,n1*n2);
+
+        int l1,l2;
+        typename Graph1::PVertex v1;typename Graph2::PVertex v2;
+        for(l1=0, v1=g1.getVert();v1;v1=g1.getVertNext(v1),l1++)
+            for(l2=0, v2=g2.getVert();v2;v2=g2.getVertNext(v2),l2++)
+            {   typename Graph::VertInfoType vinfo;
+                cast.first(vinfo,g1.getVertInfo(v1),g2.getVertInfo(v2));
+                typename Graph::PVertex v=tabv[n1*l1+l2]=g.addVert(vinfo);
+                link.first.first()(v,v1);link.first.second()(v,v2);
+            }
+
+        for(l1=0, v1=g1.getVert();v1;v1=g1.getVertNext(v1),l1++)
+            for(typename Graph2::PEdge e=g2.getEdge();e;e=g2.getEdgeNext(e))
+            {   std::pair<typename Graph2::PVertex,typename Graph2::PVertex> ends=g2.getEdgeEnds(e);
+                EdgeDirection dir=g2.getEdgeType(e);
+                typename Graph::EdgeInfoType einfo;
+                cast.second(einfo,blackHole,g2.getEdgeInfo(e));
+                typename Graph::PEdge eres=
+                    g.addEdge(
+                          tabv[n1*indv1[v1]+indv2[ends.first]],
+                          tabv[n1*indv1[v1]+indv2[ends.second]],
+                        einfo,dir);
+                link.second.first()(eres,(typename Graph1::PEdge)0);
+                link.second.second()(eres,e);
+            }
+
+        for(l2=0, v2=g2.getVert();v2;v2=g2.getVertNext(v2),l2++)
+            for(typename Graph1::PEdge e=g1.getEdge();e;e=g1.getEdgeNext(e))
+            {   std::pair<typename Graph1::PVertex,typename Graph1::PVertex> ends=g1.getEdgeEnds(e);
+                EdgeDirection dir=g1.getEdgeType(e);
+                typename Graph::EdgeInfoType einfo;
+                cast.second(einfo,g1.getEdgeInfo(e),blackHole);
+                typename Graph::PEdge eres=
+                    g.addEdge(
+                          tabv[n1*indv1[ends.first]+indv2[v2]],
+                          tabv[n1*indv1[ends.second]+indv2[v2]],
+                        einfo,dir);
+                link.second.first()(eres,e);
+                link.second.second()(eres,(typename Graph2::PEdge)0);
+            }
+
+        return g.getVertNext(res);
+    }
+
+    // j.w. ale bez linkerow
+    template <class Graph1,class Graph2,class Graph,class VCaster,class ECaster >
+    static typename Graph::PVertex cart(const Graph1& g1,const Graph2& g2,Graph& g,std::pair<VCaster,ECaster> cast)
+    {
+        return cart(g1,g2,g,cast,std::make_pair(stdLink(false,false),stdLink(false,false)));
+    }
+
+    // j.w. ale tylko tworzy iloczyn
+    template <class Graph1,class Graph2,class Graph >
+    static typename Graph::PVertex cart(const Graph1& g1,const Graph2& g2,Graph& g)
+    {
+        return cart(g1,g2,g,std::make_pair(stdCast(false),stdCast(false)),std::make_pair(stdLink(false,false),stdLink(false,false)));
+    }
+
+
+//    Dopisuje iloczyn    leksykograficzny
+//    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
+    template <class Graph1,class Graph2,class Graph,class VCaster,class ECaster,class VLinker,class ELinker >
+    static typename Graph::PVertex lex(const Graph1& g1,const Graph2& g2,Graph& g,
+                                            std::pair<VCaster,ECaster> cast,std::pair<VLinker,ELinker> link)
+    {   typename Graph::PVertex res=g.getVertLast();
+        int n1=g1.getVertNo(),n2=g2.getVertNo();
+        for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            { link.first.first()(v,(typename Graph1::PVertex)0);link.first.second()(v,(typename Graph2::PVertex)0); }
+        for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+            { link.second.first()(e,(typename Graph1::PEdge)0);link.second.second()(e,(typename Graph2::PEdge)0); }
+        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(g1.getVertNo());
+        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(g2.getVertNo());
+        int l=0;
+        for(typename Graph1::PVertex v=g1.getVert();v;v=g1.getVertNext(v),l++) indv1[v]=l;
+        l=0;
+        for(typename Graph2::PVertex v=g2.getVert();v;v=g2.getVertNext(v),l++) indv2[v]=l;
+        typename Graph::PVertex LOCALARRAY (tabv,n1*n2);
+
+        int l1,l2;
+        typename Graph1::PVertex v1;typename Graph2::PVertex v2;
+        for(l1=0, v1=g1.getVert();v1;v1=g1.getVertNext(v1),l1++)
+            for(l2=0, v2=g2.getVert();v2;v2=g2.getVertNext(v2),l2++)
+            {   typename Graph::VertInfoType vinfo;
+                cast.first(vinfo,g1.getVertInfo(v1),g2.getVertInfo(v2));
+                typename Graph::PVertex v=tabv[n1*l1+l2]=g.addVert(vinfo);
+                link.first.first()(v,v1);link.first.second()(v,v2);
+            }
+
+        for(l1=0, v1=g1.getVert();v1;v1=g1.getVertNext(v1),l1++)
+            for(typename Graph2::PEdge e=g2.getEdge();e;e=g2.getEdgeNext(e))
+            {   std::pair<typename Graph2::PVertex,typename Graph2::PVertex> ends=g2.getEdgeEnds(e);
+                EdgeDirection dir=g2.getEdgeType(e);
+                typename Graph::EdgeInfoType einfo;
+                cast.second(einfo,blackHole,g2.getEdgeInfo(e));
+                typename Graph::PEdge eres=
+                    g.addEdge(
+                          tabv[n1*indv1[v1]+indv2[ends.first]],
+                          tabv[n1*indv1[v1]+indv2[ends.second]],
+                        einfo,dir);
+                link.second.first()(eres,(typename Graph1::PEdge)0);
+                link.second.second()(eres,e);
+            }
+
+        {   typename Graph2::PVertex v1;
+            for(typename Graph1::PEdge e=g1.getEdge();e;e=g1.getEdgeNext(e))
+            for(l1=0, v1=g2.getVert();v1;v1=g2.getVertNext(v1),l1++)
+                for(l2=0, v2=g2.getVert();v2;v2=g2.getVertNext(v2),l2++)
+                {   std::pair<typename Graph1::PVertex,typename Graph1::PVertex> ends=g1.getEdgeEnds(e);
+                    EdgeDirection dir=g1.getEdgeType(e);
+                    if (dir==Loop) dir=(v1==v2) ? EdLoop : EdUndir;
+                    typename Graph::EdgeInfoType einfo;
+                    cast.second(einfo,g1.getEdgeInfo(e),blackHole);
+                    typename Graph::PEdge eres=
+                        g.addEdge(
+                          tabv[n1*indv1[ends.first]+indv2[v1]],
+                          tabv[n1*indv1[ends.second]+indv2[v2]],
+                        einfo,dir);
+                    link.second.first()(eres,e);
+                    link.second.second()(eres,(typename Graph2::PEdge)0);
+                }
+        }
+
+        return g.getVertNext(res);
+    }
+
+    // j.w. ale bez linkerow
+    template <class Graph1,class Graph2,class Graph,class VCaster,class ECaster >
+    static typename Graph::PVertex lex(const Graph1& g1,const Graph2& g2,Graph& g,std::pair<VCaster,ECaster> cast)
+    {
+        return lex(g1,g2,g,cast,std::make_pair(stdLink(false,false),stdLink(false,false)));
+    }
+
+    // j.w. ale tylko tworzy iloczyn
+    template <class Graph1,class Graph2,class Graph >
+    static typename Graph::PVertex lex(const Graph1& g1,const Graph2& g2,Graph& g)
+    {
+        return lex(g1,g2,g,std::make_pair(stdCast(false),stdCast(false)),std::make_pair(stdLink(false,false),stdLink(false,false)));
+    }
+
+
+//    Dopisuje iloczyn    tensorowy
+//    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
+    template <class Graph1,class Graph2,class Graph,class VCaster,class ECaster,class VLinker,class ELinker >
+    static typename Graph::PVertex tensor(const Graph1& g1,const Graph2& g2,Graph& g,
+                                            std::pair<VCaster,ECaster> cast,std::pair<VLinker,ELinker> link)
+    {   typename Graph::PVertex res=g.getVertLast();
+        int n1=g1.getVertNo(),n2=g2.getVertNo();
+        for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            { link.first.first()(v,(typename Graph1::PVertex)0);link.first.second()(v,(typename Graph2::PVertex)0); }
+        for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+            { link.second.first()(e,(typename Graph1::PEdge)0);link.second.second()(e,(typename Graph2::PEdge)0); }
+        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(g1.getVertNo());
+        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(g2.getVertNo());
+        int l=0;
+        for(typename Graph1::PVertex v=g1.getVert();v;v=g1.getVertNext(v),l++) indv1[v]=l;
+        l=0;
+        for(typename Graph2::PVertex v=g2.getVert();v;v=g2.getVertNext(v),l++) indv2[v]=l;
+        typename Graph::PVertex LOCALARRAY (tabv,n1*n2);
+
+        int l1,l2;
+        typename Graph1::PVertex v1;typename Graph2::PVertex v2;
+        for(l1=0, v1=g1.getVert();v1;v1=g1.getVertNext(v1),l1++)
+            for(l2=0, v2=g2.getVert();v2;v2=g2.getVertNext(v2),l2++)
+            {   typename Graph::VertInfoType vinfo;
+                cast.first(vinfo,g1.getVertInfo(v1),g2.getVertInfo(v2));
+                typename Graph::PVertex v=tabv[n1*l1+l2]=g.addVert(vinfo);
+                link.first.first()(v,v1);link.first.second()(v,v2);
+            }
+
+
+            for(typename Graph1::PEdge e1=g1.getEdge();e1;e1=g1.getEdgeNext(e1))
+            for(typename Graph2::PEdge e2=g2.getEdge();e2;e2=g2.getEdgeNext(e2))
+                {   std::pair<typename Graph1::PVertex,typename Graph1::PVertex> ends1=g1.getEdgeEnds(e1);
+                    std::pair<typename Graph2::PVertex,typename Graph2::PVertex> ends2=g2.getEdgeEnds(e2);
+                    EdgeDirection dir1=g1.getEdgeType(e1), dir2=g2.getEdgeType(e2);
+                    typename Graph::EdgeInfoType einfo;
+                    cast.second(einfo,g1.getEdgeInfo(e1),g2.getEdgeInfo(e2));
+                    typename Graph::PEdge eres1=0,eres2=0;
+                    if (dir1==Undirected && dir2==Undirected)
+                    {   eres1=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.second]],
+                        einfo,EdUndir);
+                        eres2=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                        einfo,EdUndir);
+                    }
+                    if (dir1==Undirected && dir2==Directed)
+                    {   eres1=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.second]],
+                        einfo);
+                        eres2=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                        einfo);
+                    }
+                    if (dir1==Directed && dir2==Undirected)
+                    {   eres1=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.second]],
+                        einfo);
+                        eres2=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                        einfo);
+                    }
+                    if (dir1==Directed && dir2==Directed)
+                    {   eres1=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.second]],
+                        einfo);
+                    }
+                    if (dir1==Undirected && dir2==Loop)
+                    {   eres1=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                        einfo,EdUndir);
+                        eres2=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                        einfo,EdUndir);
+                    }
+                    if (dir1==Loop && dir2==Undirected)
+                    {   eres1=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                        einfo,EdUndir);
+                        eres2=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                        einfo,EdUndir);
+                    }
+                    if (dir1==Loop && dir2==Loop)
+                    {   eres1=
+                        g.addLoop(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                        einfo);
+                    }
+                    if (dir1==Directed && dir2==Loop)
+                    {   eres1=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                        einfo);
+                    }
+                    if (dir1==Loop && dir2==Directed)
+                    {   eres1=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                        einfo);
+                    }
+
+                    if (eres1) { link.second.first()(eres1,e1); link.second.second()(eres1,e2); }
+                    if (eres2) { link.second.first()(eres2,e1); link.second.second()(eres2,e2); }
+                }
+
+        return g.getVertNext(res);
+    }
+
+    // j.w. ale bez linkerow
+    template <class Graph1,class Graph2,class Graph,class VCaster,class ECaster >
+    static typename Graph::PVertex tensor(const Graph1& g1,const Graph2& g2,Graph& g,std::pair<VCaster,ECaster> cast)
+    {
+        return tensor(g1,g2,g,cast,std::make_pair(stdLink(false,false),stdLink(false,false)));
+    }
+
+    // j.w. ale tylko tworzy iloczyn
+    template <class Graph1,class Graph2,class Graph >
+    static typename Graph::PVertex tensor(const Graph1& g1,const Graph2& g2,Graph& g)
+    {
+        return tensor(g1,g2,g,std::make_pair(stdCast(false),stdCast(false)),std::make_pair(stdLink(false,false),stdLink(false,false)));
+    }
+
+
+//    Dopisuje strong
+//    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
+    template <class Graph1,class Graph2,class Graph,class VCaster,class ECaster,class VLinker,class ELinker >
+    static typename Graph::PVertex strong(const Graph1& g1,const Graph2& g2,Graph& g,
+                                            std::pair<VCaster,ECaster> cast,std::pair<VLinker,ELinker> link)
+    {   typename Graph::PVertex res=g.getVertLast();
+        int n1=g1.getVertNo(),n2=g2.getVertNo();
+        for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            { link.first.first()(v,(typename Graph1::PVertex)0);link.first.second()(v,(typename Graph2::PVertex)0); }
+        for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+            { link.second.first()(e,(typename Graph1::PEdge)0);link.second.second()(e,(typename Graph2::PEdge)0); }
+        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(g1.getVertNo());
+        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(g2.getVertNo());
+        int l=0;
+        for(typename Graph1::PVertex v=g1.getVert();v;v=g1.getVertNext(v),l++) indv1[v]=l;
+        l=0;
+        for(typename Graph2::PVertex v=g2.getVert();v;v=g2.getVertNext(v),l++) indv2[v]=l;
+        typename Graph::PVertex LOCALARRAY (tabv,n1*n2);
+
+        int l1,l2;
+        typename Graph1::PVertex v1;typename Graph2::PVertex v2;
+        for(l1=0, v1=g1.getVert();v1;v1=g1.getVertNext(v1),l1++)
+            for(l2=0, v2=g2.getVert();v2;v2=g2.getVertNext(v2),l2++)
+            {   typename Graph::VertInfoType vinfo;
+                cast.first(vinfo,g1.getVertInfo(v1),g2.getVertInfo(v2));
+                typename Graph::PVertex v=tabv[n1*l1+l2]=g.addVert(vinfo);
+                link.first.first()(v,v1);link.first.second()(v,v2);
+            }
+
+
+        for(l1=0, v1=g1.getVert();v1;v1=g1.getVertNext(v1),l1++)
+            for(typename Graph2::PEdge e=g2.getEdge();e;e=g2.getEdgeNext(e))
+            {   std::pair<typename Graph2::PVertex,typename Graph2::PVertex> ends=g2.getEdgeEnds(e);
+                EdgeDirection dir=g2.getEdgeType(e);
+                typename Graph::EdgeInfoType einfo;
+                cast.second(einfo,blackHole,g2.getEdgeInfo(e));
+                typename Graph::PEdge eres=
+                    g.addEdge(
+                          tabv[n1*indv1[v1]+indv2[ends.first]],
+                          tabv[n1*indv1[v1]+indv2[ends.second]],
+                        einfo,dir);
+                link.second.first()(eres,(typename Graph1::PEdge)0);
+                link.second.second()(eres,e);
+            }
+
+        for(l2=0, v2=g2.getVert();v2;v2=g2.getVertNext(v2),l2++)
+            for(typename Graph1::PEdge e=g1.getEdge();e;e=g1.getEdgeNext(e))
+            {   std::pair<typename Graph1::PVertex,typename Graph1::PVertex> ends=g1.getEdgeEnds(e);
+                EdgeDirection dir=g1.getEdgeType(e);
+                typename Graph::EdgeInfoType einfo;
+                cast.second(einfo,g1.getEdgeInfo(e),blackHole);
+                typename Graph::PEdge eres=
+                    g.addEdge(
+                          tabv[n1*indv1[ends.first]+indv2[v2]],
+                          tabv[n1*indv1[ends.second]+indv2[v2]],
+                        einfo,dir);
+                link.second.first()(eres,e);
+                link.second.second()(eres,(typename Graph2::PEdge)0);
+            }
+
+            for(typename Graph1::PEdge e1=g1.getEdge();e1;e1=g1.getEdgeNext(e1))
+            for(typename Graph2::PEdge e2=g2.getEdge();e2;e2=g2.getEdgeNext(e2))
+                {   std::pair<typename Graph1::PVertex,typename Graph1::PVertex> ends1=g1.getEdgeEnds(e1);
+                    std::pair<typename Graph2::PVertex,typename Graph2::PVertex> ends2=g2.getEdgeEnds(e2);
+                    EdgeDirection dir1=g1.getEdgeType(e1), dir2=g2.getEdgeType(e2);
+                    typename Graph::EdgeInfoType einfo;
+                    cast.second(einfo,g1.getEdgeInfo(e1),g2.getEdgeInfo(e2));
+                    typename Graph::PEdge eres1=0,eres2=0;
+                    if (dir1==Undirected && dir2==Undirected)
+                    {   eres1=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.second]],
+                        einfo,EdUndir);
+                        eres2=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                        einfo,EdUndir);
+                    }
+                    if (dir1==Undirected && dir2==Directed)
+                    {   eres1=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.second]],
+                        einfo);
+                        eres2=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                        einfo);
+                    }
+                    if (dir1==Directed && dir2==Undirected)
+                    {   eres1=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.second]],
+                        einfo);
+                        eres2=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                        einfo);
+                    }
+                    if (dir1==Directed && dir2==Directed)
+                    {   eres1=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.second]],
+                        einfo);
+                    }
+                    if (dir1==Undirected && dir2==Loop)
+                    {   eres1=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                        einfo,EdUndir);
+                        eres2=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                        einfo,EdUndir);
+                    }
+                    if (dir1==Loop && dir2==Undirected)
+                    {   eres1=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                        einfo,EdUndir);
+                        eres2=
+                        g.addEdge(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                        einfo,EdUndir);
+                    }
+                    if (dir1==Loop && dir2==Loop)
+                    {   eres1=
+                        g.addLoop(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                        einfo);
+                    }
+                    if (dir1==Directed && dir2==Loop)
+                    {   eres1=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.second]+indv2[ends2.first]],
+                        einfo);
+                    }
+                    if (dir1==Loop && dir2==Directed)
+                    {   eres1=
+                        g.addArch(
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.first]],
+                          tabv[n1*indv1[ends1.first]+indv2[ends2.second]],
+                        einfo);
+                    }
+
+                    if (eres1) { link.second.first()(eres1,e1); link.second.second()(eres1,e2); }
+                    if (eres2) { link.second.first()(eres2,e1); link.second.second()(eres2,e2); }
+                }
+
+        return g.getVertNext(res);
+    }
+
+    // j.w. ale bez linkerow
+    template <class Graph1,class Graph2,class Graph,class VCaster,class ECaster >
+    static typename Graph::PVertex strong(const Graph1& g1,const Graph2& g2,Graph& g,std::pair<VCaster,ECaster> cast)
+    {
+        return strong(g1,g2,g,cast,std::make_pair(stdLink(false,false),stdLink(false,false)));
+    }
+
+    // j.w. ale tylko tworzy iloczyn
+    template <class Graph1,class Graph2,class Graph >
+    static typename Graph::PVertex strong(const Graph1& g1,const Graph2& g2,Graph& g)
+    {
+        return strong(g1,g2,g,std::make_pair(stdCast(false),stdCast(false)),std::make_pair(stdLink(false,false),stdLink(false,false)));
+    }
+
+
+};
+
+// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+class Product : public ProductPar<AlgsDefaultSettings> {};
 
 }
 #endif

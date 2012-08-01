@@ -56,6 +56,7 @@ template< class VertInfo, class EdgeInfo, class Settings> class Graph;
 template< class VertInfo, class EdgeInfo, class Settings> class Vertex;
 template< class VertInfo, class EdgeInfo, class Settings> class Edge;
 
+template <EdgeType mask, bool matr> class GrDefaultSettings;
 
 //Wytyczne parametryzujace dzialanie algorytmow biblioteki. Z reguly klasy z procedurami maja postac
 //NazwaPar<DefaultStructs> oraz pochodna klase Nazwa dzialajaca z ustawieniem DefaultStructs=AlgsDefaultSettings
@@ -97,6 +98,12 @@ class AlgsDefaultSettings {
         typedef AssocMatrix<A,B,AMatrClTriangle> Type;
     };
 
+    // typ grafu pomocniczego stosowanego wewnatrz procedury
+    template <class A, class B,EdgeType mask,bool matr> class LocalGraph {
+        public:
+        typedef Graph<A,B,GrDefaultSettings<mask,matr> > Type;
+
+    };
 
     // czy dostosowywac rozmiar pamieci wyjsciowych tablic asocjacyjnych
     enum { ReserveOutAssocCont=true };
@@ -232,7 +239,7 @@ template<class Elem> struct SetChooser { // sprawdza, czy testowany element jest
 };
 
 template <class Elem>
-SetChooser<Elem> stdChoose(const Koala::Set<Elem*>& arg) { return SetChooser<Elem>(arg); }
+SetChooser<Elem> stdChoose( Koala::Set<Elem*> arg) { return SetChooser<Elem>(arg); }
 
 
 template <class Iter> struct ContainerChooser { // sprawdza, czy testowany element jest w przedziale miedzy podanymi iteratorami - uzywa STLowego find
@@ -337,7 +344,7 @@ template <class Info, class T, class Z> struct FieldSetChooser { // test, czy po
 };
 
 template <class Info, class T, class Z>
-FieldSetChooser<Info,T,Z> fieldChoose(T Info::*wsk,const Koala::Set<Z>& set)
+FieldSetChooser<Info,T,Z> fieldChoose(T Info::*wsk, Koala::Set<Z> set)
     { return FieldSetChooser<Info,T,Z>(wsk,set); }
 
 
@@ -365,7 +372,7 @@ template<class Cont> struct AssocHasChooser { // test, czy element jest kluczem 
 };
 
 template <class Cont>
-AssocHasChooser<Cont> assocKeyChoose(const Cont& arg)
+AssocHasChooser<Cont> assocKeyChoose( Cont arg)
 { return AssocHasChooser<Cont>(arg); }
 
 
@@ -379,7 +386,7 @@ template<class Cont> struct AssocBoolChooser {  // test, czy element jest klucze
 };
 
 template <class Cont>
-AssocBoolChooser<Cont> assocChoose(const Cont& arg) { return AssocBoolChooser<Cont>(arg); }
+AssocBoolChooser<Cont> assocChoose( Cont arg) { return AssocBoolChooser<Cont>(arg); }
 
 
 template<class Cont> struct AssocValChooser { // test, czy element jest kluczem znajdujacym sie w tablicy,
@@ -394,7 +401,7 @@ template<class Cont> struct AssocValChooser { // test, czy element jest kluczem 
 };
 
 template <class Cont>
-AssocValChooser<Cont> assocChoose(const Cont& arg, typename Cont::ValType val)
+AssocValChooser<Cont> assocChoose( Cont arg, typename Cont::ValType val)
     { return AssocValChooser<Cont>(arg,val); }
 
 template<class Cont> struct AssocValChooserL { // test, czy element jest kluczem znajdujacym sie w tablicy,
@@ -409,7 +416,7 @@ template<class Cont> struct AssocValChooserL { // test, czy element jest kluczem
 };
 
 template <class Cont>
-AssocValChooserL<Cont> assocChooseL(const Cont& arg, typename Cont::ValType val)
+AssocValChooserL<Cont> assocChooseL( Cont arg, typename Cont::ValType val)
     { return AssocValChooserL<Cont>(arg,val); }
 
 template<class Cont> struct AssocValChooserG { // test, czy element jest kluczem znajdujacym sie w tablicy,
@@ -424,7 +431,7 @@ template<class Cont> struct AssocValChooserG { // test, czy element jest kluczem
 };
 
 template <class Cont>
-AssocValChooserG<Cont> assocChooseG(const Cont& arg, typename Cont::ValType val)
+AssocValChooserG<Cont> assocChooseG( Cont arg, typename Cont::ValType val)
     { return AssocValChooserG<Cont>(arg,val); }
 
 template<class Cont> struct AssocSetChooser { // test, czy element jest kluczem znajdujacym sie w tablicy,
@@ -440,7 +447,7 @@ template<class Cont> struct AssocSetChooser { // test, czy element jest kluczem 
 };
 
 template <class Cont>
-AssocSetChooser<Cont> assocChoose(const Cont& arg,const Koala::Set<typename Cont::ValType>& set)
+AssocSetChooser<Cont> assocChoose( Cont arg,const Koala::Set<typename Cont::ValType>& set)
     { return AssocSetChooser<Cont>(arg,set); }
 
 
@@ -456,7 +463,7 @@ template <class Cont, class Iter> struct AssocContainerChooser { // test, czy el
 };
 
 template <class Cont, class Iter>
-AssocContainerChooser<Cont,Iter> assocChoose(const Cont& cont, Iter begin,Iter end)
+AssocContainerChooser<Cont,Iter> assocChoose( Cont cont, Iter begin,Iter end)
     {return AssocContainerChooser<Cont,Iter>(cont,begin,end); }
 
 
@@ -471,7 +478,7 @@ template <class Cont, class Obj> struct AssocObjChooser { // sprawdza wartosc po
 };
 
 template <class Cont, class Obj>
-AssocObjChooser<Cont,Obj> assocFChoose(const Cont& cont, Obj arg) { return AssocObjChooser<Cont,Obj>(cont,arg); }
+AssocObjChooser<Cont,Obj> assocFChoose( Cont cont, Obj arg) { return AssocObjChooser<Cont,Obj>(cont,arg); }
 
 // Wszystkie choosery operujace na tablicach asocjacyjnych maja wersje dzialajace z zewnetrzna tablica
 // podawana przez wskaznik. Unikamy kopiowania tablic, uzywajac trzeba uwazac, by tablica wciaz zyla
@@ -712,7 +719,7 @@ template <class Int> struct VertDegSetChooser { // testuje, czy stopien wierzcho
 };
 
 template <class Int>
-VertDegSetChooser<Int> vertDegChoose(const Koala::Set<Int>& aset, Koala::EdgeDirection atype=Koala::EdAll)
+VertDegSetChooser<Int> vertDegChoose( Koala::Set<Int> aset, Koala::EdgeDirection atype=Koala::EdAll)
 { return VertDegSetChooser<Int>(aset,atype); }
 
 
@@ -842,32 +849,46 @@ struct StdCaster {
 StdCaster stdCast() {return StdCaster(); }
 
 // caster ustawiajacy wartosc domyslna i ignorujacy oryginalny parametr
+// wspolpracuje z produktami grafow (stad takze operator 3-argumentowy)
 struct NoCastCaster {
     template <class InfoDest, class InfoSour>
 	void operator()(InfoDest& dest,InfoSour sour) { dest=InfoDest(); }
+
+    template <class InfoDest, class InfoSour1,class InfoSour2>
+	void operator()(InfoDest& dest,InfoSour1 sour1,InfoSour2 sour2) { dest=InfoDest(); }
 };
 
 // funkcja tworzaca - dopuszczalny jedynie argument false
 NoCastCaster stdCast(bool arg) { assert(!arg); return NoCastCaster(); }
 
 // wyliczenie wartosci nowego info poprzez podany funktor
+// wspolpracuje z produktami grafow (stad takze operator 3-argumentowy) jesli funktor je obsluguje
 // TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
 template <class Fun> struct ObjCaster {
     mutable Fun funktor;
     ObjCaster(Fun afun=Fun()) : funktor(afun) {}
+
     template <class InfoDest, class InfoSour>
 	void operator()(InfoDest& dest, InfoSour sour) { dest=(InfoDest)funktor(sour); }
+
+    template <class InfoDest, class InfoSour1,class InfoSour2>
+	void operator()(InfoDest& dest,InfoSour1 sour1,InfoSour2 sour2)	{ dest=(InfoDest)funktor(sour1,sour2); }
+
 };
 
 template <class Funktor>
 ObjCaster<Funktor> stdCast(Funktor f) { return ObjCaster<Funktor>(f); }
 
 // Caster wpisujacy ustalona wartosc
+// wspolpracuje z produktami grafow (stad takze operator 3-argumentowy)
 template <class T> struct ValueCaster {
     T val;
     ValueCaster(T arg=T()) : val(arg) {}
     template <class InfoDest, class InfoSour>
 	void operator()(InfoDest& dest, InfoSour sour) { dest=(InfoDest)val; }
+
+    template <class InfoDest, class InfoSour1,class InfoSour2>
+	void operator()(InfoDest& dest,InfoSour1 sour1,InfoSour2 sour2) { dest=(InfoDest)val; }
 };
 
 // funkcja tworzaca - podajemy stala wartosc
@@ -908,6 +929,8 @@ template <class Map> struct Std1AssocLinker{
 template <class Link1, class Link2> struct Std2Linker {
         mutable Link1 dest2sour;
         mutable Link2 sour2dest;
+        Link1& first() {    return dest2sour; };
+        Link2& second() {    return sour2dest; };
         Std2Linker(Link1 al1, Link2 al2) : dest2sour(al1), sour2dest(al2) {}
         template <class Dest, class Sour>
             void operator()(Dest* wsk, Sour* w) { dest2sour(wsk,w); sour2dest(w,wsk); }

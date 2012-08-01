@@ -167,7 +167,7 @@ void Graph< VertInfo,EdgeInfo,Settings >::clearEdges()
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-Graph< VertInfo,EdgeInfo,Settings >::addVert( const VertInfo &infoExt )
+Graph< VertInfo,EdgeInfo,Settings >::addVert( VertInfo infoExt )
 {
     PVertex tmp_vert = new Vertex( infoExt );
     if(!attach( tmp_vert ))
@@ -203,7 +203,7 @@ inline void Graph< VertInfo,EdgeInfo,Settings >::del( PVertex vert, bool force )
 
 
 template< class VertInfo, class EdgeInfo, class Settings >
-inline void Graph< VertInfo,EdgeInfo,Settings >::setVertInfo( PVertex vert, const VertInfo &info ) const
+inline void Graph< VertInfo,EdgeInfo,Settings >::setVertInfo( PVertex vert,  VertInfo info ) const
 {   assert(vert) ; // TODO: throw
     vert->setInfo( info );
 }
@@ -244,7 +244,7 @@ Graph< VertInfo,EdgeInfo,Settings >::addEdge(
 template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::addEdge(
-    PVertex vert1, PVertex vert2, const EdgeInfo &infoExt, EdgeDirection direct )
+    PVertex vert1, PVertex vert2,  EdgeInfo infoExt, EdgeDirection direct )
 {   assert(vert1 && vert2 // TODO: throw
            && (direct==EdLoop || direct==EdUndir || direct==EdDirIn || direct==EdDirOut || direct==Directed));
     PEdge tmp_edge = new Edge( infoExt );
@@ -259,7 +259,7 @@ Graph< VertInfo,EdgeInfo,Settings >::addEdge(
 template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::addArch(
-    PVertex v_out, PVertex v_in, const EdgeInfo &infoExt )
+    PVertex v_out, PVertex v_in,  EdgeInfo infoExt )
 {   assert(v_out && v_in ); // TODO: throw
     PEdge tmp_edge = new Edge( infoExt );
     if (!attach_dir( tmp_edge,v_out,v_in ))
@@ -272,7 +272,7 @@ Graph< VertInfo,EdgeInfo,Settings >::addArch(
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
-Graph< VertInfo,EdgeInfo,Settings >::addLoop( PVertex vert, const EdgeInfo &infoExt )
+Graph< VertInfo,EdgeInfo,Settings >::addLoop( PVertex vert, EdgeInfo infoExt )
 {   assert(vert); // TODO: throw
     PEdge tmp_edge = new Edge( infoExt );
     if (!attach_loop( tmp_edge,vert ))
@@ -285,7 +285,7 @@ Graph< VertInfo,EdgeInfo,Settings >::addLoop( PVertex vert, const EdgeInfo &info
 
 
 template< class VertInfo, class EdgeInfo, class Settings >
-inline void Graph< VertInfo,EdgeInfo,Settings >::setEdgeInfo( PEdge edge, const EdgeInfo& info ) const
+inline void Graph< VertInfo,EdgeInfo,Settings >::setEdgeInfo( PEdge edge, EdgeInfo info ) const
 {   assert(edge); // TODO: throw
     edge->setInfo( info );
 }
@@ -1160,7 +1160,7 @@ void Graph< VertInfo,EdgeInfo,Settings >::neg(EdgeType type, EdgeInfo info)
 
 template< class VertInfo, class EdgeInfo, class Settings >
 typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-Graph< VertInfo,EdgeInfo,Settings >::putVert( PEdge edge, const VertInfo &info )
+Graph< VertInfo,EdgeInfo,Settings >::putVert( PEdge edge, VertInfo info )
 {
 
     typename Graph< VertInfo,EdgeInfo,Settings >::PVertex res = addVert( info );
@@ -1175,7 +1175,7 @@ Graph< VertInfo,EdgeInfo,Settings >::putVert( PEdge edge, const VertInfo &info )
 
 template< class VertInfo, class EdgeInfo, class Settings >
 typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
-Graph< VertInfo,EdgeInfo,Settings >::pickVert( PVertex vert, const EdgeInfo & info )
+Graph< VertInfo,EdgeInfo,Settings >::pickVert( PVertex vert, EdgeInfo  info )
 {
 
     int no;
@@ -1468,7 +1468,7 @@ Graph< VertInfo,EdgeInfo,Settings >::substitute(
     assert(vert && ((void*)this != (void*)&graph)); // TODO: throw
     typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
         res = this->copy( graph,choosers,casters,linkers );
-    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v = getVertNext( res );
+    typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v =  res ;
     for( ; v; v = getVertNext( v ) )
     {
         typename Graph< VertInfo,EdgeInfo,Settings >::PEdge

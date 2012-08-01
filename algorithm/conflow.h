@@ -1377,24 +1377,10 @@ class Flow : public FlowFl<false,true> {};
 
 
 
-// Domyslne wytyczne dla procedur badania spojnosci grafu
-class ConnectAlgsDefaultSettings : public FlowAlgsDefaultSettings<false, true> {
-    public:
-
-    // typ pomocniczej sieci lokalnej
-    template <class A, class B> class LocalGraph {
-        public:
-        typedef Graph<A,B,GrDefaultSettings<EdDirIn|EdDirOut,false> > Type;
-
-    };
-
-};
-
-
 // Procedury badania spojnosci grafu (bez wag na wierz/kraw)
 template <class DefaultStructs>
 // DefaultStructs - wytyczne dla wewnetrznych procedur
-class ConnectPar : public PathStructs {
+class ConnectPar : public SearchStructs {
 
     public:
 
@@ -1482,9 +1468,8 @@ class ConnectPar : public PathStructs {
     static int
     edgeDisjPaths( GraphType & g,// badany graf
                   typename GraphType::PVertex start, typename GraphType::PVertex end,
-                  OutPath< VIter,EIter > iters, // iteratory wyjsciowe na kolejne wierz/kraw znalezionych sciezek
-                  std::pair<LenIterV,LenIterE> liter) // iteratory na ktore wypisywane sa pozycje poczatkow kolejnych sciezek
-                  // i laczna dlugosc ciagow (por. komentarz przy strukturze CompStore) z search.h
+                  CompStore< LenIterV,VIter > voutiter, // iteratory wyjsciowe na kolejne wierz znalezionych sciezek
+                  CompStore< LenIterE,EIter > eoutiter) // iteratory wyjsciowe na kolejne kraw znalezionych sciezek
     {   typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
                                     typename FlowPar<DefaultStructs>:: template EdgeLabs<int> >::Type
                                         edgeTab(g.getEdgeNo());
@@ -1497,7 +1482,7 @@ class ConnectPar : public PathStructs {
         typename GraphType::PEdge LOCALARRAY(eout,g.getEdgeNo());
         typename GraphType::PVertex LOCALARRAY(vout,g.getVertNo());
 
-        *liter.first=0; ++liter.first;*liter.second=0; ++liter.second;
+        *voutiter.compIter=0; ++voutiter.compIter;*eoutiter.compIter=0; ++eoutiter.compIter;
         for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
             edgeTab[e].capac=1;
         int res=FlowPar<DefaultStructs>:: template maxFlow(g,edgeTab,start,end);
@@ -1515,7 +1500,7 @@ class ConnectPar : public PathStructs {
 
             EulerPar<DefaultStructs>:: template getDirCycle(
                 makeSubgraph(g,std::make_pair(stdChoose(true),edgeTypeChoose(Directed) && extAssocKeyChoose(&(paths)))),
-                start,outPath(blackHole,euler));
+                start,EulerPar<DefaultStructs>::outPath(blackHole,euler));
         int r=0;
         for(int i=0;i<paths.size();i++)
             if (paths[euler[i]]!=-1) paths[euler[i]]=r; else r++;
@@ -1523,13 +1508,13 @@ class ConnectPar : public PathStructs {
         for(r=0;r<res;r++)
         {   int j=BFSPar<DefaultStructs>:: template getPath(
                 makeSubgraph(g,std::make_pair(stdChoose(true),extAssocChoose(&(paths),r))),
-                start,end,outPath(vout,eout),EdDirOut);
+                start,end,BFSPar<DefaultStructs>::outPath(vout,eout),EdDirOut);
             lv+=j + 1; le+=j; /*((vertsoutflag)?1:0);*/
-            *liter.first=lv; *liter.second=le;++liter.first;++liter.second;
-            if (!isBlackHole(iters.edgeIter))
-                for(int k=0;k<j;k++) { *iters.edgeIter=eout[k]; ++iters.edgeIter;}
-            if (!isBlackHole(iters.vertIter))
-                for(int k=0;k<=j;k++) { *iters.vertIter=vout[k]; ++iters.vertIter;}
+            *voutiter.compIter=lv; *eoutiter.compIter=le;++voutiter.compIter;++eoutiter.compIter;
+            if (!isBlackHole(eoutiter.vertIter))
+                for(int k=0;k<j;k++) { *eoutiter.vertIter=eout[k]; ++eoutiter.vertIter;}
+            if (!isBlackHole(voutiter.vertIter))
+                for(int k=0;k<=j;k++) { *voutiter.vertIter=vout[k]; ++voutiter.vertIter;}
         }
 
         for(typename GraphType::PEdge e=undirs.firstKey();e;e=undirs.nextKey(e))
@@ -1551,7 +1536,7 @@ class ConnectPar : public PathStructs {
     {   assert(start && end && (start!=end) ); // TODO: throw
         if (g.getEdge(start,end,EdDirOut|EdUndir)) return -1;
         typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
-                std::pair<typename GraphType::PVertex,typename GraphType::PEdge> >:: Type Image;
+                std::pair<typename GraphType::PVertex,typename GraphType::PEdge>,Directed,false >:: Type Image;
         Image ig;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                             std::pair<typename Image::PVertex,typename Image::PVertex> >::Type
@@ -1581,7 +1566,7 @@ class ConnectPar : public PathStructs {
     minVertCut (const GraphType & g,VIter iter)
     {
         typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
-                std::pair<typename GraphType::PVertex,typename GraphType::PEdge> >:: Type Image;
+                std::pair<typename GraphType::PVertex,typename GraphType::PEdge>,Directed,false >:: Type Image;
         Image ig;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                             std::pair<typename Image::PVertex,typename Image::PVertex> >::Type
@@ -1637,13 +1622,11 @@ class ConnectPar : public PathStructs {
     static int
     vertDisjPaths(const GraphType & g,// badany graf
                   typename GraphType::PVertex start, typename GraphType::PVertex end,
-                  OutPath< VIter,EIter > iters, // iteratory wyjsciowe na kolejne wierz/kraw znalezionych sciezek
-                  std::pair<LenIterV,LenIterE> liter)// iterator na ktory wypisywane sa pozycje poczatkow kolejnych sciezek
-                  // i laczna dlugosc ciagow (por. komentarz przy strukturze CompStore) z search.h
-//                  bool vertsoutflag=false)
+                  CompStore< LenIterV,VIter > voutiter, // iteratory wyjsciowe na kolejne wierz znalezionych sciezek
+                  CompStore< LenIterE,EIter > eoutiter) // iteratory wyjsciowe na kolejne kraw znalezionych sciezek
     {   assert(start && end && start!=end);//TODO: throw
         typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
-                std::pair<typename GraphType::PVertex,typename GraphType::PEdge> >:: Type Image;
+                std::pair<typename GraphType::PVertex,typename GraphType::PEdge>,Directed,false >:: Type Image;
         Image ig;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                             std::pair<typename Image::PVertex,typename Image::PVertex> >::Type
@@ -1659,37 +1642,38 @@ class ConnectPar : public PathStructs {
         for(typename Image::PEdge e=ig.getEdge(images[end].second,images[start].first);e;
             e=ig.getEdge(images[end].second,images[start].first)) ig.delEdge(e);
 
-        int res=edgeDisjPaths(ig,images[start].second,images[end].first,outPath(blackHole,impaths),
-                                                                                std::make_pair(blackHole,impos));
-        *liter.first=0; ++liter.first;*liter.second=0; ++liter.second;
+        int res=edgeDisjPaths(ig,images[start].second,images[end].first,compStore(blackHole,blackHole),
+                              compStore(impos,impaths));
+        *voutiter.compIter=0; ++voutiter.compIter;*eoutiter.compIter=0; ++eoutiter.compIter;
         int vpos=0,epos=0;
         for(int i=0;i<res;i++)
         {   bool ed=true;
-            *iters.vertIter=start; ++iters.vertIter;++vpos;
+            *voutiter.vertIter=start; ++voutiter.vertIter;++vpos;
             for(int j=impos[i];j<impos[i+1];j++)
             {   if (ed)
-                { *iters.edgeIter=impaths[j]->info.second; ++iters.edgeIter;++epos;}
+                { *eoutiter.vertIter=impaths[j]->info.second; ++eoutiter.vertIter;++epos;}
                 else
-                { *iters.vertIter=impaths[j]->info.first; ++iters.vertIter;++vpos;}
+                { *voutiter.vertIter=impaths[j]->info.first; ++voutiter.vertIter;++vpos;}
                 ed=!ed;
             }
-            *iters.vertIter=end; ++iters.vertIter;++vpos;
+            *voutiter.vertIter=end; ++voutiter.vertIter;++vpos;
             /*if (vertsoutflag) */
-            { *liter.first=vpos; ++liter.first; }
+            { *voutiter.compIter=vpos; ++voutiter.compIter; }
             /*else*/
-            { *liter.second=epos; ++liter.second; }
+            { *eoutiter.compIter=epos; ++eoutiter.compIter; }
         }
         // wszystkie krawedzie start->end sa tez traktowane jako szukane sciezki
+        // - niezgodnie z Menger's theorem!
         res+=g.getEdgeNo(start,end,EdDirOut|EdUndir);
         for(typename GraphType::PEdge e=g.getEdge(start,end,EdDirOut|EdUndir);e;
                 e=g.getEdgeNext(start,end,e,EdDirOut|EdUndir))
-        {   *iters.vertIter=start; ++iters.vertIter;++vpos;
-            *iters.edgeIter=e; ++iters.edgeIter;++epos;
-            *iters.vertIter=end; ++iters.vertIter;++vpos;
+        {   *voutiter.vertIter=start; ++voutiter.vertIter;++vpos;
+            *eoutiter.vertIter=e; ++eoutiter.vertIter;++epos;
+            *voutiter.vertIter=end; ++voutiter.vertIter;++vpos;
 //            if (vertsoutflag)
-            { *liter.first=vpos; ++liter.first; }
+            { *voutiter.compIter=vpos; ++voutiter.compIter; }
 //            else
-            { *liter.second=epos; ++liter.second; }
+            { *eoutiter.compIter=epos; ++eoutiter.compIter; }
         }
 
         return res;
@@ -1698,8 +1682,8 @@ class ConnectPar : public PathStructs {
 
 };
 
-// wersja dzialajaca na DefaultStructs=ConnectAlgsDefaultSettings
-class Connect : public ConnectPar<ConnectAlgsDefaultSettings> {};
+// wersja dzialajaca na DefaultStructs=FlowAlgsDefaultSettings<false, true>
+class Connect : public ConnectPar<FlowAlgsDefaultSettings<false, true> > {};
 
 
 }
