@@ -74,6 +74,20 @@ int main() {
         std::cout<< std::endl;
 //        l=Koala::Dijkstra::getOutPath(g,vertCont,Koala::Dijkstra::outPath(tabV,tabE),V,F);
         l=Koala::Dijkstra::getPath(g,vertCont,V,Koala::Dijkstra::outPath(tabV,tabE));
+        std:: cout << "\n\n!!!!!!!!!!!!!\n";
+        Koala::PathStructs::OutPathTool<Koala::Graph<OpisV,OpisE> > tool;
+        Koala::Dijkstra::getPath(g,vertCont,V,tool.input());
+        std::cout << tool.lenght();
+        for(int i=0;i<=tool.lenght();i++) std::cout<< tool.vertex(i)->info.name;
+        for(int i=0;i<tool.lenght();i++) std::cout << "{"<< g.getEdgeEnds(tool.edge(i)).first->info.name <<
+                            "," << g.getEdgeEnds(tool.edge(i)).second->info.name << "}";
+        std:: cout << "\n";
+        Koala::Dijkstra::getPath(g,vertCont,V,tool.input());
+        std::cout << tool.lenght();
+        for(int i=0;i<=tool.lenght();i++) std::cout<< tool.vertex(i)->info.name;
+        for(int i=0;i<tool.lenght();i++) std::cout << "{"<< g.getEdgeEnds(tool.edge(i)).first->info.name <<
+                            "," << g.getEdgeEnds(tool.edge(i)).second->info.name << "}";
+        std:: cout << "\n\n!!!!!!!!!!!!!\n";
         std::cout<<"Liczba krawedzi: "<<l<<std::endl;
         for(int i=0;i<=l;i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;i<l;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<

@@ -27,6 +27,28 @@ Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow
 Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::TrsEdgeLabs<int> > > tedgeCont;
 Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsVertLoss<int> > > tvertCont;
 
+template <class T>
+void printInfo(const SearchStructs::CompStoreTool<T>& cont)
+{
+    cout << "\nsize: " << cont.size() << "\tlen:" <<cont.lenght();;
+    for(int i=0;i<cont.size();i++)
+    {
+        cout << "\n"<<cont.size(i) << ":";
+        for(int j=0;j<cont.size(i);j++) cout << ' ' << cont[i][j]->info;
+    }
+}
+
+template <class T>
+void printInfoName(const SearchStructs::CompStoreTool<T>& cont)
+{
+    cout << "\nsize: " << cont.size() << "\tlen:" <<cont.lenght();;
+    for(int i=0;i<cont.size();i++)
+    {
+        cout << "\n"<<cont.size(i) << ":";
+        for(int j=0;j<cont.size(i);j++) cout << ' ' << cont[i][j]->info.name;
+    }
+}
+
 void dijTest()
 {   g.clear();edgeCont.clear();
 
@@ -302,23 +324,29 @@ int main() {
     Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
     int itab[20];
 
-    int p=vflag ?  Koala::Connect::vertDisjPaths(g,S,T,Koala::Connect::outPath(tabV,tabE),
-                                    std::make_pair(itab,blackHole))
-                : Koala::Connect::vertDisjPaths(g,S,T,Koala::Connect::outPath(tabV,tabE),
-                                    std::make_pair(blackHole,itab));
+
+    SearchStructs::CompStoreTool<Koala::Graph<char,OpisE>::PVertex> vstore;
+    SearchStructs::CompStoreTool<Koala::Graph<char,OpisE>::PEdge> estore;
+    int p=Koala::Connect::vertDisjPaths(g,S,T,vstore.input(),estore.input());
+//                : Koala::Connect::vertDisjPaths(g,S,T,Koala::Connect::outPath(tabV,tabE),
+//                                    std::make_pair(blackHole,itab));
+
 
     cout << p << endl;
-    for(int i=0;i<=p;i++) cout << itab[i] << ' ';
+    printInfo(vstore);
     cout <<  endl;
-    if (!vflag)
-    for(int i=0;i<p;i++)
-    {   for(int j=itab[i];j<itab[i+1];j++) cout << tabE[j]->getEnds().first->info
-                            << tabE[j]->getEnds().second->info << ' ';
-        cout << endl;
-    } else for(int i=0;i<p;i++)
-    {   for(int j=itab[i];j<itab[i+1];j++) cout << tabV[j]->info << ' ';
-        cout << endl;
-    }
+    printInfoName(estore);
+//    for(int i=0;i<=p;i++) cout << itab[i] << ' ';
+//    cout <<  endl;
+//    if (!vflag)
+//    for(int i=0;i<p;i++)
+//    {   for(int j=itab[i];j<itab[i+1];j++) cout << tabE[j]->getEnds().first->info
+//                            << tabE[j]->getEnds().second->info << ' ';
+//        cout << endl;
+//    } else for(int i=0;i<p;i++)
+//    {   for(int j=itab[i];j<itab[i+1];j++) cout << tabV[j]->info << ' ';
+//        cout << endl;
+//    }
     cout << endl;
 //    for(int i=0;i<20;i++) if (tabV[i]) cout << tabV[i]->info;
 //    cout << endl;

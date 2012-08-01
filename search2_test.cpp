@@ -125,7 +125,7 @@ int main() {
 
     std::cout<<std::endl;
 
-    int compno = Koala::Blocks::splitComp(g,C,vertCont,edgeCont,Koala::SearchStructs::compStore(comptab[0],tabV),
+    int compno = Koala::Blocks::splitComp(g,C,vertCont,edgeCont,Koala::Blocks::compStore(comptab[0],tabV),
                                    comptab[1]);
     std::cout << compno<<endl;
     for(int i=0;i<compno;i++)
@@ -155,7 +155,7 @@ int main() {
 
 
     int comptab[2][100];
-    Koala::SearchStructs::VectCompStore<Koala::Graph<OpisV,OpisE>::PVertex> vec;
+    Koala::SearchStructs::CompStoreTool<Koala::Graph<OpisV,OpisE>::PVertex> vec;
 
     std::cout<<std::endl;
 
@@ -186,7 +186,7 @@ int main() {
 
     std::cout << "\n\n------------\n\n";
     searchTest();//g.addEdge(I,A);
-    Koala::SearchStructs::VectCompStore<Koala::Graph<OpisV,OpisE>::PVertex> vec;
+    Koala::SearchStructs::CompStoreTool<Koala::Graph<OpisV,OpisE>::PVertex> vec;
 
     std::cout << vec.size() << std::endl;
     std::cout<<"\n"<<Koala::SCC::get(g,vec.input(),blackHole) << "\n\n";

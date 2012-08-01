@@ -119,10 +119,14 @@ int main()
     {   cout << "\n****************************\n\n";
         Graph<char,string> g;
 
-        Graph<string,char> lg;
+        Graph<string,char> lg,lg2;
 
         AssocTable<std::map<Edge<char,string> *,Vertex<string,char>*> > e2vmap;
         AssocTable<std::map<Vertex<string,char>*,Edge<char,string> *> > v2emap;
+
+        AssocTable<std::map<Vertex<char,string> *,Edge<string,char>*> > lv2emap;
+        AssocTable<std::map<Edge<string,char>*,Vertex<char,string> *> > le2vmap;
+
 
         Edge<char,string> *e,*f;
 
@@ -145,7 +149,8 @@ int main()
         IO::writeGraphText(g,cout,IO::RG_EdgeList);
         cout<<endl<<endl;
 
-        LineGraph::dir(g,lg,make_pair(stdCast(),stdCast()),stdLink(v2emap ,e2vmap));
+        LineGraph::dir(g,lg,make_pair(stdCast(),stdCast()),make_pair(stdLink(v2emap ,e2vmap),stdLink(le2vmap ,lv2emap)));
+        LineGraph::dir(g,lg2);
     //    LineGraph::undir(g,lg,make_pair(stdCast(),stdCast()));
         IO::writeGraphText(lg,cout,IO::RG_EdgeList);
 
@@ -153,6 +158,12 @@ int main()
         {  assert((v2emap[v])->info==v->info); }
         for(Edge<char,string> *e=g.getEdge();e;e=g.getEdgeNext(e))
         {  assert((e2vmap[e])->info==e->info); }
+
+        for(Edge<string,char> *e=lg.getEdge();e;e=lg.getEdgeNext(e))
+        {  assert((le2vmap[e])->info==e->info); }
+        for(Vertex<char,string> *v=g.getVert();v;v=g.getVertNext(v))
+        {  assert(lv2emap[v]==0 || (lv2emap[v])->info==v->info); }
+
 
         Graph<char,string> g2;
 

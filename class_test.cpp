@@ -71,6 +71,8 @@ int main() {
     g.addEdge(u3,u4);g.addEdge(u5,u4);g.addEdge(u4,u6);
     g.addEdge(u5,u6);
 
+//g.addEdge(u5,u1);g.addEdge(u5,u2);
+//g.addEdge(u4,u3);
 
 //    g.addEdge(u1,u2);g.addEdge(u1,u5);g.addEdge(u2,u3);g.addEdge(u3,u4);g.addEdge(u5,u4);g.addEdge(u1,u3);
 //
@@ -92,9 +94,14 @@ int main() {
 //    g.addEdge(u8,u9);
 //    g.addEdge(u2,u9);g.addEdge(u8,u2);
 
-    cout << IsIt::chordal(g) << "\n";
+    cout << IsIt::cochordal(g) << "\n";
     IsIt::Chordal::getOrder(g,tabV);
     for(int i=0;i<g.getVertNo();i++) cout << tabV[i]->info;
+
+    int q =IsIt::Chordal::maxClique(g,tabV);
+    cout << endl<< endl << q << endl;
+    for(int i=0;i<q;i++) cout << tabV[i]->info << ' ';
+
 
 
 //	Graph<int, int>::PVertex cq[128], cq2[128];

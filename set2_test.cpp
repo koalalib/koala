@@ -4,7 +4,7 @@
 using namespace Koala;
 using namespace std;
 
-void print(const SearchStructs::VectCompStore<char>& cont)
+void print(const SearchStructs::CompStoreTool<char>& cont)
 {
     cout << "\nsize: " << cont.size() << "\tlen:" <<cont.lenght();;
     for(int i=0;i<cont.size();i++)
@@ -16,7 +16,7 @@ void print(const SearchStructs::VectCompStore<char>& cont)
 
 int main() {
 
-    SearchStructs::VectCompStore<char> cont;
+    SearchStructs::CompStoreTool<char> cont;
     print(cont);
 
     cont.insert(0);

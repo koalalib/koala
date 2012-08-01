@@ -1,79 +1,85 @@
+#define KOALA_SET_ON_VECTOR 1
+
 #include<stdio.h>
+#include<iostream>
+#include"koala/base/def_struct.h"
 #include"koala/graph/graph.h"
 #include"koala/algorithm/search.h"
 #include"koala/io/text.h"
+#include "Koala/classes/detect.h"
 
+using namespace std;
 using namespace Koala;
 using namespace Koala::IO;
 
-template<class GraphType>
-void PrintSubsets(const GraphType & g, EdgeDirection mask = EdUndir) {
-	unsigned int depth, n, retVal;
-	typename GraphType::PEdge e;
-	typename GraphType::PVertex u, v;
-
-	Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<Koala::Privates::List_iterator<LexBFS::LVCNode<GraphType> > > > allocat(2*g.getVertNo()+1); //TODO: size?
-	Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<LexBFS::LVCNode<GraphType> > > allocat2(2*g.getVertNo()+1); //TODO: size?
-	LexBFS::LexVisitContainer<GraphType, Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<Koala::Privates::List_iterator<LexBFS::LVCNode<GraphType> > > >,Koala::Privates::BlockListAllocator<Koala::Privates::ListNode<LexBFS::LVCNode<GraphType> > > > cont(allocat,allocat2,g.getVertNo());
-	typename AlgsDefaultSettings::template AssocCont<typename GraphType::PVertex, int>::Type visited;
-
-
-	n = g.getVertNo();
-	if(n == 0) return;
-
-	cont.initializeAddAll(g);
-
-	retVal = 0;
-
-	while(!cont.empty()) {
-//		cont.dump();
-		if(cont.m_data.size() > 2) {
-			if(cont.m_data.begin().next().next()->v == NULL) {
-				printf(" |");
-				};
-			};
-		u = cont.top();
-		printf(" %d", u->info);
-		visited[u] = 1;
-
-		cont.pop();
-
-		for(e = g.getEdge(u, mask); e != NULL; e = g.getEdgeNext(u, e, mask)) {
-			v = g.getEdgeEnd(e, u);
-			if(visited.hasKey(v)) {
-				if(visited[v] == -1) cont.move(v);
-				continue;
-				};
-			visited[v] = -1;
-			cont.move(v);
-			};
-		cont.done();
-		};
-	printf("\n");
-	};
+const char* print(Modules::PartitionType x)
+{
+    switch (x) {
+        case Modules::mTrivial : return "Trivial";
+        case Modules::mConnected : return "Connected";
+        case Modules::mDisconnected : return "Disconnected";
+        case Modules::mPrime : return "Prime";
+    };
+    assert(0);
+}
 
 int main() {
-	Graph<int, int> g;
-	readGraphText(g,
-//			 "7\n"
-//			 "0(0) 3 -1 -2 -3\n"
-//			 "1(1) 2 -2 -3\n"
-//			 "2(2) 2 -3 -5\n"
-//			 "3(3) 0\n"
-//			 "4(4) 2 -5 -6\n"
-//			 "5(5) 1 -6\n"
-//			 "6(6) 0\n",
+	Graph<char> gk3;
+	Graph<char>::PVertex F,G,H;
+	F=gk3.addVert('F');G=gk3.addVert('G');H=gk3.addVert('H');
+	gk3.addEdge(F,G); gk3.addEdge(F,H);gk3.addEdge(H,G);
 
-			 "8\n"
-			 "0(0) 4 -1 -2 -3 -4\n"
-			 "1(1) 2 -2 -3\n"
-			 "2(2) 1 -3\n"
-			 "3(3) 0\n"
-			 "4(4) 3 -5 -6 -7\n"
-			 "5(5) 2 -6 -7\n"
-			 "6(6) 1 -7\n"
-			 "7(7) 0\n",
-			 RG_VertexLists);
-	PrintSubsets(g);
+	Graph<char> gn4;
+	Graph<char>::PVertex I,J,K,L;
+	I=gn4.addVert('I');J=gn4.addVert('J');K=gn4.addVert('K');L=gn4.addVert('L');
+
+	Graph<char> gp4;
+	Graph<char>::PVertex M,N,O,P;
+	M=gp4.addVert('M');N=gp4.addVert('N');O=gp4.addVert('O');P=gp4.addVert('P');
+	gp4.addEdge(O,N);gp4.addEdge(M,N);gp4.addEdge(M,P);
+
+
+
+	Graph<char> g;
+	Graph<char>::PVertex A,B,C,D;
+
+	A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');//E=g.addVert('E');
+	g.addEdge(B,D);
+	g.addEdge(A,B);
+	g.addEdge(C,A);
+
+
+	g.substitute(A,gp4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
+	g.substitute(C,gn4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
+	g.substitute(B,gn4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
+	g.substitute(D,gk3,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
+	g.addVert();g.addEdge(g.getVert(),g.getVertLast());
+
+//	g.addEdge(C,D);
+
+	SearchStructs::CompStoreTool<Graph<char>::PVertex> tool;
+	AssocTable<std::map<Graph<char>::PVertex,int> > vertTab;
+
+    cout << "\n\n" << boolalpha << IsIt::prime(gk3);
+
+	Modules::Partition res=Modules::split(g,tool.input(),vertTab);
+
+
+    cout << "size: "<< res.size << " type: " << print(res.type) << endl;
+    for(Graph<char>::PVertex v=g.getVert();v;v=g.getVertNext(v)) cout << v->info << ":" << vertTab[v] <<"\t";
+    cout << "\nsize: " << tool.size() << "\tlen:" <<tool.lenght();
+    for(int i=0;i<tool.size();i++)
+    {
+        cout << "\n"<<tool.size(i) << ":";
+        for(int j=0;j<tool.size(i);j++) cout << ' ' << tool[i][j]->info;
+    }
+
+    cout << "\n\n" << boolalpha << IsIt::prime(gp4);
+
+
+//    writeGraphText(g, cout, RG_VertexLists|RG_VInfo);
+
+
+
 	return 0;
 	};
