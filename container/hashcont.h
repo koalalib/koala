@@ -26,6 +26,11 @@ namespace Koala {
 #define COLLISION()
 #endif
 
+// domyslny rozmiar map asocjacyjnych (jesli w konstruktorze pominiemy rozmiar)
+#ifndef HASHMAPDEFAULTSIZE
+#define HASHMAPDEFAULTSIZE 1021
+#endif
+
 #define HASHSETEMPTYPTR		((void *)0)
 #define HASHSETNONEXTPTR	((void *)1)
 #define HASHSETSENTRYPTR	((void *)2)
@@ -644,7 +649,7 @@ private:
 			     	 Privates::HashMapHashWrapper<HashFunction, KeyType, ValueType>,
 				 Allocator> > baseType;
 public:
-	HashMap(size_t size = 1021): baseType()				{ baseType::resize(size); };
+	HashMap(size_t size = HASHMAPDEFAULTSIZE): baseType()				{ baseType::resize(size); };
 	HashMap(size_t size, const ValueType &defVal): baseType(defVal) { baseType::resize(size); };
 	HashMap(const HashMap &t): baseType((const baseType &)t)	{ };
 
@@ -771,7 +776,7 @@ public:
 	typedef BiDiHashMap_const_iterator<KeyType, ValueType, HashFunction, Allocator> iterator;
 	typedef BiDiHashMap_const_iterator<KeyType, ValueType, HashFunction, Allocator> const_iterator;
 
-	BiDiHashMap(size_t size = 1021): baseType()				{ baseType::resize(size); initialize(); };
+	BiDiHashMap(size_t size = HASHMAPDEFAULTSIZE): baseType()				{ baseType::resize(size); initialize(); };
 	BiDiHashMap(size_t size, const ValueType &defVal): baseType(defVal)	{ baseType::resize(size); initialize(); };
 	BiDiHashMap(const BiDiHashMap &t): baseType(t.m_defaultValue)		{ baseType::resize(t.slots()); initialize(); *this = t; };
 

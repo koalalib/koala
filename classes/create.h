@@ -555,7 +555,7 @@ class RelDiagramPar {
     template <class Graph>
     // przeprowadza domkniecie symetryczne. Mozna podac pole info wprowadzanych krawedzi
     static void symmClousure(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
-    {   typename DefaultStructs::template TwoDimNoDiagAssocCont<typename Graph::PVertex,bool> :: Type matr(g.getVertNo());
+    {   typename DefaultStructs::template TwoDimAssocCont<typename Graph::PVertex,bool,AMatrNoDiag> :: Type matr(g.getVertNo());
         typename Graph::PEdge e,enext;
         for(e=g.getEdge(Directed|Undirected);e;e=g.getEdgeNext(e,Directed|Undirected))
         {   matr(g.getEdgeEnd1(e),g.getEdgeEnd2(e))=true;
@@ -575,8 +575,8 @@ class RelDiagramPar {
     template <class Graph>
     // przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
     static void transClousure(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
-    {   typename DefaultStructs::template TwoDimFullAssocCont<typename Graph::PVertex, typename FloydPar<DefaultStructs>
-                        ::template VertLabs<int,Graph> > :: Type matr(g.getVertNo());
+    {   typename DefaultStructs::template TwoDimAssocCont<typename Graph::PVertex, typename FloydPar<DefaultStructs>
+                        ::template VertLabs<int,Graph>,AMatrFull > :: Type matr(g.getVertNo());
 //        UnitLengthsEdgeCont econt;
         typename FloydPar<DefaultStructs>::template UnitLengthEdges<int> econt;
         FloydPar<DefaultStructs>::distances(g,matr,econt);

@@ -122,7 +122,7 @@ struct ShortPathStructs : public PathStructs {
 
     template <class GraphType, class VertContainer>
     // jw. ale zwraca zbior krawedzi
-    static Set<typename GraphType::PEdge> getUsedEdgesSet(const GraphType &g,const VertContainer& vertTab)
+    static Set<typename GraphType::PEdge> getUsedEdgeSet(const GraphType &g,const VertContainer& vertTab)
     {   Set<typename GraphType::PEdge> res;
         getUsedEdges(g,vertTab,setInserter(res));
         return res;
@@ -742,7 +742,7 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	 * @return number of components
 	 */
         template< class GraphType, class VertContainer, class CompIter, class VertIter >
-        static int getComponents(
+        static int split(   // bylo getComponents
             const GraphType &g, CompStore< CompIter,VertIter > out,
 	    EdgeDirection dir, VertContainer &visited );
 
@@ -756,7 +756,7 @@ class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	 * @return number of components
 	 */
         template< class GraphType, class CompIter, class VertIter >
-        static int getComponents(
+        static int split( // bylo getComponents
             const GraphType &g, CompStore< CompIter,VertIter > out,
             EdgeDirection dir = EdUndir | EdDirOut | EdDirIn );
 
@@ -1398,7 +1398,7 @@ class SCCPar: protected SearchStructs
 	 * @return number of components
 	 */
         template< class GraphType, class CompIter, class VertIter, class CompMap >
-        static int get(
+        static int split(   // bylo get
             const GraphType &g, CompStore< CompIter,VertIter > out, CompMap & vtoc);
 
 //    Korzysta z mapy CompMap z poprzedniej procedury. Wyrzuca na iterator wartosci std::pair<int,int> - wszystkie
@@ -1573,7 +1573,7 @@ class BlocksPar : public SearchStructs
         // wyrzuca na iterator ciag wierzcholkow tworzacych rdzen grafu tj. podgraf pozostajacy po sukcesywnym
         // usuwaniu wierzcholkow stopnia < 2. Zwraca dlugosc sekwencji
         template<class GraphType,class Iterator>
-        static int core(const GraphType &g,Iterator out)
+        static int getCore(const GraphType &g,Iterator out)
         {   const EdgeType mask=EdAll;
             typename DefaultStructs:: template AssocCont<
                 typename GraphType::PVertex, int >::Type degs(g.getVertNo());
@@ -1975,51 +1975,102 @@ class Euler : public EulerPar<AlgsDefaultSettings> {};
 
 
 
+    // Typ najwyzszego wezla drzewa dekompozycji modulowej grafu
+    enum ModPartType { mpTrivial, // graf 1-wierzcholkowy
+            mpConnected, // graf spojny o niespojnym dopelnieniu
+            mpDisconnected, // graf niespojny
+            mpPrime };   // strong modules rozpinaja graf pierwszy
+
+
 // Znajdowanie robicia grafow na maksymalne silne moduly
 template<class DefaultStructs >
 // DefaultStructs - wytyczne dla wewnetrznych procedur
 class ModulesPar : public SearchStructs {
     public:
 
-    // Typ najwyzszego wezla drzewa dekompozycji modulowej grafu
-    enum PartitionType { mTrivial, // graf 1-wierzcholkowy
-            mConnected, // graf spojny o niespojnym dopelnieniu
-            mDisconnected, // graf niespojny
-            mPrime };   // strong modules rozpinaja graf pierwszy
 
     struct Partition { // opis najwyzszego wezla drzewa dekompozycji modulowej grafu
         int size;   // ile maksymalnych silnych modulow zawiera graf
-        PartitionType type; // j.w.
+        ModPartType type; // j.w.
 
-        Partition(int s,PartitionType t) : size(s), type(t) {}
+        Partition(int s,ModPartType t) : size(s), type(t) {}
     };
 
     protected:
 
-    // TODO: nieefektywne, przejsc Set->AssocCont<PVertex,bool>
     template<class Graph>
-    static Set<typename Graph::PVertex> minModule(const Graph& g, typename Graph::PVertex u, typename Graph::PVertex v)
-    {   assert(u && v && u!=v);
-        Set<typename Graph::PVertex> s,snew;
+    static int minModule
+    (const Graph& g, typename Graph::PVertex u, typename Graph::PVertex v)
+    {   //assert(u && v && u!=v && !mapa.hasKey(u) && !mapa.hasKey(v));
+//        Set<typename Graph::PVertex> s,snew,s2; xxx
+        typename DefaultStructs::template AssocCont<typename Graph::PVertex, bool >::Type
+            s(g.getVertNo()),snew(g.getVertNo()),s2(g.getVertNo()),stmp(g.getVertNo());
+
         typename Graph::PVertex i,j;
-        s+=u;s+=v;
+        //snew+=u;snew+=v;
+        snew[u]=snew[v]=true;
         do {
-            for(i=s.first();i!=s.last();i=s.next(i)) for(j=s.next(i);!s.isBad(j);j=s.next(j))
-                snew+=(g.getNeighSet(i,EdUndir)^g.getNeighSet(j,EdUndir))-s;
-            if (snew.empty()) break;
-            s+=snew;
+//            std::cout<< "Breakpoin 1\n";
+//            for(i=s.first();!s.isBad(i);i=s.next(i))
+            for(i=s.firstKey();i;i=s.nextKey(i))
+            {
+//            for(j=snew.first();!snew.isBad(j);j=snew.next(j))
+                for(j=snew.firstKey();j;j=snew.nextKey(j))
+                {
+                stmp.clear();
+                for(typename Graph::PEdge e=g.getEdge(i,EdUndir);e;e=g.getEdgeNext(i,e,EdUndir))
+                stmp[g.getEdgeEnd(e,i)]=true;
+
+                for(typename Graph::PEdge e=g.getEdge(j,EdUndir);e;e=g.getEdgeNext(j,e,EdUndir))
+                if (stmp.hasKey(g.getEdgeEnd(e,j))) stmp.delKey(g.getEdgeEnd(e,j));
+                    else stmp[g.getEdgeEnd(e,j)]=true;
+
+                for(typename Graph::PVertex w=stmp.firstKey();w;w=stmp.nextKey(w)) s2[w]=true;
+//                    s2+=(g.getNeighSet(i,EdUndir)^g.getNeighSet(j,EdUndir));
+                }
+            }
+//            std::cout<< "Breakpoin 2\n";
+//            for(i=snew.first();i!=snew.last();i=snew.next(i)) for(j=snew.next(i);!snew.isBad(j);j=snew.next(j))
+            for(i=snew.firstKey();i!=snew.lastKey();i=snew.nextKey(i))
+            {
+//            for(j=snew.first();!snew.isBad(j);j=snew.next(j))
+                for(j=snew.nextKey(i);j;j=snew.nextKey(j))
+                {
+                stmp.clear();
+                for(typename Graph::PEdge e=g.getEdge(i,EdUndir);e;e=g.getEdgeNext(i,e,EdUndir))
+                stmp[g.getEdgeEnd(e,i)]=true;
+
+                for(typename Graph::PEdge e=g.getEdge(j,EdUndir);e;e=g.getEdgeNext(j,e,EdUndir))
+                if (stmp.hasKey(g.getEdgeEnd(e,j))) stmp.delKey(g.getEdgeEnd(e,j));
+                    else stmp[g.getEdgeEnd(e,j)]=true;
+
+                for(typename Graph::PVertex w=stmp.firstKey();w;w=stmp.nextKey(w)) s2[w]=true;
+//                    s2+=(g.getNeighSet(i,EdUndir)^g.getNeighSet(j,EdUndir));
+                }
+            }
+//                s2+=(g.getNeighSet(i,EdUndir)^g.getNeighSet(j,EdUndir));
+//            std::cout<< "Breakpoin 3\n";
+//            snew=s2-(s=s+snew);
+            for(typename Graph::PVertex w=snew.firstKey();w;w=snew.nextKey(w)) s[w]=true;
+//            std::cout<< "Breakpoin 4\n";
             snew.clear();
+            for(typename Graph::PVertex w=s2.firstKey();w;w=s2.nextKey(w)) if(!s.hasKey(w)) snew[w]=true;
+//            std::cout<< "Breakpoin 5\n";
+            if (snew.empty()) break;
+            s2.clear();
         } while(1);
-        return s;
+        return s.size();
     }
 
-    template<class Graph>
-    static Set<typename Graph::PVertex> strong(const Graph& g, typename Graph::PVertex u)
+    template<class Graph,class AssocCont>
+    static Set<typename Graph::PVertex> strong(const Graph& g, typename Graph::PVertex u,AssocCont& pomin)
     {
         Set<typename Graph::PVertex> s;
         s+=u;
         for(typename Graph::PVertex i=g.getVert();i;i=g.getVertNext(i))
-            if (i!=u && minModule(g,u,i).size()<g.getVertNo()) s+=i;
+            if (i!=u
+                && !pomin.hasKey(i)
+                && minModule(g,u,i)<g.getVertNo()) s+=i;
         return s;
     }
 
@@ -2027,11 +2078,12 @@ class ModulesPar : public SearchStructs {
     // znajduje rozbicie grafu na maksymalne silne moduly
     template< class GraphType, class CompIter, class VertIter, class CompMap >
         static Partition split(
-            const GraphType &g, // badany graf
+            const GraphType &g, // badany graf, powinien byc prosty
             CompStore< CompIter,VertIter > out, // iteratory wyjsciowe z zawartoscia analogiczna jak w getComponents
             // tyle ze chodzi o rozbicie na moduly, a nie skladowe spojnosci
-            CompMap & avmap) // wyjsciowa tablica asocjacyjna PVertex->int do ktorej zapisuje sie numery modulow,
-            //do ktorych naleza wierzcholki
+            CompMap & avmap, // wyjsciowa tablica asocjacyjna PVertex->int do ktorej zapisuje sie numery modulow,
+            //do ktorych naleza wierzcholki (lub BlackHole)
+            bool skipifprime=false) // pomija badanie modulow jesli wynik ma type=mpPrime
     {
 
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
@@ -2046,18 +2098,18 @@ class ModulesPar : public SearchStructs {
         {   vmap[g.getVert()]=0;
             *out.compIter=0;++out.compIter;*out.compIter=1;++out.compIter;
             *out.vertIter=g.getVert();++out.vertIter;
-            return Partition(1,mTrivial);
+            return Partition(1,mpTrivial);
         }
         typename GraphType::PVertex LOCALARRAY(tabv,g.getVertNo());
         int LOCALARRAY(tabc,g.getVertNo()+1);
-        int compno=BFSPar<DefaultStructs>::getComponents(g,compStore(tabc,tabv),EdUndir);
+        int compno=BFSPar<DefaultStructs>::split(g,compStore(tabc,tabv),EdUndir);
         if (compno>1)
         {   for(int i=0;i<=compno;i++) { *out.compIter=tabc[i];++out.compIter;}
             for(int i=0;i<compno;i++) for(int j=tabc[i];j<tabc[i+1];j++)
             {   *out.vertIter=tabv[j];++out.vertIter;
                 vmap[tabv[j]]=i;
             }
-            return Partition(compno,mDisconnected);
+            return Partition(compno,mpDisconnected);
         }
 
         typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
@@ -2069,15 +2121,17 @@ class ModulesPar : public SearchStructs {
         for(typename ImageGraph::PVertex v=neg.getVert();v!=neg.getVertLast();v=neg.getVertNext(v))
             for(typename ImageGraph::PVertex u=neg.getVertNext(v);u;u=neg.getVertNext(u))
                 if (!g.getEdge(v->info,u->info,EdUndir)) neg.addEdge(v,u);
-        compno=BFSPar<DefaultStructs>::getComponents(neg,compStore(tabc,tabvneg),EdUndir);
+        compno=BFSPar<DefaultStructs>::split(neg,compStore(tabc,tabvneg),EdUndir);
         if (compno>1)
         {   for(int i=0;i<=compno;i++) { *out.compIter=tabc[i];++out.compIter;}
             for(int i=0;i<compno;i++) for(int j=tabc[i];j<tabc[i+1];j++)
             {   *out.vertIter=tabvneg[j]->info;++out.vertIter;
                 vmap[tabvneg[j]->info]=i;
             }
-            return Partition(compno,mConnected);
+            return Partition(compno,mpConnected);
         }
+
+        if(skipifprime) return Partition(0,mpPrime);
 
         vmap.clear();
         Set<typename GraphType::PVertex> module;
@@ -2086,7 +2140,7 @@ class ModulesPar : public SearchStructs {
         compno=0;
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
         if (!vmap.hasKey(v))
-        {   module=strong(g,v);
+        {   module=strong(g,v,vmap);
             for(typename GraphType::PVertex u=module.first();!module.isBad(u);u=module.next(u))
             {
                 vmap[u]=compno; *out.vertIter=u;++out.vertIter;
@@ -2095,7 +2149,7 @@ class ModulesPar : public SearchStructs {
             *out.compIter=pos;++out.compIter;
             ++compno;
         }
-        return Partition(compno,mPrime);
+        return Partition(compno,mpPrime);
     }
 
 };

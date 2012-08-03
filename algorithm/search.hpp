@@ -362,7 +362,7 @@ int GraphSearchBase< SearchImpl, DefaultStructs >::getPath(
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer,
     class CompIter, class VertIter >
-int GraphSearchBase< SearchImpl, DefaultStructs >::getComponents(
+int GraphSearchBase< SearchImpl, DefaultStructs >::split(
     const GraphType &g, CompStore< CompIter,VertIter > iters, EdgeDirection mask,
     VertContainer &cont )
 {
@@ -375,11 +375,11 @@ int GraphSearchBase< SearchImpl, DefaultStructs >::getComponents(
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class CompIter,
     class VertIter >
-int GraphSearchBase< SearchImpl, DefaultStructs >::getComponents(
+int GraphSearchBase< SearchImpl, DefaultStructs >::split(
     const GraphType &g, CompStore< CompIter,VertIter > iters, EdgeDirection mask )
 {
     VisitedMap< GraphType > cont(g.getVertNo());
-    return getComponents( g,iters,mask,cont );
+    return split( g,iters,mask,cont );
 }
 
 template< class GraphType, class VertContainer, class Visitor >
@@ -697,7 +697,7 @@ bool SCCPar <DefaultStructs >::SCCVisitor< GraphType,CompIter,VertIter,CompMap >
 
 template <class DefaultStructs >
 template< class GraphType, class CompIter, class VertIter, class CompMap >
-int SCCPar <DefaultStructs >::get(
+int SCCPar <DefaultStructs >::split(
     const GraphType &g, CompStore< CompIter,VertIter > out, CompMap &compMap )
 {
     int rv;
