@@ -82,7 +82,7 @@ int main() {
     searchTest2();
 
     std::cout<<std::endl;
-    int compno=Koala::SCC::get(g,Koala::SearchStructs::compStore(comptab[0],tabV),vertCont);
+    int compno=Koala::SCC::split(g,Koala::SearchStructs::compStore(comptab[0],tabV),vertCont);
     std::cout << compno<<endl;
     for(int i=0;i<=compno;i++) cout << comptab[0][i] << ' '; cout << endl;
     cout << endl;
@@ -96,7 +96,7 @@ int main() {
     int cc=Koala::SCC::connections(g,vertCont,conns);
     cout << cc << '\n';
     for(int i=0;i<cc;i++) cout << '(' << conns[i].first << ',' << conns[i].second << ") ";
-    cout << "\n-------------\n" << Koala::SCC::get(g,Koala::SearchStructs::compStore(comptab[1],tabV2),blackHole) << endl;
+    cout << "\n-------------\n" << Koala::SCC::split(g,Koala::SearchStructs::compStore(comptab[1],tabV2),blackHole) << endl;
     for(int i=0;i<=compno;i++) cout << comptab[1][i] << ' '; cout << endl;
 //    int res;
 //    searchTest();

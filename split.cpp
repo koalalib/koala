@@ -12,20 +12,20 @@ using namespace std;
 using namespace Koala;
 using namespace Koala::IO;
 
-const char* print(Modules::PartitionType x)
+const char* print(ModPartType x)
 {
     switch (x) {
-        case Modules::mTrivial : return "Trivial";
-        case Modules::mConnected : return "Connected";
-        case Modules::mDisconnected : return "Disconnected";
-        case Modules::mPrime : return "Prime";
+        case mpTrivial : return "Trivial";
+        case mpConnected : return "Connected";
+        case mpDisconnected : return "Disconnected";
+        case mpPrime : return "Prime";
     };
     assert(0);
 }
 
 int main() {
 	Graph<char> gk3;
-	Graph<char>::PVertex F,G,H;
+	Graph<char>::PVertex tabV[20],F,G,H;
 	F=gk3.addVert('F');G=gk3.addVert('G');H=gk3.addVert('H');
 	gk3.addEdge(F,G); gk3.addEdge(F,H);gk3.addEdge(H,G);
 
@@ -46,21 +46,22 @@ int main() {
 	A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');//E=g.addVert('E');
 	g.addEdge(B,D);
 	g.addEdge(A,B);
-	g.addEdge(C,A);
+	g.addEdge(C,A);g.addEdge(C,D);
 
 
-	g.substitute(A,gp4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
-	g.substitute(C,gn4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
+//	g.substitute(A,gp4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
+    g.substitute(C,gk3,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
+	g.substitute(A,gn4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
 	g.substitute(B,gn4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
 	g.substitute(D,gk3,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
-	g.addVert();g.addEdge(g.getVert(),g.getVertLast());
+	g.addVert('X');//g.addEdge(g.getVert(),g.getVertLast());
 
 //	g.addEdge(C,D);
 
 	SearchStructs::CompStoreTool<Graph<char>::PVertex> tool;
 	AssocTable<std::map<Graph<char>::PVertex,int> > vertTab;
 
-    cout << "\n\n" << boolalpha << IsIt::prime(gk3);
+    cout << "\n\n" << boolalpha << print(Modules::split(gk3,tool.input(),vertTab).type) << endl;
 
 	Modules::Partition res=Modules::split(g,tool.input(),vertTab);
 
@@ -74,7 +75,12 @@ int main() {
         for(int j=0;j<tool.size(i);j++) cout << ' ' << tool[i][j]->info;
     }
 
-    cout << "\n\n" << boolalpha << IsIt::prime(gp4);
+    //gk3.substitute(gk3.getVertLast(),gp4);
+
+    cout << "\n\n" << boolalpha << IsIt::cograph(g);
+    int q=IsIt::Cograph::maxStable(g,tabV);
+    for(int i=0;i<q;i++) cout << tabV[i]->info << ' ';
+
 
 
 //    writeGraphText(g, cout, RG_VertexLists|RG_VInfo);

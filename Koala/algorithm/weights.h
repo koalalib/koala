@@ -342,7 +342,9 @@ class DAGCritPathPar : public ShortPathStructs {
             DistType length;
         };
 
-        template <class T> ValType operator[](T e) const { ValType res; res.length=(DType)1; return res; }
+        template <class T> ValType operator[](T e) const
+        { ValType res; res.length=DefaultStructs:: template NumberTypeBounds<DType>::one();
+        return res; }
     };
 
 
@@ -722,7 +724,10 @@ class FloydPar : public PathStructs {
             DistType length;
         };
 
-        template <class T> ValType operator[](T e) const { ValType res; res.length=(DType)1; return res; }
+        template <class T> ValType operator[](T e) const
+        { ValType res; res.length=DefaultStructs:: template NumberTypeBounds<DType>::one();
+        return res; }
+
     };
 
 

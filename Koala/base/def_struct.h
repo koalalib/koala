@@ -67,35 +67,19 @@ class AlgsDefaultSettings {
     template <class A, class B> class AssocCont {
         public:
         typedef AssocArray<A,B> Type;
-// TODO: nie usuwac komentarzy (przykladowe uzycia)
+// TODO: nie usuwac komentarzy (przykladowa uzycia)
 //        typedef AssocTable < BiDiHashMap<A,B> > Type;
 //            typedef PseudoAssocArray<A,B,AssocTable<std::map<A,int> > > Type;
 
     };
 
-    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B. Kluczami sa pary uporzadkowane o roznych elementach
-    template <class A, class B> class TwoDimNoDiagAssocCont {
+    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B.
+    // Kluczami sa pary uporzadkowane lub nieuporzadkowane por. assoctab.h
+    template <class A, class B, AssocMatrixType type> class TwoDimAssocCont {
         public:
-        typedef AssocMatrix<A,B,AMatrNoDiag> Type;
-    };
-
-    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B. Kluczami sa dowolne pary uporzadkowane
-    template <class A, class B> class TwoDimFullAssocCont {
-        public:
-        typedef AssocMatrix<A,B,AMatrFull> Type;
-    };
-
-
-    // j.w. dla kluczy - par nieuporzadkowanych
-    template <class A, class B> class TwoDimTriangleAssocCont {
-        public:
-        typedef AssocMatrix<A,B,AMatrTriangle> Type;
-    };
-
-    // typ 2-wymiarowej tablicy assoc. o kluczu A i wartosci B. Kluczami sa dowolne pary uporzadkowane
-    template <class A, class B> class TwoDimClTriangleAssocCont {
-        public:
-        typedef AssocMatrix<A,B,AMatrClTriangle> Type;
+        typedef AssocMatrix<A,B,type> Type;
+   // TODO: nie usuwac komentarza (przykladowe uzycia)
+    //        typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
     };
 
     // typ grafu pomocniczego stosowanego wewnatrz procedury
@@ -118,6 +102,7 @@ class AlgsDefaultSettings {
         static T minusInfty() { return std::numeric_limits<T>::min(); }
         static bool isMinusInfty(T arg) {return arg==minusInfty(); }
         static T zero() { return (T)0; }
+        static T one() { return (T)1; }
         static bool isZero(T arg) {return arg==zero(); }
     };
 

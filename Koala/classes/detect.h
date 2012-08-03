@@ -3,7 +3,9 @@
 
 #include "..\container\simple.h"
 #include "..\graph\graph.h"
+#include "..\graph\view.h"
 #include "..\algorithm\search.h"
+#include "..\algorithm\factor.h"
 #include "..\container\joinsets.h"
 
 
@@ -72,7 +74,7 @@ class IsItPar : public SearchStructs {
 	static bool cliques(const GraphType& g)
 	{   if (!undir(g,false)) return false;
 	    int LOCALARRAY(comptab,g.getVertNo()+1);
-	    int e=0,comp=BFSPar<DefaultStructs>::getComponents(g,SearchStructs::compStore(comptab,blackHole),EdUndir);
+	    int e=0,comp=BFSPar<DefaultStructs>::split(g,SearchStructs::compStore(comptab,blackHole),EdUndir);
         for(int i=1;i<=comp;i++) e+=(comptab[i]-comptab[i-1])*(comptab[i]-comptab[i-1]-1)/2;
 	    return e==g.getEdgeNo();
 	}
@@ -108,7 +110,7 @@ class IsItPar : public SearchStructs {
 
         // Konce podanej sciezki, (NULL,NULL) w razie bledu
         template <class GraphType>
-        static std::pair<typename GraphType::PVertex,typename GraphType::PVertex> getEnds(const GraphType& g)
+        static std::pair<typename GraphType::PVertex,typename GraphType::PVertex> ends(const GraphType& g)
         {   std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
                     null=std::make_pair(typename GraphType::PVertex(0),typename GraphType::PVertex(0)),
                     res=null;
@@ -132,7 +134,7 @@ class IsItPar : public SearchStructs {
     template <class GraphType>
 	static bool path(const GraphType& g)
 	{
-	    return Path::getEnds(g).first;
+	    return Path::ends(g).first;
 	}
 
     class Caterpillar {
@@ -140,11 +142,11 @@ class IsItPar : public SearchStructs {
 
         // Konce grzbietu gasienicy, (NULL,NULL) w razie bledu
         template <class GraphType>
-        static std::pair<typename GraphType::PVertex,typename GraphType::PVertex> getSpineEnds(const GraphType& g)
+        static std::pair<typename GraphType::PVertex,typename GraphType::PVertex> spineEnds(const GraphType& g)
         {   std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
                     null=std::make_pair(typename GraphType::PVertex(0),typename GraphType::PVertex(0));
             if (!connected(g,false)) return null;
-            return Path::getEnds(makeSubgraph(g,std::make_pair(
+            return Path::ends(makeSubgraph(g,std::make_pair(
                                         notChoose(orChoose(vertDegChoose(0, EdUndir),vertDegChoose(1, EdUndir))),
                                         stdChoose(true))));
         }
@@ -154,7 +156,7 @@ class IsItPar : public SearchStructs {
     template <class GraphType>
 	static bool caterpillar(const GraphType& g)
 	{
-	    return Caterpillar::getSpineEnds(g).first;
+	    return Caterpillar::spineEnds(g).first;
 	}
 
     // cykl,
@@ -231,7 +233,98 @@ class IsItPar : public SearchStructs {
             return licz;
         }
 
-        // TODO: rozwazyc static int maxStable(const Graph &g, Iter out)
+        template <class GraphType,class Iter>
+        // znajduje najwiekszy zbior niezalezny, zwraca jego rozmiar
+        static int maxStable(const GraphType &g, Iter out)
+        {   Set<typename GraphType::PVertex> res;
+            minVertCover(g,setInserter(res));
+            res=g.getVertSet()-res;
+            res.getElements(out);
+            return res.size();
+        }
+
+        template <class GraphType,class Iter>
+        // znajduje najwiekszy zbior niezalezny, zwraca jego rozmiar
+        static int minVertCover(const GraphType &g, Iter out)
+        {	    typename DefaultStructs:: template AssocCont<
+            typename GraphType::PVertex, Koala::Matching::VertLabs<GraphType >
+                >::Type vertTab(g.getVertNo());
+
+            typename DefaultStructs:: template AssocCont<
+            typename GraphType::PEdge, bool>::Type matching(g.getVertNo()/2);
+
+            Set<typename GraphType::PVertex> setL,setR;
+            getPart(g,setInserter(setL),true);setR=g.getVertSet()-setL;
+            int matchno=MatchingPar<DefaultStructs>::find(g,vertTab,assocInserter(matching,constFun(true)));
+
+            Set<typename GraphType::PVertex> setT,setnew;
+
+            //do zbioru setT dodajemy wszystkie wierzcholki wolne z setL
+            for (typename GraphType::PVertex it=setL.first(); it; it=setL.next(it))
+            {
+                if (vertTab[it].vMatch == 0)
+                    setT +=(it);
+            }
+
+            //dla kazdego wierzcholka wolnego z setL, dodajemy do setT, jego sasiadow z setR oraz wierzcholki skojarzone z tymi sasiadami
+//            for (typename Set<typename GraphType::PVertex>::iterator itT=setT.begin(); itT!=setT.end(); ++itT)
+//                for (typename Set<typename GraphType::PVertex>::iterator itR=vertTabNeights[*itT].begin(); itR!=vertTabNeights[*itT].end(); ++itR)
+//                    if (vertTab[*itT].vMatch != *itR)
+//                    {
+//                        setT.insert(*itR);
+//                        for (typename Set<typename GraphType::PVertex>::iterator itL=vertTabNeights[*itR].begin(); itL!=vertTabNeights[*itR].end(); ++itL)
+//                            if (vertTab[*itR].vMatch == *itL)
+//                                setT.insert(*itL);
+//                    }
+            while(1)
+            {
+                setnew.clear();
+                for (typename GraphType::PVertex itT=setT.first(); itT; itT=setT.next(itT))
+                for (typename GraphType::PEdge e=g.getEdge(itT,EdUndir);e;e=g.getEdgeNext(itT,e,EdUndir))
+                if (!matching.hasKey(e))
+                {   typename GraphType::PVertex itR=g.getEdgeEnd(e,itT);
+                    setnew+=itR;
+    //                for (typename GraphType::PVertex itR=vertTabNeights[itT].first(); itR; itR=vertTabNeights[itT].next(itR))
+                    for (typename GraphType::PEdge f=g.getEdge(itR,EdUndir);f;f=g.getEdgeNext(itR,f,EdUndir))
+                    if (matching.hasKey(f)) setnew+=g.getEdgeEnd(f,itR);
+                }
+                if (setnew.subsetOf(setT)) break;
+                setT+=setnew;
+            }
+
+//            std::cout <<"\nBreakpoint:"<<setT.size();
+//            setT = (setL ^ setT); //w setT znajduja sie teraz wierzcholki nalezace do pokrycia wierzcholkowego
+             setT = (setL ^ setT);
+//             std::cout <<"\nBreakpoint:"<<setT.size();
+
+            //wpisanie wyniku w strumien wyjsciowy wierzcholkow
+            if (!isBlackHole(out))
+            {
+                for (typename GraphType::PVertex it=setT.first(); it; it=setT.next(it))
+                {
+                    *out = it; ++out;
+                }
+            }
+            return setT.size();
+        }
+
+        protected:
+
+    template <class GraphType>
+    static void
+        splitVert (
+            const GraphType & g,
+            Set<typename GraphType::PVertex> &setV1,
+            Set<typename GraphType::PVertex> &setV2)
+        {
+            typename DefaultStructs:: template AssocCont<
+                    typename GraphType::PVertex, SearchStructs::VisitVertLabs<GraphType > >
+                            ::Type vertCont(g.getVertNo());
+            BFSPar<DefaultStructs>::scan(g,blackHole,EdUndir,vertCont);
+            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+                if ((vertCont[v].distance&1)==0) setV1+=v; else setV2+=v;
+        }
+
     };
 
 
@@ -269,7 +362,7 @@ class IsItPar : public SearchStructs {
 
         template <class GraphType, class Iter,class VIter>
         // wyrzuca na out ciagi wierzcholkow tworzacych partycje grafu pelnego M-dzielnego. Zwraca liczbe partycji M lub -1 w razie bledu
-        static int getParts(const GraphType& g,CompStore< Iter,VIter > out)
+        static int split(const GraphType& g,CompStore< Iter,VIter > out)
         {
             if (!undir(g,false)) return -1;
             typename DefaultStructs:: template AssocCont<
@@ -308,7 +401,7 @@ class IsItPar : public SearchStructs {
     template <class GraphType>
 	static bool compMPartite(const GraphType& g)
 	{
-	    return CompMPartite::getParts(g,compStore(blackHole,blackHole))!=-1;
+	    return CompMPartite::split(g,compStore(blackHole,blackHole))!=-1;
 	}
 
 /* M. Habib, R. McConnel, C. Paul, L.Viennot
@@ -591,7 +684,12 @@ class IsItPar : public SearchStructs {
 	static bool cochordal(const GraphType& g)
 	{
 	    if (!undir(g,true) || g.getEdgeNo(Loop)>0) return false;
-        typename DefaultStructs::template LocalGraph<char,char,Undirected,true >:: Type cg;
+	    typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,char,Undirected,true >:: Type ImageGraph;
+        ImageGraph cg;
+        for(typename GraphType::PVertex u=g.getVert();u;u=g.getVertNext(u)) cg.addVert(u);
+        for(typename ImageGraph::PVertex u=cg.getVert();u!=cg.getVertLast();u=cg.getVertNext(u))
+            for(typename ImageGraph::PVertex v=cg.getVertNext(u);v;v=cg.getVertNext(v))
+                if (!g.getEdge(u->info,v->info,EdUndir)) cg.addEdge(u,v,EdUndir);
 
 //	    typename DefaultStructs::LocalGraph::Type cg;
 //	    typename DefaultStructs:: template TwoDimTriangleAssocCont<
@@ -606,7 +704,7 @@ class IsItPar : public SearchStructs {
 //            for(typename GraphType::PVertex u=g.getVertNext(v);u;u=g.getVertNext(u))
 //                if (!matr(u,v)) cg.addEdge(vmap[v],vmap[u]);
 
-	    cg.copy(g);cg.neg(Undirected);
+//	    cg.copy(g);cg.neg(Undirected);
 	    return chordal(cg);
 	}
 
@@ -1459,7 +1557,131 @@ class IsItPar : public SearchStructs {
         if (g.getVertNo()<4) return false;
 	    typename ModulesPar<DefaultStructs>::Partition res=
             ModulesPar<DefaultStructs>::split(g,compStore(blackHole,blackHole),blackHole);
-        return (res.type==ModulesPar<DefaultStructs>::mPrime) && (res.size==g.getVertNo());
+        return (res.type==mpPrime) && (res.size==g.getVertNo());
+	}
+
+
+	class Cograph {
+	     template <class Defs> friend class IsItPar;
+
+        public:
+
+        template<class GraphType, class VIterOut>
+        static int maxClique(const GraphType &g,VIterOut out)
+        {     typename DefaultStructs:: template AssocCont<
+            typename GraphType::PVertex, bool >::Type subset(g.getVertNo());
+            for(typename GraphType::PVertex u=g.getVert();u;u=g.getVertNext(u)) subset[u];
+            Set<typename GraphType::PVertex> res=maxClique2(g,subset);
+            for(typename GraphType::PVertex u=res.first();u;u=res.next(u))
+            { *out=u; ++out; }
+            return res.size();
+        }
+
+        template<class GraphType, class VIterOut>
+        static int maxStable(const GraphType &g,VIterOut out)
+        {     typename DefaultStructs:: template AssocCont<
+            typename GraphType::PVertex, bool >::Type subset(g.getVertNo());
+            for(typename GraphType::PVertex u=g.getVert();u;u=g.getVertNext(u)) subset[u];
+            Set<typename GraphType::PVertex> res=maxStable2(g,subset);
+            for(typename GraphType::PVertex u=res.first();u;u=res.next(u))
+            { *out=u; ++out; }
+            return res.size();
+        }
+
+        template <class GraphType,class Iter>
+        // znajduje najwiekszy zbior niezalezny, zwraca jego rozmiar
+        static int minVertCover(const GraphType &g, Iter out)
+        {   Set<typename GraphType::PVertex> res;
+            maxStable(g,setInserter(res));
+            res=g.getVertSet()-res;
+            res.getElements(out);
+            return res.size();
+        }
+
+
+//        TODO: template<class Graph, class AssocTab>
+//        static int color(const Graph &g,AssocTab out);
+
+        protected:
+
+        template <class GraphType, class Assoc>
+        static bool cograph(const GraphType& ag,Assoc& subset)
+        {   Subgraph<GraphType, AssocHasChooser<Assoc*>, BoolChooser>
+                g=makeSubgraph(ag,std::make_pair(extAssocKeyChoose(&subset),stdChoose(true)));
+            int n;
+            if ((n=g.getVertNo())==1) return true;
+            typename GraphType::PVertex LOCALARRAY(tabv,n);
+            int LOCALARRAY(tabc,n+1);
+            typename ModulesPar<DefaultStructs>::Partition parts=ModulesPar<DefaultStructs>::split(g,compStore(tabc,tabv),blackHole,true);
+            if (parts.type==mpPrime) return false;
+            for(int i=0;i<parts.size;i++)
+            {   subset.clear();
+                for(int j=tabc[i];j<tabc[i+1];j++) subset[tabv[j]];
+                if (!cograph(ag,subset)) return false;
+            }
+            return true;
+        }
+
+        template <class GraphType, class Assoc>
+        static Set<typename GraphType::PVertex> maxClique2(const GraphType& ag,Assoc& subset)
+        {   Subgraph<GraphType, AssocHasChooser<Assoc*>, BoolChooser>
+                g=makeSubgraph(ag,std::make_pair(extAssocKeyChoose(&subset),stdChoose(true)));
+            int n;
+            if ((n=g.getVertNo())==1) return g.getVertSet();
+            Set<typename GraphType::PVertex> res,tmp;
+            typename GraphType::PVertex LOCALARRAY(tabv,n);
+            int LOCALARRAY(tabc,n+1);
+            typename ModulesPar<DefaultStructs>::Partition parts=ModulesPar<DefaultStructs>::split(g,compStore(tabc,tabv),blackHole,true);
+            assert(parts.type!=mpPrime);// TODO: throw
+            for(int i=0;i<parts.size;i++)
+            {   subset.clear();
+                for(int j=tabc[i];j<tabc[i+1];j++) subset[tabv[j]];
+                tmp=maxClique2(ag,subset);
+                if (parts.type==mpConnected) res+=tmp;
+                else if (tmp.size()>res.size()) res=tmp;
+            }
+            return res;
+        }
+
+
+        template <class GraphType, class Assoc>
+        static Set<typename GraphType::PVertex> maxStable2(const GraphType& ag,Assoc& subset)
+        {   Subgraph<GraphType, AssocHasChooser<Assoc*>, BoolChooser>
+                g=makeSubgraph(ag,std::make_pair(extAssocKeyChoose(&subset),stdChoose(true)));
+            int n;
+            if ((n=g.getVertNo())==1) return g.getVertSet();
+            Set<typename GraphType::PVertex> res,tmp;
+            typename GraphType::PVertex LOCALARRAY(tabv,n);
+            int LOCALARRAY(tabc,n+1);
+            typename ModulesPar<DefaultStructs>::Partition parts=ModulesPar<DefaultStructs>::split(g,compStore(tabc,tabv),blackHole,true);
+            assert(parts.type!=mpPrime);// TODO: throw
+            for(int i=0;i<parts.size;i++)
+            {   subset.clear();
+                for(int j=tabc[i];j<tabc[i+1];j++) subset[tabv[j]];
+                tmp=maxStable2(ag,subset);
+                if (parts.type==mpDisconnected) res+=tmp;
+                else if (tmp.size()>res.size()) res=tmp;
+            }
+            return res;
+        }
+
+
+	};
+
+
+    public:
+
+
+    // czy cograph
+    template <class GraphType>
+	static bool cograph(const GraphType& g)
+	{   if (!undir(g,false)) return false;
+        typename DefaultStructs:: template AssocCont<
+            typename GraphType::PVertex, bool >::Type subset(g.getVertNo());
+        for(typename GraphType::PVertex u=g.getVert();u;u=g.getVertNext(u)) subset[u];
+        	    typename ModulesPar<DefaultStructs>::Partition res=
+            ModulesPar<DefaultStructs>::split(g,compStore(blackHole,blackHole),blackHole);
+        return Cograph::cograph(g,subset);
 	}
 
 };

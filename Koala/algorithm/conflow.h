@@ -56,7 +56,8 @@ class FlowPar : public PathStructs {
     // j.w. ale nadaje domyslne jednostkowe przepustowosci i koszty
     template <class DType, class CType=DType> struct UnitEdgeLabs : public EdgeLabs<DType,CType> {
 
-        UnitEdgeLabs(DType arg=(DType)1, CType arg2=(CType)1) : EdgeLabs<DType,CType>(arg,arg2)
+        UnitEdgeLabs(DType arg=DefaultStructs:: template NumberTypeBounds<DType>::one(),
+                     CType arg2=DefaultStructs:: template NumberTypeBounds<CType>::one()) : EdgeLabs<DType,CType>(arg,arg2)
             {}
     };
 
@@ -1351,7 +1352,7 @@ class FlowPar : public PathStructs {
 
     // znajduje drzewo Gomory-Hu grafu
     template <class GraphType, class EdgeContainer, class IterOut>
-    static void getGHTree(GraphType & g, // badany graf nieskierowany
+    static void findGHTree(GraphType & g, // badany graf nieskierowany
                           EdgeContainer& edgeTab, // tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac (wymagane nieujemne)
                 IterOut out) // iterator wyjsciowy, na ktory wyrzucamy struktury GHTreeEdge "krawedzi" drzewa
     {   assert(g.getVertNo()>1); // TODO: throw

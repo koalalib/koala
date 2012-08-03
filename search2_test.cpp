@@ -189,7 +189,7 @@ int main() {
     Koala::SearchStructs::CompStoreTool<Koala::Graph<OpisV,OpisE>::PVertex> vec;
 
     std::cout << vec.size() << std::endl;
-    std::cout<<"\n"<<Koala::SCC::get(g,vec.input(),blackHole) << "\n\n";
+    std::cout<<"\n"<<Koala::SCC::split(g,vec.input(),blackHole) << "\n\n";
     for(int i=0;i<vec.size();i++)
     {
         for(int j=0;j<vec.size(i);j++) cout << vec[i][j]->info.name << " ";

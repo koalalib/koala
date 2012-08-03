@@ -95,7 +95,7 @@ int main() {
 
     std::cout<< std::endl;
     dijTest();
-    std::cout<< "Odleglosc: "<< Koala::DAGCritPath::critPathLength(g,blackHole,edgeCont,U,V)<<":";
+    std::cout<< "Odleglosc: "<< Koala::DAGCritPath::critPathLength(g,blackHole,Koala::DAGCritPath::UnitLengthEdges<int>(),U,V)<<":";
 
     return 0;
 }
