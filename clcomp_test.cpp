@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<iostream>
 
 #include<utility>
 #include<iostream>
@@ -8,6 +9,7 @@
 #include"Koala/graph/graph.h"
 #include "Koala/io/text.h"
 #include "Koala/classes/detect.h"
+#include "Koala/classes/create.h"
 
 
 using namespace Koala;
@@ -116,5 +118,44 @@ int main() {
     cout << "\n" << out.size() << ' ' << out.size(0);
     cout  << ' ' << out.size(1);
 
+    cout <<"\n---------------------------\n";
+    {
+        Graph<char> g;
+        Graph<char>::PVertex A,B,C,D,E,F,G,H,I,J,K,L,tabV[20];
+
+        A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');
+        E=g.addVert('E');
+        F=g.addVert('F');G=g.addVert('G');H=g.addVert('H');I=g.addVert('I');
+        g.addArch(A,B);
+        g.addArch(B,C);g.addArch(D,F);
+        g.addArch(B,E);
+        g.addArch(G,F);g.addArch(F,I);
+
+//        g.addArch(E,F);g.addArch(D,F);
+//        g.addArch(H,J);g.addArch(I,J);
+//        g.addArch(F,L);g.addArch(J,K);
+//        g.del(A);g.del(L);g.del(K);g.del(G);g.del(H);g.del(I);g.del(J);
+        RelDiagram::transClousure(g);
+        g.ch2Undir();
+        writeGraphText(g, cout, RG_VertexLists|RG_VInfo);
+//
+//        g.del(D);
+        int res;
+        cout << (res=IsIt::Comparability::minVertCover(g,tabV))<<endl;
+        for(int i=0;i<res ;i++) cout << tabV[i]->info << ' ';
+
+    }
+
 	return 0;
 	};
+
+
+//       Graph<char> g;
+//        Graph<char>::PVertex A,B,C,D,E,F,G,H,I,J,K,L;
+//        A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');E=g.addVert('E');
+//        g.addArch(A,B);
+//        g.addArch(B,C);
+//        g.addArch(C,E);
+//        RelDiagram::transClousure(g);
+//        g.ch2Undir();
+//        cout << IsIt::comparability(g);

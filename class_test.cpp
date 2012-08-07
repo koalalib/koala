@@ -18,7 +18,7 @@ int main() {
 
 	bool rv;
 	Graph<int, int> g;
-	Graph<int, int>::PVertex v,u,w,y,u1,u2,u3,u4,u5,u6,u7,u8,u9,tabV[100];
+	Graph<int, int>::PVertex v,u,w,y,u1,u2,u3,u4,u5,u6,u7,u8,u9,tabV[100],tabV2[100];
 	AssocArray<Koala::Graph<int,int>::PEdge,int> edgeCont;
 	Koala::AssocArray<Koala::Graph<int,int>::PVertex,
             Koala::SearchStructs::VisitVertLabs<Koala::Graph<int,int> > > vertCont;
@@ -34,9 +34,9 @@ int main() {
     u4=g.addVert(4);
     u5=g.addVert(5);
     u6=g.addVert(6);
-//    u7=g.addVert(7);
-//    u8=g.addVert(8);
-//    u9=g.addVert(9);
+    u7=g.addVert(7);
+    u8=g.addVert(8);
+    u9=g.addVert(9);
 //
 //
 
@@ -66,10 +66,18 @@ int main() {
 //	g.addEdge(v,u);g.addEdge(u,w);//g.addEdge(v,w);
     //g.addEdge(u,y);
 
-
- g.addEdge(u1,u4);g.addEdge(u1,u6);
-    g.addEdge(u3,u4);g.addEdge(u5,u4);g.addEdge(u4,u6);
+//xxx
+    g.addEdge(u1,u4);
+    g.addEdge(u1,u6);
+    g.addEdge(u3,u4);g.addEdge(u5,u4);
+    g.addEdge(u4,u6);
     g.addEdge(u5,u6);
+    g.addEdge(u2,u7);g.addEdge(u7,u3);
+    g.addEdge(u1,u8);
+    g.addEdge(u2,u3);
+
+
+//        g.addEdge(u8,u9);
 
 //g.addEdge(u5,u1);g.addEdge(u5,u2);
 //g.addEdge(u4,u3);
@@ -94,7 +102,7 @@ int main() {
 //    g.addEdge(u8,u9);
 //    g.addEdge(u2,u9);g.addEdge(u8,u2);
 
-    cout << IsIt::cochordal(g) << "\n";
+    cout << IsIt::chordal(g) << "\n";
     IsIt::Chordal::getOrder(g,tabV);
     for(int i=0;i<g.getVertNo();i++) cout << tabV[i]->info;
 
@@ -104,22 +112,22 @@ int main() {
 
 
 
-//	Graph<int, int>::PVertex cq[128], cq2[128];
+	Graph<int, int>::PVertex cq[128], cq2[128];
 //	int ncq;
 //	if (IsIt::chordal(g))
-//	{ printf("Orders: \n"); IsIt::Chordal::getOrder(g, cq,cq2);
-//        for(int i = 0; i < g.getVertNo(); i++) cout << cq[i]->info;
-//        printf("\n");
-//        for(int i = 0; i < g.getVertNo(); i++) cout << cq2[i]->info;
-//        int cl=IsIt::Chordal::maxCliques(g,IsIt::compStore(comptab,tabV),tabpar);
-//        cout << endl << cl << endl;
-//        for(int i=0;i<cl;i++)
-//        { for(int j=comptab[i];j<comptab[i+1];j++) cout << tabV[j]->info;
-//          cout  << ' ';
-//        }
-//        cout << endl;
-//        for(int i=0;i<cl-1;i++) cout << tabpar[i].first << tabpar[i].second << ' ';
-//	}
+	{
+        int cl=IsIt::Chordal::maxCliques(g,IsIt::compStore(comptab,tabV),tabpar);
+        cout << endl << cl << endl;
+        for(int i=0;i<cl;i++)
+        { for(int j=comptab[i];j<comptab[i+1];j++) cout << tabV[j]->info;
+          cout  << ' ';
+        }
+        cout << endl;
+        for(int i=0;i<cl-1;i++) cout << tabpar[i].first << tabpar[i].second << ' ';
+        int res;
+        cout << endl << endl << (res=IsIt::Chordal::maxStable(g,tabV2))<< endl;
+        for(int i=0;i<res;i++) cout << tabV2[i]->info << ' ';
+	}
 
 
 

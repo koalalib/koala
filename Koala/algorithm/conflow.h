@@ -101,7 +101,7 @@ class FlowPar : public PathStructs {
     template <class DType> struct TrsVertLoss {
 
         typedef DType CapacType;  // typ liczbowy przepustowosci luku i objetosci przeplywu
-        CapacType hi,lo; // maksymalny i minimalny dopuszczalny przy danym wierzcholku laczny wyplyw
+        CapacType hi,lo; // maksymalny i minimalny dopuszczalny przy danym wierzcholku laczny wplyw
         //(dopuszczalne dodatnie i ujemne np. przeplyw to trans. z hi=lo=0 wszedzie poza zrodlem i ujsciem)
 
         TrsVertLoss(CapacType alo=DefaultStructs:: template NumberTypeBounds<CapacType>::zero(),
@@ -773,74 +773,74 @@ class FlowPar : public PathStructs {
     }
 
 
-//    template <class GraphType, class VertContainer, class EdgeContainer>
-//    static bool BellmanFordFlow (
-//        const GraphType & g,
-//        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
-//        VertContainer& vertTab,
-//        typename GraphType::PVertex start, typename GraphType::PVertex end)
-//    // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
-//    {   assert(start && end && start!=end);
-//        const typename EdgeContainer::ValType::CostType
-//                inf=DefaultStructs:: template NumberTypeBounds
-//                                        <typename EdgeContainer::ValType::CostType>::plusInfty();
-//        const typename EdgeContainer::ValType::CostType
-//                zero=DefaultStructs:: template NumberTypeBounds
-//                                        <typename EdgeContainer::ValType::CostType> ::zero();
-//        const EdgeDirection mask=Koala::EdUndir | Koala::EdDirIn | Koala::EdDirOut;
-//
-//        typename EdgeContainer::ValType::CostType nd;
-//        typename GraphType::PVertex U,V;
-//
-//        //inicjalizacja
-//        //for each v: d[v] <- INF (to jest zrealizowane juz przy tworzeniu vertTab)
-//        //f[s] <- NIL
-//        vertTab[start].vPrev=0;vertTab[start].ePrev=0;
-//        //d[s] <- 0
-//        vertTab[start].distance=zero;
-//
-//        //for 1 to n-1:
-//        //  for each (u,v):
-//        //      if  d[u]+w(u,v) < d[v]:
-//        //          d[v] <- d[u]+w(u,v) and vPrev[v] <- u and ePrev[v] <- (u,v)
-//        int n=g.getVertNo();
-//        for(int i=1;i<n;i++){
-//            //relaksacja krawedzi nieskierowanych
-//            for(typename GraphType::PEdge E=g.getEdge(mask); E; E=g.getEdgeNext(E, mask))
-//            {
-//                if (usedCapCost(g,edgeTab,E,U=g.getEdgeEnds(E).first)>
-//                    DefaultStructs:: template NumberTypeBounds
-//                                        <typename EdgeContainer::ValType::CapacType> ::zero()
-//                    && vertTab[U].distance < inf
-//                    && (nd=vertTab[U].distance+costFlow(g,edgeTab,E,U))<vertTab[V=g.getEdgeEnds(E).second].distance)
-//                    { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
-//                if (usedCapCost(g,edgeTab,E,U=g.getEdgeEnds(E).second)>
-//                    DefaultStructs:: template NumberTypeBounds
-//                                        <typename EdgeContainer::ValType::CapacType> ::zero()
-//                    && vertTab[U].distance < inf
-//                    && (nd=vertTab[U].distance+costFlow(g,edgeTab,E,U))<vertTab[V=g.getEdgeEnds(E).first].distance)
-//                    { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
-//            }
-//        }
-//
-//            for(typename GraphType::PEdge E=g.getEdge(mask); E; E=g.getEdgeNext(E, mask))
-//            {
-//                if (usedCapCost(g,edgeTab,E,U=g.getEdgeEnds(E).first)>
-//                    DefaultStructs:: template NumberTypeBounds
-//                                        <typename EdgeContainer::ValType::CapacType> ::zero()
-//                    && vertTab[U].distance < inf
-//                    && (nd=vertTab[U].distance+costFlow(g,edgeTab,E,U))<vertTab[V=g.getEdgeEnds(E).second].distance)
-//                        assert(0);
-//                if (usedCapCost(g,edgeTab,E,U=g.getEdgeEnds(E).second)>
-//                    DefaultStructs:: template NumberTypeBounds
-//                                        <typename EdgeContainer::ValType::CapacType> ::zero()
-//                    && vertTab[U].distance < inf
-//                    && (nd=vertTab[U].distance+costFlow(g,edgeTab,E,U))<vertTab[V=g.getEdgeEnds(E).first].distance)
-//                        assert(0);
-//            }
-//
-//        return vertTab[end].distance < inf;
-//    }
+    template <class GraphType, class VertContainer, class EdgeContainer>
+    static bool BellmanFordFlow (
+        const GraphType & g,
+        EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
+        VertContainer& vertTab,
+        typename GraphType::PVertex start, typename GraphType::PVertex end)
+    // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
+    {   assert(start && end && start!=end);
+        const typename EdgeContainer::ValType::CostType
+                inf=DefaultStructs:: template NumberTypeBounds
+                                        <typename EdgeContainer::ValType::CostType>::plusInfty();
+        const typename EdgeContainer::ValType::CostType
+                zero=DefaultStructs:: template NumberTypeBounds
+                                        <typename EdgeContainer::ValType::CostType> ::zero();
+        const EdgeDirection mask=Koala::EdUndir | Koala::EdDirIn | Koala::EdDirOut;
+
+        typename EdgeContainer::ValType::CostType nd;
+        typename GraphType::PVertex U,V;
+
+        //inicjalizacja
+        //for each v: d[v] <- INF (to jest zrealizowane juz przy tworzeniu vertTab)
+        //f[s] <- NIL
+        vertTab[start].vPrev=0;vertTab[start].ePrev=0;
+        //d[s] <- 0
+        vertTab[start].distance=zero;
+
+        //for 1 to n-1:
+        //  for each (u,v):
+        //      if  d[u]+w(u,v) < d[v]:
+        //          d[v] <- d[u]+w(u,v) and vPrev[v] <- u and ePrev[v] <- (u,v)
+        int n=g.getVertNo();
+        for(int i=1;i<n;i++){
+            //relaksacja krawedzi nieskierowanych
+            for(typename GraphType::PEdge E=g.getEdge(mask); E; E=g.getEdgeNext(E, mask))
+            {
+                if (usedCapCost(g,edgeTab,E,U=g.getEdgeEnds(E).first)>
+                    DefaultStructs:: template NumberTypeBounds
+                                        <typename EdgeContainer::ValType::CapacType> ::zero()
+                    && vertTab[U].distance < inf
+                    && (nd=vertTab[U].distance+costFlow(g,edgeTab,E,U))<vertTab[V=g.getEdgeEnds(E).second].distance)
+                    { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
+                if (usedCapCost(g,edgeTab,E,U=g.getEdgeEnds(E).second)>
+                    DefaultStructs:: template NumberTypeBounds
+                                        <typename EdgeContainer::ValType::CapacType> ::zero()
+                    && vertTab[U].distance < inf
+                    && (nd=vertTab[U].distance+costFlow(g,edgeTab,E,U))<vertTab[V=g.getEdgeEnds(E).first].distance)
+                    { vertTab[V].distance=nd; vertTab[V].ePrev=E; vertTab[V].vPrev=U; }
+            }
+        }
+
+            for(typename GraphType::PEdge E=g.getEdge(mask); E; E=g.getEdgeNext(E, mask))
+            {
+                if (usedCapCost(g,edgeTab,E,U=g.getEdgeEnds(E).first)>
+                    DefaultStructs:: template NumberTypeBounds
+                                        <typename EdgeContainer::ValType::CapacType> ::zero()
+                    && vertTab[U].distance < inf
+                    && (nd=vertTab[U].distance+costFlow(g,edgeTab,E,U))<vertTab[V=g.getEdgeEnds(E).second].distance)
+                        assert(0);
+                if (usedCapCost(g,edgeTab,E,U=g.getEdgeEnds(E).second)>
+                    DefaultStructs:: template NumberTypeBounds
+                                        <typename EdgeContainer::ValType::CapacType> ::zero()
+                    && vertTab[U].distance < inf
+                    && (nd=vertTab[U].distance+costFlow(g,edgeTab,E,U))<vertTab[V=g.getEdgeEnds(E).first].distance)
+                        assert(0);
+            }
+
+        return vertTab[end].distance < inf;
+    }
 
     // znajdowanie przeplywu start->end o maksymalnej objetosci (ale nie przekraczajacej limitu val) i najmniejszym koszcie
     // procedura pseudowielomianowa (sciezki powiekszajace typu FulkersonFord)
@@ -923,6 +923,7 @@ class FlowPar : public PathStructs {
         return res;
     }
 
+    // TODO: nieefektywna, zrezygnowac z Setow
     template <class GraphType, class EdgeContainer, class SetContainer>
     static void ghtree(GraphType & g, EdgeContainer& edgeTab, SetContainer& setTab,
                 Set<typename GraphType::PVertex>& V, Set<typename GraphType::PVertex>& R,
