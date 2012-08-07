@@ -19,12 +19,14 @@ class MatchingPar {
     template <class GraphType> struct VertLabs {
 
         typename GraphType::PVertex vMatch;   //wierzcholek skojarzany
+        typename GraphType::PEdge eMatch;   //i krawedz skojarzenia
+                                // parametry do uzytku wewnetrznego algorytmu
         typename GraphType::PVertex vLabT[2]; //cecha T (VertLabs[Vi].T=Vj oznacza, ze istnieje parzysta droga naprzemienna z wierzcholka wolnego Vr do Vi, gdzie poprzednikiem Vi jest Vj)
         typename GraphType::PVertex vLabS;    //cecha S (VertLabs[Vi].S=Vj -||- nieparzysta droga -||-)
         typename GraphType::PVertex vLabB;    //cecha b (VertLabs[Vi].b=Vj oznacza, ze najbardziej zewnetrzny kielich, do ktorego nalezy wierzcholek Vi jest reprezentowany przez wierzcholek Vj, ktory jest podstawa tego kielicha)
         bool bS;                              //jezeli S niezbadana true, jezeli nie ma S lub S zbadana false (moze powinnam to trzymac na liscie cech?)
         bool bT;                              //jezeli T niezbadana true, jezeli nie ma T lub T zbadana false (moze to powinnam trzymac na liscie cech?)
-        VertLabs() : vMatch(0),  vLabS(0), vLabB(0), bS(false), bT(false)
+        VertLabs() : vMatch(0),  eMatch(0), vLabS(0), vLabB(0), bS(false), bT(false)
         { vLabT[0]=vLabT[1]=0; };
     };
 
@@ -485,9 +487,9 @@ template <class PVertex>
         return (vertNo-expo)/2;
     }//end edmonsAlg
 
-    //wpisanie wyniku do edgeIterOut dla maxMatching and minEdgeCover
+    //wpisanie wyniku do edgeIterOut dla maxMatching and minEdgeCover, zwraca liczbe wpisan
     template <class GraphType, class VertContainer, class EIterOut>
-    static void
+    static int
         printResultToIterators(
             const GraphType & g,
             VertContainer & vertTab,
@@ -498,24 +500,25 @@ template <class PVertex>
         typename GraphType::PEdge E;
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 typename GraphType::PVertex> ::Type tabVTmp(g.getVertNo()); //pomocnicze, by do wynikow nie doataly sie duplikaty krawedzi
+        int licz=0;
+//        if (!isBlackHole(edgeIterOut)) //na wyjsciu ma byc strumien krawedzi
 
-        if (!isBlackHole(edgeIterOut)) //na wyjsciu ma byc strumien krawedzi
-        {
             for (typename GraphType::PVertex U = g.getVert(); U; U=g.getVertNext(U))
             {
                 if (vertTab[U].vMatch != 0 and tabVTmp[U] != U)
                 {
                     V = vertTab[U].vMatch;
-                    *edgeIterOut = g.getEdge(U,V,Koala::EdUndir|Koala::EdDirIn|Koala::EdDirOut); ++edgeIterOut;
+                    *edgeIterOut = vertTab[V].eMatch=vertTab[U].eMatch=g.getEdge(U,V,Koala::EdUndir|Koala::EdDirIn|Koala::EdDirOut); ++edgeIterOut;
+                    licz++;
                     tabVTmp[V] = V; //oznaczenie wierzcholka V, ze krawedz z nim incydentna zostala dodana do strumienia wyjsciowego
                 }
                 else if(ifEdgeCover and vertTab[U].vMatch == 0)
                 {
                     E = g.getEdge (U,Koala::EdUndir|Koala::EdDirIn|Koala::EdDirOut);
-                    *edgeIterOut = E; ++edgeIterOut;
+                    if (E) { *edgeIterOut = E; ++edgeIterOut; licz++; }
                 }
             }
-        }
+        return licz;
     }//end printMatchResultsToIterators
 
     public:
@@ -523,9 +526,9 @@ template <class PVertex>
     // wlasciwa procedura - szuka skojarzenia o zadanym rozmiarze matchSize, zwraca znaleziony rozmiar skojarzenia
     template <class GraphType, class VertContainer, class EIterOut>
     static int
-        find (
+        findMax (
             const GraphType & g,
-            VertContainer & avertTab,
+            VertContainer & avertTab,// wyjsciowa tablica asocjacyjna PVertex->VertLabs, w plach vMatch tych rekordow jest wierzcholek skojarzony z danym lub 0 w razie braku (lub BlackHole)
             EIterOut edgeIterOut, //iterator wyjsciowy, na ktory wyrzucamy krawedzie matchingu
             int matchSize = -1) //Do ilu krawedzi wlacznie szukac. Tj. ilo-krawedziowy matching znalezc lub najwiekszy, gdy jest mniejszy od tego parametru. Gdy matchSize=-1 to znajdz najwiekszy.
         {
@@ -546,14 +549,14 @@ template <class PVertex>
 
             int expo = firstMatching(g,vertTab,vertTabNeights,matchSize); //funkcja tworzy skojarzenie poczatkowe, zwraca liczbe wierzcholkow wolnych w grafie
             matchSize = edmonsAlg(g,vertTab,vertTabNeights,matchSize,expo); //Algorytm Edmondsa znajduje skojarzenie o zadanym rozmiarze matchSize, zwraca znaleziony rozmiar skojarzenia
-            printResultToIterators(g,vertTab,edgeIterOut); //wpisanie wynikow do edgeIterOut
+            assert(matchSize==printResultToIterators(g,vertTab,edgeIterOut)); //wpisanie wynikow do edgeIterOut
             return matchSize; //zwracamy rozmiar matchingu
-        }//end find
+        }//end findMax
 
     // wlasciwa procedura - szuka skojarzenia o zadanym rozmiarze matchSize, zaczynajac od podanego skojarzenia poczatkowego, zwraca znaleziony rozmiar skojarzenia
     template <class GraphType, class VertContainer, class EIterIn, class EIterOut>
     static int
-        find (
+        findMax (
             const GraphType & g,
             VertContainer & avertTab,
             EIterIn vertIterInBegin, //iterator wejsciowy, zawiera poczatek strumienia z wierzcholkami tworzacymi poczatkowy matching
@@ -578,9 +581,9 @@ template <class PVertex>
 
             int expo = firstMaching(g, vertTab, vertIterInBegin, vertIterInEnd);//funkcja tworzy skojarzenie poczatkowe, na podstawie otrzymanego strumienia wierzcholkow
             matchSize = edmonsAlg(g,vertTab,vertTabNeights,matchSize,expo); //Algorytm Edmondsa znajduje skojarzenie o zadanym rozmiarze matchSize, zwraca znaleziony rozmiar skojarzenia
-            printResultToIterators(g,vertTab,edgeIterOut); //wpisanie wynikow do edgeIterOut
+            assert(matchSize==printResultToIterators(g,vertTab,edgeIterOut)); //wpisanie wynikow do edgeIterOut
             return matchSize; //zwracamy rozmiar matchingu
-        }//end find
+        }//end findMax
 
     // wlasciwa procedura - szuka minimalnego pokrycia krawedziowego
     // najpierw realizuje Edmondsa - szuka maksymalnego skojarzenia, nastepnie rozszerza je do pokrycia krawedziowego
@@ -606,9 +609,9 @@ template <class PVertex>
             fillVertTabNeights (g,vertTabNeights);
 
             int expo = firstMatching(g,vertTab,vertTabNeights,-1); //funkcja tworzy skojarzenie poczatkowe, zwraca liczbe wierzcholkow wolnych w grafie
-            int edgeCoverSize = edmonsAlg(g,vertTab,vertTabNeights,-1,expo) + expo; //Algorytm Edmondsa znajduje skojarzenie o maksymalnym rozmiarze, zwraca znaleziony rozmiar skojarzenia
-            printResultToIterators(g,vertTab,edgeIterOut,true); //wpisanie wynikow do edgeIterOut
-            return edgeCoverSize; //zwracamy rozmiar matchingu
+            edmonsAlg(g,vertTab,vertTabNeights,-1,expo); //Algorytm Edmondsa znajduje skojarzenie o maksymalnym rozmiarze, zwraca znaleziony rozmiar skojarzenia
+            return printResultToIterators(g,vertTab,edgeIterOut,true); //wpisanie wynikow do edgeIterOut
+//            return edgeCoverSize; //zwracamy rozmiar matchingu
         }//end minEdgeCover
 
     // wlasciwa procedura - zachlannie szuka skojarzenia
@@ -642,7 +645,7 @@ template <class PVertex>
                 {
                     vertTab[U].vMatch = V;
                     vertTab[V].vMatch = U;
-                    *edgeIterOut = E; ++edgeIterOut;
+                    *edgeIterOut = vertTab[V].eMatch=vertTab[U].eMatch=E; ++edgeIterOut;
                     expo -= 2;
                 }
             }
@@ -682,7 +685,7 @@ template <class PVertex>
                 {
                     vertTab[U].vMatch = V;
                     vertTab[V].vMatch = U;
-                    *edgeIterOut = *itE; ++edgeIterOut;
+                    *edgeIterOut = vertTab[V].eMatch=vertTab[U].eMatch=*itE; ++edgeIterOut;
                     expo -= 2;
                 }
             }
@@ -714,6 +717,115 @@ template <class PVertex>
 };
 
 class Matching : public MatchingPar<AlgsDefaultSettings> {};
+
+
+
+    //algorytmy dla problemu stabilnego skojarzenia
+template <class DefaultStructs>
+class StableMatchingPar {
+    protected:
+
+    template <class Graph,class Cmp>
+    struct SortCmp {
+        mutable typename Graph::PVertex v;
+        mutable Cmp comp;
+
+        SortCmp(typename Graph::PVertex av, Cmp acmp) : v(av), comp(acmp) {}
+        template <class T>
+        bool operator()(T e,T f) const
+        {
+            return !comp(v,e,f);
+        }
+    };
+
+    public:
+
+        template <class GraphType> struct VertLabs {
+
+        typename GraphType::PVertex vMatch;   //wierzcholek skojarzany lub 0 w razie braku
+         typename GraphType::PEdge eMatch;  // i krawedz skojarzenia
+
+        VertLabs(typename GraphType::PVertex v=0,typename GraphType::PEdge e=0) :
+            vMatch(v),  eMatch(e) { };
+    };
+
+    // wlasciwa procedura - testuje czy podane na wejsciu krawedzie tworza skojarzenie stabilne
+    // wynik.first- odpowiedz. Jesli jest to matching ale istnieje krawedz rozbijajaca, zostaje ona zwrocona w .second
+    template <class GraphType, class EIterIn,class Comp>
+    static std::pair<bool,typename GraphType::PEdge>
+        test (
+            const GraphType & g,
+            Comp compare,// funktor podajacy preferencje wierzcholkow odnosnie ich krawedzi, wolanie
+            // bool compare(v,e1,e2) jest true jesli e2 jest lepsze od e1 z punktu widzenia ich koncowki v
+            EIterIn edgeIterInBegin, //iterator wejsciowy, zawiera poczatek strumienia z krawedziemi, ktore maja byc przetestowane
+            EIterIn edgeIterInEnd) //iterator wejsciowy, zawiera koniec strumienia z krawedziemi, ktore maja byc przetestowane
+        {   std::pair<bool,typename GraphType::PEdge> res;
+            res.second=0;
+            if (!(res.first=MatchingPar<DefaultStructs>::template test(g,edgeIterInBegin,edgeIterInEnd))) return res;
+            typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                typename GraphType::PEdge >::Type match(g.getVertNo());
+            for(;edgeIterInBegin!=edgeIterInEnd;++edgeIterInBegin)
+                match[g.getEdgeEnd1(*edgeIterInBegin)]=match[g.getEdgeEnd2(*edgeIterInBegin)]=*edgeIterInBegin;
+            for(typename GraphType::PEdge e=g.getEdge(Directed|Undirected);e;e=g.getEdgeNext(e,Directed|Undirected))
+                if (match[g.getEdgeEnd1(e)]!=e)
+                    if (    (!match[g.getEdgeEnd1(e)] || compare(g.getEdgeEnd1(e),match[g.getEdgeEnd1(e)],e)) &&
+                            (!match[g.getEdgeEnd2(e)] || compare(g.getEdgeEnd2(e),match[g.getEdgeEnd2(e)],e))
+                        ) return std::make_pair(false,e);
+
+            return std::make_pair(true,(typename GraphType::PEdge)0);
+        }
+
+        template <class GraphType, class VIterIn,class Comp, class vertCont, class EIterOut>
+        static int bipartFind(const GraphType & g, VIterIn begin, VIterIn end, Comp compare, vertCont& verttab, EIterOut out)
+        {
+            int licz=0,n1=0;
+            for(VIterIn it=begin;it!=end;++it) if (g.deg(*it,Directed|Undirected)) n1++;
+            typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,typename GraphType::PEdge* >
+                ::Type bufs(n1);
+            typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,int > ::Type love(n1);
+            typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,char > ::Type free(n1);
+            typename GraphType::PEdge LOCALARRAY(incids,g.getEdgeNo(Directed|Undirected));
+            typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                typename GraphType::PEdge> ::Type match(g.getVertNo()-n1);
+
+            for(VIterIn it=begin;it!=end;++it) if (g.deg(*it,Directed|Undirected))
+            {
+                love[*it]=0;free[*it];
+                int deg=g.getEdges(bufs[*it]=incids+licz,*it,Directed|Undirected);
+                DefaultStructs::sort(incids+licz,incids+licz+deg,SortCmp<GraphType,Comp>(*it,compare));
+                licz+=deg;
+            }
+
+            while (!free.empty())
+            {
+                typename GraphType::PVertex u=free.firstKey(),v,w;
+                typename GraphType::PEdge e=bufs[u][love[u]];
+                v=g.getEdgeEnd(e,u);
+                if (match.hasKey(v))
+                    if (compare(v,match[v],e) )
+                {   w=g.getEdgeEnd(match[v],v);
+                    if (++love[w]<g.deg(w,Directed|Undirected)) free[w];
+                    match.delKey(v);
+                }
+                if (!match.hasKey(v)) { match[v]=e; free.delKey(u); }
+                else if (++love[u]==g.deg(u,Directed|Undirected)) free.delKey(u);
+            }
+            licz=0;
+            for(typename GraphType::PVertex u=match.firstKey();u;u=match.nextKey(u))
+            {   licz++; *out=match[u]; ++out;
+                if (!isBlackHole(verttab))
+                {   VertLabs<GraphType> lu(u,match[u]),ln(g.getEdgeEnd(match[u],u),match[u]);
+                    verttab[u]=lu;verttab[g.getEdgeEnd(match[u],u)]=ln;
+                }
+            }
+            return licz;
+        }
+
+};
+
+class StableMatching : public StableMatchingPar<AlgsDefaultSettings> {};
+
+
 
 }
 

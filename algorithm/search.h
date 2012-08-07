@@ -73,7 +73,6 @@ struct PathStructs {
                     }
         };
 
-
 };
 
 
@@ -169,10 +168,58 @@ class SearchStructs {
         template< class CIter, class VIter >
         static CompStore< CIter,VIter > compStore( CIter, VIter );
 
+        // Odwrotne mapowanie ciagu dlugosci size ciagow o elementach typu T o poczatkach w iteratorach
+        // begin (kolejne rozmiary) i sbegin (wartosci) - por. powyzszy format
+        template <class T,class InputIter, class VertInputIter, class CIter, class IntIter, class ElemIter>
+    static int revCompStore(InputIter begin, VertInputIter sbegin,int size,
+                        CompStore<CIter,IntIter> out, // wyjsciowy ciag numerow (od 0) ciagow: i-ty ciag to numery
+                            // w ktorych wystepuje i-ty element poslany na eout (w razie powtorzen ten sam numer ciagu powtarza sie
+                                                                                 // odpowiednia ilosc razy.
+                        ElemIter eout) // iterator wyjsciowy na wszystkie elementy w wystepujace ciagach (kazdy jeden raz)
+                        // zwraca ilosc elementow wystepujacych w ciagach (kazdy jeden raz) tj. dlugosc sekwencji poslanej na eout
+                            // uwaga: przy wywolaniach nie dedukuje typu elementow ciagow T (tzreba podac jawnie)
+    {   InputIter it;
+        int i,licz=0;
+        for(it=begin,i=0;i<size;i++) ++it;
+        int len=*it;
+
+        std::pair<T,int> LOCALARRAY(tab,len);
+        for(it=begin,i=0;i<size;i++,++it)
+        {   InputIter it2=it; ++it2;
+            for(int j=*it;j<*it2;j++) tab[j].second=i;
+        }
+        VertInputIter vit=sbegin;
+        for(i=0;i<len;i++,++vit) tab[i].first=*vit;
+        std::make_heap(tab,tab+len); std::sort_heap(tab,tab+len);
+//        for(i=0;i<len;i++) std::cout << "(" << tab[i].first << ',' << tab[i].second << ") ";
+        for(i=0;i<len;i++)
+        {   *out.vertIter=tab[i].second; ++out.vertIter;
+            if (i==0|| tab[i-1].first!=tab[i].first)
+            {
+                *eout=tab[i].first; *eout++;
+                *out.compIter=i;++out.compIter;
+                licz++;
+            }
+        }
+        *out.compIter=len;++out.compIter;
+        return licz;
+    }
+
+    // j.w., ale zakladamy, ze elementy ciagow (a wiec sbegin) sa przechowywane w tablicy, ktorej wskaznik
+    // poczatku dostarczamy do procedury (wowczas typ T jest dedukowany).
+    template <class T,class InputIter,  class CIter, class IntIter, class ElemIter>
+    static int revCompStore(InputIter begin,const  T* sbegin,int size,
+                        CompStore<CIter,IntIter> out, ElemIter eout)
+    {
+//        std::cout << "!";
+        return revCompStore<T,InputIter, const  T*, CIter, IntIter, ElemIter>(begin, sbegin,size,out, eout);
+    }
+
 //        CompStore moze wspolpracowac z dowolnymi sekwencyjnymi kontenerami, ale ponizsza struktura
 //        ulatwia obrobke takich danych
         template <class T> // typ elementu ciagow skladowych
         class CompStoreTool {
+
             private:
                 std::vector<int> idx;
                 std::vector<T> data;
@@ -1119,7 +1166,7 @@ public:
 	 	 Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
     component jest ustawiane na component
 	 * @param[in] visitor visitor called for each vertex
-	 * @param[in] dir direction of edges to consider, LexBFS akceptuje tylko maski symetryczne
+	 * @param[in] dir direction of edges to consider, uwaga: LexBFS akceptuje tylko maski symetryczne
 	 * @param[in] compid component identifier (give 0 if don't know)
 	 * @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
 	 */

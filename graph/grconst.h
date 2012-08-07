@@ -105,13 +105,13 @@ class ConstGraphMethods {
     Set< PVertex > getVertSet() const;
 
         // Liczba krawêdzi typu zawartego w podanej masce
-        inline int getEdgeNo( EdgeDirection mask = EdAll ) const { return self.getEdgeNo(mask); }
-        inline PEdge getEdgeNext( PEdge e, EdgeDirection mask = EdAll ) const { return self.getEdgeNext(e,mask); }
-        inline PEdge getEdgePrev( PEdge e, EdgeDirection mask = EdAll ) const { return self.getEdgePrev(e,mask); }
-    template <class OutputIterator> int getEdges(OutputIterator, EdgeDirection = EdAll ) const;
+        inline int getEdgeNo( EdgeType mask = EdAll ) const { return self.getEdgeNo(mask); }
+        inline PEdge getEdgeNext( PEdge e, EdgeType mask = EdAll ) const { return self.getEdgeNext(e,mask); }
+        inline PEdge getEdgePrev( PEdge e, EdgeType mask = EdAll ) const { return self.getEdgePrev(e,mask); }
+    template <class OutputIterator> int getEdges(OutputIterator, EdgeType = EdAll ) const;
     Set< PEdge > getEdgeSet( EdgeType = EdAll ) const;
-    PEdge getEdge( EdgeDirection mask = EdAll ) const { return self.getEdgeNext( (PEdge)0,mask ); }
-    PEdge getEdgeLast( EdgeDirection mask = EdAll ) const { return self.getEdgePrev( (PEdge)0,mask ); }
+    PEdge getEdge( EdgeType mask = EdAll ) const { return self.getEdgeNext( (PEdge)0,mask ); }
+    PEdge getEdgeLast( EdgeType mask = EdAll ) const { return self.getEdgePrev( (PEdge)0,mask ); }
 
     // lista krawedzi sasiednich do v o orientacji wzgledem v zawartej w masce
         inline int getEdgeNo( PVertex v, EdgeDirection mask = EdAll) const { return self.getEdgeNo(v,mask); }

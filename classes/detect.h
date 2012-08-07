@@ -6,6 +6,7 @@
 #include "..\graph\view.h"
 #include "..\algorithm\search.h"
 #include "..\algorithm\factor.h"
+#include "..\algorithm\conflow.h"
 #include "..\container\joinsets.h"
 
 
@@ -16,7 +17,8 @@ namespace Koala
 //Algorytmy rozpoznawania rodzin grafow. Dla rodziny family jest metoda rozpoznajaca bool family(const& graph).
 //Jesli family ma sens takze dla multigrafow, bool family(const& graph, bool allowmulti) gdzie flaga bool podaje
 //czy zezwalay na krawedzie rownolegle i petle. Jesli dla klasy family sa jakies szczegolne procedury (tylko dla grafow tego typu),
-//wprowadza sie dodatkowo podklase Family z metodami realizujacymi te funkcje.
+//wprowadza sie dodatkowo podklase Family z metodami realizujacymi te funkcje. Generalnie nie maja one obowiazku
+// sprawdzania poprawnosci danych (tj. przynaleznosci grafu do tej rodziny), choc czasem tak czynia.
 
 template <class DefaultStructs>
 // DefaultStructs - wytyczne dla wewnetrznych procedur
@@ -244,7 +246,7 @@ class IsItPar : public SearchStructs {
         }
 
         template <class GraphType,class Iter>
-        // znajduje najwiekszy zbior niezalezny, zwraca jego rozmiar
+        // znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
         static int minVertCover(const GraphType &g, Iter out)
         {	    typename DefaultStructs:: template AssocCont<
             typename GraphType::PVertex, Koala::Matching::VertLabs<GraphType >
@@ -254,8 +256,9 @@ class IsItPar : public SearchStructs {
             typename GraphType::PEdge, bool>::Type matching(g.getVertNo()/2);
 
             Set<typename GraphType::PVertex> setL,setR;
-            getPart(g,setInserter(setL),true);setR=g.getVertSet()-setL;
-            int matchno=MatchingPar<DefaultStructs>::find(g,vertTab,assocInserter(matching,constFun(true)));
+            assert(-1!=getPart(g,setInserter(setL),true)); // TODO: throw
+            setR=g.getVertSet()-setL;
+            int matchno=MatchingPar<DefaultStructs>::findMax(g,vertTab,assocInserter(matching,constFun(true)));
 
             Set<typename GraphType::PVertex> setT,setnew;
 
@@ -263,7 +266,7 @@ class IsItPar : public SearchStructs {
             for (typename GraphType::PVertex it=setL.first(); it; it=setL.next(it))
             {
                 if (vertTab[it].vMatch == 0)
-                    setT +=(it);
+                    setT +=it;
             }
 
             //dla kazdego wierzcholka wolnego z setL, dodajemy do setT, jego sasiadow z setR oraz wierzcholki skojarzone z tymi sasiadami
@@ -280,8 +283,10 @@ class IsItPar : public SearchStructs {
             {
                 setnew.clear();
                 for (typename GraphType::PVertex itT=setT.first(); itT; itT=setT.next(itT))
+                if (setL.isElement(itT))
                 for (typename GraphType::PEdge e=g.getEdge(itT,EdUndir);e;e=g.getEdgeNext(itT,e,EdUndir))
-                if (!matching.hasKey(e))
+                if (g.getEdgeEnd(e,itT)!=vertTab[itT].vMatch)
+
                 {   typename GraphType::PVertex itR=g.getEdgeEnd(e,itT);
                     setnew+=itR;
     //                for (typename GraphType::PVertex itR=vertTabNeights[itT].first(); itR; itR=vertTabNeights[itT].next(itR))
@@ -470,6 +475,14 @@ class IsItPar : public SearchStructs {
                 } while(k >= 0);
                 };
             };
+
+        template <class Graph>
+        struct QTRes {
+            int size;
+            Set<typename Graph::PVertex> trees;
+            QTRes() : size(0) {}
+        };
+
 
         public:
 
@@ -664,9 +677,122 @@ class IsItPar : public SearchStructs {
             return maxClique(g,vbuf,vbuf+g.getVertNo(),out);
         }
 
+        // znajduje najwiekszy zbior niezalezny (wypuszczany na out), zwraca jego rozmiar
+        // korzysta z rozkladu na drzewo klik por. maxCliques
+        template <class Graph,  class QIter,class VIter, class QTEIter,class IterOut>
+        static int maxStable(const Graph& g, //badany graf
+                             int qn, // liczba maksymalnych klik
+                             QIter begin, // iteratory poczatkow ciagow ciagow wierzcholkow z maks. klik (por. compStore)
+                             VIter vbegin,
+                             QTEIter ebegin, // poczatek ciagu std::pair<int,int> z numerami klik-koncow krawedzi drzewa klikowego
+                             IterOut out ) // iterator wyjsciowy na wierzcholki
+        {   typename DefaultStructs:: template AssocCont<
+                typename Graph::PVertex, QTRes<Graph> >::Type LOCALARRAY(tabtab,qn);
+            QTRes<Graph>  LOCALARRAY(tabnull,qn);
+            typedef typename DefaultStructs::template LocalGraph<
+                std::pair<typename DefaultStructs:: template AssocCont<
+                typename Graph::PVertex, QTRes<Graph> >::Type*,QTRes<Graph>*>,
+                char,EdAll,true >:: Type ImageGraph;
+            ImageGraph tree;
+            typename ImageGraph::PVertex LOCALARRAY(treeverts,qn);
+            QIter it=begin,it2=it;it2++;
+            for(int i=0;i<qn;i++,it++,it2++)
+            {   int size;
+                (treeverts[i]=tree.addVert(std::make_pair(tabtab+i,tabnull+i)))->info.first
+                            ->reserve(size=(*it2-*it));
+                for(int j=0;j<size;j++,vbegin++) (*treeverts[i]->info.first)[*vbegin];
+
+            }
+            for(int i=0;i<qn-1;i++,ebegin++) tree.addEdge(treeverts[(*ebegin).first],treeverts[(*ebegin).second]);
+            typename DefaultStructs:: template AssocCont<
+                typename ImageGraph::PVertex,typename SearchStructs::template VisitVertLabs<ImageGraph > >::Type search(qn);
+            DFSPostorderPar<DefaultStructs>::scanAttainable(tree,tree.getVert(),treeverts,EdUndir,search);
+            for(typename ImageGraph::PVertex u=tree.getVert();u;u=tree.getVertNext(u)) if (search[u].ePrev)
+                tree.ch2Dir(search[u].ePrev,u,EdDirOut);
+
+            for(int i=0;i<qn;i++)
+            {   typename ImageGraph::PVertex vert=treeverts[i];
+                vert->info.second->size=0;vert->info.second->trees.clear();
+                for(typename ImageGraph::PEdge e=tree.getEdge(vert,EdDirIn);e;e=tree.getEdgeNext(vert,e,EdDirIn))
+                {   typename ImageGraph::PVertex child=tree.getEdgeEnd(e,vert);
+                    int maxs=child->info.second->size,tmpsize;
+                    Set< typename Graph::PVertex> *maxset=&child->info.second->trees;
+                    for(typename Graph::PVertex key=child->info.first->firstKey();key;key=child->info.first->nextKey(key))
+                    if ((!vert->info.first->hasKey(key)) && (tmpsize=(*child->info.first)[key].size)>maxs)
+                        { maxs=tmpsize; maxset=&(*child->info.first)[key].trees; }
+                    vert->info.second->size+=maxs;vert->info.second->trees+=*maxset;
+                }
+                typename ImageGraph::PVertex child;
+                for(typename Graph::PVertex key=vert->info.first->firstKey();key;key=vert->info.first->nextKey(key))
+                {   vert->info.first->operator[](key).size=1;
+                    vert->info.first->operator[](key).trees.clear();vert->info.first->operator[](key).trees+=key;
+                    for(typename ImageGraph::PEdge e=tree.getEdge(vert,EdDirIn);e;e=tree.getEdgeNext(vert,e,EdDirIn))
+                    if ((child=tree.getEdgeEnd(e,vert))->info.first->hasKey(key))
+                    {   (*vert->info.first)[key].size+=(*child->info.first)[key].size-1;
+                        (*vert->info.first)[key].trees+=(*child->info.first)[key].trees;
+                    } else
+                    {   int maxs=child->info.second->size,tmpsize;
+                        Set< typename Graph::PVertex> *maxset=&child->info.second->trees;
+                        for(typename Graph::PVertex childkey=child->info.first->firstKey();childkey;childkey=child->info.first->nextKey(childkey))
+                        if ((!vert->info.first->hasKey(childkey)) && (tmpsize=(*child->info.first)[childkey].size)>maxs)
+                        { maxs=tmpsize; maxset=&(*child->info.first)[childkey].trees; }
+
+                        vert->info.first->operator[](key).size+=maxs;
+                        vert->info.first->operator[](key).trees+=*maxset;
+                    }
+                }
+            }
+
+            typename ImageGraph::PVertex root=treeverts[qn-1];
+            int maxs=root->info.second->size,tmpsize;
+            Set< typename Graph::PVertex> *maxset=&root->info.second->trees;
+            for(typename Graph::PVertex key=root->info.first->firstKey();key;key=root->info.first->nextKey(key))
+            if  ((tmpsize=(root->info.first->operator[](key).size))>maxs)
+            {   maxs=tmpsize;
+                maxset=&root->info.first->operator[](key).trees;
+            }
+            maxset->getElements(out);
+            return maxset->size();
+        return tree.getVertNo();
+        }
 
 
-    // TODO: rozwazyc static int maxStable(const Graph &g, Iter out)
+        // znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
+        // sens parametrow j.w.
+        template <class Graph,  class QIter,class VIter, class QTEIter,class IterOut>
+        static int minVertCover(const Graph& g,int qn,QIter begin,VIter vbegin, QTEIter ebegin,IterOut out )
+        {   Set<typename Graph::PVertex> res;
+            maxStable(g,qn,begin,vbegin, ebegin,setInserter(res));
+            res=g.getVertSet()-res;
+            res.getElements(out);
+            return res.size();
+        }
+
+        // znajduje najwiekszy zbior niezalezny (wypuszczany na out), zwraca jego rozmiar lub -1 w razie bledu
+        // samodzielna
+        template <class Graph,class IterOut>
+        static int maxStable(const Graph& g, //badany graf
+                             IterOut out ) // iterator wyjsciowy na wierzcholki
+        {
+            typename Graph::PVertex LOCALARRAY(vbegin,g.getVertNo()*g.getVertNo());
+            int LOCALARRAY(begin,g.getVertNo()+1);
+            std::pair<int,int> LOCALARRAY(ebegin,g.getVertNo());
+            int qn=maxCliques(g,compStore(begin,vbegin),ebegin);
+            if (qn==-1) return -1;
+            return maxStable(g,qn,begin,vbegin,ebegin,out);
+        }
+
+        // znajduje najwieksze pokrycie wierzcholkowe (wypuszczane na out), zwraca jego rozmiar lub -1 w razie bledu
+        // samodzielna
+        template <class Graph,class IterOut>
+        static int minVertCover(const Graph& g, //badany graf
+                             IterOut out ) // iterator wyjsciowy na wierzcholki
+        {   Set<typename Graph::PVertex> res;
+            maxStable(g,setInserter(res));
+            res=g.getVertSet()-res;
+            res.getElements(out);
+            return res.size();
+        }
 
     };
 
@@ -768,7 +894,9 @@ class IsItPar : public SearchStructs {
                         b->cls = CompUndefined;
                         b->inv = a;
                         };
-                    for(int i = 0; i < datasize; i++) data[i].sort();
+
+                    for(int i = 0; i < datasize; i++)
+                    {   data[i].sort();                  }
                 };
 
         //		void Dump() {
@@ -864,12 +992,15 @@ class IsItPar : public SearchStructs {
         static void InitState(const Graph &g, CTState<Graph> &state, VMap &vidx, UVMap &idxv) {
             int i = 0, n = g.getVertNo();
             typename Graph::PVertex v;
+
             for(v = g.getVert(); v != NULL; v = g.getVertNext(v)) {
                 if (!isBlackHole(idxv)) idxv[i] = v;
                 vidx[v] = i++;
+
                 };
             state.flag = false;
             state.k = 0;
+
             state.cls.Init(g, vidx);
             state.ud = DefaultStructs::template NumberTypeBounds<int>::plusInfty();
         };
@@ -942,6 +1073,14 @@ class IsItPar : public SearchStructs {
                     };
                 };
             };
+
+        class FlowDefaultStructs : public DefaultStructs {
+        public:
+
+            enum { useFulkersonFord=false  };
+
+        };
+
 
         public:
             /* M.C. Golumbic
@@ -1057,7 +1196,73 @@ class IsItPar : public SearchStructs {
             static int maxClique(const Graph &g, OutIter iter)
             {   return explore(g,blackHole,blackHole,iter); }
 
-        // TODO: rozwazyc static int maxStable(const Graph &g, Iter out)
+
+                // znajduje najwiekszy zbior niezalezny, zwraca jego rozmiar
+        template<class GraphType, class VIterOut>
+        static int maxStable(const GraphType &g,VIterOut out)
+        {   typedef typename DefaultStructs::template LocalGraph<char,typename GraphType::PVertex,Directed,false >:: Type ImageGraph;
+            int n=g.getVertNo(),m=g.getEdgeNo();
+            ImageGraph cg;
+            typename DefaultStructs:: template AssocCont<
+                typename GraphType::PVertex, typename ImageGraph::PEdge >::Type mapa(n);
+            typename DefaultStructs:: template AssocCont<
+                typename GraphType::PEdge, EdgeDirection >::Type dirs(m);
+            typename DefaultStructs:: template AssocCont<
+                typename ImageGraph::PVertex, typename FlowPar<FlowDefaultStructs>::template TrsVertLoss<int> >
+                    ::Type vertcont(2+2*n);
+            typename DefaultStructs:: template AssocCont<
+                typename ImageGraph::PEdge, typename FlowPar<FlowDefaultStructs>::template  TrsEdgeLabs<int> >
+                    ::Type edgecont(3*n+m);
+            typename ImageGraph::PVertex start=cg.addVert(),end=cg.addVert();
+            for(typename GraphType::PVertex u=g.getVert();u;u=g.getVertNext(u))
+            {   typename ImageGraph::PVertex x=cg.addVert();
+                typename ImageGraph::PVertex y=cg.addVert();
+                vertcont[x]=vertcont[y]= typename FlowPar<FlowDefaultStructs>::template TrsVertLoss<int>();
+                edgecont[mapa[u]=cg.addArch(x,y,u)]=typename FlowPar<FlowDefaultStructs>::template
+                        TrsEdgeLabs<int>(1,1);
+                edgecont[cg.addArch(start,x,(typename GraphType::PVertex)0)]=
+                    edgecont[cg.addArch(y,end,(typename GraphType::PVertex)0)]=
+                    typename FlowPar<FlowDefaultStructs>::template TrsEdgeLabs<int>(0,1);
+            }
+            getDirs(g,dirs);
+            for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+            {   typename GraphType::PVertex u,v;
+                if (dirs[e]==EdDirOut) { u=g.getEdgeEnd1(e); v=g.getEdgeEnd2(e);}
+                else { u=g.getEdgeEnd2(e); v=g.getEdgeEnd1(e);}
+                edgecont[cg.addArch(cg.getEdgeEnd2(mapa[u]),cg.getEdgeEnd1(mapa[v]),(typename GraphType::PVertex)0)]
+                    =typename FlowPar<FlowDefaultStructs>::template TrsEdgeLabs<int>(0,1);
+            }
+            int a=0,b=n,c;
+            while (b-a>1)
+            {   c=(a+b)/2;
+                vertcont[end]=typename FlowPar<FlowDefaultStructs>::template TrsVertLoss<int>(0,c);
+                vertcont[start]=typename FlowPar<FlowDefaultStructs>::template TrsVertLoss<int>(-c,0);
+                if (FlowPar<FlowDefaultStructs>::transship(cg,edgecont,vertcont)) b=c; else a=c;
+            }
+                vertcont[end]=typename FlowPar<FlowDefaultStructs>::template TrsVertLoss<int>(0,b-1);
+                vertcont[start]=typename FlowPar<FlowDefaultStructs>::template TrsVertLoss<int>(-b+1,0);
+
+            if (!isBlackHole(out)) for(typename GraphType::PVertex u=g.getVert();u;u=g.getVertNext(u))
+            {
+                edgecont[mapa[u]]=typename FlowPar<FlowDefaultStructs>::template TrsEdgeLabs<int>(0,0);
+                if (FlowPar<FlowDefaultStructs>::transship(cg,edgecont,vertcont))
+                { *out=u; ++out;
+                    edgecont[mapa[u]]=typename FlowPar<FlowDefaultStructs>::template TrsEdgeLabs<int>(1,1);
+                }
+            }
+            return b;
+        }
+
+        template <class GraphType,class Iter>
+        // znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
+        static int minVertCover(const GraphType &g, Iter out)
+        {   Set<typename GraphType::PVertex> res;
+            maxStable(g,setInserter(res));
+            res=g.getVertSet()-res;
+            res.getElements(out);
+            return res.size();
+        }
+
 
     };
 
@@ -1589,7 +1794,7 @@ class IsItPar : public SearchStructs {
         }
 
         template <class GraphType,class Iter>
-        // znajduje najwiekszy zbior niezalezny, zwraca jego rozmiar
+        // znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
         static int minVertCover(const GraphType &g, Iter out)
         {   Set<typename GraphType::PVertex> res;
             maxStable(g,setInserter(res));
