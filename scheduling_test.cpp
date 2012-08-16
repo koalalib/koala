@@ -313,8 +313,7 @@ void scheduling_critical()
 		cout << " " << i->earliestStart << " " << i->latestStart << " " << i->earliestFinish << " " << i->latestFinish << endl;
 }
 
-int main()
-{
+#include "main.hpp"
 	scheduling_brucker();
 	scheduling_coffman();
 	scheduling_hu();

@@ -45,8 +45,8 @@ int& f(int i,int j)
     return vec[i][j];
 }
 
-int main()
-{   string strN="N";
+#include "main.hpp"
+   string strN="N";
 
 
     g1.addArch(A,B,"AB");

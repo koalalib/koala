@@ -65,7 +65,7 @@ void bht()
 }
 
 
-int main() {
+#include "main.hpp"
 
     bht();
 

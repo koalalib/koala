@@ -88,7 +88,7 @@ template<class T> void print(const CompStoreTool<T>& cont)
     }
 }
 
-int main() {
+#include "main.hpp"
 
     CompStoreTool<char> cont;
     CompStoreTool<int> rev;

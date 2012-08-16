@@ -245,7 +245,7 @@ void conTest()
 }
 
 
-int main() {
+#include "main.hpp"
 
     g.makeAdjMatrix();
     dijTest();

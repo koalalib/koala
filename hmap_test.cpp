@@ -142,7 +142,7 @@ int Test() {
 	};
 
 
-int main() {
+#include "main.hpp"
 	Test();
 	return 0;
 	};

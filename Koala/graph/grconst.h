@@ -180,10 +180,10 @@ class ConstGraphMethods {
         return edge->isEnd(vert); }// synonim
     // drugi koniec krawedzi
     PVertex getEdgeEnd( PEdge edge, PVertex vert) const
-    {  assert(edge); // TODO: throw
+    {  koalaAssert(edge,GraphExcNullEdge);
         return edge->getEnd(vert);}
     PVertex getEnd( PEdge edge, PVertex vert) const
-    { assert(edge); // TODO: throw
+    { koalaAssert(edge,GraphExcNullEdge);
         return edge->getEnd(vert);} // synonim
 
     inline bool incid( PEdge edge1, PEdge edge2 ) const // czy krawedzie sa incydentne
@@ -194,11 +194,11 @@ class ConstGraphMethods {
 
     // pobranie pol info
     VertInfoType getVertInfo( PVertex v ) const
-    {   assert(v); // TODO: throw
+    {   koalaAssert(v,GraphExcNullVert);
         return v->getInfo();
     }
     EdgeInfoType getEdgeInfo( PEdge e ) const
-    {   assert(e); // TODO: throw
+    {   koalaAssert(e,GraphExcNullEdge);
         return e->getInfo();
     }
 
@@ -345,6 +345,7 @@ template< class GraphType >
 int ConstGraphMethods< GraphType>::vertPos( typename  ConstGraphMethods< GraphType>::PVertex vert ) const
 {
     int idx = 0;
+    koalaAssert(vert,GraphExcNullVert);
     PVertex tmp_vert = this->getVert();
     while (tmp_vert && tmp_vert != vert)
     {
@@ -467,6 +468,7 @@ template< class GraphType>
 int ConstGraphMethods< GraphType>::edgePos( typename  ConstGraphMethods< GraphType>::PEdge edge ) const
 {
     int idx = 0;
+    koalaAssert(edge,GraphExcNullEdge);
     PEdge tmp_edge = this->getEdge();
     while (tmp_edge && tmp_edge != edge)
     {
@@ -551,7 +553,7 @@ template< class GraphType> template< class OutputIterator >
 int ConstGraphMethods< GraphType>::getNeighs(
     OutputIterator out, PVertex vert, EdgeDirection direct ) const
 {
-    assert(vert); // TODO: throw
+    koalaAssert(vert,GraphExcNullVert);
     PVertex LOCALARRAY( ans,self.root().getEdgeNo( vert,direct ) );
     int size = 0, res = 0;
     PEdge edge = this->getEdge( vert,direct );
@@ -601,7 +603,7 @@ ConstGraphMethods< GraphType>::getClNeighSet(
 template< class GraphType> template< class OutputIterator >
 int ConstGraphMethods< GraphType>::getClNeighs(
     OutputIterator out, PVertex vert, EdgeDirection direct ) const
-{   assert(vert); // TODO: throw
+{   koalaAssert(vert,GraphExcNullVert);
     PVertex LOCALARRAY( ans,self.root().getEdgeNo( vert,direct ) + 1 );
     ans[0] = vert;
     int size = 1, res = 0;
@@ -633,7 +635,8 @@ template< class GraphType>
 bool ConstGraphMethods< GraphType>::areParallel(
     typename ConstGraphMethods< GraphType>::PEdge e1, typename ConstGraphMethods< GraphType>::PEdge e2, EdgeDirection reltype ) const
 {
-    assert(e1 && e2 && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)); //TODO: throw
+    koalaAssert(e1 && e2,GraphExcNullEdge);
+    koalaAssert(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir,GraphExcWrongMask);
     std::pair<PVertex,PVertex > ends1 = self.getEdgeEnds( e1 ),ends2 = self.getEdgeEnds( e2 );
     if (e1 == e2) return true;
     else if (self.getEdgeType(e1) == Loop) return self.getEdgeType(e2) == Loop && ends1.first == ends2.first;
@@ -650,9 +653,11 @@ bool ConstGraphMethods< GraphType>::areParallel(
 
 
 template< class GraphType> template <class OutputIterator>
+// TODO: nieefektywne, mozna bezposrednio
 int ConstGraphMethods< GraphType>::getParals(  OutputIterator iter, PEdge edge, EdgeDirection reltype) const
 {
-    assert(edge && (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)); //TODO: throw
+    koalaAssert(edge,GraphExcNullEdge);
+    koalaAssert(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir,GraphExcWrongMask);
     int licz=0;
     std::pair<PVertex,PVertex> ends=self.getEdgeEnds(edge);
     for(PEdge e=this->getEdge(ends.first,ends.second,EdAll);e;e=self.getEdgeNext(ends.first,ends.second,e,EdAll))
@@ -689,9 +694,10 @@ inline int ConstGraphMethods< GraphType>::mu( EdgeDirection reltype) const
 template< class GraphType>
 std::pair< typename ConstGraphMethods< GraphType>::PEdge,int >
 ConstGraphMethods< GraphType>::maxMu( EdgeDirection reltype) const
-{   assert((reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)); //TODO: throw
+{   koalaAssert((reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir),GraphExcWrongMask);
     std::pair< PEdge,int > res((PEdge)0,0);
-    if ( !self.getEdgeNo(EdAll)) return res;
+    int m=self.getEdgeNo(EdAll);
+    if ( !m) return res;
     Parals3 LOCALARRAY(edges,self.root().getEdgeNo(EdAll));
     int i=0,l=0,nr=0;
     PEdge edge;
@@ -700,7 +706,7 @@ ConstGraphMethods< GraphType>::maxMu( EdgeDirection reltype) const
         edges[i++]=Parals3(ends.first,ends.second,self.getEdgeDir(e,ends.first),nr++,e);
     }
     GraphSettings::sort(edges,edges+i,Parals3cmp());
-    for(i=0;i<self.getEdgeNo(EdAll);i++)
+    for(i=0;i<m;i++)
     {
         if (i==0 || !this->areParallel(edges[i-1].edge,edges[i].edge,reltype))
         {
@@ -814,7 +820,7 @@ std::pair<int,int> ConstGraphMethods< GraphType>::findParals(
         std::pair<IterOut1,IterOut2> out,Iterator begin,Iterator end, EdgeType reltype) const
 {
     std::pair< int,int > res(0,0);
-    assert ((reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir)); //TODO: throw
+    koalaAssert((reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir),GraphExcWrongMask);
     int size = 0;
     for( Iterator iter = begin; iter != end; iter++ ) size++;
     if (!size) return res;
@@ -859,6 +865,7 @@ std::pair<int,int> ConstGraphMethods< GraphType>::findParals(
 
 template< class GraphType>
 template< class IterOut1, class IterOut2  >
+// TODO: nieefektywne, mozna bezposrednio
 std::pair<int,int> ConstGraphMethods< GraphType>::findParals(
         std::pair<IterOut1,IterOut2> out,PVertex vert1, PVertex vert2,EdgeType relType) const
 {   PEdge LOCALARRAY( buf,std::min(self.getEdgeNo(vert1,EdAll),self.getEdgeNo(vert2,EdAll)) );

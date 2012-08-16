@@ -7,7 +7,7 @@ using namespace Koala;
 using namespace Koala::IO;
 using namespace std;
 
-int main() {
+#include "main.hpp"
 	Graph<int,int> graph;
 	string txt = "G?r@`_";
 	readG6(graph, txt);

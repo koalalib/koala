@@ -78,7 +78,7 @@ void searchTest2()
 
 #define STRATEGY LexBFS
 
-int main() {
+#include "main.hpp"
 
     searchTest();
     int licz;

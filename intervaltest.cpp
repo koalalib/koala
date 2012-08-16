@@ -38,7 +38,7 @@ void Test(bool res, const char *id, const char *graph) {
 		};
 	};
 
-int main() {
+#include "main.hpp"
 /*
 	Sets<TableDefaultCPPAllocator> m_sets;
 	TableDefaultCPPAllocator all;

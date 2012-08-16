@@ -28,7 +28,7 @@ Koala::Graph<OpisV,OpisE>::PEdge tabE[10];
 Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Kruskal::EdgeLabs<int> > > edgeCont;
 
 
-int main() {
+#include "main.hpp"
 
     A=g.addVert(OpisV("A"));
     B=g.addVert(OpisV("B"));

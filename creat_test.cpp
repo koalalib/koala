@@ -57,7 +57,7 @@ int test3();
 void printGraph(Koala::Graph<OpisV,OpisE>& g);
 void dir2str(Koala::EdgeDirection dir, std::string & dirStr );
 
-int main() {
+#include "main.hpp"
 
 	Koala::Graph<OpisV,OpisE> g1;
 

@@ -129,7 +129,7 @@ typename JoinableSets<ITEM>::Repr
 JoinableSets< ITEM,AssocContainer >::makeSinglet( const ITEM &i )
 {
     if (mapa.hasKey( i )) return 0;
-    assert( siz < maxsize ); // TODO: throw
+    koalaAssert( siz < maxsize,ContExcFull );
     typename JoinableSets< ITEM >::Repr r = bufor + siz++;
     r->first = r->last = r->parent = r;
     r->next = 0;

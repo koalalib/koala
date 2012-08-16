@@ -43,7 +43,7 @@ class AllocTest {
 
 
 
-int main() {
+#include "main.hpp"
 
 
 //    BlockListMemPool<int> pool(7);

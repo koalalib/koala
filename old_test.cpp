@@ -34,7 +34,7 @@ struct Prawdzik {
 
 
 
-int main() {
+#include "main.hpp"
 
     Graph<> ggg;
 	GraphI graph;

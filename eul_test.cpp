@@ -54,7 +54,7 @@ void dijTest()
 
 Koala::EdgeDirection mask=Koala::EdUndir|Koala::EdLoop;
 
-int main() {
+#include "main.hpp"
 
     dijTest();
 

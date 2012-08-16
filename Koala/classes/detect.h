@@ -39,13 +39,13 @@ class IsItPar : public SearchStructs {
     template <class GraphType>
 	static bool undir(const GraphType& g,bool allowmulti=false)
 	{   if (allowmulti) return g.getVertNo()>0 && g.getEdgeNo(EdDirIn|EdDirOut)==0; // undir
-	    int i=0;            // simple
+	    int i=0,m;            // simple
 	    if (!g.getVertNo() || g.getEdgeNo(EdDirIn|EdDirOut|EdLoop)) return false;
-	    std::pair<typename GraphType::PVertex,typename GraphType::PVertex>  LOCALARRAY(tabE,g.getEdgeNo());
+	    std::pair<typename GraphType::PVertex,typename GraphType::PVertex>  LOCALARRAY(tabE,m=g.getEdgeNo());
 	    for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
 	        tabE[i++]=pairMinMax(g.getEdgeEnds(e));
-	    DefaultStructs::sort( tabE,tabE + g.getEdgeNo() );
-	    for(i=1;i<g.getEdgeNo();i++) if (tabE[i-1]==tabE[i]) return false;
+	    DefaultStructs::sort( tabE,tabE + m );
+	    for(i=1;i<m;i++) if (tabE[i-1]==tabE[i]) return false;
 	    return true;
 	}
 
@@ -67,8 +67,8 @@ class IsItPar : public SearchStructs {
     // klika
 	template <class GraphType>
 	static bool clique(const GraphType& g)
-	{
-	    return (g.getEdgeNo()==g.getVertNo()*(g.getVertNo()-1)/2) && undir(g,false);
+	{   int n=g.getVertNo();
+	    return (g.getEdgeNo()==n*(n-1)/2) && undir(g,false);
 	}
 
     // suma rozlacznych klik
@@ -193,21 +193,23 @@ class IsItPar : public SearchStructs {
 	template <class GraphType>
 	static bool block(const GraphType& g)
 	{   if (!undir(g,false)) return false;
-	    int LOCALARRAY(comptab,g.getVertNo()+g.getEdgeNo()+1);
+        int m;
+	    int LOCALARRAY(comptab,g.getVertNo()+(m=g.getEdgeNo())+1);
 	    int e=0,comp=BlocksPar<DefaultStructs>::split(g,blackHole,blackHole,SearchStructs::compStore(comptab,blackHole),blackHole,EdUndir);
         for(int i=1;i<=comp;i++) e+=(comptab[i]-comptab[i-1])*(comptab[i]-comptab[i-1]-1)/2;
-	    return e==g.getEdgeNo();
+	    return e==m;
 	}
 
 	template <class GraphType>
 	// maks. liczba cyklomatyczna skladowej 2-spojnej grafu prostego. -1 w razie bledu.
 	static int almostTree(const GraphType& g)
 	{   if (!undir(g,false)) return -1;
-	    int LOCALARRAY(comptab,g.getVertNo()+g.getEdgeNo()+1);
-	    int LOCALARRAY(compE,g.getVertNo()+g.getEdgeNo()+1);
-	    for(int i=0;i<g.getVertNo()+g.getEdgeNo()+1;i++) compE[i]=0;
+        int n,m;
+	    int LOCALARRAY(comptab,(n=g.getVertNo())+(m=g.getEdgeNo())+1);
+	    int LOCALARRAY(compE,n+m+1);
+	    for(int i=0;i<n+m+1;i++) compE[i]=0;
 	    typename DefaultStructs:: template AssocCont<
-            typename GraphType::PEdge, int >::Type edgeCont(g.getEdgeNo());
+            typename GraphType::PEdge, int >::Type edgeCont(n);
 	    int res=0,comp=BlocksPar<DefaultStructs>::split(g,blackHole,edgeCont,SearchStructs::compStore(comptab,blackHole),blackHole,EdUndir);
         for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) compE[edgeCont[e]]++;
         for(int i=0;i<comp;i++) res=std::max(res,compE[i]-(comptab[i+1]-comptab[i]-1));
@@ -248,15 +250,16 @@ class IsItPar : public SearchStructs {
         template <class GraphType,class Iter>
         // znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
         static int minVertCover(const GraphType &g, Iter out)
-        {	    typename DefaultStructs:: template AssocCont<
+        {	int n;
+                typename DefaultStructs:: template AssocCont<
             typename GraphType::PVertex, Koala::Matching::VertLabs<GraphType >
-                >::Type vertTab(g.getVertNo());
+                >::Type vertTab(n=g.getVertNo());
 
             typename DefaultStructs:: template AssocCont<
-            typename GraphType::PEdge, bool>::Type matching(g.getVertNo()/2);
+            typename GraphType::PEdge, bool>::Type matching(n/2);
 
             Set<typename GraphType::PVertex> setL,setR;
-            assert(-1!=getPart(g,setInserter(setL),true)); // TODO: throw
+            koalaAssert(-1!=getPart(g,setInserter(setL),true),AlgExcWrongArg);
             setR=g.getVertSet()-setL;
             int matchno=MatchingPar<DefaultStructs>::findMax(g,vertTab,assocInserter(matching,constFun(true)));
 
@@ -345,10 +348,11 @@ class IsItPar : public SearchStructs {
         // wypisuje na iterator wierzcholki jednej partycji grafu pelnego dwudzielnego. Zwraca licznosc partycji (-1 w razie bledu)
         template <class GraphType,class Iter>
         static int getPart(const GraphType& g,Iter out)
-        {   typename GraphType::PVertex LOCALARRAY(tabE,g.getVertNo());
+        {   int n=g.getVertNo();
+            typename GraphType::PVertex LOCALARRAY(tabE,n);
             int licz=Bipartite::getPart(g,tabE,false);
             if (licz==-1) return -1;
-            if (licz*(g.getVertNo()-licz)!=g.getEdgeNo(EdUndir)) return -1;
+            if (licz*(n-licz)!=g.getEdgeNo(EdUndir)) return -1;
             if (!isBlackHole(out)) for(int i=0;i<licz;i++) { *out=tabE[i]; ++out; };
             return licz;
         }
@@ -370,13 +374,14 @@ class IsItPar : public SearchStructs {
         static int split(const GraphType& g,CompStore< Iter,VIter > out)
         {
             if (!undir(g,false)) return -1;
+            int n;
             typename DefaultStructs:: template AssocCont<
-                typename GraphType::PVertex, int >::Type colors(g.getVertNo());
-            int LOCALARRAY(tabC,g.getVertNo());
+                typename GraphType::PVertex, int >::Type colors(n=g.getVertNo());
+            int LOCALARRAY(tabC,n);
             int i,licz=0,maxc=0;
 
             for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-            {   for(i=0;i<g.getVertNo();i++) tabC[i]=1;
+            {   for(i=0;i<n;i++) tabC[i]=1;
                 for(typename GraphType::PEdge e=g.getEdge(v,EdUndir);e;e=g.getEdgeNext(v,e,EdUndir))
                     if (colors.hasKey(g.getEdgeEnd(e,v))) tabC[colors[g.getEdgeEnd(e,v)]]=0;
                 for(i=0;!tabC[i];i++);
@@ -391,7 +396,7 @@ class IsItPar : public SearchStructs {
             if (!isBlackHole(out.compIter))
             {
                 for(i=0;i<=maxc;i++) { *out.compIter=licz; ++out.compIter; licz+=tabC[i];  }
-                *out.compIter=g.getVertNo(); ++out.compIter;
+                *out.compIter=n; ++out.compIter;
             }
             if (!isBlackHole(out.vertIter))
                 for(i=0;i<=maxc;i++)
@@ -583,13 +588,13 @@ class IsItPar : public SearchStructs {
             CompStore< QIter,VIterOut > out, // wyjsciowe iteratory na ciagi maksymalnych klik
             QTEIter qte) // wyjsciowe iteratory na pary std::pair<int, int> - pary numerow klik bedacych koncami
             // "krawedzi" tego drzewa
-        {   int i,j,licze=0,res,no;
+        {   int i,j,licze=0,res,no,n;
             VIter vi;
-            Set<typename Graph::PVertex> LOCALARRAY(tabs,g.getVertNo());
-            typename Graph::PVertex LOCALARRAY(vbuf,g.getVertNo());
-            int LOCALARRAY(sno,g.getVertNo());
+            Set<typename Graph::PVertex> LOCALARRAY(tabs,n=g.getVertNo());
+            typename Graph::PVertex LOCALARRAY(vbuf,n);
+            int LOCALARRAY(sno,n);
             typename DefaultStructs:: template AssocCont<
-                typename Graph::PVertex, bool >::Type tabf(g.getVertNo());
+                typename Graph::PVertex, bool >::Type tabf(n);
             for(i=0,vi=begin;vi!=end;++vi,++i)
             {   tabs[i]=*vi;
                 typename Graph::PVertex u;
@@ -597,7 +602,7 @@ class IsItPar : public SearchStructs {
                     if (tabf.hasKey(u=g.getEdgeEnd(e,*vi))) tabs[i]+=u;
                 tabf[*vi]=true;
             }
-            for(i=0;i<g.getVertNo()-1;i++) for(j=i+1;j<g.getVertNo();j++)
+            for(i=0;i<n-1;i++) for(j=i+1;j<n;j++)
                 if (tabs[i].subsetOf(tabs[j]))
                     { tabs[i].clear(); licze++; break; }
             *out.compIter=0;++out.compIter;
@@ -606,12 +611,12 @@ class IsItPar : public SearchStructs {
                 for(int k=0;k<tabs[i].size();k++) { *out.vertIter=vbuf[k]; ++out.vertIter; }
                 j+=tabs[i].size();*out.compIter=j;++out.compIter;
             }
-            res=g.getVertNo()-licze;
+            res=n-licze;
             if (!isBlackHole(qte) && res>1)
             {   g.getVerts(vbuf);
                 JoinableSets<typename Graph::PVertex, typename DefaultStructs::template AssocCont<typename Graph::PVertex,
                     JSPartDesrc<typename Graph::PVertex> *>::Type > sets;
-                sets.resize(g.getVertNo());
+                sets.resize(n);
                 for(typename Graph::PVertex v = g.getVert(); v ; v = g.getVertNext(v)) sets.makeSinglet(v);
                 std::pair<int, std::pair<int,int> > LOCALARRAY(edges,res*(res-1)/2);
                 int l=0;
@@ -635,9 +640,10 @@ class IsItPar : public SearchStructs {
         // j.w. ale samodzielna. Pobiera tylko graf, jesli nie byl chordal, zwraca -1
         template<class Graph, class VIterOut, class QIter,class QTEIter>
         static int maxCliques(const Graph &g,CompStore< QIter,VIterOut > out, QTEIter qte)
-        {   typename Graph::PVertex LOCALARRAY(vbuf,g.getVertNo());
+        {   int n;
+            typename Graph::PVertex LOCALARRAY(vbuf,n=g.getVertNo());
             if (!getOrder(g,vbuf)) return -1;
-            return maxCliques(g,vbuf,vbuf+g.getVertNo(),out,qte);
+            return maxCliques(g,vbuf,vbuf+n,out,qte);
         }
 
         // znajduje najwieksza klike w grafie, zwraca jej rozmiar
@@ -672,9 +678,10 @@ class IsItPar : public SearchStructs {
         // j.w. ale samodzielna. Pobiera tylko graf, jesli nie byl chordal, zwraca -1
         template<class Graph, class VIterOut>
         static int maxClique(const Graph &g,VIterOut out)
-        {   typename Graph::PVertex LOCALARRAY(vbuf,g.getVertNo());
+        {   int n;
+            typename Graph::PVertex LOCALARRAY(vbuf,n=g.getVertNo());
             if (!getOrder(g,vbuf)) return -1;
-            return maxClique(g,vbuf,vbuf+g.getVertNo(),out);
+            return maxClique(g,vbuf,vbuf+n,out);
         }
 
         // znajduje najwiekszy zbior niezalezny (wypuszczany na out), zwraca jego rozmiar
@@ -773,10 +780,10 @@ class IsItPar : public SearchStructs {
         template <class Graph,class IterOut>
         static int maxStable(const Graph& g, //badany graf
                              IterOut out ) // iterator wyjsciowy na wierzcholki
-        {
-            typename Graph::PVertex LOCALARRAY(vbegin,g.getVertNo()*g.getVertNo());
-            int LOCALARRAY(begin,g.getVertNo()+1);
-            std::pair<int,int> LOCALARRAY(ebegin,g.getVertNo());
+        {   int n=g.getVertNo();
+            typename Graph::PVertex LOCALARRAY(vbegin,n*n);
+            int LOCALARRAY(begin,n+1);
+            std::pair<int,int> LOCALARRAY(ebegin,n);
             int qn=maxCliques(g,compStore(begin,vbegin),ebegin);
             if (qn==-1) return -1;
             return maxStable(g,qn,begin,vbegin,ebegin,out);
@@ -1093,6 +1100,7 @@ class IsItPar : public SearchStructs {
             // (kierunek krawedzi miedzy getEdgeEnd1 a getEdgeEnd2). Lub BlackHole.
             // aheightmap- wysciowa tablica asocjacyjna PVertex->int z optymalnym pokolorowaniem wierzcholkowym. Lub BlackHole.
             // cliqueiter - iterator wyjsciowy, na ktory zostaje zapisana najwieksza klika
+            // TODO: tyle, ze poki co nie dziala!
             template<class Graph,class DirMap, class OutMap, class OutIter>
             static int explore(const Graph &g, DirMap& dirmap,OutMap &aheightmap,OutIter cliqueiter)
             {
@@ -1145,7 +1153,7 @@ class IsItPar : public SearchStructs {
                     heightmap=
                 BlackHoleSwitch<OutMap,typename DefaultStructs:: template AssocCont<typename Graph::PVertex,
                 int >::Type >::get(aheightmap,localheightmap);
-                if (isBlackHole(aheightmap)||DefaultStructs::ReserveOutAssocCont) heightmap.reserve(g.getVertNo());
+                if (isBlackHole(aheightmap)||DefaultStructs::ReserveOutAssocCont) heightmap.reserve(n);
 
 
                 for(i = 0; i < n; i++) heightmap[idxv[i]] = height[i] - 1;
@@ -1275,7 +1283,7 @@ class IsItPar : public SearchStructs {
 	    return Comparability::explore(g,blackHole,blackHole,blackHole)!=-1;
 	}
 
-    class Interval {
+    class Interval : protected LexBFSPar<DefaultStructs> {
 
         public:
 
@@ -1302,8 +1310,8 @@ class IsItPar : public SearchStructs {
             int licz=0,i=0,j=0;
             Iter it;
             for(it=begin;it!=end;++it)
-            // TODO: throw
-            {   assert((*it).left<=(*it).right); licz++;    }
+
+            {   koalaAssert((*it).left<=(*it).right,AlgExcWrongArg); licz++;    }
             if (!licz) return 0;
             typename GraphType::PVertex LOCALARRAY(tabv,licz);
             for(it=begin;it!=end;++it)
@@ -1342,20 +1350,20 @@ class IsItPar : public SearchStructs {
             typename GraphType::PVertex LOCALARRAY(sigma, n);
             typename GraphType::PVertex LOCALARRAY(sigmap, n);
             typename GraphType::PVertex LOCALARRAY(sigmapp, n);
-            typename DefaultStructs::template AssocCont<typename GraphType::PVertex, IvData>::Type data(g.getVertNo());
+            typename DefaultStructs::template AssocCont<typename GraphType::PVertex, IvData>::Type data(n);
 
 
-            Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > > allocat(g.getVertNo()+2); //TODO: size?
-            Privates::BlockListAllocator<Privates::ListNode<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > allocat2(2*g.getVertNo()+2); //TODO: size?
-            Privates::BlockListAllocator<Privates::ListNode<typename Sets::Elem> > allocat3(2*g.getVertNo()*g.getVertNo()); //TODO: size?
+            Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > > allocat(n+2); //TODO: size?
+            Privates::BlockListAllocator<Privates::ListNode<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > allocat2(2*n+2); //TODO: size?
+            Privates::BlockListAllocator<Privates::ListNode<typename Sets::Elem> > allocat3(2*n*n); //TODO: size?
 
 
 //            DefaultCPPAllocator allocat3;
             std::pair<typename Sets::Entry,
-                typename Sets::Entry::iterator> LOCALARRAY(Abuf,g.getVertNo());
+                typename Sets::Entry::iterator> LOCALARRAY(Abuf,n);
             std::pair<typename Sets::Entry,
-                typename Sets::Entry::iterator> LOCALARRAY(Bbuf,g.getVertNo());
-            for(i=0;i<g.getVertNo();i++)
+                typename Sets::Entry::iterator> LOCALARRAY(Bbuf,n);
+            for(i=0;i<n;i++)
                 { Abuf[i].first.init(allocat3); Bbuf[i].first.init(allocat3);}
             Sets A(Abuf,g.getVertNo(),allocat3),B(Bbuf,g.getVertNo(),allocat3);
 
@@ -1389,9 +1397,9 @@ class IsItPar : public SearchStructs {
 
             if(IsUmbrellaFree(g, data, sigma)) {
                 if(!isBlackHole(outmap)) {
-                    if(DefaultStructs::ReserveOutAssocCont) outmap.reserve(g.getVertNo());
+                    if(DefaultStructs::ReserveOutAssocCont) outmap.reserve(n);
 		    CalculateI(g, sigma, data, &IvData::posSigma, &IvData::ip);
-                    for(int i=0;i<g.getVertNo();i++) { outmap[sigma[i]] = Segment(i, data[sigma[i]].ip); }
+                    for(int i=0;i<n;i++) { outmap[sigma[i]] = Segment(i, data[sigma[i]].ip); }
 		    };
                 return true;
 	    	};
@@ -1580,11 +1588,11 @@ class IsItPar : public SearchStructs {
                     LexVisitContainer<GraphType,
                         Privates::BlockListAllocator< Privates::ListNode<Privates::List_iterator<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > >,
                         Privates::BlockListAllocator<Privates::ListNode<typename LexBFSPar<DefaultStructs>::template LVCNode<GraphType> > > >
-                alpha(allocat,allocat2,g.getVertNo()),beta(allocat,allocat2,g.getVertNo());
+                alpha(allocat,allocat2,n),beta(allocat,allocat2,n);
 
 //                typename LexBFSPar<DefaultStructs>::template LexVisitContainer<GraphType, DefaultCPPAllocator,DefaultCPPAllocator> alpha(pula,pula);
 //                typename LexBFSPar<DefaultStructs>::template LexVisitContainer<GraphType, DefaultCPPAllocator,DefaultCPPAllocator> beta(pula,pula);
-                typename DefaultStructs::template AssocCont<typename GraphType::PVertex, LBSData>::Type vertData(g.getVertNo());
+                typename DefaultStructs::template AssocCont<typename GraphType::PVertex, LBSData>::Type vertData(n);
 
                 for(i = 0; i < n; i++) {
                     vertData[sigmap[i]].aOrder = i;
@@ -1759,10 +1767,11 @@ class IsItPar : public SearchStructs {
     template <class GraphType>
 	static bool prime(const GraphType& g)
 	{   if (!undir(g,false)) return false;
-        if (g.getVertNo()<4) return false;
+        int n=g.getVertNo();
+        if (n<4) return false;
 	    typename ModulesPar<DefaultStructs>::Partition res=
             ModulesPar<DefaultStructs>::split(g,compStore(blackHole,blackHole),blackHole);
-        return (res.type==mpPrime) && (res.size==g.getVertNo());
+        return (res.type==mpPrime) && (res.size==n);
 	}
 
 
@@ -1837,7 +1846,7 @@ class IsItPar : public SearchStructs {
             typename GraphType::PVertex LOCALARRAY(tabv,n);
             int LOCALARRAY(tabc,n+1);
             typename ModulesPar<DefaultStructs>::Partition parts=ModulesPar<DefaultStructs>::split(g,compStore(tabc,tabv),blackHole,true);
-            assert(parts.type!=mpPrime);// TODO: throw
+            koalaAssert(parts.type!=mpPrime,AlgExcWrongArg);
             for(int i=0;i<parts.size;i++)
             {   subset.clear();
                 for(int j=tabc[i];j<tabc[i+1];j++) subset[tabv[j]];
@@ -1859,7 +1868,7 @@ class IsItPar : public SearchStructs {
             typename GraphType::PVertex LOCALARRAY(tabv,n);
             int LOCALARRAY(tabc,n+1);
             typename ModulesPar<DefaultStructs>::Partition parts=ModulesPar<DefaultStructs>::split(g,compStore(tabc,tabv),blackHole,true);
-            assert(parts.type!=mpPrime);// TODO: throw
+            koalaAssert(parts.type!=mpPrime,AlgExcWrongArg);
             for(int i=0;i<parts.size;i++)
             {   subset.clear();
                 for(int j=tabc[i];j<tabc[i+1];j++) subset[tabv[j]];

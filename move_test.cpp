@@ -25,7 +25,7 @@ struct InfoE1 {
 
 
 
-int main() {
+#include "main.hpp"
 
 
     Graph<InfoV1,InfoE1> g1;

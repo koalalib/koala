@@ -16,7 +16,7 @@ using namespace std;
 #define TEST_2
 // TEST_ 1-7
 
-int main() {
+#include "main.hpp"
 	bool rv;
 	Graph<int, int> g;
 	Graph<int, int>::PVertex v;

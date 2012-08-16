@@ -176,9 +176,7 @@ void BinomTest2()
 
 }
 
-int main()
-{
-
+#include "main.hpp"
 	FibonTest1();
 	FibonTest1Loc();
 	BinomTest1();
@@ -209,7 +207,17 @@ cout << "\n-------------\n";
 
 	heap4.clear();
 	cout << endl << heap4.size();
+cout << "\n-------------\n";
+    int bufor[10],data[5]={3,4,1,3,5};
+    BinomHeap<int> ii;
 
+    ii.assign(data,data+5);
+
+    while (!ii.empty())
+    {
+        cout << ii.top() << " ";
+        ii.pop();
+    }
 
 	return 0;
 }

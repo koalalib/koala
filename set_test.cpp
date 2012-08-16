@@ -37,8 +37,7 @@ Vert* vtab[4]={A,B,C,D};
 double kwadrat(int arg) { return arg*arg; }
 
 
-int main()
-{
+#include "main.hpp"
     int tab[]={3,0,3,4,7,7};
     int tab2[5];
 

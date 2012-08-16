@@ -21,7 +21,7 @@ bool Test(const char *prompt, const char *buf, const char *res) {
 	return true;
 	};
 
-int main() {
+#include "main.hpp"
 	int i;
 	bool rv;
 	char buf[65536];

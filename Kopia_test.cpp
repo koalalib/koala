@@ -48,7 +48,7 @@ void t( Cont /*AssocArray<Vert*,std::string>*/ & arr)
 //}
 
 
-int main() {
+#include "main.hpp"
 
     std::map<char,int> imap;
     imap['a']=1;

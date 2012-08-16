@@ -25,9 +25,9 @@ template<class GraphType>
 void TT(GraphType &g, int n) {
     typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
     };
-    
 
-int main() {
+
+#include "main.hpp"
 	S<int, double> LOCALARRAY(ht, 16);
 	S<int, double> LOCALARRAY(st, 2);
 	int LOCALARRAY(iht, 8192);

@@ -100,8 +100,8 @@ Graph<OpV,OpE>::PEdge e=g.addEdge(u,v,std::string("u>v"));
 
 
 
-int main()
-{   string strN="N";
+#include "main.hpp"
+   string strN="N";
 
     g.clear();
     cout << Product::strong(g1,g2,g,

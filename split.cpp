@@ -23,7 +23,7 @@ const char* print(ModPartType x)
     assert(0);
 }
 
-int main() {
+#include "main.hpp"
 	Graph<char> gk3;
 	Graph<char>::PVertex tabV[20],F,G,H;
 	F=gk3.addVert('F');G=gk3.addVert('G');H=gk3.addVert('H');

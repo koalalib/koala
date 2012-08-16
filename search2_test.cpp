@@ -113,7 +113,7 @@ void searchTest2()
 }
 
 
-int main() {
+#include "main.hpp"
 
 {
 

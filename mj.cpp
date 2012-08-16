@@ -22,7 +22,7 @@ using namespace Koala;
 
 
 
-int main() {
+#include "main.hpp"
 
 //1) W mainie utworzenie grafu i przekazanie go
 //Zalozmy, ze tworzysz graf o wierzcholkach z etykieta char i krawedziach z etykieta string

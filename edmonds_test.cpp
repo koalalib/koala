@@ -153,7 +153,7 @@ void HKTest()
 }
 
 
-int main() {
+#include "main.hpp"
     int edgeCoverSize;
     edmTest();
     std::cout<< "\n1a. Chcemy skojarzenie maksymalne.\n";

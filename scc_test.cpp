@@ -75,7 +75,7 @@ void searchTest2()
 }
 
 
-int main() {
+#include "main.hpp"
 
     std::cout << std::boolalpha;
 

@@ -311,7 +311,7 @@ void ghTest2()
 }
 
 
-int main() {
+#include "main.hpp"
 
 //    g.makeAdjMatrix();
     dijTest();

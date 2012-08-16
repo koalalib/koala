@@ -56,8 +56,7 @@ void dijTest()
     for(int i=0;i<10;i++) {tabV[i]=0; tabE[i]=0; }
 }
 
-int main() {
-
+#include "main.hpp"
     g.makeAdjMatrix();
     dijTest();
 
@@ -78,7 +77,9 @@ int main() {
         Koala::PathStructs::OutPathTool<Koala::Graph<OpisV,OpisE> > tool;
         Koala::Dijkstra::getPath(g,vertCont,V,tool.input());
         std::cout << tool.lenght();
+
         for(int i=0;i<=tool.lenght();i++) std::cout<< tool.vertex(i)->info.name;
+        std:: cout << "^";
         for(int i=0;i<tool.lenght();i++) std::cout << "{"<< g.getEdgeEnds(tool.edge(i)).first->info.name <<
                             "," << g.getEdgeEnds(tool.edge(i)).second->info.name << "}";
         std:: cout << "\n";
@@ -247,6 +248,7 @@ int main() {
     // ... interesowala go tylko odleglosc, nie chcialo mu sie zakladac kontenera asoc. dla wierzcholkow
     std::cout<< std::endl;
     dijTest();
+//    U=0;
     std::cout<< "Odleglosc: "<< Koala::DijkstraFibon::distances(g,blackHole,edgeCont,U,V)<<":";
 
 

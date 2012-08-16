@@ -48,7 +48,7 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
 }
 
 
-int main() {
+#include "main.hpp"
 
     Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > > bufor[10];
     std::map<int,std::string> mapa;

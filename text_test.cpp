@@ -19,7 +19,7 @@ struct Dummy {
     int a;
 };
 
-int main() {
+#include "main.hpp"
 	string buf;
 	Graph<char,string> g;
 	Graph<char,string>::PVertex A,B,C,D;

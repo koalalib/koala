@@ -29,7 +29,7 @@ Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> >::PEdge tabE[
 
 
 
-int main() {
+#include "main.hpp"
 
     g.makeAdjMatrix();
 

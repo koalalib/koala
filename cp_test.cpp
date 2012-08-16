@@ -52,7 +52,7 @@ struct InfoE2 {
 } ein2;
 
 
-int main() {
+#include "main.hpp"
 
 
 

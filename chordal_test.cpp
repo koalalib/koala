@@ -57,7 +57,7 @@ ChTest tests[] = {
 	};
 
 
-int main() {
+#include "main.hpp"
 	int i, ncq;
 	bool rv;
 	Graph<int, int> g, g2;

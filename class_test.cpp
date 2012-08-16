@@ -14,7 +14,7 @@ using namespace Koala::IO;
 using namespace std;
 
 
-int main() {
+#include "main.hpp"
 
 	bool rv;
 	Graph<int, int> g;

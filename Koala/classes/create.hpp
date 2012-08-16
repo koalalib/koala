@@ -571,8 +571,8 @@ Creator::erdRen1(GraphType& g, int n, double p, EdgeType eType){
 template< class GraphType, class  VInfoGen, class  EInfoGen>
 typename GraphType::PVertex
 Creator::erdRen1(GraphType& g, int n, double p, VInfoGen vInfoGen, EInfoGen eInfoGen, unsigned int randSeed, EdgeType eType)
-{
-    assert(eType == Undirected||eType == Directed);
+{   if (eType == EdDirOut) eType =Directed;
+    koalaAssert(eType == Undirected||eType == Directed,AlgExcWrongMask);
 	double rnd;
 	srand (randSeed);
 
@@ -622,7 +622,7 @@ Creator::erdRen2(GraphType& g,int n, int m, EdgeType eType){
 template< class GraphType, class  VInfoGen, class  EInfoGen>
 typename GraphType::PVertex
 Creator::erdRen2(GraphType& g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen, unsigned int randSeed, EdgeType eType)
-{
+{   if (eType == EdDirOut) eType =Directed;
 
 	srand (randSeed);
 	int maxEgdesNum = 0, j=0, k = 0,  v1num=0, v2num=0;
@@ -635,10 +635,10 @@ Creator::erdRen2(GraphType& g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGe
 	if(eType == Undirected)
 		maxEgdesNum = (n*(n-1))/2;
 	else{
-		assert(eType == Directed);
+		koalaAssert(eType == Directed,AlgExcWrongMask);
 		maxEgdesNum = n*(n-1);
 	}
-	assert (m <= maxEgdesNum);
+	koalaAssert(m <= maxEgdesNum,AlgExcWrongArg);
 
 	std::pair<int,int> LOCALARRAY( edges,maxEgdesNum);
 

@@ -51,7 +51,7 @@ void bfTest()
     for(int i=0;i<10;i++) {tabV[i]=0; tabE[i]=0; }
 }
 
-int main() {
+#include "main.hpp"
 
     bfTest();
 

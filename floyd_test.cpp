@@ -53,7 +53,7 @@ void floydTest()
 }
 
 
-int main() {
+#include "main.hpp"
 
     floydTest();
 

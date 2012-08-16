@@ -293,6 +293,7 @@ template< typename Element > inline
        return *std::vector< Element >::rbegin();
    }
 
+// TODO: dwie ponizsze maja blad, w przypadku nieznalezienia elementu e powinien leciec koalaAssert( ...,ContExcOutpass);
 template< typename Element > inline
     Element Set< Element >::prev( const Element &e ) const
     {   if (this->isBad(e)) return last();

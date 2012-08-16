@@ -1,6 +1,7 @@
 #ifndef KOALA_CREATOR_H
 #define KOALA_CREATOR_H
 
+#include "..\base\exception.h"
 #include "..\graph\graph.h"
 #include "..\algorithm\weights.h"
 #include <cstdlib>
@@ -515,6 +516,8 @@ template <class DefaultStructs>
 class RelDiagramPar {
     public:
 
+    //TODO: rozwazyc pow(Graph& g,int n) i to samo w MatrixForm
+
     template <class Graph>
     static void repair(Graph& g)
     // doprowadza diagram do zwyklej postaci, bez krawedzi nieskierowanych ani rownoleglych
@@ -574,6 +577,7 @@ class RelDiagramPar {
 
     template <class Graph>
     // przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
+    // TODO: nieefektywne, zamiast Floyda nalezy uzyc BFS z kazdego wierzcholka
     static void transClousure(Graph& g,const typename Graph::EdgeInfoType& einfo=typename Graph::EdgeInfoType())
     {   typename DefaultStructs::template TwoDimAssocCont<typename Graph::PVertex, typename FloydPar<DefaultStructs>
                         ::template VertLabs<int,Graph>,AMatrFull > :: Type matr(g.getVertNo());
@@ -854,8 +858,8 @@ class ProductPar {
             { link.first.first()(v,(typename Graph1::PVertex)0);link.first.second()(v,(typename Graph2::PVertex)0); }
         for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
             { link.second.first()(e,(typename Graph1::PEdge)0);link.second.second()(e,(typename Graph2::PEdge)0); }
-        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(g1.getVertNo());
-        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(g2.getVertNo());
+        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(n1);
+        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(n2);
         int l=0;
         for(typename Graph1::PVertex v=g1.getVert();v;v=g1.getVertNext(v),l++) indv1[v]=l;
         l=0;
@@ -931,8 +935,8 @@ class ProductPar {
             { link.first.first()(v,(typename Graph1::PVertex)0);link.first.second()(v,(typename Graph2::PVertex)0); }
         for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
             { link.second.first()(e,(typename Graph1::PEdge)0);link.second.second()(e,(typename Graph2::PEdge)0); }
-        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(g1.getVertNo());
-        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(g2.getVertNo());
+        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(n1);
+        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(n2);
         int l=0;
         for(typename Graph1::PVertex v=g1.getVert();v;v=g1.getVertNext(v),l++) indv1[v]=l;
         l=0;
@@ -1012,8 +1016,8 @@ class ProductPar {
             { link.first.first()(v,(typename Graph1::PVertex)0);link.first.second()(v,(typename Graph2::PVertex)0); }
         for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
             { link.second.first()(e,(typename Graph1::PEdge)0);link.second.second()(e,(typename Graph2::PEdge)0); }
-        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(g1.getVertNo());
-        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(g2.getVertNo());
+        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(n1);
+        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(n2);
         int l=0;
         for(typename Graph1::PVertex v=g1.getVert();v;v=g1.getVertNext(v),l++) indv1[v]=l;
         l=0;
@@ -1160,8 +1164,8 @@ class ProductPar {
             { link.first.first()(v,(typename Graph1::PVertex)0);link.first.second()(v,(typename Graph2::PVertex)0); }
         for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
             { link.second.first()(e,(typename Graph1::PEdge)0);link.second.second()(e,(typename Graph2::PEdge)0); }
-        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(g1.getVertNo());
-        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(g2.getVertNo());
+        typename DefaultStructs::template AssocCont<typename Graph1::PVertex,int>:: Type indv1(n1);
+        typename DefaultStructs::template AssocCont<typename Graph2::PVertex,int>:: Type indv2(n2);
         int l=0;
         for(typename Graph1::PVertex v=g1.getVert();v;v=g1.getVertNext(v),l++) indv1[v]=l;
         l=0;

@@ -22,7 +22,7 @@ using namespace std;
 /*
  * main
  */
-int main() {
+#include "main.hpp"
 	bool rv;
 	Graph<int, int> g;
 	Graph<int, int>::PVertex v;

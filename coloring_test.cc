@@ -8,7 +8,7 @@ typedef Koala::Graph< std::string,std::string > Graph;
 typedef Graph::PVertex Vertex;
 typedef Koala::AssocTable< std::map< Vertex,int > > Map;
 
-int main() {
+#include "main.hpp"
     Graph g;
     Vertex v[20] = {
         g.addVert( "A" ),g.addVert( "B" ),g.addVert( "C" ),g.addVert( "D" ),g.addVert( "E" ),

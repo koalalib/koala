@@ -181,7 +181,7 @@ Graph< VertInfo,EdgeInfo,Settings >::addVert( VertInfo infoExt )
 template< class VertInfo, class EdgeInfo, class Settings >
 void Graph< VertInfo,EdgeInfo,Settings >::delVert( PVertex vert, bool force )
 {
-    assert(vert) ; // TODO: throw
+    koalaAssert(vert,GraphExcNullVert) ;
     if (force)
     {
         PEdge edge = this->getEdge( vert );
@@ -204,7 +204,7 @@ inline void Graph< VertInfo,EdgeInfo,Settings >::del( PVertex vert, bool force )
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline void Graph< VertInfo,EdgeInfo,Settings >::setVertInfo( PVertex vert,  VertInfo info ) const
-{   assert(vert) ; // TODO: throw
+{   koalaAssert(vert,GraphExcNullVert) ;
     vert->setInfo( info );
 }
 
@@ -230,8 +230,8 @@ template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::addEdge(
     PVertex vert1, PVertex vert2, EdgeDirection direct )
-{   assert(vert1 && vert2 // TODO: throw
-           && (direct==EdLoop || direct==EdUndir || direct==EdDirIn || direct==EdDirOut || direct==Directed));
+{   koalaAssert(vert1 && vert2,GraphExcNullVert);
+    koalaAssert((direct==EdLoop || direct==EdUndir || direct==EdDirIn || direct==EdDirOut || direct==Directed),GraphExcWrongMask);
     PEdge tmp_edge = new Edge();
     if (!attach( tmp_edge,vert1,vert2,direct ))
     {
@@ -245,8 +245,8 @@ template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::addEdge(
     PVertex vert1, PVertex vert2,  EdgeInfo infoExt, EdgeDirection direct )
-{   assert(vert1 && vert2 // TODO: throw
-           && (direct==EdLoop || direct==EdUndir || direct==EdDirIn || direct==EdDirOut || direct==Directed));
+{   koalaAssert(vert1 && vert2,GraphExcNullVert);
+    koalaAssert (direct==EdLoop || direct==EdUndir || direct==EdDirIn || direct==EdDirOut || direct==Directed,GraphExcWrongMask);
     PEdge tmp_edge = new Edge( infoExt );
     if (!attach( tmp_edge,vert1,vert2,direct ))
     {
@@ -260,7 +260,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::addArch(
     PVertex v_out, PVertex v_in,  EdgeInfo infoExt )
-{   assert(v_out && v_in ); // TODO: throw
+{   koalaAssert(v_out && v_in ,GraphExcNullVert);
     PEdge tmp_edge = new Edge( infoExt );
     if (!attach_dir( tmp_edge,v_out,v_in ))
     {
@@ -273,7 +273,7 @@ Graph< VertInfo,EdgeInfo,Settings >::addArch(
 template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::addLoop( PVertex vert, EdgeInfo infoExt )
-{   assert(vert); // TODO: throw
+{   koalaAssert(vert,GraphExcNullVert);
     PEdge tmp_edge = new Edge( infoExt );
     if (!attach_loop( tmp_edge,vert ))
     {
@@ -286,13 +286,13 @@ Graph< VertInfo,EdgeInfo,Settings >::addLoop( PVertex vert, EdgeInfo infoExt )
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline void Graph< VertInfo,EdgeInfo,Settings >::setEdgeInfo( PEdge edge, EdgeInfo info ) const
-{   assert(edge); // TODO: throw
+{   koalaAssert(edge,GraphExcNullEdge);
     edge->setInfo( info );
 }
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline void Graph< VertInfo,EdgeInfo,Settings >::del( PEdge edge )
-{   assert(edge); // TODO: throw
+{   koalaAssert(edge,GraphExcNullEdge);
     if (detach( edge )) delete edge;
 }
 
@@ -329,7 +329,7 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgePrev( PEdge edge, EdgeType direct ) 
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline EdgeType Graph< VertInfo,EdgeInfo,Settings >::getEdgeType( PEdge edge ) const
-{   assert(edge); // TODO: throw
+{   koalaAssert(edge,GraphExcNullEdge);
     return edge->getType();
 }
 
@@ -339,7 +339,8 @@ typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::getEdgeNext(
     PVertex vert, PEdge edge, EdgeDirection direct ) const
 {
-    assert(vert && !(edge && !this->isEdgeEnd( edge,vert ))); // TODO: throw;
+    koalaAssert(vert,GraphExcNullVert);
+    koalaAssert(!(edge && !this->isEdgeEnd( edge,vert )),GraphExcWrongConn);
     if (!direct) return NULL;
     EdgeDirection type = getEdgeDir( edge,vert );
     EdgeDirection nexttype = (type == EdNone) ? EdLoop : type << 1;
@@ -370,7 +371,8 @@ template< class VertInfo, class EdgeInfo, class Settings >
 typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::getEdgePrev(
     PVertex vert, PEdge edge, EdgeDirection direct ) const
-{   assert(vert && !(edge && !this->isEdgeEnd( edge,vert ))); // TODO: throw;
+{   koalaAssert(vert,GraphExcNullVert);
+    koalaAssert(!(edge && !this->isEdgeEnd( edge,vert )),GraphExcWrongConn);
     if (!direct) return NULL;
     EdgeDirection type = getEdgeDir( edge,vert );
     EdgeDirection nexttype = (type == EdNone) ? EdDirOut : type >> 1;
@@ -401,7 +403,7 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgePrev(
 
 template< class VertInfo,class EdgeInfo , class Settings >
 inline int Graph< VertInfo,EdgeInfo,Settings >::getEdgeNo( PVertex vert, EdgeDirection direct ) const
-{   assert(vert); // TODO: throw;
+{   koalaAssert(vert,GraphExcNullVert);
     int ans = 0;
     if (direct & EdLoop)
         ans += vert->Privates::VertLinkEdLoop<VertInfo,EdgeInfo,Settings,EdLoop&Settings::EdAllow>::getDegree();
@@ -421,8 +423,9 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgeNext(
     PVertex vert1, PVertex vert2, PEdge edge, EdgeDirection direct ) const
 {
 
-    assert(vert1 && vert2 && !(edge && (!this->isEdgeEnd( edge,vert1 ) || !this->isEdgeEnd( edge,vert2 ))));
-    // TODO: throw
+    koalaAssert(vert1 && vert2,GraphExcNullVert);
+    koalaAssert(!(edge && (!this->isEdgeEnd( edge,vert1 ) || !this->isEdgeEnd( edge,vert2 ))),GraphExcWrongConn);
+
     if (vert1 == vert2)
         if (direct & EdLoop) return getEdgeNext( vert1,edge,EdLoop );
         else return 0;
@@ -486,8 +489,8 @@ typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::getEdgePrev(
     PVertex vert1, PVertex vert2, PEdge edge, EdgeDirection direct ) const
 {
-    assert(vert1 && vert2 && !(edge && (!this->isEdgeEnd( edge,vert1 ) || !this->isEdgeEnd( edge,vert2 ))));
-    // TODO: throw
+    koalaAssert(vert1 && vert2,GraphExcNullVert);
+    koalaAssert(!(edge && (!this->isEdgeEnd( edge,vert1 ) || !this->isEdgeEnd( edge,vert2 ))),GraphExcWrongConn);
     if (vert1 == vert2)
         if (direct & EdLoop) return getEdgePrev( vert1,edge,EdLoop );
         else return 0;
@@ -551,7 +554,7 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgePrev(
 template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::getEdgeNo(
     PVertex vert1, PVertex vert2, EdgeDirection direct ) const
-{       assert(vert1 && vert2 ); // TODO: throw
+{       koalaAssert(vert1 && vert2,GraphExcNullVert );
     if (vert1 == vert2)
         if (direct & EdLoop) return getEdgeNo( vert1,EdLoop );
         else return 0;
@@ -577,7 +580,7 @@ template< class VertInfo, class EdgeInfo, class Settings >
 inline std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,
     typename Graph< VertInfo,EdgeInfo,Settings >::PVertex >
 Graph< VertInfo,EdgeInfo,Settings >::getEdgeEnds( PEdge edge ) const
-{   assert(edge); // TODO: throw
+{   koalaAssert(edge,GraphExcNullEdge);
     return edge->getEnds();
 }
 
@@ -585,14 +588,14 @@ Graph< VertInfo,EdgeInfo,Settings >::getEdgeEnds( PEdge edge ) const
 template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
 Graph< VertInfo,EdgeInfo,Settings >::getEdgeEnd1( PEdge edge ) const
-{    assert(edge); // TODO: throw
+{   koalaAssert(edge,GraphExcNullEdge);
     return edge->getEnd1();
 }
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
 Graph< VertInfo,EdgeInfo,Settings >::getEdgeEnd2( PEdge edge ) const
-{    assert(edge); // TODO: throw
+{    koalaAssert(edge,GraphExcNullEdge);
     return edge->getEnd2();
 }
 
@@ -608,7 +611,7 @@ inline EdgeDirection Graph< VertInfo,EdgeInfo,Settings >::getEdgeDir( PEdge edge
 template< class VertInfo, class EdgeInfo, class Settings >
 bool Graph< VertInfo,EdgeInfo,Settings >::ch2Undir( PEdge edge)
 {
-    assert(edge); // TODO: throw
+    koalaAssert(edge,GraphExcNullEdge);
     switch (edge->type) {
         case (Undirected) : return false;
         case (Loop) : return false;
@@ -667,7 +670,7 @@ int Graph< VertInfo,EdgeInfo,Settings >::ch2Undir()
 
 template< class VertInfo, class EdgeInfo, class Settings >
 inline bool Graph< VertInfo,EdgeInfo,Settings >::revert( PEdge edge )
-{   assert(edge); //TODO: throw
+{   koalaAssert(edge,GraphExcNullEdge);
     if (edge->type == Directed)
     {
         PVertex vert_in = edge->vert[Graph< VertInfo,EdgeInfo,Settings >::Edge::V_in].vert;
@@ -737,7 +740,9 @@ int Graph< VertInfo,EdgeInfo,Settings >::revert()
 
 template< class VertInfo, class EdgeInfo, class Settings >
 bool Graph< VertInfo,EdgeInfo,Settings >::ch2Dir( PEdge edge,PVertex v, EdgeDirection dir)
-{   assert(edge && v && (dir==EdDirIn || dir==EdDirOut)); // TODO: throw
+{   koalaAssert(edge,GraphExcNullEdge);
+    koalaAssert(v, GraphExcNullVert);
+    koalaAssert((dir==EdDirIn || dir==EdDirOut),GraphExcWrongMask);
     if (edge->getDir(v)!=Undirected) return false;
 
         PVertex vert1 = (dir==EdDirOut) ? v : edge->getEnd(v);
@@ -768,8 +773,9 @@ int Graph< VertInfo,EdgeInfo,Settings >::ch2Dir(PVertex v,PVertex u, EdgeDirecti
 template< class VertInfo, class EdgeInfo, class Settings >
 inline bool Graph< VertInfo,EdgeInfo,Settings >::moveEdge(
     PEdge edge, PVertex vert1, PVertex vert2, EdgeDirection direct )
-{   assert(vert1 && vert2 && edge // TODO: throw
-           && (direct==EdLoop || direct==EdUndir || direct==EdDirIn || direct==EdDirOut || direct==Directed));
+{   koalaAssert(vert1 && vert2,GraphExcNullVert);
+    koalaAssert(edge,GraphExcNullEdge);
+    koalaAssert(direct==EdLoop || direct==EdUndir || direct==EdDirIn || direct==EdDirOut || direct==Directed,GraphExcWrongMask);
     return (bool)attach( edge,vert1,vert2,direct );
 }
 
@@ -901,7 +907,7 @@ inline int Graph< VertInfo,EdgeInfo,Settings >::delEdges(
 template< class VertInfo, class EdgeInfo, class Settings >
 typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::ch2Archs( PEdge edge )
-{   assert(edge); // TODO: throw
+{   koalaAssert(edge,GraphExcNullEdge);
     if (edge->type != Undirected) return 0;
     std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex,
         typename Graph< VertInfo,EdgeInfo,Settings >::PVertex > ends = getEdgeEnds( edge );
@@ -973,7 +979,7 @@ int Graph< VertInfo,EdgeInfo,Settings >::delParals2(
 template< class VertInfo, class EdgeInfo, class Settings > template< class Iterator >
 int Graph< VertInfo,EdgeInfo,Settings >::delParals(
     Iterator begin, Iterator end, PEdge edge, EdgeDirection reltype)
-{   assert(edge); // TODO: throw
+{   koalaAssert(edge,GraphExcNullEdge);
     int res = 0;
     for( Iterator i = begin; i != end; i++ )
         if (*i && *i!=edge && this->areParallel(*i,edge,reltype))
@@ -990,7 +996,7 @@ inline int Graph< VertInfo,EdgeInfo,Settings >::delParals(
 
 template< class VertInfo, class EdgeInfo, class Settings >
 int Graph< VertInfo,EdgeInfo,Settings >::delParals(PEdge edge, EdgeDirection reltype)
-{  assert(edge); // TODO: throw
+{  koalaAssert(edge,GraphExcNullEdge);
     std::pair< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex, typename Graph< VertInfo,EdgeInfo,Settings >::PVertex>
         ends=this->getEnds(edge);
     typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,std::min(getEdgeNo(ends.first),getEdgeNo(ends.second)) );
@@ -1041,6 +1047,7 @@ int Graph< VertInfo,EdgeInfo,Settings >::delAllParals(PVertex vert, EdgeType rel
 }
 
 template< class VertInfo, class EdgeInfo, class Settings >
+//TODO: nieefektywne, mozna bezposrednio
 int Graph< VertInfo,EdgeInfo,Settings >::delAllParals(PVertex vert1, PVertex vert2,EdgeType relType)
 {   typename Graph< VertInfo,EdgeInfo,Settings >::PEdge LOCALARRAY( buf,std::min(getEdgeNo(vert1,EdAll),getEdgeNo(vert2,EdAll)) );
     int size=this->getEdges(buf,vert1,vert2,EdAll);
@@ -1465,7 +1472,8 @@ Graph< VertInfo,EdgeInfo,Settings >::substitute(
     std::pair< VChooser,EChooser > choosers, std::pair< VCaster,ECaster > casters,
     std::pair< VLinker,ELinker > linkers )
 {
-    assert(vert && ((void*)this != (void*)&graph)); // TODO: throw
+    koalaAssert(vert,GraphExcNullVert);
+    koalaAssert(((void*)this != (void*)&graph),GraphExcWrongArg);
     typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
         res = this->copy( graph,choosers,casters,linkers );
     typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v =  res ;
@@ -1607,7 +1615,7 @@ Graph< VertInfo,EdgeInfo,Settings >::attach(
 template< class VertInfo, class EdgeInfo, class Settings >
 typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::attach_undir( PEdge edge, PVertex vertU, PVertex vertV )
-{   assert(Settings::EdAllow & EdUndir); // TODO: throw
+{   koalaAssert(Settings::EdAllow & EdUndir,GraphExcWrongMask);
     if (!edge) return NULL;
 //    if (!vertU) return NULL;
 //    if (!vertV) return NULL;
@@ -1662,7 +1670,7 @@ Graph< VertInfo,EdgeInfo,Settings >::attach_undir( PEdge edge, PVertex vertU, PV
 template< class VertInfo, class EdgeInfo, class Settings >
 typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::attach_dir( PEdge edge, PVertex vert_out, PVertex vert_in )
-{   assert(Settings::EdAllow & EdDirOut); // TODO: throw
+{   koalaAssert(Settings::EdAllow & EdDirOut,GraphExcWrongMask);
     if (!edge) return NULL;
 //    if (!vert_out) return NULL;
 //    if (!vert_in) return NULL;
@@ -1709,7 +1717,7 @@ Graph< VertInfo,EdgeInfo,Settings >::attach_dir( PEdge edge, PVertex vert_out, P
 template< class VertInfo, class EdgeInfo, class Settings >
 typename Graph< VertInfo,EdgeInfo,Settings >::PEdge
 Graph< VertInfo,EdgeInfo,Settings >::attach_loop( PEdge edge, PVertex vert )
-{   assert(Settings::EdAllow & EdLoop); // TODO: throw
+{   koalaAssert(Settings::EdAllow & EdLoop,GraphExcWrongMask);
     if (!edge) return NULL;
 //    if (!vert) return NULL;
     if (edge->type != Detached) detach( edge );

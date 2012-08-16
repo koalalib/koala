@@ -41,7 +41,7 @@ Koala::Graph<OpisV,OpisE>::PEdge tabE[10],EE;
 Koala::Set<Koala::Graph<OpisV,OpisE>::PVertex> rset,gset;
 
 
-int main() {
+#include "main.hpp"
 
 
     A=g.addVert(OpisV("A"));

@@ -29,7 +29,7 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
     return su+s+sv;
 }
 
-int main() {
+#include "main.hpp"
 
     Vertex<char,string> *tabV[5]={B,A,A,B,A};
     Vertex<char,string> *tabV3[5]={C,B,B,C,B};

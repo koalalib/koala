@@ -38,7 +38,7 @@ void dijTest()
     for(int i=0;i<10;i++) {tabV[i]=0; tabE[i]=0; }
 }
 
-int main() {
+#include "main.hpp"
 
     Koala::EdgeDirection mask=Koala::EdDirIn;
     Koala::Subgraph<Koala::Graph<OpisV,OpisE>, Koala::BoolChooser, Koala::BoolChooser>
