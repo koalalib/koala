@@ -37,7 +37,7 @@ class DijkstraBasePar : public ShortPathStructs {
         distance(DefaultStructs:: template NumberTypeBounds<DType>::plusInfty()) {}
 
         template <class Rec>
-            void copy(Rec& rec) { rec.distance=distance; rec.vPrev=vPrev; rec.ePrev=ePrev; }
+            void copy(Rec& rec) const { rec.distance=distance; rec.vPrev=vPrev; rec.ePrev=ePrev; }
     };
 
     // wlasciwa procedura: odleglosc miedzy para wierzcholkow
@@ -49,14 +49,14 @@ class DijkstraBasePar : public ShortPathStructs {
         const EdgeContainer& edgeTab, // wejsciowa tablica asocjacyjna PEdge->EdgeLabs dlugosci krawedzi
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
-    {   assert(start); // TODO: throw
+    {   koalaAssert(start,AlgExcNullVert);
         const typename EdgeContainer::ValType::DistType Zero=
             DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
         const typename EdgeContainer::ValType::DistType PlusInfty=
             DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
-
+        int n;
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab, Q(g.getVertNo());
+                VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab, Q(n=g.getVertNo());
         typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
                     vertTab=
@@ -64,7 +64,7 @@ class DijkstraBasePar : public ShortPathStructs {
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::get(avertTab,localvertTab);
 
         typename GraphType::PVertex U,V;
-        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(n);
 
         Q[start].vPrev=0;Q[start].ePrev=0;
         Q[start].distance=Zero;
@@ -97,7 +97,7 @@ class DijkstraBasePar : public ShortPathStructs {
         typename GraphType::PVertex end, // wierzcholek docelowy
         ShortPathStructs::OutPath<VIter,EIter> iters) // iteratory do zapisu sciezki
         // zwraca liczbe krawedzi sciezki lub -1 gdy  wierzcholek end jest nieosiagalny
-    {   assert(end); // TODO: throw
+    {   koalaAssert(end,AlgExcNullVert);
         const typename VertContainer::ValType::DistType PlusInfty=
             DefaultStructs:: template NumberTypeBounds<typename VertContainer::ValType::DistType>::plusInfty();
 
@@ -136,16 +136,16 @@ class DijkstraBasePar : public ShortPathStructs {
         const EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
-    {    assert(start); // TODO: throw
+    {    koalaAssert(start,AlgExcNullVert);
         const typename EdgeContainer::ValType::DistType Zero=
             DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::zero();
         const typename EdgeContainer::ValType::DistType PlusInfty=
             DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
-
+        int n;
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabsQue<typename EdgeContainer::ValType::DistType ,GraphType> >::Type Q(g.getVertNo());
+                VertLabsQue<typename EdgeContainer::ValType::DistType ,GraphType> >::Type Q(n=g.getVertNo());
         typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
                     vertTab=
@@ -154,9 +154,9 @@ class DijkstraBasePar : public ShortPathStructs {
 
         typename GraphType::PVertex U,V;
 
-        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(n);
 
-        Privates::BlockListAllocator<Block<typename GraphType::PVertex> > alloc(g.getVertNo());
+        Privates::BlockListAllocator<Block<typename GraphType::PVertex> > alloc(n);
         Heap<typename GraphType::PVertex,Cmp<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabsQue<typename EdgeContainer::ValType::DistType ,GraphType> >::Type>,
                 Privates::BlockListAllocator< Block<typename GraphType::PVertex> > > heap(&alloc,makeCmp(Q));
@@ -261,7 +261,7 @@ class DijkstraMainPar : public DijBase {
         ShortPathStructs::OutPath<VIter,EIter> iters) // para iteratorow do zapisu sciezki
         // zwraca rekord PathLengths z parametrami sciezki (dlugosc najkr. siezki i jej liczba krawedzi)
         // lub pare (niesk,-1) jesli end jest nieosiagalny
-    {   assert(start && end); // TODO: throw
+    {   koalaAssert(start && end,AlgExcNullVert);
         const typename EdgeContainer::ValType::DistType PlusInfty=
             DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
 
@@ -377,9 +377,9 @@ class DAGCritPathPar : public ShortPathStructs {
 
         typename GraphType::PVertex U,V;
         typename EdgeContainer::ValType::DistType nd;
-        int ibeg,iend;
+        int ibeg,iend,n=g.getVertNo();
 
-        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(n);
 
         if (start)
         {
@@ -390,15 +390,15 @@ class DAGCritPathPar : public ShortPathStructs {
 
 
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex, char >
-                ::Type followers(start ? g.getVertNo() : 0);
-        typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
+                ::Type followers(start ? n : 0);
+        typename GraphType::PVertex LOCALARRAY(tabV,n);
         if (start)
         {   Koala::BFSPar<DefaultStructs>::scanAttainable(g,start,assocInserter(followers,constFun<char>(0)),EdDirOut);
             Koala::DAGAlgsPar<DefaultStructs>::topOrd(makeSubgraph(g,std::make_pair(assocKeyChoose(followers),stdChoose(true))),tabV);
             ibeg=1;iend=followers.size();
         } else
         {   Koala::DAGAlgsPar<DefaultStructs>::topOrd(g,tabV);
-            ibeg=0; iend=g.getVertNo();
+            ibeg=0; iend=n;
         }
 
 
@@ -430,7 +430,7 @@ class DAGCritPathPar : public ShortPathStructs {
         typename GraphType::PVertex end, // wierzcholek docelowy
         ShortPathStructs::OutPath<VIter,EIter> iters) // iteratory do zapisu sciezki
         // zwraca liczbe krawedzi sciezki lub -1 gdy  wierzcholek end jest nieosiagalny
-    {   assert(end); // TODO: throw
+    {   koalaAssert(end,AlgExcNullVert);
         if (DefaultStructs:: template NumberTypeBounds<typename VertContainer::ValType::DistType>
                         ::isMinusInfty(vertTab[end].distance))
             return -1;
@@ -520,7 +520,7 @@ class BellmanFordPar : public ShortPathStructs {
     // przy end=NULL zwraca 0
     // w razie wykrycia ujemnego cyklu zwraca -niesk.
 
-    {   assert(start); // TODO: throw
+    {   koalaAssert(start,AlgExcNullVert);
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type localvertTab;
         typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
@@ -541,8 +541,8 @@ class BellmanFordPar : public ShortPathStructs {
                 minusInf=DefaultStructs:: template NumberTypeBounds
                                         <typename EdgeContainer::ValType::DistType> ::minusInfty();
         typename EdgeContainer::ValType::DistType nd;
-
-        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+          int n=g.getVertNo();
+        if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(n);
 
         bool existNegCycle = false;
 
@@ -567,7 +567,7 @@ class BellmanFordPar : public ShortPathStructs {
         //  for each (u,v):
         //      if  d[u]+w(u,v) < d[v]:
         //          d[v] <- d[u]+w(u,v) and vPrev[v] <- u and ePrev[v] <- (u,v)
-        int n=g.getVertNo();
+
         for(int i=1;i<n;i++){
             //relaksacja krawedzi nieskierowanych
             for(typename GraphType::PEdge E=g.getEdge(Koala::EdUndir); E; E=g.getEdgeNext(E, Koala::EdUndir)){
@@ -612,7 +612,7 @@ class BellmanFordPar : public ShortPathStructs {
         typename GraphType::PVertex end,
         ShortPathStructs::OutPath<VIter,EIter> iters)
         // zwraca liczbe krawedzi sciezki, -1 jesli end jest nieosiagalny, -2 w razie wykrycia ujemnego cyklu
-    {   assert(end); // TODO: throw
+    {   koalaAssert(end,AlgExcNullVert);
         if (DefaultStructs:: template NumberTypeBounds<typename VertContainer::ValType::DistType>
                                                     ::isPlusInfty(vertTab[end].distance))
             return -1; // wierzcholek end jest nieosiagalny
@@ -643,7 +643,7 @@ class BellmanFordPar : public ShortPathStructs {
         ShortPathStructs::OutPath<VIter,EIter> iters) // para iteratorow do zapisu sciezki
         // zwraca rekord PathLengths z parametrami sciezki (dlugosc najdl siezki i jej liczba krawedzi)
         // lub (niesk,-1) jesli end jest nieosiagalny, a (-niesk,-2) w razie wykrycia ujemnego cyklu
-    {   assert(start && end); // TODO: throw
+    {   koalaAssert(start && end,AlgExcNullVert);
         typename EdgeContainer::ValType::DistType dist;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type vertTab(g.getVertNo());
@@ -680,7 +680,7 @@ class FloydPar : public PathStructs {
             OutPath<VIter,EIter> iters,
             typename GraphType::PVertex start,
             typename GraphType::PVertex end)
-        {   assert(end); // TODO: throw
+        {   koalaAssert(end,AlgExcNullVert);
             typename GraphType::PVertex u,v=vertMatrix(start,end).vPrev;
             typename GraphType::PEdge  e=vertMatrix(start,end).ePrev;
             typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
@@ -807,7 +807,7 @@ class FloydPar : public PathStructs {
         typename GraphType::PVertex start,
         typename GraphType::PVertex end,
         PathStructs::OutPath<VIter,EIter> iters) // para iteratorow do zapisu znalezionej sciezki
-    {   assert(start && end); // TODO: throw
+    {   koalaAssert(start && end,AlgExcNullVert);
         if (DefaultStructs:: template NumberTypeBounds<typename TwoDimVertContainer::ValType::DistType>
                 ::isPlusInfty(vertMatrix(start,end).distance))
             return -1; // wierzcholek end jest nieosiagalny
@@ -866,25 +866,26 @@ class KruskalPar {
             Result<typename EdgeContainer::ValType::WeightType> res;
             res.edgeNo=0; res.weight=DefaultStructs:: template NumberTypeBounds
                                     <typename EdgeContainer::ValType::WeightType>::zero();
-
-            sets.resize(g.getVertNo());
-            if (g.getVertNo()==0) return res;
+            const EdgeDirection mask=Directed|Undirected;
+            int n,m=g.getEdgeNo(mask);
+            sets.resize(n=g.getVertNo());
+            if (n==0) return res;
             for(typename GraphType::PVertex v = g.getVert(); v ; v = g.getVertNext(v)) sets.makeSinglet(v);
 
-            const EdgeDirection mask=Directed|Undirected;
-            edgeNo = (edgeNo>=0) ? edgeNo : g.getVertNo()-1;
-            if (g.getEdgeNo(mask)==0||edgeNo==0) return res;
+
+            edgeNo = (edgeNo>=0) ? edgeNo : n-1;
+            if (m==0||edgeNo==0) return res;
 
             std::pair<typename EdgeContainer::ValType::WeightType, typename GraphType::PEdge>
-                            LOCALARRAY(edges,g.getEdgeNo(mask));
+                            LOCALARRAY(edges,m);
             int i = 0;
             typename GraphType::PEdge e;
             for(e = g.getEdge(mask); e != NULL; e = g.getEdgeNext(e, mask))
                 edges[i++] = std::make_pair(edgeTab[e].weight, e);
-            DefaultStructs::sort(edges,edges+g.getEdgeNo(mask));
-            if (!minWeight) std::reverse(edges,edges+g.getEdgeNo(mask));
+            DefaultStructs::sort(edges,edges+m);
+            if (!minWeight) std::reverse(edges,edges+m);
 
-            for(i = 0; i < g.getEdgeNo(mask) && edgeNo>0; i++)
+            for(i = 0; i < m && edgeNo>0; i++)
             {   std::pair<typename GraphType::PVertex, typename GraphType::PVertex> ends;
                 e = edges[i].second;
                 ends = g.getEdgeEnds(e);

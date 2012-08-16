@@ -8,6 +8,7 @@
 #include<iterator>
 #include <cassert>
 #include <limits>
+#include "../base/exception.h"
 
 #if !defined(__GNUC__) && !defined(__INTEL_COMPILER)
 typedef unsigned __int64	uint64_t;
@@ -980,7 +981,7 @@ template< class K, class V >
 K AssocTabConstInterface< BiDiHashMap< K,V > >::prevKey( K arg ) const
 {   if (!arg) return lastKey();
     typename BiDiHashMap< K,V >::const_iterator pos = cont.find( arg );
-    assert( pos != cont.end() ); // TODO: throw
+    koalaAssert( pos != cont.end(),ContExcOutpass );
     if (pos == cont.begin()) return (K)0;
     pos--;
     return pos->first;
@@ -990,7 +991,7 @@ template< class K, class V >
 K AssocTabConstInterface< BiDiHashMap< K,V > >::nextKey( K arg ) const
 {   if (!arg) return firstKey();
     typename BiDiHashMap< K,V >::const_iterator pos = cont.find( arg );
-    assert( pos != cont.end() );// TODO: throw
+    koalaAssert( pos != cont.end() ,ContExcOutpass );
     pos++;
     if (pos == cont.end()) return (K)0;
     return pos->first;
@@ -1025,7 +1026,12 @@ template< class K, class V> class AssocTabConstInterface< HashMap< K,V > > : pub
         K prevKey( K ) const;
         K nextKey( K ) const;
 
-        V &operator[]( K arg ) { return cont[arg]; }
+        V operator[]( K arg )
+        {   typename HashMap< K,V >::const_iterator i;
+              i=cont.find(arg);
+              if (i==cont.end()) return V(); else return i->second;
+        }
+//        V &operator[]( K arg ) { return cont[arg]; }
         unsigned size() const { return cont.size(); }
         bool empty() const { return this->size() == 0; }
         int capacity () const { return std::numeric_limits<int>::max(); }
@@ -1077,7 +1083,7 @@ template< class K, class V >
 K AssocTabConstInterface< HashMap< K,V > >::prevKey( K arg ) const
 {   if (!arg) return lastKey();
     typename HashMap< K,V >::const_iterator pos = cont.find( arg );
-    assert( pos != cont.end() );// TODO: throw
+    koalaAssert( pos != cont.end(),ContExcOutpass  );
     if (pos == cont.begin()) return (K)0;
     pos--;
     return pos->first;
@@ -1087,7 +1093,7 @@ template< class K, class V >
 K AssocTabConstInterface< HashMap< K,V > >::nextKey( K arg ) const
 {   if (!arg) return firstKey();
     typename HashMap< K,V >::const_iterator pos = cont.find( arg );
-    assert( pos != cont.end() );// TODO: throw
+    koalaAssert( pos != cont.end(),ContExcOutpass  );
     pos++;
     if (pos == cont.end()) return (K)0;
     return pos->first;

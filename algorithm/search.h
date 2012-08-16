@@ -56,12 +56,14 @@ struct PathStructs {
                     return verts.size()-1;
                 }
                 PEdge edge(int i) const // i-ta krawedz
-                {   assert(i>=0 && i<=this->lenght()-1); //TODO: throw
+                {   koalaAssert((i>=0 && i<=this->lenght()-1),ContExcOutpass);
                     return edges[i];
                 }
 
                 PVertex vertex(int i) const // i-ta wierzcholek
-                {   assert(i>=0 && i<=this->lenght()); //TODO: throw
+                {
+//                    throw Koala::Error::ExcBase("proba",__FILE__,__LINE__);
+                    koalaAssert((i>=0 && i<=this->lenght()),ContExcOutpass);
                     return verts[i];
                 }
 
@@ -87,11 +89,12 @@ struct ShortPathStructs : public PathStructs {
             OutPath<VIter,EIter> iters, // miejsce gdzie sciezka zostanie zapisana
             typename GraphType::PVertex end, // sciezka prowadzi "pod prad" tj. od korzenia do tego wierzcholka
             typename GraphType::PVertex start=0) // ew. wczesniejszy punkt koncowy na sciezce miedzy end a korzeniem
-        {   assert(end); // TODO: throw
+        {   koalaAssert(end,AlgExcNullVert);
+            int n;
             typename GraphType::PVertex u,v=vertTab[end].vPrev;
             typename GraphType::PEdge  e=vertTab[end].ePrev;
-            typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
-            typename GraphType::PEdge LOCALARRAY(tabE,g.getVertNo());
+            typename GraphType::PVertex LOCALARRAY(tabV,n=g.getVertNo());
+            typename GraphType::PEdge LOCALARRAY(tabE,n);
             int len=0;
 
             if (end!=start) for(;v;len++)
@@ -237,7 +240,7 @@ class SearchStructs {
                     return idx.size()-1;
                 }
                 int size(int i) const // dlugosc i-tego ciagu
-                {   assert(i>=0 && i<=this->size()-1); //TODO: throw
+                {   koalaAssert(i>=0 && i<=this->size()-1,ContExcOutpass);
                     return idx[i+1]-idx[i];
                 }
                 int lenght() const // laczna dlugosc wszystkich ciagow
@@ -246,22 +249,22 @@ class SearchStructs {
                     return res;
                 }
                 T* operator[](int i) // wskaznik poczatku i-tego ciagu
-                {   assert(i>=0 && i<=this->size()-1); //TODO: throw
+                {   koalaAssert(i>=0 && i<=this->size()-1,ContExcOutpass);
                     return &data[idx[i]];
                 }
                 const T* operator[](int i) const // wskaznik poczatku i-tego ciagu
-                {   assert(i>=0 && i<=this->size()-1); //TODO: throw
+                {   koalaAssert(i>=0 && i<=this->size()-1,ContExcOutpass);
                     return &data[idx[i]];
                 }
 
                 T* insert(int i) // umieszcza nowy ciag pusty na pozycji i. Zwraca wskaznik jego poczatku
-                {   assert(i>=0 && i<=size()); //TODO: throw
+                {   koalaAssert(i>=0 && i<=size(),ContExcOutpass);
                     idx.insert(idx.begin()+i,idx[i]);
                     return operator[](i);
                 }
 
                 void del(int i) // kasuje ciag na pozycji i
-                {   assert(i>=0 && i<=this->size()-1); //TODO: throw
+                {   koalaAssert(i>=0 && i<=this->size()-1,ContExcOutpass);
                     int delta=size(i);
                     data.erase(data.begin()+idx[i],data.begin()+idx[i+1]);
                     for(int j=i+1;j<idx.size();j++) idx[j]-=delta;
@@ -269,7 +272,8 @@ class SearchStructs {
                 }
 
                 T* resize(int i, int asize) // zmienia dlugosc i-tego ciagu. Zwraca wskaznik jego poczatku
-                {   assert(i>=0 && i<=this->size()-1 && asize>=0); //TODO: throw
+                {   koalaAssert(i>=0 && i<=this->size()-1,ContExcOutpass);
+                    koalaAssert(asize>=0,ContExcWrongArg);
                     if (asize==size(i)) return this->operator[](i);
                     if (asize>size(i))
                     {   int delta=asize-size(i);
@@ -1023,7 +1027,7 @@ template<class DefaultStructs>
 // DefaultStructs - wytyczne dla wewnetrznych procedur
 class LexBFSPar: public GraphSearchBase<LexBFSPar<DefaultStructs>,
 					 DefaultStructs> {
-public:
+protected:
     template <class Graph>
     struct LVCNode {
 			typename Graph::PVertex v;
@@ -1148,7 +1152,7 @@ public:
 			};
 		};
 
-    protected:
+//    protected:
 
     template<class GraphType>
 	struct OrderData {
@@ -1157,92 +1161,8 @@ public:
 		int orderId;	// numer w porz¹dku
 		};
 
-    public:
 
-	/** visit all vertices in the same component as a given vertex
-	 * @param[in] g graph containing vertices to visit
-	 * @param[in] src given vertex
-	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-	 	 Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
-    component jest ustawiane na component
-	 * @param[in] visitor visitor called for each vertex
-	 * @param[in] dir direction of edges to consider, uwaga: LexBFS akceptuje tylko maski symetryczne
-	 * @param[in] compid component identifier (give 0 if don't know)
-	 * @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
-	 */
-	template<class GraphType,
-		 class VertContainer,
-		 class Visitor>
-	static int visitBase(const GraphType & g,
-			     typename GraphType::PVertex start,
-			     VertContainer &visited,
-			     Visitor visit,
-			     EdgeDirection mask,
-			     int component) {
-		unsigned int depth, n, retVal;
-		typename GraphType::PEdge e;
-		typename GraphType::PVertex u, v;
-//		DefaultCPPAllocator allocat;
-//        DefaultCPPAllocator2 allocat2;
-//		LexVisitContainer<GraphType, DefaultCPPAllocator,DefaultCPPAllocator2> cont(allocat,allocat2);
-
-        if (DefaultStructs::ReserveOutAssocCont) visited.reserve(g.getVertNo());
-        assert(((mask&Directed)==0)||((mask&Directed)==Directed)); // TODO: throw
-		Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<LVCNode<GraphType> > > > allocat(g.getVertNo()+1); //TODO: size? - spr
-        Privates::BlockListAllocator<Privates::ListNode<LVCNode<GraphType> > > allocat2(2*g.getVertNo()+1); //TODO: size? - spr 2n+1 -> n+1 - oj! raczej nie!
-		LexVisitContainer<GraphType, Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<LVCNode<GraphType> > > >,Privates::BlockListAllocator<Privates::ListNode<LVCNode<GraphType> > > >
-            cont(allocat,allocat2,g.getVertNo());
-
-
-		n = g.getVertNo();
-		if(n == 0) return 0;
-		if(start == NULL) start = g.getVert();
-
-		cont.initialize(g);
-
-		visited[start] = SearchStructs::VisitVertLabs<GraphType>(NULL, NULL, 0, component);
-		cont.push(start);
-		retVal = 0;
-
-		while(!cont.empty()) {
-//			printf("before: ");
-//			cont.dump();
-			u = cont.top();
-			depth = visited[u].distance;
-			visited[u].component = component;
-
-			if(!Visitors::visitVertexPre(g, visit, u, visited[u], visit)) {
-				retVal++;
-				continue;
-				};
-			cont.pop();
-
-			for(e = g.getEdge(u, mask); e != NULL; e = g.getEdgeNext(u, e, mask)) {
-				v = g.getEdgeEnd(e, u);
-				if(!Visitors::visitEdgePre(g, visit, e, u, visit)) continue;
-//				if(visited.hasKey(v)) continue;
-//				visited[v] = SearchStructs::VisitVertLabs<GraphType>(u, e, depth + 1, component);
-				if(visited.hasKey(v)) {
-					if(visited[v].component == -1) {
-						cont.move(v);
-						};
-					continue;
-					};
-				visited[v] = SearchStructs::VisitVertLabs<GraphType>(u, e, depth + 1, -1);
-				cont.move(v);
-				if(!Visitors::visitEdgePost(g, visit, e, u, visit)) return -retVal;
-				};
-			cont.done();
-//			printf("after:  ");
-//			cont.dump();
-
-			retVal++;
-			if(!Visitors::visitVertexPost(g, visit, u, visited[u], visit))
-				return -retVal;
-			};
-		return retVal;
-		};
-
+//    protected:
 
 	/** order vertices with LexBFS order, starting with a given sequence
 	 * @param[in] g graph
@@ -1264,17 +1184,18 @@ public:
 		EdgeDirection bmask = mask;
 		typename GraphType::PEdge e;
 		typename GraphType::PVertex u, v;
-		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData(g.getVertNo());
-		Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<LVCNode<GraphType> > > > allocat(g.getVertNo()+1); //TODO: size? - spr
-        Privates::BlockListAllocator<Privates::ListNode<LVCNode<GraphType> > > allocat2(2*g.getVertNo()+1); // j.w. 2n+1 -> n + 1 - oj! raczej nie!
+		n = g.getVertNo();
+		typename DefaultStructs::template AssocCont<typename GraphType::PVertex, std::pair<int, int> >::Type orderData(n);
+		Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<LVCNode<GraphType> > > > allocat(n+1); //TODO: size? - spr
+        Privates::BlockListAllocator<Privates::ListNode<LVCNode<GraphType> > > allocat2(2*n+1); // j.w. 2n+1 -> n + 1 - oj! raczej nie!
 		LexVisitContainer<GraphType, Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<LVCNode<GraphType> > > >,Privates::BlockListAllocator<Privates::ListNode<LVCNode<GraphType> > > >
-            cont(allocat,allocat2,g.getVertNo());
+            cont(allocat,allocat2,n);
 
 		bmask &= ~EdLoop;
 //		if(bmask & EdDirOut) bmask &= ~EdDirIn; //TODO: watpliwe
-        assert(((bmask&Directed)==0)||((bmask&Directed)==Directed)); // TODO: throw
+        koalaAssert(((bmask&Directed)==0)||((bmask&Directed)==Directed),AlgExcWrongMask);
 
-		n = g.getVertNo();
+
 		assert(in == n);
 		m = g.getEdgeNo(bmask);
 		int LOCALARRAY(first, n + 1);
@@ -1366,6 +1287,93 @@ public:
 			} while(i != bucketFirst[bp]);
 			};
 		};
+
+    public:
+
+	/** visit all vertices in the same component as a given vertex
+	 * @param[in] g graph containing vertices to visit
+	 * @param[in] src given vertex
+	 * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
+	 	 Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
+    component jest ustawiane na component
+	 * @param[in] visitor visitor called for each vertex
+	 * @param[in] dir direction of edges to consider, uwaga: LexBFS akceptuje tylko maski symetryczne
+	 * @param[in] compid component identifier (give 0 if don't know)
+	 * @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
+	 */
+	template<class GraphType,
+		 class VertContainer,
+		 class Visitor>
+	static int visitBase(const GraphType & g,
+			     typename GraphType::PVertex start,
+			     VertContainer &visited,
+			     Visitor visit,
+			     EdgeDirection mask,
+			     int component) {
+		unsigned int depth, n, retVal;
+		typename GraphType::PEdge e;
+		typename GraphType::PVertex u, v;
+//		DefaultCPPAllocator allocat;
+//        DefaultCPPAllocator2 allocat2;
+//		LexVisitContainer<GraphType, DefaultCPPAllocator,DefaultCPPAllocator2> cont(allocat,allocat2);
+        n = g.getVertNo();
+        if (DefaultStructs::ReserveOutAssocCont) visited.reserve(n);
+        koalaAssert(((mask&Directed)==0)||((mask&Directed)==Directed),AlgExcWrongMask);
+		Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<LVCNode<GraphType> > > > allocat(n+1); //TODO: size? - spr
+        Privates::BlockListAllocator<Privates::ListNode<LVCNode<GraphType> > > allocat2(2*n+1); //TODO: size? - spr 2n+1 -> n+1 - oj! raczej nie!
+		LexVisitContainer<GraphType, Privates::BlockListAllocator<Privates::ListNode<Privates::List_iterator<LVCNode<GraphType> > > >,Privates::BlockListAllocator<Privates::ListNode<LVCNode<GraphType> > > >
+            cont(allocat,allocat2,n);
+
+
+
+		if(n == 0) return 0;
+		if(start == NULL) start = g.getVert();
+
+		cont.initialize(g);
+
+		visited[start] = SearchStructs::VisitVertLabs<GraphType>(NULL, NULL, 0, component);
+		cont.push(start);
+		retVal = 0;
+
+		while(!cont.empty()) {
+//			printf("before: ");
+//			cont.dump();
+			u = cont.top();
+			depth = visited[u].distance;
+			visited[u].component = component;
+
+			if(!Visitors::visitVertexPre(g, visit, u, visited[u], visit)) {
+				retVal++;
+				continue;
+				};
+			cont.pop();
+
+			for(e = g.getEdge(u, mask); e != NULL; e = g.getEdgeNext(u, e, mask)) {
+				v = g.getEdgeEnd(e, u);
+				if(!Visitors::visitEdgePre(g, visit, e, u, visit)) continue;
+//				if(visited.hasKey(v)) continue;
+//				visited[v] = SearchStructs::VisitVertLabs<GraphType>(u, e, depth + 1, component);
+				if(visited.hasKey(v)) {
+					if(visited[v].component == -1) {
+						cont.move(v);
+						};
+					continue;
+					};
+				visited[v] = SearchStructs::VisitVertLabs<GraphType>(u, e, depth + 1, -1);
+				cont.move(v);
+				if(!Visitors::visitEdgePost(g, visit, e, u, visit)) return -retVal;
+				};
+			cont.done();
+//			printf("after:  ");
+//			cont.dump();
+
+			retVal++;
+			if(!Visitors::visitVertexPost(g, visit, u, visited[u], visit))
+				return -retVal;
+			};
+		return retVal;
+		};
+
 
 	};
 
@@ -1620,14 +1628,16 @@ class BlocksPar : public SearchStructs
         // wyrzuca na iterator ciag wierzcholkow tworzacych rdzen grafu tj. podgraf pozostajacy po sukcesywnym
         // usuwaniu wierzcholkow stopnia < 2. Zwraca dlugosc sekwencji
         template<class GraphType,class Iterator>
+        // TODO: przejsc na kopiec
         static int getCore(const GraphType &g,Iterator out)
         {   const EdgeType mask=EdAll;
+            int n;
             typename DefaultStructs:: template AssocCont<
-                typename GraphType::PVertex, int >::Type degs(g.getVertNo());
-            std::pair<int, typename GraphType::PVertex> LOCALARRAY(buf,2*g.getVertNo());
+                typename GraphType::PVertex, int >::Type degs(n=g.getVertNo());
+            std::pair<int, typename GraphType::PVertex> LOCALARRAY(buf,2*n);
             PriQueueInterface< std::pair<int, typename GraphType::PVertex>*,
-                    std::greater<std::pair<int, typename GraphType::PVertex> > > q(buf,2*g.getVertNo());
-            if (!g.getVertNo()) return 0;
+                    std::greater<std::pair<int, typename GraphType::PVertex> > > q(buf,2*n);
+            if (!n) return 0;
             for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
                 q.push(std::make_pair(degs[v]=g.deg(v,mask),v));
             while(!q.empty() && q.top().first<=1)
@@ -1825,7 +1835,7 @@ public:
 	template<class GraphType>
 	static bool hasPath(const GraphType &g,
 			    typename GraphType::PVertex u) {
-        assert(u); // TODO: throw
+        koalaAssert(u,AlgExcNullVert);
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 //		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
 		return (res.first==u ||(/* !dir &&*/ res.second==u));
@@ -1839,7 +1849,7 @@ public:
 	template<class GraphType>
 	static bool hasDirPath(const GraphType &g,
 			    typename GraphType::PVertex u) {
-        assert(u); // TODO: throw
+        koalaAssert(u,AlgExcNullVert);
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
 //		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
 		return res.first==u;// ||(!dir && res.second==u));
@@ -1854,7 +1864,7 @@ public:
 	template<class GraphType>
 	static bool hasCycle(const GraphType &g,
 			    typename GraphType::PVertex u) {
-        assert(u); // TODO: throw
+        koalaAssert(u,AlgExcNullVert);
 		return hasCycle(g) && g.deg(u,EdUndir|EdLoop);
 		};
 
@@ -1866,7 +1876,7 @@ public:
 	template<class GraphType>
 	static bool hasDirCycle(const GraphType &g,
 			    typename GraphType::PVertex u) {
-        assert(u); // TODO: throw
+        koalaAssert(u,AlgExcNullVert);
 		return hasDirCycle(g) && g.deg(u,EdDirOut|EdLoop);
 		};
 
@@ -1880,10 +1890,11 @@ public:
 		 class EdgeIter>
 	static bool getCycle(const GraphType &g,
 			    OutPath<VertIter, EdgeIter> out) {
+        int n,m;
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 		if (res.first==0 || res.first!=res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdUndir|EdLoop);
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, (n=g.getVertNo()) + (m=g.getEdgeNo())); //TODO: size? - spr
+		EulerState<GraphType> state(g, _vstk, n + m + 1, EdUndir|EdLoop);
 		eulerEngine<GraphType>(res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
@@ -1898,10 +1909,11 @@ public:
 		 class EdgeIter>
 	static bool getDirCycle(const GraphType &g,
 			    OutPath<VertIter, EdgeIter> out) {
+        int n,m;
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
 		if (res.first==0 || res.first!=res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdDirOut|EdLoop);
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, (n=g.getVertNo()) + (m=g.getEdgeNo())); //TODO: size? - spr
+		EulerState<GraphType> state(g, _vstk, n + m + 1, EdDirOut|EdLoop);
 		eulerEngine<GraphType>(res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
@@ -1920,11 +1932,11 @@ public:
 	static bool getCycle(const GraphType &g,
 			    typename GraphType::PVertex prefstart,
 			    OutPath<VertIter, EdgeIter> out) {
-
+        int n,m;
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 		if (res.first==0 || res.first!=res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdUndir|EdLoop);
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, (n=g.getVertNo()) + (m=g.getEdgeNo())); //TODO: size? - spr
+		EulerState<GraphType> state(g, _vstk, n + m + 1, EdUndir|EdLoop);
 		eulerEngine<GraphType>(g.getEdge(prefstart,EdUndir|EdLoop) ? prefstart : res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
@@ -1942,11 +1954,11 @@ public:
 	static bool getDirCycle(const GraphType &g,
 			    typename GraphType::PVertex prefstart,
 			    OutPath<VertIter, EdgeIter> out) {
-
+        int n,m;
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
 		if (res.first==0 || res.first!=res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdDirOut|EdLoop);
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk,(n= g.getVertNo()) + (m=g.getEdgeNo())); //TODO: size? - spr
+		EulerState<GraphType> state(g, _vstk, n +m + 1, EdDirOut|EdLoop);
 		eulerEngine<GraphType>(g.getEdge(prefstart,EdDirOut|EdLoop) ? prefstart : res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
@@ -1963,10 +1975,11 @@ public:
 		 class EdgeIter>
 	static bool getPath(const GraphType &g,
 			   OutPath<VertIter, EdgeIter> out) {
+        int n,m;
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 		if (res.first==0 || res.first==res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdUndir|EdLoop);
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, (n=g.getVertNo()) + (m=g.getEdgeNo())); //TODO: size? - spr
+		EulerState<GraphType> state(g, _vstk, n + m + 1, EdUndir|EdLoop);
 		eulerEngine<GraphType>(res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
@@ -1982,10 +1995,11 @@ public:
 		 class EdgeIter>
 	static bool getDirPath(const GraphType &g,
 			   OutPath<VertIter, EdgeIter> out) {
+        int n,m;
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdDirOut|EdLoop);
 		if (res.first==0 || res.first==res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdDirOut|EdLoop);
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, (n=g.getVertNo()) + (m=g.getEdgeNo())); //TODO: size? - spr
+		EulerState<GraphType> state(g, _vstk, n + m + 1, EdDirOut|EdLoop);
 		eulerEngine<GraphType>(res.first, NULL, state);
 		eulerResult(state, out);
 		return true;
@@ -2005,10 +2019,11 @@ public:
 	static bool getPath(const GraphType &g,
 			    typename GraphType::PVertex prefstart,
 			   OutPath<VertIter, EdgeIter> out) {
+        int n,m;
 		std::pair<typename GraphType::PVertex,typename GraphType::PVertex> res=ends(g,EdUndir|EdLoop);
 		if (res.first==0 || res.first==res.second) return false;
-		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, g.getVertNo() + g.getEdgeNo()); //TODO: size? - spr
-		EulerState<GraphType> state(g, _vstk, g.getVertNo() + g.getEdgeNo() + 1, EdUndir|EdLoop);
+		std::pair<typename GraphType::PVertex, typename GraphType::PEdge> LOCALARRAY(_vstk, (n=g.getVertNo()) + (m=g.getEdgeNo())); //TODO: size? - spr
+		EulerState<GraphType> state(g, _vstk, n + m + 1, EdUndir|EdLoop);
 //		bool dir= (mask&(EdDirIn|EdDirOut))==EdDirIn || (mask&(EdDirIn|EdDirOut))==EdDirOut;
 		eulerEngine<GraphType>((prefstart==res.second) ? res.second : res.first, NULL, state);
 		eulerResult(state, out);
@@ -2030,6 +2045,7 @@ class Euler : public EulerPar<AlgsDefaultSettings> {};
 
 
 // Znajdowanie robicia grafow na maksymalne silne moduly
+// TODO: nieefektywne, znalezc szybszy algorytm
 template<class DefaultStructs >
 // DefaultStructs - wytyczne dla wewnetrznych procedur
 class ModulesPar : public SearchStructs {
@@ -2050,8 +2066,9 @@ class ModulesPar : public SearchStructs {
     (const Graph& g, typename Graph::PVertex u, typename Graph::PVertex v)
     {   //assert(u && v && u!=v && !mapa.hasKey(u) && !mapa.hasKey(v));
 //        Set<typename Graph::PVertex> s,snew,s2; xxx
+        int n=g.getVertNo();
         typename DefaultStructs::template AssocCont<typename Graph::PVertex, bool >::Type
-            s(g.getVertNo()),snew(g.getVertNo()),s2(g.getVertNo()),stmp(g.getVertNo());
+            s(n),snew(n),s2(n),stmp(n);
 
         typename Graph::PVertex i,j;
         //snew+=u;snew+=v;
@@ -2114,10 +2131,11 @@ class ModulesPar : public SearchStructs {
     {
         Set<typename Graph::PVertex> s;
         s+=u;
+        int n=g.getVertNo();
         for(typename Graph::PVertex i=g.getVert();i;i=g.getVertNext(i))
             if (i!=u
                 && !pomin.hasKey(i)
-                && minModule(g,u,i)<g.getVertNo()) s+=i;
+                && minModule(g,u,i)<n) s+=i;
         return s;
     }
 
@@ -2139,16 +2157,16 @@ class ModulesPar : public SearchStructs {
                 int >::Type >::Type & vmap =
                 BlackHoleSwitch<CompMap,typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 int >::Type >::get(avmap,localvtab);
-
-        if (isBlackHole(avmap) || DefaultStructs::ReserveOutAssocCont) vmap.reserve(g.getVertNo());
-        if (g.getVertNo()==1)
+        int n=g.getVertNo();
+        if (isBlackHole(avmap) || DefaultStructs::ReserveOutAssocCont) vmap.reserve(n);
+        if (n==1)
         {   vmap[g.getVert()]=0;
             *out.compIter=0;++out.compIter;*out.compIter=1;++out.compIter;
             *out.vertIter=g.getVert();++out.vertIter;
             return Partition(1,mpTrivial);
         }
-        typename GraphType::PVertex LOCALARRAY(tabv,g.getVertNo());
-        int LOCALARRAY(tabc,g.getVertNo()+1);
+        typename GraphType::PVertex LOCALARRAY(tabv,n);
+        int LOCALARRAY(tabc,n+1);
         int compno=BFSPar<DefaultStructs>::split(g,compStore(tabc,tabv),EdUndir);
         if (compno>1)
         {   for(int i=0;i<=compno;i++) { *out.compIter=tabc[i];++out.compIter;}
@@ -2163,7 +2181,7 @@ class ModulesPar : public SearchStructs {
                 char,Undirected,true >:: Type ImageGraph;
 //        typedef Graph<typename GraphType::PVertex,EmptyEdgeInfo,GrDefaultSettings<EdUndir,true> >  ImageGraph;
         ImageGraph neg;
-        typename ImageGraph::PVertex LOCALARRAY(tabvneg,g.getVertNo());
+        typename ImageGraph::PVertex LOCALARRAY(tabvneg,n);
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) neg.addVert(v);
         for(typename ImageGraph::PVertex v=neg.getVert();v!=neg.getVertLast();v=neg.getVertNext(v))
             for(typename ImageGraph::PVertex u=neg.getVertNext(v);u;u=neg.getVertNext(u))

@@ -110,6 +110,15 @@ namespace Koala
 		void merge(BinomHeap&); // dopisuje klucze z drugiej kolejki, ktora jest czyszczona
 		void clear();
 
+    template <class InputIterator>
+        void assign (InputIterator first, InputIterator last)
+        {   int len=0;
+            clear();
+            for(InputIterator i=first;i!=last;++i) ++len;
+            assign2(first,len);
+        }
+
+
 		unsigned size() const;
 		bool empty() const;
 
@@ -135,6 +144,18 @@ namespace Koala
 		    if (!allocator) delete node;
 		    else allocator->deallocate(node);
 		}
+
+    template <class InputIterator>
+        void assign2 (InputIterator& first, int len)
+        {
+            if (len==1) { push(*first); ++ first; }
+            if (len<=1) return;
+            {   int half=len/2;
+                BinomHeap<Key, Compare,Allocator> heap(*this);
+                assign2(first,half);heap.assign2(first,len-half);
+                merge(heap);
+            }
+        }
 
 	};
 
@@ -182,7 +203,7 @@ namespace Koala
 
 	template <class Key, class Compare,class Allocator>
 	Key BinomHeap<Key, Compare,Allocator>::top() const
-	{   assert(minimum); // TODO: throw
+	{   koalaAssert(minimum,ContExcOutpass);
 		return minimum->key;
 	}
 
@@ -251,7 +272,7 @@ namespace Koala
 	template <class Key, class Compare,class Allocator>
 	void BinomHeap<Key, Compare,Allocator>::decrease(Node *A, const Key &key)
 	{
-		assert(!function(A->key,key)); // TODO: throw
+		koalaAssert(!function(A->key,key),ContExcWrongArg);
 		if (!function(A->key,key) && !function(key,A->key)) return;
 
 		A->key = key;
@@ -302,7 +323,7 @@ namespace Koala
 
 	template <class Key, class Compare,class Allocator>
 	void BinomHeap<Key, Compare,Allocator>::del(Node *A)
-	{   assert(nodes); // TODO: throw
+	{   koalaAssert(nodes,ContExcOutpass);
 		nodes--;
 
 		if(nodes == 0)
@@ -596,6 +617,10 @@ namespace Koala
 
 		void merge(FibonHeap&);
 		void clear();
+    template <class InputIterator>
+        void assign (InputIterator first, InputIterator last)
+        {clear();for(;first!=last;first++) push(*first); }
+
 
 		unsigned size() const;
 		bool empty() const;
@@ -650,7 +675,7 @@ namespace Koala
 
 	template <class Key, class Compare,class Allocator>
 	Key FibonHeap<Key, Compare,Allocator>::top() const
-	{   assert(root); // TODO: throw
+	{   koalaAssert(root,ContExcOutpass);
 		return root->key;
 	}
 
@@ -671,7 +696,7 @@ namespace Koala
 
 	template <class Key, class Compare,class Allocator>
 	void FibonHeap<Key, Compare,Allocator>::pop()
-	{   assert(nodes); // TODO: throw
+	{   koalaAssert(nodes,ContExcOutpass);
 		nodes--;
 
 		Node *A = root->child, *B;
@@ -734,7 +759,7 @@ namespace Koala
 	template <class Key, class Compare,class Allocator>
 	void FibonHeap<Key, Compare,Allocator>::decrease(Node *A, const Key &key)
 	{
-		assert(!function(A->key,key)); // TODO: throw
+		koalaAssert(!function(A->key,key),ContExcWrongArg);
 		if (!function(A->key,key) && !function(key,A->key)) return;
 
 

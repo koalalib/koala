@@ -87,13 +87,13 @@ class Subgraph: public SubgraphBase,
         const RootGrType &root() const
         {
             const RootGrType *res = getRootPtr();
-            assert( res ); // TODO: throw
+            koalaAssert( res ,GraphExc);
             return *res;
         }
         const ParentGrType &up() const
         {
             const ParentGrType *res = getParentPtr();
-            assert( res ); // TODO: throw
+            koalaAssert( res ,GraphExc);
             return *res;
         }
 
@@ -194,8 +194,8 @@ class UndirView: public SubgraphBase,
                  | ((EdLoop&ParentGrType::allowedEdgeTypes()) ? EdLoop : 0 ); }
         const RootGrType* getRootPtr() const { return parent ? (( const ParentGrType*)parent)->getRootPtr() : NULL; }
         const ParentGrType* getParentPtr() const { return (const ParentGrType*)parent; }
-        const ParentGrType &up() const { const ParentGrType *res = getParentPtr(); assert( res ); return *res; }
-        const RootGrType &root() const { const RootGrType *res = getRootPtr(); assert( res ); return *res; }
+        const ParentGrType &up() const { const ParentGrType *res = getParentPtr(); koalaAssert( res ,GraphExc); return *res; }
+        const RootGrType &root() const { const RootGrType *res = getRootPtr(); koalaAssert( res,GraphExc ); return *res; }
         void plug(const Graph &g ) { SubgraphBase::link( &g ); } // rozlacza obiekt od jego rodzica (jesli taki istnial) i podlacza do podanego grafu
         bool unplug() { return SubgraphBase::unlink(); } // sprawia, ze podgraf staje sie niepodlaczony do zadnego rodzica
 
@@ -292,8 +292,8 @@ class RevView: public SubgraphBase,
         static EdgeType allowedEdgeTypes()  { return ParentGrType::allowedEdgeTypes(); }
         const RootGrType* getRootPtr() const { return parent ? (( const ParentGrType*)parent)->getRootPtr() : NULL; }
         const ParentGrType* getParentPtr() const { return (const ParentGrType*)parent; }
-        const ParentGrType &up() const { const ParentGrType *res = getParentPtr(); assert( res ); return *res; }
-        const RootGrType &root() const { const RootGrType *res = getRootPtr(); assert( res ); return *res; }
+        const ParentGrType &up() const { const ParentGrType *res = getParentPtr(); koalaAssert( res,GraphExc ); return *res; }
+        const RootGrType &root() const { const RootGrType *res = getRootPtr(); koalaAssert( res ,GraphExc); return *res; }
         void plug(const Graph &g ) { SubgraphBase::link( &g ); } // rozlacza obiekt od jego rodzica (jesli taki istnial) i podlacza do podanego grafu
         bool unplug() { return SubgraphBase::unlink(); } // sprawia, ze podgraf staje sie niepodlaczony do zadnego rodzica
 
@@ -412,7 +412,8 @@ class RevView: public SubgraphBase,
 
         PEdge getNext(PVertex vert, PEdge edge, EdgeDirection direct ) const
         {
-            assert(vert && !(edge && !this->isEdgeEnd( edge,vert ))); // TODO: throw;
+            koalaAssert(vert,GraphExcNullVert);
+            koalaAssert(!(edge && !this->isEdgeEnd( edge,vert )),GraphExcWrongConn);
             if (!direct) return NULL;
             EdgeDirection type = up().getEdgeDir( edge,vert );
             EdgeDirection nexttype = (type == EdNone) ? EdLoop : nextDir(type);
@@ -439,7 +440,9 @@ class RevView: public SubgraphBase,
 
         PEdge getPrev(PVertex vert, PEdge edge, EdgeDirection direct ) const
         {
-            assert(vert && !(edge && !this->isEdgeEnd( edge,vert ))); // TODO: throw;
+                        koalaAssert(vert,GraphExcNullVert);
+            koalaAssert(!(edge && !this->isEdgeEnd( edge,vert )),GraphExcWrongConn);
+
             if (!direct) return NULL;
             EdgeDirection type = up().getEdgeDir( edge,vert );
             EdgeDirection nexttype = (type == EdNone) ? EdDirIn : prevDir(type);

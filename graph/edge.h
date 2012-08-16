@@ -81,7 +81,7 @@ public:
 
     // zwroc drugi koniec krawedzi
     Vertex<VertInfo,EdgeInfo,Settings>* getEnd(Vertex<VertInfo,EdgeInfo,Settings>* v)
-    {   assert(v); // TODO: throw
+    {   koalaAssert(v,GraphExcNullVert);
         if (vert[0].vert == v) return vert[1].vert;
         if (vert[1].vert == v) return vert[0].vert;
         return NULL;

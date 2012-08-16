@@ -370,9 +370,9 @@ template <class PVertex>
             bool isS, //if true - S, if false - T
             typename GraphType::PVertex vCurr,
             int expo)
-        {
+        {   int n;
             typename GraphType::PVertex vNext;
-            typename GraphType::PVertex LOCALARRAY(tabV,g.getVertNo());
+            typename GraphType::PVertex LOCALARRAY(tabV,n=g.getVertNo());
 
             if (isS) //cecha S
             {
@@ -385,8 +385,8 @@ template <class PVertex>
                     {
                         if (vertTab[vNext].vLabS!=0) //jezeli vNext ma ceche S
                         {
-                            typename GraphType::PVertex LOCALARRAY(tabPathCurr,g.getVertNo());
-                            typename GraphType::PVertex LOCALARRAY(tabPathNext,g.getVertNo());
+                            typename GraphType::PVertex LOCALARRAY(tabPathCurr,n);
+                            typename GraphType::PVertex LOCALARRAY(tabPathNext,n);
 
                             int  iLenCurr = 0, iLenNext = 0;
                             if (backtracking(g, vertTab, tabPathCurr, iLenCurr, vCurr, true, 0) != backtracking(g, vertTab, tabPathNext, iLenNext, vNext, true, 0)) //korzenie rozne - znalezlismy droge powiekszajaca
@@ -414,8 +414,8 @@ template <class PVertex>
                     {
                        if (vertTab[vNext].vLabT[0]!=0) //jezeli vNext ma ceche T
                         {
-                            typename GraphType::PVertex LOCALARRAY(tabPathCurr,g.getVertNo());
-                            typename GraphType::PVertex LOCALARRAY(tabPathNext,g.getVertNo());
+                            typename GraphType::PVertex LOCALARRAY(tabPathCurr,n);
+                            typename GraphType::PVertex LOCALARRAY(tabPathNext,n);
                             int  iLenCurr = 0, iLenNext = 0;
                             if (backtracking(g, vertTab, tabPathCurr, iLenCurr, vCurr, false, 0) != backtracking(g, vertTab, tabPathNext, iLenNext, vNext, false, 0)) //korzenie rozne - znalezlismy droge powiekszajaca
                             {
@@ -495,11 +495,11 @@ template <class PVertex>
             VertContainer & vertTab,
             EIterOut edgeIterOut,
             bool ifEdgeCover = false) //jezeli ifEdgeCover ustawiony (true) to rozszerzemy skojarzenie do pokrycia krawedziowego
-    {
-        typename GraphType::PVertex V, LOCALARRAY(tabV,g.getVertNo());
+    {   int n;
+        typename GraphType::PVertex V, LOCALARRAY(tabV,n=g.getVertNo());
         typename GraphType::PEdge E;
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                typename GraphType::PVertex> ::Type tabVTmp(g.getVertNo()); //pomocnicze, by do wynikow nie doataly sie duplikaty krawedzi
+                typename GraphType::PVertex> ::Type tabVTmp(n); //pomocnicze, by do wynikow nie doataly sie duplikaty krawedzi
         int licz=0;
 //        if (!isBlackHole(edgeIterOut)) //na wyjsciu ma byc strumien krawedzi
 
@@ -539,11 +539,11 @@ template <class PVertex>
                         vertTab=
                     BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                     VertLabs<GraphType> >::Type >::get(avertTab,localvertTab);
-
-            if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+            int n=g.getVertNo();
+            if (isBlackHole(avertTab)) vertTab.reserve(n);
 
             typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                Set<typename GraphType::PVertex> >::Type    vertTabNeights(g.getVertNo());
+                Set<typename GraphType::PVertex> >::Type    vertTabNeights(n);
 //            std::map <typename GraphType::PVertex, Set<typename GraphType::PVertex> > vertTabNeights; //mapa przypisujaca wierzcholkowi - zbior jego sasiadow
             fillVertTabNeights (g,vertTabNeights);
 
@@ -571,11 +571,11 @@ template <class PVertex>
                         vertTab=
                     BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                     VertLabs<GraphType> >::Type >::get(avertTab,localvertTab);
-
-            if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+            int n=g.getVertNo();
+            if (isBlackHole(avertTab)) vertTab.reserve(n);
 
             typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                Set<typename GraphType::PVertex> >::Type    vertTabNeights(g.getVertNo());
+                Set<typename GraphType::PVertex> >::Type    vertTabNeights(n);
 //            std::map <typename GraphType::PVertex, Set<typename GraphType::PVertex> > vertTabNeights; //mapa przypisujaca wierzcholkowi - zbior jego sasiadow
             fillVertTabNeights (g,vertTabNeights);
 
@@ -601,10 +601,10 @@ template <class PVertex>
                         vertTab=
                     BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                     VertLabs<GraphType> >::Type >::get(avertTab,localvertTab);
-
-            if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+            int n=g.getVertNo();
+            if (isBlackHole(avertTab)) vertTab.reserve(n);
             typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                Set<typename GraphType::PVertex> >::Type    vertTabNeights(g.getVertNo());
+                Set<typename GraphType::PVertex> >::Type    vertTabNeights(n);
 //            std::map <typename GraphType::PVertex, Set<typename GraphType::PVertex> > vertTabNeights; //mapa przypisujaca wierzcholkowi - zbior jego sasiadow
             fillVertTabNeights (g,vertTabNeights);
 
@@ -631,9 +631,10 @@ template <class PVertex>
                     BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                     VertLabs<GraphType> >::Type >::get(avertTab,localvertTab);
 
-            if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
+
 
             int vertNo = g.getVertNo();        // liczba wierzcholkow w grafie
+            if (isBlackHole(avertTab)) vertTab.reserve(vertNo);
             int expo = vertNo;                 // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
             typename GraphType::PVertex U,V;
 
@@ -671,9 +672,9 @@ template <class PVertex>
                     BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                     VertLabs<GraphType> >::Type >::get(avertTab,localvertTab);
 
-            if (isBlackHole(avertTab)) vertTab.reserve(g.getVertNo());
 
             int vertNo = g.getVertNo();        // liczba wierzcholkow w grafie
+            if (isBlackHole(avertTab)) vertTab.reserve(vertNo);
             int expo = vertNo;                 // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
             typename GraphType::PVertex U,V;
 
@@ -704,7 +705,7 @@ template <class PVertex>
             int expo = vertNo;                 // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
             typename GraphType::PVertex U,V;
             typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                bool >::Type vertTabMatch(g.getVertNo()); //jezeli true - wierzcholek nalezy do matchingu
+                bool >::Type vertTabMatch(vertNo); //jezeli true - wierzcholek nalezy do matchingu
 
             for (EIterIn itE = edgeIterInBegin; itE!=edgeIterInEnd; ++itE)  //przeglasamy podane krawedzie
             {

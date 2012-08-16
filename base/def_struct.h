@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <functional>
 
+#include "exception.h"
 #include "../container/simple.h"
 #include "../container/localarray.h"
 #include "../container/assoctab.h"
@@ -844,7 +845,7 @@ struct NoCastCaster {
 };
 
 // funkcja tworzaca - dopuszczalny jedynie argument false
-NoCastCaster stdCast(bool arg) { assert(!arg); return NoCastCaster(); }
+NoCastCaster stdCast(bool arg) { koalaAssert(!arg,ExcBase); return NoCastCaster(); }
 
 // wyliczenie wartosci nowego info poprzez podany funktor
 // wspolpracuje z produktami grafow (stad takze operator 3-argumentowy) jesli funktor je obsluguje
@@ -889,7 +890,7 @@ ValueCaster<T> valCast(T arg=T()) { return ValueCaster<T>(arg); }
 
 // tylko false jest dopuszczalne - brak polaczenia
 struct Std1NoLinker {
-    Std1NoLinker(bool arg=false) { assert(!arg);}
+    Std1NoLinker(bool arg=false) { koalaAssert(!arg,ExcBase);}
     template <class Dest,class Sour>
         void operator()(Dest*,Sour*) {}
 };

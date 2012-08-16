@@ -28,6 +28,7 @@
 #define KOALA__SET__H__
 
 #include <limits>
+#include "../base/exception.h"
 
 namespace Koala {
 

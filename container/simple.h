@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "../base/exception.h"
+
 
 //Proste interfejsy udajace kontenery stosu, vectora, kolejki FIFO i kolejki priorytetowej z elementami typu T
 // Interfejs wzorowany na STLu
@@ -42,7 +44,6 @@ std::pair<T,T> pairMinMax(std::pair<T,T> arg)
 //biblioteki korzystajacych z tych interfejsow!
 
 
-// TODO: assert -> throw. 2 typy wyjatkow: przekroczenie zakresu danych kontenera i przekroczenie maks. pojemnosci
 
 template <class Container> class StackInterface;
 
@@ -60,10 +61,13 @@ template <class T> class StackInterface<T*> {
         int size() { return siz; }
         bool empty() { return siz==0; }
         bool operator!() const { return empty(); }
-        void push(const T& val) { assert(siz<maxsize); buf[siz++]=val; }
-        void pop() { assert(siz); siz--; }
-        T& top() { assert(siz); return buf[siz-1]; }
+        void push(const T& val) { koalaAssert(siz<maxsize,ContExcFull); buf[siz++]=val; }
+        void pop() { koalaAssert(siz,ContExcOutpass); siz--; }
+        T& top() { koalaAssert(siz,ContExcOutpass); return buf[siz-1]; }
         void clear() { siz=0; }
+    template <class InputIterator>
+        void assign (InputIterator first, InputIterator last)
+    { clear(); for(;first!=last;first++) push(*first);  }
 };
 
 
@@ -87,12 +91,16 @@ template <class T> class QueueInterface<T*> {
         int size() { return (beg<=end) ? end-beg : maxsize+1-(beg-end); }
         bool empty() { return beg==end; }
         bool operator!() const { return empty(); }
-        void push(const T& val) { buf[end]=val; end=next(end); assert(end!=beg); }
-        void pop() { assert(beg!=end); beg=next(beg); }
-        T& front() { assert(!empty()); return buf[beg]; }
-        T& top() { assert(!empty()); return buf[beg]; }
-        T& back() { assert(!empty()); return buf[prev(end)]; }
+        void push(const T& val) { buf[end]=val; end=next(end); koalaAssert(end!=beg,ContExcFull); }
+        void pop() { koalaAssert(beg!=end,ContExcOutpass); beg=next(beg); }
+        T& front() { koalaAssert(!empty(),ContExcOutpass); return buf[beg]; }
+        T& top() { koalaAssert(!empty(),ContExcOutpass); return buf[beg]; }
+        T& back() { koalaAssert(!empty(),ContExcOutpass); return buf[prev(end)]; }
         void clear() { beg=end=0; }
+    template <class InputIterator>
+        void assign (InputIterator first, InputIterator last)
+    { clear(); for(;first!=last;first++) push(*first);  }
+
 };
 
 
@@ -117,23 +125,23 @@ template <class T> class VectorInterface<T*> {
     int capacity() { return limit-start ; }
     bool empty() { return siz==0 ; }
     bool operator!() const { return empty(); }
-    void reserve(int arg) { assert(arg<=max_size()); }
-    void resize(int arg) {   assert(arg<=max_size()); while(siz<arg) push_back(T()); }
+    void reserve(int arg) { koalaAssert(arg<=max_size(),ContExcFull); }
+    void resize(int arg) {  koalaAssert(arg<=max_size(),ContExcFull); while(siz<arg) push_back(T()); }
 
     T& operator[] (int pos) { return at(pos); }
-    T& at(int pos) { assert(pos>=0 && pos<capacity()); return start[pos]; }
+    T& at(int pos) { koalaAssert(pos>=0 ,ContExcOutpass); koalaAssert(pos<capacity(),ContExcFull);return start[pos]; }
     T& front() { return at(0); }
     T& back() { return at(siz-1); }
 
-    void push_back(const T& arg) { assert(siz<capacity()); start[siz++]=arg; }
-    void pop_back() { assert(siz); siz--; }
+    void push_back(const T& arg) { koalaAssert(siz<capacity(),ContExcFull); start[siz++]=arg; }
+    void pop_back() { koalaAssert(siz,ContExcOutpass); siz--; }
     static void revert(T* f,T *l)
     {   T z; l--; while(f<l) { z=*f;*f=*l;*l=z; f++;l--; }  }
     template <class InputIterator>
         void assign (InputIterator first, InputIterator last)
     { clear(); for(;first!=last;first++) push_back(*first);  }
     void insert (T* where, int n, const T& x )
-    {   assert(siz+n<=max_size());
+    {   koalaAssert(siz+n<=max_size(),ContExcFull);
         for(int i=siz-1;i>=where-start;i--) start[i+n]=start[i];
         for(int i=0;i<n;i++) where[i]=x;
         siz+=n;
@@ -158,7 +166,7 @@ template <class T> class VectorInterface<T*> {
 
 template <class Container, class Comp> class PriQueueInterface;
 
-// TODO: po usunieciu specjalizacji dac wartosc domyslna Comp=std::less<T>
+// TODO: po usunieciu specjalizacji dac wartosc domyslna Comp=std::greater<T>
 template <class T, class Comp> class PriQueueInterface<T*,Comp> {
     T* buf;
     int siz,maxsize;
@@ -173,14 +181,21 @@ template <class T, class Comp> class PriQueueInterface<T*,Comp> {
         PriQueueInterface(T* bufor, int max, Comp acomp=Comp()) : buf(bufor), maxsize(max), siz(0), comp(acomp) {}
         PriQueueInterface(T* bufor, T* end, int max, Comp acomp=Comp()) :
             buf(bufor), maxsize(max), siz(end-bufor), comp(acomp)
-        { assert(siz>=0 && siz<=maxsize); std::make_heap(buf,end,comp); }
+        { koalaAssert(siz>=0 && siz<=maxsize,ContExcWrongArg); std::make_heap(buf,end,comp); }
         int size() { return siz; }
         bool empty() { return siz==0; }
         bool operator!() const { return empty(); }
-        void push(const T& val) { assert(siz<maxsize); buf[siz++]=val; std::push_heap(buf,buf+siz,comp); }
-        void pop() { assert(siz); std::pop_heap(buf,buf+siz,comp); siz--; }
-        T top() { assert(siz); return buf[0]; }
+        void push(const T& val) { koalaAssert(siz<maxsize,ContExcFull); buf[siz++]=val; std::push_heap(buf,buf+siz,comp); }
+        void pop() { koalaAssert(siz,ContExcOutpass); std::pop_heap(buf,buf+siz,comp); siz--; }
+        T top() { koalaAssert(siz,ContExcOutpass); return buf[0]; }
         void clear() { siz=0; }
+    template <class InputIterator>
+        void assign (InputIterator first, InputIterator last)
+    { clear(); for(siz=0;first!=last;first++,siz++)
+        { buf[siz]=(*first);  koalaAssert(siz<maxsize,ContExcFull); }
+        std::make_heap(buf,buf+siz,comp);
+    }
+
 };
 
 

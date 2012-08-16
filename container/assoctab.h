@@ -58,7 +58,7 @@ template< class K, class V > class AssocTabConstInterface< std::map< K,V > > : p
         K nextKey( K ) const;
 
         V operator[]( K arg ) const // wartosc przypisana danemu kluczowi, wartosc domyslna typu ValType przy braku klucza w tablicy
-            {   assert(arg); // TODO: throw
+            {   koalaAssert(arg,ContExcOutpass);
                 typename std::map< K,V >::const_iterator i;
                 i=cont.find(arg);
                 if (i==cont.end()) return V(); else return i->second;
@@ -82,11 +82,11 @@ template< class K, class V > class AssocTabConstInterface< std::map< K,V > > : p
         void clear() { _cont().clear(); }
         bool delKey( K ); // usuwanie klucza, zwraca true jesli klucz byl
         V &get( K arg ) // referencja na wartosc przypisana do arg, wpis z wartoscia domyslna typu ValType jest tworzony jesli klucza nie bylo
-        {   assert(arg); // TODO: throw
+        {   koalaAssert(arg,ContExcOutpass);
             return (_cont())[arg];
         }
         ValType* valPtr(K arg) // wskaznik do wartosci przypisanej do arg, NULL w razie braku klucza
-        {   assert(arg); // TODO: throw
+        {   koalaAssert(arg,ContExcOutpass);
             typename std::map<K,V>::iterator i=_cont().find( arg );
             if (i==_cont().end()) return NULL; else return &(_cont())[arg];
         }
@@ -127,6 +127,7 @@ template <class T> class AssocTabInterface : public AssocTabConstInterface<T>
             for(KeyType k=arg.firstKey();k;k=arg.nextKey(k)) operator[](k)=arg[k];
             return *this;
         }
+
         template <class AssocCont>
         AssocTabInterface<T>& operator=(const AssocCont& arg)
         {
@@ -136,6 +137,8 @@ template <class T> class AssocTabInterface : public AssocTabConstInterface<T>
             for(KeyType k=arg.firstKey();k;k=arg.nextKey(k)) operator[](k)=arg[k];
             return *this;
         }
+        //TODO: dorobic operator=(const AssocTabConstInterface<T>&) i operator=(const AssocTabInterface<T>&)
+        // jako zabezpieczenia powyzszego operatora przed przypisaniem z zewnetrznego interfejsu do jego wlasnego pola cont
 
         void reserve(int arg) { AssocTabConstInterface<T>::reserve(arg); }
         void clear() { AssocTabConstInterface<T>::clear(); }

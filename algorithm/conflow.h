@@ -221,11 +221,11 @@ class FlowPar : public PathStructs {
         bool out,Iter& iter)
     {
         EdgeDirection mask=EdDirIn | EdDirOut | EdUndir;
-        int depth;
+        int depth,m=g.getEdgeNo();
         typename GraphType::PEdge e;
         typename GraphType::PVertex u, v;
-        typename GraphType::PVertex LOCALARRAY( buf,g.getEdgeNo() + 3 );
-        QueueInterface< typename GraphType::PVertex* > cont( buf,g.getEdgeNo() + 3 );
+        typename GraphType::PVertex LOCALARRAY( buf,m + 3 );
+        QueueInterface< typename GraphType::PVertex* > cont( buf,m + 3 );
 
 //        visited[first]=(VertLabs<GraphType,typename EdgeContainer::ValType::CapacType>
 //                                                    (NULL,NULL,0);
@@ -413,9 +413,8 @@ class FlowPar : public PathStructs {
         VertContainer& vertTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         typename EdgeContainer::ValType::CapacType limit)
-    {   assert(start); // TODO: throw
-        assert(end);
-        assert(start!=end);
+    {   koalaAssert(start && end,AlgExcNullVert);
+        koalaAssert(start!=end,AlgExcWrongConn);
         typename GraphType::PVertex LOCALARRAY(buf,g.getVertNo());
         typename GraphType::PVertex* bufend=buf;
         typename EdgeContainer::ValType::CapacType res=
@@ -450,10 +449,9 @@ class FlowPar : public PathStructs {
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         typename EdgeContainer::ValType::CapacType limit // gorny limit wielkosci znalezionego przeplywu
         )
-    {   // TODO: throw
-        assert(start);
-        assert(end);
-        assert(start!=end);
+    {
+koalaAssert(start && end,AlgExcNullVert);
+        koalaAssert(start!=end,AlgExcWrongConn);
         const typename EdgeContainer::ValType::CapacType PlusInfty
                     = DefaultStructs:: template NumberTypeBounds
                     <typename EdgeContainer::ValType::CapacType>::plusInfty();
@@ -470,7 +468,7 @@ class FlowPar : public PathStructs {
         for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         {
             edgeTab[e].flow=Zero;
-            assert(edgeTab[e].capac>=Zero);// TODO: throw
+            koalaAssert(edgeTab[e].capac>=Zero,AlgExcWrongArg);
         }
         if (limit==Zero) return Zero;
         while (Zero!=(add=layerFlow(g,edgeTab,vertTab,start,end,limit-res)))
@@ -492,25 +490,25 @@ class FlowPar : public PathStructs {
                                 // wyniki zwracane do pol flow
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         typename EdgeContainer::ValType::CapacType limit)// gorny limit wielkosci znalezionego przeplywu
-    {   // TODO: throw
-        assert(start);
-        assert(end);
-        assert(start!=end);
+    {
+        koalaAssert(start,AlgExcNullVert);
+
+        koalaAssert(start!=end,AlgExcWrongConn);
         const typename EdgeContainer::ValType::CapacType Zero
                     = DefaultStructs:: template NumberTypeBounds
                     <typename EdgeContainer::ValType::CapacType>::zero();
 
-
+        int n;
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabs<GraphType,typename EdgeContainer::ValType::CapacType> >::Type vertTab(g.getVertNo());
+                VertLabs<GraphType,typename EdgeContainer::ValType::CapacType> >::Type vertTab(n=g.getVertNo());
         typename EdgeContainer::ValType::CapacType res=Zero;
-        typename GraphType::PVertex LOCALARRAY(vTab,g.getVertNo());
-        typename GraphType::PEdge LOCALARRAY(eTab,g.getVertNo());
+        typename GraphType::PVertex LOCALARRAY(vTab,n);
+        typename GraphType::PEdge LOCALARRAY(eTab,n);
 
         for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         {
             edgeTab[e].flow=Zero;
-            assert(edgeTab[e].capac>=Zero); // TODO: throw
+            koalaAssert(edgeTab[e].capac>=Zero,AlgExcWrongArg);
         }
 
         while (res<limit && BFSFlow(g,edgeTab,vertTab,start,end,true,blackHole))
@@ -618,7 +616,8 @@ class FlowPar : public PathStructs {
         EdgeContainer& edgeTab,
         VertContainer& vertTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end)
-    {   assert(start && end && start!=end); // TODO: throw
+    {   koalaAssert(start && end,AlgExcNullVert);
+        koalaAssert(start!=end,AlgExcWrongConn);
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabsCost<GraphType, typename EdgeContainer::ValType::CostType> >::Type Q(g.getVertNo());
         typename GraphType::PVertex U,V;
@@ -686,22 +685,22 @@ class FlowPar : public PathStructs {
         const typename EdgeContainer::ValType::CostType Zero
                     = DefaultStructs:: template NumberTypeBounds
                     <typename EdgeContainer::ValType::CostType>::zero();
-
+        int n=g.getVertNo();
         CycLabs< GraphType, typename EdgeContainer::ValType::CostType> LOCALARRAY(
-                                                            buf,g.getVertNo()*g.getVertNo()+g.getVertNo());
+                                                            buf,n*n+n);
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 std::pair<CycLabs< GraphType, typename EdgeContainer::ValType::CostType>*,int> >
-                    ::Type vTab(g.getVertNo());
+                    ::Type vTab(n);
 
-        typename GraphType::PVertex LOCALARRAY(vBuf,g.getVertNo()+1);
-        typename GraphType::PEdge LOCALARRAY(eBuf,g.getVertNo()+1);
-        int n=g.getVertNo();
+        typename GraphType::PVertex LOCALARRAY(vBuf,n+1);
+        typename GraphType::PEdge LOCALARRAY(eBuf,n+1);
+
         // TODO: chyba zbedne:
         //for(int i=0;i<n*n+n;i++) buf[i]=CycLabs< GraphType, typename EdgeContainer::ValType::CostType>();
 
         CycLabs< GraphType, typename EdgeContainer::ValType::CostType> *buf2=buf;
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-        {   vTab[v].second=0; vTab[v].first=buf2; buf2+=g.getVertNo()+1; }
+        {   vTab[v].second=0; vTab[v].first=buf2; buf2+=n+1; }
 
         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
             vTab[v].first->dist=Zero;
@@ -860,14 +859,14 @@ class FlowPar : public PathStructs {
                     = DefaultStructs:: template NumberTypeBounds
                     <typename EdgeContainer::ValType::CapacType>::zero();
 
-
+        int n;
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabsCost<GraphType, typename EdgeContainer::ValType::CostType> >::Type vertTab(g.getVertNo());
+                VertLabsCost<GraphType, typename EdgeContainer::ValType::CostType> >::Type vertTab(n=g.getVertNo());
         typename EdgeContainer::ValType::CapacType res=Zero;
 //        typename EdgeContainer::ValType::CostType res2=DefaultStructs:: template NumberTypeBounds
 //                    <typename EdgeContainer::ValType::CostType>::zero();
-        typename GraphType::PVertex LOCALARRAY(vTab,g.getVertNo());
-        typename GraphType::PEdge LOCALARRAY(eTab,g.getVertNo());
+        typename GraphType::PVertex LOCALARRAY(vTab,n);
+        typename GraphType::PEdge LOCALARRAY(eTab,n);
 
 
         while (DijkstraFlow(g,edgeTab,vertTab,start,end))
@@ -906,8 +905,9 @@ class FlowPar : public PathStructs {
         typename EdgeContainer::ValType::CapacType res=Zero;
 //        typename EdgeContainer::ValType::CostType res2=DefaultStructs:: template NumberTypeBounds
 //                    <typename EdgeContainer::ValType::CostType>::zero();
-        typename GraphType::PVertex LOCALARRAY(vTab,g.getVertNo());
-        typename GraphType::PEdge LOCALARRAY(eTab,g.getVertNo());
+        int n;
+        typename GraphType::PVertex LOCALARRAY(vTab,n=g.getVertNo());
+        typename GraphType::PEdge LOCALARRAY(eTab,n);
 
 
         int len;
@@ -999,7 +999,8 @@ class FlowPar : public PathStructs {
         EdgeDirection type=EdUndir)
         // type=EdDirOut - objetosc wyplywajaca, type=EdDirIn - objetosc wplywajaca, type=EdUndir - bilans wyplywajacy
     {
-        assert(v && (type==EdDirOut ||type==EdDirIn ||type==EdUndir)); // TODO: throw
+        koalaAssert(v,AlgExcNullVert)
+        koalaAssert((type==EdDirOut ||type==EdDirIn ||type==EdUndir),AlgExcWrongMask);
            const typename EdgeContainer::ValType::CapacType Zero=DefaultStructs:: template NumberTypeBounds
                     <typename EdgeContainer::ValType::CapacType>::zero();
             typename EdgeContainer::ValType::CapacType sum=Zero;
@@ -1038,7 +1039,8 @@ class FlowPar : public PathStructs {
     {   const typename EdgeContainer::ValType::CapacType Zero
                     = DefaultStructs:: template NumberTypeBounds
                     <typename EdgeContainer::ValType::CapacType>::zero();
-        assert(S && T && S!=T); // TODO: throw
+        koalaAssert(S && T,AlgExcNullVert);
+        koalaAssert(S!=T,AlgExcWrongConn); //
         for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir))
             if (std::max(edgeTab[e].flow,-edgeTab[e].flow)<Zero ||
                 std::max(edgeTab[e].flow,-edgeTab[e].flow)>edgeTab[e].capac) return false;
@@ -1060,9 +1062,9 @@ class FlowPar : public PathStructs {
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         typename EdgeContainer::ValType::CapacType limit=DefaultStructs:: template NumberTypeBounds
                     <typename EdgeContainer::ValType::CapacType>::plusInfty()) // gorny limit wielkosci przeplywu
-    {   // TODO: throw
-        assert(start && end && limit>=DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::zero());
+    {
+        koalaAssert(start && end,AlgExcNullVert);
+        koalaAssert(limit>=DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::CapacType>::zero(),AlgExcWrongArg);
         if (DefaultStructs::useFulkersonFord) return maxFlowFF(g,edgeTab,start,end,limit);
         else return maxFlowMKM(g,edgeTab,start,end,limit);
     }
@@ -1095,12 +1097,10 @@ class FlowPar : public PathStructs {
         typename EdgeContainer::ValType::CapacType val=// gorny limit wielkosci szukanego przeplywu
                     DefaultStructs:: template NumberTypeBounds
                     <typename EdgeContainer::ValType::CapacType>::plusInfty())
-    {   // TODO: throw
-        assert(start);
-        assert(end);
-        assert(start!=end);
-        assert(val>=DefaultStructs:: template NumberTypeBounds
-                    <typename EdgeContainer::ValType::CapacType>::zero());
+    {
+        koalaAssert(start &&end,AlgExcNullVert);
+        koalaAssert(start!=end,AlgExcWrongConn);
+        koalaAssert(val>=DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::CapacType>::zero(),AlgExcWrongArg);
         const typename EdgeContainer::ValType::CapacType Zero
                     = DefaultStructs:: template NumberTypeBounds
                     <typename EdgeContainer::ValType::CapacType>::zero();
@@ -1109,14 +1109,13 @@ class FlowPar : public PathStructs {
         for(typename GraphType::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         {
             edgeTab[e].flow=Zero;
-            // TODO: throw
-            assert(edgeTab[e].capac>=Zero);
+
+            koalaAssert(edgeTab[e].capac>=Zero,AlgExcWrongArg);
         }
         for(typename GraphType::PEdge E=g.getEdge(EdDirIn | EdDirOut | EdUndir);E;
                                             E=g.getEdgeNext(E,EdDirIn | EdDirOut | EdUndir))
-            // TODO: throw
-            assert(edgeTab[E].cost >= DefaultStructs:: template NumberTypeBounds
-                            <typename EdgeContainer::ValType::CostType>::zero());
+
+            koalaAssert(edgeTab[E].cost >= DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::CostType>::zero(),AlgExcWrongArg);
 
         std::pair<typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType> res;
         if (DefaultStructs::useCostFulkersonFord) res.second= minCostFlowFF(g,edgeTab,start,end,val);
@@ -1167,13 +1166,14 @@ class FlowPar : public PathStructs {
         const GraphType & g,
         EdgeContainer& edgeTab, // i tablica dlugosci krawedzi
         OutPath<VIter,EIter> iters)
-    {   assert(g.getVertNo()>=2); // TODO: throw
+    {   int n,m;
+        koalaAssert(g.getVertNo()>=2,AlgExcWrongArg);
         EdgeCut<typename EdgeContainer::ValType::CapacType> res,buf;
         typename GraphType::PVertex a,b;
-        typename GraphType::PVertex LOCALARRAY(vres,g.getVertNo()-1);
-        typename GraphType::PVertex LOCALARRAY(vbuf,g.getVertNo()-1);
-        typename GraphType::PEdge LOCALARRAY(eres,g.getEdgeNo());
-        typename GraphType::PEdge LOCALARRAY(ebuf,g.getEdgeNo());
+        typename GraphType::PVertex LOCALARRAY(vres,(n=g.getVertNo())-1);
+        typename GraphType::PVertex LOCALARRAY(vbuf,n-1);
+        typename GraphType::PEdge LOCALARRAY(eres,m=g.getEdgeNo());
+        typename GraphType::PEdge LOCALARRAY(ebuf,m);
         res.capac=DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::CapacType>
                     ::plusInfty();
 
@@ -1233,18 +1233,19 @@ class FlowPar : public PathStructs {
                     <typename EdgeContainer::ValType::CapacType>::zero();
 
         typename GraphType::PVertex s,t,u,v;
+        int n,m;
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                 typename EdgeContainer::ValType::CapacType >::Type exc(g.getVertNo()+3);
+                 typename EdgeContainer::ValType::CapacType >::Type exc((n=g.getVertNo())+3);
         typename DefaultStructs:: template AssocCont<typename GraphType::PEdge,
-                 EdgeLabs<typename EdgeContainer::ValType::CapacType > >::Type edgeLabs(2*g.getVertNo()+g.getEdgeNo()+2);
+                 EdgeLabs<typename EdgeContainer::ValType::CapacType > >::Type edgeLabs(2*n+(m=g.getEdgeNo())+2);
         typename EdgeContainer::ValType::CapacType sum
                             =Zero;
 
         for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir))
-            {   assert(Zero==edgeTab[e].lo); // TODO: throw
+            {   koalaAssert(Zero==edgeTab[e].lo,AlgExcWrongArg);
             }
 
-        if (DefaultStructs::ReserveOutAssocCont) edgeTab.reserve(g.getEdgeNo()+g.getVertNo());
+        if (DefaultStructs::ReserveOutAssocCont) edgeTab.reserve(m+n);
 
         u=g.addVert();
         for(v=g.getVert();v;v=g.getVertNext(v))
@@ -1294,18 +1295,19 @@ class FlowPar : public PathStructs {
                     <typename EdgeContainer::ValType::CapacType>::zero();
 
         typename GraphType::PVertex s,t,u,v;
+        int n,m;
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                 typename EdgeContainer::ValType::CapacType >::Type exc(g.getVertNo()+3);
+                 typename EdgeContainer::ValType::CapacType >::Type exc((n=g.getVertNo())+3);
         typename DefaultStructs:: template AssocCont<typename GraphType::PEdge,
-                 EdgeLabs<typename EdgeContainer::ValType::CapacType > >::Type edgeLabs(2*g.getVertNo()+g.getEdgeNo()+2);
+                 EdgeLabs<typename EdgeContainer::ValType::CapacType > >::Type edgeLabs(2*n+(m=g.getEdgeNo())+2);
         typename EdgeContainer::ValType::CapacType sum
                             =Zero;
 
         for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir))
-            {   assert(Zero==edgeTab[e].lo); // TODO: throw
+            {   koalaAssert(Zero==edgeTab[e].lo,AlgExcWrongArg);
             }
 
-        if (DefaultStructs::ReserveOutAssocCont) edgeTab.reserve(g.getEdgeNo()+g.getVertNo());
+        if (DefaultStructs::ReserveOutAssocCont) edgeTab.reserve(m+n);
 
         u=g.addVert();
         for(v=g.getVert();v;v=g.getVertNext(v))
@@ -1352,18 +1354,20 @@ class FlowPar : public PathStructs {
     }
 
     // znajduje drzewo Gomory-Hu grafu
+    // TODO: niezbyt efektywne, moze zrezygnowac z Setow
     template <class GraphType, class EdgeContainer, class IterOut>
     static void findGHTree(GraphType & g, // badany graf nieskierowany
                           EdgeContainer& edgeTab, // tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac (wymagane nieujemne)
                 IterOut out) // iterator wyjsciowy, na ktory wyrzucamy struktury GHTreeEdge "krawedzi" drzewa
-    {   assert(g.getVertNo()>1); // TODO: throw
-        GHTreeEdge<GraphType,typename EdgeContainer::ValType::CapacType> LOCALARRAY(buf,g.getVertNo());
+    {   koalaAssert(g.getVertNo()>1,AlgExcWrongArg);
+        int n;
+        GHTreeEdge<GraphType,typename EdgeContainer::ValType::CapacType> LOCALARRAY(buf,n=g.getVertNo());
         typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                Set<typename GraphType::PVertex> >::Type setMap(g.getVertNo());
+                Set<typename GraphType::PVertex> >::Type setMap(n);
         Set<typename GraphType::PVertex> V=g.getVertSet(),R=V;
         // TODO: if (DefaultStructs::ReserveOutAssocCont) edgeTab.reserve(???);
         ghtree(g,edgeTab,setMap,V,R,buf);
-        for(int i=0;i<g.getVertNo()-1;i++) { *out=buf[i]; ++out; }
+        for(int i=0;i<n-1;i++) { *out=buf[i]; ++out; }
     }
 
 
@@ -1472,17 +1476,18 @@ class ConnectPar : public SearchStructs {
                   typename GraphType::PVertex start, typename GraphType::PVertex end,
                   CompStore< LenIterV,VIter > voutiter, // iteratory wyjsciowe na kolejne wierz znalezionych sciezek
                   CompStore< LenIterE,EIter > eoutiter) // iteratory wyjsciowe na kolejne kraw znalezionych sciezek
-    {   typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
+    {   int n,m;
+        typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
                                     typename FlowPar<DefaultStructs>:: template EdgeLabs<int> >::Type
-                                        edgeTab(g.getEdgeNo());
+                                        edgeTab(m=g.getEdgeNo());
         typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,
                             std::pair<typename GraphType::PVertex,typename GraphType::PVertex> >::Type
                                         undirs(g.getEdgeNo(EdUndir));
         typename DefaultStructs::   template AssocCont<typename GraphType::PEdge,int>::Type
-                                        paths(2*g.getEdgeNo());
-        typename GraphType::PEdge LOCALARRAY(euler,2*g.getEdgeNo());
-        typename GraphType::PEdge LOCALARRAY(eout,g.getEdgeNo());
-        typename GraphType::PVertex LOCALARRAY(vout,g.getVertNo());
+                                        paths(2*m);
+        typename GraphType::PEdge LOCALARRAY(euler,2*m);
+        typename GraphType::PEdge LOCALARRAY(eout,m);
+        typename GraphType::PVertex LOCALARRAY(vout,n=g.getVertNo());
 
         *voutiter.compIter=0; ++voutiter.compIter;*eoutiter.compIter=0; ++eoutiter.compIter;
         for(typename GraphType::PEdge e=g.getEdge(EdDirIn|EdDirOut|EdUndir);e;e=g.getEdgeNext(e,EdDirIn|EdDirOut|EdUndir))
@@ -1535,18 +1540,20 @@ class ConnectPar : public SearchStructs {
         const GraphType & g,// badany graf
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         VIter iter) // iterator wyjsciowy
-    {   assert(start && end && (start!=end) ); // TODO: throw
+    {   koalaAssert(start && end,AlgExcNullVert);
+        koalaAssert(start!=end, AlgExcWrongConn);
         if (g.getEdge(start,end,EdDirOut|EdUndir)) return -1;
         typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
                 std::pair<typename GraphType::PVertex,typename GraphType::PEdge>,Directed,false >:: Type Image;
         Image ig;
+        int n,m;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                             std::pair<typename Image::PVertex,typename Image::PVertex> >::Type
-                                images(g.getVertNo());
+                                images(n=g.getVertNo());
         typename DefaultStructs::   template AssocCont<typename Image::PEdge,
                                     typename FlowPar<DefaultStructs>:: template EdgeLabs<int> >::Type
-                                        imageFlow(2*g.getEdgeNo()+2*g.getVertNo());
-        typename Image::PEdge LOCALARRAY(icut,g.getVertNo());
+                                        imageFlow(2*g.getEdgeNo()+2*n);
+        typename Image::PEdge LOCALARRAY(icut,n);
 
         makeImage(g,ig,images);
         for(typename Image::PEdge e=ig.getEdge();e;e=ig.getEdgeNext(e))
@@ -1570,14 +1577,15 @@ class ConnectPar : public SearchStructs {
         typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
                 std::pair<typename GraphType::PVertex,typename GraphType::PEdge>,Directed,false >:: Type Image;
         Image ig;
+        int n;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                             std::pair<typename Image::PVertex,typename Image::PVertex> >::Type
-                                images(g.getVertNo());
+                                images(n=g.getVertNo());
         typename DefaultStructs::   template AssocCont<typename Image::PEdge,
                                     typename FlowPar<DefaultStructs>:: template EdgeLabs<int> >::Type
-                                        imageFlow(2*g.getEdgeNo()+2*g.getVertNo());
-        typename Image::PEdge LOCALARRAY(icut,g.getVertNo());
-        typename Image::PEdge LOCALARRAY(bestcut,g.getVertNo());
+                                        imageFlow(2*g.getEdgeNo()+2*n);
+        typename Image::PEdge LOCALARRAY(icut,n);
+        typename Image::PEdge LOCALARRAY(bestcut,n);
 
         makeImage(g,ig,images);
         for(typename Image::PEdge e=ig.getEdge();e;e=ig.getEdgeNext(e))
@@ -1626,16 +1634,18 @@ class ConnectPar : public SearchStructs {
                   typename GraphType::PVertex start, typename GraphType::PVertex end,
                   CompStore< LenIterV,VIter > voutiter, // iteratory wyjsciowe na kolejne wierz znalezionych sciezek
                   CompStore< LenIterE,EIter > eoutiter) // iteratory wyjsciowe na kolejne kraw znalezionych sciezek
-    {   assert(start && end && start!=end);//TODO: throw
+    {   koalaAssert(start && end,AlgExcNullVert);
+        koalaAssert(start!=end, AlgExcWrongConn);
         typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,
                 std::pair<typename GraphType::PVertex,typename GraphType::PEdge>,Directed,false >:: Type Image;
         Image ig;
+        int n,m;
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                             std::pair<typename Image::PVertex,typename Image::PVertex> >::Type
-                                images(g.getVertNo());
+                                images(n=g.getVertNo());
 
-        typename Image::PEdge LOCALARRAY(impaths,g.getVertNo()+2*g.getEdgeNo());
-        int LOCALARRAY(impos,2*g.getEdgeNo()+2);
+        typename Image::PEdge LOCALARRAY(impaths,n+2*(m=g.getEdgeNo()));
+        int LOCALARRAY(impos,2*m+2);
 
 
         makeImage(g,ig,images);

@@ -28,6 +28,7 @@ template< class Graph > void readG6( Graph &graph, const char *str_graph )
             if (!mask)
             {
                 ++ch;
+                // TODO: zamienic na zwracanie false przez funkcje
                 if (!(*ch)) throw KoalaG6Exception( 2 );
                 if (*ch < LIMIT_LO || *ch > LIMIT_HI) throw KoalaG6Exception( 1 );
                 *ch -= LIMIT_LO;
