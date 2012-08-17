@@ -184,8 +184,8 @@ template< class Klucz, class Elem, class Container >
 Klucz AssocArray< Klucz,Elem,Container >::nextKey( Klucz v )  const
 {
     if (!v) return firstKey();
-    int x;
-    koalaAssert((x = keyPos( v )) != -1,ContExcOutpass);
+    int x= keyPos( v ); //TODO: poprawiony blad, uaktualnic
+    koalaAssert(x != -1,ContExcOutpass);
     if ((x = tab.nextPos( x )) == -1) return 0;
     return tab[x].key;
 }
@@ -194,8 +194,8 @@ template< class Klucz, class Elem, class Container >
 Klucz AssocArray< Klucz,Elem,Container >::prevKey( Klucz v )  const
 {
     if (!v) return lastKey();
-    int x;
-    koalaAssert((x = keyPos( v )) != -1,ContExcOutpass);
+    int x= keyPos( v );//TODO: poprawiony blad, uaktualnic
+    koalaAssert(x  != -1,ContExcOutpass);
     if ((x = tab.prevPos( x )) == -1) return 0;
     return tab[x].key;
 }
@@ -287,8 +287,8 @@ template< class Klucz, class Elem, class AssocCont,class Container >
 Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::nextKey( Klucz v )  const
 {
     if (!v) return firstKey();
-    int x;
-    koalaAssert((x = keyPos( v )) != -1,ContExcOutpass);
+    int x= keyPos( v ); // TODO: poprawiony blad, uaktualnic
+    koalaAssert(x  != -1,ContExcOutpass);
     if ((x = tab.nextPos( x )) == -1) return 0;
     return tab[x].key;
 }
@@ -297,8 +297,8 @@ template< class Klucz, class Elem, class AssocCont,class Container >
 Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::prevKey( Klucz v )  const
 {
     if (!v) return lastKey();
-    int x;
-    koalaAssert((x = keyPos( v )) != -1,ContExcOutpass);
+    int x= keyPos( v ); // TODO: poprawiony blad, uaktualnic
+    koalaAssert(x  != -1,ContExcOutpass);
     if ((x = tab.prevPos( x )) == -1) return 0;
     return tab[x].key;
 }
