@@ -428,7 +428,7 @@ class BlockList : protected BlockListVectInerfTest<Container>
                         e->next = a;
                         a->prev = e;
                         e = a;
-                        if((a = a->next) == NULL) break;
+                        if((a = a->next) == ae) break;
                     } else {
                         e->next = b;
                         b->prev = e;

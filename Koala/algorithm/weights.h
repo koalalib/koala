@@ -127,8 +127,7 @@ class DijkstraBasePar : public ShortPathStructs {
     };
 
 
-    template <class GraphType, class VertContainer, class EdgeContainer,
-        template <class Key,class Comparator,class Allocator> class Heap, template <class _Key> class Block>
+    template <class GraphType, class VertContainer, class EdgeContainer>
     static typename EdgeContainer::ValType::DistType
     distancesOnHeap (
         const GraphType & g,
@@ -155,11 +154,13 @@ class DijkstraBasePar : public ShortPathStructs {
         typename GraphType::PVertex U,V;
 
         if (DefaultStructs::ReserveOutAssocCont || isBlackHole(avertTab)) vertTab.reserve(n);
-
-        Privates::BlockListAllocator<Block<typename GraphType::PVertex> > alloc(n);
-        Heap<typename GraphType::PVertex,Cmp<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
-                VertLabsQue<typename EdgeContainer::ValType::DistType ,GraphType> >::Type>,
-                Privates::BlockListAllocator< Block<typename GraphType::PVertex> > > heap(&alloc,makeCmp(Q));
+        Privates::BlockListAllocator<typename DefaultStructs:: template HeapCont<typename GraphType::PVertex,void,void>::NodeType > alloc(n);
+        typename DefaultStructs:: template HeapCont
+            <typename GraphType::PVertex,
+                Cmp<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                    VertLabsQue<typename EdgeContainer::ValType::DistType ,GraphType> >::Type>
+                ,Privates::BlockListAllocator<typename DefaultStructs:: template HeapCont<typename GraphType::PVertex,void,void>::NodeType > >
+                    ::Type heap(&alloc,makeCmp(Q));
 
         Q[start].vPrev=0;Q[start].ePrev=0;
         Q[start].distance=Zero;
@@ -171,7 +172,7 @@ class DijkstraBasePar : public ShortPathStructs {
             U=heap.top(); d=Q[U].distance;
 //            vertTab[U]=Q[U];
             Q[U].copy(vertTab[U]);
-            heap.del(( Block<typename GraphType::PVertex>*)Q[U].repr);
+            heap.del(( typename DefaultStructs:: template HeapCont<typename GraphType::PVertex,void,void>::NodeType*)Q[U].repr);
             Q.delKey(U);
             if (U==end) return vertTab[end].distance;
 
@@ -179,7 +180,7 @@ class DijkstraBasePar : public ShortPathStructs {
                 E;E=g.getEdgeNext(U,E,Koala::EdDirOut|Koala::EdUndir))
                     if (!vertTab.hasKey(V=g.getEdgeEnd(E,U)))
                         if ((nd=vertTab[U].distance+edgeTab[E].length)<Q[V].distance)
-                        {   if (Q[V].repr) heap.del(( Block<typename GraphType::PVertex>*)Q[V].repr);
+                        {   if (Q[V].repr) heap.del(( typename DefaultStructs:: template HeapCont<typename GraphType::PVertex,void,void>::NodeType*)Q[V].repr);
                             Q[V].distance=nd; Q[V].ePrev=E; Q[V].vPrev=U;
                             Q[V].repr=heap.push(V);
                         }
@@ -205,31 +206,7 @@ class DijkstraHeapBasePar : public DijkstraBasePar<DefaultStructs> {
         typename GraphType::PVertex start, typename GraphType::PVertex end=0)
     // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
     {
-        return DijkstraBasePar<DefaultStructs>::template distancesOnHeap
-                <GraphType,VertContainer,EdgeContainer,BinomHeap,BinomHeapNode>
-                (g,avertTab,edgeTab,start,end);
-    }
-
-};
-
-
-template <class DefaultStructs>
-class DijkstraFibonBasePar : public DijkstraBasePar<DefaultStructs> {
-
-    public:
-
-    template <class GraphType, class VertContainer, class EdgeContainer>
-    static typename EdgeContainer::ValType::DistType
-    distances (
-        const GraphType & g,
-        VertContainer& avertTab, // wyjsciowa tablica asocjacyjna PVertex->VertLabs poszczegolnych wierzcholkow
-        const EdgeContainer& edgeTab, // wejsciowa tablica asocjacyjna PEdge->EdgeLabs dlugosci krawedzi
-        typename GraphType::PVertex start, typename GraphType::PVertex end=0)
-    // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
-    {
-        return DijkstraBasePar<DefaultStructs>::template distancesOnHeap
-                <GraphType,VertContainer,EdgeContainer,FibonHeap,FibonHeapNode>
-                (g,avertTab,edgeTab,start,end);
+        return DijkstraBasePar<DefaultStructs>::distancesOnHeap(g,avertTab,edgeTab,start,end);
     }
 
 };
@@ -294,16 +271,10 @@ template <class DefaultStructs>
 class DijkstraHeapPar : public DijkstraMainPar<DefaultStructs,DijkstraHeapBasePar<DefaultStructs> > {};
 
 
-// Algorytm Dijkstry na kopcu Fibonacziego
-template <class DefaultStructs>
-// DefaultStructs - wytyczne dla wewnetrznych procedur
-class DijkstraFibonPar : public DijkstraMainPar<DefaultStructs,DijkstraFibonBasePar<DefaultStructs> > {};
-
-
 // wersje dzialajaca na DefaultStructs=AlgsDefaultSettings
 class Dijkstra : public DijkstraPar<AlgsDefaultSettings> {};
 class DijkstraHeap : public DijkstraHeapPar<AlgsDefaultSettings> {};
-class DijkstraFibon : public DijkstraFibonPar<AlgsDefaultSettings> {};
+
 
 
 // najdluzsze sciezki w DAGu z wagami na krawedziach

@@ -298,6 +298,8 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
         mapa[A]="A";
         AssocTabConstInterface<std::map<Vert*,std::string> > inf(mapa);
         AssocTabInterface<std::map<Vert*,std::string> > inf2(mapa),inf3(inf2),inf4(mapa2);
+        std::cout << "\n\n\n*******\n\n\n" << Privates::asssocTabInterfTest(mapa) << ' ' <<
+            Privates::asssocTabInterfTest(inf) << ' ' << Privates::asssocTabInterfTest(inf2) << ' ' << (&mapa) << ' ' << (Privates::asssocTabInterfTest(inf2)==&mapa)<< "\n\n\n*******\n\n\n";
         inf3[B]="B";
         inf3=inf;
         t(inf3);
