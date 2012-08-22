@@ -1283,6 +1283,23 @@ class IsItPar : public SearchStructs {
 	    return Comparability::explore(g,blackHole,blackHole,blackHole)!=-1;
 	}
 
+    // czy graf jest dopelnieniem comparability
+    template <class GraphType>
+	static bool cocomparability(const GraphType& g)
+	{
+	    if (!undir(g,true) || g.getEdgeNo(Loop)>0) return false;
+	    typedef typename DefaultStructs::template LocalGraph<typename GraphType::PVertex,char,Undirected,true >:: Type ImageGraph;
+        ImageGraph cg;
+        for(typename GraphType::PVertex u=g.getVert();u;u=g.getVertNext(u)) cg.addVert(u);
+        for(typename ImageGraph::PVertex u=cg.getVert();u!=cg.getVertLast();u=cg.getVertNext(u))
+            for(typename ImageGraph::PVertex v=cg.getVertNext(u);v;v=cg.getVertNext(v))
+                if (!g.getEdge(u->info,v->info,EdUndir)) cg.addEdge(u,v,EdUndir);
+
+
+	    return comparability(cg);
+	}
+
+
     class Interval : protected LexBFSPar<DefaultStructs> {
 
         public:
@@ -1760,7 +1777,8 @@ class IsItPar : public SearchStructs {
     template <class GraphType>
 	static bool interval(const GraphType& g)
 	{
-	    return Interval::graph2segs(g,blackHole);
+//	    return Interval::graph2segs(g,blackHole);
+        return chordal(g) && cocomparability(g);
 	}
 
     // czy pierwszy

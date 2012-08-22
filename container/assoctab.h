@@ -137,8 +137,6 @@ template <class T> class AssocTabInterface : public AssocTabConstInterface<T>
             for(KeyType k=arg.firstKey();k;k=arg.nextKey(k)) operator[](k)=arg[k];
             return *this;
         }
-        //TODO: dorobic operator=(const AssocTabConstInterface<T>&) i operator=(const AssocTabInterface<T>&)
-        // jako zabezpieczenia powyzszego operatora przed przypisaniem z zewnetrznego interfejsu do jego wlasnego pola cont
 
         void reserve(int arg) { AssocTabConstInterface<T>::reserve(arg); }
         void clear() { AssocTabConstInterface<T>::clear(); }
@@ -158,6 +156,18 @@ template <class T> class AssocTabInterface : public AssocTabConstInterface<T>
  *
  * ------------------------------------------------------------------------- */
 
+// sprawdzenie adresu oryginalnego kontenera dla interfejsow asocjacyjnych
+namespace Privates {
+template <class T>
+void* asssocTabInterfTest(const T& ) { return 0; }
+
+template <class T>
+void* asssocTabInterfTest(const AssocTabConstInterface<T>& arg) { return (void*)(&arg.cont); }
+
+template <class T>
+void* asssocTabInterfTest(const AssocTabInterface<T>& arg) { return (void*)(&arg.cont); }
+
+}
 
 // Opakowanie dla kontenera asocjacyjnego typu spoza Koali, udostepnia taki kontener w polu cont, jednoczesnie
 // operujac na nim metodami z AssocTabInterface. Typ tworzony automatycznie na podstawie AssocTabConstInterface
@@ -178,6 +188,7 @@ template< class T > class AssocTable : public Privates::AssocTabTag<typename Ass
         {
             //std::cout << "\nObcy=\n";
             Privates::AssocTabTag<typename AssocTabInterface< T >::KeyType>::operator=(arg);
+            if (Privates::asssocTabInterfTest(arg)==&cont) return *this;
             clear();
             for(typename AssocTabInterface< T >::KeyType k=arg.firstKey();k;k=arg.nextKey(k)) operator[](k)=arg[k];
             return *this;

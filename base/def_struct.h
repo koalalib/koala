@@ -18,6 +18,7 @@
 #include "../container/assoctab.h"
 #include "../container/hashcont.h"
 #include "../container/set.h"
+#include "../container/heap.h"
 
 
 //Glowne procedury biblioteki leza w namespace Koala
@@ -83,12 +84,27 @@ class AlgsDefaultSettings {
     //        typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
     };
 
+    // typ struktury kopca i jego wezla
+    template <class Key, class Compare = std::less<Key>,class Allocator=Privates::DefaultCPPAllocator >
+    class HeapCont {
+        public:
+        typedef FibonHeap<Key,Compare,Allocator> Type;
+    };
+
+    template <class Key>
+    class HeapCont<Key,void,void> {
+        public:
+        typedef FibonHeapNode<Key> NodeType;
+    };
+
+
     // typ grafu pomocniczego stosowanego wewnatrz procedury
     template <class A, class B,EdgeType mask,bool matr> class LocalGraph {
         public:
         typedef Graph<A,B,GrDefaultSettings<mask,matr> > Type;
 
     };
+
 
     // czy dostosowywac rozmiar pamieci wyjsciowych tablic asocjacyjnych
     enum { ReserveOutAssocCont=true };
