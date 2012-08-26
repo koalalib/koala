@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <limits>
-#include "../base/def_struct.h"
+#include "../base/defs.h"
 //#include "../graph/graph.h"
 #include "../graph/view.h"
 #include "../algorithm/search.h"

@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <vector>
-#include "../base/def_struct.h"
+#include "../base/defs.h"
 #include "../container/assoctab.h"
 #include "../algorithm/search.h"
 

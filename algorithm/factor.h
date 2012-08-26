@@ -1,7 +1,7 @@
 #ifndef KOALA_DEF_FACTOR_H
 #define KOALA_DEF_FACTOR_H
 
-#include "../base/def_struct.h"
+#include "../base/defs.h"
 #include "../graph/view.h"
 
 
