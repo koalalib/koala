@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <vector>
-#include "Koala/base/def_struct.h"
+#include "Koala/base/defs.h"
 #include "Koala/graph/graph.h"
 #include "Koala/graph/view.h"
 #include "Koala/classes/create.h"

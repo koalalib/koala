@@ -1,0 +1,109 @@
+// AlgsDefaultSettings
+
+template< class Iterator > void AlgsDefaultSettings::sort( Iterator first, Iterator last )
+{
+    std::make_heap( first,last );
+    std::sort_heap( first,last );
+}
+
+template< class Iterator, class Comp > void AlgsDefaultSettings::sort( Iterator first, Iterator last, Comp comp )
+{
+    std::make_heap( first,last,comp );
+    std::sort_heap( first,last,comp );        
+}
+
+// BlackHole
+
+template< class T > BlackHole &BlackHole::operator[]( T )
+{
+    assert( 0 );
+    return *this;
+}
+    
+template< class T, class R > BlackHole &BlackHole::operator()( T,R )
+{
+    assert( 0 );
+    return *this; 
+}
+
+template< class T > BlackHole::operator T()
+{
+    assert( 0 );
+    return T();
+}
+
+// AssocContainerChooser
+
+template< class Cont, class Iter > template< class Elem, class Graph > bool
+    AssocContainerChooser< Cont *,Iter >::operator()( Elem *elem, const Graph & ) const
+{
+    return cont->hasKey( elem ) && std::find( begin,end,cont->operator[]( elem )) != end;
+}
+
+NoCastCaster stdCast( bool arg )
+{
+    koalaAssert( !arg,ExcBase );
+    return NoCastCaster();
+}
+
+// Std2Linker
+
+template< class Link1, class Link2 > template< class Dest, class Sour >
+    void Std2Linker< Link1,Link2 >::operator()( Dest *wsk, Sour *w )
+{
+    dest2sour( wsk,w );
+    sour2dest( w,wsk );
+}
+
+Std2Linker< Std1NoLinker,Std1NoLinker > stdLink( bool a1, bool a2 )
+{ return Std2Linker< Std1NoLinker,Std1NoLinker >( Std1NoLinker( a1 ),Std1NoLinker( a2 )); }
+
+template< class Info,class T > Std2Linker< Std1NoLinker,Std1FieldLinker< Info,T > > stdLink( bool a1, T Info:: *awsk )
+{ 
+    return Std2Linker< Std1NoLinker,Std1FieldLinker< Info,T > >( Std1NoLinker( a1 ),Std1FieldLinker< Info,T >( awsk ) );
+}
+
+template< class Map > Std2Linker< Std1NoLinker,Std1AssocLinker< Map > > stdLink( bool a1, Map &tab )
+{
+    return Std2Linker< Std1NoLinker,Std1AssocLinker< Map > >( Std1NoLinker( a1 ),Std1AssocLinker< Map >( tab ));
+}
+
+template< class Info1, class T1 >
+    Std2Linker< Std1FieldLinker< Info1,T1 >,Std1NoLinker > stdLink( T1 Info1:: *awsk1, bool a2 )
+{
+    return Std2Linker< Std1FieldLinker< Info1,T1 >,Std1NoLinker >( Std1FieldLinker< Info1,T1 >( awsk1 ),
+        Std1NoLinker( a2 ) );
+}
+
+template< class Info1, class T1, class Info, class T >
+    Std2Linker< Std1FieldLinker< Info1,T1 >,Std1FieldLinker< Info,T > > stdLink( T1 Info1:: *awsk1, T Info:: *awsk )
+{
+    return Std2Linker< Std1FieldLinker< Info1,T1 >,Std1FieldLinker< Info,T > >( Std1FieldLinker< Info1,T1 >( awsk1 ),
+        Std1FieldLinker< Info,T >( awsk ));
+}
+
+template< class Info1, class T1, class Map >
+    Std2Linker< Std1FieldLinker< Info1,T1 >,Std1AssocLinker< Map > > stdLink( T1 Info1:: *awsk1, Map &tab)
+{
+    return Std2Linker< Std1FieldLinker< Info1,T1 >,Std1AssocLinker< Map > >( Std1FieldLinker< Info1,T1 >( awsk1 ),
+        Std1AssocLinker< Map >( tab ));
+}
+
+template< class Map1 > Std2Linker< Std1AssocLinker< Map1 >,Std1NoLinker > stdLink( Map1 &tab1, bool a2 )
+{
+    return Std2Linker< Std1AssocLinker< Map1 >,Std1NoLinker >( Std1AssocLinker< Map1 >( tab1 ),Std1NoLinker( a2 ) );
+}
+
+template< class Map1, class Info, class T >
+    Std2Linker< Std1AssocLinker< Map1 >,Std1FieldLinker< Info,T > > stdLink( Map1 &tab1, T Info:: *awsk )
+{
+    return Std2Linker< Std1AssocLinker< Map1 >,Std1FieldLinker< Info,T > >( Std1AssocLinker< Map1 >( tab1 ),
+        Std1FieldLinker< Info,T >( awsk ) );
+}
+
+template< class Map1, class Map >
+    Std2Linker< Std1AssocLinker< Map1 >,Std1AssocLinker< Map > > stdLink( Map1 &tab1, Map &tab )
+{
+    return Std2Linker< Std1AssocLinker< Map1 >,Std1AssocLinker< Map > >( Std1AssocLinker< Map1 >( tab1 ),
+        Std1AssocLinker< Map >( tab ));
+}

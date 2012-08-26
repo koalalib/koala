@@ -2,7 +2,7 @@
 
 #include<stdio.h>
 #include<iostream>
-#include"koala/base/def_struct.h"
+#include"koala/base/defs.h"
 #include"koala/graph/graph.h"
 #include"koala/algorithm/search.h"
 #include"koala/io/text.h"

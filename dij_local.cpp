@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "Koala/base/def_struct.h"
+#include "Koala/base/defs.h"
 #include "Koala/algorithm/search.h"
 #include "Koala/graph/graph.h"
 

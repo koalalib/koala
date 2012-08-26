@@ -6,7 +6,7 @@
 
 //#define KOALA_SET_ON_VECTOR
 
-#include "Koala/base/def_struct.h"
+#include "Koala/base/defs.h"
 #include "Koala/container/joinsets.h"
 
 

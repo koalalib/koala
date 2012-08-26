@@ -5,7 +5,7 @@
 #include <list>
 #include <cassert>
 #include "Koala/graph/graph.h"
-#include "Koala/base/def_struct.h"
+#include "Koala/base/defs.h"
 #include "Koala/algorithm/search.h"
 
 

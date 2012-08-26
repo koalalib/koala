@@ -6,7 +6,7 @@
  *
  * ------------------------------------------------------------------------- */
 
-#include "../base/def_struct.h"
+#include "../base/defs.h"
 #include "../graph/view.h"
 
 
@@ -655,7 +655,7 @@ class Visitors: public SearchStructs {
 
 // Ogolna implementacja przeszukiwania grafu roznymi strategiami (DFS, BFS, LexBFS)
 // Strategie dostarcza metoda visitBase z klasy SearchImpl, ktora odwiedza wierzcholki stosownie do swojej klasy
-// DefaultStructs dostarcza wytycznych dla wewnetrznych procedur por. np. AlgsDefaultSettings z def_struct.h
+// DefaultStructs dostarcza wytycznych dla wewnetrznych procedur por. np. AlgsDefaultSettings z defs.h
 template< class SearchImpl, class DefaultStructs >
 class GraphSearchBase: public ShortPathStructs, public SearchStructs
 {

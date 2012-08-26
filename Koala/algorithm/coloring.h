@@ -7,7 +7,7 @@
  * Różne metody kolorowania grafów.
  * ------------------------------------------------------------------------- */
 
-#include "../base/def_struct.h"
+#include "../base/defs.h"
 #include "../graph/view.h"
 #include "search.h"
 #include <algorithm>

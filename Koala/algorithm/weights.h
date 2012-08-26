@@ -1,7 +1,7 @@
 #ifndef KOALA_DEF_WEIGHTS_H
 #define KOALA_DEF_WEIGHTS_H
 
-#include "../base/def_struct.h"
+#include "../base/defs.h"
 //#include "../graph/graph.h"
 #include "../graph/view.h"
 #include "../algorithm/search.h"

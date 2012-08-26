@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Koala/base/def_struct.h"
+#include "Koala/base/defs.h"
 #include "Koala/graph/graph.h"
 
 
