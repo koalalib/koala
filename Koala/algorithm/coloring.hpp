@@ -1,26 +1,24 @@
 template< typename Pair >
-inline bool SeqVertColoring::LfCmp< Pair >::operator() ( Pair a, Pair b )
+    inline bool SeqVertColoring::LfCmp< Pair >::operator()( Pair a, Pair b )
 {
     return a.second > b.second || (a.second == b.second && a.first < b.first);
 }
 
 template< typename Pair >
-inline bool SeqVertColoring::SlCmp< Pair >::operator() ( Pair a, Pair b )
+    inline bool SeqVertColoring::SlCmp< Pair >::operator()( Pair a, Pair b )
 {
     return a.second < b.second || (a.second == b.second && a.first > b.first);
 }
 
 template< typename Triple >
-inline bool SeqVertColoring::SlfCmp< Triple >::operator() ( Triple a, Triple b )
+    inline bool SeqVertColoring::SlfCmp< Triple >::operator() ( Triple a, Triple b )
 {
-    return a.second.first > b.second.first || (a.second.first == b.second.first
-        && (a.second.second > b.second.second || (a.second.second == b.second.second
-        && a.first < b.first)));
+    return a.second.first > b.second.first || (a.second.first == b.second.first &&
+        (a.second.second > b.second.second || (a.second.second == b.second.second && a.first < b.first)));
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::satDeg(
-    const Graph &g, ColorMap &c, typename Graph::PVertex v )
+    int SeqVertColoring::satDeg( const Graph &g, ColorMap &c, typename Graph::PVertex v )
 {
     int sd = 0, s = g.getVertNo(), cs = 0;
     int LOCALARRAY( ns,s );
@@ -38,9 +36,8 @@ int SeqVertColoring::satDeg(
 }
 
 template< typename Graph, typename ColorMap, typename CompMap >
-int SeqVertColoring::interchangeComponents(
-    const Graph &g, ColorMap &c, typename Graph::PVertex v, CompMap &map,
-    int c1, int c2 )
+    int SeqVertColoring::interchangeComponents( const Graph &g, ColorMap &c, typename Graph::PVertex v, CompMap &map,
+        int c1, int c2 )
 {
     assert( v && !c.hasKey( v ) );
 
@@ -62,11 +59,11 @@ int SeqVertColoring::interchangeComponents(
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::colorInterchange(
-    const Graph &g, ColorMap &c, typename Graph::PVertex v )
+    int SeqVertColoring::colorInterchange( const Graph &g, ColorMap &c, typename Graph::PVertex v )
 {
     int oc = -1;
-    if (c.hasKey( v )) {
+    if (c.hasKey( v ))
+    {
         oc = c[v];
         c.delKey( v );
     }
@@ -112,7 +109,8 @@ int SeqVertColoring::colorInterchange(
                 }
             } while (e = g.getEdgeNext( v,e,EdDirIn|EdDirOut|EdUndir )) ;
 
-            if (!found) {
+            if (!found)
+            {
                 typename Graph::PVertex u = m.firstKey();
 
                 for( ; u; u = m.nextKey( u ) )
@@ -126,7 +124,7 @@ int SeqVertColoring::colorInterchange(
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::maxColor( const Graph &g, ColorMap &c )
+    int SeqVertColoring::maxColor( const Graph &g, ColorMap &c )
 {
     typename ColorMap::KeyType k = c.firstKey();
 
@@ -137,8 +135,7 @@ int SeqVertColoring::maxColor( const Graph &g, ColorMap &c )
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::greedy(
-    const Graph &g, ColorMap &c, typename Graph::PVertex v )
+    int SeqVertColoring::greedy( const Graph &g, ColorMap &c, typename Graph::PVertex v )
 {
     if (c.hasKey( v ) && c[v] >= 0) return -1;
 
@@ -158,15 +155,14 @@ int SeqVertColoring::greedy(
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::greedyInter(
-    const Graph &g, ColorMap &c, typename Graph::PVertex v, int l )
+    int SeqVertColoring::greedyInter( const Graph &g, ColorMap &c, typename Graph::PVertex v, int l )
 {
     int c1 = greedy( g,c,v );
     return (c1 <= l) ? c1 : colorInterchange( g,c,v );
 }
 
 template< typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::greedy( const Graph &g, ColorMap &c, Iterator b, Iterator e )
+    int SeqVertColoring::greedy( const Graph &g, ColorMap &c, Iterator b, Iterator e )
 {
     int c1 = -1;
     while (b != e)
@@ -178,8 +174,7 @@ int SeqVertColoring::greedy( const Graph &g, ColorMap &c, Iterator b, Iterator e
 }
 
 template< typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::greedyInter(
-    const Graph &g, ColorMap &c, Iterator b, Iterator e )
+    int SeqVertColoring::greedyInter( const Graph &g, ColorMap &c, Iterator b, Iterator e )
 {
     int c1 = -1, l = maxColor( g,c );
     while (b != e)
@@ -192,8 +187,7 @@ int SeqVertColoring::greedyInter(
 }
 
 template< typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::greedyInter(
-    const Graph &g, ColorMap &c, Iterator b, Iterator e, int l )
+    int SeqVertColoring::greedyInter( const Graph &g, ColorMap &c, Iterator b, Iterator e, int l )
 {
     int c1 = -1;
     while (b != e)
@@ -205,7 +199,7 @@ int SeqVertColoring::greedyInter(
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::greedy( const Graph &g, ColorMap &c )
+    int SeqVertColoring::greedy( const Graph &g, ColorMap &c )
 {
     int c1 = -1;
     for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
@@ -217,7 +211,7 @@ int SeqVertColoring::greedy( const Graph &g, ColorMap &c )
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::greedyInter( const Graph &g, ColorMap &c )
+    int SeqVertColoring::greedyInter( const Graph &g, ColorMap &c )
 {
     int c1 = -1, l = maxColor( g,c );
     for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
@@ -230,7 +224,7 @@ int SeqVertColoring::greedyInter( const Graph &g, ColorMap &c )
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::greedyInter( const Graph &g, ColorMap &c, int l )
+    int SeqVertColoring::greedyInter( const Graph &g, ColorMap &c, int l )
 {
     int c1 = -1;
     for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
@@ -242,7 +236,7 @@ int SeqVertColoring::greedyInter( const Graph &g, ColorMap &c, int l )
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::lf( const Graph &g, ColorMap &c )
+    int SeqVertColoring::lf( const Graph &g, ColorMap &c )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
 
@@ -259,7 +253,8 @@ int SeqVertColoring::lf( const Graph &g, ColorMap &c )
     std::sort_heap( vs,vs + n,LfCmp< Pair >() );
 
     int c1 = -1;
-    for( int i = 0; i < n; i++ ) {
+    for( int i = 0; i < n; i++ )
+    {
         int c2 = greedy( g,c,vs[i].first );
         if (c2 > c1) c1 = c2;
     }
@@ -267,7 +262,7 @@ int SeqVertColoring::lf( const Graph &g, ColorMap &c )
 }
 
 template < typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::lf( const Graph &g, ColorMap &c , Iterator b, Iterator e )
+    int SeqVertColoring::lf( const Graph &g, ColorMap &c , Iterator b, Iterator e )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
 
@@ -286,7 +281,8 @@ int SeqVertColoring::lf( const Graph &g, ColorMap &c , Iterator b, Iterator e )
     m = std::unique( vs,vs + n ) - vs;
 
     int c1 = -1;
-    for( int i = 0; i < m; i++ ) {
+    for( int i = 0; i < m; i++ )
+    {
         int c2 = greedy( g,c,vs[i].first );
         if (c2 > c1) c1 = c2;
     }
@@ -294,7 +290,7 @@ int SeqVertColoring::lf( const Graph &g, ColorMap &c , Iterator b, Iterator e )
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::lfInter( const Graph &g, ColorMap &c )
+    int SeqVertColoring::lfInter( const Graph &g, ColorMap &c )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
 
@@ -311,7 +307,8 @@ int SeqVertColoring::lfInter( const Graph &g, ColorMap &c )
     std::sort_heap( vs,vs + n,LfCmp< Pair >() );
 
     int c1 = -1,  l = maxColor( g,c );
-    for( int i = 0; i < n; i++ ) {
+    for( int i = 0; i < n; i++ )
+    {
         int c2 = greedyInter( g,c,vs[i].first,l );
         if (c2 > l) l = c2;
         if (c2 > c1) c1 = c2;
@@ -320,7 +317,7 @@ int SeqVertColoring::lfInter( const Graph &g, ColorMap &c )
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::lfInter( const Graph &g, ColorMap &c, int l )
+    int SeqVertColoring::lfInter( const Graph &g, ColorMap &c, int l )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
 
@@ -337,15 +334,16 @@ int SeqVertColoring::lfInter( const Graph &g, ColorMap &c, int l )
     std::sort_heap( vs,vs + n,LfCmp< Pair >() );
 
     int c1 = -1;
-    for( int i = 0; i < n; i++ ) {
+    for( int i = 0; i < n; i++ )
+    {
         int c2 = greedyInter( g,c,vs[i].first,l );
         if (c2 > c1) c1 = c2;
     }
     return c1;
 }
 
-template < typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::lfInter( const Graph &g, ColorMap &c , Iterator b, Iterator e )
+template< typename Graph, typename ColorMap, typename Iterator >
+    int SeqVertColoring::lfInter( const Graph &g, ColorMap &c , Iterator b, Iterator e )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
 
@@ -364,7 +362,8 @@ int SeqVertColoring::lfInter( const Graph &g, ColorMap &c , Iterator b, Iterator
     m = std::unique( vs,vs + n ) - vs;
 
     int c1 = -1,  l = maxColor( g,c );
-    for( int i = 0; i < n; i++ ) {
+    for( int i = 0; i < n; i++ )
+    {
         int c2 = greedyInter( g,c,vs[i].first,l );
         if (c2 > l) l = c2;
         if (c2 > c1) c1 = c2;
@@ -373,8 +372,7 @@ int SeqVertColoring::lfInter( const Graph &g, ColorMap &c , Iterator b, Iterator
 }
 
 template < typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::lfInter(
-    const Graph &g, ColorMap &c , Iterator b, Iterator e, int l )
+    int SeqVertColoring::lfInter( const Graph &g, ColorMap &c , Iterator b, Iterator e, int l )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
 
@@ -393,7 +391,8 @@ int SeqVertColoring::lfInter(
     m = std::unique( vs,vs + n ) - vs;
 
     int c1 = -1;
-    for( int i = 0; i < n; i++ ) {
+    for( int i = 0; i < n; i++ )
+    {
         int c2 = greedyInter( g,c,vs[i].first,l );
         if (c2 > c1) c1 = c2;
     }
@@ -401,7 +400,7 @@ int SeqVertColoring::lfInter(
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::sl( const Graph &g, ColorMap &c )
+    int SeqVertColoring::sl( const Graph &g, ColorMap &c )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
     Pair LOCALARRAY( vs,g.getVertNo() * (g.Delta() + 1) );
@@ -421,11 +420,13 @@ int SeqVertColoring::sl( const Graph &g, ColorMap &c )
     typename Graph::PVertex LOCALARRAY( cs,n );
 
     int m = n - 1;
-    while (!pq.empty()) {
+    while (!pq.empty())
+    {
         Pair p = pq.top();
         pq.pop();
 
-        if (vd.hasKey( p.first )) {
+        if (vd.hasKey( p.first ))
+        {
             typename Graph::PEdge e = g.getEdge( p.first,EdDirIn|EdDirOut|EdUndir );
             do
             {
@@ -463,16 +464,17 @@ int SeqVertColoring::sl( const Graph &g, ColorMap &c , Iterator b, Iterator e )
             vs[n++] = std::make_pair( *i,vd[*i] );
         }
 
-    PriQueueInterface< Pair *,SlCmp< Pair > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Pair *,SlCmp< Pair > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
     typename Graph::PVertex LOCALARRAY( cs,n );
 
     int m = n - 1;
-    while (!pq.empty()) {
+    while (!pq.empty())
+    {
         Pair p = pq.top();
         pq.pop();
 
-        if (vd.hasKey( p.first )) {
+        if (vd.hasKey( p.first ))
+        {
             typename Graph::PEdge e = g.getEdge( p.first,EdDirIn|EdDirOut|EdUndir );
             do
             {
@@ -495,7 +497,7 @@ int SeqVertColoring::sl( const Graph &g, ColorMap &c , Iterator b, Iterator e )
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::slInter( const Graph &g, ColorMap &c )
+    int SeqVertColoring::slInter( const Graph &g, ColorMap &c )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
     Pair LOCALARRAY( vs,g.getVertNo() * (g.Delta() + 1) );
@@ -510,16 +512,17 @@ int SeqVertColoring::slInter( const Graph &g, ColorMap &c )
             vs[n++] = std::make_pair( v,vd[v] );
         }
 
-    PriQueueInterface< Pair *,SlCmp< Pair > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Pair *,SlCmp< Pair > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
     typename Graph::PVertex LOCALARRAY( cs,n );
 
     int m = n - 1;
-    while (!pq.empty()) {
+    while (!pq.empty())
+    {
         Pair p = pq.top();
         pq.pop();
 
-        if (vd.hasKey( p.first )) {
+        if (vd.hasKey( p.first ))
+        {
             typename Graph::PEdge e = g.getEdge( p.first,EdDirIn|EdDirOut|EdUndir );
             do
             {
@@ -542,7 +545,7 @@ int SeqVertColoring::slInter( const Graph &g, ColorMap &c )
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::slInter( const Graph &g, ColorMap &c, int l )
+    int SeqVertColoring::slInter( const Graph &g, ColorMap &c, int l )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
     Pair LOCALARRAY( vs,g.getVertNo() * (g.Delta() + 1) );
@@ -557,16 +560,17 @@ int SeqVertColoring::slInter( const Graph &g, ColorMap &c, int l )
             vs[n++] = std::make_pair( v,vd[v] );
         }
 
-    PriQueueInterface< Pair *,SlCmp< Pair > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Pair *,SlCmp< Pair > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
     typename Graph::PVertex LOCALARRAY( cs,n );
 
     int m = n - 1;
-    while (!pq.empty()) {
+    while (!pq.empty())
+    {
         Pair p = pq.top();
         pq.pop();
 
-        if (vd.hasKey( p.first )) {
+        if (vd.hasKey( p.first ))
+        {
             typename Graph::PEdge e = g.getEdge( p.first,EdDirIn|EdDirOut|EdUndir );
             do
             {
@@ -589,7 +593,7 @@ int SeqVertColoring::slInter( const Graph &g, ColorMap &c, int l )
 }
 
 template < typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::slInter( const Graph &g, ColorMap &c , Iterator b, Iterator e )
+    int SeqVertColoring::slInter( const Graph &g, ColorMap &c , Iterator b, Iterator e )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
     Pair LOCALARRAY( vs,g.getVertNo() * (g.Delta() + 1) );
@@ -604,16 +608,17 @@ int SeqVertColoring::slInter( const Graph &g, ColorMap &c , Iterator b, Iterator
             vs[n++] = std::make_pair( *i,vd[*i] );
         }
 
-    PriQueueInterface< Pair *,SlCmp< Pair > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Pair *,SlCmp< Pair > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
     typename Graph::PVertex LOCALARRAY( cs,n );
 
     int m = n - 1;
-    while (!pq.empty()) {
+    while (!pq.empty())
+    {
         Pair p = pq.top();
         pq.pop();
 
-        if (vd.hasKey( p.first )) {
+        if (vd.hasKey( p.first ))
+        {
             typename Graph::PEdge e = g.getEdge( p.first,EdDirIn|EdDirOut|EdUndir );
             do
             {
@@ -636,8 +641,7 @@ int SeqVertColoring::slInter( const Graph &g, ColorMap &c , Iterator b, Iterator
 }
 
 template < typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::slInter(
-    const Graph &g, ColorMap &c , Iterator b, Iterator e, int l )
+    int SeqVertColoring::slInter( const Graph &g, ColorMap &c , Iterator b, Iterator e, int l )
 {
     typedef std::pair< typename Graph::PVertex,int > Pair;
     Pair LOCALARRAY( vs,g.getVertNo() * (g.Delta() + 1) );
@@ -652,16 +656,17 @@ int SeqVertColoring::slInter(
             vs[n++] = std::make_pair( *i,vd[*i] );
         }
 
-    PriQueueInterface< Pair *,SlCmp< Pair > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Pair *,SlCmp< Pair > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
     typename Graph::PVertex LOCALARRAY( cs,n );
 
     int m = n - 1;
-    while (!pq.empty()) {
+    while (!pq.empty())
+    {
         Pair p = pq.top();
         pq.pop();
 
-        if (vd.hasKey( p.first )) {
+        if (vd.hasKey( p.first ))
+        {
             typename Graph::PEdge e = g.getEdge( p.first,EdDirIn|EdDirOut|EdUndir );
             do
             {
@@ -684,7 +689,7 @@ int SeqVertColoring::slInter(
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::slf( const Graph &g, ColorMap &c )
+    int SeqVertColoring::slf( const Graph &g, ColorMap &c )
 {
     typedef std::pair< typename Graph::PVertex, std::pair< int,int > > Triple;
 
@@ -710,8 +715,7 @@ int SeqVertColoring::slf( const Graph &g, ColorMap &c )
             vs[n].second.second = g.deg( vs[n++].first,EdDirIn|EdDirOut|EdUndir );
         }
 
-    PriQueueInterface< Triple *,SlfCmp< Triple > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Triple *,SlfCmp< Triple > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
 
     int c1 = -1;
     while (!pq.empty())
@@ -742,7 +746,7 @@ int SeqVertColoring::slf( const Graph &g, ColorMap &c )
 }
 
 template < typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::slf( const Graph &g, ColorMap &c , Iterator b, Iterator e )
+    int SeqVertColoring::slf( const Graph &g, ColorMap &c, Iterator b, Iterator e )
 {
     typedef std::pair< typename Graph::PVertex, std::pair< int,int > > Triple;
 
@@ -768,8 +772,7 @@ int SeqVertColoring::slf( const Graph &g, ColorMap &c , Iterator b, Iterator e )
             vs[n].second.second = g.deg( vs[n++].first,EdDirIn|EdDirOut|EdUndir );
         }
 
-    PriQueueInterface< Triple *,SlfCmp< Triple > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Triple *,SlfCmp< Triple > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
 
     int c1 = -1;
     while (!pq.empty())
@@ -800,7 +803,7 @@ int SeqVertColoring::slf( const Graph &g, ColorMap &c , Iterator b, Iterator e )
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::slfInter( const Graph &g, ColorMap &c )
+    int SeqVertColoring::slfInter( const Graph &g, ColorMap &c )
 {
     typedef std::pair< typename Graph::PVertex, std::pair< int,int > > Triple;
 
@@ -826,8 +829,7 @@ int SeqVertColoring::slfInter( const Graph &g, ColorMap &c )
             vs[n].second.second = g.deg( vs[n++].first,EdDirIn|EdDirOut|EdUndir );
         }
 
-    PriQueueInterface< Triple *,SlfCmp< Triple > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Triple *,SlfCmp< Triple > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
 
     int c1 = -1;
     while (!pq.empty())
@@ -859,7 +861,7 @@ int SeqVertColoring::slfInter( const Graph &g, ColorMap &c )
 }
 
 template< typename Graph, typename ColorMap >
-int SeqVertColoring::slfInter( const Graph &g, ColorMap &c, int l )
+    int SeqVertColoring::slfInter( const Graph &g, ColorMap &c, int l )
 {
     typedef std::pair< typename Graph::PVertex, std::pair< int,int > > Triple;
 
@@ -885,8 +887,7 @@ int SeqVertColoring::slfInter( const Graph &g, ColorMap &c, int l )
             vs[n].second.second = g.deg( vs[n++].first,EdDirIn|EdDirOut|EdUndir );
         }
 
-    PriQueueInterface< Triple *,SlfCmp< Triple > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Triple *,SlfCmp< Triple > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
 
     int c1 = -1;
     while (!pq.empty())
@@ -917,7 +918,7 @@ int SeqVertColoring::slfInter( const Graph &g, ColorMap &c, int l )
 }
 
 template < typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::slfInter( const Graph &g, ColorMap &c , Iterator b, Iterator e )
+    int SeqVertColoring::slfInter( const Graph &g, ColorMap &c, Iterator b, Iterator e )
 {
     typedef std::pair< typename Graph::PVertex, std::pair< int,int > > Triple;
 
@@ -943,8 +944,7 @@ int SeqVertColoring::slfInter( const Graph &g, ColorMap &c , Iterator b, Iterato
             vs[n].second.second = g.deg( vs[n++].first,EdDirIn|EdDirOut|EdUndir );
         }
 
-    PriQueueInterface< Triple *,SlfCmp< Triple > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Triple *,SlfCmp< Triple > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
 
     int c1 = -1;
     while (!pq.empty())
@@ -975,9 +975,8 @@ int SeqVertColoring::slfInter( const Graph &g, ColorMap &c , Iterator b, Iterato
     return c1;
 }
 
-template < typename Graph, typename ColorMap, typename Iterator >
-int SeqVertColoring::slfInter(
-    const Graph &g, ColorMap &c , Iterator b, Iterator e, int l )
+template< typename Graph, typename ColorMap, typename Iterator >
+    int SeqVertColoring::slfInter( const Graph &g, ColorMap &c, Iterator b, Iterator e, int l )
 {
     typedef std::pair< typename Graph::PVertex, std::pair< int,int > > Triple;
 
@@ -1003,8 +1002,7 @@ int SeqVertColoring::slfInter(
             vs[n].second.second = g.deg( vs[n++].first,EdDirIn|EdDirOut|EdUndir );
         }
 
-    PriQueueInterface< Triple *,SlfCmp< Triple > >
-        pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
+    PriQueueInterface< Triple *,SlfCmp< Triple > > pq( vs,vs + n,g.getVertNo() * (g.Delta() + 1) );
 
     int c1 = -1;
     while (!pq.empty())
