@@ -2,7 +2,7 @@
 #define KOALA_DEF_WEIGHTS_H
 
 /* weights.h
- * 
+ *
  */
 
 #include "../algorithm/search.h"
@@ -14,7 +14,7 @@
 namespace Koala
 {
     /* DijkstraBasePar
-     * 
+     *
      */
     template< class DefaultStructs > class DijkstraBasePar: public ShortPathStructs
     {
@@ -23,24 +23,25 @@ namespace Koala
         template< class DType > struct EdgeLabs
         {
             // typ wagi liczbowej na krawedzi
-            typedef DType DistType; 
+            typedef DType DistType;
             // dlugosc krawedzi
-            DistType length;    
+            DistType length;
         };
 
         // rekord wyjsciowy opisujacy wierzcholek
         template< class DType, class GraphType > struct VertLabs
         {
             // typ wagi liczbowej na krawedzi
-            typedef DType DistType; 
+            typedef DType DistType;
             // znaleziona odleglosc
-            DType distance; 
+            DType distance;
             // element sciezki, analogicznie jak VisitVertLabs w search.h
-            typename GraphType::PVertex vPrev;  
+            typename GraphType::PVertex vPrev;
             typename GraphType::PEdge ePrev;
 
             VertLabs(): vPrev( 0 ), ePrev( 0 ),
-                distance( DefaultStructs::template NumberTypeBounds< DType >::plusInfty() ) { }
+                distance( DefaultStructs::template NumberTypeBounds< DType >::plusInfty() )
+                { }
 
             template< class Rec > void copy( Rec &rec ) const;
         };
@@ -49,7 +50,7 @@ namespace Koala
         // avertTab, wyjsciowa tablica asocjacyjna PVertex->VertLabs poszczegolnych wierzcholkow
         // edgeTab, wejsciowa tablica asocjacyjna PEdge->EdgeLabs dlugosci krawedzi
         template< class GraphType, class VertContainer, class EdgeContainer > static
-            typename EdgeContainer::ValType::DistType distances( const GraphType &g, VertContainer &avertTab, 
+            typename EdgeContainer::ValType::DistType distances( const GraphType &g, VertContainer &avertTab,
                 const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end = 0 );
 
         // korzystajac z vertTab wyliczonej  metoda distances odczytuje najkrotsza sciezke prowadzaca do end
@@ -59,7 +60,7 @@ namespace Koala
         // zwraca liczbe krawedzi sciezki lub -1 gdy  wierzcholek end jest nieosiagalny
         template< class GraphType, class VertContainer, class VIter, class EIter > static int
             getPath( const GraphType &g, const VertContainer& vertTab, typename GraphType::PVertex end,
-                ShortPathStructs::OutPath< VIter,EIter > iters ); 
+                ShortPathStructs::OutPath< VIter,EIter > iters );
 
       protected:
 
@@ -67,7 +68,8 @@ namespace Koala
         template< typename Container > struct Cmp
         {
             Container *cont;
-            Cmp( Container &acont ): cont( &acont ) { }
+            Cmp( Container &acont ): cont( &acont )
+                { }
 
             template< class T > bool operator()( T a, T b ) const
                 { return cont->operator[]( a ).distance < cont->operator[]( b ).distance; }
@@ -79,7 +81,8 @@ namespace Koala
         template< class DType, class GraphType > struct VertLabsQue: public VertLabs< DType,GraphType >
         {
             void* repr;
-            VertLabsQue(): VertLabs< DType,GraphType >(), repr( 0 ) { }
+            VertLabsQue(): VertLabs< DType,GraphType >(), repr( 0 )
+                { }
         };
 
         template< class GraphType, class VertContainer, class EdgeContainer >
@@ -89,7 +92,7 @@ namespace Koala
     };
 
     /* DijkstraHeapBasePar
-     * 
+     *
      */
     template< class DefaultStructs > class DijkstraHeapBasePar: public DijkstraBasePar< DefaultStructs >
     {
@@ -101,7 +104,7 @@ namespace Koala
     };
 
     /* DijkstraMainPar
-     * 
+     *
      */
     template< class DefaultStructs, class DijBase > class DijkstraMainPar: public DijBase
     {
@@ -112,8 +115,10 @@ namespace Koala
             DistType length;
             int edgeNo;
 
-            PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano ) { }
-            PathLengths() {}
+            PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano )
+                { }
+            PathLengths()
+                { }
         };
 
         // zapisuje od razu sciezke  start->end (wierzcholki i krawedzie) pod pare podanych iteratorow
@@ -150,24 +155,25 @@ namespace Koala
         template< class DType > struct EdgeLabs
         {
             // typ wagi liczbowej na krawedzi
-            typedef DType DistType; 
+            typedef DType DistType;
             // dlugosc krawedzi
-            DistType length;    
+            DistType length;
         };
 
         // rekord wyjsciowy opisujacy wierzcholek
         template< class DType, class GraphType > struct VertLabs
         {
             // typ wagi liczbowej na krawedzi`
-            typedef DType DistType; 
+            typedef DType DistType;
             // znaleziona odleglosc
-            DType distance; 
+            DType distance;
             // element sciezki, analogicznie jak VisitVertLabs w search.h
-            typename GraphType::PVertex vPrev; 
+            typename GraphType::PVertex vPrev;
             typename GraphType::PEdge  ePrev;
 
             VertLabs(): vPrev( 0 ), ePrev( 0 ),
-                distance( DefaultStructs:: template NumberTypeBounds< DType >::minusInfty() ) { }
+                distance( DefaultStructs:: template NumberTypeBounds< DType >::minusInfty() )
+                { }
         };
 
         // mozna stosowac jako kontener opisujacy krawedz w przypadkach, gdy chcemy wsystkim krawedziom nadac wagi jednostkowe
@@ -201,8 +207,10 @@ namespace Koala
             DistType length;
             int edgeNo;
 
-            PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano ) { }
-            PathLengths() {}
+            PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano )
+                { }
+            PathLengths()
+                { }
         };
 
         // zapisuje od razu sciezke krytyczna (wierzcholki i krawedzie) pod pare podanych iteratorow
@@ -217,7 +225,7 @@ namespace Koala
     class DAGCritPath: public DAGCritPathPar< AlgsDefaultSettings > { };
 
     /* BellmanFordPar
-     * 
+     *
      */
     template< class DefaultStructs > class BellmanFordPar: public ShortPathStructs
     {
@@ -226,24 +234,25 @@ namespace Koala
         template< class DType > struct EdgeLabs
         {
             // typ wagi liczbowej na krawedzi
-            typedef DType DistType;  
+            typedef DType DistType;
             // dlugosc krawedzi
-            DistType length;  
+            DistType length;
         };
 
         // rekord wyjsciowy opisujacy wierzcholek
         template< class DType, class GraphType > struct VertLabs
         {
             // typ wagi liczbowej na krawedzi
-            typedef DType DistType; 
+            typedef DType DistType;
             // znaleziona odleglosc
-            DType distance;  
+            DType distance;
             // element sciezki, analogicznie jak VisitVertLabs w search.h
-            typename GraphType::PVertex vPrev;  
+            typename GraphType::PVertex vPrev;
             typename GraphType::PEdge ePrev;
 
             VertLabs(): vPrev( 0 ), ePrev( 0 ),
-                distance( DefaultStructs:: template NumberTypeBounds< DType >::plusInfty() ) { }
+                distance( DefaultStructs:: template NumberTypeBounds< DType >::plusInfty() )
+                { }
         };
 
         // wlasciwa procedura: odleglosc miedzy para wierzcholkow
@@ -268,8 +277,10 @@ namespace Koala
             DistType length;
             int edgeNo;
 
-            PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano ) { }
-            PathLengths() { }
+            PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano )
+                { }
+            PathLengths()
+                { }
         };
 
         // zapisuje od razu sciezke krytyczna (wierzcholki i krawedzie) pod pare podanych iteratorow
@@ -309,15 +320,16 @@ namespace Koala
         template< class DType, class GraphType > struct VertLabs
         {
             // typ wagi liczbowej na krawedzi
-            typedef DType DistType;  
+            typedef DType DistType;
             // znaleziona odleglosc
-            DType distance; 
+            DType distance;
             // element sciezki, analogicznie jak VisitVertLabs w search.h
-            typename GraphType::PVertex vPrev; 
+            typename GraphType::PVertex vPrev;
             typename GraphType::PEdge ePrev;
 
             VertLabs(): vPrev( 0 ), ePrev( 0 ),
-                    distance( DefaultStructs:: template NumberTypeBounds< DType >::plusInfty() ) { }
+                    distance( DefaultStructs:: template NumberTypeBounds< DType >::plusInfty() )
+                    { }
         };
 
         // mozna stosowac jako kontener opisujacy krawedz w przypadkach, gdy chcemy wsystkim krawedziom nadac wagi jednostkowe
@@ -357,7 +369,7 @@ namespace Koala
         template< class DType > struct EdgeLabs
         {
             // typ wagi liczbowej na krawedzi
-            typedef DType WeightType; 
+            typedef DType WeightType;
             // wagakrawedzi
             WeightType weight;
         };
@@ -367,7 +379,7 @@ namespace Koala
             // waga znalezionego lasu
             DType weight;
             // jego liczba krawedzi
-            int edgeNo; 
+            int edgeNo;
         };
 
       protected:
@@ -385,7 +397,7 @@ namespace Koala
         // pominiecie parametru - znaleziony las bedzie mial najwieksza mozliwa liczbe krawedzi
         template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
             Result< typename EdgeContainer::ValType::WeightType > getMinForest( const GraphType &g,
-                const EdgeContainer &edgeTab, Iter out, VertCompContainer &asets, int edgeNo = -1 ) 
+                const EdgeContainer &edgeTab, Iter out, VertCompContainer &asets, int edgeNo = -1 )
             { return getForest( g,edgeTab,out,asets,edgeNo,true ); }
 
         // znajduje najciezszy las

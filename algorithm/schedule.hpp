@@ -116,17 +116,20 @@ template< class DefaultStructs > template< typename TaskIterator >
 template< class DefaultStructs > template< typename GraphType, typename TaskIterator, typename TaskWindowIterator >
     int SchedulingPar< DefaultStructs >::critPath( TaskIterator begin, TaskIterator end, const GraphType &DAG,
         TaskWindowIterator schedule )
-{   
-    int nn;
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Triple< Task< GraphType > > >::Type
-        tasks( nn = DAG.getVertNo() );
+{
+
 
     int n = 0, time = 0;
-    for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ )
+    for( TaskIterator iterator = begin; iterator != end; ++iterator ) n++;
+
+    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Triple< Task< GraphType > > >::Type
+        tasks( n );
+
+    for( TaskIterator iterator = begin; iterator != end; ++iterator)
         tasks[iterator->vertex] = Triple< Task< GraphType > >(*iterator);
 
     // Wyznaczenie kolejnoci wierzcho³ków
-    typename GraphType::PVertex LOCALARRAY( vertices,nn );
+    typename GraphType::PVertex LOCALARRAY( vertices,n );
     Koala::DAGAlgs::topOrd( DAG,vertices );
 
     // Wyznaczenie czasow najwczeniejszego startu
@@ -181,12 +184,12 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 {
     typedef std::pair< TaskPart,int > Pair;
 
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,TaskPart >::Type tasks( DAG.getVertNo() );
-
     int parts = 0, n = 0;
     // D³ugoci zadañ s¹ nieujemne
     for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ )
         koalaAssert( iterator->length > 0,AlgExcWrongArg );
+
+    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,TaskPart >::Type tasks( n );
 
     // Dwa rózne zadania nie s¹ wykonywane jednoczenie na jednej maszynie
     for( typename Schedule::Type::const_iterator i = schedule.machines.begin();
@@ -242,8 +245,6 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
     typedef std::pair< int,int > IntPair;
     typedef std::pair< typename GraphType::PVertex,int > Pair;
 
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Element< Task< GraphType > > >::Type
-        tasks( DAG.getVertNo() );
 
     IntPair LOCALARRAY( machines,schedule.getMachNo() );
     PriQueueInterface< IntPair *,compareSecondLast< IntPair > > machine( machines,schedule.getMachNo() );
@@ -251,6 +252,9 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 
     int n = 0;
     for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ ) ;
+
+    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Element< Task< GraphType > > >::Type
+        tasks( n );
 
     Pair LOCALARRAY( candidates,n );
     Pair LOCALARRAY( actives,n );
@@ -296,7 +300,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 
         if (out < stop) out = stop;
     }
-    
+
     return out;
 }
 
@@ -306,14 +310,17 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 {
     koalaAssert( schedule.getMachNo() == 2,AlgExcWrongArg );
     typedef std::list< typename GraphType::PVertex > VertexList;
-    int nn;
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,std::pair< Task< GraphType >,int > >::Type
-        tasks( nn = DAG.getVertNo() );
 
     VertexList vertices;
-    std::list< int > LOCALARRAY( candidates,nn );
 
     int n = 0;
+    for( TaskIterator iterator = begin; iterator != end; ++iterator ) n++;
+    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,std::pair< Task< GraphType >,int > >::Type
+        tasks( n );
+
+    std::list< int > LOCALARRAY( candidates,n );
+
+    n = 0;
     for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ )
         tasks[iterator->vertex] = std::make_pair( *iterator,n ), vertices.push_back( iterator->vertex );
 
@@ -361,28 +368,31 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 template< class DefaultStructs > template< typename GraphType, typename TaskIterator >
     int SchedulingPar< DefaultStructs >::precLiu( TaskIterator begin, TaskIterator end, const GraphType& DAG,
         Schedule &schedule )
-{   
+{
     koalaAssert( schedule.getMachNo() == 1,AlgExcWrongArg );
     typedef std::pair< typename GraphType::PVertex,int > Pair;
-    int nn;
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Element< Task< GraphType > > >::Type
-        tasks( nn = DAG.getVertNo() );
+
 
     int n = 0;
+    for( TaskIterator iterator = begin; iterator != end; ++iterator) n++;
+    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Element< Task< GraphType > > >::Type
+        tasks( n );
+
+    n = 0;
     for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ )
     {
         Element< Task< GraphType > > &element = tasks[iterator->vertex] = Element< Task< GraphType > >( *iterator,n );
         element.duedate = iterator->duedate, element.degree = DAG.getEdgeNo( iterator->vertex,EdDirIn );
     }
 
-    typename GraphType::PVertex LOCALARRAY( vertices,nn );
+    typename GraphType::PVertex LOCALARRAY( vertices,n );
     Koala::DAGAlgs::topOrd( DAG,vertices );
 
     Pair LOCALARRAY( candidates,n );
     Pair LOCALARRAY( actives,n );
     PriQueueInterface< Pair *,compareSecondLast< Pair > > candidate( candidates,n ), active( actives,n );
 
-    for( int i = nn - 1; i >= 0; i-- )
+    for( int i = n - 1; i >= 0; i-- )
     {
         typename GraphType::PVertex v = vertices[i];
         Element< Task< GraphType > > &first = tasks[v];
@@ -444,11 +454,13 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
         Schedule &schedule )
 {
     typedef std::pair< typename GraphType::PVertex,int > Pair;
-    int nn;
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Element< Task< GraphType > > >::Type
-        tasks( nn = DAG.getVertNo() );
 
     int n = 0;
+    for( TaskIterator iterator = begin; iterator != end; ++iterator) n++ ;
+    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Element< Task< GraphType > > >::Type
+        tasks( n );
+
+    n = 0;
     for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ )
     {
         Element< Task< GraphType> > &element = tasks[iterator->vertex] = Element< Task< GraphType > >( *iterator,n );
@@ -456,13 +468,13 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
     }
 
     // Wyznaczenie kolejnoci wierzcho³ków
-    typename GraphType::PVertex LOCALARRAY( vertices,nn );
+    typename GraphType::PVertex LOCALARRAY( vertices,n );
     Koala::DAGAlgs::topOrd( DAG,vertices );
 
     // Aktualizacja terminów zakoñczenia zadañ, zgodnie z relacj¹ prec, i tworzenie kolejki priorytetowej zadañ dostêpnych
     Pair LOCALARRAY( actives,n );
     PriQueueInterface< Pair *,compareSecondFirst< Pair > > active( actives,n );
-    for( int i = nn - 1; i >= 0; i-- )
+    for( int i = n - 1; i >= 0; i-- )
     {
         typename GraphType::PVertex v = vertices[i];
         Element< Task< GraphType > > &first = tasks[v];
@@ -511,11 +523,13 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
         Schedule &schedule )
 {
     typedef std::pair< typename GraphType::PVertex,int > Pair;
-    int nn;
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Element< Task< GraphType > > >::Type
-        tasks( nn = DAG.getVertNo() );
 
     int n = 0;
+    for( TaskIterator iterator = begin; iterator != end; ++iterator) n++ ;
+    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Element< Task< GraphType > > >::Type
+        tasks( n );
+
+    n = 0;
     for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ )
     {
         Element< Task< GraphType > > &element = tasks[iterator->vertex] = Element< Task< GraphType > >( *iterator,n );
@@ -523,13 +537,13 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
     }
 
     // Wyznaczenie kolejnoci wierzcho³ków
-    typename GraphType::PVertex LOCALARRAY( vertices,nn );
+    typename GraphType::PVertex LOCALARRAY( vertices,n );
     Koala::DAGAlgs::topOrd( DAG,vertices );
 
     // Odwzorowanie poziomów drzewa i tworzenie kolejki priorytetowej zadañ dostêpnych
     Pair LOCALARRAY( actives,n );
     PriQueueInterface< Pair *,compareSecondFirst< Pair > > active( actives,n );
-    for( int i = nn - 1; i >= 0; i-- )
+    for( int i = n - 1; i >= 0; i-- )
     {
         typename GraphType::PVertex v = vertices[i];
         Element< Task< GraphType > > &first = tasks[v];
@@ -599,7 +613,7 @@ template< class DefaultStructs > template< typename TaskIterator >
 
 template< class DefaultStructs > template< typename TaskIterator >
     int SchedulingPar< DefaultStructs >::hodgson( TaskIterator begin, TaskIterator end, Schedule &schedule )
-{   
+{
     koalaAssert( schedule.getMachNo() == 1,AlgExcWrongArg );
     typedef std::pair< int,int > Pair;
 

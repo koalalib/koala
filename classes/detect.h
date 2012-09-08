@@ -5,6 +5,7 @@
 #include "../graph/graph.h"
 #include "../graph/view.h"
 #include "../algorithm/search.h"
+#include "../algorithm/weights.h"
 #include "../algorithm/factor.h"
 #include "../algorithm/conflow.h"
 #include "../container/joinsets.h"
@@ -25,17 +26,19 @@ namespace Koala
       public:
         // Generalnie zaklada sie, ze poprawny (dla IsItPar) graf wejsciowy nie ma petli ani lukow oraz n>0
         // Ta metoda jest wyjatkiem, sprawdza czy n=0
-        template< class GraphType > static bool zero( const GraphType &g ) { return !g.getVertNo(); }
-    
+        template< class GraphType > static bool zero( const GraphType &g )
+            { return !g.getVertNo(); }
+
         // czy graf jest prosty (tj. nie ma krawedzi rownoleglych)
         template< class GraphType > static bool undir( const GraphType &g, bool allowmulti = false );
-    
+
         // czy spojny
         template< class GraphType > static bool connected( const GraphType &g, bool allowmulti = false );
-        
+
         // czy bezkrawedziowy
-        template< class GraphType > static bool empty( const GraphType &g ) { return g.getVertNo() && !g.getEdgeNo(); }
-        
+        template< class GraphType > static bool empty( const GraphType &g )
+            { return g.getVertNo() && !g.getEdgeNo(); }
+
         // drzewo
         template< class GraphType > static bool tree( const GraphType &g )
             { return connected( g,true ) && (g.getVertNo() - 1 == g.getEdgeNo()); }
@@ -53,7 +56,7 @@ namespace Koala
         template< class GraphType > static bool regular( const GraphType &g, bool allowmulti = false );
 
         /* Path
-         * 
+         *
          */
         class Path
         {
@@ -64,10 +67,11 @@ namespace Koala
         };
 
         // sciezka
-        template< class GraphType > static bool path( const GraphType &g ) { return Path::ends( g ).first; }
+        template< class GraphType > static bool path( const GraphType &g )
+            { return Path::ends( g ).first; }
 
         /* Caterpillar
-         * 
+         *
          */
         class Caterpillar
         {
@@ -102,9 +106,9 @@ namespace Koala
 
         // maks. liczba cyklomatyczna skladowej 2-spojnej grafu prostego. -1 w razie bledu.
         template< class GraphType > static int almostTree( const GraphType &g );
-        
+
         /* Bipartite
-         * 
+         *
          */
         class Bipartite
         {
@@ -129,7 +133,7 @@ namespace Koala
             { return Bipartite::getPart( g,blackHole,allowmulti ) != -1; }
 
         /* CompBipartite
-         * 
+         *
          */
         class CompBipartite
         {
@@ -137,13 +141,13 @@ namespace Koala
             // wypisuje na iterator wierzcholki jednej partycji grafu pelnego dwudzielnego. Zwraca licznosc partycji (-1 w razie bledu)
             template< class GraphType, class Iter > static int getPart( const GraphType &g, Iter out );
         };
-            
+
         // czy pelny dwudzielny
         template< class GraphType > static bool compBipartite( const GraphType &g )
             { return CompBipartite::getPart( g,blackHole ) != -1; }
-        
+
         /* CompMPartite
-         * 
+         *
          */
         class CompMPartite
         {
@@ -181,12 +185,13 @@ namespace Koala
             // a poni¿sza funkcja mo¿e zwróciæ np.: A E B C D
 
             static void SemiPostOrderTree( int *parent, int n, int *out );
-        
+
             template< class Graph > struct QTRes
             {
                 int size;
                 Set< typename Graph::PVertex > trees;
-                QTRes(): size( 0 ) { }
+                QTRes(): size( 0 )
+                    { }
             };
 
           public:
@@ -231,71 +236,44 @@ namespace Koala
         /** test if graph is chordal
          * @param[in] g graph to test
          * @return true if graph is chordal, false otherwise */
-        template< class GraphType > static bool chordal( const GraphType &g ) { return Chordal::getOrder( g,blackHole ); }
+        template< class GraphType > static bool chordal( const GraphType &g )
+        { return Chordal::getOrder( g,blackHole ); }
 
         // czy graf jest dopelnieniem chordala
         template< class GraphType > static bool cochordal( const GraphType &g );
 
         // czy splitgraph
-        template< class GraphType > static bool split( const GraphType &g ) { return chordal( g ) && cochordal( g ); }
+        template< class GraphType > static bool split( const GraphType &g )
+        { return chordal( g ) && cochordal( g ); }
 
         /* Comparability
-         * 
+         *
          */
         class Comparability
         {
           protected:
-            template< class Graph > class AdjStruct
+
+            struct EDir : public std::pair<int,int> {
+
+            EDir() : std::pair<int,int>(0,0)
+                {}
+
+            int& operator()(EdgeDirection arg)
             {
-              public:
-                struct Node
-                {
-                    int v;
-                    int cls;
-                    Privates::List_iterator< Node > inv;
-                    Node();
-                    Node( int _v, int _c, Privates::List_iterator< Node > _i);
-                    bool operator<( const Node &b ) { return v < b.v; }
+                switch (arg) {
+                    case EdDirIn : return first;
+                    case EdDirOut : return second;
+                    default: assert(0);
                 };
-
-                typedef Privates::List_iterator< Node > Ptr;
-
-                AdjStruct( size_t s, Privates::List< Node,Privates::BlockListAllocator< Privates::ListNode< Node > > > *adata ):
-                    datasize( s ), data( adata ) { }
-
-                Ptr Begin( int idx ) { return data[idx].begin(); }
-                Ptr End( int idx ) { return data[idx].end(); }
-
-                template< class VertMap > void Init( const Graph &g, VertMap &vertexToIndex );
-
-                Privates::List< Node,Privates::BlockListAllocator< Privates::ListNode< Node > > > *data;
-                int datasize;
-            };
-
-            template< class Graph > struct CTState
-            {
-                AdjStruct< Graph > cls;
-                bool flag;
-                int k;
-                int ud;
-                CTState( size_t n, Privates::List< typename AdjStruct< Graph >::Node,
-                    Privates::BlockListAllocator< Privates::ListNode< typename AdjStruct< Graph >::Node > > > *acls ):
-                    cls( n,acls ) { }
-            };
-
-            template< class Graph > static void Explore( const Graph &g, int i, int j, CTState< Graph > &state );
-            template< class Graph, class VMap, class UVMap > static void
-                InitState( const Graph &g, CTState< Graph > &state, VMap &vidx, UVMap &idxv );
-            template< class Graph > static bool ComparabilityTool( const Graph &g, CTState< Graph > &state );
-            template< class Graph > static int Height( CTState< Graph > &state, int *height, int i );
-            template< class Graph, class VMap, class OutIter > static void
-                GetClique( CTState< Graph > &state, int *height, int i, VMap &idxv, OutIter &out );
+            }
+        };
 
             class FlowDefaultStructs: public DefaultStructs
             {
               public:
                 enum { useFulkersonFord = false };
             };
+
 
           public:
             /* M.C. Golumbic
@@ -308,9 +286,9 @@ namespace Koala
             // (kierunek krawedzi miedzy getEdgeEnd1 a getEdgeEnd2). Lub BlackHole.
             // aheightmap- wysciowa tablica asocjacyjna PVertex->int z optymalnym pokolorowaniem wierzcholkowym. Lub BlackHole.
             // cliqueiter - iterator wyjsciowy, na ktory zostaje zapisana najwieksza klika
-            // TODO: tyle, ze poki co nie dziala!
             template< class Graph, class DirMap, class OutMap, class OutIter >
                 static int explore( const Graph &g, DirMap &dirmap, OutMap &aheightmap, OutIter cliqueiter );
+
             // sprawdza, czy graf byl comparability
             // adirmap - wysciowa tablica asocjacyjna PVertex->EdgeDirection z przykladowa comparability orientation krawedzi
             // (kierunek krawedzi miedzy getEdgeEnd1 a getEdgeEnd2). Lub BlackHole
@@ -343,12 +321,12 @@ namespace Koala
          * @return true if graph is a comparability graph, false otherwise */
         template< class GraphType > static bool comparability( const GraphType &g )
             { return Comparability::explore( g,blackHole,blackHole,blackHole ) != -1; }
-    
+
         // czy graf jest dopelnieniem comparability
         template< class GraphType > static bool cocomparability( const GraphType &g );
 
         /* Interval
-         * 
+         *
          */
         class Interval: protected LexBFSPar< DefaultStructs >
         {
@@ -357,11 +335,13 @@ namespace Koala
             struct Segment
             {
                 int left, right;
-                Segment( int l = 0, int r = 1 ): left( l ), right( r ) { }
+                Segment( int l = 0, int r = 1 ): left( l ), right( r )
+                { }
             };
 
             // czy dwa takie przedzialy tna sie niepusto
-            static bool touch( Segment a, Segment b ) { return std::max( a.left,b.left ) <= std::min( a.right,b.right ); }
+            static bool touch( Segment a, Segment b )
+                { return std::max( a.left,b.left ) <= std::min( a.right,b.right ); }
 
             // konwersja zbior przedzialow-> interval graph
             // pobiera spomiedzy 2 iteratorow ciag przedzialow (struktur typu segment)
@@ -390,7 +370,8 @@ namespace Koala
                     int value;
                     Privates::List< Elem,Privates::BlockListAllocator< Privates::ListNode< Elem > > > *cont;
                     Privates::List_iterator< Elem > next;
-                    Elem( int _v = -1 ): value( _v ), next(), cont( NULL ) { }
+                    Elem( int _v = -1 ): value( _v ), next(), cont( NULL )
+                    { }
                 };
                 typedef Privates::List< Elem,Privates::BlockListAllocator< Privates::ListNode< Elem > > > Entry;
 
@@ -402,11 +383,14 @@ namespace Koala
                 // usuwa id ze wszystkich zbiorów
                 void remove( int id );
                 // iloœæ elementów w zbiorze id
-                int count( int id ) { return m_data[id].first.size(); }
+                int count( int id )
+                    { return m_data[id].first.size(); }
                 // czy zbiór id pusty
-                bool empty( int id ) { return m_data[id].first.empty(); };
+                bool empty( int id )
+                    { return m_data[id].first.empty(); };
                 // pierwszy element ze zbioru id (w praktyce -- dowolny)
-                int first( int id ) { return m_data[id].first.front().value; }
+                int first( int id )
+                    { return m_data[id].first.front().value; }
 
                 std::pair< Entry,Privates::List_iterator< Elem > > *m_data;
             };
@@ -431,9 +415,9 @@ namespace Koala
             {
                 typename GraphType::PVertex v;
                 // kogo jest s¹siadem (numer s¹siada w porz¹dku)
-                int vertId;     
+                int vertId;
                 // numer w porz¹dku
-                int orderId;    
+                int orderId;
             };
 
             struct LBSData
@@ -467,12 +451,12 @@ namespace Koala
          * @return true if g is interval, false otherwise */
         template< class GraphType > static bool interval( const GraphType &g )
             { return chordal( g ) && cocomparability( g ); }
-            
+
         // czy pierwszy
         template< class GraphType > static bool prime( const GraphType &g );
-    
+
         /* Cograph
-        * 
+        *
         */
         class Cograph
         {

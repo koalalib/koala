@@ -136,7 +136,7 @@ template< class GraphType, class VInfoGen, class EInfoGen >
         EdgeDirection centerDir, EdgeDirection borderDir )
 {
     typename GraphType::PVertex centrVertex = NULL, pathVertex = NULL, tempVertex = NULL;
-    
+
     centrVertex = addVertices( g,1,0,centerDir,vInfoGen,eInfoGen ).first;
     if (n < 2) return centrVertex;
     pathVertex = addVertices( g,1,1,borderDir,vInfoGen,eInfoGen ).first;
@@ -255,11 +255,11 @@ template< class GraphType, class VInfoGen, class EInfoGen, class Iter, class Ite
         k = *iter;
         n += k;
     }
-    
+
     typename GraphType::PVertex LOCALARRAY( vTab,n );
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex > LOCALARRAY( partTab,size );
     int LOCALARRAY( partSize,size );
-    
+
     addVertices2Tab( g,vTab,n,0,dir,vInfoGen,eInfoGen );
 
     int j = 0;
@@ -349,7 +349,7 @@ template< class GraphType, class VInfoGen, class EInfoGen, class Iter > typename
         n+= num;
         lvl++;
     }
-    
+
     typename GraphType::PVertex LOCALARRAY( vTab,n + 1 );
 
     addVertices2Tab( g,vTab,n + 1,0,dir,vInfoGen,eInfoGen );
@@ -384,7 +384,7 @@ template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::
     Creator::regTree( GraphType &g, int deg, int height, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection dir )
 {
     int LOCALARRAY( degrees,height+1 );
-    
+
     for( int i = 0; i < height; i++ ) degrees[i] = deg;
     return regTree( g,degrees,degrees + height,vInfoGen,eInfoGen,dir );
 }
@@ -472,7 +472,7 @@ template< class GraphType > typename GraphType::PVertex Creator::erdRen1( GraphT
 template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
     Creator::erdRen1( GraphType &g, int n, double p, VInfoGen vInfoGen, EInfoGen eInfoGen, unsigned int randSeed,
         EdgeType eType )
-{   
+{
     if (eType == EdDirOut) eType = Directed;
     koalaAssert( eType == Undirected || eType == Directed,AlgExcWrongMask );
     double rnd;
@@ -513,7 +513,7 @@ template< class GraphType > typename GraphType::PVertex Creator::erdRen2( GraphT
 template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
     Creator::erdRen2( GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen, unsigned int randSeed,
         EdgeType eType )
-{   
+{
     if (eType == EdDirOut) eType = Directed;
     srand( randSeed );
     int maxEgdesNum = 0, j = 0, k = 0, v1num = 0, v2num = 0;
@@ -581,9 +581,9 @@ int Creator::random( int begin, int end )
 // RelDiagramPar
 
 template< class DefaultStructs > template< class Graph > void RelDiagramPar< DefaultStructs >::repair( Graph &g )
-{   
+{
     g.ch2Archs();
-    g.delAllParals( EdDirOut );  
+    g.delAllParals( EdDirOut );
 }
 
 template< class DefaultStructs > template< class Graph > void
@@ -591,7 +591,7 @@ template< class DefaultStructs > template< class Graph > void
 {
     g.clearEdges();
     for( typename Graph::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
-    {   
+    {
         g.addLoop( u,einfo );
         for( typename Graph::PVertex v = g.getVertNext( u ); v; v = g.getVertNext( v ) )
         {
@@ -610,33 +610,30 @@ template< class DefaultStructs > template< class Graph > void
 
 template< class DefaultStructs > template< class Graph > void
     RelDiagramPar< DefaultStructs >::symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo )
-{   
+{
     typename DefaultStructs::template TwoDimAssocCont< typename Graph::PVertex,bool,AMatrNoDiag >::Type
         matr( g.getVertNo() );
     typename Graph::PEdge e,enext;
     for( e = g.getEdge( Directed | Undirected ); e; e = g.getEdgeNext( e,Directed | Undirected ) )
-    {   
+    {
         matr( g.getEdgeEnd1( e ),g.getEdgeEnd2( e )) = true;
         if (g.getEdgeType( e ) == Undirected) matr( g.getEdgeEnd2( e ),g.getEdgeEnd1( e ) ) = true;
     }
-    for( e = g.getEdge( Directed ); e; e = enext )
-    {   
-        enext = g.getEdgeNext( e,Directed );
-        if (matr( g.getEdgeEnd1( e ),g.getEdgeEnd2( e ) ) != matr( g.getEdgeEnd2( e ),g.getEdgeEnd1( e ) ))
-        {   
-            g.addArch( g.getEdgeEnd2( e ),g.getEdgeEnd1( e ),einfo );
-            matr( g.getEdgeEnd1( e ),g.getEdgeEnd2( e )) = false;
-        }
-    }
+    int m = g.getEdgeNo( Directed );
+    typename Graph::PEdge LOCALARRAY(tabe,m);
+    g.getEdges(tabe,Directed);
+    for(int i = 0; i<m; i++)
+        if (!matr( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ) ))
+            g.addArch( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ),einfo );
 }
 
 template< class DefaultStructs > template< class Graph > void
     RelDiagramPar< DefaultStructs >::transClousure( Graph &g, const typename Graph::EdgeInfoType &einfo )
-{   
+{
     typename DefaultStructs::template TwoDimAssocCont< typename Graph::PVertex,typename FloydPar< DefaultStructs >
         ::template VertLabs< int,Graph >,AMatrFull >::Type matr( g.getVertNo() );
     typename FloydPar< DefaultStructs >::template UnitLengthEdges< int > econt;
-    
+
     FloydPar< DefaultStructs >::distances( g,matr,econt );
     for( typename Graph::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
         for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
@@ -653,43 +650,43 @@ template< class DefaultStructs > template< class Graph > void
 
 template< class DefaultStructs > template< class Cont > void
     RelDiagramPar< DefaultStructs >::MatrixForm::empty( Cont &cont, int size )
-{   
+{
     for( int i = 0; i < size; ++i )
-        for( int j = 0; j < size; ++j ) 
-            cont[i][j] = false;    
+        for( int j = 0; j < size; ++j )
+            cont[i][j] = false;
 }
 
 template< class DefaultStructs > template< class Cont, class Iter > void
     RelDiagramPar< DefaultStructs >::MatrixForm::empty( Cont &cont, Iter beg, Iter end )
-{   
+{
     for( Iter i = beg; i != end; ++i )
         for( Iter j = beg; j != end; ++j )
-            cont( *i,*j ) = false; 
+            cont( *i,*j ) = false;
 }
 
 template< class DefaultStructs > template< class Cont > void
     RelDiagramPar< DefaultStructs >::MatrixForm::total( Cont &cont, int size )
-{   
+{
     for( int i = 0; i < size; ++i )
-        for( int j = 0; j < size; ++j ) 
-            cont[i][j] = true; 
+        for( int j = 0; j < size; ++j )
+            cont[i][j] = true;
 }
 
 template< class DefaultStructs > template< class Cont,class Iter > void
     RelDiagramPar< DefaultStructs >::MatrixForm::total( Cont &cont, Iter beg, Iter end )
-{   
+{
     for( Iter i = beg; i != end; ++i )
-        for( Iter j = beg; j != end; ++j ) 
+        for( Iter j = beg; j != end; ++j )
             cont( *i,*j ) = true;
 }
 
 template< class DefaultStructs > template< class Cont > void
     RelDiagramPar< DefaultStructs >::MatrixForm::inv( Cont &cont, int size )
-{   
+{
     for( int i = 0; i < size - 1; ++i )
         for( int j = i + 1; j < size; ++j )
             if (cont[i][j] != cont[j][i])
-            { 
+            {
                 bool tmp = (bool)cont[i][j];
                 cont[i][j] = cont[j][i];
                 cont[j][i] = tmp;
@@ -698,13 +695,13 @@ template< class DefaultStructs > template< class Cont > void
 
 template< class DefaultStructs > template< class Cont, class Iter > void
     RelDiagramPar< DefaultStructs >::MatrixForm::inv( Cont &cont, Iter beg, Iter end )
-{   
+{
     for( Iter i = beg; i != end; ++i )
-    {   
+    {
         Iter j = i;
         for( ++j; j != end; ++j )
             if (cont( *i,*j ) != cont( *j,*i ))
-            {  
+            {
                 bool tmp = (bool)cont( *i,*j );
                 cont( *i,*j ) = cont( *j,*i );
                 cont( *j,*i ) = tmp;
@@ -714,19 +711,19 @@ template< class DefaultStructs > template< class Cont, class Iter > void
 
 template< class DefaultStructs > template< class Cont > void
     RelDiagramPar< DefaultStructs >::MatrixForm::reflClousure( Cont& cont, int size )
-{   
-    for( int i = 0; i < size; ++i ) cont[i][i] = true;    
+{
+    for( int i = 0; i < size; ++i ) cont[i][i] = true;
 }
 
 template< class DefaultStructs > template< class Cont, class Iter > void
     RelDiagramPar< DefaultStructs >::MatrixForm::reflClousure( Cont &cont, Iter beg, Iter end )
-{   
+{
     for( Iter i = beg; i != end; ++i ) cont( *i,*i ) = true;
 }
 
 template< class DefaultStructs > template< class Cont > void
     RelDiagramPar< DefaultStructs >::MatrixForm::symmClousure( Cont &cont, int size )
-{   
+{
     for( int i = 0; i < size - 1; ++i )
         for( int j = i + 1; j < size; ++j )
             cont[i][j] = cont[j][i] = cont[i][j] || cont[j][i];
@@ -734,24 +731,24 @@ template< class DefaultStructs > template< class Cont > void
 
 template< class DefaultStructs > template< class Cont,class Iter > void
     RelDiagramPar< DefaultStructs >::MatrixForm::symmClousure( Cont &cont, Iter beg, Iter end )
-{   
+{
     for( Iter i = beg; i != end; ++i )
         for( Iter j = i; j != end; ++j )
-            if (i != j) cont( *i,*j ) = cont( *j,*i ) = cont( *i,*j ) || cont( *j,*i );    
+            if (i != j) cont( *i,*j ) = cont( *j,*i ) = cont( *i,*j ) || cont( *j,*i );
 }
 
 template< class DefaultStructs > template< class Cont > void
     RelDiagramPar< DefaultStructs >::MatrixForm::transClousure( Cont &cont, int size )
-{   
+{
     for( int k = 0; k < size; ++k )
         for( int i = 0; i < size; ++i )
             for( int j = 0; j < size; ++j )
                 cont[i][j] = cont[i][j] || (cont[i][k] && cont[k][j]);
 }
 
-template< class DefaultStructs > template< class Cont, class Iter > void 
+template< class DefaultStructs > template< class Cont, class Iter > void
     RelDiagramPar< DefaultStructs >::MatrixForm::transClousure( Cont &cont, Iter beg, Iter end )
-{   
+{
     for( Iter k = beg; k != end; ++k )
         for( Iter i = beg; i != end; ++i )
             for( Iter j = beg; j != end; ++j )
@@ -778,7 +775,7 @@ template< class DefaultStructs > template< class Graph > bool
 template< class DefaultStructs > template< class GraphIn, class GraphOut, class VCaster, class ECaster, class VLinker,
     class ELinker> typename GraphOut::PVertex LineGraphPar< DefaultStructs >::undir( const GraphIn &g,
         GraphOut &lg, std::pair< VCaster,ECaster > casters, std::pair< VLinker,ELinker > linkers )
-{   
+{
     typename DefaultStructs::template AssocCont< typename GraphIn::PEdge,typename GraphOut::PVertex >::Type
         e2vtab( g.getEdgeNo() );
     typename DefaultStructs::template AssocCont< typename GraphIn::PVertex,char >::Type vset( g.getVertNo() );
@@ -786,7 +783,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
     for( typename GraphOut::PVertex v = lg.getVert(); v; v = lg.getVertNext( v ) )
         linkers.first( v,(typename GraphIn::PEdge)NULL );
     for( typename GraphIn::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-    {   
+    {
         typename GraphOut::VertInfoType vinfo;
         casters.first( vinfo,g.getEdgeInfo( e ) );
         linkers.first( e2vtab[e] = lg.addVert( vinfo ),e );
@@ -796,7 +793,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
         for( typename GraphIn::PEdge e = g.getEdge( v ); e; e = g.getEdgeNext( v,e ) )
             for( typename GraphIn::PEdge f = g.getEdgeNext( v,e ); f; f = g.getEdgeNext( v,f ) )
                 if (open( g,e,v,f ) && (!open( g,e,g.getEdgeEnd( e,v ),f ) || (g.getEdgeEnd( e,v ) >= v)))
-                {   
+                {
                     typename GraphOut::EdgeInfoType einfo;
                     casters.second( einfo,g.getVertInfo( v ) );
                     linkers.second( lg.addEdge( e2vtab[e],e2vtab[f],einfo ),v );
@@ -810,13 +807,13 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
 template< class DefaultStructs > template< class GraphIn, class GraphOut, class VCaster, class ECaster >
     typename GraphOut::PVertex LineGraphPar< DefaultStructs >::undir( const GraphIn &g, GraphOut &lg,
         std::pair< VCaster,ECaster > casters)
-{   
-    return undir( g,lg,casters,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );  
+{
+    return undir( g,lg,casters,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 }
 
 template< class DefaultStructs > template< class GraphIn, class GraphOut >
     typename GraphOut::PVertex LineGraphPar< DefaultStructs >::undir( const GraphIn &g, GraphOut &lg )
-{   
+{
     return undir( g,lg,std::make_pair( stdCast( false ),stdCast( false ) ),
         std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 }
@@ -824,7 +821,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut >
 template< class DefaultStructs > template< class GraphIn, class GraphOut, class VCaster, class ECaster, class VLinker,
     class ELinker > typename GraphOut::PVertex LineGraphPar< DefaultStructs >::dir( const GraphIn &g,
         GraphOut &lg, std::pair< VCaster,ECaster > casters, std::pair< VLinker,ELinker > linkers )
-{   
+{
     typename DefaultStructs::template AssocCont< typename GraphIn::PEdge,typename GraphOut::PVertex >::Type
         e2vtab( g.getEdgeNo() );
     typename DefaultStructs::template AssocCont< typename GraphIn::PVertex,char >::Type vset( g.getVertNo() );
@@ -832,7 +829,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
     for( typename GraphOut::PVertex v = lg.getVert(); v; v = lg.getVertNext( v ) )
         linkers.first( v,(typename GraphIn::PEdge)NULL );
     for( typename GraphIn::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-    {   
+    {
         typename GraphOut::VertInfoType vinfo;
         casters.first( vinfo,g.getEdgeInfo( e ) );
         linkers.first( e2vtab[e] = lg.addVert( vinfo ),e );
@@ -842,7 +839,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
         for( typename GraphIn::PEdge e = g.getEdge( v ); e; e = g.getEdgeNext( v,e ) )
             for( typename GraphIn::PEdge f = g.getEdge( v ); f; f = g.getEdgeNext( v,f ) )
                 if (openDir( g,e,v,f ))
-                {   
+                {
                     typename GraphOut::EdgeInfoType einfo;
                     casters.second( einfo,g.getVertInfo( v ) );
                     linkers.second( lg.addArch( e2vtab[e],e2vtab[f],einfo ),v );
@@ -858,17 +855,17 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
 template< class DefaultStructs > template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster,
     class VLinker, class ELinker > typename Graph::PVertex ProductPar< DefaultStructs >::cart( const Graph1 &g1,
         const Graph2 &g2, Graph &g, std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link )
-{   
+{
     typename Graph::PVertex res = g.getVertLast();
     int n1 = g1.getVertNo(), n2 = g2.getVertNo();
-    
+
     for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-    { 
+    {
         link.first.first()( v,(typename Graph1::PVertex)0 );
         link.first.second()( v,(typename Graph2::PVertex)0 );
     }
-    for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )    
-    { 
+    for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
+    {
         link.second.first()( e,(typename Graph1::PEdge)0 );
         link.second.second()( e,(typename Graph2::PEdge)0 );
     }
@@ -885,17 +882,17 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
     typename Graph2::PVertex v2;
     for( l1 = 0, v1 = g1.getVert(); v1; v1 = g1.getVertNext( v1 ),l1++ )
         for( l2 = 0, v2 = g2.getVert(); v2; v2 = g2.getVertNext( v2 ),l2++ )
-        {   
+        {
             typename Graph::VertInfoType vinfo;
             cast.first( vinfo,g1.getVertInfo( v1 ),g2.getVertInfo( v2 ) );
             typename Graph::PVertex v = tabv[n1 * l1 + l2] = g.addVert( vinfo );
             link.first.first()( v,v1 );
             link.first.second()( v,v2 );
         }
-        
+
     for( l1 = 0, v1 = g1.getVert(); v1; v1 = g1.getVertNext( v1 ),l1++ )
         for( typename Graph2::PEdge e = g2.getEdge(); e; e = g2.getEdgeNext( e ) )
-        {   
+        {
             std::pair< typename Graph2::PVertex,typename Graph2::PVertex > ends = g2.getEdgeEnds( e );
             EdgeDirection dir = g2.getEdgeType( e );
             typename Graph::EdgeInfoType einfo;
@@ -908,7 +905,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 
     for( l2 = 0, v2 = g2.getVert(); v2; v2 = g2.getVertNext( v2 ),l2++ )
         for( typename Graph1::PEdge e = g1.getEdge(); e; e = g1.getEdgeNext( e ) )
-        {   
+        {
             std::pair< typename Graph1::PVertex,typename Graph1::PVertex > ends = g1.getEdgeEnds( e );
             EdgeDirection dir = g1.getEdgeType( e );
             typename Graph::EdgeInfoType einfo;
@@ -918,23 +915,23 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
             link.second.first()( eres,e );
             link.second.second()( eres,(typename Graph2::PEdge)0 );
         }
-        
+
     return g.getVertNext( res );
 }
 
 template< class DefaultStructs > template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster,
     class VLinker, class ELinker > typename Graph::PVertex ProductPar< DefaultStructs >::lex( const Graph1 &g1,
         const Graph2 &g2, Graph &g, std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link )
-{   
+{
     typename Graph::PVertex res = g.getVertLast();
     int n1 = g1.getVertNo(), n2 = g2.getVertNo();
     for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-    { 
+    {
         link.first.first()( v,(typename Graph1::PVertex)0 );
         link.first.second()( v,(typename Graph2::PVertex)0 );
     }
     for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-    { 
+    {
         link.second.first()( e,(typename Graph1::PEdge)0 );
         link.second.second()( e,(typename Graph2::PEdge)0 );
     }
@@ -951,7 +948,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
     typename Graph2::PVertex v2;
     for( l1 = 0, v1 = g1.getVert(); v1; v1 = g1.getVertNext( v1 ),l1++ )
         for( l2 = 0, v2 = g2.getVert(); v2; v2 = g2.getVertNext( v2 ),l2++ )
-        {   
+        {
             typename Graph::VertInfoType vinfo;
             cast.first( vinfo,g1.getVertInfo( v1 ),g2.getVertInfo( v2 ) );
             typename Graph::PVertex v = tabv[n1 * l1 + l2] = g.addVert( vinfo );
@@ -961,7 +958,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 
     for( l1 = 0, v1 = g1.getVert(); v1; v1 = g1.getVertNext( v1 ),l1++ )
         for( typename Graph2::PEdge e = g2.getEdge(); e; e = g2.getEdgeNext( e ) )
-        {   
+        {
             std::pair< typename Graph2::PVertex,typename Graph2::PVertex > ends = g2.getEdgeEnds( e );
             EdgeDirection dir = g2.getEdgeType( e );
             typename Graph::EdgeInfoType einfo;
@@ -975,7 +972,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
     for( typename Graph1::PEdge e = g1.getEdge(); e; e = g1.getEdgeNext( e ) )
     for( l1 = 0, v1 = g2.getVert(); v1; v1 = g2.getVertNext( v1 ),l1++ )
         for( l2 = 0, v2 = g2.getVert(); v2; v2 = g2.getVertNext( v2 ),l2++ )
-        {   
+        {
             std::pair< typename Graph1::PVertex,typename Graph1::PVertex > ends = g1.getEdgeEnds( e );
             EdgeDirection dir = g1.getEdgeType( e );
             if (dir == Loop) dir = (v1 == v2) ? EdLoop : EdUndir;
@@ -993,16 +990,16 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 template< class DefaultStructs > template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster,
     class VLinker, class ELinker > typename Graph::PVertex ProductPar< DefaultStructs >::tensor( const Graph1 &g1,
         const Graph2 &g2, Graph &g, std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link )
-{   
+{
     typename Graph::PVertex res = g.getVertLast();
     int n1 = g1.getVertNo(), n2 = g2.getVertNo();
     for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-    { 
+    {
         link.first.first()( v,(typename Graph1::PVertex)0 );
         link.first.second()( v,(typename Graph2::PVertex)0 );
     }
     for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-    { 
+    {
         link.second.first()( e,(typename Graph1::PEdge)0 );
         link.second.second()( e,(typename Graph2::PEdge)0 );
     }
@@ -1019,7 +1016,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
     typename Graph2::PVertex v2;
     for( l1 = 0, v1 = g1.getVert(); v1; v1 = g1.getVertNext( v1 ),l1++ )
         for( l2 = 0, v2 = g2.getVert(); v2; v2 = g2.getVertNext( v2 ),l2++ )
-        {   
+        {
             typename Graph::VertInfoType vinfo;
             cast.first( vinfo,g1.getVertInfo( v1 ),g2.getVertInfo( v2 ) );
             typename Graph::PVertex v = tabv[n1 * l1 + l2] = g.addVert( vinfo );
@@ -1029,7 +1026,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 
         for( typename Graph1::PEdge e1 = g1.getEdge(); e1; e1 = g1.getEdgeNext( e1 ) )
         for( typename Graph2::PEdge e2 = g2.getEdge(); e2; e2 = g2.getEdgeNext( e2 ) )
-        {   
+        {
             std::pair< typename Graph1::PVertex,typename Graph1::PVertex > ends1 = g1.getEdgeEnds( e1 );
             std::pair< typename Graph2::PVertex,typename Graph2::PVertex > ends2 = g2.getEdgeEnds( e2 );
             EdgeDirection dir1 = g1.getEdgeType( e1 ), dir2 = g2.getEdgeType( e2 );
@@ -1037,40 +1034,40 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
             cast.second( einfo,g1.getEdgeInfo( e1 ),g2.getEdgeInfo( e2 ) );
             typename Graph::PEdge eres1 = 0, eres2 = 0;
             if (dir1 == Undirected && dir2 == Undirected)
-            {   
+            {
                 eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo,EdUndir );
                 eres2 = g.addEdge( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
             }
             if (dir1 == Undirected && dir2 == Directed)
-            {   
+            {
                 eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
                 eres2 = g.addArch( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
             }
             if (dir1 == Directed && dir2 == Undirected)
-            {   
+            {
                 eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
                 eres2 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo );
             }
             if (dir1 == Directed && dir2 == Directed)
-            {   
+            {
                 eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
             }
             if (dir1 == Undirected && dir2 == Loop)
-            {   
+            {
                 eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
                 eres2 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
             }
             if (dir1 == Loop && dir2 == Undirected)
-            {   
+            {
                 eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
                 eres2 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
@@ -1085,7 +1082,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
                 eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
             if (eres1)
-            { 
+            {
                 link.second.first()( eres1,e1 );
                 link.second.second()( eres1,e2 );
             }
@@ -1101,18 +1098,18 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 template< class DefaultStructs > template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster,
     class VLinker, class ELinker > typename Graph::PVertex ProductPar< DefaultStructs >::strong( const Graph1 &g1,
         const Graph2 &g2, Graph &g, std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link )
-{   
+{
     typename Graph::PVertex res = g.getVertLast();
     int n1 = g1.getVertNo(), n2 = g2.getVertNo();
     for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-    { 
+    {
         link.first.first()( v,(typename Graph1::PVertex)0 );
         link.first.second()( v,(typename Graph2::PVertex)0 );
     }
     for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-    { 
+    {
         link.second.first()( e,(typename Graph1::PEdge)0 );
-        link.second.second()( e,(typename Graph2::PEdge)0 ); 
+        link.second.second()( e,(typename Graph2::PEdge)0 );
     }
     typename DefaultStructs::template AssocCont< typename Graph1::PVertex,int >::Type indv1( n1 );
     typename DefaultStructs::template AssocCont< typename Graph2::PVertex,int >::Type indv2( n2 );
@@ -1127,7 +1124,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
     typename Graph2::PVertex v2;
     for( l1 = 0, v1 = g1.getVert(); v1; v1 = g1.getVertNext( v1 ),l1++ )
         for( l2 = 0, v2 = g2.getVert(); v2; v2 = g2.getVertNext( v2 ),l2++ )
-        {   
+        {
             typename Graph::VertInfoType vinfo;
             cast.first( vinfo,g1.getVertInfo( v1 ),g2.getVertInfo( v2 ) );
             typename Graph::PVertex v = tabv[n1 * l1 + l2] = g.addVert( vinfo );
@@ -1137,7 +1134,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 
     for( l1 = 0, v1 = g1.getVert(); v1; v1 = g1.getVertNext( v1 ),l1++ )
         for( typename Graph2::PEdge e = g2.getEdge(); e; e = g2.getEdgeNext( e ) )
-        {   
+        {
             std::pair< typename Graph2::PVertex,typename Graph2::PVertex > ends = g2.getEdgeEnds( e );
             EdgeDirection dir = g2.getEdgeType( e );
             typename Graph::EdgeInfoType einfo;
@@ -1150,7 +1147,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 
     for( l2 = 0, v2 = g2.getVert(); v2; v2 = g2.getVertNext( v2 ),l2++ )
         for( typename Graph1::PEdge e = g1.getEdge(); e; e = g1.getEdgeNext( e ) )
-        {   
+        {
             std::pair< typename Graph1::PVertex,typename Graph1::PVertex > ends = g1.getEdgeEnds( e );
             EdgeDirection dir = g1.getEdgeType( e );
             typename Graph::EdgeInfoType einfo;
@@ -1163,7 +1160,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 
     for( typename Graph1::PEdge e1 = g1.getEdge(); e1; e1 = g1.getEdgeNext( e1 ) )
         for( typename Graph2::PEdge e2 = g2.getEdge(); e2; e2 = g2.getEdgeNext( e2 ) )
-        {   
+        {
             std::pair< typename Graph1::PVertex,typename Graph1::PVertex > ends1 = g1.getEdgeEnds( e1 );
             std::pair< typename Graph2::PVertex,typename Graph2::PVertex > ends2 = g2.getEdgeEnds( e2 );
             EdgeDirection dir1 = g1.getEdgeType( e1 ), dir2 = g2.getEdgeType( e2 );
@@ -1171,21 +1168,21 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
             cast.second( einfo,g1.getEdgeInfo( e1 ),g2.getEdgeInfo( e2 ) );
             typename Graph::PEdge eres1 = 0, eres2 = 0;
             if (dir1 == Undirected && dir2 == Undirected)
-            {   
+            {
                 eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo,EdUndir );
                 eres2 = g.addEdge( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
             }
             if (dir1 == Undirected && dir2 == Directed)
-            {   
+            {
                 eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
                 eres2 = g.addArch( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
             }
             if (dir1 == Directed && dir2 == Undirected)
-            {   
+            {
                 eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
                 eres2 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],
@@ -1195,14 +1192,14 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
                 eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
             if (dir1 == Undirected && dir2 == Loop)
-            {   
+            {
                 eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
                 eres2 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
             }
             if (dir1 == Loop && dir2 == Undirected)
-            {   
+            {
                 eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
                 eres2 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
@@ -1218,12 +1215,12 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
 
             if (eres1)
-            { 
+            {
                 link.second.first()( eres1,e1 );
-                link.second.second()( eres1,e2 ); 
+                link.second.second()( eres1,e2 );
             }
             if (eres2)
-            { 
+            {
                 link.second.first()( eres2,e1 );
                 link.second.second()( eres2,e2 );
             }

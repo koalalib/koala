@@ -488,14 +488,16 @@ namespace Koala
         template< class Graph > static void repair( Graph &g );
 
         // wpisz relacje pusta na istniejacych wierzcholkach
-        template< class Graph > static void empty( Graph &g ) { g.clearEdges(); }
+        template< class Graph > static void empty( Graph &g )
+            { g.clearEdges(); }
 
         // wpisz relacje kazdy z kazdym na istniejacych wierzcholkach. Mozna podac pole info wprowadzanych krawedzi
         template< class Graph > static void
             total( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
         // zamienia w relacje odwrotna
-        template< class Graph > static void inv( Graph &g ) { g.revert(); }
+        template< class Graph > static void inv( Graph &g )
+            { g.revert(); }
 
         // przeprowadza domkniecie zwrotne. Mozna podac pole info wprowadzanych krawedzi
         template< class Graph > static void
@@ -531,10 +533,10 @@ namespace Koala
             template< class Cont, class Iter > static void transClousure( Cont &cont, Iter beg, Iter end );
         };
     } ;
-    
+
     // wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
     class RelDiagram: public RelDiagramPar< AlgsDefaultSettings > { };
-    
+
     /* LineGraphPar
      * Kreator linegrafow
      * DefaultStructs - wytyczne dla wewnetrznych procedur
@@ -586,7 +588,7 @@ namespace Koala
 
     // wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
     class LineGraph: public LineGraphPar< AlgsDefaultSettings > { };
-    
+
     /* ComplexCaster
      * Caster zlozony z jednego castera 3-argumentowego i dwoch 2-argumentowych
      */
@@ -596,24 +598,29 @@ namespace Koala
         mutable FirstArg firstarg;
         mutable SecondArg secondarg;
         ComplexCaster( TwoArg t = TwoArg(), FirstArg f = FirstArg(), SecondArg s = SecondArg() ):
-            twoarg( t ), firstarg( f ), secondarg( s ) { }
+            twoarg( t ), firstarg( f ), secondarg( s )
+            { }
 
         // jesli podano oba argumenty, zastosuj twoarg
         template< class InfoDest, class InfoSour1, class InfoSour2 >
-            void operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) { twoarg( dest,sour1,sour2 ); }
+            void operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 )
+            { twoarg( dest,sour1,sour2 ); }
 
         // jesli podano pierwszy argument, zastosuj firstarg
         template< class InfoDest, class InfoSour1 >
-            void operator()( InfoDest &dest, InfoSour1 sour1, Koala::BlackHole b ) { firstarg( dest,sour1 ); }
+            void operator()( InfoDest &dest, InfoSour1 sour1, Koala::BlackHole b )
+            { firstarg( dest,sour1 ); }
 
         // jesli podano drugi argument, zastosuj secondarg
         template< class InfoDest, class InfoSour1 >
-            void operator()( InfoDest &dest, Koala::BlackHole b, InfoSour1 sour2 ) { secondarg( dest,sour2 ); }
+            void operator()( InfoDest &dest, Koala::BlackHole b, InfoSour1 sour2 )
+            { secondarg( dest,sour2 ); }
     };
 
     // funkcja tworzaca - podajemy castery skladowe
     template< class TwoArg, class FirstArg, class SecondArg > ComplexCaster< TwoArg, FirstArg,SecondArg >
-        complexCast( TwoArg t, FirstArg f, SecondArg s ) { return ComplexCaster< TwoArg,FirstArg,SecondArg >( t,f,s ); }
+        complexCast( TwoArg t, FirstArg f, SecondArg s )
+        { return ComplexCaster< TwoArg,FirstArg,SecondArg >( t,f,s ); }
 
     /* ProductPar
      * Kreator iloczynow grafow

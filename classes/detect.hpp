@@ -2,7 +2,7 @@
 
 template< class DefaultStructs > template< class GraphType >
     bool IsItPar< DefaultStructs >::undir( const GraphType &g, bool allowmulti )
-{   
+{
     if (allowmulti) return g.getVertNo() > 0 && g.getEdgeNo( EdDirIn | EdDirOut ) == 0;
     int i=0, m;            // simple
     if (!g.getVertNo() || g.getEdgeNo( EdDirIn | EdDirOut | EdLoop )) return false;
@@ -24,14 +24,14 @@ template< class DefaultStructs > template< class GraphType >
 
 template< class DefaultStructs > template< class GraphType >
     bool IsItPar< DefaultStructs >::clique( const GraphType &g )
-{   
+{
     int n = g.getVertNo();
     return (g.getEdgeNo() == n * (n - 1) / 2) && undir( g,false );
 }
 
 template< class DefaultStructs > template< class GraphType >
     bool IsItPar< DefaultStructs >::cliques( const GraphType &g )
-{   
+{
     if (!undir( g,false )) return false;
     int LOCALARRAY( comptab,g.getVertNo() + 1 );
     int e = 0, comp = BFSPar< DefaultStructs >::split( g,SearchStructs::compStore( comptab,blackHole ),EdUndir );
@@ -52,7 +52,7 @@ template< class DefaultStructs > template< class GraphType >
 template< class DefaultStructs > template< class GraphType >
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
     IsItPar< DefaultStructs >::Path::ends( const GraphType &g )
-{   
+{
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
         null = std::make_pair( typename GraphType::PVertex( 0 ),typename GraphType::PVertex( 0 ) ), res = null;
     if (!tree( g )) return null;
@@ -72,7 +72,7 @@ template< class DefaultStructs > template< class GraphType >
 template< class DefaultStructs > template< class GraphType >
     std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
     IsItPar< DefaultStructs >::Caterpillar::spineEnds( const GraphType &g )
-{   
+{
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
         null = std::make_pair( typename GraphType::PVertex( 0 ),typename GraphType::PVertex( 0 ) );
     if (!connected( g,false )) return null;
@@ -82,7 +82,7 @@ template< class DefaultStructs > template< class GraphType >
 
 template< class DefaultStructs > template< class GraphType >
     bool IsItPar< DefaultStructs >::block( const GraphType &g )
-{   
+{
     if (!undir( g,false )) return false;
     int m;
     int LOCALARRAY( comptab,g.getVertNo() + (m = g.getEdgeNo()) + 1 );
@@ -94,7 +94,7 @@ template< class DefaultStructs > template< class GraphType >
 
 template< class DefaultStructs > template< class GraphType >
     int IsItPar< DefaultStructs >::almostTree( const GraphType &g )
-{   
+{
     if (!undir( g,false )) return -1;
     int n,m;
     int LOCALARRAY( comptab,(n = g.getVertNo()) + (m = g.getEdgeNo()) + 1 );
@@ -110,26 +110,26 @@ template< class DefaultStructs > template< class GraphType >
 
 template< class DefaultStructs > template< class GraphType, class Iter >
     int IsItPar< DefaultStructs >::Bipartite::getPart( const GraphType &g, Iter out, bool allowmulti )
-{   
+{
     if ((!undir( g,allowmulti )) || g.getEdgeNo( EdLoop )) return -1;
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
         SearchStructs::VisitVertLabs< GraphType > >::Type vertCont( g.getVertNo() );
     BFSPar< DefaultStructs >::scan( g,blackHole,EdUndir,vertCont );
     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-    {   
+    {
         std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends = g.getEdgeEnds( e );
         if ((vertCont[ends.first].distance & 1) == (vertCont[ends.second].distance & 1)) return -1;
     }
     int licz = 0;
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
         if ((vertCont[v].distance & 1) == 0)
-        { 
+        {
             licz++;
             if (!isBlackHole( out ))
             {
                 *out = v;
                 ++out;
-                
+
             }
         }
     return licz;
@@ -137,7 +137,7 @@ template< class DefaultStructs > template< class GraphType, class Iter >
 
 template< class DefaultStructs > template< class GraphType, class Iter >
     int IsItPar< DefaultStructs >::Bipartite::maxStable( const GraphType &g, Iter out )
-{   
+{
     Set< typename GraphType::PVertex > res;
     minVertCover( g,setInserter( res ) );
     res = g.getVertSet() - res;
@@ -147,7 +147,7 @@ template< class DefaultStructs > template< class GraphType, class Iter >
 
 template< class DefaultStructs > template< class GraphType, class Iter >
     int IsItPar< DefaultStructs >::Bipartite::minVertCover( const GraphType &g, Iter out )
-{       
+{
     int n;
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
         Koala::Matching::VertLabs< GraphType > >::Type vertTab( n = g.getVertNo() );
@@ -172,7 +172,7 @@ template< class DefaultStructs > template< class GraphType, class Iter >
             if (setL.isElement( itT ))
                 for ( typename GraphType::PEdge e = g.getEdge( itT,EdUndir ); e; e = g.getEdgeNext( itT,e,EdUndir ))
                     if (g.getEdgeEnd( e,itT ) != vertTab[itT].vMatch)
-                    {   
+                    {
                         typename GraphType::PVertex itR = g.getEdgeEnd( e,itT );
                         setnew += itR;
                         for( typename GraphType::PEdge f = g.getEdge( itR,EdUndir ); f; f = g.getEdgeNext( itR,f,EdUndir ) )
@@ -209,7 +209,7 @@ template< class DefaultStructs > template< class GraphType >
 
 template< class DefaultStructs > template< class GraphType, class Iter >
     int IsItPar< DefaultStructs >::CompBipartite::getPart( const GraphType &g, Iter out )
-{   
+{
     int n = g.getVertNo();
     typename GraphType::PVertex LOCALARRAY( tabE,n );
     int licz = Bipartite::getPart( g,tabE,false );
@@ -217,10 +217,10 @@ template< class DefaultStructs > template< class GraphType, class Iter >
     if (licz * (n - licz) != g.getEdgeNo( EdUndir )) return -1;
     if (!isBlackHole( out ))
         for( int i = 0; i < licz; i++ )
-        { 
+        {
             *out = tabE[i];
             ++out;
-            
+
         }
     return licz;
 }
@@ -235,7 +235,7 @@ template< class DefaultStructs > template< class GraphType, class Iter, class VI
     int i, licz = 0, maxc = 0;
 
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-    {   
+    {
         for( i = 0; i < n; i++ ) tabC[i] = 1;
         for( typename GraphType::PEdge e = g.getEdge( v,EdUndir ); e; e = g.getEdgeNext( v,e,EdUndir ) )
             if (colors.hasKey( g.getEdgeEnd( e,v ) )) tabC[colors[g.getEdgeEnd( e,v )]] = 0;
@@ -252,7 +252,7 @@ template< class DefaultStructs > template< class GraphType, class Iter, class VI
     if (!isBlackHole( out.compIter ))
     {
         for( i = 0; i <= maxc; i++ )
-        { 
+        {
             *out.compIter = licz;
             ++out.compIter;
             licz += tabC[i];
@@ -410,7 +410,7 @@ template< class DefaultStructs > template< class Graph, class VIter2 >
     }
     if (!isBlackHole( riter ))
         for( int i = g.getVertNo() - 1; i >= 0; i-- )
-        { 
+        {
             *riter = pi[i];
             ++riter;
         }
@@ -421,7 +421,7 @@ template< class DefaultStructs > template< class Graph, class VIter2 >
 template< class DefaultStructs > template< class Graph, class VIter, class VIterOut, class QIter, class QTEIter >
     int IsItPar< DefaultStructs >::Chordal::maxCliques( const Graph &g, VIter begin, VIter end,
         CompStore< QIter,VIterOut > out, QTEIter qte )
-{   
+{
     int i,j, licze = 0, res,no,n;
     VIter vi;
     Set< typename Graph::PVertex> LOCALARRAY( tabs,n = g.getVertNo() );
@@ -429,7 +429,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
     int LOCALARRAY( sno,n );
     typename DefaultStructs:: template AssocCont< typename Graph::PVertex,bool >::Type tabf( n );
     for( i = 0, vi = begin; vi != end; ++vi,++i )
-    {   
+    {
         tabs[i] = *vi;
         typename Graph::PVertex u;
         for( typename Graph::PEdge e = g.getEdge( *vi,EdUndir ); e; e = g.getEdgeNext( *vi,e,EdUndir ) )
@@ -439,7 +439,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
     for( i = 0; i < n - 1; i++ )
         for( j = i + 1; j < n; j++ )
             if (tabs[i].subsetOf( tabs[j] ))
-            { 
+            {
                 tabs[i].clear();
                 licze++;
                 break;
@@ -448,11 +448,11 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
     ++out.compIter;
     for( no = j = i = 0, vi = begin; vi != end; ++vi,++i )
         if (!tabs[i].empty())
-        {   
+        {
             tabs[i].getElements( vbuf );
             sno[no++] = i;
             for( int k = 0; k < tabs[i].size(); k++ )
-            { 
+            {
                 *out.vertIter = vbuf[k];
                 ++out.vertIter;
             }
@@ -462,7 +462,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
         }
     res = n - licze;
     if (!isBlackHole( qte ) && res > 1)
-    {   
+    {
         g.getVerts( vbuf );
         JoinableSets< typename Graph::PVertex,typename DefaultStructs::template AssocCont< typename Graph::PVertex,
             JSPartDesrc< typename Graph::PVertex> * >::Type > sets;
@@ -478,7 +478,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
         std::reverse( edges,edges + l );
         int edgeNo = res - 1;
         for( int i = 0; edgeNo > 0; i++ )
-        {   
+        {
             std::pair< int,int > ends = edges[i].second;
             if (sets.getSetId( vbuf[sno[ends.first]] ) != sets.getSetId( vbuf[sno[ends.second]] ))
             {
@@ -494,7 +494,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
 
 template< class DefaultStructs > template< class Graph, class VIterOut, class QIter, class QTEIter >
     int IsItPar< DefaultStructs >::Chordal::maxCliques( const Graph &g, CompStore< QIter,VIterOut > out, QTEIter qte )
-{   
+{
     int n;
     typename Graph::PVertex LOCALARRAY( vbuf,n = g.getVertNo() );
     if (!getOrder( g,vbuf )) return -1;
@@ -503,7 +503,7 @@ template< class DefaultStructs > template< class Graph, class VIterOut, class QI
 
 template< class DefaultStructs > template< class Graph, class VIter, class VIterOut >
     int IsItPar< DefaultStructs >::Chordal::maxClique( const Graph &g, VIter begin, VIter end, VIterOut out )
-{   
+{
     int maxsize = 1;
     typename Graph::PVertex u;
     typename Graph::PVertex maxv = *begin;
@@ -511,7 +511,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
     VIter vi = begin;
     tabf[maxv] = true;
     for( ++vi; vi != end; ++vi )
-    {   
+    {
         int siz = 1;
         for( typename Graph::PEdge e = g.getEdge( *vi,EdUndir ); e; e = g.getEdgeNext( *vi,e,EdUndir ) )
             if (tabf.hasKey( u = g.getEdgeEnd( e,*vi ) )) siz++;
@@ -527,7 +527,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
     int licz = 0;
     for( typename Graph::PEdge e = g.getEdge( maxv,EdUndir ); e; e = g.getEdgeNext( maxv,e,EdUndir ) )
         if (tabf.hasKey( u = g.getEdgeEnd( e,*vi ) ))
-        {   
+        {
             *out = u;
             ++out;
             ++licz;
@@ -540,7 +540,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
 
 template< class DefaultStructs > template< class Graph, class VIterOut >
     int IsItPar< DefaultStructs >::Chordal::maxClique( const Graph &g, VIterOut out )
-{   
+{
     int n;
     typename Graph::PVertex LOCALARRAY( vbuf,n = g.getVertNo() );
     if (!getOrder( g,vbuf )) return -1;
@@ -550,7 +550,7 @@ template< class DefaultStructs > template< class Graph, class VIterOut >
 template< class DefaultStructs > template < class Graph, class QIter, class VIter, class QTEIter, class IterOut >
     int IsItPar< DefaultStructs >::Chordal::maxStable( const Graph& g, int qn, QIter begin, VIter vbegin,
         QTEIter ebegin, IterOut out )
-{   
+{
     typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes< Graph > >::Type LOCALARRAY( tabtab,qn );
     QTRes< Graph > LOCALARRAY( tabnull,qn );
     typedef typename DefaultStructs::template LocalGraph< std::pair< typename DefaultStructs:: template AssocCont<
@@ -560,7 +560,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
     QIter it = begin, it2 = it;
     it2++;
     for( int i = 0; i < qn; i++,it++,it2++ )
-    {   
+    {
         int size;
         (treeverts[i] = tree.addVert( std::make_pair( tabtab + i,tabnull + i ) ))->info.first->reserve( size = (*it2 - *it) );
         for( int j = 0; j < size; j++,vbegin++ ) (*treeverts[i]->info.first)[*vbegin];
@@ -573,18 +573,18 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
         if (search[u].ePrev) tree.ch2Dir( search[u].ePrev,u,EdDirOut );
 
     for( int i = 0; i < qn; i++ )
-    {   
+    {
         typename ImageGraph::PVertex vert = treeverts[i];
         vert->info.second->size = 0;
         vert->info.second->trees.clear();
         for( typename ImageGraph::PEdge e = tree.getEdge( vert,EdDirIn ); e; e = tree.getEdgeNext( vert,e,EdDirIn ) )
-        {   
+        {
             typename ImageGraph::PVertex child = tree.getEdgeEnd( e,vert );
             int maxs = child->info.second->size, tmpsize;
             Set< typename Graph::PVertex > *maxset = &child->info.second->trees;
             for( typename Graph::PVertex key = child->info.first->firstKey(); key; key = child->info.first->nextKey( key ) )
                 if ((!vert->info.first->hasKey( key )) && (tmpsize = (*child->info.first)[key].size) > maxs)
-                { 
+                {
                     maxs = tmpsize;
                     maxset = &(*child->info.first)[key].trees;
                 }
@@ -593,24 +593,24 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
         }
         typename ImageGraph::PVertex child;
         for( typename Graph::PVertex key = vert->info.first->firstKey(); key; key = vert->info.first->nextKey( key ) )
-        {   
+        {
             vert->info.first->operator[]( key ).size = 1;
             vert->info.first->operator[]( key ).trees.clear();
             vert->info.first->operator[]( key ).trees += key;
             for( typename ImageGraph::PEdge e = tree.getEdge( vert,EdDirIn ); e; e = tree.getEdgeNext( vert,e,EdDirIn ) )
                 if ((child = tree.getEdgeEnd( e,vert ))->info.first->hasKey( key ))
-                {   
+                {
                     (*vert->info.first)[key].size += (*child->info.first)[key].size - 1;
                     (*vert->info.first)[key].trees += (*child->info.first)[key].trees;
                 }
                 else
-                {   
+                {
                     int maxs = child->info.second->size, tmpsize;
                     Set< typename Graph::PVertex > *maxset = &child->info.second->trees;
                     for( typename Graph::PVertex childkey = child->info.first->firstKey(); childkey;
                         childkey = child->info.first->nextKey( childkey ) )
-                        if ((!vert->info.first->hasKey( childkey )) && (tmpsize = (*child->info.first)[childkey].size) > maxs) 
-                        { 
+                        if ((!vert->info.first->hasKey( childkey )) && (tmpsize = (*child->info.first)[childkey].size) > maxs)
+                        {
                             maxs = tmpsize;
                             maxset = &(*child->info.first)[childkey].trees;
                         }
@@ -625,7 +625,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
     Set< typename Graph::PVertex > *maxset = &root->info.second->trees;
     for( typename Graph::PVertex key = root->info.first->firstKey(); key; key = root->info.first->nextKey( key ) )
     if ((tmpsize = (root->info.first->operator[]( key ).size)) > maxs)
-    {   
+    {
         maxs = tmpsize;
         maxset = &root->info.first->operator[]( key ).trees;
     }
@@ -637,7 +637,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
 template< class DefaultStructs > template < class Graph, class QIter, class VIter, class QTEIter, class IterOut >
     int IsItPar< DefaultStructs >::Chordal::minVertCover( const Graph &g, int qn, QIter begin, VIter vbegin,
         QTEIter ebegin, IterOut out )
-{   
+{
     Set< typename Graph::PVertex > res;
     maxStable( g,qn,begin,vbegin,ebegin,setInserter( res ) );
     res = g.getVertSet() - res;
@@ -647,7 +647,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
 
 template< class DefaultStructs > template< class Graph, class IterOut >
     int IsItPar< DefaultStructs >::Chordal::maxStable( const Graph &g, IterOut out )
-{   
+{
     int n = g.getVertNo();
     typename Graph::PVertex LOCALARRAY( vbegin,n * n );
     int LOCALARRAY( begin,n + 1 );
@@ -659,7 +659,7 @@ template< class DefaultStructs > template< class Graph, class IterOut >
 
 template< class DefaultStructs > template< class Graph, class IterOut >
     int IsItPar< DefaultStructs >::Chordal::minVertCover( const Graph &g, IterOut out )
-{   
+{
     Set< typename Graph::PVertex > res;
     maxStable( g,setInserter( res ) );
     res = g.getVertSet() - res;
@@ -682,219 +682,13 @@ template< class DefaultStructs > template< class GraphType >
     return chordal( cg );
 }
 
-template< class DefaultStructs > template< class Graph >
-    IsItPar< DefaultStructs >::Comparability::AdjStruct< Graph >::Node::Node()
-{ 
-    v = 0; cls = 0; 
-}
-
-template< class DefaultStructs > template< class Graph >
-    IsItPar< DefaultStructs >::Comparability::AdjStruct< Graph >::Node::Node( int _v, int _c,
-        Privates::List_iterator< Node > _i )
-{
-    v = _v;
-    cls = _c;
-    inv = _i;
-}
-
-template< class DefaultStructs > template< class Graph > template< class VertMap > 
-    void IsItPar< DefaultStructs >::Comparability::AdjStruct< Graph >::Init( const Graph &g, VertMap &vertexToIndex )
-{
-    int u,v;
-    typename Graph::PEdge e;
-    Privates::List_iterator< Node > a,b;
-    std::pair< typename Graph::PVertex,typename Graph::PVertex > p;
-    int CompUndefined = DefaultStructs::template NumberTypeBounds< int >::plusInfty();
-
-    for( e = g.getEdge( EdUndir ); e != NULL; e = g.getEdgeNext( e,EdUndir ) )
-    {
-        p = g.getEdgeEnds( e );
-        u = vertexToIndex[p.first];
-        v = vertexToIndex[p.second];
-        data[u].push_front( Node() );
-        data[v].push_front( Node() );
-        a = data[u].begin();
-        b = data[v].begin();
-        a->v = v;
-        a->cls = CompUndefined;
-        a->inv = b;
-        b->v = u;
-        b->cls = CompUndefined;
-        b->inv = a;
-    }
-
-    for( int i = 0; i < datasize; i++ ) data[i].sort();
-}
-
-template< class DefaultStructs > template< class Graph >
-    void IsItPar< DefaultStructs >::Comparability::Explore( const Graph &g, int i, int j, CTState<Graph> &state )
-{
-    int m;
-    typename AdjStruct< Graph >::Ptr ip,jp;
-    typename AdjStruct< Graph >::Ptr ie,je;
-    ip = state.cls.Begin( i );
-    jp = state.cls.Begin( j );
-    ie = state.cls.End( i );
-    je = state.cls.End( j );
-    // for each m \in ADJ(i) such that
-    //  [ m \notin ADJ(j) or |cls(j, m)| < k] do
-    while (ip != ie)
-    {
-        m = ip->v;
-        while (jp != je && jp->v < m) ++jp;
-        if (jp != je)
-            if (jp->v == m && abs( jp->cls ) >= state.k)
-            {
-                ++ip;
-                continue;
-            }
-        // if CLASS(i, m) is undefined
-        if (ip->cls == state.ud)
-        {
-            ip->cls = state.k;
-            ip->inv->cls = -state.k;
-            Explore( g,i,m,state );
-        }
-        else if (ip->cls == -state.k)
-        {
-            ip->cls = state.k;
-            state.flag = true;
-            Explore( g,i,m,state );
-        }
-        ++ip;
-    }
-
-    ip = state.cls.Begin( i );
-    jp = state.cls.Begin( j );
-    ie = state.cls.End( i );
-    je = state.cls.End( j );
-    // for each m \in ADJ(v) such that
-    //  [ m \notin ADJ(u) or |cls(u, m)| < k] do
-    while (jp != je)
-    {
-        m = jp->v;
-        while (ip != ie && ip->v < m) ++ip;
-        if (ip != ie)
-            if (ip->v == m && abs( ip->cls ) >= state.k)
-            {
-                ++jp;
-                continue;
-            }
-        // if CLASS(m, j) is undefined
-        if (jp->inv->cls == state.ud)
-        {
-            jp->inv->cls = state.k;
-            jp->cls = -state.k;
-            Explore( g,m,j,state );
-        } 
-        else if (jp->inv->cls == -state.k)
-        {
-            jp->inv->cls = state.k;
-            state.flag = true;
-            Explore( g,m,j,state );
-        }
-        ++jp;
-    }
-}
-
-template< class DefaultStructs > template< class Graph, class VMap, class UVMap >
-    void IsItPar< DefaultStructs >::Comparability::InitState( const Graph &g, CTState< Graph > &state,
-        VMap &vidx, UVMap &idxv )
-{
-    int i = 0, n = g.getVertNo();
-    typename Graph::PVertex v;
-
-    for( v = g.getVert(); v != NULL; v = g.getVertNext( v ) )
-    {
-        if (!isBlackHole( idxv )) idxv[i] = v;
-        vidx[v] = i++;
-    }
-    state.flag = false;
-    state.k = 0;
-
-    state.cls.Init( g,vidx );
-    state.ud = DefaultStructs::template NumberTypeBounds< int >::plusInfty();
-}
-
-template< class DefaultStructs > template< class Graph >
-    bool IsItPar< DefaultStructs >::Comparability::ComparabilityTool( const Graph &g, CTState< Graph > &state )
-{
-    int i,n;
-    typename Graph::PEdge e;
-    typename Graph::PVertex u,v;
-    typename AdjStruct< Graph >::Ptr ip,ie;
-    std::pair< typename Graph::PVertex,typename Graph::PVertex > p;
-
-    n = g.getVertNo();
-    for( i = 0; i < n; i++ )
-    {
-        ip = state.cls.Begin( i );
-        ie = state.cls.End( i );
-        for( ; ip != ie; ++ip )
-        {
-            if (ip->cls != state.ud) continue;
-            state.k++;
-            ip->cls = state.k;
-            ip->inv->cls = -state.k;
-            Explore< Graph >( g,i,ip->v,state );
-        }
-    }
-    return !state.flag;
-}
-
-template< class DefaultStructs > template< class Graph >
-    int IsItPar< DefaultStructs >::Comparability::Height( CTState< Graph > &state, int *height, int i)
-{
-    int h, m = 0;
-    typename AdjStruct< Graph >::Ptr ip,ie;
-    if (height[i] != 0) return height[i];
-    ip = state.cls.Begin( i );
-    ie = state.cls.End( i );
-    for( ; ip != ie; ++ip)
-    {
-        if (ip->cls < 0) continue;
-        h = height[ip->v];
-        if (h == 0) h = Height( state,height,ip->v );
-        if (h > m) m = h;
-    }
-    height[i] = m + 1;
-    return m + 1;
-}
-
-template< class DefaultStructs > template< class Graph, class VMap, class OutIter >
-    void IsItPar< DefaultStructs >::Comparability::GetClique( CTState< Graph > &state, int *height, int i,
-        VMap &idxv, OutIter &out )
-{
-    int h;
-    typename AdjStruct< Graph >::Ptr ip,ie;
-    h = height[i] - 1;
-    *out = idxv[i];
-    out++;
-    while (h > 0)
-    {
-        ip = state.cls.Begin( i );
-        ie = state.cls.End( i );
-        for( ; ip != ie; ++ip )
-        {
-            if (ip->cls < 0) continue;
-            if (height[ip->v] == h)
-            {
-                i = ip->v;
-                *out = idxv[i];
-                ++out;
-                h--;
-                break;
-            }
-        }
-    }
-}
 
 template< class DefaultStructs > template< class Graph, class DirMap, class OutMap, class OutIter >
-    int IsItPar< DefaultStructs >::Comparability::explore( const Graph &g, DirMap &dirmap, OutMap &aheightmap,
+    int IsItPar< DefaultStructs >::Comparability::explore( const Graph &g, DirMap &adirmap, OutMap &aheightmap,
         OutIter cliqueiter)
 {
     if (!undir( g,false )) return -1;
-    int b,i,m,h,n = g.getVertNo();
+    int b,i,m=g.getEdgeNo(),h,n = g.getVertNo();
     if (n == 1)
     {   if (!isBlackHole( aheightmap )) aheightmap[g.getVert()] = 0;
         *cliqueiter = g.getVert();
@@ -902,58 +696,105 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
         return 1;
     }
 
-    if (DefaultStructs::ReserveOutAssocCont) dirmap.reserve( g.getEdgeNo() );
+    typename DefaultStructs::template TwoDimAssocCont< typename Graph::PVertex,bool,AMatrTriangle >::Type
+        adjmatr( n );
+    g.getAdj(adjmatr,EdUndir);
 
-    typename Graph::PVertex LOCALARRAY( idxv,n );
-    Privates::BlockListAllocator< Privates::ListNode< typename AdjStruct< Graph >::Node > > pula( 2 * g.getEdgeNo() );    // TODO: size?
-    Privates::List< typename AdjStruct< Graph >::Node,
-        Privates::BlockListAllocator< Privates::ListNode< typename AdjStruct< Graph >::Node> > > LOCALARRAY( statebuf,n );
+    int mm=0;
+    for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v)) mm+=g.deg(v)*(g.deg(v)-1);
+    std::pair<typename Graph::PEdge,EdgeDirection> LOCALARRAY( buf,mm + 3 );    //TODO: size?
+    QueueInterface< std::pair<typename Graph::PEdge,EdgeDirection> * > cont( buf,mm+ 3 );   //TODO: size?
+    typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EDir >::Type visited(m);
 
-    for( i = 0; i < n; i++ ) statebuf[i].init( pula );
-    CTState< Graph > state( n,statebuf );
+    int comp=1;
+    for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+    for(EdgeDirection dir=EdDirIn;dir<=EdDirOut;dir*=2) if (!visited[e](dir))
+    {   visited[e](dir)=comp;
+        cont.push(std::make_pair(e,dir));
 
-    typename DefaultStructs::template AssocCont< typename Graph::PVertex,int >::Type vidx( g.getVertNo() );
+        while (!cont.empty())
+        {   typename Graph::PEdge f = cont.top().first;
+            EdgeDirection fdir=cont.top().second;
+            typename Graph::PVertex a= (fdir==EdDirOut) ? g.getEdgeEnd1(f) : g.getEdgeEnd2(f);
+            typename Graph::PVertex b= g.getEdgeEnd(f,a);
+            cont.pop();
 
-    InitState( g,state,vidx,idxv);
-
-    if (!ComparabilityTool( g,state )) return -1;
-    int LOCALARRAY( height,n );
-    typename AdjStruct< Graph >::Ptr ip,ie;
-
-    for( i = 0; i < n; i++ ) height[i] = 0;
-    for( m = 0, i = 0; i < n; i++ )
-    {
-        h = Height( state,height,i );
-        if (h > m)
-        { 
-            m = h; 
-            b = i; 
+            for(typename Graph::PEdge f2=g.getEdge(a,EdUndir);f2;f2=g.getEdgeNext(a,f2,EdUndir) )
+            if (f2!=f && ! adjmatr(b,g.getEdgeEnd(f2,a)))
+            {
+                EdgeDirection f2dir=(a==g.getEdgeEnd1(f2)) ? EdDirOut : EdDirIn;
+                if (visited[f2](f2dir)) continue;
+                visited[f2](f2dir)=comp;
+                cont.push(std::make_pair(f2,f2dir));
+            }
+            for(typename Graph::PEdge f2=g.getEdge(b,EdUndir);f2;f2=g.getEdgeNext(b,f2,EdUndir) )
+            if (f2!=f && ! adjmatr(a,g.getEdgeEnd(f2,b)))
+            {
+                EdgeDirection f2dir=(b==g.getEdgeEnd2(f2)) ? EdDirOut : EdDirIn;
+                if (visited[f2](f2dir)) continue;
+                visited[f2](f2dir)=comp;
+                cont.push(std::make_pair(f2,f2dir));
+            }
         }
+        comp++;
+    }
+    for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+    {   assert(visited[e](EdDirIn) && visited[e](EdDirOut));
+         if (visited[e](EdDirIn)==visited[e](EdDirOut)) return -1;
     }
 
-    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,int >::Type localheightmap;
-    typename BlackHoleSwitch< OutMap,typename DefaultStructs::template AssocCont< typename Graph::PVertex,int >::Type
-        >::Type &heightmap = BlackHoleSwitch< OutMap,typename DefaultStructs:: template AssocCont<
-        typename Graph::PVertex,int >::Type >::get( aheightmap,localheightmap );
-    if (isBlackHole( aheightmap ) || DefaultStructs::ReserveOutAssocCont) heightmap.reserve( n );
+    typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EdgeDirection >::Type localdirmap;
+    typename BlackHoleSwitch< DirMap,typename DefaultStructs::template AssocCont< typename Graph::PEdge,EdgeDirection >::Type
+        >::Type &dirmap = BlackHoleSwitch< DirMap,typename DefaultStructs:: template AssocCont<
+        typename Graph::PEdge,EdgeDirection >::Type >::get( adirmap,localdirmap );
+    if (isBlackHole( adirmap ) || DefaultStructs::ReserveOutAssocCont) dirmap.reserve( m );
 
-    for( i = 0; i < n; i++ ) heightmap[idxv[i]] = height[i] - 1;
+    bool LOCALARRAY(compflag,comp+1);
+    for(int i=0;i<=comp;i++) compflag[i]=true;
 
-    if (!isBlackHole( dirmap ))
-        for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-        {   
-            // TODO: w finalnej wersji usunac assert
-            assert( heightmap[g.getEdgeEnd1( e )] != heightmap[g.getEdgeEnd2( e )] );
-            if (heightmap[g.getEdgeEnd1( e )] < heightmap[g.getEdgeEnd2( e )]) dirmap[e] = EdDirIn;
-            else dirmap[e] = EdDirOut;
-        }
-    if (!isBlackHole( cliqueiter )) GetClique( state,height,b,idxv,cliqueiter );
-    return m;
+    for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+    for(EdgeDirection dir=EdDirIn;dir<=EdDirOut;dir*=2) if (compflag[visited[e](dir)])
+    {   dirmap[e]=dir;
+        (compflag[visited[e]((dir==EdDirIn) ? EdDirOut : EdDirIn)])=false;
+    }
+
+    typedef typename DefaultStructs::template LocalGraph< typename Graph::PVertex,
+        typename Graph::PEdge ,Directed,false >::Type Image;
+
+    Image ig;
+    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,typename Image::PVertex >
+        ::Type org2image(n);
+    for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v)) org2image[v]=ig.addVert(v);
+    for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+        if (dirmap[e]==EdDirOut) ig.addArch(org2image[g.getEdgeEnd1(e)],org2image[g.getEdgeEnd2(e)],e);
+        else ig.addArch(org2image[g.getEdgeEnd2(e)],org2image[g.getEdgeEnd1(e)],e);
+
+    //assert(DAGAlgsPar<DefaultStructs>::isDAG(ig));
+
+    typename DefaultStructs:: template AssocCont< typename Image::PVertex, typename DAGCritPathPar<DefaultStructs>:: template VertLabs<int,Image> >
+        ::Type vertCont(n);
+    typename DAGCritPathPar<DefaultStructs>:: template UnitLengthEdges<int> edgeCont;
+    DAGCritPathPar<DefaultStructs>:: template critPathLength(ig,vertCont,edgeCont,(typename Image::PVertex)0,(typename Image::PVertex)0);
+    int res= -1;
+    typename Image::PVertex vmax=0;
+    for(typename Image::PVertex v=ig.getVert();v;v=ig.getVertNext(v))
+    {
+        if (res<vertCont[v].distance) { res=vertCont[v].distance; vmax=v; }
+        if (!isBlackHole(aheightmap)) aheightmap[v->info]=vertCont[v].distance;
+    }
+
+    if (!isBlackHole(cliqueiter))
+    {
+        typename Image::PVertex LOCALARRAY(clique,n);
+        DAGCritPathPar<DefaultStructs>:: template getPath(ig,vertCont,vmax,DAGCritPathPar<DefaultStructs>::template outPath(clique,blackHole));
+        for(int i=0;i<=res;i++) { *cliqueiter=clique[i]->info; ++cliqueiter; }
+    }
+    return res+1;
 }
 
 template< class DefaultStructs > template< class Graph >
     bool IsItPar< DefaultStructs >::Comparability::getDirs( Graph &g )
-{   
+{
     int m = g.getEdgeNo();
     typename Graph::PEdge LOCALARRAY( tab,m );
     typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EdgeDirection >::Type dir( m );
@@ -966,7 +807,7 @@ template< class DefaultStructs > template< class Graph >
 
 template< class DefaultStructs > template< class GraphType, class VIterOut >
     int IsItPar< DefaultStructs >::Comparability::maxStable( const GraphType &g, VIterOut out )
-{   
+{
     typedef typename DefaultStructs::template LocalGraph< char,typename GraphType::PVertex,Directed,false >::Type
         ImageGraph;
     int n = g.getVertNo(), m = g.getEdgeNo();
@@ -979,7 +820,7 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
         typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int > >::Type edgecont( 3 * n + m );
     typename ImageGraph::PVertex start = cg.addVert(), end = cg.addVert();
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
-    {   
+    {
         typename ImageGraph::PVertex x = cg.addVert();
         typename ImageGraph::PVertex y = cg.addVert();
         vertcont[x] = vertcont[y] = typename FlowPar< FlowDefaultStructs >::template TrsVertLoss< int >();
@@ -991,10 +832,10 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
     }
     getDirs( g,dirs );
     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-    {   
+    {
         typename GraphType::PVertex u,v;
         if (dirs[e] == EdDirOut)
-        { 
+        {
             u = g.getEdgeEnd1( e );
             v = g.getEdgeEnd2( e );
         }
@@ -1008,7 +849,7 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
     }
     int a = 0, b = n, c;
     while (b - a > 1)
-    {   
+    {
         c = (a + b) / 2;
         vertcont[end] = typename FlowPar< FlowDefaultStructs >::template TrsVertLoss< int >( 0,c );
         vertcont[start] = typename FlowPar< FlowDefaultStructs >::template TrsVertLoss< int >( -c,0 );
@@ -1023,18 +864,18 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
         {
             edgecont[mapa[u]] = typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int >( 0,0 );
             if (FlowPar< FlowDefaultStructs >::transship( cg,edgecont,vertcont ))
-            { 
-                *out = u; 
+            {
+                *out = u;
                 ++out;
                 edgecont[mapa[u]] = typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int >( 1,1 );
-            } 
+            }
         }
     return b;
 }
 
 template< class DefaultStructs > template< class GraphType, class Iter >
     int IsItPar< DefaultStructs >::Comparability::minVertCover( const GraphType &g, Iter out )
-{   
+{
     Set< typename GraphType::PVertex > res;
     maxStable( g,setInserter( res ) );
     res = g.getVertSet() - res;
@@ -1059,24 +900,24 @@ template< class DefaultStructs > template< class GraphType >
 template< class DefaultStructs > template< class GraphType, class Iter, class IterOut, class VInfoGen, class EInfoGen >
     typename GraphType::PVertex IsItPar< DefaultStructs >::Interval::segs2graph( GraphType &g, Iter begin,
         Iter end, IterOut out, VInfoGen vinfo, EInfoGen einfo )
-{   
+{
     typename GraphType::PVertex res = 0,tmp;
     int licz = 0, i = 0, j = 0;
     Iter it;
     for( it = begin; it != end; ++it )
-    {   
+    {
         koalaAssert( (*it).left <= (*it).right,AlgExcWrongArg );
         licz++;
     }
     if (!licz) return 0;
     typename GraphType::PVertex LOCALARRAY( tabv,licz );
     for( it = begin; it != end; ++it )
-    {   
+    {
         tmp = tabv[i++] = g.addVert( vinfo( i ) );
         if (!res) res = tmp;
     }
     for( i = 0, it = begin; it != end; ++it,++i )
-    {   
+    {
         Iter it2 = it;
         it2++;
         j = i + 1;
@@ -1084,7 +925,7 @@ template< class DefaultStructs > template< class GraphType, class Iter, class It
             if (touch( *it,*it2 )) g.addEdge( tabv[i],tabv[j],einfo( i,j ),EdUndir );
     }
     for( i = 0; i < licz; i++ )
-    { 
+    {
         *out = tabv[i];
         ++out;
     }
@@ -1094,7 +935,7 @@ template< class DefaultStructs > template< class GraphType, class Iter, class It
 template< class DefaultStructs > template< class GraphType, class Iter, class IterOut >
     typename GraphType::PVertex IsItPar< DefaultStructs >::Interval::segs2graph( GraphType &g, Iter begin,
         Iter end, IterOut out )
-{  
+{
     return segs2graph( g,begin,end,out,ConstFunctor< typename GraphType::VertInfoType >(),
         ConstFunctor< typename GraphType::EdgeInfoType >() );
 }
@@ -1120,7 +961,7 @@ template< class DefaultStructs > template< class GraphType, class IntMap >
     std::pair< typename Sets::Entry,typename Sets::Entry::iterator > LOCALARRAY( Abuf,n );
     std::pair< typename Sets::Entry,typename Sets::Entry::iterator > LOCALARRAY( Bbuf,n );
     for( i = 0; i < n; i++ )
-    { 
+    {
         Abuf[i].first.init( allocat3 );
         Bbuf[i].first.init( allocat3 );
     }
@@ -1413,7 +1254,7 @@ template< class DefaultStructs > template< class GraphType, class Map >
         typename GraphType::PVertex *order )
 {
     typename GraphType::PVertex v;
-    for( v = g.getVert(); v != NULL; v = g.getVertNext( v ) ) 
+    for( v = g.getVert(); v != NULL; v = g.getVertNext( v ) )
         if(!UmbrellaTestVertex( g,v,data,order )) return false;
     return true;
 }
@@ -1432,9 +1273,9 @@ template< class DefaultStructs > template< class T >
     }
 }
 
-template< class DefaultStructs > template< class GraphType > 
+template< class DefaultStructs > template< class GraphType >
     bool IsItPar< DefaultStructs >::prime( const GraphType &g )
-{   
+{
     if (!undir( g,false )) return false;
     int n = g.getVertNo();
     if (n < 4) return false;
@@ -1445,12 +1286,12 @@ template< class DefaultStructs > template< class GraphType >
 
 template< class DefaultStructs > template< class GraphType, class VIterOut >
     int IsItPar< DefaultStructs >::Cograph::maxClique( const GraphType &g, VIterOut out )
-{   
+{
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type subset( g.getVertNo() );
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) subset[u];
     Set< typename GraphType::PVertex > res = maxClique2( g,subset );
     for( typename GraphType::PVertex u = res.first(); u; u = res.next( u ) )
-    { 
+    {
         *out = u;
         ++out;
     }
@@ -1459,12 +1300,12 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
 
 template< class DefaultStructs > template< class GraphType, class VIterOut >
     int IsItPar< DefaultStructs >::Cograph::maxStable( const GraphType &g, VIterOut out )
-{   
+{
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type subset( g.getVertNo() );
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) subset[u];
     Set< typename GraphType::PVertex > res = maxStable2( g,subset );
     for( typename GraphType::PVertex u = res.first(); u; u = res.next( u ) )
-    { 
+    {
         *out = u;
         ++out;
     }
@@ -1473,7 +1314,7 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
 
 template< class DefaultStructs > template< class GraphType, class Iter >
     int IsItPar< DefaultStructs >::Cograph::minVertCover( const GraphType &g, Iter out )
-{   
+{
     Set< typename GraphType::PVertex > res;
     maxStable( g,setInserter( res ) );
     res = g.getVertSet() - res;
@@ -1483,7 +1324,7 @@ template< class DefaultStructs > template< class GraphType, class Iter >
 
 template< class DefaultStructs > template< class GraphType, class Assoc >
     bool IsItPar< DefaultStructs >::Cograph::cograph( const GraphType &ag, Assoc &subset )
-{   
+{
     Subgraph< GraphType,AssocHasChooser< Assoc * >,BoolChooser >
         g = makeSubgraph( ag,std::make_pair( extAssocKeyChoose( &subset ),stdChoose( true ) ) );
     int n;
@@ -1494,7 +1335,7 @@ template< class DefaultStructs > template< class GraphType, class Assoc >
         ModulesPar< DefaultStructs >::split( g,compStore( tabc,tabv ),blackHole,true );
     if (parts.type == mpPrime) return false;
     for( int i = 0; i < parts.size; i++ )
-    {   
+    {
         subset.clear();
         for( int j = tabc[i]; j <tabc[i + 1]; j++ ) subset[tabv[j]];
         if (!cograph( ag,subset )) return false;
@@ -1505,7 +1346,7 @@ template< class DefaultStructs > template< class GraphType, class Assoc >
 template< class DefaultStructs > template< class GraphType, class Assoc >
     Set< typename GraphType::PVertex > IsItPar< DefaultStructs >::Cograph::maxClique2( const GraphType &ag,
         Assoc &subset )
-{   
+{
     Subgraph< GraphType,AssocHasChooser< Assoc * >,BoolChooser >
         g = makeSubgraph( ag,std::make_pair( extAssocKeyChoose( &subset ),stdChoose( true ) ) );
     int n;
@@ -1517,7 +1358,7 @@ template< class DefaultStructs > template< class GraphType, class Assoc >
         ModulesPar< DefaultStructs >::split( g,compStore( tabc,tabv ),blackHole,true );
     koalaAssert( parts.type != mpPrime,AlgExcWrongArg );
     for( int i = 0; i < parts.size; i++ )
-    {   
+    {
         subset.clear();
         for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
         tmp = maxClique2( ag,subset );
@@ -1530,7 +1371,7 @@ template< class DefaultStructs > template< class GraphType, class Assoc >
 template< class DefaultStructs > template< class GraphType, class Assoc >
     Set< typename GraphType::PVertex > IsItPar< DefaultStructs >::Cograph::maxStable2( const GraphType &ag,
         Assoc &subset )
-{   
+{
     Subgraph< GraphType,AssocHasChooser< Assoc * >,BoolChooser >
         g = makeSubgraph( ag,std::make_pair( extAssocKeyChoose( &subset ),stdChoose( true ) ) );
     int n;
@@ -1538,11 +1379,11 @@ template< class DefaultStructs > template< class GraphType, class Assoc >
     Set< typename GraphType::PVertex > res,tmp;
     typename GraphType::PVertex LOCALARRAY( tabv,n );
     int LOCALARRAY( tabc,n + 1 );
-    typename ModulesPar< DefaultStructs >::Partition parts = 
+    typename ModulesPar< DefaultStructs >::Partition parts =
         ModulesPar< DefaultStructs >::split( g,compStore( tabc,tabv ),blackHole,true );
     koalaAssert( parts.type != mpPrime,AlgExcWrongArg );
     for( int i = 0; i < parts.size; i++ )
-    {   
+    {
         subset.clear();
         for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
         tmp = maxStable2( ag,subset );
@@ -1554,7 +1395,7 @@ template< class DefaultStructs > template< class GraphType, class Assoc >
 
 template< class DefaultStructs > template< class GraphType >
     bool IsItPar< DefaultStructs >::cograph( const GraphType &g )
-{   
+{
     if (!undir( g,false )) return false;
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type subset( g.getVertNo() );
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) subset[u];
