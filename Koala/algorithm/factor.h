@@ -14,26 +14,30 @@ namespace Koala
       public:
         template< class GraphType > struct VertLabs
         {
-            //wierzcholek skojarzany
-            typename GraphType::PVertex vMatch; 
-            //i krawedz skojarzenia
-            typename GraphType::PEdge eMatch;   
-            // parametry do uzytku wewnetrznego algorytmu
-            //cecha T (VertLabs[Vi].T=Vj oznacza, ze istnieje parzysta droga naprzemienna z wierzcholka wolnego Vr do Vi, gdzie poprzednikiem Vi jest Vj)
-            typename GraphType::PVertex vLabT[2]; 
-            //cecha S (VertLabs[Vi].S=Vj -||- nieparzysta droga -||-)
-            typename GraphType::PVertex vLabS;    
-            //cecha b (VertLabs[Vi].b=Vj oznacza, ze najbardziej zewnetrzny kielich, do ktorego nalezy wierzcholek Vi jest reprezentowany przez wierzcholek Vj, ktory jest podstawa tego kielicha)
-            typename GraphType::PVertex vLabB;    
-            //jezeli S niezbadana true, jezeli nie ma S lub S zbadana false (moze powinnam to trzymac na liscie cech?)
-            bool bS; 
-            //jezeli T niezbadana true, jezeli nie ma T lub T zbadana false (moze to powinnam trzymac na liscie cech?)
-            bool bT; 
-            
-            VertLabs(): vMatch( 0 ), eMatch( 0 ), vLabS( 0 ), vLabB( 0 ), bS( false ), bT( false )
-                { vLabT[0] = vLabT[1] = 0; }
+                friend class MatchingPar<DefaultStructs>;
+                //wierzcholek skojarzany
+                typename GraphType::PVertex vMatch;
+                //i krawedz skojarzenia
+                typename GraphType::PEdge eMatch;
+
+                VertLabs(): vMatch( 0 ), eMatch( 0 ), vLabS( 0 ), vLabB( 0 ), bS( false ), bT( false )
+                    { vLabT[0] = vLabT[1] = 0; }
+
+            protected:
+                // parametry do uzytku wewnetrznego algorytmu
+                //cecha T (VertLabs[Vi].T=Vj oznacza, ze istnieje parzysta droga naprzemienna z wierzcholka wolnego Vr do Vi, gdzie poprzednikiem Vi jest Vj)
+                typename GraphType::PVertex vLabT[2];
+                //cecha S (VertLabs[Vi].S=Vj -||- nieparzysta droga -||-)
+                typename GraphType::PVertex vLabS;
+                //cecha b (VertLabs[Vi].b=Vj oznacza, ze najbardziej zewnetrzny kielich, do ktorego nalezy wierzcholek Vi jest reprezentowany przez wierzcholek Vj, ktory jest podstawa tego kielicha)
+                typename GraphType::PVertex vLabB;
+                //jezeli S niezbadana true, jezeli nie ma S lub S zbadana false (moze powinnam to trzymac na liscie cech?)
+                bool bS;
+                //jezeli T niezbadana true, jezeli nie ma T lub T zbadana false (moze to powinnam trzymac na liscie cech?)
+                bool bT;
+
         };
-        
+
       protected:
         //procedura wypelnia vertTabNeights - kazdemu wierzcholkowi przybisuje zbior jego sasiadow
         template< class GraphType, class AssocTab >
@@ -82,7 +86,7 @@ namespace Koala
         //iterator wyjsciowy, na ktory wyrzucamy krawedzie matchingu
         //Do ilu krawedzi wlacznie szukac. Tj. ilo-krawedziowy matching znalezc lub najwiekszy, gdy jest mniejszy od tego parametru. Gdy matchSize=-1 to znajdz najwiekszy.
         template< class GraphType, class VertContainer, class EIterOut > static int findMax( const GraphType &g,
-            VertContainer &avertTab, EIterOut edgeIterOut, int matchSize = -1 ); 
+            VertContainer &avertTab, EIterOut edgeIterOut, int matchSize = -1 );
         // wlasciwa procedura - szuka skojarzenia o zadanym rozmiarze matchSize, zaczynajac od podanego skojarzenia poczatkowego, zwraca znaleziony rozmiar skojarzenia
         // vertIterInBegin iterator wejsciowy, zawiera poczatek strumienia z wierzcholkami tworzacymi poczatkowy matching
         // edgeIterOut iterator wyjsciowy, na ktory wyrzucamy krawedzie matchingu
@@ -107,7 +111,7 @@ namespace Koala
     };
 
     /* Matching
-     * 
+     *
      */
     class Matching: public MatchingPar< AlgsDefaultSettings > { };
 
@@ -122,19 +126,22 @@ namespace Koala
             mutable typename Graph::PVertex v;
             mutable Cmp comp;
 
-            SortCmp( typename Graph::PVertex av, Cmp acmp ): v( av ), comp( acmp ) { }
-            template< class T > bool operator()( T e,T f ) const { return !comp( v,e,f ); }
+            SortCmp( typename Graph::PVertex av, Cmp acmp ): v( av ), comp( acmp )
+                { }
+            template< class T > bool operator()( T e,T f ) const
+                { return !comp( v,e,f ); }
         };
-        
+
       public:
         template< class GraphType > struct VertLabs
         {
             //wierzcholek skojarzany lub 0 w razie braku
             typename GraphType::PVertex vMatch;
             // i krawedz skojarzenia
-            typename GraphType::PEdge eMatch;  
+            typename GraphType::PEdge eMatch;
 
-            VertLabs( typename GraphType::PVertex v = 0, typename GraphType::PEdge e = 0 ): vMatch( v ), eMatch( e ) { }
+            VertLabs( typename GraphType::PVertex v = 0, typename GraphType::PEdge e = 0 ): vMatch( v ), eMatch( e )
+                { }
         };
 
         // wlasciwa procedura - testuje czy podane na wejsciu krawedzie tworza skojarzenie stabilne
@@ -149,7 +156,7 @@ namespace Koala
     };
 
     /* StableMatching
-     * 
+     *
      */
     class StableMatching: public StableMatchingPar< AlgsDefaultSettings > { };
 

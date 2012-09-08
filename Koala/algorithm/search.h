@@ -40,7 +40,7 @@ namespace Koala
           private:
             std::vector< typename Graph::PVertex > verts;
             std::vector< typename Graph::PEdge > edges;
-            
+
           public:
             typedef typename Graph::PVertex PVertex;
             typedef typename Graph::PEdge PEdge;
@@ -64,7 +64,7 @@ namespace Koala
     };
 
     /* ShortPathStructs
-     * 
+     *
      */
     struct ShortPathStructs: public PathStructs
     {
@@ -76,7 +76,7 @@ namespace Koala
         // sciezka prowadzi "pod prad" tj. od korzenia do tego wierzcholka
         // ew. wczesniejszy punkt koncowy na sciezce miedzy end a korzeniem
         template< class GraphType, class VertContainer, class VIter, class EIter >
-            static int getOutPath( const GraphType &g, const VertContainer &vertTab, OutPath< VIter,EIter > iters, 
+            static int getOutPath( const GraphType &g, const VertContainer &vertTab, OutPath< VIter,EIter > iters,
             typename GraphType::PVertex end, typename GraphType::PVertex start = 0 );
 
         // Zapisuje na podany iterator wszystkie krawedzie nalezace do drzewa (lasu) tj. uzyte jako wartosci pol ePrev
@@ -90,7 +90,7 @@ namespace Koala
 
 
     /* SearchStructs
-     * 
+     *
      */
     class SearchStructs
     {
@@ -99,16 +99,17 @@ namespace Koala
         template< class GraphType > struct VisitVertLabs
         {
             // rodzic danego wierzcholka w drzewie (lesie), NULL dla korzenia
-            typename GraphType::PVertex vPrev; 
+            typename GraphType::PVertex vPrev;
             // krawedz prowadzaca do rodzica
-            typename GraphType::PEdge ePrev; 
+            typename GraphType::PEdge ePrev;
 
             // odleglosc od korzenia (liczba krawedzi) i numer skladowej spojnosci (od 0)
             int distance,component;
 
             VisitVertLabs( typename GraphType::PVertex vp = 0, typename GraphType::PEdge ep = 0,
                 int dist = std::numeric_limits< int >::max(), int comp = -1 ):
-                    vPrev( vp ), ePrev( ep ), distance( dist ), component( comp ) { }
+                    vPrev( vp ), ePrev( ep ), distance( dist ), component( comp )
+                { }
         };
 
         //        Para iteratorow wyjsciowych do kodowania ciagu ciagow (zazwyczaj wierzcholki/kraw)
@@ -121,7 +122,8 @@ namespace Koala
             CIter compIter;
             VIter vertIter;
 
-            CompStore( CIter ac, VIter av ): vertIter( av ), compIter( ac ) { }
+            CompStore( CIter ac, VIter av ): vertIter( av ), compIter( ac )
+                { }
         } ;
 
         // Funkcja tworzaca, analogia make_pair
@@ -138,7 +140,7 @@ namespace Koala
         // zwraca ilosc elementow wystepujacych w ciagach (kazdy jeden raz) tj. dlugosc sekwencji poslanej na eout
         // uwaga: przy wywolaniach nie dedukuje typu elementow ciagow T (tzreba podac jawnie)
         template< class T, class InputIter, class VertInputIter, class CIter, class IntIter, class ElemIter >
-            static int revCompStore( InputIter begin, VertInputIter sbegin, int size, CompStore< CIter,IntIter > out, 
+            static int revCompStore( InputIter begin, VertInputIter sbegin, int size, CompStore< CIter,IntIter > out,
                 ElemIter eout );
         // j.w., ale zakladamy, ze elementy ciagow (a wiec sbegin) sa przechowywane w tablicy, ktorej wskaznik
         // poczatku dostarczamy do procedury (wowczas typ T jest dedukowany).
@@ -155,13 +157,14 @@ namespace Koala
           private:
             std::vector< int > idx;
             std::vector< T > data;
-            
+
           public:
             typedef T ValueType;
             typedef std::back_insert_iterator< std::vector< int > > CIterType;
             typedef std::back_insert_iterator< std::vector< T > > VIterType;
 
-            CompStoreTool() { clear(); }
+            CompStoreTool()
+                { clear(); }
             void clear();
              // liczba zebranych ciagow
             int size() const;
@@ -170,15 +173,15 @@ namespace Koala
              // laczna dlugosc wszystkich ciagow
             int lenght() const;
             // wskaznik poczatku i-tego ciagu
-            T *operator[]( int i ); 
+            T *operator[]( int i );
             // wskaznik poczatku i-tego ciagu
             const T *operator[]( int i ) const;
             // umieszcza nowy ciag pusty na pozycji i. Zwraca wskaznik jego poczatku
-            T *insert( int i ); 
+            T *insert( int i );
             // kasuje ciag na pozycji i
-            void del( int i ); 
+            void del( int i );
             // zmienia dlugosc i-tego ciagu. Zwraca wskaznik jego poczatku
-            T *resize( int i, int asize ); 
+            T *resize( int i, int asize );
             //Umiesczamy wywolanie funkcji w miejsu compStore a pozniej przetwarzamy zebrane ciagi
             // czysci kontener
             CompStore< std::back_insert_iterator< std::vector< int > >,std::back_insert_iterator< std::vector< T > > >
@@ -301,7 +304,7 @@ namespace Koala
             { return v.visitEdgePre( g,e,u ); }
 
         template< class GraphType, class Visitor > static bool visitEdgePre( const GraphType &g, Visitor &v,
-            typename GraphType::PEdge e, typename GraphType::PVertex u, simple_visitor_tag &s ) 
+            typename GraphType::PEdge e, typename GraphType::PVertex u, simple_visitor_tag &s )
             { return true; }
 
         template< class GraphType, class Visitor > static bool visitEdgePre( const GraphType &g, Visitor &v,
@@ -317,29 +320,38 @@ namespace Koala
             { return true; }
 
         template< class GraphType, class Visitor > static bool visitEdgePost( const GraphType &g, Visitor &v,
-            typename GraphType::PEdge e, typename GraphType::PVertex u, ... ) { return true; }
+            typename GraphType::PEdge e, typename GraphType::PVertex u, ... )
+            { return true; }
 
         template< class GraphType, class Visitor > static bool beginComponent( const GraphType &g, Visitor &v,
-            unsigned comp, component_visitor_tag &c ) { return v.beginComponent( g,comp ); }
+            unsigned comp, component_visitor_tag &c )
+            { return v.beginComponent( g,comp ); }
 
         template< class GraphType, class Visitor > static bool beginComponent( const GraphType &g, Visitor &v,
-            unsigned comp, no_component_visitor_tag &c ) { return true; }
+            unsigned comp, no_component_visitor_tag &c )
+            { return true; }
 
         template< class GraphType, class Visitor > static bool beginComponent( const GraphType &g, Visitor &v,
-            unsigned comp, ... ) { return true; }
+            unsigned comp, ... )
+            { return true; }
 
-        static bool beginComponent( ... ) { return true; }
-
-        template< class GraphType, class Visitor > static bool endComponent( const GraphType &g, Visitor &v,
-            unsigned comp, component_visitor_tag &c ) { return v.endComponent( g,comp ); }
-
-        template< class GraphType, class Visitor > static bool endComponent( const GraphType &g, Visitor &v,
-            unsigned comp, no_component_visitor_tag &c ) { return true; }
+        static bool beginComponent( ... )
+        { return true; }
 
         template< class GraphType, class Visitor > static bool endComponent( const GraphType &g, Visitor &v,
-            unsigned, ... ) { return true; }
+            unsigned comp, component_visitor_tag &c )
+            { return v.endComponent( g,comp ); }
 
-        static bool endComponent( ... ) { return true; }
+        template< class GraphType, class Visitor > static bool endComponent( const GraphType &g, Visitor &v,
+            unsigned comp, no_component_visitor_tag &c )
+            { return true; }
+
+        template< class GraphType, class Visitor > static bool endComponent( const GraphType &g, Visitor &v,
+            unsigned, ... )
+            { return true; }
+
+        static bool endComponent( ... )
+        { return true; }
 
         /*
          * EmptyVisitor
@@ -347,10 +359,12 @@ namespace Koala
         class EmptyVisitor: public simple_postorder_visitor_tag, public no_component_visitor_tag
         {
           public:
-            EmptyVisitor() { }
+            EmptyVisitor()
+                { }
 
             template< class GraphType >  bool operator()( const GraphType &g, typename GraphType::PVertex u,
-                VisitVertLabs< GraphType > &r ) { return true; }
+                VisitVertLabs< GraphType > &r )
+                { return true; }
          };
 
         /*
@@ -360,19 +374,24 @@ namespace Koala
         class EndVertVisitor: public complex_visitor_tag, public no_component_visitor_tag
         {
           public:
-            EndVertVisitor( void *arg ): ptr( arg ) { }
+            EndVertVisitor( void *arg ): ptr( arg )
+                { }
 
             template< class GraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
-                VisitVertLabs< GraphType > &data ) { return true; }
+                VisitVertLabs< GraphType > &data )
+                { return true; }
 
             template< class GraphType > bool visitVertexPost( const GraphType &g, typename GraphType::PVertex u,
-                VisitVertLabs< GraphType > &v ) { return true; }
+                VisitVertLabs< GraphType > &v )
+                { return true; }
 
             template< class GraphType > bool visitEdgePre( const GraphType &g, typename GraphType::PEdge e,
-                typename GraphType::PVertex u ) { return (void*)u != ptr; }
+                typename GraphType::PVertex u )
+                { return (void*)u != ptr; }
 
             template< class GraphType > bool visitEdgePost( const GraphType &g, typename GraphType::PEdge e,
-                typename GraphType::PVertex u ) { return !e || (void*)g.getEdgeEnd( e,u ) != ptr; }
+                typename GraphType::PVertex u )
+                { return !e || (void*)g.getEdgeEnd( e,u ) != ptr; }
 
           private:
             void *ptr;
@@ -385,7 +404,8 @@ namespace Koala
             public no_component_visitor_tag
         {
           public:
-            StoreTargetToVertIter( VertIter &i ): m_iter( i ) { }
+            StoreTargetToVertIter( VertIter &i ): m_iter( i )
+            { }
 
             template< class GraphType > bool operator()( const GraphType &, typename GraphType::PVertex,
                 VisitVertLabs< GraphType > & );
@@ -409,7 +429,8 @@ namespace Koala
                 _State( CompStore< CompIter,VertIter > i );
             } State;
 
-            StoreCompVisitor( State &st ): m_st( st ) { }
+            StoreCompVisitor( State &st ): m_st( st )
+            { }
 
             template< class GraphType > bool operator()( const GraphType &, typename GraphType::PVertex,
                 VisitVertLabs< GraphType > & );
@@ -427,19 +448,24 @@ namespace Koala
         template< class Visitor > class ComplexPreorderVisitor: public complex_visitor_tag
         {
           public:
-            ComplexPreorderVisitor( Visitor &v ): visit( v ) { }
+            ComplexPreorderVisitor( Visitor &v ): visit( v )
+            { }
 
             template< class GraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
-                VisitVertLabs< GraphType > &data ) { return visit.operator()( g,u,data ); }
+                VisitVertLabs< GraphType > &data )
+                { return visit.operator()( g,u,data ); }
 
             template< class GraphType > bool visitVertexPost( const GraphType &g, typename GraphType::PVertex u,
-                VisitVertLabs< GraphType > &data ) { return true; }
+                VisitVertLabs< GraphType > &data )
+                { return true; }
 
             template< class GraphType > bool visitEdgePre( const GraphType &g, typename GraphType::PEdge e,
-                typename GraphType::PVertex u ) { return true; }
+                typename GraphType::PVertex u )
+                { return true; }
 
             template< class GraphType > bool visitEdgePost( const GraphType &g, typename GraphType::PEdge e,
-                typename GraphType::PVertex u ) { return true; }
+                typename GraphType::PVertex u )
+                { return true; }
 
           private:
             Visitor &visit;
@@ -451,30 +477,35 @@ namespace Koala
         template< class Visitor > class ComplexPostorderVisitor: public complex_visitor_tag
         {
           public:
-            ComplexPostorderVisitor( Visitor &v ): visit( v ) { }
+            ComplexPostorderVisitor( Visitor &v ): visit( v )
+                { }
 
             template< class GraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
-                VisitVertLabs<GraphType> &data ) { return true; }
+                VisitVertLabs<GraphType> &data )
+                { return true; }
 
             template< class GraphType > bool visitVertexPost( const GraphType &g, typename GraphType::PVertex u,
-                VisitVertLabs< GraphType > &data ) { return visit.operator()( g,u,data ); }
+                VisitVertLabs< GraphType > &data )
+                { return visit.operator()( g,u,data ); }
 
             template< class GraphType > bool visitEdgePre( const GraphType &g, typename GraphType::PEdge e,
-                typename GraphType::PVertex u ) { return true; }
+                typename GraphType::PVertex u )
+                { return true; }
 
             template< class GraphType > bool visitEdgePost( const GraphType &g, typename GraphType::PEdge e,
-                typename GraphType::PVertex u ) { return true; }
+                typename GraphType::PVertex u )
+                { return true; }
 
           private:
             Visitor &visit;
         };
     };
-    
+
     /* GraphSearchBase
      * Ogolna implementacja przeszukiwania grafu roznymi strategiami (DFS, BFS, LexBFS)
      * Strategie dostarcza metoda visitBase z klasy SearchImpl, ktora odwiedza wierzcholki stosownie do swojej klasy
      * DefaultStructs dostarcza wytycznych dla wewnetrznych procedur por. np. AlgsDefaultSettings z def_struct.h
-     * 
+     *
      */
     template< class SearchImpl, class DefaultStructs > class GraphSearchBase: public ShortPathStructs, public SearchStructs
     {
@@ -483,13 +514,13 @@ namespace Koala
         // mapa PVertex -> VisitVertLabs< GraphType >
         template< class GraphType > class VisitedMap: public DefaultStructs:: template AssocCont<
             typename GraphType::PVertex,VisitVertLabs< GraphType > >::Type
-            {   
+            {
               public:
                 // inicjujemy przewidywanym potrzebnym rozmiarem
                 VisitedMap( int asize ): DefaultStructs:: template
                     AssocCont< typename GraphType::PVertex,VisitVertLabs< GraphType > >::Type( asize ) { }
             };
-            
+
       public:
         typedef SearchImpl SearchStrategy;
 
@@ -624,7 +655,8 @@ namespace Koala
         int component;
 
         DFSParamBlock( const GraphType &_g, VertContainer &_v, Visitor &_vis, EdgeDirection _m, int _c ):
-            g( _g ), visited( _v ), visit( _vis ), mask( _m ), component( _c ) { }
+            g( _g ), visited( _v ), visit( _vis ), mask( _m ), component( _c )
+            { }
     };
 
     /*
@@ -634,7 +666,7 @@ namespace Koala
     template< class SearchImpl, class DefaultStructs > class DFSBase: public GraphSearchBase< SearchImpl,DefaultStructs >
     {
       protected:
-        template< class GraphType, class VertContainer, class Visitor > static int dfsDoVisit( 
+        template< class GraphType, class VertContainer, class Visitor > static int dfsDoVisit(
             DFSParamBlock< GraphType,VertContainer,Visitor > &, typename GraphType::PVertex, unsigned );
 
       public:
@@ -795,7 +827,8 @@ namespace Koala
             Privates::List_iterator< LVCNode > block;
 
             LVCNode( typename Graph::PVertex _v = NULL): v( _v ) { }
-            LVCNode( typename Graph::PVertex _v, Privates::List_iterator< LVCNode > it ): v( _v ), block( it ) { }
+            LVCNode( typename Graph::PVertex _v, Privates::List_iterator< LVCNode > it ): v( _v ), block( it )
+                { }
         };
 
         template< class Graph, class Allocator, class ContAllocator > class LexVisitContainer
@@ -806,7 +839,8 @@ namespace Koala
             class Container: public Privates::List< Node,ContAllocator >
             {
               public:
-                Container( ContAllocator &a): Privates::List< Node,ContAllocator >( a ) { }
+                Container( ContAllocator &a): Privates::List< Node,ContAllocator >( a )
+                { }
             };
 
             Container m_data;
@@ -816,9 +850,11 @@ namespace Koala
                 AssocCont< typename Graph::PVertex,Privates::List_iterator< Node > >::Type m_vertexToPos;
 
             LexVisitContainer( Allocator& a, ContAllocator& ca, int n):
-                m_data( ca ), m_splits( a ), m_openBlock(), m_vertexToPos( n ) { }
-                
-            ~LexVisitContainer() { clear(); }
+                m_data( ca ), m_splits( a ), m_openBlock(), m_vertexToPos( n )
+                { }
+
+            ~LexVisitContainer()
+                { clear(); }
 
             void clear();
             void initialize( const Graph &g );
@@ -830,7 +866,8 @@ namespace Koala
             void pop();
             void push( typename Graph::PVertex v );
             void move( typename Graph::PVertex v );
-            void remove( typename Graph::PVertex v ) { m_data.erase( m_vertexToPos[v] ); }
+            void remove( typename Graph::PVertex v )
+                { m_data.erase( m_vertexToPos[v] ); }
             void done();
             void dump();
         };
@@ -839,11 +876,11 @@ namespace Koala
         {
             typename GraphType::PVertex v;
             // kogo jest s¹siadem (numer s¹siada w porz¹dku)
-            int vertId;    
+            int vertId;
             // numer w porz¹dku
-            int orderId;   
+            int orderId;
         };
-        
+
       public:
         /** order vertices with LexBFS order, starting with a given sequence
         * @param[in] g graph
@@ -876,7 +913,7 @@ namespace Koala
 
     // wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
     class LexBFS: public LexBFSPar< AlgsDefaultSettings > { };
-    
+
     /*
      * Cheriyan/Mehlhorn/Gabow algorithm
      * Wyszukiwanie skladowych silnie spojnych grafu skierowanego
@@ -888,8 +925,9 @@ namespace Koala
         {
             int preIdx;
             bool assigned;
-            
-            SCCData( int p = 0, bool a = false ): preIdx( p ), assigned( a ) { }
+
+            SCCData( int p = 0, bool a = false ): preIdx( p ), assigned( a )
+                { }
         };
 
         template< class GraphType, class CompIter, class VertIter, class CompMap > class SCCState
@@ -897,7 +935,8 @@ namespace Koala
           public:
             SCCState( CompStore< CompIter,VertIter > _i, CompMap &cm, typename GraphType::PVertex *buf1,
                 typename GraphType::PVertex *buf2, int n ): vmap( n ), s( buf1,n ), p( buf2,n ), iters( _i ),
-                idx( 0 ), count( 0 ), c( 0 ), compMap( cm ) { }
+                idx( 0 ), count( 0 ), c( 0 ), compMap( cm )
+                    { }
 
             void addVert( typename GraphType::PVertex );
             void newComp();
@@ -1003,10 +1042,12 @@ namespace Koala
             BiConState( CompStore< CompIter,VertIter > _i, EdgeMap &em, EdgeDirection _m,
                 std::pair< typename GraphType::PEdge *,int > st, VertBlockList *_vbl, int vno ):
                 vmap( vno ), emap( st.second - 1 ), estk( st.first,st.second ), iters( _i ), idx( 0 ), count( 0 ),
-                mask( _m ), vbl( _vbl ), vblAlloc( 0 ), outEMap( em ) { }
+                mask( _m ), vbl( _vbl ), vblAlloc( 0 ), outEMap( em )
+                { }
 
             void addVert( typename GraphType::PVertex );
-            void addEdge( typename GraphType::PEdge e ) { if (!isBlackHole( outEMap )) outEMap[e] = count; }
+            void addEdge( typename GraphType::PEdge e )
+                { if (!isBlackHole( outEMap )) outEMap[e] = count; }
 
             void newComp();
 
@@ -1043,13 +1084,14 @@ namespace Koala
 
       public:
         // wynikowa etykieta wierzcholka
-        struct VertData { 
+        struct VertData {
             // w ilu blokach lezy ten wierzcholek
-            int blockNo;    
+            int blockNo;
             // pozycja pierwszego w sekwencji numerow blokow (por. viter nizej) bloku zawierajacego
-            int firstBlock; 
+            int firstBlock;
             // ten wierzcholek (jego pozostale bloki wystepuja kolejno za nim)
-            VertData( int b = 0, int f = -1 ): blockNo( b ), firstBlock( f ) { }
+            VertData( int b = 0, int f = -1 ): blockNo( b ), firstBlock( f )
+                { }
         };
 
         /** split graph into blocks
@@ -1102,7 +1144,8 @@ namespace Koala
             EdgeDirection mask;
 
             EulerState( const GraphType &_g, std::pair< typename GraphType::PVertex,typename GraphType::PEdge > *_stk,
-                int nv, EdgeDirection m ): g( _g ), stk( _stk,nv ), edgeVisited( _g.getEdgeNo() ), mask( m ) { }
+                int nv, EdgeDirection m ): g( _g ), stk( _stk,nv ), edgeVisited( _g.getEdgeNo() ), mask( m )
+                { }
         };
 
         template< class GraphType > static void eulerEngine( typename GraphType::PVertex u,
@@ -1121,13 +1164,15 @@ namespace Koala
         // para zawierajaca 2 rozne wierzcholki - konce nieskierowanej sciezki Eulera - jesli ta istnieje
         // (NULL,NULL) w przciwnym razie
         template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
-            ends( const GraphType &g ) { return ends( g,EdUndir | EdLoop ); }
+            ends( const GraphType &g )
+            { return ends( g,EdUndir | EdLoop ); }
 
         // para zawierajaca 2 razy ten sam wierzcholek - jesli graf ma skierowany cykl Eulera
         // para zawierajaca 2 rozne wierzcholki - konce skierowanej sciezki Eulera - jesli ta istnieje
         // (NULL,NULL) w przciwnym razie
         template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
-            dirEnds( const GraphType &g ) { return ends( g,EdDirOut | EdLoop ); }
+            dirEnds( const GraphType &g )
+            { return ends( g,EdDirOut | EdLoop ); }
 
         /** test if graph has an undirected Eulerian cycle
         * @param[in] g graph
@@ -1148,7 +1193,7 @@ namespace Koala
         * @param[in] g graph
         * @return true if it has, false otherwise */
         template< class GraphType > static bool hasDirPath( const GraphType &g );
-    
+
         /** test if graph has an undirected Eulerian path starting at vertex u
         * @param[in] g graph
         * @param[in] u starting vertex
@@ -1199,7 +1244,7 @@ namespace Koala
         * @return true if graph has an Eulerian cycle, false otherwise */
         template< class GraphType, class VertIter, class EdgeIter > static bool
             getCycle( const GraphType &g, typename GraphType::PVertex prefstart, OutPath< VertIter,EdgeIter> out );
-        
+
         /** get directed Eulerian cycle
         * @param[in] g graph
         * @param[in] prefstart preferred starting vertex, ale jesli cykl E. nie
@@ -1236,42 +1281,33 @@ namespace Koala
 
     // wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
     class Euler: public EulerPar< AlgsDefaultSettings > { };
-    
+
     // Typ najwyzszego wezla drzewa dekompozycji modulowej grafu
     // graf 1-wierzcholkowy
     // graf spojny o niespojnym dopelnieniu
     // graf niespojny
     // strong modules rozpinaja graf pierwszy
-    enum ModPartType { mpTrivial,mpConnected,mpDisconnected,mpPrime };   
+    enum ModPartType { mpTrivial,mpConnected,mpDisconnected,mpPrime };
 
     /* ModulesPar
      * Znajdowanie robicia grafow na maksymalne silne moduly
-     * TODO: nieefektywne, znalezc szybszy algorytm
      */
     template< class DefaultStructs > class ModulesPar: public SearchStructs
     {
       public:
         // opis najwyzszego wezla drzewa dekompozycji modulowej grafu
         struct Partition
-        { 
+        {
             // size ile maksymalnych silnych modulow zawiera graf
-            int size;   
+            int size;
             // j.w.
-            ModPartType type; 
+            ModPartType type;
 
             Partition( int s, ModPartType t ): size( s ), type( t ) { }
         };
 
-      protected:
-        template< class Graph > static int
-            minModule( const Graph &g, typename Graph::PVertex u, typename Graph::PVertex v );
-
-        template< class Graph, class AssocCont > static Set< typename Graph::PVertex >
-            strong( const Graph &g, typename Graph::PVertex u, AssocCont &pomin );
-
-      public:
         // znajduje rozbicie grafu na maksymalne silne moduly
-        // g, badany graf, powinien byc prosty
+        // g, badany graf, powinien byc prosty, nieskierowany
         // out,  iteratory wyjsciowe z zawartoscia analogiczna jak w getComponents
         // tyle ze chodzi o rozbicie na moduly, a nie skladowe spojnosci
         // avmap, wyjsciowa tablica asocjacyjna PVertex->int do ktorej zapisuje sie numery modulow,

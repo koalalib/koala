@@ -13,16 +13,16 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         int matchSize )
 {
     // liczba wierzcholkow w grafie
-    int vertNo = g.getVertNo();        
+    int vertNo = g.getVertNo();
     // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
-    int expo = vertNo;                 
+    int expo = vertNo;
     typename GraphType::PVertex V;
     typename GraphType::PVertex LOCALARRAY( tabV,vertNo );
     for( typename GraphType::PVertex U = g.getVert(); U; U = g.getVertNext( U ) )
     {
         vertTab[U].vLabB = U;
         //jezeli osiagnelismy skojarzenie o zadanym rozmiarze - koniec
-        if (matchSize == (vertNo - expo) / 2) break; 
+        if (matchSize == (vertNo - expo) / 2) break;
         if (vertTab[U].vMatch == 0)
         {
             for (V = vertTabNeights[U].first(); V; V = vertTabNeights[U].next( V ) )
@@ -37,16 +37,16 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         }
     }
     //liczba wolnych wierzcholkow
-    return expo; 
+    return expo;
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EIterIn > int
     MatchingPar< DefaultStructs >::firstMaching( const GraphType &g, VertContainer &vertTab, EIterIn begin, EIterIn end )
 {
     // liczba wierzcholkow w grafie
-    int vertNo = g.getVertNo();        
+    int vertNo = g.getVertNo();
     // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
-    int expo = vertNo;                 
+    int expo = vertNo;
     typename GraphType::PVertex V,U;
     typename GraphType::PEdge E;
     for( EIterIn it = begin; it != end; ++it )
@@ -61,7 +61,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     for( typename GraphType::PVertex U = g.getVert(); U; U = g.getVertNext( U ) )
         vertTab[U].vLabB = U;
     //liczba wolnych wierzcholkow
-    return expo; 
+    return expo;
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer > void
@@ -129,26 +129,26 @@ template< class DefaultStructs > template< class GraphType, class VertContainer 
 {
     typename GraphType::PVertex vCurr = vStart;
 
-    while (vCurr != vStop and vertTab[vCurr].vLabS != vCurr)
+    while (vCurr != vStop && vertTab[vCurr].vLabS != vCurr)
     {
         //dodajemy aktualnie rozpatrywany wierzcholek do tablicy
-        tabPath[iCurr] = vCurr; 
+        tabPath[iCurr] = vCurr;
         iCurr++;
         isS = !isS;
 
         //jezeli sprawdzamy w vCurr ceche S to nst, rozpatrywany bedzie wierzcholek, na ktory wskazuje cecha vCurr.vLabS
         if (!isS) vCurr = vertTab[vCurr].vLabS;
         //sprawdzamy w vCurr ceche T
-        else if (isS)  
+        else if (isS)
         {
             //jezeli cecha T jest pojedyncza to nst, rozpatrywany bedzie wierzecholek, na ktory wskazuje cecha vCurr.vLabT[0]
             if (vertTab[vCurr].vLabT[1] == 0) vCurr = vertTab[vCurr].vLabT[0];
             //jezeli cecha T jest podwojna, trzeba wywolac ponownie funkcje backtracking
-            else  
+            else
             {
                 typename GraphType::PVertex vNewStop = vCurr;
                 //po powrocie z funkcji backtracking bedziemy kontynuowac od wierzcholka, na ktory wskazuje cecha T1
-                vCurr = vertTab[vCurr].vLabT[0]; 
+                vCurr = vertTab[vCurr].vLabT[0];
                 int iFrom = (int)iCurr;
                 backtracking( g,vertTab,tabPath,iCurr,vertTab[vNewStop].vLabT[1],true,vNewStop );
                 int iTo = (int)(iCurr - 1);
@@ -189,9 +189,9 @@ template< class DefaultStructs > template< class GraphType, class VertContainer 
     if (len1 < len2)
     {
         //root
-        vBase = tabPath1[len1 - 1]; 
+        vBase = tabPath1[len1 - 1];
         for( int i = len1 - 1; i > 0; i-- )
-            if (tabPath1[i - 1] != tabPath2[i - 1 + len2 - len1] and tabPath1[i] == tabPath2[i + len2 - len1])
+            if (tabPath1[i - 1] != tabPath2[i - 1 + len2 - len1] && tabPath1[i] == tabPath2[i + len2 - len1])
             {
                 m = len1 - i - 1;
                 vBase = tabPath1[i];
@@ -201,9 +201,9 @@ template< class DefaultStructs > template< class GraphType, class VertContainer 
     else
     {
         //root
-        vBase = tabPath2[len2 - 1]; 
+        vBase = tabPath2[len2 - 1];
         for( int i = len2 - 1; i > 0; i-- )
-            if (tabPath2[i - 1] != tabPath1[i - 1 + len1 - len2] and tabPath2[i] == tabPath1[i + len1 - len2])
+            if (tabPath2[i - 1] != tabPath1[i - 1 + len1 - len2] && tabPath2[i] == tabPath1[i + len1 - len2])
             {
                 m = len2 - i - 1;
                 vBase = tabPath2[i];
@@ -216,13 +216,13 @@ template< class DefaultStructs > template< class GraphType, class VertContainer 
     for( int i = len1 - m - 2; i > 0; i-- )
     {
         //(i nie ma S -> (i,i-1) in M) and i-1 nie ma T
-        if (vertTab[tabPath1[i]].vLabS == 0 and vertTab[tabPath1[i-1]].vLabT[0] == 0)
+        if (vertTab[tabPath1[i]].vLabS == 0 && vertTab[tabPath1[i-1]].vLabT[0] == 0)
             vertTab[tabPath1[i]].vLabS = tabPath1[i - 1];
         //(i nie ma T -> (i,i-1) not in M) and i-1 nie ma S
-        else if (vertTab[tabPath1[i]].vLabT[0] == 0 and vertTab[tabPath1[i - 1]].vLabS == 0) 
+        else if (vertTab[tabPath1[i]].vLabT[0] == 0 && vertTab[tabPath1[i - 1]].vLabS == 0)
             vertTab[tabPath1[i]].vLabT[0] = tabPath1[i - 1];
         //[(i nie ma T -> (i,i-1) not in M) and i-1 ma S] -> i musial byc podstawa w jakims poprzednim kielichow zawierajacych i-1
-        else if (vertTab[tabPath1[i]].vLabT[0] == 0 and vertTab[tabPath1[i - 1]].vLabS != 0) 
+        else if (vertTab[tabPath1[i]].vLabT[0] == 0 && vertTab[tabPath1[i - 1]].vLabS != 0)
         {
             //szukamy ostatniego wierzcholka w ciagu nalezacego do tego samego kielicha co i
             typename GraphType::PVertex vOldBase = vertTab[tabPath1[i]].vLabB;
@@ -244,13 +244,13 @@ template< class DefaultStructs > template< class GraphType, class VertContainer 
     for( int i = len2 - m - 2; i > 0; i-- )
     {
         //(i nie ma S -> (i,i-1) in M) and i-1 nie ma T
-        if (vertTab[tabPath2[i]].vLabS == 0 and vertTab[tabPath2[i - 1]].vLabT[0] == 0) 
+        if (vertTab[tabPath2[i]].vLabS == 0 && vertTab[tabPath2[i - 1]].vLabT[0] == 0)
             vertTab[tabPath2[i]].vLabS = tabPath2[i - 1];
         //(i nie ma T -> (i,i-1) not in M) and i-1 nie ma S
-        else if (vertTab[tabPath2[i]].vLabT[0] == 0 and vertTab[tabPath2[i - 1]].vLabS == 0) 
+        else if (vertTab[tabPath2[i]].vLabT[0] == 0 && vertTab[tabPath2[i - 1]].vLabS == 0)
             vertTab[tabPath2[i]].vLabT[0] = tabPath2[i - 1];
-        //[(i nie ma T -> (i,i-1) not in M) and i-1 ma S] -> i musial byc podstawa w jakims poprzednim kielichow zawierajacych i-1
-        else if (vertTab[tabPath2[i]].vLabT[0] == 0 and vertTab[tabPath2[i - 1]].vLabS != 0) 
+        //[(i nie ma T -> (i,i-1) not in M) && i-1 ma S] -> i musial byc podstawa w jakims poprzednim kielichow zawierajacych i-1
+        else if (vertTab[tabPath2[i]].vLabT[0] == 0 && vertTab[tabPath2[i - 1]].vLabS != 0)
         {
             typename GraphType::PVertex vOldBase = vertTab[tabPath2[i]].vLabB;
             int last;
@@ -307,24 +307,24 @@ template< class DefaultStructs > template< class GraphType, class VertContainer 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class AssocTab > int
     MatchingPar< DefaultStructs >::labeling( const GraphType &g, VertContainer &vertTab, AssocTab &vertTabNeights,
     bool isS, typename GraphType::PVertex vCurr, int expo )
-{   
+{
     int n;
     typename GraphType::PVertex vNext;
     typename GraphType::PVertex LOCALARRAY( tabV,n = g.getVertNo() );
 
     //cecha S
-    if (isS) 
+    if (isS)
     {
         //oznaczamy ceche jako zbadana
-        vertTab[vCurr].bS = true; 
+        vertTab[vCurr].bS = true;
         //przegladamy wszystkie krawedzie incydentne z wierzcholkiem vCurr
         for( vNext = vertTabNeights[vCurr].first(); vNext; vNext = vertTabNeights[vCurr].next( vNext ) )
         {
-            // dla S w vCurr rozwazamy krawedzie E = (vCurr, vNext) nie nalezace do matchingu  oraz maja nalezec do roznych kielichow           
-            if (vertTab[vNext].vMatch != vCurr and vertTab[vNext].vLabB != vertTab[vCurr].vLabB) 
+            // dla S w vCurr rozwazamy krawedzie E = (vCurr, vNext) nie nalezace do matchingu  oraz maja nalezec do roznych kielichow
+            if (vertTab[vNext].vMatch != vCurr && vertTab[vNext].vLabB != vertTab[vCurr].vLabB)
             {
                 //jezeli vNext ma ceche S
-                if (vertTab[vNext].vLabS != 0) 
+                if (vertTab[vNext].vLabS != 0)
                 {
                     typename GraphType::PVertex LOCALARRAY( tabPathCurr,n );
                     typename GraphType::PVertex LOCALARRAY( tabPathNext,n );
@@ -332,7 +332,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
                     int  iLenCurr = 0, iLenNext = 0;
                     //korzenie rozne - znalezlismy droge powiekszajaca
                     if (backtracking( g,vertTab,tabPathCurr,iLenCurr,vCurr,true,0 ) !=
-                        backtracking( g,vertTab,tabPathNext,iLenNext,vNext,true,0) ) 
+                        backtracking( g,vertTab,tabPathNext,iLenNext,vNext,true,0) )
                     {
                         expo = augmentation( g,vertTab,tabPathCurr,iLenCurr,tabPathNext,iLenNext,expo );
                         break;
@@ -343,32 +343,32 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
                 //vNext nie ma cechy S i nie ma T, nadamy mu T
                 //vNext dostaje ceche T: vCurr
                 //jezeli mialby vNext ceche T to mielibysmy cykl parzysty - takie nam nie przeszkadzaja
-                else if (vertTab[vNext].vLabT[0] == 0) vertTab[vNext].vLabT[0] = vCurr; 
+                else if (vertTab[vNext].vLabT[0] == 0) vertTab[vNext].vLabT[0] = vCurr;
             }
         }
     }
     //cecha T
-    else 
+    else
     {
         //oznaczamy ceche T jako zbadana
-        vertTab[vCurr].bT = true; 
+        vertTab[vCurr].bT = true;
         //przegladamy wszystkie krawedzie incydentne z wierzcholkiem vCurr
         for( typename GraphType::PEdge E = g.getEdge( vCurr,EdUndir | EdDirIn | EdDirOut ); E;
             E = g.getEdgeNext( vCurr,E,EdUndir | EdDirIn | EdDirOut ) )
         {
             //sasiad wierzcholka vCurr
-            vNext = g.getEdgeEnd( E,vCurr ); 
-            if (vertTab[vNext].vMatch == vCurr and vertTab[vNext].vLabB != vertTab[vCurr].vLabB)
+            vNext = g.getEdgeEnd( E,vCurr );
+            if (vertTab[vNext].vMatch == vCurr && vertTab[vNext].vLabB != vertTab[vCurr].vLabB)
             {
                 //jezeli vNext ma ceche T
-                if (vertTab[vNext].vLabT[0] != 0) 
+                if (vertTab[vNext].vLabT[0] != 0)
                 {
                     typename GraphType::PVertex LOCALARRAY( tabPathCurr,n );
                     typename GraphType::PVertex LOCALARRAY( tabPathNext,n );
                     int  iLenCurr = 0, iLenNext = 0;
                     //korzenie rozne - znalezlismy droge powiekszajaca
                     if (backtracking( g,vertTab,tabPathCurr,iLenCurr,vCurr,false,0) !=
-                        backtracking( g,vertTab,tabPathNext,iLenNext,vNext,false,0 )) 
+                        backtracking( g,vertTab,tabPathNext,iLenNext,vNext,false,0 ))
                     {
                         expo = augmentation( g,vertTab,tabPathCurr,iLenCurr,tabPathNext,iLenNext,expo );
                         break;
@@ -379,7 +379,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
                 //vNext nie ma cechy S i nie ma T, nadamy mu S
                 //vNext dostaje ceche T: vCurr
                 //jezeli mialby vNext ceche S to mielibysmy cykl parzysty - takie nam nie przeszkadzaja
-                else if (vertTab[vNext].vLabS == 0) vertTab[vNext].vLabS = vCurr; 
+                else if (vertTab[vNext].vLabS == 0) vertTab[vNext].vLabS = vCurr;
             }
         }
     }
@@ -394,17 +394,17 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     //if true - istnieja niezbadane cechy
     //jezeli mamy conajmniej 2 wolne wierzcholki oraz nie osieglelismy zadanego rozmiaru matchingu
     //jest wiecej niz jeden wolny wierzcholek i istnieje niezbadana cecha
-    bool isLabel = true; 
+    bool isLabel = true;
 
-    while (expo >= 2 and (matchSize > (vertNo - expo) / 2 or matchSize == -1) and isLabel)
+    while (expo >= 2 && (matchSize > (vertNo - expo) / 2 || matchSize == -1) && isLabel)
     {
         //nadajemy wszystkim wierzcholkom wolnym ceche S: S
         for( typename GraphType::PVertex U = g.getVert(); U; U = g.getVertNext( U ) )
             //U ma ceche S:U, U jest wolny i jest rootem
-            if (vertTab[U].vMatch == 0) vertTab[U].vLabS = U; 
+            if (vertTab[U].vMatch == 0) vertTab[U].vLabS = U;
 
         //nie znaleziono drogi powiekszajacej
-        bool noAugment = true; 
+        bool noAugment = true;
 
         do
         {
@@ -414,14 +414,14 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
             int expo_new;
             for( typename GraphType::PVertex U = g.getVert(); U; U = g.getVertNext( U ) )
             {
-                if (vertTab[U].vLabS != 0 and !vertTab[U].bS)
+                if (vertTab[U].vLabS != 0 && !vertTab[U].bS)
                 {
                     vCurr = U;
                     expo_new = labeling( g,vertTab,vertTabNeights,true,vCurr,expo );
                     isLabel = true;
                     break;
                 }
-                else if (vertTab[U].vLabT[0] != 0 and !vertTab[U].bT)
+                else if (vertTab[U].vLabT[0] != 0 && !vertTab[U].bT)
                 {
                     vCurr = U;
                     expo_new = labeling( g,vertTab,vertTabNeights,false,vCurr,expo );
@@ -435,7 +435,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
                 noAugment = false;
                 clearLabels( g,vertTab );
             }
-        } while (isLabel and noAugment);
+        } while (isLabel && noAugment);
     }
     return (vertNo - expo) / 2;
 }
@@ -443,17 +443,17 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EIterOut > int
     MatchingPar< DefaultStructs >::printResultToIterators( const GraphType &g, VertContainer &vertTab,
         EIterOut edgeIterOut, bool ifEdgeCover )
-{   
+{
     int n;
     typename GraphType::PVertex V, LOCALARRAY( tabV,n = g.getVertNo() );
     typename GraphType::PEdge E;
     //pomocnicze, by do wynikow nie doataly sie duplikaty krawedzi
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PVertex>::Type
-        tabVTmp( n ); 
+        tabVTmp( n );
     int licz = 0;
     for( typename GraphType::PVertex U = g.getVert(); U; U = g.getVertNext( U ) )
     {
-        if (vertTab[U].vMatch != 0 and tabVTmp[U] != U)
+        if (vertTab[U].vMatch != 0 && tabVTmp[U] != U)
         {
             V = vertTab[U].vMatch;
             *edgeIterOut = vertTab[V].eMatch = vertTab[U].eMatch =
@@ -461,13 +461,13 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
             ++edgeIterOut;
             licz++;
             //oznaczenie wierzcholka V, ze krawedz z nim incydentna zostala dodana do strumienia wyjsciowego
-            tabVTmp[V] = V; 
+            tabVTmp[V] = V;
         }
-        else if (ifEdgeCover and vertTab[U].vMatch == 0)
+        else if (ifEdgeCover && vertTab[U].vMatch == 0)
         {
             E = g.getEdge( U,Koala::EdUndir | Koala::EdDirIn | Koala::EdDirOut );
             if (E)
-            { 
+            {
                 *edgeIterOut = E;
                 ++edgeIterOut;
                 licz++;
@@ -494,13 +494,13 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     fillVertTabNeights( g,vertTabNeights );
 
     //funkcja tworzy skojarzenie poczatkowe, zwraca liczbe wierzcholkow wolnych w grafie
-    int expo = firstMatching( g,vertTab,vertTabNeights,matchSize ); 
+    int expo = firstMatching( g,vertTab,vertTabNeights,matchSize );
     //Algorytm Edmondsa znajduje skojarzenie o zadanym rozmiarze matchSize, zwraca znaleziony rozmiar skojarzenia
-    matchSize = edmonsAlg( g,vertTab,vertTabNeights,matchSize,expo ); 
+    matchSize = edmonsAlg( g,vertTab,vertTabNeights,matchSize,expo );
     //wpisanie wynikow do edgeIterOut
-    assert( matchSize == printResultToIterators( g,vertTab,edgeIterOut ) ); 
+    assert( matchSize == printResultToIterators( g,vertTab,edgeIterOut ) );
     //zwracamy rozmiar matchingu
-    return matchSize; 
+    return matchSize;
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EIterIn, class EIterOut >
@@ -521,11 +521,11 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     //funkcja tworzy skojarzenie poczatkowe, na podstawie otrzymanego strumienia wierzcholkowi
     int expo = firstMaching( g,vertTab,vertIterInBegin,vertIterInEnd );
     //Algorytm Edmondsa znajduje skojarzenie o zadanym rozmiarze matchSize, zwraca znaleziony rozmiar skojarzenia
-    matchSize = edmonsAlg( g,vertTab,vertTabNeights,matchSize,expo ); 
+    matchSize = edmonsAlg( g,vertTab,vertTabNeights,matchSize,expo );
     //wpisanie wynikow do edgeIterOut
-    assert( matchSize == printResultToIterators( g,vertTab,edgeIterOut ) ); 
+    assert( matchSize == printResultToIterators( g,vertTab,edgeIterOut ) );
     //zwracamy rozmiar matchingu
-    return matchSize; 
+    return matchSize;
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EIterOut >
@@ -542,11 +542,11 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     fillVertTabNeights( g,vertTabNeights );
 
     //funkcja tworzy skojarzenie poczatkowe, zwraca liczbe wierzcholkow wolnych w grafie
-    int expo = firstMatching( g,vertTab,vertTabNeights,-1 ); 
+    int expo = firstMatching( g,vertTab,vertTabNeights,-1 );
     //Algorytm Edmondsa znajduje skojarzenie o maksymalnym rozmiarze, zwraca znaleziony rozmiar skojarzenia
-    edmonsAlg( g,vertTab,vertTabNeights,-1,expo ); 
+    edmonsAlg( g,vertTab,vertTabNeights,-1,expo );
     //wpisanie wynikow do edgeIterOut
-    return printResultToIterators(g,vertTab,edgeIterOut,true); 
+    return printResultToIterators(g,vertTab,edgeIterOut,true);
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EIterOut >
@@ -559,22 +559,22 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type >::get( avertTab,localvertTab );
 
     // liczba wierzcholkow w grafie
-    int vertNo = g.getVertNo();        
+    int vertNo = g.getVertNo();
     if (isBlackHole( avertTab )) vertTab.reserve( vertNo );
     // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
-    int expo = vertNo;                 
+    int expo = vertNo;
     typename GraphType::PVertex U,V;
-    
+
     //przegladamy krawedzie grafu
     for( typename GraphType::PEdge E = g.getEdge( EdUndir | EdDirIn | EdDirOut ); E;
         E = g.getEdgeNext( E,EdUndir | EdDirIn | EdDirOut ) )
     {
         //jezeli osiagniemy zadany rozmiar skojarzenia - koniec
-        if (matchSize == (vertNo - expo) / 2) break; 
+        if (matchSize == (vertNo - expo) / 2) break;
         U = g.getEdgeEnd1( E );
         V = g.getEdgeEnd2( E );
         //jezeli U i V sa wolne tzn. ze mozna E dodac do skojarzenia
-        if (vertTab[U].vMatch == 0 and vertTab[V].vMatch == 0) 
+        if (vertTab[U].vMatch == 0 && vertTab[V].vMatch == 0)
         {
             vertTab[U].vMatch = V;
             vertTab[V].vMatch = U;
@@ -584,7 +584,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         }
     }
     //zwracamy rozmiar matchingu
-    return ((vertNo - expo) / 2); 
+    return ((vertNo - expo) / 2);
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EIterIn, class EIterOut >
@@ -597,21 +597,21 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type >::get( avertTab,localvertTab );
 
     // liczba wierzcholkow w grafie
-    int vertNo = g.getVertNo();        
+    int vertNo = g.getVertNo();
     if (isBlackHole( avertTab )) vertTab.reserve( vertNo );
     // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
-    int expo = vertNo;                 
+    int expo = vertNo;
     typename GraphType::PVertex U,V;
 
     //przeglasamy podane krawedzie
-    for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )  
+    for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )
     {
         //jezeli osiagniemy zadany rozmiar skojarzenia - koniec
-        if (matchSize == (vertNo - expo) / 2) break; 
+        if (matchSize == (vertNo - expo) / 2) break;
         U = g.getEdgeEnd1( *itE );
         V = g.getEdgeEnd2( *itE );
         //jezeli U i V sa wolne tzn. ze mozna E dodac do skojarzenia
-        if (vertTab[U].vMatch == 0 and vertTab[V].vMatch == 0) 
+        if (vertTab[U].vMatch == 0 && vertTab[V].vMatch == 0)
         {
             vertTab[U].vMatch = V;
             vertTab[V].vMatch = U;
@@ -621,27 +621,27 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         }
     }
     //zwracamy rozmiar matchingu
-    return ((vertNo - expo) / 2); 
+    return ((vertNo - expo) / 2);
 }
 
 template< class DefaultStructs > template< class GraphType, class EIterIn > bool MatchingPar< DefaultStructs >::test(
     const GraphType &g, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd )
 {
     // liczba wierzcholkow w grafie
-    int vertNo = g.getVertNo();        
+    int vertNo = g.getVertNo();
     // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
-    int expo = vertNo;                 
+    int expo = vertNo;
     typename GraphType::PVertex U,V;
      //jezeli true - wierzcholek nalezy do matchingu
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type vertTabMatch( vertNo );
 
     //przeglasamy podane krawedzie
-    for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )  
+    for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )
     {
         U = g.getEdgeEnd1( *itE );
         V = g.getEdgeEnd2( *itE );
-        //jezeli ktorykolwiek z wierzcholkow tworzacych krawedz nie jest wolny to nie mamy matchingu        
-        if (vertTabMatch.hasKey( U ) or vertTabMatch.hasKey( V )) return false; 
+        //jezeli ktorykolwiek z wierzcholkow tworzacych krawedz nie jest wolny to nie mamy matchingu
+        if (vertTabMatch.hasKey( U ) || vertTabMatch.hasKey( V )) return false;
         vertTabMatch[U] = vertTabMatch[V] = true;
     }
     return true;
@@ -652,7 +652,7 @@ template< class DefaultStructs > template< class GraphType, class EIterIn > bool
 template< class DefaultStructs > template< class GraphType, class EIterIn, class Comp >
     std::pair< bool,typename GraphType::PEdge > StableMatchingPar< DefaultStructs >::test( const GraphType &g,
         Comp compare, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd )
-{   
+{
     std::pair< bool,typename GraphType::PEdge > res;
     res.second = 0;
     if (!(res.first = MatchingPar< DefaultStructs >::template test( g,edgeIterInBegin,edgeIterInEnd ))) return res;
@@ -700,13 +700,13 @@ template< class DefaultStructs > template< class GraphType, class VIterIn, class
         v = g.getEdgeEnd( e,u );
         if (match.hasKey( v ))
             if (compare( v,match[v],e ))
-            {   
+            {
                 w = g.getEdgeEnd( match[v],v );
                 if (++love[w] < g.deg( w,Directed | Undirected )) free[w];
                 match.delKey( v );
             }
         if (!match.hasKey( v ))
-        { 
+        {
             match[v] = e;
             free.delKey( u );
         }
@@ -714,12 +714,12 @@ template< class DefaultStructs > template< class GraphType, class VIterIn, class
     }
     licz = 0;
     for( typename GraphType::PVertex u = match.firstKey(); u; u = match.nextKey( u ) )
-    {   
+    {
         licz++;
         *out = match[u];
         ++out;
         if (!isBlackHole( verttab ))
-        {   
+        {
             VertLabs< GraphType > lu( u,match[u] ), ln( g.getEdgeEnd( match[u],u ),match[u] );
             verttab[u] = lu;
             verttab[g.getEdgeEnd( match[u],u )] = ln;

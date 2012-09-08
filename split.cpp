@@ -46,28 +46,31 @@ const char* print(ModPartType x)
 	A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');//E=g.addVert('E');
 	g.addEdge(B,D);
 	g.addEdge(A,B);
-	g.addEdge(C,A);g.addEdge(C,D);
+	g.addEdge(C,A);//g.addEdge(C,D);
 
 
 //	g.substitute(A,gp4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
     g.substitute(C,gk3,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
-	g.substitute(A,gn4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
-	g.substitute(B,gn4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
+	g.substitute(A,gp4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
+	g.substitute(B,gp4,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
 	g.substitute(D,gk3,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
-	g.addVert('X');//g.addEdge(g.getVert(),g.getVertLast());
+
+//	g.addVert('X');
+//g.addEdge(g.getVert(),g.getVertLast());
 
 //	g.addEdge(C,D);
 
 	SearchStructs::CompStoreTool<Graph<char>::PVertex> tool;
 	AssocTable<std::map<Graph<char>::PVertex,int> > vertTab;
 
-    cout << "\n\n" << boolalpha << print(Modules::split(gk3,tool.input(),vertTab).type) << endl;
-
-	Modules::Partition res=Modules::split(g,tool.input(),vertTab);
+//    cout << "\n\n" << boolalpha << print(Modules::split(gp4,tool.input(),vertTab).type) << endl;
+//    gp4.substitute(gp4.getVertLast(),gk3,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
+#define _g g
+	Modules::Partition res=Modules::split(_g,tool.input(),vertTab);
 
 
     cout << "size: "<< res.size << " type: " << print(res.type) << endl;
-    for(Graph<char>::PVertex v=g.getVert();v;v=g.getVertNext(v)) cout << v->info << ":" << vertTab[v] <<"\t";
+    for(Graph<char>::PVertex v=_g.getVert();v;v=_g.getVertNext(v)) cout << v->info << ":" << vertTab[v] <<"\t";
     cout << "\nsize: " << tool.size() << "\tlen:" <<tool.lenght();
     for(int i=0;i<tool.size();i++)
     {
@@ -77,9 +80,9 @@ const char* print(ModPartType x)
 
     //gk3.substitute(gk3.getVertLast(),gp4);
 
-    cout << "\n\n" << boolalpha << IsIt::cograph(g);
-    int q=IsIt::Cograph::maxStable(g,tabV);
-    for(int i=0;i<q;i++) cout << tabV[i]->info << ' ';
+//    cout << "\n\n" << boolalpha << IsIt::cograph(g);
+//    int q=IsIt::Cograph::maxStable(g,tabV);
+//    for(int i=0;i<q;i++) cout << tabV[i]->info << ' ';
 
 
 

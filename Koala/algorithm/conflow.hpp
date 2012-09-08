@@ -50,7 +50,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         typename GraphType::PVertex first, typename GraphType::PVertex last, bool out, Iter &iter )
 {
     EdgeDirection mask = EdDirIn | EdDirOut | EdUndir;
-    int depth, m = g.getEdgeNo();
+    int depth, m = g.getEdgeNo( mask );
     typename GraphType::PEdge e;
     typename GraphType::PVertex u,v;
     typename GraphType::PVertex LOCALARRAY( buf,m + 3 );
@@ -92,7 +92,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EdgeContainer, class Iter > bool
     FlowPar< DefaultStructs >::layers( const GraphType &g, EdgeContainer &edgeTab, VertContainer &visited,
         typename GraphType::PVertex first, typename GraphType::PVertex last, Iter &iterout )
-{   
+{
     int res;
     typename GraphType::PVertex *iter;
     typename GraphType::PVertex LOCALARRAY( buf,g.getVertNo() );
@@ -106,7 +106,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         else visited[v].used = false;
     for( typename GraphType::PVertex *i = buf; i < iter; i++ )
         if (visited[*i].used)
-        { 
+        {
             *iterout = *i;
             ++iterout;
         }
@@ -117,7 +117,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     FlowPar< DefaultStructs >::findPot( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
         std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends, typename GraphType::PVertex v,
         bool pin, bool pout )
-{   
+{
     assert( vertTab[v].used );
     const typename EdgeContainer::ValType::CapacType PlusInfty = DefaultStructs:: template NumberTypeBounds
         < typename EdgeContainer::ValType::CapacType >::plusInfty();
@@ -129,7 +129,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     typename GraphType::PVertex u;
 
     if (pin)
-    {   
+    {
         vertTab[v].inPot = (v == ends.first) ? PlusInfty : Zero;
         if (v != ends.first)
             for( typename GraphType::PEdge e = g.getEdge( v,mask ); e; e = g.getEdgeNext( v,e,mask ) )
@@ -138,7 +138,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
                     vertTab[v].inPot += d;
     }
     if (pout)
-    {   
+    {
         vertTab[v].outPot = (v == ends.second) ? PlusInfty : Zero;
         if (v != ends.second)
             for( typename GraphType::PEdge e = g.getEdge( v,mask ); e; e = g.getEdgeNext( v,e,mask ) )
@@ -162,7 +162,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     if (Zero == vertTab[v].mass) return;
     for( typename GraphType::PEdge e = g.getEdge( v,mask ); e; e = g.getEdgeNext( v,e,mask ) )
         if (vertTab[u = g.getEdgeEnd( e,v )].used && vertTab[u].distance == vertTab[v].distance + ((front) ? 1 : -1))
-        {   
+        {
             if (Zero == vertTab[v].mass) break;
             d = std::min( usedCap( g,edgeTab,e,v,front ),vertTab[v].mass );
             if (Zero == d) continue;
@@ -196,17 +196,17 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
     for( int i = 0; i < size; i++ )
         if (vertTab[tab[i]].used)
-        {   
+        {
             vertTab[tab[i]].mass = Zero;
             if (minpot > std::min( vertTab[tab[i]].inPot,vertTab[tab[i]].outPot ))
-            {   
+            {
                 minpot = std::min( vertTab[tab[i]].inPot,vertTab[tab[i]].outPot );
                 minpos = i;
             }
         }
     assert( minpos >= 0 && minpos < size );
     if (minpot > Zero)
-    {   
+    {
         minpot=std::min( minpot,limit );
         vertTab[tab[minpos]].mass = minpot;
         for( int i = minpos; i < size - 1; i++ )
@@ -218,7 +218,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     vertTab[tab[minpos]].used = false;
     for( typename GraphType::PEdge e = g.getEdge( tab[minpos],mask ); e; e = g.getEdgeNext( tab[minpos],e,mask ) )
     if (vertTab[u = g.getEdgeEnd( e,tab[minpos] )].used)
-    { 
+    {
         if (vertTab[u].distance == vertTab[tab[minpos]].distance + 1)
             findPot( g,edgeTab,vertTab,std::make_pair( tab[0],tab[size-1] ),u,true,false );
         if (vertTab[u].distance == vertTab[tab[minpos]].distance - 1)
@@ -231,7 +231,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     typename EdgeContainer::ValType::CapacType FlowPar< DefaultStructs >::layerFlow( const GraphType &g,
         EdgeContainer &edgeTab, VertContainer &vertTab, typename GraphType::PVertex start,
         typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType limit )
-{   
+{
     koalaAssert( start && end,AlgExcNullVert );
     koalaAssert( start != end,AlgExcWrongConn );
     typename GraphType::PVertex LOCALARRAY( buf,g.getVertNo() );
@@ -245,7 +245,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     for( int i = 0; i < size; i++ )
         if (vertTab[buf[i]].used) findPot( g,edgeTab,vertTab,std::make_pair( start,end ),buf[i],true,true );
     do
-    {   
+    {
         typename EdgeContainer::ValType::CapacType x = onevert( g,edgeTab,vertTab,buf,size,limit );
         res += x;
         limit -= x;
@@ -281,7 +281,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
     }
     if (limit == Zero) return Zero;
     while (Zero != (add = layerFlow( g,edgeTab,vertTab,start,end,limit - res ) ))
-    {   
+    {
         res += add;
         if (limit == res) break;
     }
@@ -313,7 +313,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
     }
 
     while (res < limit && BFSFlow( g,edgeTab,vertTab,start,end,true,blackHole ))
-    {   
+    {
         ShortPathStructs::getOutPath( g,vertTab,outPath( vTab,eTab ),end );
         typename EdgeContainer::ValType::CapacType delta = limit - res;
         for( int i = 0; i < vertTab[end].distance; i++ )
@@ -341,13 +341,13 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
         case EdDirIn: return edgeTab[e].flow;
         default:
             if (g.getEdgeEnd1( e ) == v)
-            {   
+            {
                 if (edgeTab[e].flow > Zero) return edgeTab[e].capac - edgeTab[e].flow;
                 else if (edgeTab[e].flow < Zero) return -edgeTab[e].flow;
                 else return edgeTab[e].capac;
             }
             else
-            {   
+            {
                 if (edgeTab[e].flow > Zero) return edgeTab[e].flow;
                 else if (edgeTab[e].flow < Zero) return edgeTab[e].capac + edgeTab[e].flow;
                 else return edgeTab[e].capac;
@@ -381,7 +381,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EdgeContainer >
     bool FlowPar< DefaultStructs >::DijkstraFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end )
-{   
+{
     koalaAssert( start && end,AlgExcNullVert );
     koalaAssert( start != end,AlgExcWrongConn );
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
@@ -412,7 +412,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
                 if (vertTab[V = g.getEdgeEnd( E,U )].distance == DefaultStructs:: template NumberTypeBounds
                     < typename EdgeContainer::ValType::CostType >::plusInfty())
                     if ((nd = vertTab[U].distance + costFlowDij( g,edgeTab,vertTab,E,U )) < Q[V].distance)
-                    { 
+                    {
                         Q[V].distance = nd;
                         Q[V].ePrev = E;
                         Q[V].vPrev = U;
@@ -450,7 +450,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
     CycLabs< GraphType,typename EdgeContainer::ValType::CostType > *buf2 = buf;
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-    {   
+    {
         vTab[v].second = 0;
         vTab[v].first = buf2;
         buf2 += n + 1;
@@ -460,7 +460,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
         vTab[v].first->dist = Zero;
     for( int k = 1; k <= n; k++ )
         for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-        {   
+        {
             typename EdgeContainer::ValType::CostType nd;
             typename GraphType::PVertex U;
             (vTab[v].first+k)->dist = PlusInfty;
@@ -470,7 +470,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
                     usedCapCost( g,edgeTab,E,U ) > DefaultStructs:: template NumberTypeBounds
                         < typename EdgeContainer::ValType::CapacType >::zero() &&
                     (nd = (vTab[U].first + k - 1)->dist + costFlow( g,edgeTab,E,U )) < (vTab[v].first + k)->dist)
-                {   
+                {
                     (vTab[v].first+k)->dist = nd;
                     (vTab[v].first+k)->ePrev = E;
                     (vTab[v].first+k)->vPrev = U;
@@ -488,19 +488,19 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     typename GraphType::PVertex minv = 0;
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
         if ((vTab[v].first + n)->dist < PlusInfty)
-        {   
+        {
             if (!minv)
-            {   
+            {
                 minv = v;
                 minval = std::make_pair( (vTab[v].first + n)->dist - (vTab[v].first + vTab[v].second)->dist,
                     n - vTab[v].second );
-            } 
+            }
             else
-            {   
+            {
                 tmpval = std::make_pair( (vTab[v].first + n)->dist - (vTab[v].first + vTab[v].second)->dist,
                     n - vTab[v].second );
                 if (minval.first * tmpval.second > minval.second * tmpval.first)
-                { 
+                {
                     minval = tmpval;
                     minv = v;
                 }
@@ -511,7 +511,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
     int licz = 0;
     for( int i = n; i > 0; i-- )
-    {   
+    {
         vBuf[licz] = minv;
         eBuf[licz] = (vTab[minv].first + i)->ePrev;
         minv = (vTab[minv].first + i)->vPrev;
@@ -525,7 +525,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     for( int i = 0; i <= n; i++ )
         if (vTab[vBuf[i]].second == -1) vTab[vBuf[i]].second = i;
         else
-        { 
+        {
             fpos = vTab[vBuf[i]].second;
             lpos = i;
             break;
@@ -533,7 +533,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     assert( fpos != -1 && lpos != -1 && fpos < lpos );
     licz = 0;
     for( int i = lpos; i > fpos; i-- )
-    {   
+    {
         *iters.vertIter = vBuf[i];
         ++iters.vertIter;
         *iters.edgeIter = eBuf[i - 1];
@@ -547,7 +547,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EdgeContainer >
     bool FlowPar< DefaultStructs >::BellmanFordFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end )
-{   
+{
     assert( start && end && start != end);
     const typename EdgeContainer::ValType::CostType inf = DefaultStructs:: template NumberTypeBounds
         < typename EdgeContainer::ValType::CostType >::plusInfty();
@@ -580,7 +580,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
                 DefaultStructs::template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::zero()
                 && vertTab[U].distance < inf &&
                 (nd = vertTab[U].distance + costFlow( g,edgeTab,E,U )) < vertTab[V = g.getEdgeEnds( E ).second].distance)
-                { 
+                {
                     vertTab[V].distance = nd;
                     vertTab[V].ePrev = E;
                     vertTab[V].vPrev = U;
@@ -630,7 +630,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
     typename GraphType::PEdge LOCALARRAY( eTab,n );
 
     while (DijkstraFlow( g,edgeTab,vertTab,start,end ))
-    {   
+    {
         int len = ShortPathStructs::getOutPath( g,vertTab,outPath( vTab,eTab ),end );
         typename EdgeContainer::ValType::CapacType delta = val - res;
         for( int i = 0; i < len; i++ )
@@ -678,7 +678,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
     Set< typename GraphType::PVertex > W1,W2,Vnew,Rnew;
     if (R.size() == 1)
-    { 
+    {
         setTab[R.first()] = V;
         return;
     }
@@ -700,7 +700,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
     typename GraphType::PVertex vnew = g.addVert();
     for( typename GraphType::PVertex v = W1.first(); ; v = W1.next( v ) )
-    {   
+    {
         typename GraphType::PEdge enew = g.addEdge( v,vnew );
         edgeTab[enew].capac = DefaultStructs:: template NumberTypeBounds
             < typename EdgeContainer::ValType::CapacType >::zero();
@@ -716,7 +716,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType > *out2 = out + Rnew.size() - 1;
     for( s = Rnew.first(); s; s = Rnew.next( s ) )
         if (setTab[s].isElement( vnew ))
-        { 
+        {
             setTab[s] -= vnew;
             break;
         }
@@ -725,7 +725,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     g.delEdges( vnew );
 
     for( typename GraphType::PVertex v = W2.first(); ; v = W2.next( v ) )
-    {   
+    {
         typename GraphType::PEdge enew = g.addEdge( v,vnew );
         edgeTab[enew].capac = DefaultStructs:: template NumberTypeBounds
             < typename EdgeContainer::ValType::CapacType >::zero();
@@ -785,11 +785,11 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer > bool
     FlowPar< DefaultStructs >::testFlow( const GraphType &g, const EdgeContainer &edgeTab, typename GraphType::PVertex S,
         typename GraphType::PVertex T )
-{   
+{
     const typename EdgeContainer::ValType::CapacType Zero = DefaultStructs:: template NumberTypeBounds
         < typename EdgeContainer::ValType::CapacType >::zero();
     koalaAssert( S && T,AlgExcNullVert );
-    koalaAssert( S != T,AlgExcWrongConn ); 
+    koalaAssert( S != T,AlgExcWrongConn );
     for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
         if (std::max( edgeTab[e].flow,-edgeTab[e].flow ) < Zero ||
             std::max( edgeTab[e].flow,-edgeTab[e].flow ) > edgeTab[e].capac) return false;
@@ -815,7 +815,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
     typename EdgeContainer::ValType::CostType FlowPar< DefaultStructs >::flowCost( const GraphType &g,
         const EdgeContainer &edgeTab )
-{   
+{
     typename EdgeContainer::ValType::CostType res = DefaultStructs:: template NumberTypeBounds
         < typename EdgeContainer::ValType::CostType >::zero();
     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
@@ -873,20 +873,20 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     BFSFlow( g,edgeTab,vertTab,start,end,true,blackHole );
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
     if (std::numeric_limits< int >::max() > vertTab[v].distance)
-    {   
+    {
         res.vertNo++;
         if (!isBlackHole( iters.vertIter ))
-        { 
+        {
             *iters.vertIter = v;
             ++iters.vertIter;
         }
         for( typename GraphType::PEdge e = g.getEdge( v,EdDirOut | EdUndir ); e;
             e = g.getEdgeNext( v,e,EdDirOut | EdUndir ) )
             if (vertTab[g.getEdgeEnd( e,v )].distance == std::numeric_limits< int >::max())
-            {   
+            {
                 res.edgeNo++;
                 if (!isBlackHole( iters.edgeIter ))
-                { 
+                {
                     *iters.edgeIter = e;
                     ++iters.edgeIter;
                 }
@@ -898,14 +898,14 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VIter, class EIter >
     typename FlowPar< DefaultStructs >::template EdgeCut2< GraphType,typename EdgeContainer::ValType::CapacType >
     FlowPar< DefaultStructs >::minEdgeCut( const GraphType &g, EdgeContainer &edgeTab, OutPath< VIter,EIter > iters )
-{   
+{
     int n,m;
     koalaAssert( g.getVertNo() >= 2,AlgExcWrongArg );
     EdgeCut< typename EdgeContainer::ValType::CapacType > res,buf;
     typename GraphType::PVertex a,b;
     typename GraphType::PVertex LOCALARRAY( vres,(n = g.getVertNo()) - 1 );
     typename GraphType::PVertex LOCALARRAY( vbuf,n - 1 );
-    typename GraphType::PEdge LOCALARRAY( eres,m = g.getEdgeNo() );
+    typename GraphType::PEdge LOCALARRAY( eres,m = g.getEdgeNo(Directed | Undirected) );
     typename GraphType::PEdge LOCALARRAY( ebuf,m );
     res.capac = DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty();
 
@@ -920,7 +920,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
                 buf = minEdgeCut( g,edgeTab,s,t,outPath( vbuf,blackHole ) );
             else buf = minEdgeCut( g,edgeTab,s,t,outPath( vbuf,ebuf ) );
             if (buf.capac < res.capac)
-            {   
+            {
                 res = buf;
                 a = s;
                 b = t;
@@ -939,7 +939,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
                     buf = minEdgeCut( g,edgeTab,t,s,outPath( vbuf,blackHole ) );
                 else buf = minEdgeCut( g,edgeTab,t,s,outPath( vbuf,ebuf ) );
                 if (buf.capac < res.capac)
-                {   
+                {
                     res = buf;
                     a = t;
                     b = s;
@@ -952,7 +952,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
         }
     if (!isBlackHole( iters.vertIter ))
         for( int i = 0; i < res.vertNo; i++ )
-        { 
+        {
             *iters.vertIter = vres[i];
             ++iters.vertIter;
         }
@@ -996,7 +996,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
             TrsEdgeLabs< typename EdgeContainer::ValType::CapacType >( vertTab[v].lo,vertTab[v].hi );
 
     for( v = g.getVert(); v; v = g.getVertNext( v ) )
-    {   
+    {
         exc[v] = Zero;
         for( typename GraphType::PEdge e = g.getEdge( v,EdDirIn ); e; e = g.getEdgeNext( v,e,EdDirIn ) )
             exc[v] += edgeTab[e].lo;
@@ -1012,7 +1012,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     t = g.addVert();
     for( v = g.getVert(); v; v = g.getVertNext( v ) )
         if (v != s && v != t)
-        {   
+        {
             if (exc[v] > Zero) edgeLabs[g.addArch( s,v )].capac = exc[v];
             else if (exc[v] < Zero) edgeLabs[g.addArch( v,t )].capac = -exc[v];
         }
@@ -1059,7 +1059,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
             TrsEdgeLabs< typename EdgeContainer::ValType::CapacType >( vertTab[v].lo,vertTab[v].hi );
 
     for( v = g.getVert(); v; v = g.getVertNext( v ) )
-    {   
+    {
         exc[v] = Zero;
         for( typename GraphType::PEdge e = g.getEdge( v,EdDirIn ); e; e = g.getEdgeNext( v,e,EdDirIn ) )
             exc[v] += edgeTab[e].lo;
@@ -1078,7 +1078,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     t = g.addVert();
     for( v = g.getVert(); v; v = g.getVertNext( v ) )
         if (v != s && v != t)
-        {   
+        {
             if (exc[v] > Zero) edgeLabs[g.addArch( s,v )].capac = exc[v];
             else if (exc[v] < Zero) edgeLabs[g.addArch( v,t )].capac = -exc[v];
         }
@@ -1104,7 +1104,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class IterOut >
     void FlowPar< DefaultStructs >::findGHTree( GraphType &g, EdgeContainer &edgeTab, IterOut out )
-{   
+{
     koalaAssert( g.getVertNo() > 1,AlgExcWrongArg );
     int n;
     GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType > LOCALARRAY( buf,n = g.getVertNo() );
@@ -1114,7 +1114,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     // TODO: if (DefaultStructs::ReserveOutAssocCont) edgeTab.reserve(???);
     ghtree( g,edgeTab,setMap,V,R,buf );
     for( int i = 0; i < n - 1; i++ )
-    { 
+    {
         *out = buf[i];
         ++out;
     }
@@ -1124,7 +1124,7 @@ template< class DefaultStructs > template< class GraphType, class ImageType, cla
     void ConnectPar< DefaultStructs >::makeImage(const GraphType &g, ImageType &ig, Linker &images )
 {
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-    {   
+    {
         images[v].first = ig.addVert( v );
         images[v].second = ig.addVert( v );
         ig.addArch( images[v].first,images[v].second,
@@ -1134,7 +1134,7 @@ template< class DefaultStructs > template< class GraphType, class ImageType, cla
         ig.addArch( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
             std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
     for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
-    {   
+    {
         ig.addArch( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
             std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
         ig.addArch( images[g.getEdgeEnd2( e )].second,images[g.getEdgeEnd1( e )].first,
@@ -1144,7 +1144,7 @@ template< class DefaultStructs > template< class GraphType, class ImageType, cla
 
 template< class DefaultStructs > template< class GraphType, class EIter > int ConnectPar< DefaultStructs >::minEdgeCut(
     const GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end, EIter iter )
-{   
+{
     typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,
         typename FlowPar<DefaultStructs>:: template EdgeLabs< int > >::Type edgeLabs( g.getEdgeNo() );
     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) ) edgeLabs[e].capac = 1;
@@ -1155,7 +1155,7 @@ template< class DefaultStructs > template< class GraphType, class EIter > int Co
 template< class DefaultStructs > template< class GraphType, class EIter >
     typename ConnectPar< DefaultStructs >::template EdgeCut< GraphType >
     ConnectPar< DefaultStructs >::minEdgeCut( const GraphType &g, EIter iter )
-{   
+{
     EdgeCut< GraphType > res;
     typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,
         typename FlowPar< DefaultStructs >:: template EdgeLabs< int > >::Type edgeLabs( g.getEdgeNo() );
@@ -1172,7 +1172,7 @@ template< class DefaultStructs > template< class GraphType, class EIter >
 template< class DefaultStructs > template< class GraphType, class VIter, class EIter, class LenIterV, class LenIterE >
     int ConnectPar< DefaultStructs >::edgeDisjPaths( GraphType &g, typename GraphType::PVertex start,
         typename GraphType::PVertex end, CompStore< LenIterV,VIter > voutiter, CompStore< LenIterE,EIter > eoutiter )
-{   
+{
     int n,m;
     typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,
         typename FlowPar< DefaultStructs >:: template EdgeLabs< int > >::Type edgeTab( m = g.getEdgeNo() );
@@ -1213,7 +1213,7 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
         else r++;
     int lv = 0, le = 0;
     for( r = 0; r < res; r++ )
-    {   
+    {
         int j = BFSPar< DefaultStructs >:: template getPath( makeSubgraph( g,std::make_pair( stdChoose(true),
             extAssocChoose( &(paths),r ) ) ),start,end,BFSPar< DefaultStructs >::outPath( vout,eout ),EdDirOut );
         lv += j + 1;
@@ -1224,13 +1224,13 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
         ++eoutiter.compIter;
         if (!isBlackHole( eoutiter.vertIter ))
             for( int k = 0; k < j; k++ )
-            { 
+            {
                 *eoutiter.vertIter = eout[k];
                 ++eoutiter.vertIter;
             }
         if (!isBlackHole(voutiter.vertIter))
             for( int k = 0; k <= j; k++ )
-            { 
+            {
                 *voutiter.vertIter = vout[k];
                 ++voutiter.vertIter;
             }
@@ -1247,7 +1247,7 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
 
 template< class DefaultStructs > template< class GraphType, class VIter > int ConnectPar< DefaultStructs >::minVertCut(
     const GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end, VIter iter )
-{  
+{
     koalaAssert( start && end,AlgExcNullVert );
     koalaAssert( start != end,AlgExcWrongConn );
     if (g.getEdge( start,end,EdDirOut | EdUndir )) return -1;
@@ -1269,7 +1269,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
         FlowPar< DefaultStructs >::outPath( blackHole,icut )).edgeNo;
     if (!isBlackHole( iter ))
         for( int i = 0; i < res; i++ )
-        {   
+        {
             assert( icut[i]->info.first );
             *iter = icut[i]->info.first;
             ++iter;
@@ -1297,7 +1297,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
 
     int best = std::numeric_limits< int >::max() - 1, iv = 0;
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-    {   
+    {
         ++iv;
         for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
             if (u != v)
@@ -1307,7 +1307,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
                     int res = FlowPar< DefaultStructs >::minEdgeCut( ig,imageFlow,images[u].second,images[v].first,
                         FlowPar< DefaultStructs >::outPath( blackHole,icut )).edgeNo;
                     if (res < best)
-                    { 
+                    {
                         best = res;
                         for( int i = 0; i < res; i++ ) bestcut[i] = icut[i];
                     }
@@ -1317,16 +1317,16 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
                     int res = FlowPar< DefaultStructs >::minEdgeCut( ig,imageFlow,images[v].second,images[u].first,
                         FlowPar< DefaultStructs >::outPath( blackHole,icut )).edgeNo;
                     if (res < best)
-                    { 
+                    {
                         best = res;
                         for( int i = 0; i < res; i++ ) bestcut[i] = icut[i];
                     }
                 }
                 if (iv > best + 1)
-                {   
+                {
                     if (!isBlackHole( iter ))
                         for( int i = 0; i < best; i++ )
-                        {   
+                        {
                             assert( bestcut[i]->info.first );
                             *iter = bestcut[i]->info.first;
                             ++iter;
@@ -1341,7 +1341,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
 template< class DefaultStructs > template< class GraphType, class VIter, class EIter, class LenIterV, class LenIterE >
     int ConnectPar< DefaultStructs >::vertDisjPaths( const GraphType &g, typename GraphType::PVertex start,
         typename GraphType::PVertex end, CompStore< LenIterV,VIter > voutiter, CompStore< LenIterE,EIter > eoutiter )
-{   
+{
     koalaAssert( start && end,AlgExcNullVert );
     koalaAssert( start != end,AlgExcWrongConn );
     typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,
@@ -1368,21 +1368,21 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
     ++eoutiter.compIter;
     int vpos = 0, epos = 0;
     for( int i = 0; i < res; i++ )
-    {   
+    {
         bool ed = true;
         *voutiter.vertIter = start;
         ++voutiter.vertIter;
         ++vpos;
         for( int j = impos[i]; j < impos[i+1]; j++ )
-        {   
+        {
             if (ed)
-            { 
+            {
                 *eoutiter.vertIter = impaths[j]->info.second;
                 ++eoutiter.vertIter;
                 ++epos;
             }
             else
-            { 
+            {
                 *voutiter.vertIter = impaths[j]->info.first;
                 ++voutiter.vertIter;
                 ++vpos;
@@ -1402,7 +1402,7 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
     res += g.getEdgeNo( start,end,EdDirOut | EdUndir );
     for( typename GraphType::PEdge e = g.getEdge( start,end,EdDirOut | EdUndir ); e;
         e = g.getEdgeNext( start,end,e,EdDirOut | EdUndir ))
-    {   
+    {
         *voutiter.vertIter = start;
         ++voutiter.vertIter;
         ++vpos;

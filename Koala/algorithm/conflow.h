@@ -2,7 +2,7 @@
 #define KOALA_DEF_FLOWS_H
 
 /* conflow.h
- * 
+ *
  */
 
 #include <algorithm>
@@ -45,12 +45,12 @@ namespace Koala
             // typ liczbowy przepustowosci luku i objetosci przeplywu
             typedef DType CapacType;
             // typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
-            typedef CType CostType; 
+            typedef CType CostType;
 
             // przepustowosc (dana wejsciowa), wartosc znalezionego przeplywu w kierunku getEdgeEnd1->getEdgeEnd2
             CapacType capac,flow;
             // koszt jednostkowy przeplywu przez luk (dana wejsciowa)
-            CostType cost;  
+            CostType cost;
 
             // agrs: przepustowosc i koszt krawedzi
             EdgeLabs( CapacType arg = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
@@ -64,18 +64,19 @@ namespace Koala
         {
             UnitEdgeLabs( DType arg = DefaultStructs:: template NumberTypeBounds< DType >::one(),
                 CType arg2 = DefaultStructs:: template NumberTypeBounds< CType >::one() ):
-                    EdgeLabs< DType,CType >( arg,arg2 ) { }
+                    EdgeLabs< DType,CType >( arg,arg2 )
+                    { }
         };
 
         // rekord wynikowy opisujacy rozciecie krawedziowe w grafie miedzy para wierzcholkow
         template< class CapacType > struct EdgeCut
         {
             // typ liczbowy przepustowosci luku i objetosci przeplywu
-            CapacType capac; 
+            CapacType capac;
             // liczba wierzcholkow osiagalnych z poczatkowego po usunieciu rozciecia
-            int vertNo; 
+            int vertNo;
             // liczba krawedzi rozciecia
-            int edgeNo; 
+            int edgeNo;
 
             EdgeCut(): capac( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), vertNo( 0 ), edgeNo( 0 )
                 { }
@@ -91,16 +92,17 @@ namespace Koala
         template< class GraphType, class CType > struct GHTreeEdge
         {
             // typ liczbowy przepustowosci luku
-            typedef CType CapacType; 
+            typedef CType CapacType;
             // koncowki krawedzi
-            typename GraphType::PVertex first,second; 
+            typename GraphType::PVertex first,second;
             // przepustowosc "krawedzi"
-            CapacType capac; 
+            CapacType capac;
 
             // args: oba wierzcholki koncowe i przepustowosc
             GHTreeEdge( typename GraphType::PVertex f = 0, typename GraphType::PVertex s = 0,
                 CapacType c = DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ): first( f ),
-                    second( s ), capac( c ) { }
+                    second( s ), capac( c )
+                    { }
         };
 
         // Transshipment - uogolnienie przeplywu (por. Schrijver)
@@ -108,10 +110,10 @@ namespace Koala
         template< class DType > struct TrsVertLoss
         {
             // typ liczbowy przepustowosci luku i objetosci przeplywu
-            typedef DType CapacType;  
+            typedef DType CapacType;
             // maksymalny i minimalny dopuszczalny przy danym wierzcholku laczny wplyw
-            CapacType hi,lo; 
-            
+            CapacType hi,lo;
+
             //(dopuszczalne dodatnie i ujemne np. przeplyw to trans. z hi=lo=0 wszedzie poza zrodlem i ujsciem)
             TrsVertLoss( CapacType alo = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
                  CapacType ahi = DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ): hi( ahi ), lo( alo )
@@ -122,22 +124,23 @@ namespace Koala
         template< class DType, class CType = DType > struct TrsEdgeLabs
         {
             // typ liczbowy przepustowosci luku i objetosci przeplywu
-            typedef DType CapacType; 
+            typedef DType CapacType;
             // typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
-            typedef CType CostType; 
+            typedef CType CostType;
             // wymagane gorne i dolne ograniczenie na wielkosc przeplywu przez ta krawedz.
             //Dla nieskierowanych wymaga sie lo=0
             // TODO: sprawdzic, czy moga byc ujemne dla lukow
-            CapacType hi,lo; 
+            CapacType hi,lo;
             // wartosc znalezionego przeplywu (transship.) w kierunku getEdgeEnd1->getEdgeEnd2
             CapacType flow;
             // koszt jednostkowy przeplywu dla luku, jesli wymagany to wymagany nieujemny z wyjatkiem petli
-            CostType cost; 
+            CostType cost;
 
             TrsEdgeLabs( CapacType alo = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
                 CapacType ahi = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
                 CostType c = DefaultStructs:: template NumberTypeBounds< CostType >::zero() ): hi( ahi ), lo( alo ),
-                    cost( c ) { }
+                    cost( c )
+                    { }
         };
 
         // TODO: w ostatecznej wersji   protected: (ale na razie wystepuje w testach)
@@ -146,14 +149,14 @@ namespace Koala
         template< class GraphType, class CapacType > struct VertLabs
         {
             // do BFS w sieci tymczasowej
-            int distance,backdist; 
+            int distance,backdist;
             typename GraphType::PVertex vPrev;
             typename GraphType::PEdge  ePrev;
-            
+
             // potencjaly przesylu (na uzytek maxFlowMKM)
-            CapacType mass,inPot,outPot; 
+            CapacType mass,inPot,outPot;
             // czy wierzcholek jest w sieci warstwowej (na uzytek maxFlowMKM)
-            bool used; 
+            bool used;
 
             VertLabs( typename GraphType::PVertex pv = 0, typename GraphType::PEdge pe = 0,
                 int d = std::numeric_limits< int >::max(), int bd = std::numeric_limits< int >::max() ):
@@ -161,7 +164,8 @@ namespace Koala
                     mass( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ),
                     inPot( DefaultStructs:: template NumberTypeBounds< CapacType >::plusInfty() ),
                     outPot( DefaultStructs:: template NumberTypeBounds< CapacType >::plusInfty() ),
-                    used( false ) { }
+                    used( false )
+                    { }
         };
 
       protected:
@@ -239,7 +243,8 @@ namespace Koala
 
             VertLabsCost(): vPrev( 0 ), ePrev( 0 ),
                 distance( DefaultStructs:: template NumberTypeBounds< CostType >::plusInfty() ),
-                pot( DefaultStructs:: template NumberTypeBounds< CostType >::zero() ) { }
+                pot( DefaultStructs:: template NumberTypeBounds< CostType >::zero() )
+                { }
         };
 
         // Korekta kosztu luku na uzytek Dijkstry z potencjalami wierzcholkow (nowe koszty nie wprowadzaja ujemnych cykli)
@@ -340,7 +345,7 @@ namespace Koala
         template< class GraphType, class EdgeContainer, class IterOut > static void findGHTree( GraphType &g,
             EdgeContainer& edgeTab, IterOut out );
     };
-    
+
     // wersja dzialajaca na DefaultStructs=FlowAlgsDefaultSettings
     template< bool FF, bool costFF > class FlowFl: public FlowPar< FlowAlgsDefaultSettings< FF,costFF > > { };
 
@@ -349,7 +354,7 @@ namespace Koala
 
     /* ConnectPar
      * Procedury badania spojnosci grafu (bez wag na wierz/kraw)
-     * DefaultStructs - wytyczne dla wewnetrznych procedur    
+     * DefaultStructs - wytyczne dla wewnetrznych procedur
      */
     template< class DefaultStructs > class ConnectPar: public SearchStructs
     {
@@ -358,11 +363,12 @@ namespace Koala
         template< class GraphType > struct EdgeCut
         {
             // dwa wierzcholki po obu stronach rozciecia
-            typename GraphType::PVertex first,second; 
+            typename GraphType::PVertex first,second;
             // liczba krawedzi
-            int edgeNo; 
+            int edgeNo;
 
-            EdgeCut() { }
+            EdgeCut()
+                { }
         };
 
       protected:
@@ -370,7 +376,8 @@ namespace Koala
         {
             int capac,flow;
 
-            EdgeLabs(): capac( 1 ), flow( 0 ) { }
+            EdgeLabs(): capac( 1 ), flow( 0 )
+                { }
         };
 
         // tworzy w ig pomocnicza siec na podstawie g. Mapa images laczy wierzcholki g z parami odpowiednich krawedzi w ig

@@ -2,7 +2,7 @@
 #define KOALA_DEF_SCHEDULING_H
 
 /* schedule.h
- * 
+ *
  */
 
 #include <algorithm>
@@ -16,7 +16,7 @@
 namespace Koala
 {
     /* SchedulingPar
-     * 
+     *
      */
     template< class DefaultStructs > class SchedulingPar
     {
@@ -27,10 +27,12 @@ namespace Koala
             typename GraphType::PVertex vertex;
 
             Task( typename GraphType::PVertex _vertex = 0): length( 1 ), release( 0 ),
-                duedate(AlgsDefaultSettings::NumberTypeBounds< int >::plusInfty()), vertex(_vertex) { }
+                duedate(AlgsDefaultSettings::NumberTypeBounds< int >::plusInfty()), vertex(_vertex)
+                { }
 
             Task( int _length, int _release, int _duedate, typename GraphType::PVertex _vertex = 0 ):
-                length( _length ), release( _release ), duedate( _duedate ), vertex( _vertex ) { }
+                length( _length ), release( _release ), duedate( _duedate ), vertex( _vertex )
+                { }
         };
 
         struct TaskPart
@@ -38,7 +40,8 @@ namespace Koala
             int task,start,end,part;
 
             TaskPart( int _task = 0, int _start = 0, int _end = 0, int _part = 0):
-                task( _task ), start( _start ), end( _end ), part( _part ) { }
+                task( _task ), start( _start ), end( _end ), part( _part )
+                { }
         };
 
         struct TaskWindow
@@ -49,7 +52,8 @@ namespace Koala
 
             template< class GraphType > TaskWindow( Task< GraphType > task, int start, int finish ):
                 earliestStart( start ), latestFinish( finish ), earliestFinish( start + task.length ),
-                latestStart( finish - task.length ) { }
+                latestStart( finish - task.length )
+                { }
         };
 
         struct Schedule
@@ -59,10 +63,14 @@ namespace Koala
 
             Type machines;
 
-            Schedule( int m = 0 ) { setMachNo( m ); }
-            void setMachNo( int m ) { machines.resize( m ); }
-            int getMachNo() { return machines.size(); }
-            void clearMachine( int m ) { machines[m].clear(); }
+            Schedule( int m = 0 )
+                { setMachNo( m ); }
+            void setMachNo( int m )
+                { machines.resize( m ); }
+            int getMachNo()
+                { return machines.size(); }
+            void clearMachine( int m )
+                { machines[m].clear(); }
             void clearMachines();
         };
 
@@ -160,7 +168,8 @@ namespace Koala
             Task task;
             int start, finish;
 
-            Triple( Task _task = Task()): task( _task ) { }
+            Triple( Task _task = Task()): task( _task )
+                { }
         };
 
         template< typename Task > struct Element
@@ -169,7 +178,8 @@ namespace Koala
             int index,priority,duedate,degree,timeleft,parts;
 
             Element( Task _task = Task(), int _index = 0 ): task( _task ), index( _index ), priority( 0 ),
-                duedate( 0 ), timeleft( _task.length ), parts( 0 ) { }
+                duedate( 0 ), timeleft( _task.length ), parts( 0 )
+                { }
         };
 
         struct HodgsonElement
@@ -178,7 +188,8 @@ namespace Koala
             bool late;
 
             HodgsonElement( int _index = 0, int _length = 1, int _duedate = 0 ): index( _index ), length( _length ),
-                duedate( _duedate ), late( 0 ) { }
+                duedate( _duedate ), late( 0 )
+                { }
         };
     };
 

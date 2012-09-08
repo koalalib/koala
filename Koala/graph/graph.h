@@ -15,7 +15,7 @@ namespace Koala
 {
     // Domyslne wytyczne parametryzujace strukture i dzialanie metod klasy grafu
     // TODO: przetestowac dzialanie grafu przy roznych ustawieniach
-    
+
     /* GrDefaultSettings
      * edAllow - maska okreslajaca dopuszczalne typy krawedzi
      * adjMatrixAllowed - czy jest dopuszczalne tworzenie macierzy sasiedztwa
@@ -24,9 +24,9 @@ namespace Koala
     {
       public:
         // maska okreslajaca dopuszczalne typy krawedzi
-        enum { EdAllow = edAllow }; 
+        enum { EdAllow = edAllow };
         // czy jest dopuszczalne tworzenie macierzy sasiedztwa
-        enum { AdjMatrixAllowed = adjMatrixAllowed }; 
+        enum { AdjMatrixAllowed = adjMatrixAllowed };
 
         // typ klasy tablicy asocjacyjnej uzywanej w metodach grafu przypisujacej wierzcholkom wartosci typu B
         template< class A, class B > class VertAssocCont
@@ -67,14 +67,14 @@ namespace Koala
         template< class VertInfo, class EdgeInfo, class Settings > struct VertAdditData
         {
             // - w tej wersji umozliwia korzystanie z AssocArray
-            AssocKeyContReg assocReg; 
+            AssocKeyContReg assocReg;
         };
 
         // Dodatkowe pola (poza info) wprowadzane do obiektu krawedzi
         template< class VertInfo, class EdgeInfo, class Settings > struct EdgeAdditData
         {
             // - w tej wersji umozliwia korzystanie z AssocArray
-            AssocKeyContReg assocReg; 
+            AssocKeyContReg assocReg;
         };
 
         // czy dostosowywac rozmiar pamieci wyjsciowych tablic asocjacyjnych
@@ -114,28 +114,30 @@ namespace Koala
     {
       public:
         // tworzy pusty, niepowiazany obiekt
-        SubgraphBase(): parent( NULL ), next( NULL ), child( NULL ) { }
+        SubgraphBase(): parent( NULL ), next( NULL ), child( NULL )
+        { }
         // przylacza sie jako obiekt podrzedny rodzica podanego obiektu
-        SubgraphBase( const SubgraphBase &x ): child( NULL ), parent( NULL ), next( NULL ) { link( x.parent ); }
+        SubgraphBase( const SubgraphBase &x ): child( NULL ), parent( NULL ), next( NULL )
+        { link( x.parent ); }
         // j.w.
-        SubgraphBase &operator=( const SubgraphBase & ); 
+        SubgraphBase &operator=( const SubgraphBase & );
 
         // odlacza sie od rodzica (jesli istnial) i odlacza od siebie wszystkie swoje dzieci
-        ~SubgraphBase(); 
+        ~SubgraphBase();
 
       protected:
         mutable const SubgraphBase *parent,*next,*child;
 
         // wypisuje sie z listy potomkow obiektu nadrzednego, jednak nie usuwa powiazan ze swoimi obiektami podrzednymi
-        bool unlink(); 
+        bool unlink();
         // dolacza sie jako obiekt podrzedny podanego obiektu
-        bool link(const SubgraphBase * = NULL ); 
+        bool link(const SubgraphBase * = NULL );
     };
 
     namespace Privates
     {
         /* EdgeCounterLoop
-         * 
+         *
          */
         template< EdgeType EdgeAllow > class EdgeCounterLoop
         {
@@ -156,11 +158,11 @@ namespace Koala
         };
 
         /* EdgeCounterDir
-         * 
+         *
          */
         template< EdgeType EdgeAllow > class EdgeCounterDir;
         template <> class EdgeCounterDir<EdDirIn|EdDirOut>
-        { 
+        {
           protected:
             typedef int &NoType;
 
@@ -170,7 +172,7 @@ namespace Koala
         };
 
         template <> class EdgeCounterDir< 0 >
-        { 
+        {
           protected:
             typedef DummyVar< int > NoType;
 
@@ -178,10 +180,10 @@ namespace Koala
         };
 
         /* EdgeCounterUndir
-         * 
+         *
          */
         template< EdgeType EdgeAllow > class EdgeCounterUndir
-        { 
+        {
           protected:
             typedef int &NoType;
 
@@ -194,7 +196,7 @@ namespace Koala
         {
           protected:
             typedef DummyVar< int > NoType;
-    
+
             DummyVar< int > no() const { return DummyVar< int >(); }
         };
 
@@ -240,7 +242,7 @@ namespace Koala
         typedef Graph< VertInfo,EdgeInfo,Settings > GraphType;
 
         // Do wspolpracy z podgrafami
-        typedef Graph< VertInfo,EdgeInfo,Settings > RootGrType; 
+        typedef Graph< VertInfo,EdgeInfo,Settings > RootGrType;
 
         // Konstruktory
         // Tworzy pusty graf, bez krawędzi i wierzchołków.
@@ -253,7 +255,7 @@ namespace Koala
         void clear();
         // Usuwamy wszystkie wierzchołki grafu.
         void clearEdges();
-        
+
         // Operacje na całym grafie
         // Operator przypisania.
         Graph< VertInfo,EdgeInfo,Settings > &operator=( const Graph< VertInfo,EdgeInfo,Settings > & );
@@ -263,7 +265,8 @@ namespace Koala
         typename GraphType::PVertex move( Graph< VertInfo,EdgeInfo,Settings > & );
 
         // dopuszczalne typy krawedzi grafu
-        static EdgeType allowedEdgeTypes() { return Settings::EdAllow ; }
+        static EdgeType allowedEdgeTypes()
+            { return Settings::EdAllow ; }
 
         // metody przekazywane do ConstGraphMethods
         int getVertNo() const { return this->no_vert; }
@@ -290,9 +293,10 @@ namespace Koala
 
         // Usuwamy wierzchołek z grafu.
         // wersja z false skuteczna tylko dla wierzcholka izolowanego
-        inline void del( PVertex vert, bool force = true ) { this->delVert( vert,force ); }
+        inline void del( PVertex vert, bool force = true )
+            { this->delVert( vert,force ); }
         // synonim
-        void delVert( PVertex, bool = true ); 
+        void delVert( PVertex, bool = true );
         // usuwanie zbioru wierzcholkow, zwraca ich liczbe
         template< class Iterator > int delVerts( Iterator begin, Iterator end );
         // wersja odporna na powtorzenia, ktore sa pmijane
@@ -305,7 +309,8 @@ namespace Koala
         // Usuwamy krawędź z grafu.
         inline void del( PEdge );
         // synonim
-        inline void delEdge( PEdge edge ) { this->del( edge ); }
+        inline void delEdge( PEdge edge )
+            { this->del( edge ); }
         // usuwanie zbiorow krawedzi
         // krawedzie przy danym wierzcholku o podanej orientacji wgledem niego
         int delEdges( PVertex, EdgeDirection = EdAll );
@@ -316,7 +321,8 @@ namespace Koala
         // wersja odporna na powtorzenia, ktore sa pmijane
         template< class Iterator > int delEdges2( Iterator begin, Iterator end, EdgeType = EdAll );
         inline int delEdges( const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> &s,
-            EdgeType direct = EdAll ) { return delEdges( s.begin(),s.end(),direct ); }
+            EdgeType direct = EdAll )
+            { return delEdges( s.begin(),s.end(),direct ); }
         // Usuwamy krawędzie z grafu o typie zawartym w masce
         int delEdges( EdgeType = EdAll );
 
@@ -341,7 +347,8 @@ namespace Koala
         // zamiana na nieskierowane krawedzi z podanego zbioru, wynik - liczba udanych zmian
         // podany jest zbior krawedzi
         template< class Iterator > int ch2Undir( Iterator,Iterator );
-        inline int ch2Undir( const Set< typename GraphType::PEdge > &s ) { return ch2Undir( s.begin(),s.end() ); }
+        inline int ch2Undir( const Set< typename GraphType::PEdge > &s )
+            { return ch2Undir( s.begin(),s.end() ); }
         // wszystkie krawedzie przy danym wierzcholku o podanej orientacji wzgledem niego
         int ch2Undir( PVertex, EdgeDirection = EdDirIn|EdDirOut );
         // wszystkie krawedzie miedzy danymi wierzcholkami o podanej orientacji
@@ -354,10 +361,11 @@ namespace Koala
         // Odwrocenie krawedzi skierowanych z podanego zbioru, wynik - liczba udanych zmian
         // podany zbior krawedzi
         template< class Iterator > int revert( Iterator,Iterator );
-        inline int revert( const Set< typename GraphType::PEdge > &s ){ return revert( s.begin(),s.end() ); }
+        inline int revert( const Set< typename GraphType::PEdge > &s )
+            { return revert( s.begin(),s.end() ); }
 
         // wersja odporna na powtorzenia (ignorowane)
-        template< class Iterator > int revert2( Iterator,Iterator ); 
+        template< class Iterator > int revert2( Iterator,Iterator );
         // wszystkie krawedzie przy danym wierzcholku o podanej orientacji wzgledem niego
         int revert( PVertex, EdgeDirection = EdDirIn|EdDirOut );
         // wszystkie krawedzie miedzy danymi wierzcholkami o podanej orientacji
@@ -401,7 +409,8 @@ namespace Koala
             glue( Iterator, Iterator, bool makeloops = false, PVertex = NULL );
         inline typename GraphType::PVertex
             glue( const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex > &s, bool makeloops = false,
-                  PVertex res = NULL ) { glue( s.begin(),s.end(),makeloops,res ); }
+                  PVertex res = NULL )
+                { glue( s.begin(),s.end(),makeloops,res ); }
         // wersja odporna na powtorzenia (ignorowane)
         template< class Iterator > typename GraphType::PVertex
             glue2( Iterator, Iterator, bool makeloops = false, PVertex = NULL );
@@ -439,13 +448,15 @@ namespace Koala
         // podana wartosc
         template< class Iterator, class EdInfoGen > void neg( Iterator, Iterator, EdgeType, EdInfoGen );
         template< class Iterator > void neg( Iterator beg, Iterator end, EdgeType type = Settings::EdAllow,
-            EdgeInfo info = EdgeInfo() ) { neg( beg,end,type,ConstFunctor< EdgeInfo >( info ) ); }
+            EdgeInfo info = EdgeInfo() )
+            { neg( beg,end,type,ConstFunctor< EdgeInfo >( info ) ); }
         template< class EdInfoGen > void neg( const Set< PVertex > &vset, EdgeType type, EdInfoGen infoGen )
             { neg( vset.begin(),vset.end(),type,infoGen ); }
         void neg( const Set< PVertex > &vset, EdgeType = Settings::EdAllow, EdgeInfo = EdgeInfo() );
         // ... i dopelnienie calego grafu
         template< class EdInfoGen > void neg( EdgeType type, EdInfoGen infoGen );
-        void neg( EdgeType type = Settings::EdAllow, EdgeInfo = EdgeInfo() ) { neg( type,ConstFunctor< EdgeInfo >() ); }
+        void neg( EdgeType type = Settings::EdAllow, EdgeInfo = EdgeInfo() )
+            { neg( type,ConstFunctor< EdgeInfo >() ); }
 
         // Kopiowanie do naszego innego grafu (np. innego typu). Wierzcholki dotychczasowe pozostaja na liscie
         // przed skopiowanymi. W najogolniejszej wersji mozna podac
@@ -486,15 +497,20 @@ namespace Koala
         inline bool hasAdjMatrix() const;
 
         // czy ten typ grafu obsluguje macierz sasiedztwa
-        static bool allowedAdjMatrix() { return Settings::AdjMatrixAllowed; }
+        static bool allowedAdjMatrix()
+            { return Settings::AdjMatrixAllowed; }
         // alokacja pamieci na podana liczbe wierzcholkow
         inline void reserveAdjMatrix( int );
 
         // do wspolpracy z hierarchia podgrafow i widokow.
-        const Graph< VertInfo,EdgeInfo,Settings > *getRootPtr() const { return this; }
-        const Graph< VertInfo,EdgeInfo,Settings >& root() const { return *this; }
-        bool good( PVertex, bool = false ) const { return true; }
-        bool good( PEdge, bool = false ) const { return true; }
+        const Graph< VertInfo,EdgeInfo,Settings > *getRootPtr() const
+            { return this; }
+        const Graph< VertInfo,EdgeInfo,Settings >& root() const
+            { return *this; }
+        bool good( PVertex, bool = false ) const
+            { return true; }
+        bool good( PEdge, bool = false ) const
+            { return true; }
 
       private:
         AdjMatrix< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed > *pAdj;
@@ -520,9 +536,8 @@ namespace Koala
         typename GraphType::PEdge attach_loop( PEdge, PVertex );
         typename GraphType::PEdge detach( PEdge );
     } ;
-    
+
 #include "graph.hpp"
 }
 
 #endif
-    
