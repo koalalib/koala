@@ -620,9 +620,9 @@ template< class DefaultStructs > template< class Graph > void
         if (g.getEdgeType( e ) == Undirected) matr( g.getEdgeEnd2( e ),g.getEdgeEnd1( e ) ) = true;
     }
     int m = g.getEdgeNo( Directed );
-    typename Graph::PEdge LOCALARRAY(tabe,m);
-    g.getEdges(tabe,Directed);
-    for(int i = 0; i<m; i++)
+    typename Graph::PEdge LOCALARRAY( tabe,m );
+    g.getEdges( tabe,Directed );
+    for( int i = 0; i < m; i++ )
         if (!matr( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ) ))
             g.addArch( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ),einfo );
 }

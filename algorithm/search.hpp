@@ -1557,78 +1557,97 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
 
     typename DefaultStructs::template TwoDimAssocCont< typename GraphType::PVertex,bool,AMatrTriangle >::Type
         adjmatr( n );
-    g.getAdj(adjmatr,EdUndir);
+    g.getAdj( adjmatr,EdUndir );
 
-    int mm=0;
-    for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v)) mm+=g.deg(v)*(g.deg(v)-1);
+    int mm = 0;
+    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) mm += g.deg( v ) * (g.deg( v ) - 1);
     typename GraphType::PEdge LOCALARRAY( buf,mm + 3 );    //TODO: size?
     QueueInterface< typename GraphType::PEdge * > cont( buf,mm+ 3 );   //TODO: size?
     typedef typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,int >::Type VisitTab;
-    VisitTab visited(m);
+    VisitTab visited( m );
 
-    int comp=1;
-    for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir)) if (!visited.hasKey(e))
-    {   visited[e]=comp;
-        cont.push(e);
+    int comp = 1;
+    for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
+        if (!visited.hasKey( e ))
+        {   
+            visited[e] = comp;
+            cont.push( e );
 
-        while (!cont.empty())
-        {   typename GraphType::PEdge f = cont.top();
-            typename GraphType::PVertex a= g.getEdgeEnd1(f),b= g.getEdgeEnd2(f);
-            cont.pop();
+            while (!cont.empty())
+            {   
+                typename GraphType::PEdge f = cont.top();
+                typename GraphType::PVertex a = g.getEdgeEnd1( f ), b = g.getEdgeEnd2( f );
+                cont.pop();
 
-            for(typename GraphType::PEdge f2=g.getEdge(a,EdUndir);f2;f2=g.getEdgeNext(a,f2,EdUndir) )
-            if (f2!=f && ! adjmatr(b,g.getEdgeEnd(f2,a)))
-            {
-                if (visited.hasKey(f2)) continue;
-                visited[f2]=comp;
-                cont.push(f2);
+                for( typename GraphType::PEdge f2 = g.getEdge( a,EdUndir ); f2; f2 = g.getEdgeNext( a,f2,EdUndir ) )
+                if (f2 != f && !adjmatr( b,g.getEdgeEnd( f2,a ) ))
+                {
+                    if (visited.hasKey( f2 )) continue;
+                    visited[f2] = comp;
+                    cont.push( f2 );
+                }
+                for( typename GraphType::PEdge f2 = g.getEdge( b,EdUndir ); f2; f2 = g.getEdgeNext( b,f2,EdUndir ) )
+                if (f2 != f && !adjmatr( a,g.getEdgeEnd( f2,b ) ))
+                {
+                    if (visited.hasKey( f2 )) continue;
+                    visited[f2] = comp;
+                    cont.push( f2 );
+                }
             }
-            for(typename GraphType::PEdge f2=g.getEdge(b,EdUndir);f2;f2=g.getEdgeNext(b,f2,EdUndir) )
-            if (f2!=f && ! adjmatr(a,g.getEdgeEnd(f2,b)))
-            {
-                if (visited.hasKey(f2)) continue;
-                visited[f2]=comp;
-                cont.push(f2);
-            }
+            comp++;
         }
-        comp++;
-    }
 
-    int elicz=0;
-    std::pair<int,typename GraphType::PVertex> LOCALARRAY(bufor,2*m);
-    for(typename GraphType::PEdge e=g.getEdge(EdUndir);e;e=g.getEdgeNext(e,EdUndir))
+    int elicz = 0;
+    std::pair< int,typename GraphType::PVertex > LOCALARRAY( bufor,2 * m );
+    for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
     {
-        bufor[elicz++]=std::make_pair(visited[e],g.getEdgeEnd1(e));
-        bufor[elicz++]=std::make_pair(visited[e],g.getEdgeEnd2(e));
+        bufor[elicz++] = std::make_pair( visited[e],g.getEdgeEnd1( e ) );
+        bufor[elicz++] = std::make_pair( visited[e],g.getEdgeEnd2( e ) );
     }
-    DefaultStructs::sort( bufor,bufor + 2*m );
-    int l = std::unique( bufor,bufor + 2*m ) - bufor;
-    int ccomp=-1;
-    for(int i=0;i<l;i++)
+    DefaultStructs::sort( bufor,bufor + 2 * m );
+    int l = std::unique( bufor,bufor + 2 * m ) - bufor;
+    int ccomp = -1;
+    for( int i = 0; i < l; i++ )
     {
-        if (i==0 || bufor[i-1].first!=bufor[i].first) elicz=0;
-        if (++elicz==n) { assert(ccomp==-1); ccomp=bufor[i].first; /*break;*/ }
+        if (i == 0 || bufor[i-1].first != bufor[i].first) elicz = 0;
+        if (++elicz == n)
+        { 
+            assert( ccomp == -1 );
+            ccomp = bufor[i].first;
+        }
     }
-    assert(ccomp>0 && ccomp<=comp);
+    assert( ccomp > 0 && ccomp <= comp );
 
     adjmatr.clear();
-    makeSubgraph(g,std::make_pair(stdChoose(true),extAssocChoose(&visited,ccomp))).getAdj(adjmatr,EdUndir);
+    makeSubgraph( g,std::make_pair( stdChoose( true ),extAssocChoose( &visited,ccomp ) ) ).getAdj( adjmatr,EdUndir );
 
-    l=compno=0;
-    *out.compIter=0; ++out.compIter;
-    for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-    if (!vmap.hasKey(v))
+    l = compno = 0;
+    *out.compIter = 0;
+    ++out.compIter;
+    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+    if (!vmap.hasKey( v ))
     {
-        l++; vmap[v]=compno; *out.vertIter=v; ++out.vertIter;
-        for(typename GraphType::PVertex u=g.getVertNext(v);u;u=g.getVertNext(u))
-        if (! vmap.hasKey(u) && !adjmatr(u,v))
-        {   bool found=false;
-            for(typename GraphType::PVertex x=g.getVert();x;x=g.getVertNext(x))
-                if (x!=u && x!=v) found=found || (adjmatr(x,v)!=adjmatr(x,u));
-            if (!found)
-            {   l++; vmap[u]=compno; *out.vertIter=u; ++out.vertIter; }
-        }
-        *out.compIter=l; /*std::cout<< "\n!"<<l <<"!";*/ ++out.compIter;compno++;
+        l++;
+        vmap[v] = compno;
+        *out.vertIter = v;
+        ++out.vertIter;
+        for( typename GraphType::PVertex u = g.getVertNext( v ); u; u = g.getVertNext( u ) )
+            if (!vmap.hasKey( u ) && !adjmatr( u,v ))
+            {   
+                bool found = false;
+                for( typename GraphType::PVertex x = g.getVert(); x; x = g.getVertNext( x ) )
+                    if (x != u && x != v) found = found || (adjmatr( x,v ) != adjmatr( x,u ));
+                if (!found)
+                {   
+                    l++;
+                    vmap[u] = compno;
+                    *out.vertIter = u;
+                    ++out.vertIter;
+                }
+            }
+        *out.compIter = l; 
+        ++out.compIter;
+        compno++;
     }
 
     return Partition( compno,mpPrime );
