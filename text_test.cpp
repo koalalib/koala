@@ -5,9 +5,9 @@
 #include<string>
 #include <fstream>
 
-#include"./koala/graph/graph.h"
-#include"./koala/io/text.h"
-#include"./koala/container/set.h"
+#include"./Koala/graph/graph.h"
+#include"./Koala/io/text.h"
+#include"./Koala/container/set.h"
 
 using namespace std;
 using namespace Koala;

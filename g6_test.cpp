@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
-#include "koala/io/g6.h"
-#include "koala/classes/create.h"
+#include "Koala/io/g6.h"
+#include "Koala/classes/create.h"
 
 struct Gene {
 	int operator()(int i) {return i;}

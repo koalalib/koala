@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "koala/container/heap.h"
+#include "Koala/container/heap.h"
 
 using namespace std;
 using namespace Koala;

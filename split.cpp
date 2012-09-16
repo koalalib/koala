@@ -2,10 +2,10 @@
 
 #include<stdio.h>
 #include<iostream>
-#include"koala/base/defs.h"
-#include"koala/graph/graph.h"
-#include"koala/algorithm/search.h"
-#include"koala/io/text.h"
+#include"Koala/base/defs.h"
+#include"Koala/graph/graph.h"
+#include"Koala/algorithm/search.h"
+#include"Koala/io/text.h"
 #include "Koala/classes/detect.h"
 
 using namespace std;

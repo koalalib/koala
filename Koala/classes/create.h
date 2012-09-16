@@ -488,16 +488,14 @@ namespace Koala
         template< class Graph > static void repair( Graph &g );
 
         // wpisz relacje pusta na istniejacych wierzcholkach
-        template< class Graph > static void empty( Graph &g )
-            { g.clearEdges(); }
+        template< class Graph > static void empty( Graph &g ) { g.clearEdges(); }
 
         // wpisz relacje kazdy z kazdym na istniejacych wierzcholkach. Mozna podac pole info wprowadzanych krawedzi
         template< class Graph > static void
             total( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
         // zamienia w relacje odwrotna
-        template< class Graph > static void inv( Graph &g )
-            { g.revert(); }
+        template< class Graph > static void inv( Graph &g ) { g.revert(); }
 
         // przeprowadza domkniecie zwrotne. Mozna podac pole info wprowadzanych krawedzi
         template< class Graph > static void

@@ -1,3 +1,6 @@
+#ifndef KOALA_LOCALTABLE_H
+#define KOALA_LOCALTABLE_H
+
 /* this file defines LOCALARRAY macro
  *
  * it is intended to declare local tables
@@ -31,134 +34,94 @@
 
 //#define KOALA_DONT_USE_ALLOCA
 
-#ifndef KOALA_LOCALTABLE_H
-#define KOALA_LOCALTABLE_H
-
 #ifndef KOALA_STACK_THRESHOLD
-#define KOALA_STACK_THRESHOLD		8192
+#define KOALA_STACK_THRESHOLD       8192
 #endif
 
-#include<new>
-#include<stdio.h>
-#include<malloc.h>
+#include <new>
+#include <malloc.h>
+#include <stdio.h>
 
 #ifdef __INTEL_COMPILER
-#include<alloca.h>
+#include <alloca.h>
 #endif
 
+namespace Koala
+{
+    /*
+    * LocalTableMgr
+    * an object handling initialization and deletion of an allocated memory
+    */
+    class LocalTableMgr
+    {
+      public:
+        LocalTableMgr() { }
+        ~LocalTableMgr() { m_killer( m_ptr,m_size ); }
 
-namespace Koala {
+        // if local == true, ptr is a alloca-ted memory for size elements of type T
+        // if local == false, ptr is NULL, size is the number of elements to allocate
+        // returns a pointer to allocated and initialized memory
+        template< class T > T *Bind( T *ptr, size_t size, bool local );
 
-
-/*
- * LocalTableMgr
- * an object handling initialization and deletion of an allocated memory
- */
-class LocalTableMgr {
-public:
-	LocalTableMgr()			{ };
-	~LocalTableMgr()		{ m_killer(m_ptr, m_size); };
-
-	// if local == true, ptr is a alloca-ted memory for size elements of type T
-	// if local == false, ptr is NULL, size is the number of elements to allocate
-	// returns a pointer to allocated and initialized memory
-	template<class T> T *Bind(T *ptr, size_t size, bool local) {
-		size /= sizeof(T);
-		m_size = size;
-		if(local) {
-			for(size_t i = 0; i < size; i++) new (ptr + i) T();
-			m_ptr = ptr;
-			m_killer = &LocalTableMgr::StackKiller<T>;
-			return ptr;
-		} else {
-			m_ptr = new T[size];
-			m_killer = &LocalTableMgr::HeapKiller<T>;
-			return (T *)m_ptr;
-			};
-		};
-
-	// fallback Bind for types not matched by the template
-	// (e.g. anonymous structs in GCC)
-	void *Bind(void *ptr, size_t size, bool local);
+        // fallback Bind for types not matched by the template
+        // (e.g. anonymous structs in GCC)
+        void *Bind( void *ptr, size_t size, bool local );
 
 #ifdef __BORLANDC__
 #pragma argsused
 #endif
-	template<class T>
-	static void StackKiller(void *ptr, size_t size) {
-		typedef T Type;
-		for(size_t i = 0; i < size; i++) ((Type *)ptr)[i].~Type();
-		};
+        
+        template< class T > static void StackKiller( void *ptr, size_t size );
+        template< class T > static void HeapKiller( void *ptr, size_t ) { delete[] (T *)ptr; }
+        size_t GetSize() { return m_size; };
 
-	template<class T>
-	static void HeapKiller(void *ptr, size_t ) {
-		delete[] (T *)ptr;
-		};
+      private:
+        // pointer to allocated array
+        void *m_ptr;    
+        // number of items allocated
+        size_t m_size;  
+        
+        void (*m_killer)( void *, size_t );
+    };
 
-	size_t GetSize()	{ return m_size; };
+    template<> void LocalTableMgr::StackKiller< void >( void *, size_t ) { }
+    template<> void LocalTableMgr::HeapKiller< void >( void *ptr, size_t ) { free( ptr ); }
 
-private:
-	void *m_ptr;	// pointer to allocated array
-	size_t m_size;	// number of items allocated
-	void (*m_killer)(void *, size_t);
-	};
-
-
-template<> void LocalTableMgr::StackKiller<void>(void *, size_t )	{ };
-template<> void LocalTableMgr::HeapKiller<void>(void *ptr, size_t )	{ free(ptr); };
-
-void *LocalTableMgr::Bind(void *ptr, size_t size, bool local) {
-	m_size = size;
-	if(local) {
-		m_killer = &LocalTableMgr::StackKiller<void>;
-		m_ptr = ptr;
-	} else {
-		m_ptr = malloc(size);
-		m_killer = &LocalTableMgr::HeapKiller<void>;
-		return (void *)m_ptr;
-		};
-	return ptr;
-	};
-
-
-template<class T> inline T *k__cast(T *, void *p2)	{ return (T *)p2; };
-inline void *k__cast(void *, void *p2)			{ return (void *)p2; };
+    template< class T > inline T *k__cast( T *, void *p2 ) { return (T *)p2; }
+    inline void *k__cast( void *, void *p2 ) { return (void *)p2; }
 
 // just to prevent a warning
 #ifdef __BORLANDC__
 #define LA_SETTONULL
 #else
-#define LA_SETTONULL	= NULL
+#define LA_SETTONULL    = NULL
 #endif
-
 
 // Intel Compiler, GCC-likes, Visual Studio and Borland have alloca
 #if !defined(KOALA_DONT_USE_ALLOCA) && \
     (defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__) || \
      defined(__INTEL_COMPILER) || defined(__GCC__))
 
-// name = NULL a dopiero potem name = cast ... ¿eby unikn¹æ warningu
+// name = NULL a dopiero potem name = cast ... ç¸ by uniknè§„ warningu
 // od VS o wykorzystaniu niezainicjowanej zmiennej
-#define LOCALARRAY(name, size)							\
-	*name LA_SETTONULL;							\
-	*(void **)&name = ((size) * sizeof(*name) < KOALA_STACK_THRESHOLD)	\
-		? Koala::k__cast(name, alloca((size) * sizeof(*name)))		\
-		: NULL;								\
-	Koala::LocalTableMgr name##_KILLER;					\
-	*(void **)&name = name##_KILLER.Bind(name, (size) * sizeof(*name), ((size) * sizeof(*name) < KOALA_STACK_THRESHOLD));
-
+#define LOCALARRAY(name, size)                          \
+    *name LA_SETTONULL;                         \
+    *(void **)&name = ((size) * sizeof(*name) < KOALA_STACK_THRESHOLD)  \
+        ? Koala::k__cast(name, alloca((size) * sizeof(*name)))      \
+        : NULL;                             \
+    Koala::LocalTableMgr name##_KILLER;                 \
+    *(void **)&name = name##_KILLER.Bind(name, (size) * sizeof(*name), ((size) * sizeof(*name) < KOALA_STACK_THRESHOLD));
 
 // assume others don't know about alloca
 #else
 
-#define LOCALARRAY(name, size)				\
-	*name LA_SETTONULL;				\
-	Koala::LocalTableMgr name##_KILLER;		\
-	*(void **)&name = name##_KILLER.Bind(name, (size) * sizeof(*name), false);
-
+#define LOCALARRAY(name, size)              \
+    *name LA_SETTONULL;             \
+    Koala::LocalTableMgr name##_KILLER;     \
+    *(void **)&name = name##_KILLER.Bind(name, (size) * sizeof(*name), false);
 #endif
 
-}; // namespace Koala
+#include "localarray.hpp"
+}
 
 #endif
-

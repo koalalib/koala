@@ -2,8 +2,8 @@
 #include<stdio.h>
 
 //#define KOALA_DONT_USE_ALLOCA
-#include"koala/graph/graph.h"
-#include"koala/container/localarray.h"
+#include"Koala/graph/graph.h"
+#include"Koala/container/localarray.h"
 
 using namespace Koala;
 

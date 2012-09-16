@@ -688,9 +688,10 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
         OutIter cliqueiter)
 {
     if (!undir( g,false )) return -1;
-    int b,i,m=g.getEdgeNo(),h,n = g.getVertNo();
+    int b,i,m = g.getEdgeNo(),h,n = g.getVertNo();
     if (n == 1)
-    {   if (!isBlackHole( aheightmap )) aheightmap[g.getVert()] = 0;
+    {   
+        if (!isBlackHole( aheightmap )) aheightmap[g.getVert()] = 0;
         *cliqueiter = g.getVert();
         ++cliqueiter;
         return 1;
@@ -698,49 +699,53 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
 
     typename DefaultStructs::template TwoDimAssocCont< typename Graph::PVertex,bool,AMatrTriangle >::Type
         adjmatr( n );
-    g.getAdj(adjmatr,EdUndir);
+    g.getAdj( adjmatr,EdUndir );
 
-    int mm=0;
-    for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v)) mm+=g.deg(v)*(g.deg(v)-1);
-    std::pair<typename Graph::PEdge,EdgeDirection> LOCALARRAY( buf,mm + 3 );    //TODO: size?
-    QueueInterface< std::pair<typename Graph::PEdge,EdgeDirection> * > cont( buf,mm+ 3 );   //TODO: size?
-    typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EDir >::Type visited(m);
+    int mm = 0;
+    for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) mm += g.deg( v ) * (g.deg( v ) - 1);
+    std::pair< typename Graph::PEdge,EdgeDirection > LOCALARRAY( buf,mm + 3 );    //TODO: size?
+    QueueInterface< std::pair< typename Graph::PEdge,EdgeDirection > * > cont( buf,mm+ 3 );   //TODO: size?
+    typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EDir >::Type visited( m );
 
-    int comp=1;
-    for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-    for(EdgeDirection dir=EdDirIn;dir<=EdDirOut;dir*=2) if (!visited[e](dir))
-    {   visited[e](dir)=comp;
-        cont.push(std::make_pair(e,dir));
+    int comp = 1;
+    for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
+        for( EdgeDirection dir = EdDirIn; dir <= EdDirOut; dir *= 2)
+            if (!visited[e]( dir ))
+            {   
+                visited[e]( dir ) = comp;
+                cont.push( std::make_pair( e,dir ) );
 
-        while (!cont.empty())
-        {   typename Graph::PEdge f = cont.top().first;
-            EdgeDirection fdir=cont.top().second;
-            typename Graph::PVertex a= (fdir==EdDirOut) ? g.getEdgeEnd1(f) : g.getEdgeEnd2(f);
-            typename Graph::PVertex b= g.getEdgeEnd(f,a);
-            cont.pop();
+                while (!cont.empty())
+                {   
+                    typename Graph::PEdge f = cont.top().first;
+                    EdgeDirection fdir = cont.top().second;
+                    typename Graph::PVertex a = (fdir == EdDirOut) ? g.getEdgeEnd1( f ) : g.getEdgeEnd2( f );
+                    typename Graph::PVertex b = g.getEdgeEnd( f,a );
+                    cont.pop();
 
-            for(typename Graph::PEdge f2=g.getEdge(a,EdUndir);f2;f2=g.getEdgeNext(a,f2,EdUndir) )
-            if (f2!=f && ! adjmatr(b,g.getEdgeEnd(f2,a)))
-            {
-                EdgeDirection f2dir=(a==g.getEdgeEnd1(f2)) ? EdDirOut : EdDirIn;
-                if (visited[f2](f2dir)) continue;
-                visited[f2](f2dir)=comp;
-                cont.push(std::make_pair(f2,f2dir));
+                    for( typename Graph::PEdge f2 = g.getEdge( a,EdUndir ); f2; f2 = g.getEdgeNext( a,f2,EdUndir ) )
+                        if (f2 != f && !adjmatr( b,g.getEdgeEnd( f2,a ) ))
+                        {
+                            EdgeDirection f2dir = (a == g.getEdgeEnd1( f2 )) ? EdDirOut : EdDirIn;
+                            if (visited[f2]( f2dir )) continue;
+                            visited[f2]( f2dir ) = comp;
+                            cont.push( std::make_pair( f2,f2dir ) );
+                        }
+                    for( typename Graph::PEdge f2 = g.getEdge( b,EdUndir ); f2; f2 = g.getEdgeNext( b,f2,EdUndir ) )
+                        if (f2 != f && !adjmatr( a,g.getEdgeEnd( f2,b ) ))
+                        {
+                            EdgeDirection f2dir = (b == g.getEdgeEnd2( f2 )) ? EdDirOut : EdDirIn;
+                            if (visited[f2]( f2dir )) continue;
+                            visited[f2]( f2dir ) = comp;
+                            cont.push( std::make_pair( f2,f2dir ) );
+                        }
+                }
+                comp++;
             }
-            for(typename Graph::PEdge f2=g.getEdge(b,EdUndir);f2;f2=g.getEdgeNext(b,f2,EdUndir) )
-            if (f2!=f && ! adjmatr(a,g.getEdgeEnd(f2,b)))
-            {
-                EdgeDirection f2dir=(b==g.getEdgeEnd2(f2)) ? EdDirOut : EdDirIn;
-                if (visited[f2](f2dir)) continue;
-                visited[f2](f2dir)=comp;
-                cont.push(std::make_pair(f2,f2dir));
-            }
-        }
-        comp++;
-    }
-    for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-    {   assert(visited[e](EdDirIn) && visited[e](EdDirOut));
-         if (visited[e](EdDirIn)==visited[e](EdDirOut)) return -1;
+    for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
+    {   
+        assert( visited[e]( EdDirIn ) && visited[e]( EdDirOut ) );
+        if (visited[e]( EdDirIn ) == visited[e]( EdDirOut )) return -1;
     }
 
     typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EdgeDirection >::Type localdirmap;
@@ -749,47 +754,57 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
         typename Graph::PEdge,EdgeDirection >::Type >::get( adirmap,localdirmap );
     if (isBlackHole( adirmap ) || DefaultStructs::ReserveOutAssocCont) dirmap.reserve( m );
 
-    bool LOCALARRAY(compflag,comp+1);
-    for(int i=0;i<=comp;i++) compflag[i]=true;
+    bool LOCALARRAY( compflag,comp + 1 );
+    for( int i = 0; i <= comp; i++ ) compflag[i] = true;
 
-    for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-    for(EdgeDirection dir=EdDirIn;dir<=EdDirOut;dir*=2) if (compflag[visited[e](dir)])
-    {   dirmap[e]=dir;
-        (compflag[visited[e]((dir==EdDirIn) ? EdDirOut : EdDirIn)])=false;
-    }
+    for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
+        for( EdgeDirection dir = EdDirIn; dir <= EdDirOut; dir *= 2 )
+            if (compflag[visited[e]( dir )])
+            {   
+                dirmap[e] = dir;
+                (compflag[visited[e]( (dir == EdDirIn) ? EdDirOut : EdDirIn )]) = false;
+            }
 
     typedef typename DefaultStructs::template LocalGraph< typename Graph::PVertex,
         typename Graph::PEdge ,Directed,false >::Type Image;
 
     Image ig;
     typename DefaultStructs:: template AssocCont< typename Graph::PVertex,typename Image::PVertex >
-        ::Type org2image(n);
-    for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v)) org2image[v]=ig.addVert(v);
-    for(typename Graph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-        if (dirmap[e]==EdDirOut) ig.addArch(org2image[g.getEdgeEnd1(e)],org2image[g.getEdgeEnd2(e)],e);
-        else ig.addArch(org2image[g.getEdgeEnd2(e)],org2image[g.getEdgeEnd1(e)],e);
+        ::Type org2image( n );
+    for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) org2image[v] = ig.addVert( v );
+        for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
+            if (dirmap[e] == EdDirOut) ig.addArch( org2image[g.getEdgeEnd1( e )],org2image[g.getEdgeEnd2( e )],e );
+            else ig.addArch( org2image[g.getEdgeEnd2( e )],org2image[g.getEdgeEnd1( e )],e );
 
-    //assert(DAGAlgsPar<DefaultStructs>::isDAG(ig));
-
-    typename DefaultStructs:: template AssocCont< typename Image::PVertex, typename DAGCritPathPar<DefaultStructs>:: template VertLabs<int,Image> >
-        ::Type vertCont(n);
-    typename DAGCritPathPar<DefaultStructs>:: template UnitLengthEdges<int> edgeCont;
-    DAGCritPathPar<DefaultStructs>:: template critPathLength(ig,vertCont,edgeCont,(typename Image::PVertex)0,(typename Image::PVertex)0);
-    int res= -1;
-    typename Image::PVertex vmax=0;
-    for(typename Image::PVertex v=ig.getVert();v;v=ig.getVertNext(v))
+    typename DefaultStructs:: template AssocCont< typename Image::PVertex,typename
+        DAGCritPathPar< DefaultStructs >:: template VertLabs< int,Image > >::Type vertCont( n );
+    typename DAGCritPathPar< DefaultStructs >:: template UnitLengthEdges< int > edgeCont;
+    DAGCritPathPar< DefaultStructs >:: template
+        critPathLength( ig,vertCont,edgeCont,(typename Image::PVertex)0,(typename Image::PVertex)0 );
+    int res = -1;
+    typename Image::PVertex vmax = 0;
+    for( typename Image::PVertex v = ig.getVert(); v; v = ig.getVertNext( v ) )
     {
-        if (res<vertCont[v].distance) { res=vertCont[v].distance; vmax=v; }
-        if (!isBlackHole(aheightmap)) aheightmap[v->info]=vertCont[v].distance;
+        if (res < vertCont[v].distance)
+        { 
+            res = vertCont[v].distance;
+            vmax = v;
+        }
+        if (!isBlackHole( aheightmap )) aheightmap[v->info] = vertCont[v].distance;
     }
 
-    if (!isBlackHole(cliqueiter))
+    if (!isBlackHole( cliqueiter ))
     {
-        typename Image::PVertex LOCALARRAY(clique,n);
-        DAGCritPathPar<DefaultStructs>:: template getPath(ig,vertCont,vmax,DAGCritPathPar<DefaultStructs>::template outPath(clique,blackHole));
-        for(int i=0;i<=res;i++) { *cliqueiter=clique[i]->info; ++cliqueiter; }
+        typename Image::PVertex LOCALARRAY( clique,n );
+        DAGCritPathPar< DefaultStructs >:: template
+            getPath( ig,vertCont,vmax,DAGCritPathPar< DefaultStructs >::template outPath( clique,blackHole ) );
+        for( int i = 0; i <= res; i++ )
+        { 
+            *cliqueiter = clique[i]->info;
+            ++cliqueiter;
+        }
     }
-    return res+1;
+    return res + 1;
 }
 
 template< class DefaultStructs > template< class Graph >

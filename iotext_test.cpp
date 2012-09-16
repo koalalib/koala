@@ -4,8 +4,8 @@
 
 #include<string>
 
-#include"./koala/graph/graph.h"
-#include"./koala/io/text.h"
+#include"./Koala/graph/graph.h"
+#include"./Koala/io/text.h"
 
 using namespace std;
 using namespace Koala;
