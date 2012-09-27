@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+    <key id="liczint" attr.type="int" for="node" />
+    <key id="liczdouble" attr.type="double" for="edge" />
+    <key id="elitera" attr.type="int" for="edge" />
+    <key id="vlitera" attr.type="int" for="node" />
+    <graph id="first" edgedefault="undirected">
+        <node id="n003E87F8">
+            <data key="liczint">1</data>
+            <data key="vlitera">65</data>
+        </node>
+        <node id="n003E8848">
+            <data key="liczint">2</data>
+        </node>
+        <edge id="e003E8898" source="n003E87F8" target="n003E8848">
+            <data key="elitera">101</data>
+            <data key="liczdouble">0.000000</data>
+        </edge>
+        <edge id="e003E6AF8" source="n003E8848" target="n003E87F8" directed="true">
+            <data key="liczdouble">0.500000</data>
+        </edge>
+        <edge id="e003E6B48" source="n003E8848" target="n003E8848">
+            <data key="elitera">102</data>
+            <data key="liczdouble">1.500000</data>
+        </edge>
+    </graph>
+</graphml>

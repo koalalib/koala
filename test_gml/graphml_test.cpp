@@ -1,152 +1,227 @@
+#include <stdio.h>
+#include <time.h>
 #include <iostream>
-#include "../Koala/graph/graph.h"
-#include "../Koala/base/def_struct.h"
+#include <map>
 #include "../Koala/io/graphml.h"
-#define TEST1
+#include "../Koala/classes/create.h"
+#include"../Koala/io/text.h"
 
-using namespace std;
-using namespace Koala;
+typedef Koala::Graph<int,int> GraphII;
+struct Gene {
+	int operator()(int i) {return i;}
+	int operator()(int i, int j, Koala::EdgeDirection x) {return i+j;}
+};
 
-typedef Graph<int,int> GraphI;
-typedef Graph<double,double> GraphD;
-
-struct FunktorReadV {
-	GraphI::VertInfoType operator()(IO::KeysHolderRead *keysHolder) {
-		GraphI::VertInfoType tmp;
-		keysHolder->getId("vrt");
-		int id = keysHolder->getId("nn");
-		tmp = id ? keysHolder->getInt(id) : 0;
-		return tmp;
+struct VertRead {
+	int operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		return gmlkr->getInt("kolorV");
 	}
 };
-struct FunktorReadE {
-	GraphI::EdgeInfoType operator()(IO::KeysHolderRead *keysHolder) {
-		GraphI::EdgeInfoType tmp;
-		keysHolder->getId("edg");
-		int id = keysHolder->getId("ee");
-		tmp = id ? keysHolder->getInt(id) : 0;
-		return tmp;
+struct EdgeRead {
+	int operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		return gmlkr->getInt("kolorE");
 	}
 };
 
-struct FunktorWrite {
-	void operator()(GraphI::PVertex vert, IO::KeysHolderWrite *keysHolder) {
-		keysHolder->getIdCr("VRT");
-		int id = keysHolder->getIdCr("NN");
-		char zm[30];
-		sprintf(zm,"%d",vert->info);
-		keysHolder->setString(id, zm);
-	}
-	void operator()(GraphI::PEdge edge, IO::KeysHolderWrite *keysHolder) {
-		keysHolder->getIdCr("EDG");
-		int id = keysHolder->getIdCr("EE");
-		char zm[30];
-		sprintf(zm,"%d", edge->info);
-		keysHolder->setString(id, zm);
-	}
-	void operator()(GraphI &graph, IO::KeysHolderWrite *keysHolder) {
-		keysHolder->getIdCr("GRH");
-		int id = keysHolder->getIdCr("GG");
-		char zm[30];
-		sprintf(zm, "%d", (int)&graph);
-		keysHolder->setString(id, zm);
+struct VertWrite {
+	void operator()( GraphII::PVertex vert, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setInt("kolorV", vert->info);
 	}
 };
 
-#ifdef TEST0
-int main() {
-	IO::GraphML graphml;
-	GraphI graph;
-	graphml.writeFile("graph_none.xml");
-	graphml.writeGraph(graph, "empty");
-	graphml.writeFile("empty_graph.xml");
-	return 0;
+struct EdgeWrite {
+	void operator()( GraphII::PEdge edge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setInt("kolorE", edge->info);
+	}
+};
+
+std::map<std::string,Koala::IO::GraphMLKeyTypes::Type> keymap;
+
+	static char what(Koala::IO::GraphMLKeyTypes::ForKey arg)
+	{
+	    switch (arg)
+	    {
+	        case Koala::IO::GraphMLKeyTypes::All : return 'a';
+	        case Koala::IO::GraphMLKeyTypes::GraphML : return 'f';
+	        case Koala::IO::GraphMLKeyTypes::Graph : return 'g';
+	        case Koala::IO::GraphMLKeyTypes::Node : return 'v';
+	        case Koala::IO::GraphMLKeyTypes::Edge : return 'e';
+	        case Koala::IO::GraphMLKeyTypes::Unknown : return '?';
+	    }
+	}
+
+	static char what(Koala::IO::GraphMLKeyTypes::Type arg)
+	{
+	    switch (arg)
+	    {
+	        case Koala::IO::GraphMLKeyTypes::Bool : return 'b';
+	        case Koala::IO::GraphMLKeyTypes::Int : return 'i';
+	        case Koala::IO::GraphMLKeyTypes::Long : return 'l';
+	        case Koala::IO::GraphMLKeyTypes::Float : return 'f';
+	        case Koala::IO::GraphMLKeyTypes::Double : return 'd';
+	        case Koala::IO::GraphMLKeyTypes::String : return 's';
+	        case Koala::IO::GraphMLKeyTypes::NotDefined : return '?';
+	    }
+	}
+
+
+struct OpisV {
+    int licz;
+    char lit;
+
+    OpisV(int i=0, char c=' ') : licz(i), lit(c) {}
+};
+
+std::ostream& operator<<(std::ostream& strumien, OpisV arg)
+{
+    return strumien << arg.licz << ',' << arg.lit;
 }
-#endif
 
-#ifdef TEST1
-int main() {
-	IO::GraphML graphml;
-	GraphI graph;
-/*	graphml.readFile("graph_in1.xml");
-	graph.clear();
-	graphml.readGraph(graph,0);
-	graphml.clear();
-	graphml.writeGraph(graph,"test");
-	graphml.writeGraph(graph,"test1");
-	graphml.writeFile("graph_out1.xml"); //*/
 
-	// testy z kluczami
-	graphml.readFile("graph_in2.xml");
-	graphml.readGraph(graph, 0, FunktorReadV(), FunktorReadE());
-	graphml.clear();
-	graphml.writeGraph(graph, "test", FunktorWrite(), FunktorWrite());
-	graphml.writeFile("graph_out2.xml");
-//*/
-/*	graphml.readFile("graph1.xml");
-	graphml.getGraph(graph, 0);
-	graph.testGraph();
-	graphml.setGraph(graph, "ala");
-	graphml.writeFile("graph00.xml");*/
-//	graphml.readFile("graph_int.xml");
-//	graphml.getGraph(graph,0);
-//	graphml.getGraph(graph,0,FunktorGet());
-//	graph.testGraph();
-//	graphml.setGraph(graph, "nowy", FunktorSet());
-//	graphml.writeFile("graph_int_out.xml");
-    return 0;
+struct OpisE {
+    double licz;
+    char lit;
+
+    OpisE(double i=0, char c=' ') : licz(i), lit(c) {}
+};
+
+std::ostream& operator<<(std::ostream& strumien, OpisE arg)
+{
+    return strumien << arg.licz << ',' << arg.lit;
 }
-#endif
 
 
-#ifdef TEST2
+struct OpisVRead {
+	OpisV operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+	    keymap.clear();
+	    gmlkr->getKeys(keymap);
+	    std::cout<<"\n";
+	    for(std::map<std::string,Koala::IO::GraphMLKeyTypes::Type>::const_iterator i=keymap.begin();i!=keymap.end();++i)
+        {
+            std::cout << "\t vread:"<< i->first << ' ' << std::boolalpha << gmlkr->isValue(i->first.c_str()) << '\n';
+        }
+        std::cout<<"\n";
+        std:: cout << "\t liczint: " << what(gmlkr->getKeyType("liczint")) << ' ' << what(gmlkr->getKeyFor("liczint")) <<"  ";
+        std:: cout << "\t vlitera: " << what(gmlkr->getKeyType("vlitera")) << ' ' << what(gmlkr->getKeyFor("vlitera")) <<"  ";
+        std:: cout << "\t liczdouble: " << what(gmlkr->getKeyType("liczdouble")) << ' ' << what(gmlkr->getKeyFor("liczdouble")) <<"  ";
+        std:: cout << "\t elitera: " << what(gmlkr->getKeyType("elitera")) << ' ' << what(gmlkr->getKeyFor("elitera")) <<"\n\n";
+
+
+
+		return OpisV(gmlkr->getInt("liczint"),(char)gmlkr->getInt("vlitera"));
+	}
+};
+
+
+struct OpisVWrite {
+void *skip;
+    OpisVWrite(void* toskip=0) : skip(toskip) {}
+    template <class T>
+	void operator()( T vert, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setInt("liczint", vert->info.licz);
+		if (vert!=skip) gmlkw->setInt("vlitera", vert->info.lit);
+	}
+};
+
+struct OpisERead {
+	OpisE operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+	    keymap.clear();
+	    gmlkr->getKeys(keymap);
+	    std::cout<<"\n";
+	    for(std::map<std::string,Koala::IO::GraphMLKeyTypes::Type>::const_iterator i=keymap.begin();i!=keymap.end();++i)
+        {
+            std::cout << "\t eread:"<< i->first << ' ' << std::boolalpha << gmlkr->isValue(i->first.c_str()) << '\n';
+        }
+        std::cout<<"\n";
+        std:: cout << "\t liczint: " << what(gmlkr->getKeyType("liczint")) << ' ' << what(gmlkr->getKeyFor("liczint")) <<"  ";
+        std:: cout << "\t vlitera: " << what(gmlkr->getKeyType("vlitera")) << ' ' << what(gmlkr->getKeyFor("vlitera")) <<"  ";
+        std:: cout << "\t liczdouble: " << what(gmlkr->getKeyType("liczdouble")) << ' ' << what(gmlkr->getKeyFor("liczdouble")) <<"  ";
+        std:: cout << "\t elitera: " << what(gmlkr->getKeyType("elitera")) << ' ' << what(gmlkr->getKeyFor("elitera")) <<"\n\n";
+
+		return OpisE(gmlkr->getDouble("liczdouble"),(char)gmlkr->getInt("elitera"));
+	}
+
+};
+
+
+struct OpisEWrite {
+    void *skip;
+    OpisEWrite(void* toskip=0) : skip(toskip) {}
+    template <class T>
+	void operator()( T vert, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setDouble("liczdouble", vert->info.licz);
+		if (vert!=skip) gmlkw->setInt("elitera", vert->info.lit);
+	}
+};
+
 int main() {
-	IO::GraphML graphml;
-	GraphI graph;
-	IO::KeysHolderGraph khGraph;
+	typedef  GraphII::PVertex Vert;
+	typedef  GraphII::PEdge Edge;
+	GraphII g1;
+	Koala::IO::GraphML gml;
+	Koala::IO::GraphMLGraph *gmlg;
+	gml.newGraphML();
 
-	graphml.readFile("graph_in2.xml");
-	graphml.readGraphParam(0, khGraph);
+//	gml.newKey("kv", "kolorV", Koala::IO::GraphMLKeyTypes::Int,
+//		Koala::IO::GraphMLKeyTypes::Node);
+//	gml.newKey("ke", "kolorE", Koala::IO::GraphMLKeyTypes::Int,
+//		Koala::IO::GraphMLKeyTypes::Edge);
+//	gml.newKey("dg", "graphType", Koala::IO::GraphMLKeyTypes::Int,
+//		Koala::IO::GraphMLKeyTypes::Graph);
+//	gml.newKey("dgml", "graphML", Koala::IO::GraphMLKeyTypes::Int,
+//		Koala::IO::GraphMLKeyTypes::GraphML);
 
-	int id = khGraph.getIdCr("nowyEl");
-	khGraph.setInt(id, 456);
-	id = khGraph.getIdCr("nn");
-	khGraph.setInt(id, 567);
-	id = khGraph.getIdCr("ee");
-	khGraph.setInt(id, 678);
-	id = khGraph.getIdCr("gg");
-	khGraph.setInt(id, 789);
-	graphml.writeGraphParam(0, khGraph);
+	Koala::Creator::erdRen1(g1, 10, 0.1, Gene(), Gene(), time(NULL), Koala::EdUndir);
+	for(Vert vv = g1.getVert(); vv; vv = g1.getVertNext(vv)) {
+		printf("%d : ", vv->info);
+		for(Edge ee = g1.getEdge(vv); ee; ee = g1.getEdgeNext(vv, ee)) {
+			Vert uu = g1.getEdgeEnd(ee, vv);
+			printf("%d(%d), ", ee->info, uu->info);
+		}
+		printf("\n");
+	}
+	gmlg = gml.createGraph("first");
+	gmlg->writeGraph(g1, VertWrite(), EdgeWrite());
+	gmlg->setInt("graphType", 2);
+	printf("%d %d\n", g1.getVertNo(), g1.getEdgeNo());
 
-	graphml.writeFile("graph_out2.xml");
+	gml.setInt("graphML", 4);
+	gml.writeFile("xyz.xml");
 
-    return 0;
+	gml.newGraphML();
+	g1.clear();
+
+	gml.readFile("xyz.xml");
+	gmlg = gml.getGraph("first");
+	printf("%d %d\n", gml.getInt("graphML"), gmlg->getInt("graphType"));
+	gmlg->readGraph(g1, VertRead(), EdgeRead());
+	for(Vert vv = g1.getVert(); vv; vv = g1.getVertNext(vv)) {
+		printf("%d : ", vv->info);
+		for(Edge ee = g1.getEdge(vv); ee; ee = g1.getEdgeNext(vv, ee)) {
+			Vert uu = g1.getEdgeEnd(ee, vv);
+			printf("%d(%d), ", ee->info, uu->info);
+		}
+		printf("\n");
+	}
+
+	{ std::cout << "\n\n************************\n\n";
+        Koala::Graph<OpisV,OpisE> g,g1;
+        Koala::Vertex<OpisV,OpisE> *u=g.addVert(OpisV(1,'A')), *v=g.addVert(OpisV(2,'B'));
+        Koala::Edge<OpisV,OpisE> *e=g.addEdge(u,v,OpisE(0,'e')), *d=g.addArch(v,u,OpisE(0.5,'d')), *f=g.addLoop(v,OpisE(1.5,'f'));
+
+        Koala::IO::writeGraphText(g,std::cout,Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
+
+        std::cout << "\n\n***\n\n";
+        gml.newGraphML();
+        gmlg = gml.createGraph("first");
+        gmlg->writeGraph(g,OpisVWrite(v),OpisEWrite(d));
+        gml.writeFile("xyz.xml");
+
+        gml.newGraphML();
+        gml.readFile("xyz.xml");
+        gmlg = gml.getGraph(0);
+        gmlg->readGraph(g1,OpisVRead(),OpisERead());
+        Koala::IO::writeGraphText(g1,std::cout,Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
+
+	}
 }
-#endif
-
-#ifdef TEST3
-int main() {
-	IO::GraphML graphml;
-	GraphI graph;
-	IO::KeysHolderGraph khGraph;
-
-	graphml.readFile("graph_in2.xml");
-	graphml.readGraphParam(0, khGraph);
-
-	int id = khGraph.getIdNoCr("nowyEl");
-	khGraph.setInt(id, 456);
-	id = khGraph.getIdNoCr("nn");
-	khGraph.setInt(id, 567);
-	id = khGraph.getIdNoCr("ee");
-	khGraph.setInt(id, 678);
-	id = khGraph.getIdNoCr("gg");
-	khGraph.setInt(id, 789);
-	graphml.writeGraphParam(0, khGraph);
-
-	graphml.writeFile("graph_out2.xml");
-
-    return 0;
-}
-#endif
-
-
