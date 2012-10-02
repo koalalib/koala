@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"  
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns 
+		./graphml.xsd">
+	<key id="show" for="graph" attr.type="int" attr.name="write">
+		<default>0</default> <!--writes graph; 0-don't write; 1-write maxColor; 2-write graph with colors-->
+	</key>
+	<key id="vName" for="node" attr.type="string" attr.name="vName"/>
+	<key id="eName" for="edge" attr.type="string" attr.name="eName"/>
+	<key id="color" for="edge" attr.type="int" attr.name="color">
+		<default>-1</default>
+	</key>
+	<!-- for all keys below: 0-make test; 1-don't make test-->
+	<key id="testColor" for="graph" attr.type="int"/>
+	<key id="colorA" for="graph" attr.type="int"/>
+	<!-- TEST 0 -->
+	<graph id="Petersen" edgedefault="undirected">
+		<data key="show">2</data>
+		<node id="a0"> <data key="vName">0</data> </node>
+		<node id="a1"> <data key="vName">1</data> </node>
+		<node id="a2"> <data key="vName">2</data> </node>
+		<node id="a3"> <data key="vName">3</data> </node>
+		<node id="a4"> <data key="vName">4</data> </node>
+		<node id="b0"> <data key="vName">5</data> </node>
+		<node id="b1"> <data key="vName">6</data> </node>
+		<node id="b2"> <data key="vName">7</data> </node>
+		<node id="b3"> <data key="vName">8</data> </node>
+		<node id="b4"> <data key="vName">9</data> </node>
+		<edge id="c0" source="a0" target="a1"/>
+		<edge id="c1" source="a1" target="a2"/>
+		<edge id="c2" source="a2" target="a3"/>
+		<edge id="c3" source="a3" target="a4"/>
+		<edge id="c4" source="a4" target="a0"/>
+		<edge id="d0" source="b0" target="b1"/>
+		<edge id="d1" source="b1" target="b2"/>
+		<edge id="d2" source="b2" target="b3"/>
+		<edge id="d3" source="b3" target="b4"/>
+		<edge id="d4" source="b4" target="b0"/>
+		<edge id="i0" source="a0" target="b0"/>
+		<edge id="i1" source="a1" target="b2"/>
+		<edge id="i2" source="a2" target="b4"/>
+		<edge id="i3" source="a3" target="b1"/>
+		<edge id="i4" source="a4" target="b3"/>
+	</graph>
+	<!-- TEST 1 - multigraph Petersen with double edges-->
+	<graph id="Petersen x2" edgedefault="undirected">
+		<data key="show">2</data>
+		<node id="a0"> <data key="vName">0</data> </node>
+		<node id="a1"> <data key="vName">1</data> </node>
+		<node id="a2"> <data key="vName">2</data> </node>
+		<node id="a3"> <data key="vName">3</data> </node>
+		<node id="a4"> <data key="vName">4</data> </node>
+		<node id="b0"> <data key="vName">5</data> </node>
+		<node id="b1"> <data key="vName">6</data> </node>
+		<node id="b2"> <data key="vName">7</data> </node>
+		<node id="b3"> <data key="vName">8</data> </node>
+		<node id="b4"> <data key="vName">9</data> </node>
+		<edge id="c0" source="a0" target="a1"/>
+		<edge id="c1" source="a1" target="a2"/>
+		<edge id="c2" source="a2" target="a3"/>
+		<edge id="c3" source="a3" target="a4"/>
+		<edge id="c4" source="a4" target="a0"/>
+		<edge id="d0" source="b0" target="b1"/>
+		<edge id="d1" source="b1" target="b2"/>
+		<edge id="d2" source="b2" target="b3"/>
+		<edge id="d3" source="b3" target="b4"/>
+		<edge id="d4" source="b4" target="b0"/>
+		<edge id="i0" source="a0" target="b0"/>
+		<edge id="i1" source="a1" target="b2"/>
+		<edge id="i2" source="a2" target="b4"/>
+		<edge id="i3" source="a3" target="b1"/>
+		<edge id="i4" source="a4" target="b3"/>
+
+		<edge id="c0q" source="a0" target="a1"/>
+		<edge id="c1q" source="a1" target="a2"/>
+		<edge id="c2q" source="a2" target="a3"/>
+		<edge id="c3q" source="a3" target="a4"/>
+		<edge id="c4q" source="a4" target="a0"/>
+		<edge id="d0q" source="b0" target="b1"/>
+		<edge id="d1q" source="b1" target="b2"/>
+		<edge id="d2q" source="b2" target="b3"/>
+		<edge id="d3q" source="b3" target="b4"/>
+		<edge id="d4q" source="b4" target="b0"/>
+		<edge id="i0q" source="a0" target="b0"/>
+		<edge id="i1q" source="a1" target="b2"/>
+		<edge id="i2q" source="a2" target="b4"/>
+		<edge id="i3q" source="a3" target="b1"/>
+		<edge id="i4q" source="a4" target="b3"/>
+	</graph>
+	<!-- TEST 2 -->
+	<graph id="Fan check (A)" edgedefault="undirected">
+		<data key="show">2</data>
+		<node id="a0"> <data key="vName">a0</data> </node>
+		<node id="a1"> <data key="vName">a1</data> </node>
+		<node id="a2"> <data key="vName">a2</data> </node>
+		<node id="b0"> <data key="vName">b0</data> </node>
+		<node id="b1"> <data key="vName">b1</data> </node>
+		<node id="b2"> <data key="vName">b2</data> </node>
+		<edge id="ab" source="a0" target="b0"/>
+		<edge id="a1" source="a0" target="a1"/>
+		<edge id="a2" source="a0" target="a2"/>
+		<edge id="b1" source="b0" target="b1"/>
+		<edge id="b2" source="b0" target="b2"/>
+	</graph>
+</graphml>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"  
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns 
+		./graphml.xsd">
+	<key id="show" for="graph" attr.type="int">
+		<default>0</default> <!--show results; 0-don't write; 1-write maxColor; 2-write graph with colors-->
+	</key>
+	<key id="vName" for="node" attr.type="string"/>
+	<key id="eName" for="edge" attr.type="string"/>
+	<key id="color" for="edge" attr.type="int">
+		<default>-1</default>
+	</key>
+	<!-- colorings -->
+	<!-- for all keys below: 0-make test; 1-don't make test-->
+	<key id="testColor" for="graph" attr.type="int"/>
+	<key id="greedy" for="graph" attr.type="int"/>
+	<key id="greedyInter" for="graph" attr.type="int"/>
+	<key id="vizingSimple" for="graph" attr.type="int"/>
+	<key id="vizing" for="graph" attr.type="int"/>
+	<!-- TEST 0 -->
+	<graph id="Petersen" edgedefault="undirected">
+		<node id="a0"> <data key="vName">0</data> </node>
+		<node id="a1"> <data key="vName">1</data> </node>
+		<node id="a2"> <data key="vName">2</data> </node>
+		<node id="a3"> <data key="vName">3</data> </node>
+		<node id="a4"> <data key="vName">4</data> </node>
+		<node id="b0"> <data key="vName">5</data> </node>
+		<node id="b1"> <data key="vName">6</data> </node>
+		<node id="b2"> <data key="vName">7</data> </node>
+		<node id="b3"> <data key="vName">8</data> </node>
+		<node id="b4"> <data key="vName">9</data> </node>
+		<edge id="c0" source="a0" target="a1"/>
+		<edge id="c1" source="a1" target="a2"/>
+		<edge id="c2" source="a2" target="a3"/>
+		<edge id="c3" source="a3" target="a4"/>
+		<edge id="c4" source="a4" target="a0"/>
+		<edge id="d0" source="b0" target="b1"/>
+		<edge id="d1" source="b1" target="b2"/>
+		<edge id="d2" source="b2" target="b3"/>
+		<edge id="d3" source="b3" target="b4"/>
+		<edge id="d4" source="b4" target="b0"/>
+		<edge id="i0" source="a0" target="b0"/>
+		<edge id="i1" source="a1" target="b2"/>
+		<edge id="i2" source="a2" target="b4"/>
+		<edge id="i3" source="a3" target="b1"/>
+		<edge id="i4" source="a4" target="b3"/>
+	</graph>
+	<!-- TEST 1 -->
+	<graph id="recoloring 1" edgedefault="undirected">
+		<node id="x"> <data key="vName">x</data> </node>
+		<node id="a0"> <data key="vName">a0</data> </node>
+		<node id="a1"> <data key="vName">a1</data> </node>
+		<node id="b0"> <data key="vName">b0</data> </node>
+		<node id="b1"> <data key="vName">b1</data> </node>
+		<node id="c0"> <data key="vName">c0</data> </node>
+		<node id="c1"> <data key="vName">c1</data> </node>
+		<node id="c2"> <data key="vName">c11</data> </node>
+		<node id="z"> <data key="vName">z</data> </node>
+		<node id="zz"> <data key="vName">zz</data> </node>
+		<edge id="xz" source="x" target="z"> <data key="eName">0</data> </edge>
+		<edge id="xa" source="x" target="a0"> <data key="eName">1</data> <data key="color">0</data> </edge>
+		<edge id="xb" source="x" target="b0"> <data key="eName">2</data> <data key="color">1</data> </edge>
+		<edge id="xc" source="x" target="c0"> <data key="eName">3</data> <data key="color">2</data> </edge>
+		<edge id="aa" source="a0" target="a1"> <data key="eName">4</data> <data key="color">2</data> </edge>
+		<edge id="bb" source="b0" target="b1"> <data key="eName">5</data> <data key="color">0</data> </edge>
+		<edge id="cc" source="c0" target="c1"> <data key="eName">6</data> <data key="color">0</data> </edge>
+		<edge id="zz" source="z" target="zz"> <data key="eName">7</data> <data key="color">3</data> </edge>
+		<edge id='nn' source="a0" target='b0'> <data key="eName">8</data> <data key="color">3</data> </edge>
+		<edge id="ccc" source="c0" target="c2"> <data key="eName">9</data> <data key="color">3</data> </edge>
+	</graph>
+	<!-- TEST 2 -->
+	<graph id="recoloring 2" edgedefault="undirected">
+		<node id="x"> <data key="vName">x</data> </node>
+		<node id="a0"> <data key="vName">a0</data> </node>
+		<node id="a1"> <data key="vName">a1</data> </node>
+		<node id="b0"> <data key="vName">b0</data> </node>
+		<node id="b1"> <data key="vName">b1</data> </node>
+		<node id="c0"> <data key="vName">c0</data> </node>
+		<node id="c1"> <data key="vName">c1</data> </node>
+		<node id="c2"> <data key="vName">c11</data> </node>
+		<node id="z"> <data key="vName">z</data> </node>
+		<node id="zz"> <data key="vName">zz</data> </node>
+		<edge id="xz" source="x" target="z"> <data key="eName">0</data> </edge>
+		<edge id="xa" source="x" target="a0"> <data key="eName">1</data> <data key="color">0</data> </edge>
+		<edge id="xb" source="x" target="b0"> <data key="eName">2</data> <data key="color">1</data> </edge>
+		<edge id="xc" source="x" target="c0"> <data key="eName">3</data> <data key="color">2</data> </edge>
+		<edge id="aa" source="a0" target="a1"> <data key="eName">4</data> <data key="color">2</data> </edge>
+		<edge id="bb" source="b0" target="b1"> <data key="eName">5</data> <data key="color">0</data> </edge>
+		<edge id="cc" source="c0" target="c1"> <data key="eName">6</data> <data key="color">0</data> </edge>
+		<edge id="zz" source="z" target="zz"> <data key="eName">7</data> <data key="color">3</data> </edge>
+		<edge id='nn' source="a0" target='b1'> <data key="eName">8</data> <data key="color">3</data> </edge>
+		<edge id="ccc" source="c0" target="c2"> <data key="eName">9</data> <data key="color">3</data> </edge>
+	</graph>
+	<!-- TEST 3 - multigraph Petersen with double edges-->
+	<graph id="Petersen x2" edgedefault="undirected">
+		<data key="vizingSimple">1</data>
+		<node id="a0"> <data key="vName">0</data> </node>
+		<node id="a1"> <data key="vName">1</data> </node>
+		<node id="a2"> <data key="vName">2</data> </node>
+		<node id="a3"> <data key="vName">3</data> </node>
+		<node id="a4"> <data key="vName">4</data> </node>
+		<node id="b0"> <data key="vName">5</data> </node>
+		<node id="b1"> <data key="vName">6</data> </node>
+		<node id="b2"> <data key="vName">7</data> </node>
+		<node id="b3"> <data key="vName">8</data> </node>
+		<node id="b4"> <data key="vName">9</data> </node>
+		<edge id="c0" source="a0" target="a1"/>
+		<edge id="c1" source="a1" target="a2"/>
+		<edge id="c2" source="a2" target="a3"/>
+		<edge id="c3" source="a3" target="a4"/>
+		<edge id="c4" source="a4" target="a0"/>
+		<edge id="d0" source="b0" target="b1"/>
+		<edge id="d1" source="b1" target="b2"/>
+		<edge id="d2" source="b2" target="b3"/>
+		<edge id="d3" source="b3" target="b4"/>
+		<edge id="d4" source="b4" target="b0"/>
+		<edge id="i0" source="a0" target="b0"/>
+		<edge id="i1" source="a1" target="b2"/>
+		<edge id="i2" source="a2" target="b4"/>
+		<edge id="i3" source="a3" target="b1"/>
+		<edge id="i4" source="a4" target="b3"/>
+
+		<edge id="c0q" source="a0" target="a1"/>
+		<edge id="c1q" source="a1" target="a2"/>
+		<edge id="c2q" source="a2" target="a3"/>
+		<edge id="c3q" source="a3" target="a4"/>
+		<edge id="c4q" source="a4" target="a0"/>
+		<edge id="d0q" source="b0" target="b1"/>
+		<edge id="d1q" source="b1" target="b2"/>
+		<edge id="d2q" source="b2" target="b3"/>
+		<edge id="d3q" source="b3" target="b4"/>
+		<edge id="d4q" source="b4" target="b0"/>
+		<edge id="i0q" source="a0" target="b0"/>
+		<edge id="i1q" source="a1" target="b2"/>
+		<edge id="i2q" source="a2" target="b4"/>
+		<edge id="i3q" source="a3" target="b1"/>
+		<edge id="i4q" source="a4" target="b3"/>
+	</graph>
+	<!-- TEST 4 - simple check fan part A-->
+	<graph id="Fan check (A)" edgedefault="undirected">
+		<data key="show">2</data>
+		<node id="a0"> <data key="vName">a0</data> </node>
+		<node id="a1"> <data key="vName">a1</data> </node>
+		<node id="a2"> <data key="vName">a2</data> </node>
+		<node id="b0"> <data key="vName">b0</data> </node>
+		<node id="b1"> <data key="vName">b1</data> </node>
+		<node id="b2"> <data key="vName">b2</data> </node>
+		<edge id="ab" source="a0" target="b0"/>
+		<edge id="ab1" source="a0" target="b0"/>
+		<edge id="ab2" source="a0" target="b0"/>
+		<edge id="ab3" source="a0" target="b0"/>
+		<edge id="ab4" source="a0" target="b0"/>
+		<edge id="ab5" source="a0" target="b0"/>
+		<edge id="a1" source="a0" target="a1"> <data key="color">1</data> </edge>
+		<edge id="a2" source="a0" target="a2"> <data key="color">2</data> </edge>
+		<edge id="b1" source="b0" target="b1"> <data key="color">0</data> </edge>
+		<edge id="b2" source="b0" target="b2"> <data key="color">1</data> </edge>
+	</graph>
+</graphml>

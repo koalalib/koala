@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"  
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns 
+		./graphml.xsd">
+	<key id="show" for="graph" attr.type="int">
+		<default>0</default> <!--writes graph; 0-don't write; 1-write maxColor; 2-write graph with colors-->
+	</key>
+	<key id="vName" for="node" attr.type="string"/>
+	<key id="eName" for="edge" attr.type="string"/>
+	<key id="color" for="node" attr.type="int">
+		<default>-1</default>
+	</key>
+	<!-- for all keys below: 0-make test; 1-don't make test-->
+	<key id="testColor" for="graph" attr.type="int"/>
+	<key id="colorA" for="graph" attr.type="int"/>
+
+	<!-- TEST 0 -->
+	<graph id="K_4" edgedefault="undirected">
+		<data key="show">2</data>
+		<node id="0"> <data key="vName">0</data> </node>
+		<node id="1"> <data key="vName">1</data> </node>
+		<node id="2"> <data key="vName">2</data> </node>
+		<node id="3"> <data key="vName">3</data> </node>
+		<edge id="01" source="0" target="1"/>
+		<edge id="02" source="0" target="2"/>
+		<edge id="03" source="0" target="3"/>
+		<edge id="12" source="1" target="2"/>
+		<edge id="13" source="1" target="3"/>
+		<edge id="23" source="2" target="3"/>
+	</graph>
+	<!-- TEST 1 -->
+	<graph id="K_5" edgedefault="undirected">
+		<data key="show">2</data>
+		<node id="0"> <data key="vName">0</data> </node>
+		<node id="1"> <data key="vName">1</data> </node>
+		<node id="2"> <data key="vName">2</data> </node>
+		<node id="3"> <data key="vName">3</data> </node>
+		<node id="4"> <data key="vName">4</data> </node>
+		<edge id="01" source="0" target="1"/>
+		<edge id="02" source="0" target="2"/>
+		<edge id="03" source="0" target="3"/>
+		<edge id="04" source="0" target="4"/>
+		<edge id="12" source="1" target="2"/>
+		<edge id="13" source="1" target="3"/>
+		<edge id="14" source="1" target="4"/>
+		<edge id="23" source="2" target="3"/>
+		<edge id="24" source="2" target="4"/>
+		<edge id="34" source="3" target="4"/>
+	</graph>
+	<!-- TEST 2 -->
+	<graph id="test 2" edgedefault="undirected">
+		<data key="show">2</data>
+		<node id="a0"> <data key="vName">a0</data> </node>
+		<node id="a1"> <data key="vName">a1</data> </node>
+		<node id="a2"> <data key="vName">a2</data> </node>
+		<node id="b0"> <data key="vName">b0</data> </node>
+		<node id="b1"> <data key="vName">b1</data> </node>
+		<node id="b2"> <data key="vName">b2</data> </node>
+		<edge id="1" source="a0" target="a1"/>
+		<edge id="2" source="a1" target="a2"/>
+		<edge id="3" source="a2" target="a0"/>
+		<edge id="4" source="b0" target="b1"/>
+		<edge id="5" source="b1" target="b2"/>
+		<edge id="6" source="b2" target="b0"/>
+		<edge id="7" source="a0" target="b0"/>
+	</graph>
+	<!-- TEST 3 - smallest graph hard for LF (Kubale et. 'Modele i metody kolorowania grafow')-->
+	<graph id="Small hard LF" edgedefault="undirected">
+		<data key="show">2</data>
+		<node id="3"> <data key="vName">3</data> </node>
+		<node id="4"> <data key="vName">4</data> </node>
+		<node id="5"> <data key="vName">5</data> </node>
+		<node id="1"> <data key="vName">1</data> </node>
+		<node id="2"> <data key="vName">2</data> </node>
+		<node id="6"> <data key="vName">6</data> </node>
+		<node id="7"> <data key="vName">7</data> </node>
+		<edge id="1" source="1" target="3"/>
+		<edge id="2" source="1" target="4"/>
+		<edge id="3" source="1" target="6"/>
+		<edge id="4" source="1" target="7"/>
+		<edge id="5" source="2" target="3"/>
+		<edge id="6" source="2" target="5"/>
+		<edge id="7" source="2" target="6"/>
+		<edge id="8" source="2" target="7"/>
+		<edge id="9" source="3" target="4"/>
+		<edge id="10" source="3" target="5"/>
+		<edge id="11" source="4" target="5"/>
+	</graph>
+</graphml>
