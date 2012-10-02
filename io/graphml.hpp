@@ -1463,7 +1463,7 @@ InOutType GraphMLGraph::get(const char *name, const InOutType def)
 void GraphMLGraph::readXML() {
 	nameVals.clear();
 	TiXmlElement *xmlElem = this->xml->FirstChildElement("data");
-	while(xmlElem) {
+	for(;xmlElem; xmlElem = xmlElem->NextSiblingElement("data")) {
 		const char *name = xmlElem->Attribute("key");
 		if(name==NULL)
 			continue;
@@ -1475,8 +1475,6 @@ void GraphMLGraph::readXML() {
 		data.xml = xmlElem;
 		data.set(xmlElem->GetText());
 		nameVals[name] = data;
-
-		xmlElem = xmlElem->NextSiblingElement("data");
 	}
 }
 
