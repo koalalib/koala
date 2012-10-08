@@ -2,7 +2,7 @@
 #define KOALA_SIMPLE_STRUCTS_H
 
 /* simple.h
- * 
+ *
  *Proste interfejsy udajace kontenery stosu, vectora, kolejki FIFO i kolejki priorytetowej z elementami typu T
  * Interfejs wzorowany na STLu
  *Dzialaja dostarczonej w konstruktorze na zewnetrznej tablicy gotowych elementow typu T o podanym rozmiarze
@@ -33,7 +33,7 @@ namespace Koala
     //template <class T> class StackInterface<T> (bez specjalizacji). Wymaga modyfikacji deklaracji we wszystkich modulach
     //biblioteki korzystajacych z tych interfejsow!
     /* StackInterface
-     * 
+     *
      */
     template< class Container > class StackInterface;
     template< class T > class StackInterface< T * >
@@ -55,12 +55,12 @@ namespace Koala
         void pop();
         T &top();
         void clear() { siz = 0; }
-    
+
         template< class InputIterator > void assign( InputIterator first, InputIterator last );
     };
 
     /* QueueInterface
-     * 
+     *
      */
     template< class Container > class QueueInterface;
     template< class T > class QueueInterface< T * >
@@ -73,7 +73,7 @@ namespace Koala
 
         int prev( int x ) { return (x) ? x - 1 : maxsize; }
         int next( int x ) { return (x == maxsize) ? 0 : x + 1; }
-    
+
       public:
         typedef T ElemType;
 
@@ -89,12 +89,12 @@ namespace Koala
         T &top();
         T &back();
         void clear() { beg = end = 0; }
-        
+
         template< class InputIterator > void assign( InputIterator first, InputIterator last );
     };
 
     /* VectorInterface
-     * 
+     *
      */
     template< class Container > class VectorInterface;
     template< class T > class VectorInterface< T * >
@@ -127,7 +127,7 @@ namespace Koala
 
         void push_back( const T &arg );
         void pop_back();
-        static void revert( T* f,T *l );
+        static void rev( T* f,T *l );
         template< class InputIterator > void assign( InputIterator first, InputIterator last );
         void insert( T *where, int n, const T &x );
         void insert( T *where, const T &x ) { insert( where,1,x ); }
@@ -139,7 +139,7 @@ namespace Koala
     };
 
     /* PriQueueInterface
-     * 
+     *
      */
     template< class Container, class Comp > class PriQueueInterface;
     // TODO: po usunieciu specjalizacji dac wartosc domyslna Comp=std::greater<T>

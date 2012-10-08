@@ -882,7 +882,7 @@ bool GraphMLGraph::readGraph(Graph &graph)
 				edgeDirect = (isEdgeDir[0] == 't' || isEdgeDir[0] == '1')
 					? true : false;
 			}
-			if (edgeDirect) graph.addArch( verts[source],verts[target] );
+			if (edgeDirect) graph.addArc( verts[source],verts[target] );
 			else graph.addEdge( verts[source],verts[target] );
 		}
 		xmlEdge = xmlEdge->NextSiblingElement( "edge" );
@@ -950,7 +950,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, BlackHole)
 					edgeDirect = false;
 			}
 			if (edgeDirect)
-				graph.addArch( verts[source],verts[target] );
+				graph.addArc( verts[source],verts[target] );
 			else
 				graph.addEdge( verts[source],verts[target] );
 		}
@@ -1014,7 +1014,7 @@ bool GraphMLGraph::readGraph(Graph &graph, BlackHole, InfoEdge infoEdge)
 					edgeDirect = false;
 			}
 			if (edgeDirect)
-				graph.addArch( verts[source],verts[target],infoEdge( &gmlData ) );
+				graph.addArc( verts[source],verts[target],infoEdge( &gmlData ) );
 			else
 				graph.addEdge( verts[source],verts[target],infoEdge( &gmlData ) );
 		}
@@ -1088,7 +1088,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdg
 					edgeDirect = false;
 			}
 			if (edgeDirect)
-				graph.addArch( verts[source],verts[target],infoEdge( &gmlData ) );
+				graph.addArc( verts[source],verts[target],infoEdge( &gmlData ) );
 			else
 				graph.addEdge( verts[source],verts[target],infoEdge( &gmlData ) );
 		}

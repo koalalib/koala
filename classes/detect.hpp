@@ -195,17 +195,6 @@ template< class DefaultStructs > template< class GraphType, class Iter >
     return setT.size();
 }
 
-template< class DefaultStructs > template< class GraphType >
-    void IsItPar< DefaultStructs >::Bipartite::splitVert( const GraphType &g,
-        Set< typename GraphType::PVertex > &setV1, Set< typename GraphType::PVertex > &setV2 )
-{
-    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
-        SearchStructs::VisitVertLabs< GraphType > >::Type vertCont( g.getVertNo() );
-    BFSPar< DefaultStructs >::scan( g,blackHole,EdUndir,vertCont );
-    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-        if ((vertCont[v].distance & 1) == 0) setV1 += v;
-        else setV2 += v;
-}
 
 template< class DefaultStructs > template< class GraphType, class Iter >
     int IsItPar< DefaultStructs >::CompBipartite::getPart( const GraphType &g, Iter out )
@@ -690,7 +679,7 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
     if (!undir( g,false )) return -1;
     int b,i,m = g.getEdgeNo(),h,n = g.getVertNo();
     if (n == 1)
-    {   
+    {
         if (!isBlackHole( aheightmap )) aheightmap[g.getVert()] = 0;
         *cliqueiter = g.getVert();
         ++cliqueiter;
@@ -711,12 +700,12 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
     for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
         for( EdgeDirection dir = EdDirIn; dir <= EdDirOut; dir *= 2)
             if (!visited[e]( dir ))
-            {   
+            {
                 visited[e]( dir ) = comp;
                 cont.push( std::make_pair( e,dir ) );
 
                 while (!cont.empty())
-                {   
+                {
                     typename Graph::PEdge f = cont.top().first;
                     EdgeDirection fdir = cont.top().second;
                     typename Graph::PVertex a = (fdir == EdDirOut) ? g.getEdgeEnd1( f ) : g.getEdgeEnd2( f );
@@ -743,7 +732,7 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
                 comp++;
             }
     for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-    {   
+    {
         assert( visited[e]( EdDirIn ) && visited[e]( EdDirOut ) );
         if (visited[e]( EdDirIn ) == visited[e]( EdDirOut )) return -1;
     }
@@ -760,7 +749,7 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
     for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
         for( EdgeDirection dir = EdDirIn; dir <= EdDirOut; dir *= 2 )
             if (compflag[visited[e]( dir )])
-            {   
+            {
                 dirmap[e] = dir;
                 (compflag[visited[e]( (dir == EdDirIn) ? EdDirOut : EdDirIn )]) = false;
             }
@@ -773,8 +762,8 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
         ::Type org2image( n );
     for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) org2image[v] = ig.addVert( v );
         for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-            if (dirmap[e] == EdDirOut) ig.addArch( org2image[g.getEdgeEnd1( e )],org2image[g.getEdgeEnd2( e )],e );
-            else ig.addArch( org2image[g.getEdgeEnd2( e )],org2image[g.getEdgeEnd1( e )],e );
+            if (dirmap[e] == EdDirOut) ig.addArc( org2image[g.getEdgeEnd1( e )],org2image[g.getEdgeEnd2( e )],e );
+            else ig.addArc( org2image[g.getEdgeEnd2( e )],org2image[g.getEdgeEnd1( e )],e );
 
     typename DefaultStructs:: template AssocCont< typename Image::PVertex,typename
         DAGCritPathPar< DefaultStructs >:: template VertLabs< int,Image > >::Type vertCont( n );
@@ -786,7 +775,7 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
     for( typename Image::PVertex v = ig.getVert(); v; v = ig.getVertNext( v ) )
     {
         if (res < vertCont[v].distance)
-        { 
+        {
             res = vertCont[v].distance;
             vmax = v;
         }
@@ -799,7 +788,7 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
         DAGCritPathPar< DefaultStructs >:: template
             getPath( ig,vertCont,vmax,DAGCritPathPar< DefaultStructs >::template outPath( clique,blackHole ) );
         for( int i = 0; i <= res; i++ )
-        { 
+        {
             *cliqueiter = clique[i]->info;
             ++cliqueiter;
         }
@@ -839,10 +828,10 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
         typename ImageGraph::PVertex x = cg.addVert();
         typename ImageGraph::PVertex y = cg.addVert();
         vertcont[x] = vertcont[y] = typename FlowPar< FlowDefaultStructs >::template TrsVertLoss< int >();
-        edgecont[mapa[u] = cg.addArch( x,y,u )] = typename FlowPar< FlowDefaultStructs >::template
+        edgecont[mapa[u] = cg.addArc( x,y,u )] = typename FlowPar< FlowDefaultStructs >::template
             TrsEdgeLabs< int >( 1,1 );
-        edgecont[cg.addArch( start,x,(typename GraphType::PVertex)0 )] =
-            edgecont[cg.addArch( y,end,(typename GraphType::PVertex)0 )] =
+        edgecont[cg.addArc( start,x,(typename GraphType::PVertex)0 )] =
+            edgecont[cg.addArc( y,end,(typename GraphType::PVertex)0 )] =
             typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int >( 0,1 );
     }
     getDirs( g,dirs );
@@ -859,7 +848,7 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
             u = g.getEdgeEnd2( e );
             v = g.getEdgeEnd1( e );
         }
-        edgecont[cg.addArch( cg.getEdgeEnd2( mapa[u] ),cg.getEdgeEnd1( mapa[v] ),(typename GraphType::PVertex)0 )] =
+        edgecont[cg.addArc( cg.getEdgeEnd2( mapa[u] ),cg.getEdgeEnd1( mapa[v] ),(typename GraphType::PVertex)0 )] =
             typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int >( 0,1 );
     }
     int a = 0, b = n, c;

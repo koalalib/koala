@@ -210,7 +210,9 @@ int SeqVertColoringPar<DefaultStructs>::lfSort(const Graph &graph,
 	typedef VertDeg<Vert> LfStr;
 
 	assert(beg!=end);
-	LfStr LOCALARRAY(lfStr, end - beg);
+	int atablen;
+    for(VInOutIter cur=beg; cur!=end; ++cur) ++ atablen;
+	LfStr LOCALARRAY(lfStr, atablen);
 	int lenLfStr = 0;
 
 	for(VInOutIter cur=beg; cur!=end; ++cur) {
@@ -234,14 +236,23 @@ int SeqVertColoringPar<DefaultStructs>::slSort(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	typedef VertDeg<Vert> SlStruct;
-	typedef typename DefaultStructs::template
-		HeapCont< SlStruct, SlCmp<SlStruct> >::Type PriQueue;
+
+	int atablen;
+    for(VInOutIter cur=beg; cur!=end; ++cur) ++ atablen;
+
+    Privates::BlockListAllocator< typename DefaultStructs:: template
+        HeapCont< SlStruct,void,void >::NodeType > alloc( atablen );
+    typedef typename DefaultStructs::template
+		HeapCont< SlStruct, SlCmp<SlStruct>,
+		Privates::BlockListAllocator< typename DefaultStructs:: template
+        HeapCont< SlStruct,void,void >::NodeType > >::Type PriQueue;
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, typename PriQueue::Node*>::Type VertToQueue;
 
 	assert(beg!=end);
-	PriQueue priQueue;
-	VertToQueue vertToQueue(end - beg);
+	PriQueue priQueue(&alloc);
+
+	VertToQueue vertToQueue(atablen);
 
 	int lenVerts = 0;
 	for(VInOutIter cur = beg; cur!=end; ++cur) {
@@ -250,7 +261,8 @@ int SeqVertColoringPar<DefaultStructs>::slSort(const Graph &graph,
 		lenVerts++;
 	}
 
-	VInOutIter cur = beg+lenVerts;
+	VInOutIter cur = beg;//+lenVerts;
+	for(int i = 0; i<lenVerts;++i) ++cur;
 	int iVerts = lenVerts;
 	while(priQueue.size()>0) {
 		SlStruct t = priQueue.top();
@@ -1207,17 +1219,23 @@ int SeqVertColoringPar<DefaultStructs>::slf(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	typedef VertDegSat<Vert> SlfStruct;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+
+	int n = 0;
+	for(VInIter cur = beg; cur!=end; ++cur, ++n);
+    Privates::BlockListAllocator< typename DefaultStructs:: template
+        HeapCont< SlfStruct,void,void >::NodeType > alloc( n );
+
 	typedef typename DefaultStructs::template
-		HeapCont< SlfStruct, SlfCmp<SlfStruct> >::Type PriQueue;
+		HeapCont< SlfStruct, SlfCmp<SlfStruct>,
+		Privates::BlockListAllocator< typename DefaultStructs:: template
+        HeapCont< SlfStruct,void,void >::NodeType > >::Type PriQueue;
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, typename PriQueue::Node*>::Type VertToQueue;
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, Set<int> >::Type VertColNeigh;
 
-	int n = 0;
-	for(VInIter cur = beg; cur!=end; ++cur, ++n);
 	assert(beg!=end);
-	PriQueue priQueue;
+	PriQueue priQueue(&alloc);
 
 	VertToQueue vertToQueue(n);
 	VertColNeigh vertColNeigh(n);
@@ -1294,17 +1312,21 @@ int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	typedef VertDegSat<Vert> SlfStruct;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	int n = 0;
+	for(VInIter cur = beg; cur!=end; ++cur, ++n);
+    Privates::BlockListAllocator< typename DefaultStructs:: template
+        HeapCont< SlfStruct,void,void >::NodeType > alloc( n );
 	typedef typename DefaultStructs::template
-		HeapCont< SlfStruct, SlfCmp<SlfStruct> >::Type PriQueue;
+		HeapCont< SlfStruct, SlfCmp<SlfStruct>,
+		Privates::BlockListAllocator< typename DefaultStructs:: template
+        HeapCont< SlfStruct,void,void >::NodeType > >::Type PriQueue;
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, typename PriQueue::Node*>::Type VertToQueue;
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, Set<int> >::Type VertColNeigh;
 
-	int n = 0;
-	for(VInIter cur = beg; cur!=end; ++cur, ++n);
 	assert(beg!=end);
-	PriQueue priQueue;
+	PriQueue priQueue(&alloc);
 	VertToQueue vertToQueue(n);
 	VertColNeigh vertColNeigh(n);
 
