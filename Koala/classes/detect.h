@@ -123,9 +123,6 @@ namespace Koala
             // znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
             template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
 
-          protected:
-            template <class GraphType> static void splitVert( const GraphType &g,
-                Set< typename GraphType::PVertex > &setV1, Set< typename GraphType::PVertex > &setV2 );
         };
 
         // czy dwudzielny

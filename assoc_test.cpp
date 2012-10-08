@@ -25,6 +25,12 @@ Vert *A=new Vert("Ala"),*B=new Vert("Basia"),*C=new Vert("Celina"),*D=new Vert("
 
 Vert* vtab[4]={A,B,C,D};
 
+void Delete(Vert* v)
+{
+    delete v;
+    for(int i=0;i<4;i++) if (vtab[i]==v) vtab[i]=0;
+}
+
 template <class Cont>
 void t(const Cont /*AssocArray<Vert*,std::string>*/ & arr)
 {   std::cout << "size:" << arr.size() << std::endl;
@@ -36,15 +42,18 @@ void t(const Cont /*AssocArray<Vert*,std::string>*/ & arr)
 
 template <class A, class B, AssocMatrixType aType, class D, class E>
 void t(const AssocMatrix<A,B,aType,D,E>& m)
-{  std::cout << "size:" << m.size();
+{
+//    std::cout << "\n*a\n";
+    std::cout << "size:" << m.size();
+//    std::cout << "\n*b\n"<< std::endl;
    for(std::pair<Vert*,Vert*> k=m.firstKey();k.first || k.second;k=m.nextKey(k)) std::cout<< "(" << k.first->name <<","<< k.second->name<<"):" <<m(k.first,k.second)<<" ";
-   std::cout << std::endl;
+//   std::cout << "\n*c\n";
    for(std::pair<Vert*,Vert*> k=m.lastKey();k.first || k.second;k=m.prevKey(k)) std::cout<< "(" << k.first->name <<","<< k.second->name<<"):" <<m(k.first,k.second)<<" ";
-   std::cout << std::endl;
-   for(int i=0;i<4;i++) for (int j=0;j<4;j++) if (m.hasKey(vtab[i],vtab[j])) std::cout << vtab[i]->name <<"," <<vtab[j]->name << " ";
-   std::cout << std::endl;
-   for(int i=0;i<4;i++)  if (m.hasInd(vtab[i])) std::cout << vtab[i]->name << " ";
-   std::cout<<std::endl;
+//   std::cout << "\n*d\n";
+   for(int i=0;i<4;i++) if (vtab[i]) for (int j=0;j<4;j++) if (vtab[j] && m.hasKey(vtab[i],vtab[j])) std::cout << vtab[i]->name <<"," <<vtab[j]->name << " ";
+//   std::cout << "\n*e\n";
+   for(int i=0;i<4;i++)  if (vtab[i] && m.hasInd(vtab[i])) std::cout << vtab[i]->name << " ";
+//   std::cout<<5 <<std::endl;
 }
 
 
@@ -75,7 +84,7 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
     t(a);
     t(b);
     b[A]="Ab";
-//    delete B;
+//    Delete( B);
     t(a);
     t(b);
     a.clear();
@@ -111,7 +120,7 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
     t(ha);
     t(hb);
     hb[A]="Ab";
-//    delete B;
+//    Delete (B);
     t(ha);
     t(hb);
     ha.clear();
@@ -134,7 +143,7 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
     m1=m;
     m.defrag();
     t(m);
-//    delete D;
+//    Delete (D);
     m.defrag();
     t(m);
     m1.defrag();
@@ -156,7 +165,7 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
     pm1=pm;
     pm.defrag();
     t(pm);
-//    delete D;
+//    Delete (D);
     pm.defrag();
     t(pm);
     pm1.defrag();
@@ -186,7 +195,7 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
 //    pm1=pm;
 //    lpm.defrag();
     t(lpm);
-//    delete D;
+//    Delete (D);
     lpm.defrag();
     t(lpm);
     pm1.defrag();
@@ -281,7 +290,7 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
     cout << endl<<endl;
     aaa=cona;
     t(cona);
-    delete C;
+    Delete(C);
     t(aaa);
     t(cona);
 
@@ -293,7 +302,7 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
     hmp.reserve(200000);
     cout << hmp[3] << hmp.size();
     {
-        cout << "\n!!!!!!!!!!!!!!!!!!1\n\n";
+        cout << "\n(((((((((((((((1\n\n";
         std::map<Vert*,std::string> mapa,mapa2;
         mapa[A]="A";
         AssocTabConstInterface<std::map<Vert*,std::string> > inf(mapa);
@@ -324,12 +333,13 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
         hmapa=pa;
         t(hmapa);
 
-        AssocMatrix<Vert*,std::string,AMatrClTriangle,std::vector< BlockOfAssocMatrix< std::string > >
+        AssocMatrix<Vert*,std::string,AMatrFull,std::vector< BlockOfAssocMatrix< std::string > >
          ,PseudoAssocArray<Vert*,int,AssocTable<std::map<Vert*,int> > > > mat,mat2;
         mat(A,B)="AB";
         mat2=mat;
         t(mat2);
-        AssocMatrix<Vert*,std::string,AMatrClTriangle> mat3;
+        AssocMatrix<Vert*,std::string,AMatrFull> mat3;
+//        mat3(A,B)="AB";
         mat3=mat;
         t(mat3);
 

@@ -296,7 +296,7 @@ template< class GraphType, class Iter, class IterInsert > typename GraphType::PV
 }
 
 template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
-    Creator::petersenGraph( GraphType &g, VInfoGen vInfoGen, EInfoGen eInfoGen )
+    Creator::petersen( GraphType &g, VInfoGen vInfoGen, EInfoGen eInfoGen )
 {
     typename GraphType::PVertex LOCALARRAY( vert,10 );
 
@@ -323,9 +323,9 @@ template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::
     return vert[0];
 }
 
-template< class GraphType > typename GraphType::PVertex Creator::petersenGraph( GraphType &g )
+template< class GraphType > typename GraphType::PVertex Creator::petersen( GraphType &g )
 {
-    return petersenGraph( g,Koala::ConstFunctor< typename GraphType::VertInfoType >(),
+    return petersen( g,Koala::ConstFunctor< typename GraphType::VertInfoType >(),
         Koala::ConstFunctor< typename GraphType::EdgeInfoType >() );
 }
 
@@ -595,8 +595,8 @@ template< class DefaultStructs > template< class Graph > void
         g.addLoop( u,einfo );
         for( typename Graph::PVertex v = g.getVertNext( u ); v; v = g.getVertNext( v ) )
         {
-            g.addArch( u,v,einfo );
-            g.addArch( v,u,einfo );
+            g.addArc( u,v,einfo );
+            g.addArc( v,u,einfo );
         }
     }
 }
@@ -624,7 +624,7 @@ template< class DefaultStructs > template< class Graph > void
     g.getEdges( tabe,Directed );
     for( int i = 0; i < m; i++ )
         if (!matr( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ) ))
-            g.addArch( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ),einfo );
+            g.addArc( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ),einfo );
 }
 
 template< class DefaultStructs > template< class Graph > void
@@ -638,7 +638,7 @@ template< class DefaultStructs > template< class Graph > void
     for( typename Graph::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
         for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
             if (u != v && matr( u,v ).distance > 1 && DefaultStructs::template NumberTypeBounds< int >::plusInfty()
-                > matr( u,v ).distance) g.addArch( u,v,einfo );
+                > matr( u,v ).distance) g.addArc( u,v,einfo );
     for( typename Graph::PEdge e = g.getEdge( Directed | Undirected ); e; e = g.getEdgeNext( e,Directed | Undirected ) )
         if ((g.getEdgeType( e ) == Undirected) || ((g.getEdgeType( e ) == Directed) &&
             DefaultStructs::template NumberTypeBounds< int >::plusInfty() > matr( g.getEdgeEnd2( e ),g.getEdgeEnd1( e ) ).distance))
@@ -842,7 +842,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
                 {
                     typename GraphOut::EdgeInfoType einfo;
                     casters.second( einfo,g.getVertInfo( v ) );
-                    linkers.second( lg.addArch( e2vtab[e],e2vtab[f],einfo ),v );
+                    linkers.second( lg.addArc( e2vtab[e],e2vtab[f],einfo ),v );
                     vset[v];
                 }
     for( typename GraphIn::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
@@ -1042,21 +1042,21 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
             }
             if (dir1 == Undirected && dir2 == Directed)
             {
-                eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
+                eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
-                eres2 = g.addArch( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
+                eres2 = g.addArc( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
             }
             if (dir1 == Directed && dir2 == Undirected)
             {
-                eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
+                eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
-                eres2 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],
+                eres2 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo );
             }
             if (dir1 == Directed && dir2 == Directed)
             {
-                eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
+                eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
             }
             if (dir1 == Undirected && dir2 == Loop)
@@ -1076,10 +1076,10 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
             if (dir1 == Loop && dir2 == Loop)
                 eres1 = g.addLoop( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],einfo );
             if (dir1 == Directed && dir2 == Loop)
-                eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
+                eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo );
             if (dir1 == Loop && dir2 == Directed)
-                eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
+                eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
             if (eres1)
             {
@@ -1176,20 +1176,20 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
             }
             if (dir1 == Undirected && dir2 == Directed)
             {
-                eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
+                eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
-                eres2 = g.addArch( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
+                eres2 = g.addArc( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
             }
             if (dir1 == Directed && dir2 == Undirected)
             {
-                eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
+                eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
-                eres2 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],
+                eres2 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo );
             }
             if (dir1 == Directed && dir2 == Directed)
-                eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
+                eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
             if (dir1 == Undirected && dir2 == Loop)
             {
@@ -1208,10 +1208,10 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
             if (dir1 == Loop && dir2 == Loop)
                 eres1 = g.addLoop( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],einfo );
             if (dir1 == Directed && dir2 == Loop)
-                eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
+                eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo );
             if (dir1 == Loop && dir2 == Directed)
-                eres1 = g.addArch( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
+                eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
                     tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
 
             if (eres1)

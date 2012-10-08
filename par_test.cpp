@@ -47,7 +47,7 @@ void dijTest()
     dijTest();
 
     g.addEdge(C,D);g.addEdge(C,D);//g.addEdge(C,D);
-    g.addArch(C,B);g.addArch(C,B);
+    g.addArc(C,B);g.addArc(C,B);
 
     g.addLoop(E);g.addLoop(E);g.addLoop(E);
 //    g.clearEdges();g.addLoop(E);

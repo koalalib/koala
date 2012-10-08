@@ -207,7 +207,7 @@ int main() {
 	{ std::cout << "\n\n************************\n\n";
         Koala::Graph<OpisV,OpisE> g,g1;
         Koala::Vertex<OpisV,OpisE> *u=g.addVert(OpisV(1,'A')), *v=g.addVert(OpisV(2,'B'));
-        Koala::Edge<OpisV,OpisE> *e=g.addEdge(u,v,OpisE(0,'e')), *d=g.addArch(v,u,OpisE(0.5,'d')), *f=g.addLoop(v,OpisE(1.5,'f'));
+        Koala::Edge<OpisV,OpisE> *e=g.addEdge(u,v,OpisE(0,'e')), *d=g.addArc(v,u,OpisE(0.5,'d')), *f=g.addLoop(v,OpisE(1.5,'f'));
 
         Koala::IO::writeGraphText(g,std::cout,Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
 

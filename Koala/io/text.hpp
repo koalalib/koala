@@ -251,9 +251,16 @@ bool readGraphEL(Graph &g, std::istream &strm,
 template<typename Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, std::istream &strm, RG_Format format,
 		   VMap &vertexMap, EMap &edgeMap) {
+    Privates::EmptyMap<typename Graph::PVertex> tv;
+	Privates::EmptyMap<typename Graph::PEdge> te;
+    typename  BlackHoleSwitch< VMap, Privates::EmptyMap<typename Graph::PVertex> >::Type &avmap =
+                BlackHoleSwitch< VMap, Privates::EmptyMap<typename Graph::PVertex> >::get(vertexMap ,tv );
+    typename  BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::Type &aemap =
+                BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::get(edgeMap ,te );
+
 	switch(format & (~RG_Info)) {
-		case RG_VertexLists:	return Privates::readGraphVL(g, strm, vertexMap, edgeMap);
-		case RG_EdgeList:	return Privates::readGraphEL(g, strm, vertexMap, edgeMap);
+		case RG_VertexLists:	return Privates::readGraphVL(g, strm, avmap, aemap);
+		case RG_EdgeList:	return Privates::readGraphEL(g, strm, avmap, aemap);
 		};
 	return false;
 	};
@@ -384,9 +391,16 @@ bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::ostream &out, int format,
                     const VMap& vmap,const EMap& emap) {
+
+    Privates::EmptyMap2 em;
+    const typename  BlackHoleSwitch< VMap, Privates::EmptyMap2 >::Type &avmap =
+            BlackHoleSwitch< VMap, Privates::EmptyMap2 >::get(const_cast<VMap&>( vmap ),em );
+    const typename  BlackHoleSwitch< EMap, Privates::EmptyMap2 >::Type &aemap =
+            BlackHoleSwitch< EMap, Privates::EmptyMap2 >::get(const_cast<EMap&>( emap ),em );
+
 	switch(format & (~RG_Info)) {
-		case RG_VertexLists:	return Privates::writeGraphVL(g, out, std::make_pair((bool)(format&RG_VInfo),(bool)(format&RG_EInfo)),vmap,emap);
-		case RG_EdgeList:	return Privates::writeGraphEL(g, out, std::make_pair((bool)(format&RG_VInfo),(bool)(format&RG_EInfo)),vmap,emap);
+		case RG_VertexLists:	return Privates::writeGraphVL(g, out, std::make_pair((bool)(format&RG_VInfo),(bool)(format&RG_EInfo)),avmap,aemap);
+		case RG_EdgeList:	return Privates::writeGraphEL(g, out, std::make_pair((bool)(format&RG_VInfo),(bool)(format&RG_EInfo)),avmap,aemap);
 		};
 	return false;
 	};

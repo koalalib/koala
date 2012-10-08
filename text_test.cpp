@@ -38,16 +38,16 @@ struct Dummy {
 
 	d=g.addEdge(A,B,"ab");
 	e=g.addEdge(A,C,"ac");
-	f=g.addArch(B,C,"bc");
+	f=g.addArc(B,C,"bc");
 	h=g.addLoop(C,"cc");
 	g.addLoop(C,"cc2");
 	g.addLoop(C,"cc3");
-	x=g.addArch(A,C,"ac1");
-	y=g.addArch(C,A,"ac2");
+	x=g.addArc(A,C,"ac1");
+	y=g.addArc(C,A,"ac2");
 	z=g.addEdge(C,B,"bc2");
-	g.addArch(C,A,"ac3");
-	g.addArch(A,C,"ac4");
-//	g.addEdge(A,B);g.addArch(B,C);g.addLoop(C);
+	g.addArc(C,A,"ac3");
+	g.addArc(A,C,"ac4");
+//	g.addEdge(A,B);g.addArc(B,C);g.addLoop(C);
     z=g.addLoop(D,"DD");g.addLoop(D,"dd");
 
 
@@ -103,9 +103,11 @@ struct Dummy {
     e2int[g.getEdge(EdLoop)]=102;
 
 	writeGraphText(g, cout, RG_EdgeList|RG_Info,v2int,e2int);
+    cout << "\n!!!!!!!!!!!!!!!!\n";
+//	writeGraphText(g, cout, RG_EdgeList|RG_Info,v2int,blackHole);
 	ofstream pliko("plik.txt");
 //	writeGraphText(g, pliko, RG_VertexLists,form,v2int,e2int);
-	writeGraphText(g, pliko, RG_EdgeList+eform);
+	writeGraphText(g, pliko, RG_EdgeList+eform,v2int,e2int);
 //	pliko << '\n';
 //	writeGraphText(g, pliko, RG_VertexLists,std::make_pair(true,true),v2int,e2int);
 	writeGraphText(g, pliko, RG_EdgeList|RG_Info);
@@ -130,7 +132,7 @@ struct Dummy {
 
     Graph<VT,ET> gr;
     gr.addVert();gr.addVert();
-    gr.addArch(gr.getVert(),gr.getVertLast());
+    gr.addArc(gr.getVert(),gr.getVertLast());
     ofstream pliko2("plik2.txt");
     writeGraphText(gr, cout, Mask|RG_Info );
 	writeGraphText(gr, pliko2, Mask);
@@ -141,12 +143,20 @@ struct Dummy {
 	readGraphText(gr, pliki2, Mask);
 	pliki2.close();
 	g.clear();
-//	readGraphText(g, pliki, RG_VertexLists,int2v,int2e);
+
 	writeGraphText(gr, cout, Mask|RG_Info );
+	pliki.open("plik.txt");
+	readGraphText(g, pliki, RG_EdgeList,int2v,int2e);
+    cout << "\n!!!!!!!!!!!!!!!!\n";
+	writeGraphText(g, cout, RG_EdgeList|RG_Info );
+    g.clear();
+	readGraphText(g, pliki, RG_EdgeList,blackHole,blackHole);
+	writeGraphText(g, cout, RG_EdgeList );
 
 
+    cout << "\n\n" << int2v[99]->info << ' ' << int2e[102]->info;
 
-//    cout << "\n\n" << int2v[99]->info << ' ' << int2e[102]->info;
+
 //	Graph<> gc; gc.copy(g);
 //	writeGraphText(gc, cout, RG_VertexLists);
 

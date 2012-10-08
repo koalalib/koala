@@ -992,7 +992,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
     u = g.addVert();
     for( v = g.getVert(); v; v = g.getVertNext( v ) )
-        if (v != u) edgeTab[g.addArch( v,u )]=
+        if (v != u) edgeTab[g.addArc( v,u )]=
             TrsEdgeLabs< typename EdgeContainer::ValType::CapacType >( vertTab[v].lo,vertTab[v].hi );
 
     for( v = g.getVert(); v; v = g.getVertNext( v ) )
@@ -1013,8 +1013,8 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     for( v = g.getVert(); v; v = g.getVertNext( v ) )
         if (v != s && v != t)
         {
-            if (exc[v] > Zero) edgeLabs[g.addArch( s,v )].capac = exc[v];
-            else if (exc[v] < Zero) edgeLabs[g.addArch( v,t )].capac = -exc[v];
+            if (exc[v] > Zero) edgeLabs[g.addArc( s,v )].capac = exc[v];
+            else if (exc[v] < Zero) edgeLabs[g.addArc( v,t )].capac = -exc[v];
         }
     bool res = maxFlow( g,edgeLabs,s,t ) == sum;
 
@@ -1055,7 +1055,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
     u = g.addVert();
     for( v = g.getVert(); v; v = g.getVertNext( v ) )
-        if (v != u) edgeTab[g.addArch( v,u )]=
+        if (v != u) edgeTab[g.addArc( v,u )]=
             TrsEdgeLabs< typename EdgeContainer::ValType::CapacType >( vertTab[v].lo,vertTab[v].hi );
 
     for( v = g.getVert(); v; v = g.getVertNext( v ) )
@@ -1079,8 +1079,8 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     for( v = g.getVert(); v; v = g.getVertNext( v ) )
         if (v != s && v != t)
         {
-            if (exc[v] > Zero) edgeLabs[g.addArch( s,v )].capac = exc[v];
-            else if (exc[v] < Zero) edgeLabs[g.addArch( v,t )].capac = -exc[v];
+            if (exc[v] > Zero) edgeLabs[g.addArc( s,v )].capac = exc[v];
+            else if (exc[v] < Zero) edgeLabs[g.addArc( v,t )].capac = -exc[v];
         }
     if (minCostFlow( g,edgeLabs,s,t,sum ).second != sum) return DefaultStructs:: template NumberTypeBounds
         < typename EdgeContainer::ValType::CostType >::plusInfty();
@@ -1127,17 +1127,17 @@ template< class DefaultStructs > template< class GraphType, class ImageType, cla
     {
         images[v].first = ig.addVert( v );
         images[v].second = ig.addVert( v );
-        ig.addArch( images[v].first,images[v].second,
+        ig.addArc( images[v].first,images[v].second,
             std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( v,(typename GraphType::PEdge)0 ) );
     }
     for( typename GraphType::PEdge e = g.getEdge( EdDirIn | EdDirOut ); e; e = g.getEdgeNext( e,EdDirIn | EdDirOut ) )
-        ig.addArch( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
+        ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
             std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
     for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
     {
-        ig.addArch( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
+        ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
             std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
-        ig.addArch( images[g.getEdgeEnd2( e )].second,images[g.getEdgeEnd1( e )].first,
+        ig.addArc( images[g.getEdgeEnd2( e )].second,images[g.getEdgeEnd1( e )].first,
             std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ));
     }
 }
@@ -1202,7 +1202,7 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
     for( typename GraphType::PEdge e = g.getEdge( EdDirIn | EdDirOut | EdUndir ); e;
         e = g.getEdgeNext( e,EdDirIn | EdDirOut | EdUndir ) )
         if (edgeTab[e].flow) paths[e] = 0;
-    for( int i = 0; i <res; i++ ) paths[g.addArch( end,start )] = -1;
+    for( int i = 0; i <res; i++ ) paths[g.addArc( end,start )] = -1;
 
     EulerPar< DefaultStructs >:: template getDirCycle( makeSubgraph( g,std::make_pair( stdChoose(true),
         edgeTypeChoose( Directed ) && extAssocKeyChoose( &(paths) ) ) ),start,

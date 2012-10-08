@@ -35,9 +35,9 @@ void dijTest()
     A=g.addVert(OpisV("A"));B=g.addVert(OpisV("B"));C=g.addVert(OpisV("C"));
     D=g.addVert(OpisV("D"));E=g.addVert(OpisV("E"));F=g.addVert(OpisV("F"));
 
-    g.addArch(A,B,OpisE(1));g.addArch(B,D,OpisE(1));g.addArch(A,C,OpisE(1));g.addArch(C,D,OpisE(1));
-    g.addArch(C,E,OpisE(1));g.addArch(B,C,OpisE(1));g.addArch(D,E,OpisE(1));
-    g.addArch(F,D,OpisE(1));
+    g.addArc(A,B,OpisE(1));g.addArc(B,D,OpisE(1));g.addArc(A,C,OpisE(1));g.addArc(C,D,OpisE(1));
+    g.addArc(C,E,OpisE(1));g.addArc(B,C,OpisE(1));g.addArc(D,E,OpisE(1));
+    g.addArc(F,D,OpisE(1));
 
     for(Koala::Graph<OpisV,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
         edgeCont[ePt].length=ePt->info.dlugosc;

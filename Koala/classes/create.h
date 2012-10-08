@@ -223,10 +223,10 @@ namespace Koala
           eInfoGen - generator for info objects for edges.
         */
         template< class GraphType, class VInfoGen, class EInfoGen >
-            static typename GraphType::PVertex petersenGraph( GraphType &g, VInfoGen vInfoGen, EInfoGen eInfoGen );
+            static typename GraphType::PVertex petersen( GraphType &g, VInfoGen vInfoGen, EInfoGen eInfoGen );
 
         /* It is a simpler version of the above function*/
-        template< class GraphType > static typename GraphType::PVertex petersenGraph( GraphType &g );
+        template< class GraphType > static typename GraphType::PVertex petersen( GraphType &g );
 
         /* The function generates a tree in which each non-leaf vertex has the same degree specified by the parameter deg.
          The height of the tree is defined by the parameter height. Additionally if the mask contains a loop then the loop is attached to each vertex.
@@ -495,7 +495,7 @@ namespace Koala
             total( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
         // zamienia w relacje odwrotna
-        template< class Graph > static void inv( Graph &g ) { g.revert(); }
+        template< class Graph > static void inv( Graph &g ) { g.rev(); }
 
         // przeprowadza domkniecie zwrotne. Mozna podac pole info wprowadzanych krawedzi
         template< class Graph > static void

@@ -44,14 +44,14 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
 
 //    g1.addLoop(A,"A");g1.addLoop(A,"A");
 //    g1.addEdge(A,B,"A--B");g1.addEdge(A,B,"A--B");
-//    g1.addArch(B,D,"B->D");
+//    g1.addArc(B,D,"B->D");
 //    g1.addEdge(B,C,"B--C");
 //
-////    g1.addArch(B,D,"B->D");g1.addArch(B,D,"B->D");g1.addArch(B,D,"B->D");
+////    g1.addArc(B,D,"B->D");g1.addArc(B,D,"B->D");g1.addArc(B,D,"B->D");
 ////    g1.addLoop(A,"A");
 ////    g1.addEdge(A,B,"A--B");g1.addEdge(A,B,"A--B");g1.addEdge(A,B,"A--B");
-////    g1.addArch(B,A,"B->A");g1.addArch(B,A,"B->A");
-////    g1.addArch(A,B,"A->B");g1.addArch(A,B,"A->B");g1.addArch(B,A,"B->A");g1.addArch(B,A,"B->A");
+////    g1.addArc(B,A,"B->A");g1.addArc(B,A,"B->A");
+////    g1.addArc(A,B,"A->B");g1.addArc(A,B,"A->B");g1.addArc(B,A,"B->A");g1.addArc(B,A,"B->A");
 ////    g1.addLoop(C,"C");g1.addLoop(C,"C");
 ////    g1.addEdge(B,C,"B--C");g1.addEdge(B,C,"B--C");
 //    g1.delVert(C);g1.delVert(D);
@@ -65,12 +65,12 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
 
     g1.addLoop(A,"A");g1.addLoop(B,"B");g1.addLoop(C,"C");
     g1.addEdge(A,B,"A-B");g1.addEdge(A,C,"A-C");g1.addEdge(B,C,"B-C");g1.addEdge(A,D,"A-D");
-    g1.addArch(A,B,"A>B");g1.addArch(A,C,"A>C");g1.addArch(B,C,"B>C");g1.addArch(B,D,"B>D");
-    g1.addArch(B,A,"B>A");g1.addArch(C,A,"C>A");g1.addArch(C,B,"C>B");g1.addArch(D,B,"D>B");
+    g1.addArc(A,B,"A>B");g1.addArc(A,C,"A>C");g1.addArc(B,C,"B>C");g1.addArc(B,D,"B>D");
+    g1.addArc(B,A,"B>A");g1.addArc(C,A,"C>A");g1.addArc(C,B,"C>B");g1.addArc(D,B,"D>B");
     g1.addLoop(A,"A");g1.addLoop(B,"B");g1.addLoop(C,"C");
     g1.addEdge(A,B,"A-B");g1.addEdge(A,C,"A-C");g1.addEdge(B,C,"B-C");g1.addEdge(A,D,"A-D");
-    g1.addArch(A,B,"A>B");g1.addArch(A,C,"A>C");g1.addArch(B,C,"B>C");g1.addArch(B,D,"B>D");
-    g1.addArch(B,A,"B>A");g1.addArch(C,A,"C>A");g1.addArch(C,B,"C>B");g1.addArch(D,B,"D>B");
+    g1.addArc(A,B,"A>B");g1.addArc(A,C,"A>C");g1.addArc(B,C,"B>C");g1.addArc(B,D,"B>D");
+    g1.addArc(B,A,"B>A");g1.addArc(C,A,"C>A");g1.addArc(C,B,"C>B");g1.addArc(D,B,"D>B");
 
     cout << endl;
 //    for(int i=0;i<g1.getConEdges(tabE,tabV3,tabV3+5,tabV,tabV+5,EdAll);i++) cout << tabE[i]->info << '\n';
@@ -129,7 +129,7 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
 //        cout << endl<<endl<< makeSubgraph(g1,make_pair(stdChoose(true),stdChoose(true))).getChosenSets(make_pair(stdChoose(true),stdChoose(true)),false).first<< endl<<g1.getVertSet()<<endl<<g1.getEdge() << endl;
 //    }
 //
-//    g1.addArch(B,A);g1.addEdge(C,B);g1.addLoop(A);g1.addLoop(A);
+//    g1.addArc(B,A);g1.addEdge(C,B);g1.addLoop(A);g1.addLoop(A);
 //    vset=A;vset+=B;
 //    cout << vset << endl << makeSubgraph(g1,make_pair(stdChoose(true),stdChoose(true))).getIndEdgeSet(vset,EdAll);
 

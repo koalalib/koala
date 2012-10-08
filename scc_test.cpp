@@ -45,9 +45,9 @@ void searchTest()
     D=g.addVert(OpisV("D"));E=g.addVert(OpisV("E"));F=g.addVert(OpisV("F"));
     G=g.addVert(OpisV("G"));H=g.addVert(OpisV("H"));
 
-    g.addArch(B,A,OpisE(1));g.addArch(B,C,OpisE(4));g.addArch(C,A,OpisE(5));g.addArch(E,C,OpisE(2));
-    g.addArch(D,E,OpisE(1));g.addArch(F,G,OpisE(2)); g.addArch(D,C,OpisE(2)); g.addArch(E,A,OpisE(2));
-    g.addArch(D,A,OpisE(2));
+    g.addArc(B,A,OpisE(1));g.addArc(B,C,OpisE(4));g.addArc(C,A,OpisE(5));g.addArc(E,C,OpisE(2));
+    g.addArc(D,E,OpisE(1));g.addArc(F,G,OpisE(2)); g.addArc(D,C,OpisE(2)); g.addArc(E,A,OpisE(2));
+    g.addArc(D,A,OpisE(2));
 
     U=A; V=E;
     for(int i=0;i<10;i++) {tabV[i]=0; tabE[i]=0; }
@@ -62,13 +62,13 @@ void searchTest2()
     G=g.addVert(OpisV("G"));
     H=g.addVert(OpisV("H"));
 
-    g.addArch(A,B,OpisE(1));g.addArch(A,C,OpisE(4));g.addArch(B,C,OpisE(5));g.addArch(C,D,OpisE(2));
-    g.addArch(B,D,OpisE(1)); g.addArch(E,F,OpisE(1));
-    g.addArch(F,G,OpisE(1));
-    g.addArch(G,E,OpisE(1)); g.addArch(D,A,OpisE(1)); g.addArch(C,F,OpisE(1)); g.addArch(D,E,OpisE(1));
+    g.addArc(A,B,OpisE(1));g.addArc(A,C,OpisE(4));g.addArc(B,C,OpisE(5));g.addArc(C,D,OpisE(2));
+    g.addArc(B,D,OpisE(1)); g.addArc(E,F,OpisE(1));
+    g.addArc(F,G,OpisE(1));
+    g.addArc(G,E,OpisE(1)); g.addArc(D,A,OpisE(1)); g.addArc(C,F,OpisE(1)); g.addArc(D,E,OpisE(1));
     g.addLoop(F,OpisE(1));
 
-    g.addArch(E,H,OpisE(1)); g.addArch(G,H,OpisE(1)); //g.addArch(A,H,OpisE(1));
+    g.addArc(E,H,OpisE(1)); g.addArc(G,H,OpisE(1)); //g.addArc(A,H,OpisE(1));
 
     U=A; V=E;
     for(int i=0;i<10;i++) {tabV[i]=0; tabE[i]=0; }

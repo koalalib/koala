@@ -48,9 +48,9 @@ void searchTest_()
     g.addEdge(A,B,OpisE(1));g.addEdge(A,C,OpisE(4));g.addEdge(B,D,OpisE(5));g.addEdge(B,C,OpisE(2));
     g.addEdge(C,D,OpisE(1));g.addEdge(C,E,OpisE(2),Koala::EdDirOut);g.addEdge(C,F,OpisE(1),Koala::EdDirOut);
     g.addEdge(D,G,OpisE(2),Koala::EdDirOut);
-    g.addArch(G,H,OpisE(2));
+    g.addArc(G,H,OpisE(2));
 
-    g.addArch(E,F,OpisE(2));
+    g.addArc(E,F,OpisE(2));
 
 //    for(Koala::Graph<OpisV,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
 //        edgeCont[ePt].length=ePt->info.dlugosc;
@@ -87,7 +87,7 @@ void searchTest()
     g.addEdge(G,H,OpisE(2));
     g.addLoop(G,OpisE(2));
 
-    g.addEdge(E,F,OpisE(2));    //g.addArch(H,F,OpisE(2));
+    g.addEdge(E,F,OpisE(2));    //g.addArc(H,F,OpisE(2));
 //    g.addEdge(H,I,OpisE(2));g.addEdge(D,I,OpisE(2));
 //    g.addLoop(C);
 //    for(Koala::Graph<OpisV,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))

@@ -39,14 +39,14 @@ struct InfoE1 {
     Vertex<InfoV1,InfoE1> *D=g1.addVert(InfoV1(2,"D"));
     Edge<InfoV1,InfoE1> *e,*en,*e2,*en2,*ee;
 
-    g1.addArch(B,D,InfoE1(0,"BD"));
+    g1.addArc(B,D,InfoE1(0,"BD"));
 
     g1.addEdge(A,B,InfoE1(0,"AB1"));
     g1.addEdge(A,B,InfoE1(0,"AB2"));
-//    ee=g1.addArch(A,B,InfoE1(0,"A->B1"));
-    //g1.addArch(A,B,InfoE1(0,"A->B2"));
-//    g1.addArch(B,A,InfoE1(0,"B->A1"));
-    g1.addArch(B,A,InfoE1(0,"B->A2"));
+//    ee=g1.addArc(A,B,InfoE1(0,"A->B1"));
+    //g1.addArc(A,B,InfoE1(0,"A->B2"));
+//    g1.addArc(B,A,InfoE1(0,"B->A1"));
+    g1.addArc(B,A,InfoE1(0,"B->A2"));
     g1.addLoop(A,InfoE1(0,"A1"));
     g1.addLoop(A,InfoE1(0,"A2"));
 
@@ -148,8 +148,8 @@ struct InfoE1 {
     Graph<char,string> gs;
     gs.makeAdjMatrix();
     Graph<char,string>::PVertex As=gs.addVert('A'), Bs=gs.addVert('B'), Cs=gs.addVert('C');
-    gs.addArch(As,Bs,"A>B 1");gs.addArch(As,Bs,"A>B 2"); gs.addArch(As,Bs,"A>B 3");
-    gs.addArch(Bs,As,"B>A 1");gs.addArch(Bs,As,"B>A 2"); gs.addArch(Bs,As,"B>A 3");
+    gs.addArc(As,Bs,"A>B 1");gs.addArc(As,Bs,"A>B 2"); gs.addArc(As,Bs,"A>B 3");
+    gs.addArc(Bs,As,"B>A 1");gs.addArc(Bs,As,"B>A 2"); gs.addArc(Bs,As,"B>A 3");
     gs.addEdge(As,Bs,"A-B 1");gs.addEdge(Bs,As,"A-B 2"); gs.addEdge(As,Bs,"A-B 3");
     for(Graph<char,string>::PEdge e=gs.getEdge(As,Bs,maska);e;e=gs.getEdgeNext(As,Bs,e,maska))
         cout << e->info << "\n";

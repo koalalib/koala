@@ -22,9 +22,9 @@ void scheduling_brucker()
         G.addVert("9 "), G.addVert("10"), G.addVert("11"), G.addVert("12")
     };
 
-	G.addArch(V[0], V[6]), G.addArch(V[1], V[6]), G.addArch(V[2], V[7]), G.addArch(V[3], V[8]);
-	G.addArch(V[4], V[8]), G.addArch(V[5], V[9]), G.addArch(V[6], V[9]), G.addArch(V[7], V[10]);
-	G.addArch(V[8], V[10]), G.addArch(V[9], V[11]), G.addArch(V[10], V[11]);
+	G.addArc(V[0], V[6]), G.addArc(V[1], V[6]), G.addArc(V[2], V[7]), G.addArc(V[3], V[8]);
+	G.addArc(V[4], V[8]), G.addArc(V[5], V[9]), G.addArc(V[6], V[9]), G.addArc(V[7], V[10]);
+	G.addArc(V[8], V[10]), G.addArc(V[9], V[11]), G.addArc(V[10], V[11]);
 
 	Scheduling::Task<GraphType> T[] =
 	{
@@ -66,11 +66,11 @@ void scheduling_coffman()
 		G.addVert("1 "), G.addVert("2 ")
     };
 
-	G.addArch(V[0], V[6]), G.addArch(V[0], V[7]), G.addArch(V[1], V[5]), G.addArch(V[2], V[7]);
-	G.addArch(V[3], V[7]), G.addArch(V[4], V[8]), G.addArch(V[4], V[9]), G.addArch(V[5], V[10]);
-	G.addArch(V[6], V[10]), G.addArch(V[7], V[11]), G.addArch(V[7], V[12]), G.addArch(V[7], V[14]);
-	G.addArch(V[8], V[11]), G.addArch(V[8], V[12]), G.addArch(V[9], V[13]), G.addArch(V[13], V[12]);
-	G.addArch(V[15], V[1]), G.addArch(V[15], V[2]), G.addArch(V[16], V[3]), G.addArch(V[16], V[4]);
+	G.addArc(V[0], V[6]), G.addArc(V[0], V[7]), G.addArc(V[1], V[5]), G.addArc(V[2], V[7]);
+	G.addArc(V[3], V[7]), G.addArc(V[4], V[8]), G.addArc(V[4], V[9]), G.addArc(V[5], V[10]);
+	G.addArc(V[6], V[10]), G.addArc(V[7], V[11]), G.addArc(V[7], V[12]), G.addArc(V[7], V[14]);
+	G.addArc(V[8], V[11]), G.addArc(V[8], V[12]), G.addArc(V[9], V[13]), G.addArc(V[13], V[12]);
+	G.addArc(V[15], V[1]), G.addArc(V[15], V[2]), G.addArc(V[16], V[3]), G.addArc(V[16], V[4]);
 
 	Scheduling::Task<GraphType> T[] =
 	{
@@ -108,9 +108,9 @@ void scheduling_hu()
         G.addVert("9 "), G.addVert("10"), G.addVert("11"), G.addVert("12")
     };
 
-	G.addArch(V[0], V[6]), G.addArch(V[1], V[6]), G.addArch(V[2], V[7]), G.addArch(V[3], V[8]);
-	G.addArch(V[4], V[8]), G.addArch(V[5], V[9]), G.addArch(V[6], V[9]), G.addArch(V[7], V[10]);
-	G.addArch(V[8], V[10]), G.addArch(V[9], V[11]), G.addArch(V[10], V[11]);
+	G.addArc(V[0], V[6]), G.addArc(V[1], V[6]), G.addArc(V[2], V[7]), G.addArc(V[3], V[8]);
+	G.addArc(V[4], V[8]), G.addArc(V[5], V[9]), G.addArc(V[6], V[9]), G.addArc(V[7], V[10]);
+	G.addArc(V[8], V[10]), G.addArc(V[9], V[11]), G.addArc(V[10], V[11]);
 
 	Scheduling::Task<GraphType> T[] =
 	{
@@ -144,8 +144,8 @@ void scheduling_liu()
         G.addVert("5"), G.addVert("6"), G.addVert("7")
     };
 	for(int i = 0; i < N - 2; i++)
-		G.addArch(V[i], V[i + 2]);
-	G.addArch(V[3], V[4]), G.addArch(V[5], V[6]);
+		G.addArc(V[i], V[i + 2]);
+	G.addArc(V[3], V[4]), G.addArc(V[5], V[6]);
 
 	Scheduling::Task<GraphType> T[] =
 	{
@@ -241,8 +241,8 @@ void scheduling_list()
         G.addVert("1"), G.addVert("2"), G.addVert("3"), G.addVert("4"),
         G.addVert("5"), G.addVert("6"), G.addVert("7")
     };
-	G.addArch(V[0], V[1]), G.addArch(V[1], V[2]), G.addArch(V[2], V[3]);
-	G.addArch(V[4], V[5]), G.addArch(V[5], V[6]);
+	G.addArc(V[0], V[1]), G.addArc(V[1], V[2]), G.addArc(V[2], V[3]);
+	G.addArc(V[4], V[5]), G.addArc(V[5], V[6]);
 
 	Scheduling::Task<GraphType> T[] =
 	{
@@ -291,8 +291,8 @@ void scheduling_critical()
         G.addVert("5"), G.addVert("6"), G.addVert("7")
     };
 	for(int i = 0; i < N - 2; i++)
-		G.addArch(V[i], V[i + 2]);
-	G.addArch(V[3], V[4]), G.addArch(V[5], V[6]);
+		G.addArc(V[i], V[i + 2]);
+	G.addArc(V[3], V[4]), G.addArc(V[5], V[6]);
 
 	Scheduling::Task<GraphType> T[] =
 	{

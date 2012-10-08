@@ -37,17 +37,17 @@ void dijTest()
 //    g.addEdge(C,E,OpisE(1));g.addEdge(B,C,OpisE(2));g.addEdge(D,E,OpisE(1));
 //    g.addEdge(A,D,OpisE(2));
 
-    g.addArch(A,B,OpisE(1));g.addArch(D,B,OpisE(5));g.addArch(A,C,OpisE(4));g.addArch(C,D,OpisE(2));
-    g.addArch(C,E,OpisE(1));g.addArch(B,C,OpisE(2));g.addArch(E,D,OpisE(1));
-    g.addArch(D,A,OpisE(2));
+    g.addArc(A,B,OpisE(1));g.addArc(D,B,OpisE(5));g.addArc(A,C,OpisE(4));g.addArc(C,D,OpisE(2));
+    g.addArc(C,E,OpisE(1));g.addArc(B,C,OpisE(2));g.addArc(E,D,OpisE(1));
+    g.addArc(D,A,OpisE(2));
 
 //
-//    g.addArch(F,A,OpisE(2));g.addArch(B,F,OpisE(2));
+//    g.addArc(F,A,OpisE(2));g.addArc(B,F,OpisE(2));
     g.addEdge(F,A,OpisE(2));g.addEdge(F,B,OpisE(2));
     g.addLoop(E);g.addLoop(E);g.addLoop(D);
 
-    g.addArch(B,A,OpisE(2));
-//    g.addArch(A,B,OpisE(2));
+    g.addArc(B,A,OpisE(2));
+//    g.addArc(A,B,OpisE(2));
 
     for(int i=0;i<20;i++) {tabV[i]=0; tabE[i]=0; }
 }
@@ -86,7 +86,7 @@ Koala::EdgeDirection mask=Koala::EdUndir|Koala::EdLoop;
 
         g.clear();
         A=g.addVert(); B=g.addVert(); C=g.addVert();
-        g.addArch(A,B); g.addEdge(B,A); //g.addLoop(C);
+        g.addArc(A,B); g.addEdge(B,A); //g.addLoop(C);
 
         std::cout << g.mu(g.getEdge(),Koala::EdUndir);
 

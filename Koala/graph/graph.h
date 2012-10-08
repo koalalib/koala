@@ -335,7 +335,7 @@ namespace Koala
         // Dodajemy nową krawędź do grafu (z etykietą).
         inline typename GraphType::PEdge addEdge( PVertex,PVertex,EdgeInfo, EdgeDirection = EdUndir );
         // Dodajemy nowy łuk do grafu (z etykietą).
-        inline typename GraphType::PEdge addArch( PVertex,PVertex,EdgeInfo = EdgeInfo() );
+        inline typename GraphType::PEdge addArc( PVertex,PVertex,EdgeInfo = EdgeInfo() );
         // Dodajemy nową pętlę do grafu (z etykietą)
         inline typename GraphType::PEdge addLoop( PVertex,EdgeInfo = EdgeInfo() );
 
@@ -357,21 +357,21 @@ namespace Koala
         int ch2Undir();
 
         // Zmieniamy kierunek krawędzi skierowanej, wynik - czy z sukcesem
-        inline bool revert( PEdge );
+        inline bool rev( PEdge );
         // Odwrocenie krawedzi skierowanych z podanego zbioru, wynik - liczba udanych zmian
         // podany zbior krawedzi
-        template< class Iterator > int revert( Iterator,Iterator );
-        inline int revert( const Set< typename GraphType::PEdge > &s )
-            { return revert( s.begin(),s.end() ); }
+        template< class Iterator > int rev( Iterator,Iterator );
+        inline int rev( const Set< typename GraphType::PEdge > &s )
+            { return rev( s.begin(),s.end() ); }
 
         // wersja odporna na powtorzenia (ignorowane)
-        template< class Iterator > int revert2( Iterator,Iterator );
+        template< class Iterator > int rev2( Iterator,Iterator );
         // wszystkie krawedzie przy danym wierzcholku o podanej orientacji wzgledem niego
-        int revert( PVertex, EdgeDirection = EdDirIn|EdDirOut );
+        int rev( PVertex, EdgeDirection = EdDirIn|EdDirOut );
         // wszystkie krawedzie miedzy danymi wierzcholkami o podanej orientacji
-        int revert( PVertex,PVertex, EdgeDirection = EdDirIn|EdDirOut );
+        int rev( PVertex,PVertex, EdgeDirection = EdDirIn|EdDirOut );
         // wszystkie w grafie
-        int revert();
+        int rev();
 
         // zmiana krawedzi nieskierowanej na luk o zadanej orientacji wzgledem jej podanej koncowki, wynik - czy
         // skuteczne

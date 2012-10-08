@@ -48,9 +48,9 @@ void searchTest()
     g.addEdge(A,B,OpisE(1));g.addEdge(A,C,OpisE(4));g.addEdge(B,D,OpisE(5));g.addEdge(D,C,OpisE(2));
     g.addEdge(C,E,OpisE(1));g.addEdge(B,C,OpisE(2),Koala::EdDirOut);g.addEdge(D,E,OpisE(1),Koala::EdDirOut);
     g.addEdge(F,D,OpisE(2),Koala::EdDirOut);
-    g.addArch(G,H,OpisE(2));
+    g.addArc(G,H,OpisE(2));
 
-    g.addArch(G,H,OpisE(2));g.addArch(G,H,OpisE(2));
+    g.addArc(G,H,OpisE(2));g.addArc(G,H,OpisE(2));
 
 //    for(Koala::Graph<OpisV,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
 //        edgeCont[ePt].length=ePt->info.dlugosc;

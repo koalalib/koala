@@ -119,9 +119,9 @@ void dir2str(Koala::EdgeDirection dir, std::string & dirStr );
 	Koala::Creator::compKPartite(g9, 7, 3, vec_insert2.begin(), Koala::EdUndir | Koala::EdDirIn);
 	Koala::Graph<OpisV,OpisE> g10;
 
-	Koala::Creator::petersenGraph(g10, Koala::ConstFunctor<OpisV>(), Koala::ConstFunctor<OpisE>());
+	Koala::Creator::petersen(g10, Koala::ConstFunctor<OpisV>(), Koala::ConstFunctor<OpisE>());
 
-	Koala::Creator::petersenGraph(g10);
+	Koala::Creator::petersen(g10);
 
 	Koala::Graph<OpisV,OpisE> g11;
 	std::vector<int> vec2;
@@ -271,7 +271,7 @@ int test2(){
 	printGraph(g7);
 
 	Koala::Graph<OpisV,OpisE> g8;
-	Koala::Creator::petersenGraph(g8, vFunktor, eFunktor);
+	Koala::Creator::petersen(g8, vFunktor, eFunktor);
 	std::cout<< "--g8" <<std::endl;
 //	g8.testGraph();
 	printGraph(g8);

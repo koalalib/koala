@@ -59,19 +59,19 @@ struct Prawdzik {
 	printf("%p\n",e1);
 
 	printf("Dir out\n");
-	e1 = graph.addArch(v1,v2);
+	e1 = graph.addArc(v1,v2);
 	printf("%p\n",e1);
-	e1 = graph.addArch(v1,v2);
+	e1 = graph.addArc(v1,v2);
 	printf("%p\n",e1);
-	e1 = graph.addArch(v1,v2);
+	e1 = graph.addArc(v1,v2);
 	printf("%p\n",e1);
 
 	printf("Dir in\n");
-	e1 = graph.addArch(v2,v1);
+	e1 = graph.addArc(v2,v1);
 	printf("%p\n",e1);
-	e1 = graph.addArch(v2,v1);
+	e1 = graph.addArc(v2,v1);
 	printf("%p\n",e1);
-	e1 = graph.addArch(v2,v1);
+	e1 = graph.addArc(v2,v1);
 	printf("%p\n",e1);
 
 	printf("TEST\n");

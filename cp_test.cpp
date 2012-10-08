@@ -76,12 +76,12 @@ struct InfoE2 {
     Vertex<InfoV1,InfoE1> *C=g1.addVert(InfoV1(2,"C"));
     Vertex<InfoV1,InfoE1> *D=g1.addVert(InfoV1(2,"D"));
     Edge<InfoV1,InfoE1> *e=g1.addEdge(B,C,InfoE1(0,"BC"));
-    Edge<InfoV1,InfoE1> *f=g1.addArch(B,D,InfoE1(0,"BD"));
-    Edge<InfoV1,InfoE1> *h=g1.addArch(A,D,InfoE1(0,"BC"));
+    Edge<InfoV1,InfoE1> *f=g1.addArc(B,D,InfoE1(0,"BD"));
+    Edge<InfoV1,InfoE1> *h=g1.addArc(A,D,InfoE1(0,"BC"));
     Edge<InfoV1,InfoE1> *k=g1.addEdge(A,B,InfoE1(0,"BC"));
 
     Vertex<InfoV2,InfoE2>* A2=g2.addVert(),*B2=g2.addVert();
-    g2.addArch(A2,B2);
+    g2.addArc(A2,B2);
     g2.substitute(B2,g1,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(&vtrans),valCast<InfoE2>())
             , make_pair(stdLink(am21,m12),stdLink(an21,an12)));
 

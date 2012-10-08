@@ -49,10 +49,10 @@ int& f(int i,int j)
    string strN="N";
 
 
-    g1.addArch(A,B,"AB");
-    g1.addArch(B,C,"BC");
-//    g1.addArch(C,A,"CA");
-//    g1.addArch(D,C,"DC");
+    g1.addArc(A,B,"AB");
+    g1.addArc(B,C,"BC");
+//    g1.addArc(C,A,"CA");
+//    g1.addArc(D,C,"DC");
     g1.addLoop(B,"*B");
     g1.addLoop(C,"*C");
 
@@ -94,8 +94,8 @@ int& f(int i,int j)
         Vertex<char,string> *D=g.addVert('D');
 
         e=g.addEdge(A,B,"AB");
-        f=g.addArch(A,B,"AB");
-        g.addArch(B,C,"BC");
+        f=g.addArc(A,B,"AB");
+        g.addArc(B,C,"BC");
         g.addLoop(C,"C");
 
     //    cout <<boolalpha << g.isEdgeEnd(e,B) <<endl;
@@ -136,11 +136,11 @@ int& f(int i,int j)
         Vertex<char,string> *D=g.addVert('D');
 
 
-        g.addArch(A,B,"AB");
+        g.addArc(A,B,"AB");
         g.addEdge(D,C,"DC");
 
-        g.addArch(B,A,"BA");
-//        g.addArch(B,C,"BC");
+        g.addArc(B,A,"BA");
+//        g.addArc(B,C,"BC");
 
 
     //    cout <<boolalpha << g.isEdgeEnd(e,B) <<endl;

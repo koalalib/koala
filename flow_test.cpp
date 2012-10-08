@@ -57,12 +57,12 @@ void dijTest()
     S=g.addVert('S');T=g.addVert('T');
 //    F=g.addVert('F');
 
-    g.addArch(S,A,OpisE(20));g.addArch(S,B,OpisE(50));g.addArch(B,A,OpisE(10));
-    g.addArch(A,D,OpisE(50));g.addArch(A,C,OpisE(60));g.addArch(B,C,OpisE(30));
-    g.addArch(C,D,OpisE(10));g.addArch(C,T,OpisE(20));
-    g.addArch(D,T,OpisE(40));g.addArch(D,E,OpisE(80));g.addArch(E,T,OpisE(40));
-//    g.addArch(F,S,OpisE(40));
-//    g.addArch(T,S,OpisE(100));
+    g.addArc(S,A,OpisE(20));g.addArc(S,B,OpisE(50));g.addArc(B,A,OpisE(10));
+    g.addArc(A,D,OpisE(50));g.addArc(A,C,OpisE(60));g.addArc(B,C,OpisE(30));
+    g.addArc(C,D,OpisE(10));g.addArc(C,T,OpisE(20));
+    g.addArc(D,T,OpisE(40));g.addArc(D,E,OpisE(80));g.addArc(E,T,OpisE(40));
+//    g.addArc(F,S,OpisE(40));
+//    g.addArc(T,S,OpisE(100));
 
     for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
         {   char buf[20];
@@ -84,11 +84,11 @@ void dijTest2()
     S=g.addVert('S');T=g.addVert('T');
     F=g.addVert('F');
 
-    g.addArch(S,A,OpisE(2));g.addArch(S,B,OpisE(2));g.addArch(S,C,OpisE(2));
-    g.addArch(A,D,OpisE(5));g.addArch(A,E,OpisE(1));g.addArch(B,D,OpisE(1));
-    g.addArch(B,F,OpisE(1));g.addArch(C,E,OpisE(1));
-    g.addArch(B,E,OpisE(3));g.addArch(D,T,OpisE(3));g.addArch(E,T,OpisE(2));
-    g.addArch(F,T,OpisE(4));
+    g.addArc(S,A,OpisE(2));g.addArc(S,B,OpisE(2));g.addArc(S,C,OpisE(2));
+    g.addArc(A,D,OpisE(5));g.addArc(A,E,OpisE(1));g.addArc(B,D,OpisE(1));
+    g.addArc(B,F,OpisE(1));g.addArc(C,E,OpisE(1));
+    g.addArc(B,E,OpisE(3));g.addArc(D,T,OpisE(3));g.addArc(E,T,OpisE(2));
+    g.addArc(F,T,OpisE(4));
 
     for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
         {   char buf[20];
@@ -117,10 +117,10 @@ void dijTest3()
     g.addEdge(C,D,OpisE(10));g.addEdge(C,T,OpisE(20));
     g.addEdge(D,T,OpisE(40));g.addEdge(D,E,OpisE(80));g.addEdge(E,T,OpisE(40));
 
-//    g.addArch(S,T,OpisE(40));g.addArch(S,T,OpisE(40));g.addArch(T,S,OpisE(40));g.addEdge(T,S,OpisE(40));
+//    g.addArc(S,T,OpisE(40));g.addArc(S,T,OpisE(40));g.addArc(T,S,OpisE(40));g.addEdge(T,S,OpisE(40));
 
 //    g.addEdge(E,C,OpisE(40));
-//    g.addEdge(T,F,OpisE(40));//g.addArch(D,F,OpisE(40));g.addArch(S,C,OpisE(40));g.addArch(B,D,OpisE(40));
+//    g.addEdge(T,F,OpisE(40));//g.addArc(D,F,OpisE(40));g.addArc(S,C,OpisE(40));g.addArc(B,D,OpisE(40));
 
     for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
         {   char buf[20];
@@ -143,11 +143,11 @@ void dijTest4()
     S=g.addVert('S');T=g.addVert('T');
     F=g.addVert('F');
 
-    g.addArch(S,A,OpisE(1));g.addArch(S,B,OpisE(1));g.addEdge(A,B,OpisE(1));
-    g.addArch(A,D,OpisE(1));g.addArch(A,C,OpisE(1));g.addArch(B,C,OpisE(1));
-    g.addArch(C,D,OpisE(1));g.addArch(C,T,OpisE(1));
-    g.addArch(D,T,OpisE(1));g.addArch(D,E,OpisE(1));g.addArch(E,T,OpisE(1));
-    g.addArch(F,S,OpisE(1));
+    g.addArc(S,A,OpisE(1));g.addArc(S,B,OpisE(1));g.addEdge(A,B,OpisE(1));
+    g.addArc(A,D,OpisE(1));g.addArc(A,C,OpisE(1));g.addArc(B,C,OpisE(1));
+    g.addArc(C,D,OpisE(1));g.addArc(C,T,OpisE(1));
+    g.addArc(D,T,OpisE(1));g.addArc(D,E,OpisE(1));g.addArc(E,T,OpisE(1));
+    g.addArc(F,S,OpisE(1));
 
     for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
         {   char buf[20];
@@ -172,11 +172,11 @@ void tdijTest()
     tvertCont[S].lo=-170;tvertCont[S].hi=-160;
     tvertCont[T].lo=130;tvertCont[T].hi=170;
 
-    g.addArch(S,A,OpisE(20));g.addArch(S,B,OpisE(50));g.addArch(B,A,OpisE(10));
-    g.addArch(A,D,OpisE(50));g.addArch(A,C,OpisE(60));g.addArch(B,C,OpisE(30));
-    g.addArch(C,D,OpisE(10));g.addArch(C,T,OpisE(20));
-    g.addArch(D,T,OpisE(40));g.addArch(D,E,OpisE(80));g.addArch(E,T,OpisE(40));
-    g.addArch(F,S,OpisE(40));
+    g.addArc(S,A,OpisE(20));g.addArc(S,B,OpisE(50));g.addArc(B,A,OpisE(10));
+    g.addArc(A,D,OpisE(50));g.addArc(A,C,OpisE(60));g.addArc(B,C,OpisE(30));
+    g.addArc(C,D,OpisE(10));g.addArc(C,T,OpisE(20));
+    g.addArc(D,T,OpisE(40));g.addArc(D,E,OpisE(80));g.addArc(E,T,OpisE(40));
+    g.addArc(F,S,OpisE(40));
     g.addEdge(T,S,OpisE(100));
     g.addLoop(A,OpisE(30));
 
@@ -226,11 +226,11 @@ void conTest()
     S=g.addVert('S');T=g.addVert('T');
     F=g.addVert('F');
 
-    g.addArch(S,A,OpisE(20));g.addArch(S,B,OpisE(50));g.addEdge(A,B,OpisE(10));
-    g.addArch(A,D,OpisE(50));g.addArch(A,C,OpisE(60));g.addArch(B,C,OpisE(30));
-    g.addArch(C,D,OpisE(10));g.addArch(C,T,OpisE(20));
-    g.addArch(D,T,OpisE(40));g.addArch(D,E,OpisE(80));g.addArch(E,T,OpisE(40));
-    g.addArch(F,S,OpisE(40));
+    g.addArc(S,A,OpisE(20));g.addArc(S,B,OpisE(50));g.addEdge(A,B,OpisE(10));
+    g.addArc(A,D,OpisE(50));g.addArc(A,C,OpisE(60));g.addArc(B,C,OpisE(30));
+    g.addArc(C,D,OpisE(10));g.addArc(C,T,OpisE(20));
+    g.addArc(D,T,OpisE(40));g.addArc(D,E,OpisE(80));g.addArc(E,T,OpisE(40));
+    g.addArc(F,S,OpisE(40));
 
 
     for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
