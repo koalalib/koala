@@ -470,10 +470,10 @@ namespace Koala
 
           protected:
             template< class GraphType, class Assoc > static bool cograph( const GraphType &ag, Assoc &subset );
-            template< class GraphType, class Assoc > static Set< typename GraphType::PVertex >
-                maxClique2( const GraphType &ag, Assoc &subset );
-            template< class GraphType, class Assoc > static Set< typename GraphType::PVertex >
-                maxStable2( const GraphType &ag, Assoc &subset );
+            template< class GraphType, class Assoc, class Iter >
+                static int maxClique2( const GraphType &ag, Assoc &subset, Iter& out );
+            template< class GraphType, class Assoc, class Iter >
+                static int maxStable2( const GraphType &ag, Assoc &subset, Iter& out );
         };
 
         // czy cograph

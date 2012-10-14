@@ -1322,13 +1322,7 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
 {
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type subset( g.getVertNo() );
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) subset[u];
-    Set< typename GraphType::PVertex > res = maxClique2( g,subset );
-    for( typename GraphType::PVertex u = res.first(); u; u = res.next( u ) )
-    {
-        *out = u;
-        ++out;
-    }
-    return res.size();
+    return maxClique2( g,subset,out );
 }
 
 template< class DefaultStructs > template< class GraphType, class VIterOut >
@@ -1336,13 +1330,7 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
 {
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type subset( g.getVertNo() );
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) subset[u];
-    Set< typename GraphType::PVertex > res = maxStable2( g,subset );
-    for( typename GraphType::PVertex u = res.first(); u; u = res.next( u ) )
-    {
-        *out = u;
-        ++out;
-    }
-    return res.size();
+    return maxStable2( g,subset,out );
 }
 
 template< class DefaultStructs > template< class GraphType, class Iter >
@@ -1382,53 +1370,99 @@ template< class DefaultStructs > template< class GraphType, class Assoc >
     return true;
 }
 
-template< class DefaultStructs > template< class GraphType, class Assoc >
-    Set< typename GraphType::PVertex > IsItPar< DefaultStructs >::Cograph::maxClique2( const GraphType &ag,
-        Assoc &subset )
+template< class DefaultStructs > template< class GraphType, class Assoc, class Iter >
+    int IsItPar< DefaultStructs >::Cograph::maxClique2( const GraphType &ag, Assoc &subset, Iter & out )
 {
     Subgraph< GraphType,AssocHasChooser< Assoc * >,BoolChooser >
         g = makeSubgraph( ag,std::make_pair( extAssocKeyChoose( &subset ),stdChoose( true ) ) );
     int n;
-    if ((n = g.getVertNo()) == 1) return g.getVertSet();
-    Set< typename GraphType::PVertex > res,tmp;
+    if ((n = g.getVertNo()) == 1)
+    {   *out=g.getVert();
+        ++out;
+        return 1;
+    }
+    int res=0,tmp;
     typename GraphType::PVertex LOCALARRAY( tabv,n );
+    typename GraphType::PVertex LOCALARRAY( restab,n );
+    typename GraphType::PVertex LOCALARRAY( tmptab,n );
     int LOCALARRAY( tabc,n + 1 );
     typename ModulesPar< DefaultStructs >::Partition parts =
         ModulesPar< DefaultStructs >::split( g,compStore( tabc,tabv ),blackHole,true );
     koalaAssert( parts.type != mpPrime,AlgExcWrongArg );
-    for( int i = 0; i < parts.size; i++ )
-    {
-        subset.clear();
-        for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
-        tmp = maxClique2( ag,subset );
-        if (parts.type == mpConnected) res += tmp;
-        else if (tmp.size() > res.size()) res = tmp;
-    }
+    if (parts.type == mpConnected)
+        for( int i = 0; i < parts.size; i++ )
+        {   subset.clear();
+            for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
+            res+= maxClique2( ag,subset,out );
+        }
+    else
+        for( int i = 0; i < parts.size; i++ )
+        {
+            subset.clear();
+            for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
+            typename GraphType::PVertex *ptr=tmptab;
+            tmp= maxClique2( ag,subset,ptr );
+            if (tmp>res)
+            {
+                res=tmp;
+                for(int k=0; k<res;k++)
+                    restab[k]=tmptab[k];
+            }
+        }
+    if (parts.type == mpDisconnected)
+        for( int k=0;k<res;k++)
+        {
+            *out=restab[k];
+            ++out;
+        }
     return res;
 }
 
-template< class DefaultStructs > template< class GraphType, class Assoc >
-    Set< typename GraphType::PVertex > IsItPar< DefaultStructs >::Cograph::maxStable2( const GraphType &ag,
-        Assoc &subset )
+template< class DefaultStructs > template< class GraphType, class Assoc, class Iter >
+    int IsItPar< DefaultStructs >::Cograph::maxStable2( const GraphType &ag, Assoc &subset, Iter & out )
 {
     Subgraph< GraphType,AssocHasChooser< Assoc * >,BoolChooser >
         g = makeSubgraph( ag,std::make_pair( extAssocKeyChoose( &subset ),stdChoose( true ) ) );
     int n;
-    if ((n = g.getVertNo()) == 1) return g.getVertSet();
-    Set< typename GraphType::PVertex > res,tmp;
+    if ((n = g.getVertNo()) == 1)
+    {   *out=g.getVert();
+        ++out;
+        return 1;
+    }
+    int res=0,tmp;
     typename GraphType::PVertex LOCALARRAY( tabv,n );
+    typename GraphType::PVertex LOCALARRAY( restab,n );
+    typename GraphType::PVertex LOCALARRAY( tmptab,n );
     int LOCALARRAY( tabc,n + 1 );
     typename ModulesPar< DefaultStructs >::Partition parts =
         ModulesPar< DefaultStructs >::split( g,compStore( tabc,tabv ),blackHole,true );
     koalaAssert( parts.type != mpPrime,AlgExcWrongArg );
-    for( int i = 0; i < parts.size; i++ )
-    {
-        subset.clear();
-        for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
-        tmp = maxStable2( ag,subset );
-        if (parts.type == mpDisconnected) res += tmp;
-        else if (tmp.size() > res.size()) res = tmp;
-    }
+    if (parts.type == mpDisconnected)
+        for( int i = 0; i < parts.size; i++ )
+        {   subset.clear();
+            for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
+            res+= maxStable2( ag,subset,out );
+        }
+    else
+        for( int i = 0; i < parts.size; i++ )
+        {
+            subset.clear();
+            for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
+            typename GraphType::PVertex *ptr=tmptab;
+            tmp= maxStable2( ag,subset,ptr );
+            if (tmp>res)
+            {
+                res=tmp;
+                for(int k=0; k<res;k++)
+                    restab[k]=tmptab[k];
+            }
+        }
+    if (parts.type == mpConnected)
+        for( int k=0;k<res;k++)
+        {
+            *out=restab[k];
+            ++out;
+        }
     return res;
 }
 
