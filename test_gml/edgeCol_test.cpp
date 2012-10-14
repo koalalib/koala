@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../Koala/algorithm/coloring.h"
+#include "../Koala/coloring/edge.h"
 #include "../Koala/io/graphml.h"
 
 using namespace std;
