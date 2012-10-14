@@ -25,7 +25,7 @@ const char* print(ModPartType x)
 
 #include "main.hpp"
 	Graph<char> gk3;
-	Graph<char>::PVertex tabV[20],F,G,H;
+	Graph<char>::PVertex tabV[20],tabV2[20],F,G,H;
 	F=gk3.addVert('F');G=gk3.addVert('G');H=gk3.addVert('H');
 	gk3.addEdge(F,G); gk3.addEdge(F,H);gk3.addEdge(H,G);
 
@@ -80,12 +80,24 @@ const char* print(ModPartType x)
 
     cout << "\n\ncograph\n";
 
-    gk3.substitute(gk3.getVertLast(),gn4);
+    g.clear();
 
-    cout << "\n\n" << boolalpha << IsIt::cograph(gk3);
-    int q=IsIt::Cograph::maxClique(gk3,tabV);
+    g.copy(gn4,stdChoose(true) & stdChoose(true),stdCast() & stdCast());
+    g.substitute(g.getVertLast(),gk3,stdChoose(true) & stdChoose(true),stdCast() & stdCast());
+    gk3.del(gk3.getVert());
+    g.substitute(g.getVert(),gk3,stdChoose(true) & stdChoose(true),stdCast() & stdCast());
+
+    cout << "\n\n" << boolalpha << IsIt::cograph(g);
+    int q=IsIt::Cograph::maxStable(g,tabV);
     cout << endl << q << endl;
     for(int i=0;i<q;i++) cout << tabV[i]->info << ' ';
+
+    g.neg();
+
+    q=IsIt::Cograph::maxClique(g,tabV);
+    cout << endl << q << endl;
+    for(int i=0;i<q;i++) cout << tabV[i]->info << ' ';
+
 
 
 

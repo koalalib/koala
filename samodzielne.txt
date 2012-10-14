@@ -1,3 +1,5 @@
+Moga byc inkludowane przez uzytkownika
+
 Kontenery:
 simple.h, localarray.h, hashcont.h, heap.h, set.h, joinsets.h
 
@@ -11,5 +13,8 @@ Algorytmy:
 *.h
 
 Klasy:
+*.h
+
+Kolorowania:
 *.h
 
