@@ -373,8 +373,5 @@ void HKTest()
 
     }
 
-
-    Koala::ConstFunctor<int> con=13;
-    std::cout << "\n" <<con() << con('a') << con (12.5,3);
     return 0;
 }

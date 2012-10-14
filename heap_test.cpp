@@ -176,14 +176,96 @@ void BinomTest2()
 
 }
 
+void PairTest1()
+{
+    Privates::BlockListAllocator<PairHeapNode<int> > alloc(4);
+//    Privates::DefaultCPPAllocator stdAlloc;
+//    FibonHeap<int,std::less<int>,Privates::BlockListAllocator<FibonHeapNode<int> > > heap(&alloc);
+//    FibonHeap<int,std::less<int>,Privates::DefaultCPPAllocator  > heap(&stdAlloc);
+
+    PairHeap<int> heap, heap2;
+
+	heap.push(10), heap.push(12), heap.push(20);
+	PairHeap<int>::Repr test = heap.push(30);
+
+    heap2.push(10), heap2.push(12), heap2.push(20);
+	PairHeap<int>::Repr test2 = heap2.push(35);
+
+    PairHeap<int> heap3(heap);
+	heap3.check();
+
+	heap.decrease(test, 11);
+	heap.del(test);
+	heap.merge(heap2);
+	heap.del(test2);
+	heap.merge(heap3);
+
+    while (!heap.empty())
+        cout << heap.top() << " ", heap.pop();
+	cout << endl;
+    PairHeap<int> heap4;
+	heap4=heap;
+}
+
+void PairTest1Loc()
+{
+    Privates::BlockListAllocator<PairHeapNode<int> > alloc(100);
+//    Privates::DefaultCPPAllocator stdAlloc;
+    PairHeap<int,std::less<int>,Privates::BlockListAllocator<PairHeapNode<int> > > heap(&alloc),heap2(&alloc);
+//    PairHeap<int,std::less<int>,Privates::DefaultCPPAllocator  > heap(&stdAlloc);
+
+
+	heap.push(10), heap.push(12), heap.push(20);
+	PairHeap<int>::Repr test = heap.push(30);
+
+    heap2.push(10), heap2.push(12), heap2.push(20);
+	PairHeap<int>::Repr test2 = heap2.push(35);
+
+    PairHeap<int,std::less<int>,Privates::BlockListAllocator<PairHeapNode<int> > > heap3(heap);
+	heap3.check();
+
+	heap.decrease(test, 11);
+	heap.del(test);
+	heap.merge(heap2);
+	heap.del(test2);
+	heap.merge(heap3);
+
+    while (!heap.empty())
+        cout << heap.top() << " ", heap.pop();
+	cout << endl;
+}
+
+void PairTest2()
+{
+    PairHeap<int> heap;
+	heap.push(40), heap.push(30), heap.push(20);
+
+    PairHeap<int> heap2(heap);
+	PairHeap<int>::Repr test = heap.push(10), test2 = heap.push(40);
+	heap2.pop();
+
+    PairHeap<int> heap3(heap2);
+	heap.del(test), heap.decrease(test2, 15);
+
+    while (!heap.empty())
+        cout << heap.top() << " ", heap.pop();
+
+	heap2.merge(heap3);
+	heap.merge(heap2);
+	cout << endl;
+}
+
 #include "main.hpp"
 	FibonTest1();
 	FibonTest1Loc();
 	BinomTest1();
+	BinomTest1Loc();
+	PairTest1();
+	PairTest1Loc();
 
 	FibonTest2();
-	BinomTest1Loc();
 	BinomTest2();
+	PairTest2();
 
 
     cout << "\n-------------\n";

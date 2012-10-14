@@ -78,11 +78,14 @@ const char* print(ModPartType x)
         for(int j=0;j<tool.size(i);j++) cout << ' ' << tool[i][j]->info;
     }
 
-    //gk3.substitute(gk3.getVertLast(),gp4);
+    cout << "\n\ncograph\n";
 
-//    cout << "\n\n" << boolalpha << IsIt::cograph(g);
-//    int q=IsIt::Cograph::maxStable(g,tabV);
-//    for(int i=0;i<q;i++) cout << tabV[i]->info << ' ';
+    gk3.substitute(gk3.getVertLast(),gn4);
+
+    cout << "\n\n" << boolalpha << IsIt::cograph(gk3);
+    int q=IsIt::Cograph::maxClique(gk3,tabV);
+    cout << endl << q << endl;
+    for(int i=0;i<q;i++) cout << tabV[i]->info << ' ';
 
 
 

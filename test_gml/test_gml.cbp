@@ -39,7 +39,7 @@
 		<Unit filename="..\Koala\tinyxml\tinyxml.h" />
 		<Unit filename="..\Koala\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="..\Koala\tinyxml\tinyxmlparser.cpp" />
-		<Unit filename="graphml_test.cpp" />
+		<Unit filename="vertCol_test.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

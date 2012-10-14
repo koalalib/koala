@@ -133,8 +133,17 @@ namespace Koala
       public:
         ConstFunctor( const T &aval = T() ): val( aval ) { }
 
-        T operator()(...) { return val; }
+        T operator()() { return val; }
 
+        template< class A > T operator()(const A&) { return val; }
+        template< class A, class B > T operator()(const A&, const B& ) { return val; }
+        template< class A, class B, class C > T operator()( const A&,const B&,const C& ) { return val; }
+        template< class A, class B, class C, class D > T operator()( const A&,const B&,const C&,const D& )
+                { return val; }
+        template< class A, class B, class C,class D, class E > T operator()( const A&,const B&,const C&,const D&,const E& )
+                { return val; }
+        template< class A, class B, class C,class D, class E, class F > T operator()( const A&,const B&,const C&,const D&,const E&,const F& )
+                { return val; }
     };
 
     // Funkcja tworząca powyższy funktor.
