@@ -1,5 +1,5 @@
 /* set_vector.h
- * 
+ *
  */
 
 #include <set>
@@ -51,6 +51,12 @@ namespace Koala
         // Operator przypisania.
         Set< Element > &operator=( const Element & );
 
+        // Operator przypisania zbioru o elementach innego typu (dla elementow zachodza rzutowania wartosci
+        // typow T-> Element)
+        template <class T>
+        Set< Element > &operator=( const Set<T> &s );
+
+
         // Informacje odnośnie zbioru.
         // czy zbior jest pusty
         bool operator!() const { return this->size() == 0; }
@@ -94,10 +100,10 @@ namespace Koala
         // Metody iterujace po kolejnych elementach zbioru. Brak kolejnego elementu lub lista pusta - wartosc badValue()
         // - obie zwracaja 0 dla zbioru pustego
         Element first() const;
-        Element last() const; 
+        Element last() const;
 
         // zwracaja 0 gdy nie ma kolejnego elementu. Mozna podac 0, wowczas zwracaja element pierwszy/ostatni
-        Element next( const Element & ) const; 
+        Element next( const Element & ) const;
         Element prev( const Element & ) const;
 
         using std::vector< Element >::reserve;

@@ -2,34 +2,34 @@
 
 template< class GraphType > typename ConstGraphMethods< GraphType >::PVertex
     ConstGraphMethods< GraphType >::getEdgeEnd( PEdge edge, PVertex vert ) const
-{  
+{
     koalaAssert( edge,GraphExcNullEdge );
     return edge->getEnd( vert );
 }
 
 template< class GraphType > typename ConstGraphMethods< GraphType >::PVertex
     ConstGraphMethods< GraphType >::getEnd( PEdge edge, PVertex vert ) const
-{ 
+{
     koalaAssert( edge,GraphExcNullEdge );
     return edge->getEnd( vert );
 }
 
 template< class GraphType > inline bool ConstGraphMethods< GraphType >::incid( PEdge edge1, PEdge edge2 ) const
-{   
+{
     if (!edge2) return false;
     return (isEdgeEnd( edge1,self.getEdgeEnd1( edge2 ) ) || isEdgeEnd( edge1,self.getEdgeEnd2( edge2 ) ) );
 }
 
 template< class GraphType > typename ConstGraphMethods< GraphType >::VertInfoType
     ConstGraphMethods< GraphType >::getVertInfo( PVertex v ) const
-{   
+{
     koalaAssert( v,GraphExcNullVert );
     return v->getInfo();
 }
 
 template< class GraphType > typename ConstGraphMethods< GraphType >::EdgeInfoType
     ConstGraphMethods< GraphType >::getEdgeInfo( PEdge e ) const
-{   
+{
     koalaAssert( e,GraphExcNullEdge );
     return e->getInfo();
 }
@@ -59,14 +59,14 @@ template< class GraphType >
 
 template< class GraphType > template< class OutputIterator, class VChooser2 >
     int ConstGraphMethods< GraphType >::getVerts( OutputIterator out, VChooser2 ch ) const
-{   
+{
     int licz=0;
     for( typename GraphType::PVertex v = this->getVert(); v; v = self.getVertNext( v ) )
-        if (ch( v,*this ))    
-        {  
-            *out = v; 
-            ++out; 
-            ++licz;  
+        if (ch( v,*this ))
+        {
+            *out = v;
+            ++out;
+            ++licz;
         }
     return licz;
 }
@@ -103,6 +103,22 @@ template< class GraphType >
         ++idx;
     }
     return tmp_vert ? idx : -1;
+}
+
+template< class GraphType >
+    bool ConstGraphMethods< GraphType >::has( typename ConstGraphMethods< GraphType >::PVertex vert ) const
+{
+    for( PVertex tmp_vert = this->getVert(); tmp_vert; tmp_vert = this->getVertNext( tmp_vert) )
+        if (tmp_vert == vert) return true;
+    return false;
+}
+
+template< class GraphType >
+    bool ConstGraphMethods< GraphType >::has( typename ConstGraphMethods< GraphType >::PEdge edge ) const
+{
+    for( PEdge tmp_edge = this->getEdge(); tmp_edge; tmp_edge = this->getEdgeNext( tmp_edge) )
+        if (tmp_edge == edge) return true;
+    return false;
 }
 
 template< class GraphType > template< class OutputIterator >
@@ -152,14 +168,14 @@ template< class GraphType > template< class OutputIterator > int
 
 template< class GraphType > template< class OutputIterator,class EChooser2 >
     int ConstGraphMethods< GraphType >::getEdges( OutputIterator out, EChooser2 ch ) const
-{   
+{
     int licz = 0;
     for( PEdge e = this->getEdge(); e; e = self.getEdgeNext( e ) )
         if (ch( e,*this ))
-        {  
+        {
             *out = e;
             ++out;
-            ++licz;  
+            ++licz;
         }
     return licz;
 }
@@ -225,7 +241,7 @@ template< class GraphType >
 template< class GraphType> template< class OutputV, class OutputE, class VChooser2, class EChooser2 > std::pair< int,int >
     ConstGraphMethods< GraphType >::getChosen( std::pair< OutputV,OutputE > out,
         std::pair< VChooser2,EChooser2 > chs, bool chosenends ) const
-{   
+{
     int vlicz = this->getVerts( out.first,chs.first ), elicz;
     if (!chosenends) elicz = this->getEdges( out.second,chs.second );
     else elicz = this->getEdges( out.second,(edgeFirstEndChoose( chs.first ) && edgeSecondEndChoose( chs.first )) &&
@@ -237,7 +253,7 @@ template< class GraphType> template< class VChooser2, class EChooser2 >
     std::pair< Set< typename ConstGraphMethods< GraphType >::PVertex >,
         Set< typename ConstGraphMethods< GraphType >::PEdge > >
     ConstGraphMethods< GraphType>::getChosenSets( std::pair< VChooser2,EChooser2 > chs, bool chosenends ) const
-{   
+{
     Set< PVertex > sv;
     Set< PEdge > se;
     this->getChosen( std::make_pair( setInserter( sv ),setInserter( se ) ),chs,chosenends );
@@ -246,11 +262,11 @@ template< class GraphType> template< class VChooser2, class EChooser2 >
 
 template< class GraphType > template< class Cont >
 void ConstGraphMethods< GraphType >::getAdj( Cont &cont, EdgeType mask ) const
-{   
+{
     if (GraphSettings::ReserveOutAssocCont) cont.reserve( self.getVertNo() );
     std::pair< PVertex,PVertex > ends;
     for( PEdge e = this->getEdge( mask ); e; e = self.getEdgeNext( e,mask ) )
-    {   
+    {
         ends = self.getEdgeEnds( e );
         cont( ends.first,ends.second ) = true;
         if (self.getEdgeType( e ) == Undirected) cont( ends.second,ends.first ) = true;
@@ -334,7 +350,7 @@ template< class GraphType > Set< typename ConstGraphMethods< GraphType >::PVerte
 
 template< class GraphType > template< class OutputIterator >
     int ConstGraphMethods< GraphType>::getClNeighs( OutputIterator out, PVertex vert, EdgeDirection direct ) const
-{   
+{
     koalaAssert( vert,GraphExcNullVert );
     PVertex LOCALARRAY( ans,self.root().getEdgeNo( vert,direct ) + 1 );
     ans[0] = vert;
@@ -386,7 +402,7 @@ int ConstGraphMethods< GraphType >::getParals( OutputIterator iter, PEdge edge, 
     std::pair< PVertex,PVertex > ends = self.getEdgeEnds( edge );
     for( PEdge e = this->getEdge( ends.first,ends.second,EdAll ); e; e = self.getEdgeNext( ends.first,ends.second,e,EdAll ) )
         if (e != edge && this->areParallel( e,edge,reltype ))
-        {   
+        {
             *iter = e;
             ++iter;
             licz++;
@@ -405,7 +421,7 @@ template< class GraphType > Set< typename ConstGraphMethods< GraphType >::PEdge 
 
 template< class GraphType > std::pair< typename ConstGraphMethods< GraphType >::PEdge,int >
     ConstGraphMethods< GraphType >::maxMu( EdgeDirection reltype ) const
-{   
+{
     koalaAssert( (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir),GraphExcWrongMask );
     std::pair< PEdge,int > res( (PEdge)0,0 );
     int m = self.getEdgeNo( EdAll );
@@ -414,7 +430,7 @@ template< class GraphType > std::pair< typename ConstGraphMethods< GraphType >::
     int i = 0, l = 0, nr = 0;
     PEdge edge;
     for( PEdge e = this->getEdge( EdAll ); e; e = self.getEdgeNext( e,EdAll ) )
-    {   
+    {
         std::pair< PVertex,PVertex > ends = pairMinMax( self.getEdgeEnd1( e ), self.getEdgeEnd2( e ) );
         edges[i++] = Parals3( ends.first,ends.second,self.getEdgeDir( e,ends.first ),nr++,e );
     }
@@ -435,7 +451,7 @@ template< class GraphType > std::pair< typename ConstGraphMethods< GraphType >::
 template< class GraphType > template< class Iterator, class OutIter > int
     ConstGraphMethods< GraphType >::getIncEdges( OutIter out, Iterator beg, Iterator end,
         EdgeDirection type, EdgeType kind ) const
-{   
+{
     int licze = 0;
     typename GraphSettings:: template VertAssocCont< PVertex,bool >::Type vset( self.getVertNo() );
     for( Iterator i = beg; i != end; ++i ) vset[*i] = true;
@@ -444,7 +460,7 @@ template< class GraphType > template< class Iterator, class OutIter > int
             if (((kind & Loop) && (((self.getEdgeDir( e,this->getEdgeEnd( e,v )) & type) == 0) ||
                 this->getEdgeEnd( e,v ) >= v) && vset.hasKey( this->getEdgeEnd( e,v ))) ||
                 ((kind & (Directed | Undirected)) && !vset.hasKey( this->getEdgeEnd( e,v ) )))
-            { 
+            {
                 *out = e;
                 ++out;
                 ++licze;
@@ -472,7 +488,7 @@ template< class GraphType > Set< typename ConstGraphMethods< GraphType >::PEdge 
 template< class GraphType > template< class Iterator, class OutIter >
     int ConstGraphMethods< GraphType >::getIncVerts( OutIter out, Iterator beg, Iterator end, EdgeDirection type,
         EdgeType kind) const
-{   
+{
     int liczv = 0;
     typename GraphSettings:: template VertAssocCont< PVertex,bool >::Type vset( self.getVertNo() );
     for( Iterator i = beg; i != end; ++i ) vset[*i] = true;
@@ -535,7 +551,7 @@ template< class GraphType > template< class IterOut1, class IterOut2, class Iter
     Parals3 LOCALARRAY( edges,size );
     int i = 0, nr = 0;
     for( Iterator iter = begin; iter != end; iter++ )
-    {   
+    {
         PEdge e = *iter;
         std::pair< typename GraphType::PVertex,typename GraphType::PVertex > vv = pairMinMax( getEdgeEnd1( e ),getEdgeEnd2( e ) );
         edges[i++] = Parals3( vv.first,vv.second,self.getEdgeDir( e,vv.first ),nr++,e );
@@ -562,7 +578,7 @@ template< class GraphType > template< class IterOut1, class IterOut2, class Iter
 
 template< class GraphType > template< class IterOut1, class IterOut2 > std::pair< int,int >
     ConstGraphMethods< GraphType >::findParals( std::pair< IterOut1,IterOut2 > out, PVertex vert, EdgeType relType ) const
-{   
+{
     PEdge LOCALARRAY( buf,self.getEdgeNo( vert,EdAll ) );
     int size = this->getEdges( buf,vert,EdAll );
     return this->findParals( out,buf,buf + size,relType );
@@ -572,7 +588,7 @@ template< class GraphType > template< class IterOut1, class IterOut2 >
     std::pair<int,int> ConstGraphMethods< GraphType >::findParals(
         std::pair< IterOut1,IterOut2 > out, PVertex vert1, PVertex vert2, EdgeType relType ) const
 // TODO: nieefektywne, mozna bezposrednio
-{   
+{
     PEdge LOCALARRAY( buf,std::min( self.getEdgeNo( vert1,EdAll ),self.getEdgeNo( vert2,EdAll ) ) );
     int size = this->getEdges( buf,vert1,vert2,EdAll );
     return this->findParals( out,buf,buf + size,relType );
@@ -580,7 +596,7 @@ template< class GraphType > template< class IterOut1, class IterOut2 >
 
 template< class GraphType > template< class IterOut1, class IterOut2 > std::pair< int,int >
     ConstGraphMethods< GraphType >::findParals( std::pair< IterOut1,IterOut2 > out, EdgeType relType ) const
-{   
+{
     PEdge LOCALARRAY( buf,self.getEdgeNo( EdAll ) );
     this->getEdges( buf,EdAll );
     return this->findParals( out, buf,buf + getEdgeNo( EdAll ),relType );

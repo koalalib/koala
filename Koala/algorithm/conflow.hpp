@@ -50,11 +50,11 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         typename GraphType::PVertex first, typename GraphType::PVertex last, bool out, Iter &iter )
 {
     EdgeDirection mask = EdDirIn | EdDirOut | EdUndir;
-    int depth, m = g.getEdgeNo( mask );
+    int depth, n = g.getVertNo();
     typename GraphType::PEdge e;
     typename GraphType::PVertex u,v;
-    typename GraphType::PVertex LOCALARRAY( buf,m + 3 );
-    QueueInterface< typename GraphType::PVertex * > cont( buf,m + 3 );
+    typename GraphType::PVertex LOCALARRAY( buf,n + 2 );
+    QueueInterface< typename GraphType::PVertex * > cont( buf,n + 1 );
 
     visited[first].vPrev = 0;
     visited[first].ePrev = 0;

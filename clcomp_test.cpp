@@ -141,7 +141,7 @@ using namespace std;
 //
 //        g.del(D);
         int res;
-        cout << (res=IsIt::Comparability::minVertCover(g,tabV))<<endl;
+        cout << (res=IsIt::Comparability::maxStable(g,tabV))<<endl;
         for(int i=0;i<res ;i++) cout << tabV[i]->info << ' ';
 
     }

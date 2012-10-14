@@ -104,7 +104,7 @@ struct Dummy {
 
 	writeGraphText(g, cout, RG_EdgeList|RG_Info,v2int,e2int);
     cout << "\n!!!!!!!!!!!!!!!!\n";
-//	writeGraphText(g, cout, RG_EdgeList|RG_Info,v2int,blackHole);
+	writeGraphText(g, cout, RG_EdgeList|RG_Info,blackHole,blackHole);
 	ofstream pliko("plik.txt");
 //	writeGraphText(g, pliko, RG_VertexLists,form,v2int,e2int);
 	writeGraphText(g, pliko, RG_EdgeList+eform,v2int,e2int);

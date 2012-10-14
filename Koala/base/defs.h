@@ -133,14 +133,8 @@ namespace Koala
       public:
         ConstFunctor( const T &aval = T() ): val( aval ) { }
 
-        T operator()() { return T(); }
+        T operator()(...) { return val; }
 
-        template< class A > T operator()(A) { return val; }
-        template< class A, class B > T operator()( A,B ) { return val; }
-        template< class A, class B, class C > T operator()( A,B,C ) { return val; }
-        template< class A, class B, class C, class D > T operator()( A,B,C,D ) { return val; }
-        template< class A, class B, class C,class D, class E > T operator()( A,B,C,D,E ) { return val; }
-        template< class A, class B, class C,class D, class E, class F > T operator()( A,B,C,D,E,F ) { return val; }
     };
 
     // Funkcja tworząca powyższy funktor.
@@ -191,6 +185,7 @@ namespace Koala
         typedef Cont1 Type;
 
         static Cont1 &get( Cont1 &a, Cont2 &b ) { return a; }
+        static const Cont1 &get(const Cont1 &a, const Cont2 &b ) {  return a; }
     };
 
     template< class Cont2 > struct BlackHoleSwitch< BlackHole,Cont2 >
@@ -198,6 +193,7 @@ namespace Koala
         typedef Cont2 Type;
 
         static Cont2 &get( BlackHole &a, Cont2 &b ) { return b; }
+        static const Cont2 &get(const BlackHole &a,const Cont2 &b ) {  return b; }
     };
 
     // Choosery są strukturami funkcyjnymi zwracającymi true/false (poprzez operator()) dla wierzchołków/krawędzi
@@ -1092,6 +1088,8 @@ namespace Koala
      */
     struct StdCaster
     {
+        typedef StdCaster CastersSelfType;
+
         template< class InfoDest, class InfoSour >
             void operator()( InfoDest &dest, InfoSour sour ) { dest = (InfoDest)sour; }
     };
@@ -1105,6 +1103,8 @@ namespace Koala
      */
     struct NoCastCaster
     {
+        typedef NoCastCaster CastersSelfType;
+
         template< class InfoDest, class InfoSour >
             void operator()( InfoDest &dest, InfoSour sour ) { dest = InfoDest(); }
 
@@ -1122,6 +1122,8 @@ namespace Koala
     // TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
     template< class Fun > struct ObjCaster
     {
+        typedef ObjCaster< Fun > CastersSelfType;
+
         mutable Fun funktor;
         ObjCaster( Fun afun = Fun() ): funktor( afun ) { }
 
@@ -1139,6 +1141,8 @@ namespace Koala
      */
     template< class T > struct ValueCaster
     {
+        typedef ValueCaster< T > CastersSelfType;
+
         T val;
 
         ValueCaster( T arg = T() ): val( arg ) { }
@@ -1198,6 +1202,8 @@ namespace Koala
      */
     template< class Link1, class Link2 > struct Std2Linker
     {
+        typedef Std2Linker< Link1, Link2> LinkersSelfType;
+
         mutable Link1 dest2sour;
         mutable Link2 sour2dest;
 
@@ -1247,6 +1253,21 @@ namespace Koala
 
     template< class Map1, class Map >
         Std2Linker< Std1AssocLinker< Map1 >,Std1AssocLinker< Map > > stdLink( Map1 &tab1, Map &tab );
+
+
+    // wygodne laczenie chooserow, casterow i linkerow w pary za pomoca &
+    template <class  Ch1, class Ch2> std::pair< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >
+        operator&( Ch1 a, Ch2 b )
+        { return std::pair< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >(a,b); }
+
+    template <class  Ch1, class Ch2> std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >
+        operator&( Ch1 a, Ch2 b )
+        { return std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >(a,b); }
+
+    template <class  Ch1, class Ch2> std::pair< typename Ch1::LinkersSelfType,typename Ch2::LinkersSelfType >
+        operator&( Ch1 a, Ch2 b )
+        { return std::pair< typename Ch1::LinkersSelfType,typename Ch2::LinkersSelfType >(a,b); }
+
 
 #include "defs.hpp"
 }

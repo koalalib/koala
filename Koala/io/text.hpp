@@ -394,9 +394,9 @@ bool writeGraphText(const Graph &g, std::ostream &out, int format,
 
     Privates::EmptyMap2 em;
     const typename  BlackHoleSwitch< VMap, Privates::EmptyMap2 >::Type &avmap =
-            BlackHoleSwitch< VMap, Privates::EmptyMap2 >::get(const_cast<VMap&>( vmap ),em );
+            BlackHoleSwitch< VMap, Privates::EmptyMap2 >::get(( vmap ),em );
     const typename  BlackHoleSwitch< EMap, Privates::EmptyMap2 >::Type &aemap =
-            BlackHoleSwitch< EMap, Privates::EmptyMap2 >::get(const_cast<EMap&>( emap ),em );
+            BlackHoleSwitch< EMap, Privates::EmptyMap2 >::get(( emap ),em );
 
 	switch(format & (~RG_Info)) {
 		case RG_VertexLists:	return Privates::writeGraphVL(g, out, std::make_pair((bool)(format&RG_VInfo),(bool)(format&RG_EInfo)),avmap,aemap);

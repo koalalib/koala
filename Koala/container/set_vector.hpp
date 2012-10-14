@@ -23,6 +23,15 @@ template< typename Element > inline Set< Element > &Set< Element >::operator=( c
     return *this;
 }
 
+template< typename Element > template <class T> Set< Element > &Set< Element >::operator=( const Set<T> &s )
+{
+    if (this==(Set< Element >*)(&s)) return *this;
+    this->clear();
+    for(T i=s.first();!s.isBad(i);i=s.next(i))
+        this->add((Element)i);
+    return *this;
+}
+
 template< typename Element > bool Set< Element >::subsetOf( const Set< Element > &s ) const
 {
     if (this->size() > s.size()) return false;
@@ -142,19 +151,19 @@ template< typename Element > template< class Iter > int Set< Element >::getEleme
 }
 
 template< typename Element > inline Element Set< Element >::first() const
-{   
+{
     if (size() == 0) return this->badValue();
     return *begin();
 }
 
 template< typename Element > inline Element Set< Element >::last() const
-{   
+{
     if (size() == 0) return this->badValue();
     return *std::vector< Element >::rbegin();
 }
 
 template< typename Element > inline Element Set< Element >::prev( const Element &e ) const
-{   
+{
     if (this->isBad( e )) return last();
     if (e == this->first()) return this->badValue();
     unsigned l = 0, r = size() - 1;
@@ -170,7 +179,7 @@ template< typename Element > inline Element Set< Element >::prev( const Element 
 }
 
 template< typename Element > inline Element Set< Element >::next( const Element &e ) const
-{   
+{
     if (this->isBad( e )) return first();
     if (e == this->last()) return this->badValue();
     unsigned l = 0, r = size() - 1;

@@ -76,7 +76,7 @@ void searchTest2()
 
 
 
-#define STRATEGY LexBFS
+#define STRATEGY BFS
 
 #include "main.hpp"
 

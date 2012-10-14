@@ -1,5 +1,5 @@
 /* set_set.h
- * 
+ *
  */
 
 #include <set>
@@ -25,8 +25,8 @@ namespace Koala
     {
       public:
         // typ elementu zbioru
-        typedef Element ElemType; 
-    
+        typedef Element ElemType;
+
         // Konstruktory
         // Konstruktor tworzący zbiór pusty.
         Set(): std::set< Element >() { }
@@ -44,6 +44,11 @@ namespace Koala
 
         // Operator przypisania.
         Set< Element > &operator=( const Element &e );
+
+        // Operator przypisania zbioru o elementach innego typu (dla elementow zachodza rzutowania wartosci
+        // typow T-> Element)
+        template <class T>
+        Set< Element > &operator=( const Set<T> &s );
 
         // Informacje odnośnie zbioru.
         // czy zbior jest pusty
@@ -84,7 +89,7 @@ namespace Koala
         Element first() const;
         Element last() const;
         // zwracaja 0 gdy nie ma kolejnego elementu. Mozna podac 0, wowczas zwracaja element pierwszy/ostatni
-        Element next( const Element & ) const; 
+        Element next( const Element & ) const;
         Element prev( const Element & ) const;
 
         void reserve( int ) { }

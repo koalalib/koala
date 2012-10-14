@@ -464,13 +464,12 @@ template <class DefaultStructs > template< class GraphType, class VertContainer,
     int BFSPar <DefaultStructs >::bfsDoVisit( const GraphType &g, typename GraphType::PVertex first,
         VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
 {
-    unsigned depth, n, m,retVal;
+    unsigned depth, n = g.getVertNo(),retVal;
     typename GraphType::PEdge e;
     typename GraphType::PVertex u, v;
-    typename GraphType::PVertex LOCALARRAY( buf,(m = g.getEdgeNo( mask )) + 3 );    //TODO: size?
-    QueueInterface< typename GraphType::PVertex * > cont( buf,m + 3 );   //TODO: size?
+    typename GraphType::PVertex LOCALARRAY( buf,n+2 );    //TODO: size?
+    QueueInterface< typename GraphType::PVertex * > cont( buf,n + 1 );   //TODO: size?
 
-    n = g.getVertNo();
     if (n == 0) return 0;
     if (first == NULL) first = g.getVert();
 
@@ -1559,22 +1558,20 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
         adjmatr( n );
     g.getAdj( adjmatr,EdUndir );
 
-    int mm = 0;
-    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) mm += g.deg( v ) * (g.deg( v ) - 1);
-    typename GraphType::PEdge LOCALARRAY( buf,mm + 3 );    //TODO: size?
-    QueueInterface< typename GraphType::PEdge * > cont( buf,mm+ 3 );   //TODO: size?
+    typename GraphType::PEdge LOCALARRAY( buf,g.getEdgeNo(EdUndir)+2 );    //TODO: size?
+    QueueInterface< typename GraphType::PEdge * > cont( buf,g.getEdgeNo(EdUndir)+1 );   //TODO: size?
     typedef typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,int >::Type VisitTab;
     VisitTab visited( m );
 
     int comp = 1;
     for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
         if (!visited.hasKey( e ))
-        {   
+        {
             visited[e] = comp;
             cont.push( e );
 
             while (!cont.empty())
-            {   
+            {
                 typename GraphType::PEdge f = cont.top();
                 typename GraphType::PVertex a = g.getEdgeEnd1( f ), b = g.getEdgeEnd2( f );
                 cont.pop();
@@ -1611,7 +1608,7 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
     {
         if (i == 0 || bufor[i-1].first != bufor[i].first) elicz = 0;
         if (++elicz == n)
-        { 
+        {
             assert( ccomp == -1 );
             ccomp = bufor[i].first;
         }
@@ -1633,19 +1630,19 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
         ++out.vertIter;
         for( typename GraphType::PVertex u = g.getVertNext( v ); u; u = g.getVertNext( u ) )
             if (!vmap.hasKey( u ) && !adjmatr( u,v ))
-            {   
+            {
                 bool found = false;
                 for( typename GraphType::PVertex x = g.getVert(); x; x = g.getVertNext( x ) )
                     if (x != u && x != v) found = found || (adjmatr( x,v ) != adjmatr( x,u ));
                 if (!found)
-                {   
+                {
                     l++;
                     vmap[u] = compno;
                     *out.vertIter = u;
                     ++out.vertIter;
                 }
             }
-        *out.compIter = l; 
+        *out.compIter = l;
         ++out.compIter;
         compno++;
     }

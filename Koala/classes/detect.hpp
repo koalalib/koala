@@ -138,11 +138,17 @@ template< class DefaultStructs > template< class GraphType, class Iter >
 template< class DefaultStructs > template< class GraphType, class Iter >
     int IsItPar< DefaultStructs >::Bipartite::maxStable( const GraphType &g, Iter out )
 {
-    Set< typename GraphType::PVertex > res;
-    minVertCover( g,setInserter( res ) );
-    res = g.getVertSet() - res;
-    res.getElements( out );
-    return res.size();
+        int n;
+        typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,char >::Type
+                                                            res( n = g.getVertNo() );
+        minVertCover( g,assocInserter( res, ConstFunctor<char>() ) );
+        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            if (! res.hasKey(v))
+            {
+                *out=v;
+                ++out;
+            }
+        return n - res.size();
 }
 
 template< class DefaultStructs > template< class GraphType, class Iter >
@@ -153,46 +159,51 @@ template< class DefaultStructs > template< class GraphType, class Iter >
         Koala::Matching::VertLabs< GraphType > >::Type vertTab( n = g.getVertNo() );
 
     typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,bool >::Type matching( n / 2 );
-
-    Set< typename GraphType::PVertex > setL,setR;
-    koalaAssert(-1 != getPart( g,setInserter( setL ),true ),AlgExcWrongArg );
-    setR = g.getVertSet() - setL;
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type setL( n ), setR( n );
+    koalaAssert(-1 != getPart( g,assocInserter( setL, constFun( true ) ),true ),AlgExcWrongArg );
+    for( typename GraphType::PVertex v=g.getVert(); v; v=g.getVertNext(v))
+        if (! setL.hasKey( v ) ) setR[v];
     int matchno = MatchingPar< DefaultStructs >::findMax( g,vertTab,assocInserter( matching,constFun( true ) ) );
 
-    Set< typename GraphType::PVertex > setT,setnew;
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type setT( n ), setnew( n );
+
 
     //do zbioru setT dodajemy wszystkie wierzcholki wolne z setL
-    for( typename GraphType::PVertex it = setL.first(); it; it = setL.next( it ) )
-        if (vertTab[it].vMatch == 0) setT +=it;
+    for( typename GraphType::PVertex it = setL.firstKey(); it; it = setL.nextKey( it ) )
+        if (vertTab[it].vMatch == 0) setT [it];
 
     while (1)
     {
         setnew.clear();
-        for( typename GraphType::PVertex itT = setT.first(); itT; itT = setT.next( itT ) )
-            if (setL.isElement( itT ))
+        for( typename GraphType::PVertex itT = setT.firstKey(); itT; itT = setT.nextKey( itT ) )
+            if (setL.hasKey( itT ))
                 for ( typename GraphType::PEdge e = g.getEdge( itT,EdUndir ); e; e = g.getEdgeNext( itT,e,EdUndir ))
                     if (g.getEdgeEnd( e,itT ) != vertTab[itT].vMatch)
                     {
                         typename GraphType::PVertex itR = g.getEdgeEnd( e,itT );
-                        setnew += itR;
+                        setnew[ itR ];
                         for( typename GraphType::PEdge f = g.getEdge( itR,EdUndir ); f; f = g.getEdgeNext( itR,f,EdUndir ) )
-                            if (matching.hasKey( f )) setnew += g.getEdgeEnd( f,itR );
+                            if (matching.hasKey( f )) setnew[g.getEdgeEnd( f,itR )];
                     }
-        if (setnew.subsetOf( setT )) break;
-        setT += setnew;
+
+        bool subflag=true;
+        for( typename GraphType::PVertex it = setnew.firstKey(); it; it = setnew.nextKey( it ) )
+            if (! setT.hasKey(it))
+            {
+                subflag=false;
+                setT[it];
+            }
+
+        if (subflag) break;
     }
-    setT = (setL ^ setT);
+    setR.clear();
+    for( typename GraphType::PVertex v=g.getVert(); v; v=g.getVertNext(v))
+        if ( setL.hasKey(v)!=setT.hasKey(v)) setR[v];
 
     //wpisanie wyniku w strumien wyjsciowy wierzcholkow
     if (!isBlackHole( out ))
-    {
-        for (typename GraphType::PVertex it = setT.first(); it; it = setT.next( it ) )
-        {
-            *out = it;
-            ++out;
-        }
-    }
-    return setT.size();
+        setR.getKeys(out);
+    return setR.size();
 }
 
 
@@ -627,11 +638,17 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
     int IsItPar< DefaultStructs >::Chordal::minVertCover( const Graph &g, int qn, QIter begin, VIter vbegin,
         QTEIter ebegin, IterOut out )
 {
-    Set< typename Graph::PVertex > res;
-    maxStable( g,qn,begin,vbegin,ebegin,setInserter( res ) );
-    res = g.getVertSet() - res;
-    res.getElements( out );
-    return res.size();
+    int n;
+    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,char >::Type
+                                                            res( n = g.getVertNo() );
+    maxStable( g,qn,begin,vbegin,ebegin,assocInserter( res, ConstFunctor<char>() ) );
+    for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            if (! res.hasKey(v))
+            {
+                *out=v;
+                ++out;
+            }
+    return n - res.size();
 }
 
 template< class DefaultStructs > template< class Graph, class IterOut >
@@ -649,11 +666,17 @@ template< class DefaultStructs > template< class Graph, class IterOut >
 template< class DefaultStructs > template< class Graph, class IterOut >
     int IsItPar< DefaultStructs >::Chordal::minVertCover( const Graph &g, IterOut out )
 {
-    Set< typename Graph::PVertex > res;
-    maxStable( g,setInserter( res ) );
-    res = g.getVertSet() - res;
-    res.getElements( out );
-    return res.size();
+    int n;
+    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,char >::Type
+                                                            res( n = g.getVertNo() );
+    maxStable( g,assocInserter( res, ConstFunctor<char>() ) );
+    for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            if (! res.hasKey(v))
+            {
+                *out=v;
+                ++out;
+            }
+    return n - res.size();
 }
 
 template< class DefaultStructs > template< class GraphType >
@@ -690,10 +713,10 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
         adjmatr( n );
     g.getAdj( adjmatr,EdUndir );
 
-    int mm = 0;
-    for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) mm += g.deg( v ) * (g.deg( v ) - 1);
-    std::pair< typename Graph::PEdge,EdgeDirection > LOCALARRAY( buf,mm + 3 );    //TODO: size?
-    QueueInterface< std::pair< typename Graph::PEdge,EdgeDirection > * > cont( buf,mm+ 3 );   //TODO: size?
+//    int mm = 0;
+//    for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) mm += g.deg( v ) * (g.deg( v ) - 1);
+    std::pair< typename Graph::PEdge,EdgeDirection > LOCALARRAY( buf,m + 2 );    //TODO: size?
+    QueueInterface< std::pair< typename Graph::PEdge,EdgeDirection > * > cont( buf,m+ 1 );   //TODO: size?
     typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EDir >::Type visited( m );
 
     int comp = 1;
@@ -879,12 +902,18 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
 
 template< class DefaultStructs > template< class GraphType, class Iter >
     int IsItPar< DefaultStructs >::Comparability::minVertCover( const GraphType &g, Iter out )
-{
-    Set< typename GraphType::PVertex > res;
-    maxStable( g,setInserter( res ) );
-    res = g.getVertSet() - res;
-    res.getElements( out );
-    return res.size();
+{       int n;
+        typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,char >::Type
+                                                            res( n = g.getVertNo() );
+        maxStable( g,assocInserter( res, ConstFunctor<char>() ) );
+        for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            if (! res.hasKey(v))
+            {
+                *out=v;
+                ++out;
+            }
+        return n - res.size();
+
 }
 
 template< class DefaultStructs > template< class GraphType >
@@ -1319,11 +1348,17 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
 template< class DefaultStructs > template< class GraphType, class Iter >
     int IsItPar< DefaultStructs >::Cograph::minVertCover( const GraphType &g, Iter out )
 {
-    Set< typename GraphType::PVertex > res;
-    maxStable( g,setInserter( res ) );
-    res = g.getVertSet() - res;
-    res.getElements( out );
-    return res.size();
+    int n;
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,char >::Type
+                                                            res( n = g.getVertNo() );
+    maxStable( g,assocInserter( res, ConstFunctor<char>() ) );
+    for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            if (! res.hasKey(v))
+            {
+                *out=v;
+                ++out;
+            }
+    return n - res.size();
 }
 
 template< class DefaultStructs > template< class GraphType, class Assoc >

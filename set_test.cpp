@@ -213,7 +213,16 @@ double kwadrat(int arg) { return arg*arg; }
         cout << preimageSet(dset,hset,kwadrat);
 
     }
-    cout << "\n!\n";
+    cout << "\n!!!\n";
+    {
+        Set<int> iset, iset2;
+        Set<double> dset;
+        dset.add(1.5);dset.add(2);dset.add(2.5);dset.add(3);
+        iset=dset;
+        cout << "\n" << iset << "\n";
+        iset2=iset;
+        cout << "\n" << iset2 << "\n";
+    }
 
 
 }

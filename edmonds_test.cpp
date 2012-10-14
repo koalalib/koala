@@ -2,7 +2,7 @@
 #include <string>
 #include "Koala/base/defs.h"
 #include "Koala/graph/graph.h"
-#include "Koala/algorithm/factor.h"
+#include "Koala/algorithm/matching.h"
 #include "Koala/classes/detect.h"
 
 struct OpisV;  // pewna struktura opisujaca moj wierzcholek
@@ -374,6 +374,7 @@ void HKTest()
     }
 
 
-
+    Koala::ConstFunctor<int> con=13;
+    std::cout << "\n" <<con() << con('a') << con (12.5,3);
     return 0;
 }
