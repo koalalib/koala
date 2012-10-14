@@ -19,7 +19,7 @@ template< class Key > bool BinomHeapNode< Key >::check() const
 
 template< class Key, class Compare, class Allocator > BinomHeap< Key,Compare,Allocator >
     &BinomHeap< Key,Compare,Allocator >::operator=( const BinomHeap< Key,Compare,Allocator > &X )
-{   
+{
     if (this == &X) return *this;
     clear();
     root = minimum = 0;
@@ -29,7 +29,7 @@ template< class Key, class Compare, class Allocator > BinomHeap< Key,Compare,All
     root = copy( X.root,0 );
 
     Node *A = root, *B = X.root;
-    while (B != X.minimum) 
+    while (B != X.minimum)
     {
         A = A->next;
         B = B->next;
@@ -41,7 +41,7 @@ template< class Key, class Compare, class Allocator > BinomHeap< Key,Compare,All
 
 template< class Key, class Compare, class Allocator > template <class InputIterator>
     void BinomHeap< Key,Compare,Allocator >::assign( InputIterator first, InputIterator last )
-{   
+{
     int len = 0;
     clear();
     for( InputIterator i = first; i != last; ++i ) ++len;
@@ -67,7 +67,7 @@ template< class Key, class Compare, class Allocator > template< class InputItera
     void BinomHeap< Key,Compare,Allocator >::assign2( InputIterator &first, int len )
 {
     if (len == 1)
-    { 
+    {
         push( *first );
         ++first;
     }
@@ -113,7 +113,7 @@ template< class Key, class Compare, class Allocator >
 }
 
 template< class Key, class Compare, class Allocator > Key BinomHeap< Key,Compare,Allocator >::top() const
-{   
+{
     koalaAssert( minimum,ContExcOutpass );
     return minimum->key;
 }
@@ -136,6 +136,7 @@ template< class Key, class Compare, class Allocator > typename BinomHeap< Key,Co
 
 template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compare,Allocator >::pop()
 {
+    koalaAssert( nodes,ContExcOutpass );
     nodes--;
 
     if(root == minimum) root = root->next;
@@ -191,7 +192,7 @@ template< class Key, class Compare, class Allocator >
         else
         {
             Node *E = D;
-            while (B != E->next) 
+            while (B != E->next)
             {
                 E = E->next;
                 C->degree--;
@@ -229,7 +230,7 @@ template< class Key, class Compare, class Allocator >
 }
 
 template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compare,Allocator >::del( Node *A )
-{   
+{
     koalaAssert( nodes,ContExcOutpass );
     nodes--;
 
@@ -345,7 +346,7 @@ template< class Key, class Compare, class Allocator > inline typename BinomHeap<
 {
     Node *start, *C;
     if (A->degree <= B->degree)
-    { 
+    {
         start = C = A;
         A = A->next;
     }
@@ -422,7 +423,7 @@ template< class Key, class Compare, class Allocator > inline typename BinomHeap<
 }
 
 template< class Key > inline void FibonHeapNode< Key >::init( const Key &_key )
-{   
+{
     parent = child = 0;
     flag = 0;
     key=_key;
@@ -479,7 +480,7 @@ template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compar
 
 template< class Key, class Compare, class Allocator > FibonHeap< Key,Compare,Allocator >
     &FibonHeap< Key,Compare,Allocator >::operator=( const FibonHeap< Key,Compare,Allocator > &X )
-{   
+{
     if (this == &X) return *this;
     clear();
     root=0;
@@ -501,7 +502,7 @@ template< class Key, class Compare, class Allocator > template< class InputItera
 template< class Key, class Compare,class Allocator > inline
     FibonHeap< Key,Compare,Allocator >::FibonHeap( const FibonHeap< Key,Compare,Allocator > &other ):
         root( 0 ), nodes( other.nodes ), allocator( other.allocator ), function( other.function )
-{   
+{
     if (!other.nodes) return;
     root = copy( other.root,0 );
 }
@@ -528,7 +529,7 @@ template< class Key, class Compare, class Allocator > typename FibonHeap< Key,Co
 }
 
 template< class Key, class Compare, class Allocator > Key FibonHeap< Key,Compare,Allocator >::top() const
-{   
+{
     koalaAssert( root,ContExcOutpass );
     return root->key;
 }
@@ -547,7 +548,7 @@ template< class Key, class Compare, class Allocator > typename FibonHeap< Key,Co
 }
 
 template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compare,Allocator >::pop()
-{   
+{
     koalaAssert( nodes,ContExcOutpass );
     nodes--;
 
@@ -663,6 +664,7 @@ template< class Key, class Compare, class Allocator >
 
 template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compare,Allocator >::del( Node *A )
 {
+    koalaAssert( nodes,ContExcOutpass );
     Node *B = A->parent, *C = A;
     if (!B)
     {
@@ -746,4 +748,256 @@ template< class Key, class Compare, class Allocator > bool FibonHeap< Key,Compar
     } while (A != root);
 
     return true;
+}
+
+// PairHeapNode
+
+template< class Key > inline void PairHeapNode< Key >::init( const Key &_key )
+{
+    parent = child = previous = next = 0;
+    degree = 0;
+    key=_key;
+}
+
+template <class Key>
+inline void PairHeapNode<Key>::insert(PairHeapNode<Key> *A)
+{
+	if(child)
+		child->previous = A;
+	A->parent = this, A->previous = 0, A->next = child, child = A, degree++;
+}
+
+template <class Key>
+inline void PairHeapNode<Key>::remove()
+{
+	if(this == parent->child)
+		parent->child = next;
+	else
+		previous->next = next;
+	if(next)
+		next->previous = previous;
+	parent->degree--, parent = previous = next = 0;
+}
+
+template <class Key>
+bool PairHeapNode<Key>::check() const
+{
+	unsigned degree = 0;
+	for(PairHeapNode<Key> *child = this->child; child; child = child->next, degree++)
+	{
+		if(child->next && child->next->previous && child->next->previous != child)
+			return false;
+		if(child->previous && child->previous->next && child->previous->next != child)
+			return false;
+		if(child->parent != this || !child->check())
+			return false;
+	}
+	if(degree != this->degree)
+		return false;
+	return true;
+}
+
+template< class Key, class Compare, class Allocator > typename PairHeap< Key,Compare,Allocator >::Node
+    *PairHeap< Key,Compare,Allocator >::newNode( Key key )
+{
+    if (!allocator) return new Node( key );
+    Node *res = allocator->template allocate< PairHeapNode< Key > >();
+    res->init( key );
+    return res;
+}
+
+template< class Key, class Compare, class Allocator > void PairHeap< Key,Compare,Allocator >::delNode( Node *node )
+{
+    if (!allocator) delete node;
+    else allocator->deallocate( node );
+}
+
+template< class Key, class Compare, class Allocator > PairHeap< Key,Compare,Allocator >
+    &PairHeap< Key,Compare,Allocator >::operator=( const PairHeap< Key,Compare,Allocator > &X )
+{
+    if (this == &X) return *this;
+    clear();
+    root=0;
+    nodes = X.nodes;
+    function = X.function;
+    if (!nodes) return *this;
+    root = copy( X.root,0 );
+
+    return *this;
+}
+
+template< class Key, class Compare, class Allocator > template< class InputIterator >
+    void PairHeap< Key,Compare,Allocator >::assign( InputIterator first, InputIterator last )
+{
+    clear();
+    for( ; first != last; first++ ) push( *first );
+}
+
+template< class Key, class Compare,class Allocator > inline
+    PairHeap< Key,Compare,Allocator >::PairHeap( const PairHeap< Key,Compare,Allocator > &other ):
+        root( 0 ), nodes( other.nodes ), allocator( other.allocator ), function( other.function )
+{
+    if (!other.nodes) return;
+    root = copy( other.root,0 );
+}
+
+template <class Key, class Compare,class Allocator>
+typename PairHeap<Key, Compare,Allocator>::Node* PairHeap<Key, Compare,Allocator>::copy(Node *A, Node *parent)
+{
+	Node *B = A, *C = newNode(B->key), *D = C, *E;
+	D->parent = parent, D->child = B->child ? copy(B->child, B) : 0;
+	while(B->next)
+	{
+		B = B->next;
+		E = D, D = D->next = newNode(B->key), D->previous = E;
+		D->parent = parent, D->child = B->child ? copy(B->child, B) : 0;
+	}
+	D->next = 0, C->previous = 0;
+
+	return C;
+}
+
+template <class Key, class Compare,class Allocator>
+Key PairHeap<Key, Compare,Allocator>::top() const
+{   koalaAssert(root,ContExcOutpass);
+	return root->key;
+}
+
+template <class Key, class Compare,class Allocator>
+typename PairHeap<Key, Compare,Allocator>::Node* PairHeap<Key, Compare,Allocator>::push(const Key &key)
+{
+	nodes++;
+	Node *A = newNode(key);
+
+	if(root == 0)
+		return root = A;
+
+	if(function(A->key, root->key))
+		A->insert(root), root = A;
+	else
+		root->insert(A);
+	return A;
+}
+
+template <class Key, class Compare,class Allocator>
+void PairHeap<Key, Compare,Allocator>::pop()
+{
+    koalaAssert( nodes,ContExcOutpass );
+	nodes--;
+
+	if(nodes == 0)
+	{
+		delNode(root), root = 0;
+		return;
+	}
+
+	Node *A = root->child, *B, *C;
+	delNode(root), root = A, root->parent = 0;
+
+	while(A)
+	{
+		B = A->next;
+		if(!B)
+			break;
+
+		C = B->next;
+		if(function(A->key, B->key))
+		{
+			if(B->next)
+				B->next->previous = A;
+			A->next = B->next, A->insert(B), A = A->next;
+		}
+		else
+		{
+			if(A->previous)
+				A->previous->next = B;
+			B->previous = A->previous, B->insert(A), A = B->next;
+		}
+	}
+
+	if(root->parent)
+		root = root->parent;
+	A = root->next;
+	while(A)
+	{
+		if(function(A->key, root->key))
+			A->insert(root), A->previous = 0, root = A;
+		else
+			root->next = A->next, root->insert(A);
+
+		A = root->next;
+	}
+	root->parent = 0;
+}
+
+template <class Key, class Compare,class Allocator>
+void PairHeap<Key, Compare,Allocator>::decrease(Node *A, const Key &key)
+{
+	koalaAssert(!function(A->key,key),ContExcWrongArg);
+	if (!function(A->key,key) && !function(key,A->key)) return;
+
+	A->key = key;
+	if(!A->parent)
+		return;
+	A->remove();
+
+	if(function(A->key, root->key))
+		A->insert(root), root = A;
+	else
+		root->insert(A);
+}
+
+template <class Key, class Compare,class Allocator>
+void PairHeap<Key, Compare,Allocator>::del(Node *A)
+{   koalaAssert(nodes,ContExcOutpass);
+	if(A->parent)
+		A->remove(), A->insert(root), A->parent = 0, root = A;
+	pop();
+}
+
+template <class Key, class Compare,class Allocator>
+void PairHeap<Key, Compare,Allocator>::merge(PairHeap& heap)
+{
+	if(!heap.root || root == heap.root)
+		return;
+	else if(root)
+	{
+		if(function(heap.root->key, root->key))
+			heap.root->insert(root), root = heap.root;
+		else
+			root->insert(heap.root);
+		nodes += heap.nodes;
+	}
+	else
+		root = heap.root, nodes = heap.nodes;
+	heap.root = 0, heap.nodes = 0;
+}
+
+template <class Key, class Compare,class Allocator>
+void PairHeap<Key, Compare,Allocator>::clear()
+{
+	if(root) clear(root);
+	root=0; nodes=0;
+}
+
+template <class Key, class Compare,class Allocator>
+void PairHeap<Key, Compare,Allocator>::clear(Node* n)
+{
+	if(n->next) clear(n->next);
+	if(n->child) clear(n->child);
+	//allocator->deallocate(n);
+	delNode(n);
+}
+
+template <class Key, class Compare,class Allocator>
+bool PairHeap<Key, Compare,Allocator>::check() const
+{
+	Node *A = root;
+	while(A)
+	{
+		if(A->parent || !A->check())
+			return false;
+		A = A->next;
+	}
+	return true;
 }

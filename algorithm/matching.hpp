@@ -487,7 +487,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         VertLabs< GraphType > >::Type >::Type &vertTab = BlackHoleSwitch< VertContainer,typename DefaultStructs::
         template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type >::get( avertTab,localvertTab );
     int n = g.getVertNo();
-    if (isBlackHole( avertTab )) vertTab.reserve( n );
+    if (DefaultStructs::ReserveOutAssocCont || isBlackHole( avertTab )) vertTab.reserve( n );
 
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
         Set< typename GraphType::PVertex > >::Type vertTabNeights( n );
@@ -512,7 +512,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         VertLabs< GraphType > >::Type >::Type &vertTab = BlackHoleSwitch< VertContainer,typename DefaultStructs::
         template AssocCont<typename GraphType::PVertex,VertLabs< GraphType > >::Type >::get( avertTab,localvertTab );
     int n = g.getVertNo();
-    if (isBlackHole( avertTab )) vertTab.reserve( n );
+    if (DefaultStructs::ReserveOutAssocCont || isBlackHole( avertTab )) vertTab.reserve( n );
 
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
         Set< typename GraphType::PVertex> >::Type vertTabNeights( n );
@@ -536,7 +536,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         VertLabs< GraphType> >::Type >::Type &vertTab = BlackHoleSwitch< VertContainer,typename DefaultStructs::
         template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type >::get( avertTab,localvertTab );
     int n = g.getVertNo();
-    if (isBlackHole( avertTab )) vertTab.reserve( n );
+    if (DefaultStructs::ReserveOutAssocCont ||isBlackHole( avertTab )) vertTab.reserve( n );
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
         Set< typename GraphType::PVertex > >::Type vertTabNeights( n );
     fillVertTabNeights( g,vertTabNeights );
@@ -560,7 +560,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
     // liczba wierzcholkow w grafie
     int vertNo = g.getVertNo();
-    if (isBlackHole( avertTab )) vertTab.reserve( vertNo );
+    if (DefaultStructs::ReserveOutAssocCont ||isBlackHole( avertTab )) vertTab.reserve( vertNo );
     // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
     int expo = vertNo;
     typename GraphType::PVertex U,V;
@@ -598,7 +598,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
     // liczba wierzcholkow w grafie
     int vertNo = g.getVertNo();
-    if (isBlackHole( avertTab )) vertTab.reserve( vertNo );
+    if (DefaultStructs::ReserveOutAssocCont ||isBlackHole( avertTab )) vertTab.reserve( vertNo );
     // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
     int expo = vertNo;
     typename GraphType::PVertex U,V;
@@ -672,7 +672,7 @@ template< class DefaultStructs > template< class GraphType, class VIterIn, class
     int StableMatchingPar< DefaultStructs >::bipartFind( const GraphType &g, VIterIn begin, VIterIn end, Comp compare,
         vertCont &verttab, EIterOut out )
 {
-    int licz = 0, n1 = 0;
+    int licz = 0, n1 = 0, n;
     for( VIterIn it = begin; it != end; ++it )
         if (g.deg( *it,Directed | Undirected )) n1++;
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge* >::Type
@@ -681,7 +681,7 @@ template< class DefaultStructs > template< class GraphType, class VIterIn, class
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,char > ::Type free( n1 );
     typename GraphType::PEdge LOCALARRAY( incids,g.getEdgeNo( Directed | Undirected ) );
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge >::Type
-        match( g.getVertNo() - n1 );
+        match( (n=g.getVertNo()) - n1 );
 
     for( VIterIn it = begin; it != end; ++it )
         if (g.deg( *it,Directed | Undirected ))
@@ -713,6 +713,7 @@ template< class DefaultStructs > template< class GraphType, class VIterIn, class
         else if (++love[u] == g.deg( u,Directed | Undirected )) free.delKey( u );
     }
     licz = 0;
+    if (DefaultStructs::ReserveOutAssocCont) verttab.reserve(n);
     for( typename GraphType::PVertex u = match.firstKey(); u; u = match.nextKey( u ) )
     {
         licz++;
