@@ -1,7 +1,7 @@
 // AssocTabConstInterface
 
 template< class K, class V > V AssocTabConstInterface< std::map< K,V > >::operator[]( K arg ) const
-{   
+{
     koalaAssert( arg,ContExcOutpass );
     typename std::map< K,V >::const_iterator i;
     i = cont.find( arg );
@@ -9,14 +9,14 @@ template< class K, class V > V AssocTabConstInterface< std::map< K,V > >::operat
     else return i->second;
 }
 template< class K, class V > V &AssocTabConstInterface< std::map< K,V > >::get( K arg )
-{   
+{
     koalaAssert( arg,ContExcOutpass );
     return (_cont())[arg];
 }
 
 template< class K, class V > typename AssocTabConstInterface< std::map< K,V > >::ValType
     *AssocTabConstInterface< std::map< K,V > >::valPtr( K arg )
-{   
+{
     koalaAssert( arg,ContExcOutpass );
     typename std::map< K,V >::iterator i = _cont().find( arg );
     if (i == _cont().end()) return NULL;
@@ -79,7 +79,7 @@ template< class K, class V > template< class Iterator >
 // AssocTabInterface
 
 template< class T > AssocTabInterface< T > &AssocTabInterface< T >::operator=( const AssocTabInterface< T > &arg )
-{   
+{
     if (&arg.cont == &cont) return *this;
     clear();
     for( KeyType k = arg.firstKey(); k; k = arg.nextKey( k ) ) operator[]( k ) = arg[k];
@@ -87,7 +87,7 @@ template< class T > AssocTabInterface< T > &AssocTabInterface< T >::operator=( c
 }
 
 template< class T > AssocTabInterface< T > &AssocTabInterface< T >::operator=( const AssocTabConstInterface< T > &arg )
-{   
+{
     if (&arg.cont == &cont) return *this;
     clear();
     for( KeyType k = arg.firstKey(); k; k = arg.nextKey( k ) ) operator[]( k )=arg[k];
@@ -163,7 +163,7 @@ void AssocKeyContReg::deregister()
 
 template< class Klucz, class Elem, class Container > template< class AssocCont >
     AssocArray< Klucz,Elem,Container > &AssocArray< Klucz,Elem,Container >::operator=( const AssocCont &arg )
-{   
+{
     Privates::AssocTabTag< Klucz >::operator=( arg );
     clear();
     for( Klucz k = arg.firstKey(); k; k = arg.nextKey( k ) ) operator[]( k ) = arg[k];
@@ -171,7 +171,7 @@ template< class Klucz, class Elem, class Container > template< class AssocCont >
 }
 
 template< class Klucz, class Elem, class Container > Elem *AssocArray< Klucz,Elem,Container >::valPtr( Klucz v )
-{   
+{
     int x = keyPos( v );
     if (x == -1) return NULL;
     else return &tab[x].val;
@@ -239,7 +239,7 @@ template< class Klucz, class Elem, class Container > Klucz AssocArray< Klucz,Ele
 template< class Klucz, class Elem, class Container > Klucz AssocArray< Klucz,Elem,Container >::nextKey( Klucz v ) const
 {
     if (!v) return firstKey();
-    int x= keyPos( v ); //TODO: poprawiony blad, uaktualnic
+    int x= keyPos( v );
     koalaAssert( x != -1,ContExcOutpass );
     if ((x = tab.nextPos( x )) == -1) return 0;
     return tab[x].key;
@@ -248,7 +248,7 @@ template< class Klucz, class Elem, class Container > Klucz AssocArray< Klucz,Ele
 template< class Klucz, class Elem, class Container > Klucz AssocArray< Klucz,Elem,Container >::prevKey( Klucz v ) const
 {
     if (!v) return lastKey();
-    int x = keyPos( v ); //TODO: poprawiony blad, uaktualnic
+    int x = keyPos( v );
     koalaAssert( x != -1,ContExcOutpass );
     if ((x = tab.prevPos( x )) == -1) return 0;
     return tab[x].key;
@@ -305,7 +305,7 @@ template< class Klucz, class Elem, class Container > template< class Iterator >
 template< class Klucz, class Elem, class AssocCont, class Container > template< class AssocCont2 >
     PseudoAssocArray< Klucz,Elem,AssocCont,Container >
     &PseudoAssocArray< Klucz,Elem,AssocCont,Container >::operator=( const AssocCont2 &arg )
-{   
+{
     Privates::AssocTabTag< Klucz >::operator=( arg );
     clear();
     for( Klucz k = arg.firstKey(); k; k = arg.nextKey( k ) ) operator[]( k ) = arg[k];
@@ -348,7 +348,7 @@ template< class Klucz, class Elem, class AssocCont, class Container >
     Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::nextKey( Klucz v )  const
 {
     if (!v) return firstKey();
-    int x = keyPos( v ); // TODO: poprawiony blad, uaktualnic
+    int x = keyPos( v );
     koalaAssert( x != -1,ContExcOutpass );
     if ((x = tab.nextPos( x )) == -1) return 0;
     return tab[x].key;
@@ -358,7 +358,7 @@ template< class Klucz, class Elem, class AssocCont, class Container >
     Klucz PseudoAssocArray< Klucz,Elem,AssocCont,Container >::prevKey( Klucz v )  const
 {
     if (!v) return lastKey();
-    int x = keyPos( v ); // TODO: poprawiony blad, uaktualnic
+    int x = keyPos( v );
     koalaAssert( x != -1,ContExcOutpass );
     if ((x = tab.prevPos( x )) == -1) return 0;
     return tab[x].key;
@@ -404,24 +404,24 @@ template< class Klucz, class Elem, class AssocCont, class Container > template< 
     return size();
 }
 
-template< class Klucz, class Elem, class AssocCont, class Container > 
+template< class Klucz, class Elem, class AssocCont, class Container >
     void PseudoAssocArray< Klucz,Elem,AssocCont,Container >::reserve( int arg )
-{ 
-    tab.reserve( arg ); 
-    assocTab.reserve( arg ); 
+{
+    tab.reserve( arg );
+    assocTab.reserve( arg );
 }
 
-template< class Klucz, class Elem, class AssocCont, class Container > 
+template< class Klucz, class Elem, class AssocCont, class Container >
     Elem *PseudoAssocArray< Klucz,Elem,AssocCont,Container >::valPtr( Klucz v )
-{   
+{
     int x = keyPos( v );
     if (x == -1) return NULL;
     else return &tab[x].val;
 }
 
-template< class Klucz, class Elem, class AssocCont, class Container > 
+template< class Klucz, class Elem, class AssocCont, class Container >
     void PseudoAssocArray< Klucz,Elem,AssocCont,Container >::clear()
-{ 
+{
     tab.clear();
     assocTab.clear();
 }

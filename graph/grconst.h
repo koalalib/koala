@@ -174,6 +174,9 @@ template< class GraphType > class ConstGraphMethods
     // Numer wierzcho³ka/krawedzi, -1 w razie braku
     int vertPos( PVertex ) const;
     int edgePos( PEdge ) const;
+    // czy graf zawiera dany element
+    bool has( PVertex ) const;
+    bool has( PEdge ) const;
 
     // typ krawedzi
     inline EdgeType getEdgeType( PEdge e ) const

@@ -160,7 +160,7 @@ namespace Koala
      */
     class StableMatching: public StableMatchingPar< AlgsDefaultSettings > { };
 
-#include "factor.hpp"
+#include "matching.hpp"
 }
 
 #endif

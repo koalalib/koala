@@ -6,7 +6,7 @@
 #include "../graph/view.h"
 #include "../algorithm/search.h"
 #include "../algorithm/weights.h"
-#include "../algorithm/factor.h"
+#include "../algorithm/matching.h"
 #include "../algorithm/conflow.h"
 #include "../container/joinsets.h"
 
