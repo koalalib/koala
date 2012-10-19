@@ -51,6 +51,8 @@ namespace Koala
 
 #ifdef KOALA_SET_ON_VECTOR
 #include "set_vector.h"
+#elif defined(KOALA_SET_ON_HASHSET)
+#include "set_hashset.h"
 #else
 #include "set_set.h"
 #endif
@@ -90,6 +92,7 @@ namespace Koala
     template< class ValType, class ArgType, class Funktor >
         Set< ArgType > preimageSet( const Set< ValType > &arg, const Set< ArgType > &domain, Funktor f );
 
+// hashset ma implementacje operatorow inne niz te stl-owe
 #include "set.hpp"
 }
 

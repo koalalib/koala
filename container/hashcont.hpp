@@ -88,7 +88,7 @@ template< class KeyType, class HashFunction, class Allocator >
 }
 
 template< class KeyType, class HashFunction, class Allocator >
-    HashSet< KeyType,HashFunction,Allocator >::HashSet( const HashSet &t ): m_count( 0 ), m_size( 0 )        
+    HashSet< KeyType,HashFunction,Allocator >::HashSet( const HashSet &t ): m_count( 0 ), m_size( 0 )
 { 
     initialize( t.m_size ); 
     *this = t;    
@@ -106,6 +106,7 @@ template< class KeyType, class HashFunction, class Allocator > HashSet< KeyType,
 {
     iterator it, e;
     if (m_table == NULL) initialize( t.m_size );
+    m_resizeFactor = t.m_resizeFactor;
     clear();
     for( it = t.begin(), e = t.end(); it != e; ++it ) insert( *it );
     return *this;
@@ -156,6 +157,7 @@ template< class KeyType, class HashFunction, class Allocator > void
     std::swap( m_tables,other.m_tables );
     std::swap( m_overflowFirst,other.m_overflowFirst );
     std::swap( m_overflowSize,other.m_overflowSize );
+    std::swap( m_resizeFactor,other.m_resizeFactor );
 }
 
 template< class KeyType, class HashFunction, class Allocator >
@@ -167,6 +169,10 @@ template< class KeyType, class HashFunction, class Allocator >
 
     if (c->next == HASHSETEMPTYPTR)
     {
+        // Here should be EnlargeIfNeeded(); but it would destroy the c pointer.
+        // Moreover, inserting into the "main" table is the best case as it
+        // does not increase any access times. Therefore we will delay enlarging
+        // the main table.
         new (&(c->key)) key_type( key );
         c->next = (Privates::HSNode< KeyType > *)HASHSETNONEXTPTR;
         m_count++;
@@ -182,6 +188,9 @@ template< class KeyType, class HashFunction, class Allocator >
         COLLISION();
         p = p->next;
     }
+
+    // EnlargeIfNeeded invalidates pointers so insert again...
+    if(EnlargeIfNeeded()) return find_or_insert(key);
 
     p = make_overflow_node();
     new (&(p->key)) key_type( key );
@@ -367,6 +376,15 @@ template< class KeyType, class HashFunction, class Allocator >
     p->next = NULL;
     return p;
 }
+
+template< class KeyType, class HashFunction, class Allocator >
+    bool HashSet< KeyType,HashFunction,Allocator >::EnlargeIfNeeded()
+{
+    if( m_resizeFactor == 0 ) return false;
+    if( ((m_size * m_resizeFactor) >> 8) > m_count ) return false;
+    resize( m_size * 2 );
+    return true;
+};
 
 template< class KeyType, class ValueType > Privates::HashMapPair< KeyType,ValueType >
     &Privates::HashMapPair< KeyType,ValueType >::operator=( const Privates::HashMapPair< KeyType,ValueType > &p )
