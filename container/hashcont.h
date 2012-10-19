@@ -2,7 +2,7 @@
 #define KOALA__HASHCONTAINERS__H__
 
 /* hashcont.h
- * 
+ *
  */
 
 #include <stddef.h>
@@ -19,7 +19,7 @@
 typedef unsigned __int64    uint64_t;
 typedef unsigned __int32    uint32_t;
 #endif
-#ifdef __INTEL_COMPILER
+#if defined(__INTEL_COMPILER) || defined(__GNUC__)
 #include <stdint.h>
 #endif
 
@@ -108,7 +108,7 @@ namespace Koala
 
         bool operator==( const HashSet_const_iterator &it ) { return m_slot == it.m_slot && m_cur == it.m_cur; }
         bool operator!=( const HashSet_const_iterator &it ) { return m_slot != it.m_slot || m_cur != it.m_cur; }
-        
+
       private:
         HashSet_const_iterator( Privates::HSNode< KeyType > *slot );
         HashSet_const_iterator( Privates::HSNode< KeyType > *slot, bool ) { m_slot = m_cur = slot; }
@@ -135,10 +135,25 @@ namespace Koala
         template< class KeyType > class Int32Hash
         {
           public:
-            // explicit pointer truncation in 64bit              
+            // explicit pointer truncation in 64bit
             size_t operator()( KeyType key, size_t m ) const
                 { return ((uint64_t)(uint32_t)(((uint32_t)(size_t)key) * 2654435769u) * m) >> 32; }
         };
+
+        /*
+         * FloatHash
+         *  default hash for floating point types
+         */
+        template<class KeyType>
+        class FloatHash {
+          public:
+            size_t operator ()(KeyType key, size_t m) const {
+                // explicit pointer truncation in 64bit
+                uint64_t iv = key * 2654435769u;
+                iv = iv ^ (iv >> 32);
+                return ((uint64_t)((uint32_t)iv) * m) >> 32;
+                };
+            };
 
         /*
         * StringHash
@@ -168,6 +183,8 @@ namespace Koala
     template<> class DefaultHashFunction< unsigned long >: public Privates::Int32Hash< unsigned long >  { };
     template<> class DefaultHashFunction< unsigned short >: public Privates::Int32Hash< unsigned short > { };
     template< class T > class DefaultHashFunction< T * >: public Privates::Int32Hash< T * > { };
+
+    template<> class DefaultHashFunction<double>: public Privates::FloatHash<double> { };
 
     template<> class DefaultHashFunction< char * >: public Privates::CStringHash< char > { };
     template<> class DefaultHashFunction< const char * >: public Privates::CStringHash< char > { };
@@ -200,8 +217,8 @@ namespace Koala
         typedef HashSet_const_iterator< KeyType,HashFunction,Allocator > const_iterator;
 
       public:
-        HashSet(): m_table( NULL ), m_tables( NULL ), m_count( 0 ), m_size( 0 ) { }
-        HashSet( size_t size ): m_count( 0 ), m_size( 0 ) { initialize( size ); }
+        HashSet(): m_count( 0 ), m_size( 0 ), m_resizeFactor( 205 ) { initialize( 8 ); }
+        HashSet( size_t size ): m_count( 0 ), m_size( 0 ), m_resizeFactor( 205 ) { initialize( size ); }
         HashSet( const HashSet &t );
         template< class HF, class Alloc > HashSet( const HashSet< KeyType,HF,Alloc > &t );
 
@@ -235,6 +252,9 @@ namespace Koala
         void erase( const KeyType &key );
         void erase( const_iterator pos ) { erase( pos.m_cur->key ); }
 
+        void set_threshold( double value ) { if( value <= 0 ) m_resizeFactor = value <= 0 ? 0 : value * 256 + 0.5; };
+        double get_threshold() { return (double)m_resizeFactor / 256.0; };
+
       private:
         Privates::HSNode< KeyType > *make_overflow_node();
 
@@ -244,6 +264,7 @@ namespace Koala
         iterator Find( const KeyType &key ) const;
 
         Privates::HashSetTableList< KeyType > *CreateTable( size_t size );
+        bool EnlargeIfNeeded();
 
 #ifdef HASHSETDEBUG
       public:
@@ -254,6 +275,7 @@ namespace Koala
         Privates::HSNode< KeyType > *m_table;
         size_t m_count;
         size_t m_size;
+        size_t m_resizeFactor;  // fill rate in range 0-256, 0 = off
         Privates::HSNode< KeyType > *m_firstFree;
         Privates::HashSetTableList< KeyType > *m_tables;
         size_t m_overflowFirst;
@@ -422,7 +444,7 @@ namespace Koala
 
         bool operator==( const BiDiHashMap_const_iterator &it) { return m_cur == it.m_cur; }
         bool operator!=( const BiDiHashMap_const_iterator &it ) { return m_cur != it.m_cur; }
-        
+
       private:
         BiDiHashMap_const_iterator( const Privates::BiDiHashMapPair< KeyType,ValueType > *elem ) { m_cur = elem; }
 
@@ -443,7 +465,7 @@ namespace Koala
         typedef Privates::SetToMap< KeyType,ValueType,Privates::BiDiHashMapPair< KeyType,ValueType >,
             HashSet< Privates::BiDiHashMapPair< KeyType,ValueType >,
             Privates::BiDiHashMapHashWrapper< HashFunction,KeyType,ValueType >,Allocator > > baseType;
-            
+
       public:
         typedef BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator > iterator;
         typedef BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator > const_iterator;

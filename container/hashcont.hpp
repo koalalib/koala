@@ -2,69 +2,69 @@
 // HashSet_const_iterator
 
 template< class KeyType, class HashFunction, class Allocator > HashSet_const_iterator< KeyType,HashFunction,Allocator >
-    HashSet_const_iterator< KeyType,HashFunction,Allocator >::operator++( int )          
-{ 
+    HashSet_const_iterator< KeyType,HashFunction,Allocator >::operator++( int )
+{
     HashSet_const_iterator rv( *this );
     advance();
-    return rv;    
+    return rv;
 }
 
 template< class KeyType, class HashFunction, class Allocator > HashSet_const_iterator< KeyType,HashFunction,Allocator >
-    &HashSet_const_iterator< KeyType,HashFunction,Allocator >::operator++()         
-{ 
-    advance(); 
+    &HashSet_const_iterator< KeyType,HashFunction,Allocator >::operator++()
+{
+    advance();
     return *this;
 }
 
 
 template< class KeyType, class HashFunction, class Allocator > HashSet_const_iterator< KeyType,HashFunction,Allocator >
-    &HashSet_const_iterator< KeyType,HashFunction,Allocator >::operator--()         
-{ 
-    recede(); 
+    &HashSet_const_iterator< KeyType,HashFunction,Allocator >::operator--()
+{
+    recede();
     return *this;
 }
 
 template< class KeyType, class HashFunction, class Allocator > HashSet_const_iterator< KeyType,HashFunction,Allocator >
-    HashSet_const_iterator< KeyType,HashFunction,Allocator >::operator--( int )          
-{ 
-    HashSet_const_iterator rv( *this ); 
-    recede(); 
-    return rv;    
+    HashSet_const_iterator< KeyType,HashFunction,Allocator >::operator--( int )
+{
+    HashSet_const_iterator rv( *this );
+    recede();
+    return rv;
 }
 
 template< class KeyType, class HashFunction, class Allocator > HashSet_const_iterator< KeyType,HashFunction,Allocator >
     &HashSet_const_iterator< KeyType,HashFunction,Allocator >::operator=(
-        const HashSet_const_iterator< KeyType,HashFunction,Allocator > &it )  
-{ 
-    m_slot = it.m_slot; 
-    m_cur = it.m_cur; 
-    return *this; 
+        const HashSet_const_iterator< KeyType,HashFunction,Allocator > &it )
+{
+    m_slot = it.m_slot;
+    m_cur = it.m_cur;
+    return *this;
 }
 
 template< class KeyType, class HashFunction, class Allocator >
     HashSet_const_iterator< KeyType,HashFunction,Allocator >::HashSet_const_iterator( Privates::HSNode< KeyType > *slot )
-{ 
-    m_slot = m_cur = slot; 
-    advance_if_needed(); 
-}
-
-template< class KeyType, class HashFunction, class Allocator > 
-    HashSet_const_iterator< KeyType,HashFunction,Allocator >::HashSet_const_iterator(
-        Privates::HSNode< KeyType > *slot, Privates::HSNode< KeyType > *cur ) 
-{ 
-    m_slot = slot; 
-    m_cur = cur;   
+{
+    m_slot = m_cur = slot;
+    advance_if_needed();
 }
 
 template< class KeyType, class HashFunction, class Allocator >
-    void HashSet_const_iterator< KeyType,HashFunction,Allocator >::advance() 
+    HashSet_const_iterator< KeyType,HashFunction,Allocator >::HashSet_const_iterator(
+        Privates::HSNode< KeyType > *slot, Privates::HSNode< KeyType > *cur )
+{
+    m_slot = slot;
+    m_cur = cur;
+}
+
+template< class KeyType, class HashFunction, class Allocator >
+    void HashSet_const_iterator< KeyType,HashFunction,Allocator >::advance()
 {
     if (m_cur->next <= HASHSETNONEXTPTR)
     {
         m_slot++;
         while (m_slot->next == HASHSETEMPTYPTR) m_slot++;
         m_cur = m_slot;
-    } 
+    }
     else m_cur = m_cur->next;
 }
 
@@ -88,15 +88,15 @@ template< class KeyType, class HashFunction, class Allocator >
 }
 
 template< class KeyType, class HashFunction, class Allocator >
-    HashSet< KeyType,HashFunction,Allocator >::HashSet( const HashSet &t ): m_count( 0 ), m_size( 0 )        
-{ 
-    initialize( t.m_size ); 
-    *this = t;    
+    HashSet< KeyType,HashFunction,Allocator >::HashSet( const HashSet &t ): m_count( 0 ), m_size( 0 )
+{
+    initialize( t.m_size );
+    *this = t;
 }
 
 template< class KeyType, class HashFunction, class Allocator > template< class HF, class Alloc >
     HashSet< KeyType,HashFunction,Allocator >::HashSet( const HashSet< KeyType,HF,Alloc > &t ): m_count( 0 ), m_size( 0 )
-{ 
+{
     initialize( t.m_size );
     *this = t;
 }
@@ -104,8 +104,10 @@ template< class KeyType, class HashFunction, class Allocator > template< class H
 template< class KeyType, class HashFunction, class Allocator > HashSet< KeyType,HashFunction,Allocator >
     &HashSet< KeyType,HashFunction,Allocator >::operator=( const HashSet &t )
 {
+    if (this==&t) return *this;
     iterator it, e;
     if (m_table == NULL) initialize( t.m_size );
+    m_resizeFactor = t.m_resizeFactor;
     clear();
     for( it = t.begin(), e = t.end(); it != e; ++it ) insert( *it );
     return *this;
@@ -122,7 +124,7 @@ template< class KeyType, class HashFunction, class Allocator > template< class S
 }
 
 template< class KeyType, class HashFunction, class Allocator > void
-    HashSet< KeyType,HashFunction,Allocator >::resize( size_t size ) 
+    HashSet< KeyType,HashFunction,Allocator >::resize( size_t size )
 {
     if (size == m_size) return;
     if (!empty())
@@ -147,7 +149,7 @@ template< class KeyType, class HashFunction, class Allocator > void
 }
 
 template< class KeyType, class HashFunction, class Allocator > void
-    HashSet< KeyType,HashFunction,Allocator >::swap( HashSet &other ) 
+    HashSet< KeyType,HashFunction,Allocator >::swap( HashSet &other )
 {
     std::swap( m_table,other.m_table );
     std::swap( m_count,other.m_count );
@@ -156,6 +158,7 @@ template< class KeyType, class HashFunction, class Allocator > void
     std::swap( m_tables,other.m_tables );
     std::swap( m_overflowFirst,other.m_overflowFirst );
     std::swap( m_overflowSize,other.m_overflowSize );
+    std::swap( m_resizeFactor,other.m_resizeFactor );
 }
 
 template< class KeyType, class HashFunction, class Allocator >
@@ -167,6 +170,10 @@ template< class KeyType, class HashFunction, class Allocator >
 
     if (c->next == HASHSETEMPTYPTR)
     {
+        // Here should be EnlargeIfNeeded(); but it would destroy the c pointer.
+        // Moreover, inserting into the "main" table is the best case as it
+        // does not increase any access times. Therefore we will delay enlarging
+        // the main table.
         new (&(c->key)) key_type( key );
         c->next = (Privates::HSNode< KeyType > *)HASHSETNONEXTPTR;
         m_count++;
@@ -182,6 +189,9 @@ template< class KeyType, class HashFunction, class Allocator >
         COLLISION();
         p = p->next;
     }
+
+    // EnlargeIfNeeded invalidates pointers so insert again...
+    if(EnlargeIfNeeded()) return find_or_insert(key);
 
     p = make_overflow_node();
     new (&(p->key)) key_type( key );
@@ -219,14 +229,14 @@ template< class KeyType, class HashFunction, class Allocator > void
     while (c >= HASHSETVALIDPTR)
     {
         if (c->key != key)
-        { 
-            COLLISION(); 
-            p = c; 
-            c = c->next; 
+        {
+            COLLISION();
+            p = c;
+            c = c->next;
             continue;
         }
         if (p != NULL) // is not first -> have previous
-        { 
+        {
             c->key.~KeyType();
             p->next = c->next;
             c->next = m_firstFree;
@@ -242,7 +252,7 @@ template< class KeyType, class HashFunction, class Allocator > void
             m_firstFree = p;
         }
         else // if first and don't have next
-        {    
+        {
             c->key.~KeyType();
             c->next = (Privates::HSNode< KeyType > *)HASHSETEMPTYPTR;
         }
@@ -258,14 +268,14 @@ template< class KeyType, class HashFunction, class Allocator > Privates::HSNode<
     Privates::HashSetTableList< KeyType > *l;
 
     if (m_firstFree >= HASHSETVALIDPTR) // free slot on free list
-    {    
+    {
         rv = m_firstFree;
         m_firstFree = m_firstFree->next;
         return rv;
     }
 
     if (m_overflowFirst >= m_overflowSize) // no free slot on overflow area
-    { 
+    {
         if (m_overflowSize == 0) m_overflowSize = m_size / 2;
         else m_overflowSize *= 2;
         l = CreateTable( m_overflowSize );
@@ -368,6 +378,15 @@ template< class KeyType, class HashFunction, class Allocator >
     return p;
 }
 
+template< class KeyType, class HashFunction, class Allocator >
+    bool HashSet< KeyType,HashFunction,Allocator >::EnlargeIfNeeded()
+{
+    if( m_resizeFactor == 0 ) return false;
+    if( ((m_size * m_resizeFactor) >> 8) > m_count ) return false;
+    resize( m_size * 2 );
+    return true;
+};
+
 template< class KeyType, class ValueType > Privates::HashMapPair< KeyType,ValueType >
     &Privates::HashMapPair< KeyType,ValueType >::operator=( const Privates::HashMapPair< KeyType,ValueType > &p )
 {
@@ -376,9 +395,9 @@ template< class KeyType, class ValueType > Privates::HashMapPair< KeyType,ValueT
     return *this;
 }
 
-// StringHash    
+// StringHash
 
-size_t Privates::StringHash::operator()( const std::string &key, size_t m ) const 
+size_t Privates::StringHash::operator()( const std::string &key, size_t m ) const
 {
     size_t v = 0, i, len;
     for( len = key.size(), i = 0; i < len; i++ )
@@ -391,10 +410,10 @@ size_t Privates::StringHash::operator()( const std::string &key, size_t m ) cons
 
 // CStringHash
 
-template< class CTYPE > size_t Privates::CStringHash< CTYPE >::operator()( const CTYPE *key, size_t m ) const 
+template< class CTYPE > size_t Privates::CStringHash< CTYPE >::operator()( const CTYPE *key, size_t m ) const
 {
     size_t i, v = 0;
-    for( i = 0; key[i]; i++ ) 
+    for( i = 0; key[i]; i++ )
     {
         v += (size_t)key[i];
         v *= 2654435769u;
@@ -451,33 +470,33 @@ template< class KeyType, class ValueType > Privates::BiDiHashMapPair< KeyType,Va
 
 template< class KeyType, class ValueType, class HashFunction, class Allocator >
     BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >
-    &BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator++()    
-{ 
-    m_cur = m_cur->next; 
-    return *this; 
+    &BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator++()
+{
+    m_cur = m_cur->next;
+    return *this;
 }
 
 template< class KeyType, class ValueType, class HashFunction, class Allocator >
-    BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator > 
-    BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator++( int )  
-{ 
+    BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >
+    BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator++( int )
+{
     BiDiHashMap_const_iterator rv( *this );
     m_cur = m_cur->next;
     return rv;
 }
 
-template< class KeyType, class ValueType, class HashFunction, class Allocator > 
+template< class KeyType, class ValueType, class HashFunction, class Allocator >
     BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >
-    &BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator--()    
-{ 
-    m_cur = m_cur->prev; 
-    return *this; 
+    &BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator--()
+{
+    m_cur = m_cur->prev;
+    return *this;
 }
 
 template< class KeyType, class ValueType, class HashFunction, class Allocator >
-    BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator > 
-    BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator--( int )  
-{ 
+    BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >
+    BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator--( int )
+{
     BiDiHashMap_const_iterator rv( *this );
     m_cur = m_cur->prev;
     return rv;
@@ -486,42 +505,42 @@ template< class KeyType, class ValueType, class HashFunction, class Allocator >
 template< class KeyType, class ValueType, class HashFunction, class Allocator >
     BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >
     &BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator=(
-        const BiDiHashMap_const_iterator &it )    
-{ 
-    m_cur = it.m_cur; 
+        const BiDiHashMap_const_iterator &it )
+{
+    m_cur = it.m_cur;
     return *this;
 }
 
-template< class KeyType, class ValueType, class HashFunction, class Allocator > 
+template< class KeyType, class ValueType, class HashFunction, class Allocator >
     BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >
-    &BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator=( 
-        typename mapBase::const_iterator &it )    
-{ 
-    m_cur = &(*it); 
+    &BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator >::operator=(
+        typename mapBase::const_iterator &it )
+{
+    m_cur = &(*it);
     return *this;
 }
 
 // BiDiHashMap
 
-template< typename KeyType, typename ValueType, class HashFunction, class Allocator > 
-    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::BiDiHashMap( size_t size ): baseType()               
-{ 
-    baseType::resize( size ); 
+template< typename KeyType, typename ValueType, class HashFunction, class Allocator >
+    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::BiDiHashMap( size_t size ): baseType()
+{
+    baseType::resize( size );
     initialize();
 }
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator >
     BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::BiDiHashMap( size_t size, const ValueType &defVal ):
-        baseType( defVal ) 
-{ 
-    baseType::resize( size ); 
+        baseType( defVal )
+{
+    baseType::resize( size );
     initialize();
 }
 
-template< typename KeyType, typename ValueType, class HashFunction, class Allocator > 
+template< typename KeyType, typename ValueType, class HashFunction, class Allocator >
     BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::BiDiHashMap( const BiDiHashMap &t ):
-        baseType( t.m_defaultValue )       
-{ 
+        baseType( t.m_defaultValue )
+{
     baseType::resize( t.slots() );
     initialize();
     *this = t;
@@ -529,8 +548,9 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator >
     BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >
-    &BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::operator=( const BiDiHashMap &t ) 
+    &BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::operator=( const BiDiHashMap &t )
 {
+    if (this==&t) return *this;
     iterator it,e;
     clear();
     for( it = t.begin(), e = t.end(); it != e; ++it ) insert( it->first,it->second );
@@ -548,7 +568,7 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
 }
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator > ValueType
-    &BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::operator[]( const KeyType &key ) 
+    &BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::operator[]( const KeyType &key )
 {
     std::pair< iterator,bool > res = insert( key,this->m_defaultValue );
     return const_cast< ValueType & >( res.first->second );
@@ -564,16 +584,16 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator >
     std::pair< typename BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::iterator,bool >
-    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::insert( const KeyType &key, const ValueType &value ) 
+    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::insert( const KeyType &key, const ValueType &value )
 {
     std::pair< typename baseType::iterator,bool > res = baseType::insert( key,value );
     if (res.second) AddToList( res.first.operator->() );
     return std::make_pair( iterator( res.first ),res.second );
 }
 
-template< typename KeyType, typename ValueType, class HashFunction, class Allocator > 
+template< typename KeyType, typename ValueType, class HashFunction, class Allocator >
     std::pair< typename BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::iterator,bool >
-    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::insert( const std::pair< KeyType,ValueType > &elem ) 
+    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::insert( const std::pair< KeyType,ValueType > &elem )
 {
     std::pair< typename baseType::iterator,bool > res = baseType::insert( elem );
     if (res.second) AddToList( res.first.operator->() );
@@ -590,10 +610,10 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
 }
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator > void
-    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::clear() 
-{ 
+    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::clear()
+{
     baseType::clear();
-    initialize(); 
+    initialize();
 }
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator > void
@@ -642,7 +662,7 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator > void
     BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::AddToList(
-        const Privates::BiDiHashMapPair< KeyType,ValueType > *ptr ) 
+        const Privates::BiDiHashMapPair< KeyType,ValueType > *ptr )
 {
     ptr->prev = &m_begin;
     ptr->next = m_begin.next;
@@ -652,7 +672,7 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator > void
     BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::DelFromList(
-        const Privates::BiDiHashMapPair< KeyType,ValueType > *ptr ) 
+        const Privates::BiDiHashMapPair< KeyType,ValueType > *ptr )
 {
     ptr->prev->next = ptr->next;
     ptr->next->prev = ptr->prev;
@@ -661,7 +681,7 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
 // AssocTabConstInterface
 
 template< class K, class V > V AssocTabConstInterface< BiDiHashMap< K,V > >::operator[]( K arg )
-{   
+{
     typename BiDiHashMap< K,V >::const_iterator i;
     i = cont.find( arg );
     if (i == cont.end()) return V();
@@ -670,7 +690,7 @@ template< class K, class V > V AssocTabConstInterface< BiDiHashMap< K,V > >::ope
 
 template< class K, class V > typename AssocTabConstInterface< BiDiHashMap< K,V > >::ValType
     *AssocTabConstInterface< BiDiHashMap< K,V > >::valPtr( K arg )
-{   
+{
     typename BiDiHashMap< K,V >::iterator i = _cont().find( arg );
     if (i == _cont().end()) return NULL;
     else return _cont().operator[]( arg );
@@ -699,7 +719,7 @@ template< class K, class V > K AssocTabConstInterface< BiDiHashMap< K,V > >::las
 }
 
 template< class K, class V > K AssocTabConstInterface< BiDiHashMap< K,V > >::prevKey( K arg ) const
-{   
+{
     if (!arg) return lastKey();
     typename BiDiHashMap< K,V >::const_iterator pos = cont.find( arg );
     koalaAssert( pos != cont.end(),ContExcOutpass );
@@ -709,7 +729,7 @@ template< class K, class V > K AssocTabConstInterface< BiDiHashMap< K,V > >::pre
 }
 
 template< class K, class V > K AssocTabConstInterface< BiDiHashMap< K,V > >::nextKey( K arg ) const
-{   
+{
     if (!arg) return firstKey();
     typename BiDiHashMap< K,V >::const_iterator pos = cont.find( arg );
     koalaAssert( pos != cont.end() ,ContExcOutpass );
@@ -718,7 +738,7 @@ template< class K, class V > K AssocTabConstInterface< BiDiHashMap< K,V > >::nex
     return pos->first;
 }
 
-template< class K, class V > template< class Iterator > 
+template< class K, class V > template< class Iterator >
     int AssocTabConstInterface< BiDiHashMap< K,V > >::getKeys( Iterator iter ) const
 {
     for( K key = firstKey(); key; key = nextKey( key ) )
@@ -730,7 +750,7 @@ template< class K, class V > template< class Iterator >
 }
 
 template< class K, class V > V AssocTabConstInterface< HashMap< K,V > >::operator[]( K arg )
-{   
+{
     typename HashMap< K,V >::const_iterator i;
     i = cont.find( arg );
     if (i == cont.end()) return V();
@@ -739,7 +759,7 @@ template< class K, class V > V AssocTabConstInterface< HashMap< K,V > >::operato
 
 template< class K, class V > typename AssocTabConstInterface< HashMap< K,V > >::ValType
     *AssocTabConstInterface< HashMap< K,V > >::valPtr( K arg )
-{   
+{
     typename HashMap< K,V >::iterator i = _cont().find( arg );
     if (i == _cont().end()) return NULL;
     else return _cont().operator[]( arg );
@@ -768,7 +788,7 @@ template< class K, class V > K AssocTabConstInterface< HashMap< K,V > >::lastKey
 }
 
 template< class K, class V > K AssocTabConstInterface< HashMap< K,V > >::prevKey( K arg ) const
-{   
+{
     if (!arg) return lastKey();
     typename HashMap< K,V >::const_iterator pos = cont.find( arg );
     koalaAssert( pos != cont.end(),ContExcOutpass  );
@@ -778,7 +798,7 @@ template< class K, class V > K AssocTabConstInterface< HashMap< K,V > >::prevKey
 }
 
 template< class K, class V > K AssocTabConstInterface< HashMap< K,V > >::nextKey( K arg ) const
-{   
+{
     if (!arg) return firstKey();
     typename HashMap< K,V >::const_iterator pos = cont.find( arg );
     koalaAssert( pos != cont.end(),ContExcOutpass  );
@@ -787,7 +807,7 @@ template< class K, class V > K AssocTabConstInterface< HashMap< K,V > >::nextKey
     return pos->first;
 }
 
-template< class K, class V > template< class Iterator > 
+template< class K, class V > template< class Iterator >
     int AssocTabConstInterface< HashMap< K,V > >::getKeys( Iterator iter ) const
 {
     for( K key = firstKey(); key; key = nextKey( key ) )
