@@ -757,6 +757,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     typename GraphType::PEdge e;
     typename GraphType::PVertex u,v;
     n = g.getVertNo();
+
     if (DefaultStructs::ReserveOutAssocCont) visited.reserve( n );
     koalaAssert( ((mask & Directed) == 0) || ((mask & Directed) == Directed),AlgExcWrongMask );
     Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< LVCNode< GraphType > > > >
@@ -788,7 +789,6 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
             continue;
         }
         cont.pop();
-
         for( e = g.getEdge( u,mask ); e != NULL; e = g.getEdgeNext( u,e,mask ) )
         {
             v = g.getEdgeEnd( e,u );

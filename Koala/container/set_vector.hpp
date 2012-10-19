@@ -113,19 +113,29 @@ template< typename Element > std::ostream &operator<<( std::ostream &is, const S
 template< typename Element > inline Set< Element > &Set< Element >::operator+=( const Set< Element > &s )
 {
     if (&s == this) return *this;
-    *this = *this + s;
+    Element LOCALARRAY(buf,this->size()+s.size());
+    Element * bufend=(buf, std::set_union( this->begin(),this->end(),s.begin(),s.end(),buf ));
+    std::vector<Element>::assign(buf,bufend);
     return *this;
 }
 
 template< typename Element > inline Set< Element > &Set< Element >::operator*=( const Set< Element > &s )
 {
     if (&s == this) return *this;
-    return *this = *this * s;
+    Element LOCALARRAY(buf,std::min(this->size(),s.size()));
+    Element * bufend=(buf, std::set_intersection( this->begin(),this->end(),s.begin(),s.end(),buf ));
+    std::vector<Element>::assign(buf,bufend);
+    return *this;
 }
 
 template< typename Element > Set< Element > &Set< Element >::operator-=( const Set< Element > &s )
 {
-    if (this != &s) *this = *this - s;
+    if (this != &s)
+    {
+        Element LOCALARRAY(buf,this->size());
+        Element * bufend=(buf, std::set_difference( this->begin(),this->end(),s.begin(),s.end(),buf ));
+        std::vector<Element>::assign(buf,bufend);
+    }
     else this->clear();
     return *this;
 }

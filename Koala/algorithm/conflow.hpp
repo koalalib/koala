@@ -669,32 +669,33 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
     return res;
 }
 
-template< class DefaultStructs > template< class GraphType, class EdgeContainer, class SetContainer >
-    void FlowPar< DefaultStructs >::ghtree( GraphType &g, EdgeContainer &edgeTab, SetContainer &setTab,
+template< class DefaultStructs > template< class GraphType, class EdgeContainer, class AssocSub >
+    void FlowPar< DefaultStructs >::ghtree( GraphType &g, EdgeContainer &edgeTab,
         Set< typename GraphType::PVertex > &V, Set< typename GraphType::PVertex > &R,
-        GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType > *out )
+        GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType > *out, AssocSub& vsub )
 {
     typename EdgeContainer::ValType::CapacType capac;
 
     Set< typename GraphType::PVertex > W1,W2,Vnew,Rnew;
     if (R.size() == 1)
-    {
-        setTab[R.first()] = V;
         return;
-    }
+
     typename GraphType::PVertex s = R.first(), t = R.last();
     if (R.size() == 2)
     {
-        capac = minEdgeCut( makeSubgraph( g,std::make_pair( stdChoose( V ),edgeTypeChoose( Undirected ) ) ),
+        vsub.clear();
+        V.getElements(assocInserter(vsub,constFun('A')));
+        capac = minEdgeCut( makeSubgraph( g,std::make_pair( extAssocKeyChoose(&vsub),edgeTypeChoose( Undirected ) ) ),
             edgeTab,s,t,outPath( setInserter( W1 ),blackHole )).capac;
         W2 = V - W1;
-        setTab[s] = W1;
-        setTab[t] = W2;
         *out = GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType >( s,t,capac );
         return;
     }
 
-    capac = minEdgeCut( makeSubgraph( g,std::make_pair( stdChoose( V ),edgeTypeChoose( Undirected ) ) ),
+    vsub.clear();
+    V.getElements(assocInserter(vsub,constFun('A')));
+
+    capac = minEdgeCut( makeSubgraph( g,std::make_pair( extAssocKeyChoose(&vsub),edgeTypeChoose( Undirected ) ) ),
         edgeTab,s,t,outPath( setInserter( W1 ),blackHole )).capac;
     W2 = V - W1;
 
@@ -711,15 +712,10 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     Vnew = W1;
     Vnew += vnew;
     Rnew = R * W1;
-    ghtree( g,edgeTab,setTab,Vnew,Rnew,out );
+    ghtree( g,edgeTab,Vnew,Rnew,out,vsub );
 
     GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType > *out2 = out + Rnew.size() - 1;
-    for( s = Rnew.first(); s; s = Rnew.next( s ) )
-        if (setTab[s].isElement( vnew ))
-        {
-            setTab[s] -= vnew;
-            break;
-        }
+
     for( typename GraphType::PEdge e = g.getEdge( vnew,EdUndir ); e; e = g.getEdgeNext( vnew,e,EdUndir ) )
         edgeTab.delKey( e );
     g.delEdges( vnew );
@@ -736,17 +732,10 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     Vnew = W2;
     Vnew += vnew;
     Rnew = R * W2;
-    ghtree( g,edgeTab,setTab,Vnew,Rnew,out2 );
+    ghtree( g,edgeTab,Vnew,Rnew,out2,vsub );
 
-    for( t = Rnew.first(); t; t = Rnew.next( t ) )
-        if (setTab[t].isElement( vnew ))
-        {
-            setTab[t] -= vnew;
-            break;
-        }
     for( typename GraphType::PEdge e = g.getEdge( vnew,EdUndir ); e; e = g.getEdgeNext( vnew,e,EdUndir ) )
         edgeTab.delKey( e );
-    setTab.delKey( vnew );
     g.delVert( vnew,true );
 
     assert( V.isElement( s ) && V.isElement( t ) );
@@ -1108,11 +1097,10 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     koalaAssert( g.getVertNo() > 1,AlgExcWrongArg );
     int n;
     GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType > LOCALARRAY( buf,n = g.getVertNo() );
-    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,Set< typename GraphType::PVertex > >::Type
-        setMap( n );
     Set< typename GraphType::PVertex > V = g.getVertSet(), R = V;
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,char >::Type subset(2*n);
     // TODO: if (DefaultStructs::ReserveOutAssocCont) edgeTab.reserve(???);
-    ghtree( g,edgeTab,setMap,V,R,buf );
+    ghtree( g,edgeTab,V,R,buf,subset );
     for( int i = 0; i < n - 1; i++ )
     {
         *out = buf[i];

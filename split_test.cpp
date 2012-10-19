@@ -82,10 +82,10 @@ const char* print(ModPartType x)
 
     g.clear();
 
-    g.copy(gn4,stdChoose(true) & stdChoose(true),stdCast() & stdCast());
-    g.substitute(g.getVertLast(),gk3,stdChoose(true) & stdChoose(true),stdCast() & stdCast());
-    gk3.del(gk3.getVert());
-    g.substitute(g.getVert(),gk3,stdChoose(true) & stdChoose(true),stdCast() & stdCast());
+    g.copy(gk3,stdChoose(true) & stdChoose(true),stdCast() & stdCast());
+    g.substitute(g.getVertLast(),gn4,stdChoose(true) & stdChoose(true),stdCast() & stdCast());
+//    gk3.del(gk3.getVert());
+//    g.substitute(g.getVert(),gk3,stdChoose(true) & stdChoose(true),stdCast() & stdCast());
 
     cout << "\n\n" << boolalpha << IsIt::cograph(g);
     int q=IsIt::Cograph::maxStable(g,tabV);

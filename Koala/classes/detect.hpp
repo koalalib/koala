@@ -686,11 +686,11 @@ template< class DefaultStructs > template< class GraphType >
     typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected,true >::Type
         ImageGraph;
     ImageGraph cg;
+
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) cg.addVert( u );
     for( typename ImageGraph::PVertex u = cg.getVert(); u != cg.getVertLast(); u = cg.getVertNext( u ) )
     for( typename ImageGraph::PVertex v = cg.getVertNext( u ); v; v = cg.getVertNext( v ) )
         if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v,EdUndir );
-
     return chordal( cg );
 }
 
@@ -1381,10 +1381,9 @@ template< class DefaultStructs > template< class GraphType, class Assoc, class I
         ++out;
         return 1;
     }
-    int res=0,tmp;
+    int res=0,tmp,resi;
     typename GraphType::PVertex LOCALARRAY( tabv,n );
     typename GraphType::PVertex LOCALARRAY( restab,n );
-    typename GraphType::PVertex LOCALARRAY( tmptab,n );
     int LOCALARRAY( tabc,n + 1 );
     typename ModulesPar< DefaultStructs >::Partition parts =
         ModulesPar< DefaultStructs >::split( g,compStore( tabc,tabv ),blackHole,true );
@@ -1400,19 +1399,18 @@ template< class DefaultStructs > template< class GraphType, class Assoc, class I
         {
             subset.clear();
             for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
-            typename GraphType::PVertex *ptr=tmptab;
+            typename GraphType::PVertex *ptr=restab+tabc[i];
             tmp= maxClique2( ag,subset,ptr );
             if (tmp>res)
             {
                 res=tmp;
-                for(int k=0; k<res;k++)
-                    restab[k]=tmptab[k];
+                resi=tabc[i];
             }
         }
     if (parts.type == mpDisconnected)
         for( int k=0;k<res;k++)
         {
-            *out=restab[k];
+            *out=restab[k+resi];
             ++out;
         }
     return res;
@@ -1429,10 +1427,9 @@ template< class DefaultStructs > template< class GraphType, class Assoc, class I
         ++out;
         return 1;
     }
-    int res=0,tmp;
+    int res=0,tmp,resi;
     typename GraphType::PVertex LOCALARRAY( tabv,n );
     typename GraphType::PVertex LOCALARRAY( restab,n );
-    typename GraphType::PVertex LOCALARRAY( tmptab,n );
     int LOCALARRAY( tabc,n + 1 );
     typename ModulesPar< DefaultStructs >::Partition parts =
         ModulesPar< DefaultStructs >::split( g,compStore( tabc,tabv ),blackHole,true );
@@ -1448,19 +1445,18 @@ template< class DefaultStructs > template< class GraphType, class Assoc, class I
         {
             subset.clear();
             for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
-            typename GraphType::PVertex *ptr=tmptab;
+            typename GraphType::PVertex *ptr=restab+tabc[i];
             tmp= maxStable2( ag,subset,ptr );
             if (tmp>res)
             {
                 res=tmp;
-                for(int k=0; k<res;k++)
-                    restab[k]=tmptab[k];
+                resi=tabc[i];
             }
         }
     if (parts.type == mpConnected)
         for( int k=0;k<res;k++)
         {
-            *out=restab[k];
+            *out=restab[k+resi];
             ++out;
         }
     return res;

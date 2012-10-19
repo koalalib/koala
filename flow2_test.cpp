@@ -1,6 +1,9 @@
 #include <iostream>
 #include <string>
 #include <cstdio>
+
+//#define KOALA_SET_ON_VECTOR
+
 #include "Koala/graph/graph.h"
 #include "Koala/algorithm/conflow.h"
 #include "Koala/io/text.h"
@@ -300,7 +303,7 @@ void ghTest2()
 {   g.clear();edgeCont.clear();
     vertCont.clear();
 
-    for(int i=0;i<10;i++) g.addVert();
+    for(int i=0;i<19;i++) g.addVert();
     for(U=g.getVert();U!=g.getVertLast();U=g.getVertNext(U))
         for(V=g.getVertNext(U);V;V=g.getVertNext(V))
         if (rand()%5==0) edgeCont[g.addEdge(U,V)].capac=rand()%10;
@@ -428,6 +431,7 @@ void ghTest2()
             ghcopy.addEdge(ghlink[pairTab[i].first],ghlink[pairTab[i].second],pairTab[i].capac);
 
     }
+    cout << g.getVertNo() << ' ' << g.getEdgeNo() << "\n\n";
 
     for(U=g.getVert();U!=g.getVertLast();U=g.getVertNext(U))
         for(V=g.getVertNext(U);V;V=g.getVertNext(V))
@@ -437,7 +441,7 @@ void ghTest2()
         for(int i=0;i<len;i++) gtmin=std::min(gtmin,ecopytab[i]->info);
         truemin=Koala::Flow::minEdgeCut(g,edgeCont,U,V,Koala::Flow::outPath(blackHole,blackHole)).capac;
 
-        std::cout << truemin << ' ' << gtmin << "\n";
+//        std::cout << truemin << ' ' << gtmin << "\n";
         assert(truemin==gtmin);
 
     }
