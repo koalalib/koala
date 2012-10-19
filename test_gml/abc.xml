@@ -8,29 +8,29 @@
     <key id="ename" attr.type="string" for="edge" />
     <key id="vflag" attr.type="boolean" for="node" />
     <graph id="first" edgedefault="undirected">
-        <node id="n003F2E78">
+        <node id="n00031320">
             <data key="vbuf">Adam</data>
             <data key="vchar">A</data>
             <data key="vflag">1</data>
             <data key="vint">5</data>
         </node>
-        <node id="n003F2ED8">
+        <node id="n00031380">
             <data key="vbuf">Piotr</data>
             <data key="vchar">B</data>
             <data key="vflag">0</data>
             <data key="vint">7</data>
         </node>
-        <edge id="e003F2F50" source="n003F2E78" target="n003F2ED8">
+        <edge id="e000313F8" source="n00031320" target="n00031380">
             <data key="echar">101</data>
             <data key="edoub">0.100000</data>
             <data key="ename">Ala</data>
         </edge>
-        <edge id="e003F0F00" source="n003F2ED8" target="n003F2E78" directed="true">
+        <edge id="e00031460" source="n00031380" target="n00031320" directed="true">
             <data key="echar">100</data>
             <data key="edoub">0.500000</data>
             <data key="ename">Ola</data>
         </edge>
-        <edge id="e003F0F50" source="n003F2ED8" target="n003F2ED8">
+        <edge id="e000314C8" source="n00031380" target="n00031380">
             <data key="echar">102</data>
             <data key="edoub">1.500000</data>
             <data key="ename">Ewa</data>

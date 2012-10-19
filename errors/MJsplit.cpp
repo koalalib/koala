@@ -1,16 +1,16 @@
 #include<iostream>
 #include<string.h>
 
-#include "Koala/io/g6.h"
-#include "Koala/classes/detect.h"
-#include "Koala/graph/graph.h"
+#include "../Koala/io/g6.h"
+#include "../Koala/classes/detect.h"
+#include "../Koala/graph/graph.h"
 
 
 using namespace std;
 using namespace Koala;
 using namespace Koala::IO;
 
-#include "main.hpp"
+#include "../main.hpp"
 
     Graph<char,std::string> g;
     Graph<char,std::string>::PVertex tabv[9];

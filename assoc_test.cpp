@@ -345,6 +345,14 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
 
 
     }
+    {
+        cout << "\n\n\n";
+        AssocTable<BiDiHashMap<int,std::string> > hmp;
+        hmp[3]="A";hmp[6]="B";;hmp[7]="C";
+        hmp=hmp;
+        cout << hmp.size() << ' ' << hmp[3] << hmp[6];
+    }
+
 
 }
 
