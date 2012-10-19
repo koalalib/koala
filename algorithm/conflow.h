@@ -293,10 +293,10 @@ namespace Koala
                 typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val = DefaultStructs::
                 template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
         // TODO: nieefektywna, zrezygnowac z Setow
-        template< class GraphType, class EdgeContainer, class SetContainer >
-            static void ghtree( GraphType &g, EdgeContainer &edgeTab, SetContainer &setTab,
+        template< class GraphType, class EdgeContainer, class AssocSub >
+            static void ghtree( GraphType &g, EdgeContainer &edgeTab,
                 Set< typename GraphType::PVertex > &V, Set< typename GraphType::PVertex > &R,
-                GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType > *out );
+                GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType > *out, AssocSub& vsub );
 
       public:
         // objetosc przeplywu przy wierzcholku v

@@ -2,7 +2,7 @@
 #define KOALA__SET__H__
 
 /* set.h
- * 
+ *
  */
 
 // Set jest szablonem matematycznego zbioru z dostepnymi operacjami mnogosciowymi.
@@ -16,6 +16,7 @@
 
 #include <limits>
 
+#include "localarray.h"
 #include "../base/exception.h"
 
 namespace Koala
