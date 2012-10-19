@@ -604,7 +604,7 @@ std::string GraphML::KeyHolder::print() {
 			sprintf( tmp_ch,"%d",uVal.intVal );
 			return tmp_ch;
 		case GraphMLKeyTypes::Long:
-			sprintf( tmp_ch,"%lld",uVal.longVal );
+			lltoa(uVal.longVal, tmp_ch, 10);
 			return tmp_ch;
 		case GraphMLKeyTypes::Float:
 		case GraphMLKeyTypes::Double:
@@ -683,7 +683,7 @@ bool GraphML::KeyHolder::set(int64_t val) {
 			break;
 		case GraphMLKeyTypes::NotDefined:
 		case GraphMLKeyTypes::String:
-			sprintf(tmp_ch, "%lld", val);
+			lltoa(val, tmp_ch, 10);
 			sVal = tmp_ch;
 			break;
 		default: return false;
