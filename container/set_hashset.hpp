@@ -170,7 +170,7 @@ template< typename Element >
         typename Koala::HashSet< Element >::const_iterator i;
         for(i = s1.begin(); i != s1.end(); ++i)
         {
-            if(!s2.contains(*i)) res.insert(*i);
+            if(s2.contains(*i)) res.insert(*i);
         }
         return res;
     }
