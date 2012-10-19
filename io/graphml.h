@@ -365,9 +365,9 @@ struct GMLLongFieldPlain {
 struct GMLStringPlain {
 	std::string str;
 	GMLStringPlain(const std::string &s): str(s) {}
-	operator char() { return str.at(0); }
-	operator unsigned char() { return str.at(0); }
-	operator std::string() { return str; }
+	operator char() const { return str.at(0); }
+	operator unsigned char() const { return str.at(0); }
+	operator std::string() const { return str; }
 };
 
 struct GMLStringFieldPlain {
@@ -378,7 +378,9 @@ struct GMLStringFieldPlain {
 	}
 	template <class T>
 	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
-		gmlkw->setString(name.c_str(), (std::string)vertedge->info);
+	    std::string str;
+	    str+=vertedge->info;
+		gmlkw->setString(name.c_str(), str);
 	}
 };
 

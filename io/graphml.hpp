@@ -1016,7 +1016,7 @@ bool GraphMLGraph::readGraph(Graph &graph, BlackHole, InfoEdge infoEdge)
 			if (edgeDirect)
 				graph.addArc( verts[source],verts[target],infoEdge( &gmlData ) );
 			else
-				graph.addEdge( verts[source],verts[target],infoEdge( &gmlData ) );
+				graph.addEdge( verts[source],verts[target],infoEdge( &gmlData ), EdUndir );
 		}
 		xmlEdge = xmlEdge->NextSiblingElement( "edge" );
 	}
@@ -1090,7 +1090,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdg
 			if (edgeDirect)
 				graph.addArc( verts[source],verts[target],infoEdge( &gmlData ) );
 			else
-				graph.addEdge( verts[source],verts[target],infoEdge( &gmlData ) );
+				graph.addEdge( verts[source],verts[target],infoEdge( &gmlData ), EdUndir );
 		}
 		xmlEdge = xmlEdge->NextSiblingElement( "edge" );
 	}

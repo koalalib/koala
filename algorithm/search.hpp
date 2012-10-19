@@ -1208,7 +1208,7 @@ template< class DefaultStructs > template< class GraphType, class Iterator >
     const EdgeType mask = EdAll;
     int n;
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,int >::Type degs( n = g.getVertNo() );
-    std::pair< int,typename GraphType::PVertex > LOCALARRAY( buf,2 * n + 1 );
+    std::pair< int,typename GraphType::PVertex > LOCALARRAY( buf,2 * n );
     PriQueueInterface< std::pair< int,typename GraphType::PVertex > *,
         std::greater< std::pair< int,typename GraphType::PVertex > > > q( buf,2 * n );
     if (!n) return 0;
