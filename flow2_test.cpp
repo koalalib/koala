@@ -2,7 +2,7 @@
 #include <string>
 #include <cstdio>
 
-//#define KOALA_SET_ON_VECTOR
+#define KOALA_SET_ON_HASHSET
 
 #include "Koala/graph/graph.h"
 #include "Koala/algorithm/conflow.h"
@@ -303,7 +303,7 @@ void ghTest2()
 {   g.clear();edgeCont.clear();
     vertCont.clear();
 
-    for(int i=0;i<19;i++) g.addVert();
+    for(int i=0;i<10;i++) g.addVert();
     for(U=g.getVert();U!=g.getVertLast();U=g.getVertNext(U))
         for(V=g.getVertNext(U);V;V=g.getVertNext(V))
         if (rand()%5==0) edgeCont[g.addEdge(U,V)].capac=rand()%10;

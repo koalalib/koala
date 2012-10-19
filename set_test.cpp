@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define KOALA_SET_ON_VECTOR
+#define KOALA_SET_ON_HASHSET
 
 #include "Koala/base/defs.h"
 #include "Koala/container/joinsets.h"
@@ -230,10 +230,11 @@ double kwadrat(int arg) { return arg*arg; }
         Set<int> iset, iset2;
         iset+=1;iset+=3;iset+=3;iset+=4;iset+=1;iset+=5;
         iset2+=0;iset2+=3;iset2+=4;iset2+=6;
+        iset=iset;
         cout << "\n" << iset << "\n";
 
         cout << "\n" << iset2 << "\n";
-    cout << "\n" << (iset-=iset2) << "\n";
+    cout << "\n" << (iset^iset2) << "\n";
     }
 
 
