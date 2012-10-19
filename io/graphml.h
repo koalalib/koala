@@ -280,6 +280,375 @@ private:
 };
 
 
+namespace Privates {
+
+template< class Ch1, class Ch2 > struct GMLSumField
+{
+	Ch1 ch1;
+	Ch2 ch2;
+
+	typedef GMLSumField< Ch1,Ch2 > GMLFieldSelfType;
+	typedef typename Ch1::Type Type;
+
+	GMLSumField( Ch1 a = Ch1(), Ch2 b = Ch2() ): ch1( a ), ch2( b ) { }
+
+	void read(Type &arg, Koala::IO::GraphMLKeysRead *gmlkr) {
+		ch1.read(arg, gmlkr);
+		ch2.read(arg, gmlkr);
+	}
+
+	typename Ch1::Type operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		typename Ch1::Type res;
+		read(res, gmlkr);
+		return res;
+	}
+
+	template <class T>
+	void operator()( T vert, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		ch1(vert, gmlkw);
+		ch2(vert, gmlkw);
+	}
+};
+
+template< class Ch1, class Ch2 >
+GMLSumField< typename Ch1::GMLFieldSelfType,typename Ch2::GMLFieldSelfType >
+operator&( Ch1 a, Ch2 b ) { return GMLSumField< Ch1,Ch2 >( a,b ); }
+
+struct GMLBoolFieldPlain {
+	std::string name;
+	GMLBoolFieldPlain(std::string aname) : name(aname) {}
+	bool operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		return gmlkr->getBool(name.c_str());
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setBool(name.c_str(), (bool)(vertedge->info));
+	}
+};
+
+struct GMLIntFieldPlain {
+	std::string name;
+	GMLIntFieldPlain(std::string aname) : name(aname) {}
+	int operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		return gmlkr->getInt(name.c_str());
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setInt(name.c_str(), (int)(vertedge->info));
+	}
+};
+
+struct GMLDoubleFieldPlain {
+	std::string name;
+	GMLDoubleFieldPlain(std::string aname) : name(aname) {}
+	double operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		return gmlkr->getDouble(name.c_str());
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setDouble(name.c_str(), (double)(vertedge->info));
+	}
+};
+
+struct GMLLongFieldPlain {
+	std::string name;
+	GMLLongFieldPlain(std::string aname) : name(aname) {}
+	int64_t operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		return gmlkr->getLong(name.c_str());
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setLong(name.c_str(), (int64_t)(vertedge->info));
+	}
+};
+
+struct GMLStringPlain {
+	std::string str;
+	GMLStringPlain(const std::string &s): str(s) {}
+	operator char() { return str.at(0); }
+	operator unsigned char() { return str.at(0); }
+	operator std::string() { return str; }
+};
+
+struct GMLStringFieldPlain {
+	std::string name;
+	GMLStringFieldPlain(std::string aname) : name(aname) {}
+	GMLStringPlain operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		return gmlkr->getString(name.c_str());
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setString(name.c_str(), (std::string)vertedge->info);
+	}
+};
+
+template <class Info, class FieldType>
+struct GMLBoolField {
+	std::string name;
+	FieldType Info::*wsk;
+	typedef GMLBoolField<Info, FieldType> GMLFieldSelfType;
+	typedef Info Type;
+
+	GMLBoolField(FieldType Info::*awsk, std::string aname) : name(aname), wsk(awsk) {}
+	void read(Info& arg,Koala::IO::GraphMLKeysRead *gmlkr) {
+		arg.*wsk=(FieldType)gmlkr->getBool(name.c_str());
+	}
+	Info operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		Info res;
+		read(res, gmlkr);
+		return res;
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setBool(name.c_str(), (bool)(vertedge->info.*wsk));
+	}
+};
+
+template <class Info, class FieldType>
+struct GMLIntField {
+	std::string name;
+	FieldType Info::*wsk;
+	typedef GMLIntField<Info, FieldType> GMLFieldSelfType;
+	typedef Info Type;
+
+	GMLIntField(FieldType Info::*awsk, std::string aname) : name(aname), wsk(awsk) {}
+	void read(Info& arg,Koala::IO::GraphMLKeysRead *gmlkr) {
+		arg.*wsk=(FieldType)gmlkr->getInt(name.c_str());
+	}
+	Info operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		Info res;
+		read(res, gmlkr);
+		return res;
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setInt(name.c_str(), (int)(vertedge->info.*wsk));
+	}
+};
+
+template <class Info, class FieldType>
+struct GMLDoubleField {
+	std::string name;
+	FieldType Info::*wsk;
+	typedef GMLDoubleField<Info, FieldType> GMLFieldSelfType;
+	typedef Info Type;
+
+	GMLDoubleField(FieldType Info::*awsk, std::string aname) : name(aname), wsk(awsk) {}
+	void read(Info& arg,Koala::IO::GraphMLKeysRead *gmlkr) {
+		arg.*wsk=(FieldType)gmlkr->getDouble(name.c_str());
+	}
+	Info operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		Info res;
+		read(res, gmlkr);
+		return res;
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setDouble(name.c_str(), (double)(vertedge->info.*wsk));
+	}
+};
+
+template <class Info, class FieldType>
+struct GMLLongField {
+	std::string name;
+	FieldType Info::*wsk;
+	typedef GMLLongField<Info, FieldType> GMLFieldSelfType;
+	typedef Info Type;
+
+	GMLLongField(FieldType Info::*awsk, std::string aname) : name(aname), wsk(awsk) {}
+	void read(Info& arg,Koala::IO::GraphMLKeysRead *gmlkr) {
+		arg.*wsk=(FieldType)gmlkr->getLong(name.c_str());
+	}
+	Info operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		Info res;
+		read(res, gmlkr);
+		return res;
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setLong(name.c_str(), (int64_t)(vertedge->info.*wsk));
+	}
+};
+
+template <class Info, class FieldType>
+struct GMLStringField {
+	std::string name;
+	FieldType Info::*wsk;
+	typedef GMLStringField< Info, FieldType> GMLFieldSelfType;
+	typedef Info Type;
+
+	GMLStringField(FieldType Info::*awsk, std::string aname) : name(aname), wsk(awsk) {}
+	void read(Info& arg,Koala::IO::GraphMLKeysRead *gmlkr) {
+		arg.*wsk=(FieldType)(gmlkr->getString(name.c_str()));
+	}
+	Info operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		Info res;
+		read(res, gmlkr);
+		return res;
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setString(name.c_str(), (const std::string)(vertedge->info.*wsk));
+	}
+};
+
+template<class Info>
+struct GMLStringField<Info, char> {
+	std::string name;
+	char Info::*wsk;
+	typedef GMLStringField< Info, char> GMLFieldSelfType;
+	typedef Info Type;
+
+	GMLStringField(char Info::*awsk, std::string aname) : name(aname), wsk(awsk) {}
+	void read(Info& arg,Koala::IO::GraphMLKeysRead *gmlkr) {
+		arg.*wsk=(char)(gmlkr->getString(name.c_str())).at(0);
+	}
+	Info operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		Info res;
+		read(res, gmlkr);
+		return res;
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		std::string str;
+		str+=vertedge->info.*wsk;
+		gmlkw->setString(name.c_str(), str);
+	}
+};
+
+template<class Info>
+struct GMLStringField<Info, unsigned char> {
+	std::string name;
+	unsigned char Info::*wsk;
+	typedef GMLStringField< Info, unsigned char> GMLFieldSelfType;
+	typedef Info Type;
+
+	GMLStringField(unsigned char Info::*awsk, std::string aname) : name(aname), wsk(awsk) {}
+	void read(Info& arg,Koala::IO::GraphMLKeysRead *gmlkr) {
+		arg.*wsk=(unsigned char)(gmlkr->getString(name.c_str())).at(0);
+	}
+	Info operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		Info res;
+		read(res, gmlkr);
+		return res;
+	}
+	template <class T>
+	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		std::string str;
+		str+=(char)(vertedge->info.*wsk);
+		gmlkw->setString(name.c_str(), str);
+	}
+};
+
+template <class Info, class Char, int N >
+struct GMLCharField {
+	std::string name;
+	Char (Info::*wsk)[N];
+	typedef GMLCharField<Info, Char, N> GMLFieldSelfType;
+	typedef Info Type;
+
+	GMLCharField(Char (Info::*awsk)[N], std::string aname) : name(aname), wsk(awsk) {}
+	void read(Info& arg,Koala::IO::GraphMLKeysRead *gmlkr) {
+		std::strncpy((char*)(arg.*wsk),(gmlkr->getString(name.c_str())).c_str(),N);
+		(arg.*wsk)[N-1] = 0;
+	}
+	Info operator()(Koala::IO::GraphMLKeysRead *gmlkr) {
+		Info res;
+		read(res, gmlkr);
+		return res;
+	}
+	template <class T>
+	void operator()( T vert, Koala::IO::GraphMLKeysWrite *gmlkw) {
+		gmlkw->setString(name.c_str(), (char*)(vert->info.*wsk));
+	}
+};
+
+template <class Info, int N >
+struct GMLStringField <Info, char[N]> : public GMLCharField <Info, char, N>
+{
+	typedef GMLStringField <Info,char[N]> GMLFieldSelfType;
+	typedef Info Type;
+
+	GMLStringField(char (Info::*awsk)[N], std::string aname)
+		: GMLCharField <Info, char, N> (awsk,aname)
+		{}
+};
+
+template <class Info, int N >
+struct GMLStringField<Info,unsigned char[N]> : public GMLCharField <Info, char, N>
+{
+	typedef GMLStringField <Info,unsigned char[N]> GMLFieldSelfType;
+	typedef Info Type;
+
+	GMLStringField(unsigned char (Info::*awsk)[N], std::string aname)
+		: GMLCharField <Info, unsigned char, N> (awsk,aname)
+		{}
+};
+
+} //namespace Privates
+
+//these function can be used in readGraph/writeGraph as InfoVertex/InfoEdge
+Privates::GMLBoolFieldPlain
+gmlBoolField(std::string name) {
+	return Privates::GMLBoolFieldPlain(name);
+}
+template <class Info, class FieldType>
+Privates::GMLBoolField<Info,FieldType>
+gmlBoolField(FieldType Info::*wsk,std::string name) {
+	return Privates::GMLBoolField<Info,FieldType>(wsk,name);
+}
+
+Privates::GMLIntFieldPlain
+gmlIntField(std::string name) {
+	return Privates::GMLIntFieldPlain(name);
+}
+template <class Info, class FieldType>
+Privates::GMLIntField<Info,FieldType>
+gmlIntField(FieldType Info::*wsk,std::string name) {
+	return Privates::GMLIntField<Info,FieldType>(wsk,name);
+}
+
+Privates::GMLDoubleFieldPlain
+gmlDoubleField(std::string name) {
+	return Privates::GMLDoubleFieldPlain(name);
+}
+template <class Info, class FieldType>
+Privates::GMLDoubleField<Info,FieldType>
+gmlDoubleField(FieldType Info::*wsk,std::string name) {
+	return Privates::GMLDoubleField<Info,FieldType>(wsk,name);
+}
+
+Privates::GMLLongFieldPlain
+gmlLongField(std::string name) {
+	return Privates::GMLLongFieldPlain(name);
+}
+template <class Info, class FieldType>
+Privates::GMLLongField<Info,FieldType>
+gmlLongField(FieldType Info::*wsk,std::string name) {
+	return Privates::GMLLongField<Info,FieldType>(wsk,name);
+}
+
+Privates::GMLStringFieldPlain
+gmlStringField(std::string name) {
+	return Privates::GMLStringFieldPlain(name);
+}
+template <class Info, class FieldType>
+Privates::GMLStringField<Info,FieldType>
+gmlStringField(FieldType Info::*wsk,std::string name) {
+	return Privates::GMLStringField<Info,FieldType>(wsk,name);
+}
+template <class Info,int N>
+Privates::GMLStringField<Info,char[N]>
+gmlStringField(char (Info::*wsk)[N],std::string name) {
+	return Privates::GMLStringField<Info,char [N]>(wsk,name);
+}
+template <class Info,int N>
+Privates::GMLStringField<Info,unsigned char[N]>
+gmlStringField(unsigned char (Info::*wsk)[N],std::string name) {
+	return Privates::GMLStringField<Info,unsigned char [N]>(wsk,name);
+}
+
+
 /* ------------------------------------------------------------------------- *
  * GraphML
  *
