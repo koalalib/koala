@@ -22,6 +22,7 @@ template< class ValType, class ArgType, class Funktor >
     return res;
 }
 
+#ifndef KOALA_SET_ON_HASHSET
 template< typename Element > bool operator==( const Set< Element > &s1, const Set< Element > &s2 )
 {
     if (s1.size() != s2.size()) return false;
@@ -57,3 +58,4 @@ template< typename Element > inline Set< Element > operator^( const Set< Element
     std::set_symmetric_difference( s1.begin(),s1.end(),s2.begin(),s2.end(),std::back_inserter( res ) );
     return res;
 }
+#endif
