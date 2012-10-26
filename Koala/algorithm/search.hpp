@@ -604,6 +604,9 @@ template< class DefaultStructs > template< class Graph, class Allocator, class C
     newGrp = grp->block;
     if (newGrp == m_data.end())
     {
+        if(elem.prev() == grp
+            && (elem.next() != m_data.end() || elem.next()->v == NULL)
+            && grp != m_openBlock) return;
         newGrp = m_data.insert_before( grp,Node( NULL ) );
         grp->block = newGrp;
         m_splits.push_back( grp );
@@ -650,7 +653,7 @@ template< class DefaultStructs > template< class GraphType, class OutVertIter >
     Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< LVCNode< GraphType > > > >
         allocat( n + 1 ); //TODO: size? - spr
     // j.w. 2n+1 -> n + 1 - oj! raczej nie!
-    Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 1 );
+    Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 2 );
     LexVisitContainer< GraphType,Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator<
         LVCNode< GraphType > > > >,Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > >
         cont( allocat,allocat2,n );
@@ -763,7 +766,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< LVCNode< GraphType > > > >
         allocat( n + 1 ); //TODO: size? - spr
     //TODO: size? - spr 2n+1 -> n+1 - oj! raczej nie!
-    Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 1 );
+    Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 2 );
     LexVisitContainer< GraphType,Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator<
         LVCNode<GraphType > > > >,Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > >
         cont( allocat,allocat2,n );
