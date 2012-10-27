@@ -153,21 +153,23 @@ template< class T > int SearchStructs::CompStoreTool< T >::lenght() const
 
 template< class T > T* SearchStructs::CompStoreTool< T >::operator[]( int i )
 {
-    koalaAssert( i >= 0 && i <=this->size() - 1,ContExcOutpass );
+    koalaAssert( i >= 0 && i <= this->size() - 1,ContExcOutpass );
+    if (!this->size(i)) return 0;
     return &data[idx[i]];
 }
 
 template< class T > const T* SearchStructs::CompStoreTool< T >::operator[]( int i ) const
 {
-    koalaAssert( i >= 0 && i <=this->size() - 1,ContExcOutpass );
+    koalaAssert( i >= 0 && i <= this->size() - 1,ContExcOutpass );
+    if (!this->size(i)) return 0;
     return &data[idx[i]];
 }
 
-template< class T > T* SearchStructs::CompStoreTool< T >::insert( int i )
+template< class T > void SearchStructs::CompStoreTool< T >::insert( int i )
 {
     koalaAssert( i >= 0 && i <= size(),ContExcOutpass );
     idx.insert( idx.begin() + i,idx[i] );
-    return operator[]( i );
+    return;// operator[]( i );
 }
 
 template< class T > void SearchStructs::CompStoreTool< T >::del( int i )
@@ -179,11 +181,12 @@ template< class T > void SearchStructs::CompStoreTool< T >::del( int i )
     idx.erase( idx.begin() + i );
 }
 
-template< class T > T* SearchStructs::CompStoreTool< T >::resize( int i, int asize )
+template< class T > void SearchStructs::CompStoreTool< T >::resize( int i, int asize )
 {
     koalaAssert( i >= 0 && i <= this->size() - 1,ContExcOutpass );
     koalaAssert( asize >= 0,ContExcWrongArg );
-    if (asize == size( i )) return this->operator[]( i );
+
+    if (asize == size( i )) return;// this->operator[]( i );
     if (asize > size( i ))
     {
         int delta = asize - size( i );
@@ -196,7 +199,7 @@ template< class T > T* SearchStructs::CompStoreTool< T >::resize( int i, int asi
         data.erase( data.begin() + (idx[i + 1] - delta),data.begin() + idx[i + 1] );
         for( int j = i + 1; j < idx.size(); j++ ) idx[j] -= delta;
     }
-    return this->operator[]( i );
+    return;// this->operator[]( i );
 }
 
 template< class T > SearchStructs::CompStore< std::back_insert_iterator< std::vector< int > >,

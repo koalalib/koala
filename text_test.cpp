@@ -19,6 +19,13 @@ struct Dummy {
     int a;
 };
 
+struct bezop {
+    int a,b;
+};
+
+//template <class A, class B>
+//void operator << (const A&,const B&) {}
+
 #include "main.hpp"
 	string buf;
 	Graph<char,string> g;
@@ -165,6 +172,10 @@ struct Dummy {
 //	cout << endl;
 //    writeGraphText(g, cout, RG_UndirectedEdgeList,form);
 //	cout << endl;cout << endl;
+
+        bezop bz1,bz2;
+
+//    cin << bz1;
 
 
 }
