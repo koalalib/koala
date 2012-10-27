@@ -198,7 +198,6 @@ namespace Koala
 
             // Tworzy reprezentacje chordala w postaci drzewa jego maksymalnych klik
             // zwraca liczbe maksymalnych klik
-            // TODO: masakra! uproscic
             template< class Graph, class VIter, class VIterOut, class QIter, class QTEIter >
                 static int maxCliques( const Graph &g, VIter begin, VIter end, CompStore< QIter,VIterOut > out, QTEIter qte );
             // j.w. ale samodzielna. Pobiera tylko graf, jesli nie byl chordal, zwraca -1

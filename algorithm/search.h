@@ -172,16 +172,16 @@ namespace Koala
             int size( int i ) const;
              // laczna dlugosc wszystkich ciagow
             int lenght() const;
-            // wskaznik poczatku i-tego ciagu
+            // wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
             T *operator[]( int i );
-            // wskaznik poczatku i-tego ciagu
+            // wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
             const T *operator[]( int i ) const;
-            // umieszcza nowy ciag pusty na pozycji i. Zwraca wskaznik jego poczatku
-            T *insert( int i );
+            // umieszcza nowy ciag pusty na pozycji i.
+            void insert( int i );
             // kasuje ciag na pozycji i
             void del( int i );
-            // zmienia dlugosc i-tego ciagu. Zwraca wskaznik jego poczatku
-            T *resize( int i, int asize );
+            // zmienia dlugosc i-tego ciagu.
+            void resize( int i, int asize );
             //Umiesczamy wywolanie funkcji w miejsu compStore a pozniej przetwarzamy zebrane ciagi
             // czysci kontener
             CompStore< std::back_insert_iterator< std::vector< int > >,std::back_insert_iterator< std::vector< T > > >

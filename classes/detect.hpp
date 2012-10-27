@@ -422,74 +422,73 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
     int IsItPar< DefaultStructs >::Chordal::maxCliques( const Graph &g, VIter begin, VIter end,
         CompStore< QIter,VIterOut > out, QTEIter qte )
 {
-    int i,j, licze = 0, res,no,n;
+
+    int n=g.getVertNo(),i=0;
     VIter vi;
-    Set< typename Graph::PVertex> LOCALARRAY( tabs,n = g.getVertNo() );
-    typename Graph::PVertex LOCALARRAY( vbuf,n );
-    int LOCALARRAY( sno,n );
-    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,bool >::Type tabf( n );
-    for( i = 0, vi = begin; vi != end; ++vi,++i )
+    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,int >::Type pi( n ), kno(n);
+    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,typename Graph::PVertex >::Type parent( n );
+    typename Graph::PVertex LOCALARRAY( verts,n );
+    std::pair<int,int> LOCALARRAY( ebufs,n -1 );
+    Set< typename Graph::PVertex> LOCALARRAY( bufs,n );
+    VectorInterface<Set< typename Graph::PVertex>*> kliki(bufs,n);
+    VectorInterface<std::pair<int,int>*> qedges(ebufs,n-1);
+
+    for(vi=begin;vi!=end;++vi,++i)
     {
-        tabs[i] = *vi;
+        pi[*vi]=i;
+        parent[*vi]=0;
+        verts[i]=*vi;
+    }
+    typename Graph::PVertex lastp=0;
+    for( i = 0, vi = begin; vi != end; ++vi,++i )
+    {   int par=-1,tmp;
+        Set< typename Graph::PVertex> qvi;
+        qvi += *vi;
         typename Graph::PVertex u;
         for( typename Graph::PEdge e = g.getEdge( *vi,EdUndir ); e; e = g.getEdgeNext( *vi,e,EdUndir ) )
-            if (tabf.hasKey( u = g.getEdgeEnd( e,*vi ) )) tabs[i] += u;
-        tabf[*vi] = true;
-    }
-    for( i = 0; i < n - 1; i++ )
-        for( j = i + 1; j < n; j++ )
-            if (tabs[i].subsetOf( tabs[j] ))
+            if ((tmp = pi[ u = g.getEdgeEnd( e,*vi ) ])<i)
             {
-                tabs[i].clear();
-                licze++;
-                break;
+                par=std::max(tmp,par);
+                qvi+=u;
             }
+        if (par>=0)
+        {   parent[*vi]=verts[par];
+
+            if (kliki[kno[parent[*vi]]].subsetOf(qvi))
+                kliki[kno[*vi]=kno[parent[*vi]]]=qvi;
+            else
+            {
+                kno[*vi]=kliki.size();
+                kliki.push_back(qvi);
+                qedges.push_back(pairMinMax(std::make_pair(kno[*vi],kno[parent[*vi]])));
+            }
+        } else
+        {
+                kno[*vi]=kliki.size();
+                kliki.push_back(qvi);
+                if (lastp)
+                    qedges.push_back(pairMinMax(std::make_pair(kno[lastp],kno[*vi])));
+                lastp=*vi;
+        }
+    }
+
     *out.compIter = 0;
     ++out.compIter;
-    for( no = j = i = 0, vi = begin; vi != end; ++vi,++i )
-        if (!tabs[i].empty())
-        {
-            tabs[i].getElements( vbuf );
-            sno[no++] = i;
-            for( int k = 0; k < tabs[i].size(); k++ )
-            {
-                *out.vertIter = vbuf[k];
-                ++out.vertIter;
-            }
-            j += tabs[i].size();
-            *out.compIter = j;
-            ++out.compIter;
-        }
-    res = n - licze;
-    if (!isBlackHole( qte ) && res > 1)
+    for( int j=i = 0; i<kliki.size(); ++i )
     {
-        g.getVerts( vbuf );
-        JoinableSets< typename Graph::PVertex,typename DefaultStructs::template AssocCont< typename Graph::PVertex,
-            JSPartDesrc< typename Graph::PVertex> * >::Type > sets;
-        sets.resize( n );
-        for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-            sets.makeSinglet( v );
-        std::pair< int,std::pair< int,int > > LOCALARRAY( edges,res * (res - 1) / 2 );
-        int l = 0;
-        for( int i = 0; i < res - 1; i++ )
-            for( int j = i + 1; j < res; j++ )
-                edges[l++] = std::make_pair( (tabs[sno[i]] * tabs[sno[j]]).size(),std::make_pair( i,j ) );
-        DefaultStructs::sort( edges,edges + l );
-        std::reverse( edges,edges + l );
-        int edgeNo = res - 1;
-        for( int i = 0; edgeNo > 0; i++ )
-        {
-            std::pair< int,int > ends = edges[i].second;
-            if (sets.getSetId( vbuf[sno[ends.first]] ) != sets.getSetId( vbuf[sno[ends.second]] ))
-            {
-                sets.join( vbuf[sno[ends.first]],vbuf[sno[ends.second]] );
-                *qte = pairMinMax( ends );
-                ++qte;
-                edgeNo--;
-            }
-        }
+        kliki[i].getElements(out.vertIter);
+        for(int k=0;k<kliki[i].size();++k) ++out.vertIter;
+        j+=kliki[i].size();
+        *out.compIter = j;
+        ++out.compIter;
     }
-    return res;
+    if (!isBlackHole( qte ) && kliki.size() > 1)
+        for(i=0;i<qedges.size();i++)
+            {
+                *qte=qedges[i];
+                ++qte;
+            }
+    return kliki.size();
 }
 
 template< class DefaultStructs > template< class Graph, class VIterOut, class QIter, class QTEIter >
