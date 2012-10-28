@@ -317,24 +317,64 @@ bool GraphML::writeFile( const char *fileName) {
 	return doc->SaveFile(fileName);
 }
 
-/*std::istream& operator>>(std::istream &in, GraphML &gml) {
-	gml.clear();
-	TiXmlDocument *node = new TiXmlDocument();
-	in >> *node;
-	gml.doc = node;
-	gml.readXML();
-	return in;
+bool GraphML::readString(const char *str) {
+	clear();
+	if(doc!=NULL) delete doc;
+	doc = new TiXmlDocument();
+
+	doc->Parse(str);
+	if (doc->Error())
+	{
+		delete doc;
+		doc = NULL;
+		return false;
+	}
+	readXML();
+	return true;
 }
 
-std::ostream& operator<<(std::ostream &out, const GraphML &gml) {
-	out << *gml.doc;
-	return out;
+bool GraphML::readString(const std::string &str) {
+	clear();
+	if(doc!=NULL) delete doc;
+	doc = new TiXmlDocument();
+
+	doc->Parse(str.c_str());
+	if (doc->Error())
+	{
+		delete doc;
+		doc = NULL;
+		return false;
+	}
+	readXML();
+	return true;
 }
 
-std::string& operator<<(std::string &out, const GraphML &gml) {
-	out << *gml.doc;
-	return out;
-}*/
+int GraphML::writeString(char *str, int maxlen) {
+	if (!doc) return -1;
+	TiXmlPrinter xmlPrint;
+	xmlPrint.SetStreamPrinting();
+	doc->Accept( &xmlPrint );
+
+	const char *chIn = xmlPrint.CStr();
+	char *chOut = str;
+	int i=0;
+	while(i<maxlen) {
+		*chOut = *chIn;
+		if(*chIn==0) break;
+		++i;
+		++chIn;
+		++chOut;
+	}
+	return i;
+}
+
+std::string GraphML::writeString() {
+	if (!doc) return "";
+	TiXmlPrinter xmlPrint;
+	xmlPrint.SetStreamPrinting();
+	doc->Accept( &xmlPrint );
+	return xmlPrint.CStr();
+}
 
 template<GraphMLKeyTypes::Type Type, typename InType>
 bool GraphML::set(const char *name, InType val) {
