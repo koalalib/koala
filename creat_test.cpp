@@ -324,13 +324,13 @@ int test2(){
 	printGraph(g15);
 
 	Koala::Graph<OpisV,OpisE> g16;
-	Koala::Creator::erdRen2(g16, 4, 1, vFunktor, eFunktor, 34, Koala::Directed);
+	Koala::Creator::erdRen2(g16, 4, 1, vFunktor, eFunktor,  Koala::Directed);
 	std::cout<< "--g16" <<std::endl;
 //	g16.testGraph();
 	printGraph(g16);
 
 	Koala::Graph<OpisV,OpisE> g16a;
-	Koala::Creator::erdRen2(g16a, 4, 1, vFunktor, eFunktor, 3467, Koala::Directed);
+	Koala::Creator::erdRen2(g16a, 4, 1, vFunktor, eFunktor,  Koala::Directed);
 	std::cout<< "--g16a" <<std::endl;
 //	g16a.testGraph();
 	printGraph(g16a);
@@ -472,7 +472,7 @@ int test3(){
 
 
 	Koala::Graph<OpisV,OpisE> g16;
-	Koala::Creator::erdRen2(g16, 2, 2, vFunktor, eFunktor, 34, Koala::Directed);
+	Koala::Creator::erdRen2(g16, 2, 2, vFunktor, eFunktor,  Koala::Directed);
 	std::cout<< "--g16" <<std::endl;
 //	g16.testGraph();
 	printGraph(g16);

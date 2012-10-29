@@ -351,27 +351,13 @@ namespace Koala
           p - probability of edge's creation,
           vInfoGen - generator for info objects for vertices,
           eInfoGen - generator for info objects for edges,
-          randSeed - seed for pseudorandom generator,
+          randSeed - seed for pseudorandom generator, (uwaga: nieaktualne, seed jesli mozna ustawic przed wywolaniem
+                                                       funkcja srand, tu korzystamy jedynie z rand)
           type - the type of edges in the graph, i.e., directed or undirected.
         */
         template< class GraphType, class VInfoGen, class EInfoGen >
             static typename GraphType::PVertex erdRen1( GraphType &g, int n, double p, VInfoGen vInfoGen,
-                EInfoGen eInfoGen, unsigned int randSeed, EdgeType type = Undirected );
-
-        /* The function generates a random graph on n vertices according to ErdosRenyi model G(n, p).
-        Each edge is included in the graph with probability p independent from every other edge.
-        If the type of the graph is set to directed, then each of the two possible (opposite directed) edges
-        between two particular vertices is drawn independently. Current time is used as a seed for pseudorandom number generator.
-        Parameters:
-          g - an input graph,
-          n - number of vertices to create,
-          p - probability of edge's creation,
-          vInfoGen - generator for info objects for vertices,
-          eInfoGen - generator for info objects for edges,
-          type - the type of edges in the graph, i.e., directed or undirected.
-        */
-        template< class GraphType, class VInfoGen, class EInfoGen > static typename GraphType::PVertex
-            erdRen1( GraphType &g, int n, double p, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected );
+                EInfoGen eInfoGen, EdgeType type = Undirected );
 
         /* It is a simpler version of the above function*/
         template< class GraphType >
@@ -387,29 +373,12 @@ namespace Koala
           m - number of edges to create,
           vInfoGen - generator for info objects for vertices,
           eInfoGen - generator for info objects for edges,
-          randSeed - seed for pseudorandom generator,
+          randSeed - seed for pseudorandom generator, (uwaga: nieaktualne - j.w.)
           type - the type of edges in the graph, i.e., directed or undirected.
         */
         template< class GraphType, class VInfoGen, class EInfoGen > static typename GraphType::PVertex
-            erdRen2( GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen, unsigned int randSeed,
+            erdRen2( GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen,
                 EdgeType type = Undirected);
-
-        /* The function generates a random graph on n vertices according to ErdosRenyi model G(n, m).
-        The graph contains m edges chosen uniformly at random from the collection of all possible edges, i.e.,
-         - in the case of undirected graphs the collection contains n(n-1)/2 edges,
-         - in the case of directed graphs the collection contains n(n-1) edges.
-        Current time is used as a seed for pseudorandom number generator.
-        Parameters:
-          g - an input graph,
-          n - number of vertices to create,
-          m - number of edges to create,
-          vInfoGen - generator for info objects for vertices,
-          eInfoGen - generator for info objects for edges,
-          randSeed - seed for pseudorandom generator,
-          type - the type of edges in the graph, i.e., directed or undirected.
-        */
-        template< class GraphType, class VInfoGen, class EInfoGen > static typename GraphType::PVertex
-            erdRen2( GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected );
 
         /* It is a simpler version of the above function*/
         template< class GraphType >

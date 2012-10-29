@@ -457,26 +457,18 @@ template< class GraphType > typename GraphType::PVertex
         Koala::ConstFunctor< typename GraphType::EdgeInfoType >(),dir,dir );
 }
 
-template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
-    Creator::erdRen1( GraphType &g, int n, double p, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType eType )
-{
-    return Creator::erdRen1( g,n,p,vInfoGen,eInfoGen,(unsigned int)time( NULL ),eType );
-}
-
 template< class GraphType > typename GraphType::PVertex Creator::erdRen1( GraphType &g, int n, double p, EdgeType eType )
 {
     return Creator::erdRen1( g,n,p,Koala::ConstFunctor< typename GraphType::VertInfoType >(),
-        Koala::ConstFunctor< typename GraphType::EdgeInfoType >(),(unsigned int)time( NULL ),eType );
+        Koala::ConstFunctor< typename GraphType::EdgeInfoType >(),eType );
 }
 
 template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
-    Creator::erdRen1( GraphType &g, int n, double p, VInfoGen vInfoGen, EInfoGen eInfoGen, unsigned int randSeed,
-        EdgeType eType )
+    Creator::erdRen1( GraphType &g, int n, double p, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType eType )
 {
     if (eType == EdDirOut) eType = Directed;
     koalaAssert( eType == Undirected || eType == Directed,AlgExcWrongMask );
     double rnd;
-    srand( randSeed );
 
     typename GraphType::PVertex LOCALARRAY( vTab,n );
     for( int i = 0; i < n; i++ ) vTab[i] = g.addVert( vInfoGen( i ) );
@@ -498,24 +490,16 @@ template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::
     return vTab[0];
 }
 
-template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
-    Creator::erdRen2( GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType eType )
-{
-    return Creator::erdRen2( g,n,m,vInfoGen,eInfoGen,(unsigned int)time( NULL ),eType );
-}
-
 template< class GraphType > typename GraphType::PVertex Creator::erdRen2( GraphType &g, int n, int m, EdgeType eType )
 {
     return Creator::erdRen2( g,n,m,Koala::ConstFunctor< typename GraphType::VertInfoType >(),
-        Koala::ConstFunctor< typename GraphType::EdgeInfoType >(),(unsigned int)time( NULL ),eType );
+        Koala::ConstFunctor< typename GraphType::EdgeInfoType >(),eType );
 }
 
 template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
-    Creator::erdRen2( GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen, unsigned int randSeed,
-        EdgeType eType )
+    Creator::erdRen2( GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType eType )
 {
     if (eType == EdDirOut) eType = Directed;
-    srand( randSeed );
     int maxEgdesNum = 0, j = 0, k = 0, v1num = 0, v2num = 0;
     std::pair< int,int > temp;
 
