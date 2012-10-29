@@ -27,7 +27,11 @@ template< typename Element > bool operator==( const Set< Element > &s1, const Se
 {
     if (s1.size() != s2.size()) return false;
     typename Set< Element >::const_iterator i = s1.begin(), j = s2.begin();
-    while (i != s1.end() && j != s2.end() && *i++ == *j++ ) ;
+    while (i != s1.end() && j != s2.end())
+    {
+        if (*i != *j ) return false;
+        ++i; ++j;
+    }
     return (i == s1.end()) && (j == s2.end());
 }
 
