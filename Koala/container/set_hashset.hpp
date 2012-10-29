@@ -84,8 +84,8 @@ template< typename Element >
     bool operator==( const Set< Element > &s1, const Set< Element > &s2 )
     {
         if (s1.size() != s2.size()) return false;
-        typename Koala::HashSet< Element >::const_iterator i = s1->begin();
-        while (i != s1->end())
+        typename Koala::HashSet< Element >::const_iterator i = s1.begin();
+        while (i != s1.end())
         {
             if(!s2.contains(*i)) return false;
             i++;
