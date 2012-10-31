@@ -74,7 +74,7 @@ template< class Graph > void writeG6( const Graph &graph, std::string &str_graph
 		id++;
 	}
 
-	unsigned char *tab = (unsigned char *)calloc( (order2 >> 3) + 1,1 );
+	unsigned char *tab = (unsigned char *)calloc( (order2 >> 3) + 4,1 ); //large enough table
 	typename Graph::PEdge edge = graph.getEdge( EdUndir );
 	unsigned char masks[] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 	while (edge)
@@ -150,7 +150,7 @@ template< class Graph > int writeG6( const Graph &graph, char *str_graph, int le
 		id++;
 	}
 
-	unsigned char *tab = (unsigned char *)calloc( (order2 >> 3) + 1,1 );
+	unsigned char *tab = (unsigned char *)calloc( (order2 >> 3) + 4,1 ); //large enough table
 	typename Graph::PEdge edge = graph.getEdge( EdUndir );
 	unsigned char masks[] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 	while (edge)
