@@ -75,7 +75,7 @@ template< class Graph > void writeG6( const Graph &graph, std::string &str_graph
 	}
 
 	unsigned char *tab = (unsigned char *)calloc( (order2 >> 3) + 1,1 );
-	typename Graph::PEdge edge = graph.getEdge( EdUndir );
+	typename Graph::PEdge edge = graph.getEdge( EdUndir | EdDirIn | EdDirOut );
 	unsigned char masks[] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 	while (edge)
 	{
@@ -84,7 +84,7 @@ template< class Graph > void writeG6( const Graph &graph, std::string &str_graph
 		int id2 = ids[verts.second];
 		int nr = (id1 > id2) ? ( (id1-1)*id1/2 + id2 ) : ( (id2-1)*id2/2 + id1 );
 		tab[nr >> 3] |= masks[nr & 0x07];
-		edge = graph.getEdgeNext( edge,EdUndir );
+		edge = graph.getEdgeNext( edge,EdUndir | EdDirIn | EdDirOut );
 	}
 	int tmp_order = 0;
 	unsigned char *ch_lo = tab, *ch_hi;
@@ -151,7 +151,7 @@ template< class Graph > int writeG6( const Graph &graph, char *str_graph, int le
 	}
 
 	unsigned char *tab = (unsigned char *)calloc( (order2 >> 3) + 1,1 );
-	typename Graph::PEdge edge = graph.getEdge( EdUndir );
+	typename Graph::PEdge edge = graph.getEdge( EdUndir | EdDirIn | EdDirOut );
 	unsigned char masks[] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 	while (edge)
 	{
@@ -160,7 +160,7 @@ template< class Graph > int writeG6( const Graph &graph, char *str_graph, int le
 		int id2 = ids[verts.second];
 		int nr = (id1 > id2) ? ( (id1-1)*id1/2 + id2 ) : ( (id2-1)*id2/2 + id1 );
 		tab[nr >> 3] |= masks[nr & 0x07];
-		edge = graph.getEdgeNext( edge,EdUndir );
+		edge = graph.getEdgeNext( edge,EdUndir | EdDirIn | EdDirOut );
 	}
 	int tmp_order = 0;
 	unsigned char *ch_lo = tab, *ch_hi;

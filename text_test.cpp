@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include"./Koala/graph/graph.h"
+#include"./Koala/io/g6.h"
 #include"./Koala/io/text.h"
 #include"./Koala/container/set.h"
 
@@ -174,6 +175,16 @@ struct bezop {
 //	cout << endl;cout << endl;
 
         bezop bz1,bz2;
+        {   char tab[100];
+            g.clear();
+            A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
+            g.addArc(A,B);g.addArc(B,C);
+//            g.addEdge(A,B);g.addEdge(B,C);
+            writeG6(g,tab,99);
+            cout << "\n" << tab;
+
+
+        }
 
 //    cin << bz1;
 
