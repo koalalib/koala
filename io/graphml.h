@@ -90,9 +90,11 @@ public:
 	//GraphML read/write
 	bool readFile( const char *fileName );
 	bool writeFile( const char *fileName );
-/*	friend std::istream& operator>>(std::istream &in, GraphML &gml);
-	friend std::ostream& operator<<(std::ostream &out, const GraphML &gml);
-	friend std::string& operator<<(std::string &out, const GraphML &gml);*/
+
+	bool readString(const char *str);
+	bool readString(const std::string &str);
+	int writeString(char *str, int maxlen);
+	std::string writeString();
 private:
 	template<GraphMLKeyTypes::Type, typename InType>
 	bool set(const char *name, InType val);
