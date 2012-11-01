@@ -181,15 +181,77 @@ namespace Koala
             // DFSPostorder da: A B C E D
             // a poni¿sza funkcja mo¿e zwróciæ np.: A E B C D
 
+            template <class Elem> class RekSet {
+
+                    Elem a;
+                    Koala::Set<RekSet<Elem>* > children;
+
+                public:
+
+                RekSet() : a(0), children() {}
+
+                void clear()
+                    { a=0; children.clear(); }
+
+                RekSet& operator+=(RekSet<Elem>& X)
+                {
+                    if (&X==this) return *this;
+                    children+=& X;
+                    return *this;
+                }
+
+                RekSet& operator+=(Elem e)
+                {
+                    assert(!a);
+                    a=e;
+                    return *this;
+                }
+
+                int size()
+                {
+                    int res=(a) ? 1 : 0;
+                    for(RekSet<Elem>* w=children.first();w;w=children.next(w))
+                            res+=w->size();
+                    return res;
+                }
+
+                template <class Iter>
+                void getElements(Iter& out)
+                {
+                    if (a)
+                    {
+                        *out=a; ++out;
+                    }
+                    for(RekSet<Elem>* w=children.first();w;w=children.next(w))
+                        w->getElements(out);
+                }
+
+            };
+
+
             static void SemiPostOrderTree( int *parent, int n, int *out );
 
             template< class Graph > struct QTRes
             {
                 int size;
-                Set< typename Graph::PVertex > trees;
+                RekSet< typename Graph::PVertex > trees;
                 QTRes(): size( 0 )
                     { }
             };
+
+
+            template <class Cont>
+            struct AssocArrSwitch {
+
+                typedef Cont Type;
+            };
+
+            template <class K, class E, class Cont>
+            struct AssocArrSwitch<AssocArray<K,E,Cont> > {
+
+                typedef AssocTable<std::map< K, E> > Type;
+            };
+
 
           public:
             // wyrzuca na iterator odwrotny perf. ellimination order chordal grafu tj. porzadek doklejania nowych wierzcholkow za podkliki

@@ -169,7 +169,7 @@ bool readGraphVL(Graph &g, std::istream &strm,
 			else v = it->second;
 
 			if ((u == v) != (dir == EdLoop)) return false;
-			e = g.addEdge(u, v, dir);
+			e = g.addEdge(u, v, typename Graph::EdgeInfoType(), dir);
 
 			if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::EdgeInfoType >::res>::read(ostrm,e->info)) return false;
 			if(readOutputId(strm, ix)) edgeMap[ix] = e;
@@ -222,7 +222,7 @@ bool readGraphEL(Graph &g, std::istream &strm,
 			else v = it->second;
 
 			if ((u == v)!= (dir== EdLoop)) return false;
-			e = g.addEdge(u, v, dir);
+			e = g.addEdge(u, v, typename Graph::EdgeInfoType(),dir);
 
 			if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::EdgeInfoType >::res>::read(ostrm,e->info)) return false;
 			if(readOutputId(strm, ix)) edgeMap[ix] = e;
