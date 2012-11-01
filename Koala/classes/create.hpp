@@ -780,7 +780,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
                 {
                     typename GraphOut::EdgeInfoType einfo;
                     casters.second( einfo,g.getVertInfo( v ) );
-                    linkers.second( lg.addEdge( e2vtab[e],e2vtab[f],einfo ),v );
+                    linkers.second( lg.addEdge( e2vtab[e],e2vtab[f],einfo, EdUndir ),v );
                     vset[v];
                 }
     for( typename GraphIn::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )

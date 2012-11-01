@@ -15,7 +15,70 @@ template<class T> void print(const SearchStructs::CompStoreTool<T>& cont)
     }
 }
 
+
+template <class Elem> class RekSet {
+
+        Elem a;
+        Koala::Set<RekSet<Elem>* > children;
+
+    public:
+
+    RekSet() : a(0), children() {}
+
+    void clear()
+        { a=0; children.clear(); }
+
+    RekSet& operator+=(RekSet<Elem>& X)
+    {
+        if (&X==this) return *this;
+        children+=& X;
+        return *this;
+    }
+
+    RekSet& operator+=(Elem e)
+    {
+        assert(!a);
+        a=e;
+        return *this;
+    }
+
+    int size()
+    {
+        int res=(a) ? 1 : 0;
+        for(RekSet<Elem>* w=children.first();w;w=children.next(w))
+                res+=w->size();
+        return res;
+    }
+
+    template <class Iter>
+    void getElements(Iter& out)
+    {
+        if (a)
+        {
+            *out=a; ++out;
+        }
+        for(RekSet<Elem>* w=children.first();w;w=children.next(w))
+            w->getElements(out);
+    }
+
+};
+
 #include "main.hpp"
+
+    RekSet<char> rs1,rs2,rs3;
+    char text[10]={0},*ptext=text;
+
+    cout << rs1.size();
+//    rs1+='A';
+    rs2+='B';
+    rs3+='C';
+    rs1+=rs2; rs2+=rs3;
+    cout << ' ' << rs1.size() << endl;
+    rs1.getElements(ptext);
+
+    for(int i=0;i<10;i++) if (text[i]) cout << text[i] << ' ';
+    cout << "\n-----------\n";
+
 
     SearchStructs::CompStoreTool<char> cont;
     SearchStructs::CompStoreTool<int> rev;

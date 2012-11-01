@@ -57,6 +57,20 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
 }
 
 
+template <class Cont>
+struct AssocArrSwitch {
+
+    typedef Cont Type;
+};
+
+
+template <class K, class E, class Cont>
+struct AssocArrSwitch<AssocArray<K,E,Cont> > {
+
+    typedef AssocTable<std::map< K, E> > Type;
+};
+
+
 #include "main.hpp"
 
     Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > > bufor[10];
@@ -323,6 +337,9 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
         aa2=inf;
         t(aa2);
 
+        AssocArrSwitch<AssocArray<Vert*,std::string> >::Type  hmp2;
+        hmp2=aa;
+
         PseudoAssocArray<Vert*,std::string,AssocTable<std::map<Vert*,int> > >  pa;
         pa[B]="BB";
         PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int> > >  pa2(pa);
@@ -351,6 +368,7 @@ void t(const AssocMatrix<A,B,aType,D,E>& m)
         hmp[3]="A";hmp[6]="B";;hmp[7]="C";
         hmp=hmp;
         cout << hmp.size() << ' ' << hmp[3] << hmp[6];
+
     }
 
 

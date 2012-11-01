@@ -550,10 +550,10 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
     int IsItPar< DefaultStructs >::Chordal::maxStable( const Graph& g, int qn, QIter begin, VIter vbegin,
         QTEIter ebegin, IterOut out )
 {
-    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes< Graph > >::Type LOCALARRAY( tabtab,qn );
+    typename AssocArrSwitch<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes< Graph > >::Type>::Type LOCALARRAY( tabtab,qn );
     QTRes< Graph > LOCALARRAY( tabnull,qn );
-    typedef typename DefaultStructs::template LocalGraph< std::pair< typename DefaultStructs:: template AssocCont<
-        typename Graph::PVertex,QTRes< Graph > >::Type *,QTRes< Graph > * >,char,EdAll,true >:: Type ImageGraph;
+    typedef typename DefaultStructs::template LocalGraph< std::pair< typename AssocArrSwitch<typename DefaultStructs:: template AssocCont<
+        typename Graph::PVertex,QTRes< Graph > >::Type>::Type *,QTRes< Graph > * >,char,EdAll,false >:: Type ImageGraph;
     ImageGraph tree;
     typename ImageGraph::PVertex LOCALARRAY( treeverts,qn );
     QIter it = begin, it2 = it;
@@ -580,7 +580,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
         {
             typename ImageGraph::PVertex child = tree.getEdgeEnd( e,vert );
             int maxs = child->info.second->size, tmpsize;
-            Set< typename Graph::PVertex > *maxset = &child->info.second->trees;
+            RekSet< typename Graph::PVertex > *maxset = &child->info.second->trees;
             for( typename Graph::PVertex key = child->info.first->firstKey(); key; key = child->info.first->nextKey( key ) )
                 if ((!vert->info.first->hasKey( key )) && (tmpsize = (*child->info.first)[key].size) > maxs)
                 {
@@ -605,7 +605,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
                 else
                 {
                     int maxs = child->info.second->size, tmpsize;
-                    Set< typename Graph::PVertex > *maxset = &child->info.second->trees;
+                    RekSet< typename Graph::PVertex > *maxset = &child->info.second->trees;
                     for( typename Graph::PVertex childkey = child->info.first->firstKey(); childkey;
                         childkey = child->info.first->nextKey( childkey ) )
                         if ((!vert->info.first->hasKey( childkey )) && (tmpsize = (*child->info.first)[childkey].size) > maxs)
@@ -621,7 +621,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
 
     typename ImageGraph::PVertex root = treeverts[qn - 1];
     int maxs = root->info.second->size, tmpsize;
-    Set< typename Graph::PVertex > *maxset = &root->info.second->trees;
+    RekSet< typename Graph::PVertex > *maxset = &root->info.second->trees;
     for( typename Graph::PVertex key = root->info.first->firstKey(); key; key = root->info.first->nextKey( key ) )
     if ((tmpsize = (root->info.first->operator[]( key ).size)) > maxs)
     {
@@ -689,7 +689,7 @@ template< class DefaultStructs > template< class GraphType >
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) cg.addVert( u );
     for( typename ImageGraph::PVertex u = cg.getVert(); u != cg.getVertLast(); u = cg.getVertNext( u ) )
     for( typename ImageGraph::PVertex v = cg.getVertNext( u ); v; v = cg.getVertNext( v ) )
-        if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v,EdUndir );
+        if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v );
     return chordal( cg );
 }
 
@@ -925,7 +925,7 @@ template< class DefaultStructs > template< class GraphType >
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) cg.addVert( u );
     for( typename ImageGraph::PVertex u = cg.getVert(); u != cg.getVertLast(); u = cg.getVertNext( u ) )
         for( typename ImageGraph::PVertex v = cg.getVertNext( u ); v; v = cg.getVertNext( v ) )
-            if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v,EdUndir );
+            if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v );
     return comparability( cg );
 }
 
@@ -954,7 +954,7 @@ template< class DefaultStructs > template< class GraphType, class Iter, class It
         it2++;
         j = i + 1;
         for( ; it2 != end; ++it2,j++ )
-            if (touch( *it,*it2 )) g.addEdge( tabv[i],tabv[j],einfo( i,j ),EdUndir );
+            if (touch( *it,*it2 )) g.addEdge( tabv[i],tabv[j],einfo( i,j ), EdUndir );
     }
     for( i = 0; i < licz; i++ )
     {

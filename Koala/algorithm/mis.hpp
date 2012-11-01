@@ -295,7 +295,7 @@ template< class DefaultStructs >
     for( typename ImageGraph::PVertex u = ig.getVert(); u != ig.getVertLast(); u = ig.getVertNext( u ) )
     {
         for( typename ImageGraph::PVertex v = ig.getVertNext( u ); v ; v = ig.getVertNext( v ) )
-            if (g.getEdge( u->info,v->info )) ig.addEdge( u,v,EdUndir );
+            if (g.getEdge( u->info,v->info )) ig.addEdge( u,v );
     }
 
     // ALG: copy contains all vertices and edges
@@ -318,7 +318,7 @@ template< class DefaultStructs >
     for( typename ImageGraph::PVertex u = ig.getVert(); u != ig.getVertLast(); u = ig.getVertNext( u ) )
     {
         for( typename ImageGraph::PVertex v = ig.getVertNext( u ); v; v = ig.getVertNext( v ) )
-            if (g.getEdge( u->info,v->info )) ig.addEdge( u,v,EdUndir );
+            if (g.getEdge( u->info,v->info )) ig.addEdge( u,v );
     }
 
     // ALG: copy contains all vertices and edges
@@ -435,7 +435,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
     for( typename ImageGraph::PVertex u = ig.getVert(); u != ig.getVertLast(); u = ig.getVertNext( u ) )
     {
         for( typename ImageGraph::PVertex v = ig.getVertNext( u ); v; v = ig.getVertNext( v ) )
-            if (g.getEdge( u->info,v->info )) ig.addEdge( u,v,EdUndir );
+            if (g.getEdge( u->info,v->info )) ig.addEdge( u,v );
     }
 
     // ALG: copy contains all vertices and edges

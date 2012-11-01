@@ -182,8 +182,6 @@ struct bezop {
 //            g.addEdge(A,B);g.addEdge(B,C);
             writeG6(g,tab,99);
             cout << "\n" << tab;
-
-
         }
 
 //    cin << bz1;

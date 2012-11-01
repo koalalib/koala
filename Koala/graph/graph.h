@@ -334,6 +334,9 @@ namespace Koala
         inline typename GraphType::PEdge addEdge( PVertex,PVertex, EdgeDirection = EdUndir );
         // Dodajemy nową krawędź do grafu (z etykietą).
         inline typename GraphType::PEdge addEdge( PVertex,PVertex,EdgeInfo, EdgeDirection = EdUndir );
+
+        inline typename GraphType::PEdge addLink( PVertex u,PVertex v,EdgeInfo info= EdgeInfo() )
+            {   return addEdge(u,v,info,EdUndir); }
         // Dodajemy nowy łuk do grafu (z etykietą).
         inline typename GraphType::PEdge addArc( PVertex,PVertex,EdgeInfo = EdgeInfo() );
         // Dodajemy nową pętlę do grafu (z etykietą)

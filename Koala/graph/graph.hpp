@@ -1057,7 +1057,7 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class EdInf
                 {
                     bool undflag = this->getEdge( u,v,EdUndir );
                     while (e = this->getEdge( v,u,EdUndir )) delEdge( e );
-                    if (!undflag) addEdge( u,v,infoGen( *this,u,v,EdUndir ) );
+                    if (!undflag) addEdge( u,v,infoGen( *this,u,v,EdUndir ), EdUndir );
                 }
             }
 }

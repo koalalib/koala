@@ -62,9 +62,9 @@ using namespace std;
         g.addEdge(u2,u3);
 
 
-//        g.addEdge(u5,u1);
-//        g.addEdge(u1,u9);
+//        g.addEdge(u2,u1);
 //        g.addEdge(u8,u9);
+//        g.addEdge(u1,u9);
 
 
 
