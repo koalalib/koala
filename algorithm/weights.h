@@ -256,9 +256,8 @@ namespace Koala
         };
 
         // wlasciwa procedura: odleglosc miedzy para wierzcholkow
-        // start=NULL - szukamy najdluzszych sciezek w grafie o dowolnym poczatku
         // zwraca przy podanym end : min. dlugosc sciezki start->end lub niesk. gdy end jest nieosiagalny
-        // przy end=NULL zwraca 0
+        // przy end=NULL zwraca 0, zas do avertTab zapisuje m. in. odleglosci wierzcholkow od start
         // w razie wykrycia ujemnego cyklu zwraca -niesk.
         template< class GraphType, class VertContainer, class EdgeContainer > static
             typename EdgeContainer::ValType::DistType distances( const GraphType &g, VertContainer &avertTab,
