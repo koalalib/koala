@@ -553,7 +553,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
     typename AssocArrSwitch<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes< Graph > >::Type>::Type LOCALARRAY( tabtab,qn );
     QTRes< Graph > LOCALARRAY( tabnull,qn );
     typedef typename DefaultStructs::template LocalGraph< std::pair< typename AssocArrSwitch<typename DefaultStructs:: template AssocCont<
-        typename Graph::PVertex,QTRes< Graph > >::Type>::Type *,QTRes< Graph > * >,char,EdAll,false >:: Type ImageGraph;
+        typename Graph::PVertex,QTRes< Graph > >::Type>::Type *,QTRes< Graph > * >,char,Directed|Undirected >:: Type ImageGraph;
     ImageGraph tree;
     typename ImageGraph::PVertex LOCALARRAY( treeverts,qn );
     QIter it = begin, it2 = it;
@@ -682,7 +682,7 @@ template< class DefaultStructs > template< class GraphType >
     bool IsItPar< DefaultStructs >::cochordal( const GraphType &g )
 {
     if (!undir( g,true ) || g.getEdgeNo( Loop ) > 0) return false;
-    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected,true >::Type
+    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected >::Type
         ImageGraph;
     ImageGraph cg;
 
@@ -690,6 +690,7 @@ template< class DefaultStructs > template< class GraphType >
     for( typename ImageGraph::PVertex u = cg.getVert(); u != cg.getVertLast(); u = cg.getVertNext( u ) )
     for( typename ImageGraph::PVertex v = cg.getVertNext( u ); v; v = cg.getVertNext( v ) )
         if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v );
+    cg.makeAdjMatrix();
     return chordal( cg );
 }
 
@@ -714,8 +715,10 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
 
 //    int mm = 0;
 //    for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) mm += g.deg( v ) * (g.deg( v ) - 1);
-    std::pair< typename Graph::PEdge,EdgeDirection > LOCALARRAY( buf,m + 2 );    //TODO: size?
-    QueueInterface< std::pair< typename Graph::PEdge,EdgeDirection > * > cont( buf,m+ 1 );   //TODO: size?
+    std::pair< typename Graph::PEdge,EdgeDirection > LOCALARRAY( buf,m + 2 );
+        //TODO: size?
+    QueueInterface< std::pair< typename Graph::PEdge,EdgeDirection > * > cont( buf,m+ 1 );
+        //TODO: size?
     typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EDir >::Type visited( m );
 
     int comp = 1;
@@ -777,7 +780,7 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
             }
 
     typedef typename DefaultStructs::template LocalGraph< typename Graph::PVertex,
-        typename Graph::PEdge ,Directed,false >::Type Image;
+        typename Graph::PEdge ,Directed >::Type Image;
 
     Image ig;
     typename DefaultStructs:: template AssocCont< typename Graph::PVertex,typename Image::PVertex >
@@ -786,6 +789,7 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
         for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
             if (dirmap[e] == EdDirOut) ig.addArc( org2image[g.getEdgeEnd1( e )],org2image[g.getEdgeEnd2( e )],e );
             else ig.addArc( org2image[g.getEdgeEnd2( e )],org2image[g.getEdgeEnd1( e )],e );
+    ig.makeAdjMatrix();
 
     typename DefaultStructs:: template AssocCont< typename Image::PVertex,typename
         DAGCritPathPar< DefaultStructs >:: template VertLabs< int,Image > >::Type vertCont( n );
@@ -834,7 +838,7 @@ template< class DefaultStructs > template< class Graph >
 template< class DefaultStructs > template< class GraphType, class VIterOut >
     int IsItPar< DefaultStructs >::Comparability::maxStable( const GraphType &g, VIterOut out )
 {
-    typedef typename DefaultStructs::template LocalGraph< char,typename GraphType::PVertex,Directed,false >::Type
+    typedef typename DefaultStructs::template LocalGraph< char,typename GraphType::PVertex,Directed >::Type
         ImageGraph;
     int n = g.getVertNo(), m = g.getEdgeNo();
     ImageGraph cg;
@@ -873,6 +877,7 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
         edgecont[cg.addArc( cg.getEdgeEnd2( mapa[u] ),cg.getEdgeEnd1( mapa[v] ),(typename GraphType::PVertex)0 )] =
             typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int >( 0,1 );
     }
+    cg.makeAdjMatrix();
     int a = 0, b = n, c;
     while (b - a > 1)
     {
@@ -919,13 +924,14 @@ template< class DefaultStructs > template< class GraphType >
     bool IsItPar< DefaultStructs >::cocomparability( const GraphType &g )
 {
     if (!undir( g,true ) || g.getEdgeNo( Loop ) > 0) return false;
-    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected,true >::Type
+    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected >::Type
         ImageGraph;
     ImageGraph cg;
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) cg.addVert( u );
     for( typename ImageGraph::PVertex u = cg.getVert(); u != cg.getVertLast(); u = cg.getVertNext( u ) )
         for( typename ImageGraph::PVertex v = cg.getVertNext( u ); v; v = cg.getVertNext( v ) )
             if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v );
+    cg.makeAdjMatrix();
     return comparability( cg );
 }
 
@@ -985,10 +991,13 @@ template< class DefaultStructs > template< class GraphType, class IntMap >
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,IvData >::Type data( n );
 
     Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< typename LexBFSPar< DefaultStructs >::
-        template LVCNode< GraphType > > > > allocat( n + 2 ); //TODO: size?
+        template LVCNode< GraphType > > > > allocat( n + 2 );
+        //TODO: size?
     Privates::BlockListAllocator< Privates::ListNode< typename LexBFSPar< DefaultStructs >::
-        template LVCNode< GraphType > > > allocat2( 2 * n + 2 ); //TODO: size?
-    Privates::BlockListAllocator< Privates::ListNode< typename Sets::Elem > > allocat3( 2 * n * n ); //TODO: size?
+        template LVCNode< GraphType > > > allocat2( 2 * n + 2 );
+        //TODO: size?
+    Privates::BlockListAllocator< Privates::ListNode< typename Sets::Elem > > allocat3( 2 * n * n );
+    //TODO: size?
 
     std::pair< typename Sets::Entry,typename Sets::Entry::iterator > LOCALARRAY( Abuf,n );
     std::pair< typename Sets::Entry,typename Sets::Entry::iterator > LOCALARRAY( Bbuf,n );
@@ -1470,4 +1479,457 @@ template< class DefaultStructs > template< class GraphType >
     typename ModulesPar< DefaultStructs >::Partition res =
         ModulesPar< DefaultStructs >::split( g,compStore( blackHole,blackHole ),blackHole );
     return Cograph::cograph( g,subset );
+}
+
+template< class DefaultStructs > template<class Graph, class DFSOut>
+    void IsItPar< DefaultStructs >::Planar::dfs(typename Graph::PVertex v,typename Graph::PVertex u,const Graph &sg,DFSOut &dfso)
+{
+     const EdgeDirection mask=EdUndir;
+     dfso.num[v]=dfso.licznik;
+     dfso.licznik++;
+
+     typename Graph::PVertex w;
+     for(typename Graph::PEdge e=sg.getEdge(v,mask);(e!=NULL)&&(dfso.cflag!=1);e=sg.getEdgeNext(v,e,mask))
+     {
+         w=sg.getEdgeEnd(e,v);
+         if(!dfso.num.hasKey(w))
+         {
+             dfso.father[w]=v;
+             dfs(w,v,sg,dfso);
+
+         }
+         else if((dfso.num[w]<dfso.num[v])&&(w!=u))
+         {
+                 dfso.cflag=1;
+                 dfso.cycle[w];
+                 while(v!=w)
+                 {
+                     dfso.cycle[v];
+                     v=dfso.father[v];
+                 }
+                 return;
+          }
+     }
+}
+
+template< class DefaultStructs > template<class Graph>
+    bool IsItPar< DefaultStructs >::Planar::bicomponentplanarity(const Graph &sg)
+{
+    const EdgeDirection mask=EdUndir;
+    int n=sg.getVertNo(), m=sg.getEdgeNo(mask);
+
+    typename DefaultStructs:: template AssocCont< typename Graph::PEdge,char >::Type
+            componentE(m),he(m);
+    typename DefaultStructs:: template AssocCont< typename Graph::PEdge,char >::Type fragmE(m);
+//KG: nigdzie nie uzywana zmienna AssocArray<typename Graph::PEdge, int> heinc(m);
+
+
+    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,char >::Type
+        componentV(n),vis(n);
+    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,char >::Type fragmV(n),
+        hvcr(n),
+        face1(n), face2(n);
+    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,int >::Type hv(n);
+
+    //KG: ok, ale kontenerow stlowych ani tablic z elementami bedacymi tablicami asocacyjnymi nie uzywamy,
+    // bo to spowalnia dzialanie AssocArrayow. Wiec moze niekotre z powyzszych AssocArrayow warto jednak zostawic
+    // jako Sety (jezeli i tak musialem je przekonwertowac na zbior by dalo sie zapushowac do vectora).
+    //KG: poza tym chetnie zobaczylbym tu Localarraye Setow (z ustalonym na poczatku potrzebnym rozmiarem),
+    // na ktorych pozniej mozna nalozyc VectorInterface (z simple.h) i dalej uzywac ich jak vectorow.
+    // Jesli zas wolisz zostawic vectory, to tez zainicjuj je poczatkowym (wystarczajacym do konca) rozmiarem.
+    std::vector<Set<typename Graph::PVertex> > fragmentsV;
+    std::vector<Set<typename Graph::PEdge> > fragmentsE;
+    std::vector<Set<typename Graph::PVertex> > attachmentsV;
+    std::vector<Set<typename Graph::PVertex> > faces;
+
+    typename Graph::PVertex x0=NULL,x=sg.getVert();
+    DFSOutput<Graph > dfso(n,hv);
+    dfso.licznik=0;
+    dfso.cflag=0;
+    dfso.father[x]=x0;
+    dfs(x,x0,sg,dfso);
+
+    for(typename Graph::PVertex v=hv.firstKey();v!=NULL;v=hv.nextKey(v))
+    {
+        if(hv.nextKey(v)!=NULL)
+           he[sg.getEdge(v,hv.nextKey(v),mask)];
+        else
+           he[sg.getEdge(v,hv.firstKey(),mask)];
+    }
+
+    {
+        faces.resize(faces.size()+1);
+        hv.getKeys(setInserter(faces.back()));
+        faces.resize(faces.size()+1);
+        hv.getKeys(setInserter(faces.back()));
+    }
+
+    for(typename Graph::PVertex v=sg.getVert();v!=NULL;v=sg.getVertNext(v))
+        if(!hv.hasKey(v)) hvcr[v];
+
+
+    for(typename Graph::PEdge e=sg.getEdge(mask);e!=NULL;e=sg.getEdgeNext(e,mask))
+        if(!he.hasKey(e)&&hv.hasKey(sg.getEdgeEnd1(e))&&hv.hasKey(sg.getEdgeEnd2(e)))
+        {
+            componentV[sg.getEdgeEnd1(e)];
+            componentV[sg.getEdgeEnd2(e)];
+            fragmentsV.resize(fragmentsV.size()+1);
+            componentV.getKeys(setInserter(fragmentsV.back()));
+            attachmentsV.resize(attachmentsV.size()+1);
+            componentV.getKeys(setInserter(attachmentsV.back()));
+            componentV.clear();
+            componentE[e];
+             fragmentsE.resize(fragmentsE.size()+1);
+             componentE.getKeys(setInserter(fragmentsE.back()));
+            componentE.clear();
+        }
+
+    Subgraph<Graph,AssocHasChooser<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,char >::Type *> ,BoolChooser>
+        sgcr=makeSubgraph(sg,std::make_pair(extAssocKeyChoose(&hvcr),stdChoose(true)));
+
+    typename Graph::PVertex LOCALARRAY(tabV,sg.getVertNo());
+    typename Graph::PEdge LOCALARRAY(tabE,sg.getEdgeNo(mask));
+
+
+    int componentsize=0;
+    int edgenumber=0;
+    typename Graph::PVertex vcf;
+    Set<typename Graph::PVertex> attachV;
+    for(typename Graph::PVertex v=sgcr.getVert();v!=NULL;v=sgcr.getVertNext(v))
+    {
+        if(!vis.hasKey(v))
+        {
+            componentsize=DFSPreorderPar<DefaultStructs>::scanAttainable(sgcr,v,tabV,mask);
+            for(int i=0;i<componentsize;i++)
+            {
+                vis[tabV[i]];
+                componentV[tabV[i]];
+                 for(typename Graph::PEdge e=sg.getEdge(tabV[i],mask);e!=NULL;e=sg.getEdgeNext(tabV[i],e,mask))
+                    if(hv.hasKey(vcf=sg.getEnd(e,tabV[i])))
+                    {
+                       attachV+=vcf;
+                       componentV[vcf];
+                       componentE[e];
+            }
+
+            }
+
+            edgenumber=sgcr.getIncEdges(tabE,tabV,tabV+componentsize,mask);
+            for(int i=0;i<edgenumber;i++)
+                componentE[tabE[i]];
+
+            attachmentsV.push_back(attachV);
+            fragmentsV.resize(fragmentsV.size()+1);
+            componentV.getKeys(setInserter(fragmentsV.back()));
+            fragmentsE.resize(fragmentsE.size()+1);
+            componentE.getKeys(setInserter(fragmentsE.back()));
+
+            attachV.clear();
+            componentV.clear();
+            componentE.clear();
+        }
+    }
+
+    int pathlength=0;
+    int fragmentnumber=fragmentsV.size()-1;
+    Subgraph<Graph,
+        AssocHasChooser<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,char >::Type*> ,
+        AssocHasChooser<typename DefaultStructs:: template AssocCont< typename Graph::PEdge,char >::Type*> >
+            sgp; //podgraf do szukania sciezki
+    if(fragmentsV.empty()==true)
+      return true;
+    else
+    {
+        if(fragmentsV[fragmentnumber].size()==2)
+        {
+            pathlength=1;
+            tabV[0]=fragmentsV[fragmentnumber].first();
+            tabV[1]=fragmentsV[fragmentnumber].last();
+            tabE[0]=fragmentsE[fragmentnumber].first();
+        }
+        else
+        {
+          fragmV.clear(); fragmentsV[fragmentnumber].getElements(assocInserter(fragmV,constFun('A')));
+          for(typename Graph::PVertex v=attachmentsV[fragmentnumber].next(attachmentsV[fragmentnumber].first());
+                v!=attachmentsV[fragmentnumber].last();
+                v=attachmentsV[fragmentnumber].next(v))
+                    fragmV.delKey(v);
+          fragmE.clear(); fragmentsE[fragmentnumber].getElements(assocInserter(fragmE,constFun('A')));
+          pathlength=Koala::DFSPreorderPar<DefaultStructs>::getPath(
+                        makeSubgraph(sg,extAssocKeyChoose(&fragmV)&extAssocKeyChoose(&fragmE))
+                        ,attachmentsV[fragmentnumber].first(),attachmentsV[fragmentnumber].last(),
+                        Koala::PathStructs::outPath(tabV,tabE),mask);
+        }
+    }
+
+          int facenumber=faces.size()-1;
+          typename Graph::PVertex pv;
+          for(pv=faces[facenumber].first();
+                                    (pv!=tabV[0])&&(pv!=tabV[pathlength]);
+                                    pv=faces[facenumber].next(pv))
+                 face1[pv];
+          if(pv==tabV[0])
+          {
+                  for(int i=0;i<pathlength;i++)
+                      face1[tabV[i]];
+                  for(typename Graph::PVertex v=tabV[pathlength];v!=NULL;v=faces[facenumber].next(v))
+                        face1[v];
+                  for(typename Graph::PVertex v=tabV[0];v!=tabV[pathlength];v=faces[facenumber].next(v))
+                        face2[v];
+                  for(int i=pathlength;i>0;i--)
+                        face2[tabV[i]];
+          }
+          else
+          {
+                  for(int i=pathlength;i>0;i--)
+                        face1[tabV[i]];
+                  for(typename Graph::PVertex v=tabV[0];v!=NULL;v=faces[facenumber].next(v))
+                        face1[v];
+                  for(typename Graph::PVertex v=tabV[pathlength];v!=tabV[0];v=faces[facenumber].next(v))
+                        face2[v];
+                  for(int i=0;i<pathlength;i++)
+                      face2[tabV[i]];
+          }
+
+          {
+            faces[facenumber].clear();face1.getKeys(setInserter(faces[facenumber]));
+            faces.resize(faces.size()+1);
+            face2.getKeys(setInserter(faces.back()));
+          }
+
+    int nv=sg.getVertNo();
+    int ne=sg.getEdgeNo(mask);
+    int k;
+    int fb;
+    typename std::vector<Set<typename Graph::PVertex> >::iterator itat;
+    Set<typename Graph::PVertex> faceset;
+
+    for(int f=3;f<ne-nv+2;f++)
+    {
+        for(int i=0;i<pathlength;i++)
+        {
+            he[tabE[i]];
+            fragmentsE[fragmentnumber].del(tabE[i]);
+        }
+
+        if(pathlength>1)
+        {
+            fragmE.clear(); fragmentsE[fragmentnumber].getElements(assocInserter(fragmE,constFun('A')));
+            for(int i=1;i<pathlength;i++)
+            {
+                hv[tabV[i]];
+                fragmentsV[fragmentnumber].del(tabV[i]);
+            }
+
+            for(typename Graph::PVertex v=attachmentsV[fragmentnumber].first();
+                            v!=attachmentsV[fragmentnumber].last();
+                            v=attachmentsV[fragmentnumber].next(v))
+                    fragmentsV[fragmentnumber].del(v);
+            fragmentsV[fragmentnumber].del(attachmentsV[fragmentnumber].last());
+
+            for(typename Graph::PEdge e=fragmentsE[fragmentnumber].first();e!=NULL;e=fragmentsE[fragmentnumber].next(e))
+            {
+                if(!he.hasKey(e)&&hv.hasKey(sg.getEdgeEnd1(e))&&hv.hasKey(sg.getEdgeEnd2(e)))
+                {
+                   attachV.clear();
+                   componentV.clear();
+                   componentE.clear();
+                   attachV+=sg.getEdgeEnd1(e);
+                   attachV+=sg.getEdgeEnd2(e);
+                   componentV[sg.getEdgeEnd1(e)];
+                   componentV[sg.getEdgeEnd2(e)];
+                   componentE[e];
+
+                   fragmE.delKey(e);
+
+                   if(!componentV.empty())
+                   {
+                       fragmentsV.resize(fragmentsV.size()+1);
+                        componentV.getKeys(setInserter(fragmentsV.back()));
+                        fragmentsE.resize(fragmentsE.size()+1);
+                        componentE.getKeys(setInserter(fragmentsE.back()));
+                        attachmentsV.push_back(attachV);
+                   }
+               }
+             }
+
+
+             vis.clear();
+             fragmV.clear(); fragmentsV[fragmentnumber].getElements(assocInserter(fragmV,constFun('A')));
+             sgp=makeSubgraph(sg,std::make_pair(extAssocKeyChoose(&fragmV),extAssocKeyChoose(&fragmE)));
+
+             for(typename Graph::PVertex v=sgp.getVert();v!=NULL;v=sgp.getVertNext(v))
+             {
+                     if(!vis.hasKey(v))
+                     {
+
+                        attachV.clear();
+                        componentV.clear();
+                        componentE.clear();
+                        componentsize=DFSPreorderPar<DefaultStructs>::scanAttainable(sgp,v,tabV,mask);
+                        for(int i=0;i<componentsize;i++)
+                        {
+                            vis[tabV[i]];
+                            componentV[tabV[i]];
+                            for(typename Graph::PEdge e=sg.getEdge(tabV[i],mask);e!=NULL;e=sg.getEdgeNext(tabV[i],e,mask))
+                               if(hv.hasKey(vcf=sg.getEnd(e,tabV[i])))
+                               {
+                                     attachV+=vcf;
+                                     componentV[vcf];
+                                     componentE[e];
+                       }
+                        }
+
+                        edgenumber=sgp.getIncEdges(tabE,tabV,tabV+componentsize,mask);
+                        for(int i=0;i<edgenumber;i++)
+                            componentE[tabE[i]];
+                        if(!componentV.empty())
+                        {
+                            fragmentsV.resize(fragmentsV.size()+1);
+                            componentV.getKeys(setInserter(fragmentsV.back()));
+                            fragmentsE.resize(fragmentsE.size()+1);
+                            componentE.getKeys(setInserter(fragmentsE.back()));
+                            attachmentsV.push_back(attachV);
+                        }
+                     }
+              }
+
+
+        }
+
+        if(fragmentnumber!=fragmentsV.size()-1)
+        {
+            fragmentsV[fragmentnumber]=fragmentsV.back();
+            fragmentsE[fragmentnumber]=fragmentsE.back();
+            attachmentsV[fragmentnumber]=attachmentsV.back();
+        }
+
+        fragmentsV.pop_back();
+        fragmentsE.pop_back();
+        attachmentsV.pop_back();
+
+        k=0;
+        fragmentnumber=0;
+        for(itat=attachmentsV.begin();itat!=attachmentsV.end();++itat)
+        {
+            fb=0;
+            facenumber=0;
+            for(int j=0;j<faces.size();j++)
+            {
+                faceset=faces[j];
+                if((*itat).subsetOf(faceset))
+                {
+                    fb++;
+                    facenumber=j;
+                    fragmentnumber=k;
+                }
+            }
+            if(fb==0)
+                return false;
+            if(fb==1)
+                break;
+            k++;
+        }
+
+        pathlength=0;
+        if(fragmentsV[fragmentnumber].size()==2)
+        {
+            pathlength=1;
+            tabV[0]=fragmentsV[fragmentnumber].first();
+            tabV[1]=fragmentsV[fragmentnumber].last();
+            tabE[0]=fragmentsE[fragmentnumber].first();
+        }
+        else
+        {
+            fragmV.clear(); fragmentsV[fragmentnumber].getElements(assocInserter(fragmV,constFun('A')));
+            fragmE.clear(); fragmentsE[fragmentnumber].getElements(assocInserter(fragmE,constFun('A')));
+            for(typename Graph::PVertex v=attachmentsV[fragmentnumber].next(attachmentsV[fragmentnumber].first());v!=attachmentsV[fragmentnumber].last();v=attachmentsV[fragmentnumber].next(v))
+                fragmV.delKey(v);
+            sgp=makeSubgraph(sg,std::make_pair(extAssocKeyChoose(&fragmV),extAssocKeyChoose(&fragmE)));
+            pathlength=Koala::DFSPreorderPar<DefaultStructs>::getPath(sgp,attachmentsV[fragmentnumber].first(),attachmentsV[fragmentnumber].last(),Koala::PathStructs::outPath(tabV,tabE),mask);
+        }
+
+        face1.clear();
+        face2.clear();
+        for(pv=faces[facenumber].first();(pv!=tabV[0])&&(pv!=tabV[pathlength]);pv=faces[facenumber].next(pv))
+            face1[pv];
+        if(pv==tabV[0])
+        {
+            for(int i=0;i<pathlength;i++)
+                face1[tabV[i]];
+            for(typename Graph::PVertex v=tabV[pathlength];v!=NULL;v=faces[facenumber].next(v))
+                face1[v];
+            for(typename Graph::PVertex v=tabV[0];v!=tabV[pathlength];v=faces[facenumber].next(v))
+                face2[v];
+            for(int i=pathlength;i>0;i--)
+                face2[tabV[i]];
+        }
+        else
+        {
+            for(int i=pathlength;i>0;i--)
+                face1[tabV[i]];
+            for(typename Graph::PVertex v=tabV[0];v!=NULL;v=faces[facenumber].next(v))
+                face1[v];
+            for(typename Graph::PVertex v=tabV[pathlength];v!=tabV[0];v=faces[facenumber].next(v))
+                face2[v];
+            for(int i=0;i<pathlength;i++)
+                face2[tabV[i]];
+          }
+
+          faces[facenumber].clear();face1.getKeys(setInserter(faces[facenumber]));
+          faces.resize(faces.size()+1); face2.getKeys(setInserter(faces.back()));
+
+    }
+
+    return true;
+}
+
+template< class DefaultStructs > template<class Graph>
+    bool IsItPar< DefaultStructs >::planar(const Graph &g)
+{
+    if (!undir( g,true )) return false;
+    typename Graph::PEdge e;
+    typename Graph::PVertex LOCALARRAY(tabV,g.getVertNo()+g.getEdgeNo(EdUndir));
+    int LOCALARRAY(tabcomp,g.getVertNo()+1);
+    typename DefaultStructs:: template AssocCont< typename Graph::PEdge,char >::Type eds(g.getEdgeNo(EdUndir));
+
+    makeSubgraph(g,stdChoose(true) & edgeTypeChoose(EdUndir)).findParals(std::make_pair(assocInserter(eds,constFun('A')),blackHole));
+
+    int liczbaBlokow=BlocksPar<DefaultStructs>::split(makeSubgraph(g,stdChoose(true)&extAssocKeyChoose(&eds)),blackHole,blackHole,SearchStructs::compStore(tabcomp,tabV),blackHole);
+
+    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,char >::Type subgrTab(g.getVertNo());
+    Subgraph<Graph,AssocHasChooser<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,char >::Type*> ,
+            AssocHasChooser<typename DefaultStructs:: template AssocCont< typename Graph::PEdge,char >::Type*> > sg;
+
+    int liczbaWierzcholkow=0;
+    int liczbaKrawedzi=0;
+
+    for(int i=0;i<liczbaBlokow;i++)
+    {
+        subgrTab.clear();
+        for(int j=tabcomp[i];j<tabcomp[i+1];j++) subgrTab[tabV[j]];
+        sg=makeSubgraph(g,std::make_pair(extAssocKeyChoose(&subgrTab),extAssocKeyChoose(&eds)));
+        liczbaWierzcholkow=sg.getVertNo();
+        liczbaKrawedzi=sg.getEdgeNo();
+        if((liczbaWierzcholkow>=5)&&(liczbaKrawedzi>=9))
+        {
+            if(liczbaKrawedzi>(3*liczbaWierzcholkow-6))
+                return false;
+            if(Planar::bicomponentplanarity(sg)==false)
+                return(false);
+        }
+    }
+    return true;
+
+}
+
+template< class DefaultStructs > template<class Graph>
+    bool IsItPar< DefaultStructs >::outerplanar(Graph &g)
+{
+    typename Graph::PVertex vnew=g.addVert();
+    for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v))
+        if (v!=vnew) g.addEdge(vnew,v);
+    bool res=planar(g);
+    g.delVert(vnew,true);
+    return res;
 }

@@ -19,7 +19,7 @@ template< class Graph > bool readG6( Graph &graph, const char *str_graph )
 		vert_no = (vert_no << 6) | (*ch - LIMIT_LO);
 		++ch;
 	}
-	std::vector< typename Graph::Vertex * > vert_vect( vert_no );
+	std::vector< typename Graph::PVertex > vert_vect( vert_no );
 	for( int i = 0; i < vert_no; i++ ) vert_vect[i] = graph.addVert();
 	int bCh = *ch - LIMIT_LO;
 	for( int i = 1; i < vert_no; i++ )

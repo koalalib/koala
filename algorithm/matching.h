@@ -14,7 +14,7 @@ namespace Koala
       public:
         template< class GraphType > struct VertLabs
         {
-                friend class MatchingPar<DefaultStructs>;
+                template <class D> friend class MatchingPar;
                 //wierzcholek skojarzany
                 typename GraphType::PVertex vMatch;
                 //i krawedz skojarzenia

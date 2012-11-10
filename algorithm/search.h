@@ -687,32 +687,6 @@ namespace Koala
             typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
     } ;
 
-    /*
-    * Depth-First-Search
-    * DefaultStructs - wytyczne dla wewnetrznych procedur
-    */
-    template< class DefaultStructs > class DFSPar: public DFSBase< DFSPar< DefaultStructs >,DefaultStructs >
-    {
-      public:
-        /** visit all vertices in the same component as a given vertex
-        * @param[in] g graph containing vertices to visit
-        * @param[in] src given vertex
-        * @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-                Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
-        component jest ustawiane na compid
-        * @param[in] visitor visitor called for each vertex
-        * @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
-        zgodnych z maska, a pozostale kraw. ignorowane. Mozna
-        sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
-        * @param[in] compid component identifier (give 0 if don't know)
-        * @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
-        */
-        template< class GraphType, class VertContainer, class Visitor > static int visitBase( const GraphType &g,
-            typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
-    } ;
-
-    // wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
-    class DFS: public DFSPar< AlgsDefaultSettings > { };
 
     /*
     * Preorder Depth-First-Search

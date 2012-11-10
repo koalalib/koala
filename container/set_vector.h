@@ -106,6 +106,19 @@ namespace Koala
         Element next( const Element & ) const;
         Element prev( const Element & ) const;
 
+        Element min() const
+        {
+            koalaAssert( this->size(),ContExcOutpass )
+            return this->first();
+        }
+
+        Element max() const
+        {
+            koalaAssert( this->size(),ContExcOutpass )
+            return this->last();
+        }
+
+
         using std::vector< Element >::reserve;
 };
 

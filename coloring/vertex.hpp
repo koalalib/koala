@@ -384,7 +384,7 @@ void SeqVertColoringPar<DefaultStructs>::brooksBiconnected(
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
 	typedef typename DefaultStructs::template
-		LocalGraph<int, Koala::EmptyEdgeInfo, Undirected, false>::Type Subgraph;
+		LocalGraph<int, Koala::EmptyEdgeInfo, Undirected>::Type Subgraph;
 	typedef typename Subgraph::PVertex VertSub;
 	typedef typename Subgraph::PEdge EdgeSub;
 	typename DefaultStructs::template
@@ -392,6 +392,7 @@ void SeqVertColoringPar<DefaultStructs>::brooksBiconnected(
 	std::set< std::pair<Vert, Vert> > simple; // !CHANGE! - don't use std::set
 
 	Subgraph subgraph; //subgraph is biconnected
+	subgraph.makeAdjMatrix();
 	while(bState.begVert!=bState.endVert) {
 		//make a subgraph
 		subgraph.clear();
@@ -1466,7 +1467,7 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	int lenVerts = graph.getVertNo();
 
 	typedef typename DefaultStructs::template
-		LocalGraph<Vert, Koala::EmptyEdgeInfo, Undirected, false>::Type Subgraph;
+		LocalGraph<Vert, Koala::EmptyEdgeInfo, Undirected>::Type Subgraph;
 	typedef typename Subgraph::PVertex VertSub;
 	typedef typename Subgraph::PEdge EdgeSub;
 
@@ -1480,7 +1481,7 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 		VertSub uu = subgraph.addVert(vv);
 		map[vv] = uu;
 	}
-
+    subgraph.makeAdjMatrix();
 	for(Edge ee = graph.getEdge(Mask); ee;
 		ee = graph.getEdgeNext(ee, Mask))
 	{
@@ -1491,6 +1492,7 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 
 	int col = -1;
 	Subgraph procGraph;
+	procGraph.makeAdjMatrix();
 	while(subgraph.getVertNo()>0) {
 		++col;
 
