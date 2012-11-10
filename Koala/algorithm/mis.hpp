@@ -287,7 +287,7 @@ template< class DefaultStructs >
     // USR: directed graphs and loops are not allowed
     koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
-    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected,true >::Type
+    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected >::Type
         ImageGraph;
     ImageGraph ig;
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) ig.addVert( u );
@@ -297,7 +297,7 @@ template< class DefaultStructs >
         for( typename ImageGraph::PVertex v = ig.getVertNext( u ); v ; v = ig.getVertNext( v ) )
             if (g.getEdge( u->info,v->info )) ig.addEdge( u,v );
     }
-
+    ig.makeAdjMatrix();
     // ALG: copy contains all vertices and edges
     assert( g.getEdgeNo() == ig.getEdgeNo() && g.getVertNo() == ig.getVertNo() );
     return TemplateWMIN( ig,out,choose,vertTab);
@@ -310,7 +310,7 @@ template< class DefaultStructs >
 {
     koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
-    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected,true >::Type
+    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected >::Type
         ImageGraph;
     ImageGraph ig;
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u )) ig.addVert( u );
@@ -320,7 +320,7 @@ template< class DefaultStructs >
         for( typename ImageGraph::PVertex v = ig.getVertNext( u ); v; v = ig.getVertNext( v ) )
             if (g.getEdge( u->info,v->info )) ig.addEdge( u,v );
     }
-
+    ig.makeAdjMatrix();
     // ALG: copy contains all vertices and edges
     assert( g.getEdgeNo() == ig.getEdgeNo() && g.getVertNo() == ig.getVertNo() );
     return TemplateWMAX( ig,out,choose,vertTab );
@@ -427,7 +427,7 @@ template< class DefaultStructs > template< class GraphType, typename Iterator >
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
     unsigned MISPar< DefaultStructs >::get( GraphType &g, OutputIterator out )
 {
-    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected,true >::Type
+    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected >::Type
         ImageGraph;
     ImageGraph ig;
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) ig.addVert( u );
@@ -437,7 +437,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
         for( typename ImageGraph::PVertex v = ig.getVertNext( u ); v; v = ig.getVertNext( v ) )
             if (g.getEdge( u->info,v->info )) ig.addEdge( u,v );
     }
-
+    ig.makeAdjMatrix();
     // ALG: copy contains all vertices and edges
     assert( g.getEdgeNo() == ig.getEdgeNo() && g.getVertNo() == ig.getVertNo() );
     return __getMaximumIndependentSet( ig,out,false );
@@ -470,7 +470,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
         typename GraphType::PVertex LOCALARRAY( tabV,vertNo );
         typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
             SearchStructs::VisitVertLabs< GraphType > >::Type vd;
-        unsigned components = Koala::DFSPar< DefaultStructs >::split(g,
+        unsigned components = Koala::DFSPostorderPar< DefaultStructs >::split(g,
             Koala::SearchStructs::compStore( compTab,tabV ),EdAll,vd );
 
         // if there is more then one connected component in graph
@@ -483,8 +483,9 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
             {
                 // make a new graph from this connected component
                 typedef typename DefaultStructs::template
-                    LocalGraph< typename GraphType::VertInfoType,char,Undirected,true >::Type ImageGraph;
+                    LocalGraph< typename GraphType::VertInfoType,char,Undirected >::Type ImageGraph;
                 ImageGraph gComponent;
+                gComponent.makeAdjMatrix();
 
                 typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
                     typename ImageGraph::PVertex >::Type vMapping;
@@ -620,7 +621,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
     unsigned a = 0;
     unsigned b = 0;
 
-    typedef typename DefaultStructs::template LocalGraph< typename GraphType::VertInfoType,char,Undirected,true >::Type
+    typedef typename DefaultStructs::template LocalGraph< typename GraphType::VertInfoType,char,Undirected >::Type
         ImageGraph;
     ImageGraph graph1;
 
@@ -637,6 +638,8 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
         iuA = vMappingA[ends.second];
         if (ivA && iuA) graph1.addEdge( ivA,iuA );
     }
+
+    graph1.makeAdjMatrix();
 
     typename GraphType::VertInfoType LOCALARRAY( aOut,graph1.getVertNo() );
     typename GraphType::VertInfoType LOCALARRAY( bOut,g.getVertNo() );

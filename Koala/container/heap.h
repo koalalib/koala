@@ -98,7 +98,8 @@ namespace Koala
 
         bool empty() const { return root == 0; }
 
-        bool check() const; // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
+        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
+        bool check() const;
 
       protected:
         Node* copy( Node*,Node* );
@@ -179,6 +180,7 @@ namespace Koala
 
         unsigned size() const { return nodes; }
         bool empty() const { return !root; }
+        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
         bool check() const;
 
       protected:
@@ -252,7 +254,8 @@ namespace Koala
 
         unsigned size() const { return nodes; }
         bool empty() const { return !root; }
-        bool check() const; // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
+        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
+        bool check() const;
 
       protected:
         Node* copy( Node *, Node * );

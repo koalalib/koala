@@ -5,6 +5,7 @@
 #include <ctime>
 
 #define KOALA_SET_ON_HASHSET
+//#define KOALA_SET_ON_VECTOR
 
 #include "Koala/base/defs.h"
 #include "Koala/container/joinsets.h"
@@ -235,6 +236,9 @@ double kwadrat(int arg) { return arg*arg; }
 
         cout << "\n" << iset2 << "\n";
     cout << "\n" << (iset^iset2) << "\n";
+//    iset2.clear();
+    cout << iset2.del(100);
+    cout << iset2.min();
     }
 
 

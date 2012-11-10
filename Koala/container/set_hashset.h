@@ -31,6 +31,10 @@ template< typename Element >
 template< typename Element >
     Set< Element > operator^( const Set< Element > &, const Set< Element > & );
 
+// Uwaga: w przeciwienstwie do pozostalych implementacji Seta, tutaj obrobka elementow zbioru przez metody
+// first(), last(), next(), prev(), getElements() nie musi przebiegac w kolejnosci zgodnej z porzadkiem
+// < okreslonym na typie Element
+
 template< typename Element > class Set: public Koala::HashSet< Element >, public SetElemForbidValue<Element> {
     public:
         typedef Element ElemType; // typ elementu zbioru
@@ -101,6 +105,9 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
         Element last() const;
         Element next( const Element & ) const; // zwracaja 0 gdy nie ma kolejnego elementu. Mozna podac 0, wowczas zwracaja element pierwszy/ostatni
         Element prev( const Element & ) const;
+
+        Element min() const;
+        Element max() const;
 
         void reserve(int) {}
 private:

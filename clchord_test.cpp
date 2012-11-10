@@ -92,7 +92,7 @@ using namespace std;
 	if(rv) printf("true"); else printf("false");
 	printf("\n\n-----------------------\n");
 
-//	rv = Chordal::IsCoChordal(g);
+//	rv = IsIt::cochordal(g);
 //	printf("RESULT: ");
 //	if(rv) printf("true"); else printf("false");
 //	printf("\n\n-----------------------\n");

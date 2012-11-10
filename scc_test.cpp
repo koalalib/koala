@@ -70,6 +70,8 @@ void searchTest2()
 
     g.addArc(E,H,OpisE(1)); g.addArc(G,H,OpisE(1)); //g.addArc(A,H,OpisE(1));
 
+
+//    g.addArc(E,F,OpisE(1));g.addArc(E,F,OpisE(1));g.addArc(A,B,OpisE(1));g.addArc(A,B,OpisE(1));
     U=A; V=E;
     for(int i=0;i<10;i++) {tabV[i]=0; tabE[i]=0; }
 }

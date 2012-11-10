@@ -212,7 +212,7 @@ int ListVertColoringPar<DefaultStructs>::FirstFit::operator()(
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	Set<int> avalColors = colList;
-	int maxVal = avalColors.last();
+	int maxVal = avalColors.max();
 	for(Edge ee = graph.getEdge(vert, Mask); ee;
 		ee = graph.getEdgeNext(vert, ee, Mask))
 	{
@@ -221,7 +221,7 @@ int ListVertColoringPar<DefaultStructs>::FirstFit::operator()(
 			continue;
 		avalColors.del( colorMap[u] );
 	}
-	if(avalColors.size()>0) return avalColors.first();
+	if(avalColors.size()>0) return avalColors.min();
 	else return maxVal+1;
 }
 
@@ -463,7 +463,7 @@ int ListEdgeColoringPar<DefaultStructs>::FirstFit::operator()(const Graph &graph
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
 	Set<int> avalColors = colList;
-	int maxVal = avalColors.last();
+	int maxVal = avalColors.max();
 
 	Vert vv = graph.getEdgeEnd1( edge );
 	for(Edge ee = graph.getEdge(vv, Mask); ee;
@@ -485,6 +485,6 @@ int ListEdgeColoringPar<DefaultStructs>::FirstFit::operator()(const Graph &graph
 		if(avalColors.size()<=0) return maxVal+1;
 	}
 
-	return avalColors.first();
+	return avalColors.min();
 }
 

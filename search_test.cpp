@@ -107,7 +107,7 @@ void searchTest2()
     Koala::STRATEGY::split(g,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll,vertCont);
 
 #undef STRATEGY
-#define STRATEGY DFS
+#define STRATEGY DFSPreorder
     Koala::STRATEGY::visitAllBase(g,vertCont,Visitors::EndVertVisitor(G),EdAll);
     Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll,vertCont);
     Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll);

@@ -481,11 +481,11 @@ namespace Koala
         // Podstawienie kopii drugiego grafu za dotychczasowy wierzcholek (ktory jest usuwany). Znaczenie parametrow
         // parametry podobne jak w copy
         // Zwraca pierwszy wprowadzony wierzcholek
-        template< class ExtGraph > typename GraphType::PVertex substitute( typename GraphType::PVertex, ExtGraph & );
+        template< class ExtGraph > typename GraphType::PVertex substitute( typename GraphType::PVertex, const ExtGraph & );
         template< class ExtGraph, class VChooser, class EChooser >
-            typename GraphType::PVertex substitute( PVertex, ExtGraph &, std::pair< VChooser,EChooser > );
+            typename GraphType::PVertex substitute( PVertex, const ExtGraph &, std::pair< VChooser,EChooser > );
         template< class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster >
-            typename GraphType::PVertex substitute( PVertex, ExtGraph &, std::pair< VChooser,EChooser >,
+            typename GraphType::PVertex substitute( PVertex, const ExtGraph &, std::pair< VChooser,EChooser >,
                 std::pair< VCaster,ECaster > );
         template< class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster, class VLinker,
             class ELinker > typename GraphType::PVertex substitute( typename GraphType::PVertex, ExtGraph &,

@@ -398,16 +398,6 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
     return DFSBase< SearchImpl,DefaultStructs >:: template dfsDoVisit< GraphType,VertContainer,Visitor>( params,first,0 );
 }
 
-// DFSPar
-
-template< class DefaultStructs > template< class GraphType, class VertContainer, class Visitor >
-    int DFSPar<DefaultStructs >::visitBase( const GraphType &g, typename GraphType::PVertex start, VertContainer &cont,
-        Visitor visit, EdgeDirection mask, int component )
-{
-    if (DefaultStructs::ReserveOutAssocCont) cont.reserve( g.getVertNo() );
-    return DFSBase< DFSPar<DefaultStructs >,DefaultStructs >:: template
-        dfsVisitBase< GraphType,VertContainer,Visitor >( g,start,cont,visit,mask,component );
-}
 
 // DFSPreorderPar
 
@@ -470,8 +460,10 @@ template <class DefaultStructs > template< class GraphType, class VertContainer,
     unsigned depth, n = g.getVertNo(),retVal;
     typename GraphType::PEdge e;
     typename GraphType::PVertex u, v;
-    typename GraphType::PVertex LOCALARRAY( buf,n+2 );    //TODO: size?
-    QueueInterface< typename GraphType::PVertex * > cont( buf,n + 1 );   //TODO: size?
+    //TODO: size?
+    typename GraphType::PVertex LOCALARRAY( buf,n+2 );
+    //TODO: size?
+    QueueInterface< typename GraphType::PVertex * > cont( buf,n + 1 );
 
     if (n == 0) return 0;
     if (first == NULL) first = g.getVert();
@@ -654,15 +646,15 @@ template< class DefaultStructs > template< class GraphType, class OutVertIter >
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,std::pair< int,int > >::Type
         orderData( n );
     Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< LVCNode< GraphType > > > >
-        allocat( n + 1 ); //TODO: size? - spr
-    // j.w. 2n+1 -> n + 1 - oj! raczej nie!
+        allocat( n + 1 );
+    //TODO: size? - spr, j.w. 2n+1 -> n + 1 - oj! raczej nie!
     Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 2 );
     LexVisitContainer< GraphType,Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator<
         LVCNode< GraphType > > > >,Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > >
         cont( allocat,allocat2,n );
 
     bmask &= ~EdLoop;
-    //              if(bmask & EdDirOut) bmask &= ~EdDirIn; //TODO: watpliwe
+        //TODO: watpliwe: if(bmask & EdDirOut) bmask &= ~EdDirIn;
     koalaAssert( ((bmask & Directed) == 0) || ((bmask & Directed) == Directed),AlgExcWrongMask );
 
     assert( in == n );
@@ -767,8 +759,8 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     if (DefaultStructs::ReserveOutAssocCont) visited.reserve( n );
     koalaAssert( ((mask & Directed) == 0) || ((mask & Directed) == Directed),AlgExcWrongMask );
     Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< LVCNode< GraphType > > > >
-        allocat( n + 1 ); //TODO: size? - spr
-    //TODO: size? - spr 2n+1 -> n+1 - oj! raczej nie!
+        allocat( n + 1 );
+        //TODO: size? - spr:2n+1 -> n+1 - oj! raczej nie!
     Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 2 );
     LexVisitContainer< GraphType,Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator<
         LVCNode<GraphType > > > >,Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > >
@@ -894,12 +886,15 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,VisitVertLabs< GraphType > >::Type
         vertCont( n = g.getVertNo() );
     if (DefaultStructs::ReserveOutAssocCont) compMap.reserve( n );
-    typename GraphType::PVertex LOCALARRAY( buf1,n + 1 );   //TODO: size?
-    typename GraphType::PVertex LOCALARRAY( buf2,n + 1 );   //TODO: size?
+    typename GraphType::PVertex LOCALARRAY( buf1,n + 1 );
+    //TODO: size?
+    typename GraphType::PVertex LOCALARRAY( buf2,n + 1 );
+    //TODO: size?
     SCCState< GraphType,CompIter,VertIter,CompMap > state( out,compMap,buf1,buf2,n );
     SCCVisitor< GraphType,CompIter,VertIter,CompMap > visit( state );
-    rv = DFSPar< DefaultStructs >::visitAllBase( g,vertCont,visit,EdDirOut | EdUndir );
-    if (rv < 0) return rv; // TODO: a co to za cholera???
+    rv = DFSPostorderPar< DefaultStructs >::visitAllBase( g,vertCont,visit,EdDirOut | EdUndir );
+    if (rv < 0) return rv;
+    // TODO: a co to za cholera???
     return state.count;
 }
 
@@ -1165,13 +1160,15 @@ template< class DefaultStructs > template< class GraphType, class VertDataMap, c
         vertMap.reserve( n );
         edgeMap.reserve( m );
     }
-    typename GraphType::PEdge LOCALARRAY( stbuf,m + 1 );    // TODO: size?
-    VertBlockList LOCALARRAY( vertBlockList,m * 2 + n );    // TODO: size?
+    typename GraphType::PEdge LOCALARRAY( stbuf,m + 1 );
+    // TODO: size?
+    VertBlockList LOCALARRAY( vertBlockList,m * 2 + n );
+    // TODO: size?
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap >
         state( blocks,edgeMap,mask,std::make_pair( stbuf,m + 1 ),vertBlockList,m * 2 + n );
     BiConVisitor< GraphType,CompIter,VertIter,EdgeDataMap > visit( state );
 
-    rv = DFSPar< DefaultStructs >::visitAllBase( g,visited,visit,mask );
+    rv = DFSPostorderPar< DefaultStructs >::visitAllBase( g,visited,visit,mask );
     if (rv < 0) return rv;
 
     storeBlocksData( state,vertBlockList,vertMap,vertBlocks );
@@ -1193,13 +1190,15 @@ template< class DefaultStructs > template< class GraphType, class VertDataMap, c
         vertMap.reserve( n );
         edgeMap.reserve( m );
     }
-    typename GraphType::PEdge LOCALARRAY( stbuf,m+ 1 );    // TODO: size?
-    VertBlockList LOCALARRAY( vertBlockList,m * 2 + n );    // TODO: size?
+    typename GraphType::PEdge LOCALARRAY( stbuf,m+ 1 );
+    // TODO: size?
+    VertBlockList LOCALARRAY( vertBlockList,m * 2 + n );
+    // TODO: size?
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap >
         state( blocks,edgeMap,mask,std::make_pair( stbuf,m + 1 ),vertBlockList,m * 2 + n );
     BiConVisitor< GraphType,CompIter,VertIter,EdgeDataMap > visit( state );
 
-    rv = DFSPar< DefaultStructs >::visitBase( g,u,visited,visit,mask,0 );
+    rv = DFSPostorderPar< DefaultStructs >::visitBase( g,u,visited,visit,mask,0 );
     if (rv != 0)
     {
         storeBlocksData( state,vertBlockList,vertMap,vertBlocks );
@@ -1392,7 +1391,8 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
     if (res.first == 0 || res.first != res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
-        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) ); //TODO: size? - spr
+        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
+        //TODO: size? - spr
     EulerState< GraphType > state( g,_vstk,n + m + 1,EdUndir | EdLoop );
     eulerEngine< GraphType >( res.first,NULL,state );
     eulerResult( state,out );
@@ -1406,7 +1406,8 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdDirOut | EdLoop );
     if (res.first == 0 || res.first != res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
-        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) ); //TODO: size? - spr
+        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) );
+        //TODO: size? - spr
     EulerState< GraphType > state( g,_vstk,n + m + 1,EdDirOut | EdLoop );
     eulerEngine< GraphType >( res.first,NULL,state );
     eulerResult( state,out );
@@ -1421,7 +1422,8 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
     if (res.first == 0 || res.first != res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
-        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) ); //TODO: size? - spr
+        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
+        //TODO: size? - spr
     EulerState< GraphType > state( g,_vstk,n + m + 1,EdUndir | EdLoop );
     eulerEngine< GraphType >( g.getEdge( prefstart,EdUndir | EdLoop) ? prefstart : res.first,NULL,state );
     eulerResult( state,out );
@@ -1436,7 +1438,8 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdDirOut | EdLoop );
     if (res.first == 0 || res.first != res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
-        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) ); //TODO: size? - spr
+        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) );
+        //TODO: size? - spr
     EulerState< GraphType > state( g,_vstk,n + m + 1,EdDirOut | EdLoop );
     eulerEngine< GraphType >( g.getEdge( prefstart,EdDirOut | EdLoop ) ? prefstart : res.first,NULL,state );
     eulerResult( state,out );
@@ -1450,7 +1453,8 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
     if (res.first == 0 || res.first == res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
-        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) ); //TODO: size? - spr
+        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
+        //TODO: size? - spr
     EulerState< GraphType > state( g,_vstk,n + m + 1,EdUndir | EdLoop );
     eulerEngine< GraphType >( res.first,NULL,state );
     eulerResult( state,out );
@@ -1464,7 +1468,8 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdDirOut | EdLoop );
     if (res.first == 0 || res.first == res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
-        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) ); //TODO: size? - spr
+        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) );
+        //TODO: size? - spr
     EulerState< GraphType > state( g,_vstk,n + m + 1,EdDirOut | EdLoop );
     eulerEngine< GraphType >( res.first,NULL,state );
     eulerResult( state,out );
@@ -1479,7 +1484,8 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
     if (res.first == 0 || res.first == res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
-        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) ); //TODO: size? - spr
+        LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
+        //TODO: size? - spr
     EulerState< GraphType > state( g,_vstk,n + m + 1,EdUndir | EdLoop );
     eulerEngine< GraphType >( (prefstart == res.second) ? res.second : res.first,NULL,state );
     eulerResult( state,out );
@@ -1531,7 +1537,7 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
         return Partition( compno,mpDisconnected );
     }
 
-    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected,false >::Type
+    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected >::Type
         ImageGraph;
     ImageGraph neg;
     typename ImageGraph::PVertex LOCALARRAY( tabvneg,n );
@@ -1564,8 +1570,10 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
         adjmatr( n );
     g.getAdj( adjmatr,EdUndir );
 
-    typename GraphType::PEdge LOCALARRAY( buf,g.getEdgeNo(EdUndir)+2 );    //TODO: size?
-    QueueInterface< typename GraphType::PEdge * > cont( buf,g.getEdgeNo(EdUndir)+1 );   //TODO: size?
+    typename GraphType::PEdge LOCALARRAY( buf,g.getEdgeNo(EdUndir)+2 );
+        //TODO: size?
+    QueueInterface< typename GraphType::PEdge * > cont( buf,g.getEdgeNo(EdUndir)+1 );
+        //TODO: size?
     typedef typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,int >::Type VisitTab;
     VisitTab visited( m );
 

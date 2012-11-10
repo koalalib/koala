@@ -108,7 +108,9 @@ template< typename Element > inline
 
 template< typename Element > inline
     bool Set< Element >::del( const Element &e ) {
-        return Koala::HashSet< Element >::erase( e );
+        if (this->find( e ) == this->end()) return false;
+        Koala::HashSet< Element >::erase( e );
+        return true;
     }
 
 template< typename Element > inline
@@ -254,7 +256,7 @@ template< typename Element > template< class Iter >
 template< typename Element >
     Element Set< Element >::first() const
     {   if (this->size()==0) return this->badValue();//(Element)0;
-        return *this->begin();
+        return *(this->begin());
     }
 
 template< typename Element >
@@ -285,6 +287,25 @@ template< typename Element >
         return *i;
     }
 
+template< typename Element >
+    Element Set< Element >::min() const
+    {
+        koalaAssert( this->size(),ContExcOutpass )
+        Element res = first();
+        for( Element e=next(res);!this->isBad(e) ; e=next(e))
+            res=std::min(res,e);
+        return res;
+    }
+
+template< typename Element >
+    Element Set< Element >::max() const
+    {
+        koalaAssert( this->size(),ContExcOutpass )
+        Element res = first();
+        for( Element e=next(res);!this->isBad(e) ; e=next(e))
+            res=std::max(res,e);
+        return res;
+    }
 
 template< typename Element >
 template<typename Iter>

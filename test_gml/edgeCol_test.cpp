@@ -1,3 +1,5 @@
+#define KOALA_SET_ON_HASHSET
+
 #include <iostream>
 #include "../Koala/coloring/edge.h"
 #include "../Koala/io/graphml.h"

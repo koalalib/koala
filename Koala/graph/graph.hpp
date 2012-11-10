@@ -1301,8 +1301,9 @@ template< class VertInfo, class EdgeInfo, class Settings >
 
 template< class VertInfo, class EdgeInfo, class Settings > template< class ExtGraph >
     typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-    Graph< VertInfo,EdgeInfo,Settings >::substitute( typename GraphType::PVertex vert, ExtGraph &graph )
+    Graph< VertInfo,EdgeInfo,Settings >::substitute( typename GraphType::PVertex vert, const ExtGraph &agraph )
 {
+    ExtGraph &graph = const_cast< ExtGraph & >( agraph );
     return substitute( vert,graph,std::make_pair( stdChoose( true ),stdChoose( true ) ),
         std::make_pair( stdCast( false ),stdCast( false ) ),
         std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
@@ -1312,8 +1313,9 @@ template< class VertInfo, class EdgeInfo, class Settings >
     template< class ExtGraph, class VChooser, class EChooser >
     typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
     Graph< VertInfo,EdgeInfo,Settings >::substitute( PVertex vert,
-        ExtGraph &graph, std::pair< VChooser,EChooser > choosers )
+        const ExtGraph &agraph, std::pair< VChooser,EChooser > choosers )
 {
+    ExtGraph &graph = const_cast< ExtGraph & >( agraph );
     return substitute( vert,graph,choosers,std::make_pair( stdCast( false ),stdCast( false ) ),
         std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 }
@@ -1321,9 +1323,10 @@ template< class VertInfo, class EdgeInfo, class Settings >
 template< class VertInfo, class EdgeInfo, class Settings >
     template< class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster >
     typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
-    Graph< VertInfo,EdgeInfo,Settings >::substitute( PVertex vert, ExtGraph &graph,
+    Graph< VertInfo,EdgeInfo,Settings >::substitute( PVertex vert, const ExtGraph &agraph,
         std::pair< VChooser,EChooser > choosers, std::pair< VCaster,ECaster > casters )
 {
+    ExtGraph &graph = const_cast< ExtGraph & >( agraph );
     return substitute( vert,graph,choosers,casters,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 }
 

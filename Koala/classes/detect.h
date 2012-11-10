@@ -526,8 +526,7 @@ namespace Koala
             // znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
             template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
 
-    //        TODO: template<class Graph, class AssocTab>
-    //        static int color(const Graph &g,AssocTab out);
+    //        TODO: template<class Graph, class AssocTab> static int color(const Graph &g,AssocTab out);
 
           protected:
             template< class GraphType, class Assoc > static bool cograph( const GraphType &ag, Assoc &subset );
@@ -539,6 +538,43 @@ namespace Koala
 
         // czy cograph
         template< class GraphType > static bool cograph( const GraphType &g );
+
+        // Planarne
+
+        protected:
+
+            class Planar {
+
+                public:
+
+                template <class Graph>
+                struct DFSOutput
+                {
+                    int licznik;
+                    int cflag;
+                    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,int >::Type& cycle;
+                    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,int >::Type num;
+                    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,typename Graph::PVertex >::Type father;
+
+                    DFSOutput(int n, typename DefaultStructs:: template AssocCont< typename Graph::PVertex,int >::Type & cycp)
+                    : cycle(cycp), num (n), father(n) {}
+                };
+
+                template<class Graph, class DFSOut>
+                static void dfs(typename Graph::PVertex v,typename Graph::PVertex u,const Graph &sg,DFSOut &dfso);
+
+                template <class Graph>
+                static bool bicomponentplanarity(const Graph &sg);
+            };
+
+        public:
+
+            template <class Graph>
+            static bool planar(const Graph &g);
+
+            template <class Graph>
+            static bool outerplanar(Graph &g);
+
     };
 
     // wersja dzialajaca na DefaultStructs=AlgsDefaultSettings

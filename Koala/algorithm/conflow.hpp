@@ -1240,8 +1240,9 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     koalaAssert( start != end,AlgExcWrongConn );
     if (g.getEdge( start,end,EdDirOut | EdUndir )) return -1;
     typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,
-        std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed,false >::Type Image;
+        std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed >::Type Image;
     Image ig;
+
     int n,m;
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
         std::pair< typename Image::PVertex,typename Image::PVertex > >::Type images( n = g.getVertNo() );
@@ -1250,6 +1251,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     typename Image::PEdge LOCALARRAY( icut,n );
 
     makeImage( g,ig,images );
+    ig.makeAdjMatrix();
     for( typename Image::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
         imageFlow[e].capac = (e->info.first) ? 1 : 2;
 
@@ -1269,8 +1271,9 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     const GraphType &g, VIter iter )
 {
     typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,
-        std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed,false >::Type Image;
+        std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed >::Type Image;
     Image ig;
+
     int n;
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
         std::pair< typename Image::PVertex,typename Image::PVertex> >::Type images( n = g.getVertNo() );
@@ -1280,6 +1283,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     typename Image::PEdge LOCALARRAY( bestcut,n );
 
     makeImage( g,ig,images );
+    ig.makeAdjMatrix();
     for( typename Image::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
         imageFlow[e].capac = (e->info.first) ? 1 : 2;
 
@@ -1333,7 +1337,7 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
     koalaAssert( start && end,AlgExcNullVert );
     koalaAssert( start != end,AlgExcWrongConn );
     typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,
-        std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed,false >::Type Image;
+        std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed >::Type Image;
     Image ig;
     int n,m;
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
@@ -1343,6 +1347,7 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
     int LOCALARRAY( impos, 2 * m + 2 );
 
     makeImage( g,ig,images );
+    ig.makeAdjMatrix();
     for( typename Image::PEdge e = ig.getEdge( images[start].second,images[end].first ); e;
         e = ig.getEdge( images[start].second,images[end].first ) ) ig.delEdge( e );
     for( typename Image::PEdge e = ig.getEdge( images[end].second,images[start].first ); e;
