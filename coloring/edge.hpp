@@ -393,7 +393,6 @@ void SeqEdgeColoringPar<DefaultStructs>::vizing(
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	int vertNo = vState.graph.getVertNo();
 	int degree = vState.graph.Delta(Mask);
 
 	int freeColorX; //color not incident to X; always freeColorX <= maxColor
@@ -405,11 +404,9 @@ void SeqEdgeColoringPar<DefaultStructs>::vizing(
 	Edge LOCALARRAY(fan, degree); //as in Vizing's proof (edges that are used in fan)
 	int fanLen, ii;
 
-	int idEdge = vState.edgeToList[edge];
 	Vert vertX = vState.graph.getEdgeEnd1(edge);
 	Vert vertY = vState.graph.getEdgeEnd2(edge);
 	int idVertX = vState.vertToTab[vertX];
-	int idVertY = vState.vertToTab[vertY];
 
 	for(ii=0; ii<=vState.maxColor; ii++)
 		usedColorX[ii] = NULL;
@@ -701,7 +698,6 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	int vertNo = graph.getVertNo();
 	int degree = graph.Delta(Mask);
 	int mu = graph.mu();
 	VizingState<Graph, ColorMap> vState(graph, colors, degree+mu);
