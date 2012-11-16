@@ -117,7 +117,7 @@ namespace Koala
         SubgraphBase(): parent( NULL ), next( NULL ), child( NULL )
         { }
         // przylacza sie jako obiekt podrzedny rodzica podanego obiektu
-        SubgraphBase( const SubgraphBase &x ): child( NULL ), parent( NULL ), next( NULL )
+        SubgraphBase( const SubgraphBase &x ): parent( NULL ), next( NULL ), child( NULL )
         { link( x.parent ); }
         // j.w.
         SubgraphBase &operator=( const SubgraphBase & );

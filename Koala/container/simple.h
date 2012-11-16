@@ -78,7 +78,7 @@ namespace Koala
         typedef T ElemType;
 
         // Uwaga: wymaga elementu nadmiarowego tj. bufora o jeden dluzszego, niz maksymalny rozmiar
-        QueueInterface( T *bufor, int max ): buf( bufor ), maxsize( max ), beg( 0 ), end( 0 ) { }
+        QueueInterface( T *bufor, int max ): buf( bufor ), beg( 0 ), end( 0 ), maxsize( max ) { }
 
         int size() { return (beg <= end) ? end - beg : maxsize + 1 - (beg - end); }
         bool empty() { return beg == end; }

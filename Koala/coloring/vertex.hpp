@@ -257,7 +257,6 @@ int SeqVertColoringPar<DefaultStructs>::slSort(const Graph &graph,
 	}
 
 	VInOutIter cur = beg+lenVerts;
-	int iVerts = lenVerts;
 	while(priQueue.size()>0) {
 		SlStruct t = priQueue.top();
 		priQueue.pop();
@@ -381,7 +380,7 @@ void SeqVertColoringPar<DefaultStructs>::brooksBiconnected(
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	typedef std::pair<Vert, Vert> VertPair;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
 	typedef typename DefaultStructs::template
 		LocalGraph<int, Koala::EmptyEdgeInfo, Undirected>::Type Subgraph;
@@ -459,7 +458,7 @@ void SeqVertColoringPar<DefaultStructs>::brooksBiconnected(
 			continue; //next subgraph
 		}
 
-		VertSub vX, vA, vB; //description below
+		VertSub vX=NULL, vA=NULL, vB=NULL; //description below
 		if(minDeg==2 && maxDeg==2) {
 			//cycle graph coloring or K_{1,1,n-2}
 			EdgeSub ee = subgraph.getEdge(maxVert);
@@ -839,7 +838,7 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::lf(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int lenVerts = 0;
 	Vert LOCALARRAY(verts, graph.getVertNo());
 
@@ -858,7 +857,7 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int lenVerts = 0;
 	Vert LOCALARRAY(verts, graph.getVertNo());
 
@@ -878,7 +877,7 @@ int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph,
 	ColorMap &colors, int maxCol)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int lenVerts = 0;
 	Vert LOCALARRAY(verts, graph.getVertNo());
 
@@ -898,7 +897,7 @@ int SeqVertColoringPar<DefaultStructs>::lf(const Graph &graph, ColorMap &colors,
 	VInIter beg, VInIter end)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -921,7 +920,7 @@ int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph, ColorMap &co
 	VInIter beg, VInIter end)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -944,7 +943,7 @@ int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph, ColorMap &co
 	VInIter beg, VInIter end, int maxCol)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -995,7 +994,7 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::sl(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int lenVerts = 0;
 	Vert LOCALARRAY(verts, graph.getVertNo());
 
@@ -1015,7 +1014,7 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int lenVerts = 0;
 	Vert LOCALARRAY(verts, graph.getVertNo());
 
@@ -1036,7 +1035,7 @@ int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph,
 	ColorMap &colors, int maxCol)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int lenVerts = 0;
 	Vert LOCALARRAY(verts, graph.getVertNo());
 
@@ -1057,7 +1056,7 @@ int SeqVertColoringPar<DefaultStructs>::sl(const Graph &graph, ColorMap &colors,
 	VInIter beg, VInIter end)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -1081,7 +1080,7 @@ int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph,
 	ColorMap &colors, VInIter beg, VInIter end)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -1105,7 +1104,7 @@ int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph,
 	ColorMap &colors, VInIter beg, VInIter end, int maxCol)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -1127,7 +1126,7 @@ template < typename Graph, typename VInIter, typename VOutIter>
 int SeqVertColoringPar<DefaultStructs>::slSort(const Graph &graph,
 	VInIter beg, VInIter end, VOutIter out)
 {
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 
@@ -1152,7 +1151,7 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::slf(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int lenVerts = 0;
 	Vert LOCALARRAY(verts, graph.getVertNo());
 
@@ -1171,7 +1170,7 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int lenVerts = 0;
 	Vert LOCALARRAY(verts, graph.getVertNo());
 
@@ -1191,7 +1190,7 @@ int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph,
 	ColorMap &colors, int maxCol)
 {
 	typedef typename Graph::PVertex Vert;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int lenVerts = 0;
 	Vert LOCALARRAY(verts, graph.getVertNo());
 
@@ -1464,8 +1463,6 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
-	int lenVerts = graph.getVertNo();
-
 	typedef typename DefaultStructs::template
 		LocalGraph<Vert, Koala::EmptyEdgeInfo, Undirected>::Type Subgraph;
 	typedef typename Subgraph::PVertex VertSub;
@@ -1481,7 +1478,7 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 		VertSub uu = subgraph.addVert(vv);
 		map[vv] = uu;
 	}
-    subgraph.makeAdjMatrix();
+	subgraph.makeAdjMatrix();
 	for(Edge ee = graph.getEdge(Mask); ee;
 		ee = graph.getEdgeNext(ee, Mask))
 	{
@@ -1530,8 +1527,6 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-
-	int lenVerts = graph.getVertNo();
 
 	typedef Koala::Graph<Vert, Koala::EmptyEdgeInfo> Subgraph;
 	typedef typename Subgraph::PVertex VertSub;

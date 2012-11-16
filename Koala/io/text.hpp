@@ -15,8 +15,8 @@ class OperTest {
     int tab[5];
     OperTest() {}
 
-    OperTest(std::ostream& os) {}
-    OperTest(std::istream& os) {}
+    OperTest(std::ostream& os) { UNUSED(os); }
+    OperTest(std::istream& os) { UNUSED(os); }
 };
 
 

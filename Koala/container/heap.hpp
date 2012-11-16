@@ -572,7 +572,7 @@ template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compar
     }
 
     Node *LOCALARRAY( _degrees,(sizeof( unsigned ) << 3) );
-    for( int i = 0; i <(sizeof( unsigned ) << 3); i++ ) _degrees[i] = 0;
+    for( unsigned i = 0; i <(sizeof( unsigned ) << 3); i++ ) _degrees[i] = 0;
     Node **degrees = _degrees, *C;
     unsigned degree_max = 0, degree = 0;
     for( A = root->next, B = A->next; A != root; degrees[degree] = A, A = B, B = A->next )

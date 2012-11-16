@@ -215,6 +215,7 @@ template< class T > SearchStructs::CompStore< std::back_insert_iterator< std::ve
 template< class VertIter > template< class GraphType > bool Visitors::StoreTargetToVertIter< VertIter >::operator()(
     const GraphType &g, typename GraphType::PVertex u, VisitVertLabs< GraphType > &r )
 {
+    UNUSED(g); UNUSED(r);
     *m_iter = u;
     ++m_iter;
     return true;
@@ -231,6 +232,7 @@ template< class CompIter, class VertIter > template< class GraphType > bool
     Visitors::StoreCompVisitor< CompIter,VertIter >::operator()( const GraphType &g, typename GraphType::PVertex u,
     VisitVertLabs< GraphType > &r )
 {
+    UNUSED(g); UNUSED(r);
     *(m_st.iters.vertIter) = u;
     ++(m_st.iters.vertIter);
     ++(m_st.p);
@@ -240,6 +242,7 @@ template< class CompIter, class VertIter > template< class GraphType > bool
 template< class CompIter, class VertIter > template< class GraphType > bool
     Visitors::StoreCompVisitor< CompIter,VertIter >::endComponent( const GraphType &g, unsigned u )
 {
+    UNUSED(g); UNUSED(u);
     *(m_st.iters.compIter) = m_st.p;
     ++(m_st.iters.compIter);
     return true;
@@ -1300,10 +1303,11 @@ template< class DefaultStructs > template< class GraphType >
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
         if (!dir)
         {
-            if (g.deg( v,symmask ) & 1)
+            if (g.deg( v,symmask ) & 1) {
                 if (res.first == 0) res.first = v;
                 else if (res.second == 0) res.second = v;
                 else return zero;
+            }
         }
         else
             switch (g.deg( v,EdDirOut ) - g.deg( v,EdDirIn ))

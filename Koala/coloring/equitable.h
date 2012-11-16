@@ -3,10 +3,9 @@
 
 #include "../base/defs.h"
 #include "../graph/view.h"
+#include "../algorithm/search.h"
 #include "vertex.h"
 #include "edge.h"
-#include <map>
-#include "../io/text.h"
 
 namespace Koala {
 
