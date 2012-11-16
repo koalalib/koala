@@ -240,13 +240,11 @@ void SeqEdgeColoringPar<DefaultStructs>::vizingSimple(
 
 	int degree = vState.graph.Delta(Mask);
 	//now graph is partial colored, now we can use Vizing algorithm
-	int idEdge;
 	int LOCALARRAY(tmpTab, vState.notColored);
 	Edge LOCALARRAY(colorsToEdge1, vState.notColored);
 	Edge LOCALARRAY(colorsToEdge2, vState.notColored);
 	Edge LOCALARRAY(fan, degree); //as in Vizing's proof (colors that are used in fan)
 
-	idEdge = vState.edgeToList[edge];
 	Vert vert1 = vState.graph.getEdgeEnd1(edge);
 	Vert vert2 = vState.graph.getEdgeEnd2(edge);
 	int idVert1 = vState.vertToTab[vert1];
@@ -724,7 +722,6 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	int vertNo = graph.getVertNo();
 	int degree = graph.Delta(Mask);
 	int mu = graph.mu();
 	VizingState<Graph, ColorMap> vState(graph, colors, degree+mu);
@@ -747,7 +744,6 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	int vertNo = graph.getVertNo();
 	int degree = graph.Delta(Mask);
 	int mu = graph.mu();
 	VizingState<Graph, ColorMap> vState(graph, colors, degree+mu);

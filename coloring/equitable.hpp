@@ -125,7 +125,7 @@ repairSubgraph(const Graph &graph, ColorMap &colors)
 		} else {
 			curCompId = 0;
 
-			compNo = BFS::split(
+			compNo = BFSPar<DefaultStructs>::split(
 				makeSubgraph(
 					graph,
 					std::make_pair(
@@ -180,7 +180,7 @@ int EquitVertColoringPar<DefaultStructs>::test(const Graph &graph, const ColorMa
 {
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
-	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
 	if( !SeqVertColoring::test(graph, colors) )
 		return -1;

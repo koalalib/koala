@@ -158,9 +158,9 @@ namespace Koala
 
       public:
         inline FibonHeap( const Compare &function = Compare() ):
-            root( 0 ), nodes( 0 ), allocator( 0 ), function( function ) { }
+            root( 0 ), nodes( 0 ), function( function ), allocator( 0 ) { }
         inline FibonHeap( Allocator *all, const Compare &function = Compare() ):
-            root( 0 ), nodes( 0 ), allocator( all ), function( function ) { }
+            root( 0 ), nodes( 0 ), function( function ), allocator( all ) { }
         inline FibonHeap( const FibonHeap< Key,Compare,Allocator > & );
         FibonHeap& operator=( const FibonHeap< Key,Compare,Allocator > &X );
         ~FibonHeap() { clear(); }

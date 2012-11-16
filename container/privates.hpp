@@ -89,7 +89,7 @@ template< class Element, class Container > void BlockList< Element,Container >::
 // BlockListAllocator
 
 template< class Element > void BlockListAllocator< Element >::dealloc( Element* ptr )
-{   
+{
     if (!ptr) return;
     int pos = (((char *)ptr) - ((char *)wsk)) / sizeof( BlockOfBlockList< Element > );
     assert( manager->ready( pos ) );
@@ -97,7 +97,7 @@ template< class Element > void BlockListAllocator< Element >::dealloc( Element* 
 }
 
 template< class Element > BlockListAllocator< Element >::BlockListAllocator( int n )
-{   
+{
     wsk = new BlockOfBlockList< Element >[n];
     manager = new BlockList< Element,VectorInterface< BlockOfBlockList< Element > * > >( wsk,n );
 }
@@ -109,21 +109,21 @@ template< class Element > BlockListAllocator< Element >::~BlockListAllocator()
 }
 
 template< class Element > template< class U > U *BlockListAllocator< Element >::allocate()
-{ 
-    TestEqTypes< U,Element > x;
+{
+    TestEqTypes< U,Element > x; UNUSED(x);
     return alloc();
 }
 
 template< class Element > template< class U > void BlockListAllocator< Element >::deallocate( U *p )
-{ 
-    TestEqTypes< U,Element > x;
+{
+    TestEqTypes< U,Element > x; UNUSED(x);
     dealloc( p );
 }
 
 // List_iterator
 
-template< class T > List_iterator< T > &List_iterator< T >::operator=( const List_iterator &i ) 
-{ 
+template< class T > List_iterator< T > &List_iterator< T >::operator=( const List_iterator &i )
+{
     ptr = i.ptr;
     return *this;
 }
@@ -134,13 +134,13 @@ template< class T > List_iterator< T > &List_iterator< T >::operator++()
     return *this;
 }
 
-template< class T > List_iterator< T > &List_iterator< T >::operator--() 
+template< class T > List_iterator< T > &List_iterator< T >::operator--()
 {
     ptr = ptr->prev;
     return *this;
 }
 
-template< class T > List_iterator< T > List_iterator< T >::operator++( int ) 
+template< class T > List_iterator< T > List_iterator< T >::operator++( int )
 {
     List_iterator it;
     it = *this;
@@ -148,7 +148,7 @@ template< class T > List_iterator< T > List_iterator< T >::operator++( int )
     return it;
 }
 
-template< class T > List_iterator< T > List_iterator< T >::operator--( int ) 
+template< class T > List_iterator< T > List_iterator< T >::operator--( int )
 {
     List_iterator it;
     it = *this;
@@ -159,8 +159,8 @@ template< class T > List_iterator< T > List_iterator< T >::operator--( int )
 // List_const_iterator
 
 template< class T > List_const_iterator< T > &List_const_iterator< T >::operator=( const List_const_iterator &i )
-{ 
-    ptr = i.ptr; 
+{
+    ptr = i.ptr;
     return *this;
 }
 
@@ -196,25 +196,25 @@ template< class T > List_const_iterator< T > List_const_iterator< T >::operator-
 
 template< class T, class Allocator > List< T,Allocator >::List( const List &lst ):
     allocator( lst.allocator )
-{ 
+{
     Zero();
     *this = lst;
 }
 
-template< class T, class Allocator > void List< T,Allocator >::move_before( iterator pos, iterator elem ) 
+template< class T, class Allocator > void List< T,Allocator >::move_before( iterator pos, iterator elem )
 {
     _unlink( elem.ptr );
     _link_before( pos.ptr,elem.ptr );
 }
 
-template< class T, class Allocator > void List< T,Allocator >::move_after( iterator pos, iterator elem ) 
+template< class T, class Allocator > void List< T,Allocator >::move_after( iterator pos, iterator elem )
 {
     _unlink( elem.ptr );
     _link_after( pos.ptr,elem.ptr );
 };
 
 template< class T, class Allocator > template< class Alloc >
-    void List< T,Allocator >::copy( const List< T,Alloc > &lst ) 
+    void List< T,Allocator >::copy( const List< T,Alloc > &lst )
 {
     const_iterator it,e;
     if (this == (List*)(&lst)) return;
@@ -223,7 +223,7 @@ template< class T, class Allocator > template< class Alloc >
 }
 
 template< class T, class Allocator >  List< T,Allocator >
-    &List< T,Allocator >::operator=( const List< T,Allocator > &lst ) 
+    &List< T,Allocator >::operator=( const List< T,Allocator > &lst )
 {
     const_iterator it, e;
     if (this == &lst) return *this;
@@ -270,9 +270,9 @@ template< class T, class Allocator > void List< T,Allocator >::sort()
     }
     a = b = m_root.next;
     i = m_count / 2;
-    while (i) 
-    { 
-        b = b->next; 
+    while (i)
+    {
+        b = b->next;
         i--;
     }
     a = b->prev;
@@ -287,15 +287,15 @@ template< class T, class Allocator > void List< T,Allocator >::sort()
     merge( other );
 }
 
-template< class T, class Allocator > void List< T,Allocator >::merge( List &o ) 
+template< class T, class Allocator > void List< T,Allocator >::merge( List &o )
 {
     ListNode< T > *a,*b,*e,*ae,*be;
     if (&o == this) return;
     if (o.empty()) return;
-    if (empty()) 
-    { 
-        swap( o ); 
-        return; 
+    if (empty())
+    {
+        swap( o );
+        return;
     }
     a = m_root.next;
     b = o.m_root.next;
@@ -306,16 +306,16 @@ template< class T, class Allocator > void List< T,Allocator >::merge( List &o )
         m_root.next = e = a;
         a->prev = (ListNode< T > *)&m_root;
         a = a->next;
-    } 
-    else 
+    }
+    else
     {
         m_root.next = e = b;
         b->prev = (ListNode< T > *)&m_root;
         b = b->next;
     }
     if (a != ae && b != be)
-    {        
-        while (true) 
+    {
+        while (true)
         {
             if (a->elem < b->elem)
             {
@@ -340,8 +340,8 @@ template< class T, class Allocator > void List< T,Allocator >::merge( List &o )
         b->prev = e;
         m_root.prev = o.m_root.prev;
         o.m_root.prev->next = (ListNode< T > *)&m_root;
-    } 
-    else 
+    }
+    else
     {
         e->next = a;
         a->prev = e;
@@ -351,7 +351,7 @@ template< class T, class Allocator > void List< T,Allocator >::merge( List &o )
 }
 
 template< class T, class Allocator > List< T,Allocator >::List( ListNode< T > *n, ListNode< T > *p, size_t c,
-    Allocator *a): allocator( a ) 
+    Allocator *a): allocator( a )
 {
     m_root.next = n;
     m_root.prev = p;
@@ -367,10 +367,10 @@ template< class T, class Allocator > void List< T,Allocator >::Zero()
     m_count = 0;
 }
 
-template< class T, class Allocator > ListNode< T > *List< T,Allocator >::_find( const T &v ) 
+template< class T, class Allocator > ListNode< T > *List< T,Allocator >::_find( const T &v )
 {
     ListNode< T > *n = m_root.next;
-    while (n != NULL) 
+    while (n != NULL)
     {
         if (n->elem == v) break;
         n = n->next;
@@ -378,7 +378,7 @@ template< class T, class Allocator > ListNode< T > *List< T,Allocator >::_find( 
     return n;
 }
 
-template< class T, class Allocator > void List< T,Allocator >::_link_before( ListNode< T > *ptr, ListNode< T > *p ) 
+template< class T, class Allocator > void List< T,Allocator >::_link_before( ListNode< T > *ptr, ListNode< T > *p )
 {
     p->next = ptr;
     p->prev = ptr->prev;
@@ -386,7 +386,7 @@ template< class T, class Allocator > void List< T,Allocator >::_link_before( Lis
     p->prev->next = p;
 }
 
-template< class T, class Allocator > void List< T,Allocator >::_link_after( ListNode< T > *ptr, ListNode< T > *p ) 
+template< class T, class Allocator > void List< T,Allocator >::_link_after( ListNode< T > *ptr, ListNode< T > *p )
 {
     p->next = ptr->next;
     p->prev = ptr;
@@ -394,13 +394,13 @@ template< class T, class Allocator > void List< T,Allocator >::_link_after( List
     p->prev->next = p;
 }
 
-template< class T, class Allocator > void List< T,Allocator >::_unlink( ListNode< T > *p ) 
+template< class T, class Allocator > void List< T,Allocator >::_unlink( ListNode< T > *p )
 {
     p->prev->next = p->next;
     p->next->prev = p->prev;
 }
 
-template< class T, class Allocator > ListNode< T > *List< T,Allocator >::_insert_before( ListNode< T > *ptr, const T &v ) 
+template< class T, class Allocator > ListNode< T > *List< T,Allocator >::_insert_before( ListNode< T > *ptr, const T &v )
 {
     ListNode< T > *p = NewElem();
     if (p == NULL) return NULL;
@@ -410,7 +410,7 @@ template< class T, class Allocator > ListNode< T > *List< T,Allocator >::_insert
     return p;
 }
 
-template< class T, class Allocator > ListNode< T > *List< T,Allocator >::_insert_after( ListNode< T > *ptr, const T &v ) 
+template< class T, class Allocator > ListNode< T > *List< T,Allocator >::_insert_after( ListNode< T > *ptr, const T &v )
 {
     ListNode< T > *p = NewElem();
     if (p == NULL) return NULL;
@@ -420,7 +420,7 @@ template< class T, class Allocator > ListNode< T > *List< T,Allocator >::_insert
     return p;
 }
 
-template< class T, class Allocator > void List< T,Allocator >::_erase( ListNode< T > *p ) 
+template< class T, class Allocator > void List< T,Allocator >::_erase( ListNode< T > *p )
 {
     if (empty()) return;
     if (p == (ListNode< T > *)&m_root) return;
@@ -435,7 +435,7 @@ template< class T, class Allocator > std::ostream &operator <<( std::ostream &st
     strm << "[";
     b = lst.begin();
     e = lst.end();
-    for( it = b; it != e; ++it ) 
+    for( it = b; it != e; ++it )
     {
         if (it != b) strm << ", ";
         else strm << " ";

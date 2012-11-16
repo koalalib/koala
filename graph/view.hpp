@@ -2,14 +2,14 @@
 
 template< class Graph, class VChooser, class EChooser >
     Subgraph< Graph,VChooser,EChooser >::Subgraph( const Graph &g, std::pair< VChooser,EChooser > chs ):
-    vchoose( chs.first ), echoose( chs.second ), SubgraphBase()
+    SubgraphBase(), vchoose( chs.first ), echoose( chs.second )
 {
     SubgraphBase::link( &g );
 }
 
 template< class Graph, class VChooser, class EChooser >
     Subgraph< Graph,VChooser,EChooser >::Subgraph( std::pair< VChooser,EChooser > chs ):
-    vchoose( chs.first ), echoose( chs.second ), SubgraphBase()
+    SubgraphBase(), vchoose( chs.first ), echoose( chs.second )
 {}
 
 template< class Graph, class VChooser, class EChooser >
@@ -87,7 +87,7 @@ template< class Graph, class VChooser, class EChooser > typename Subgraph< Graph
 
 template< class Graph, class VChooser, class EChooser >
     int Subgraph< Graph,VChooser,EChooser >::getVertNo( ) const
-{   
+{
     bool b;
     if (isBoolChooser(vchoose,b))
         if (b) return up().getVertNo();
@@ -98,7 +98,7 @@ template< class Graph, class VChooser, class EChooser >
 
 template< class Graph, class VChooser, class EChooser >
     int Subgraph< Graph,VChooser,EChooser >::getEdgeNo( EdgeDirection mask ) const
-{   
+{
     bool bv,be;
     EdgeType amask;
     if (isBoolChooser(vchoose,bv) && isBoolChooser(echoose,be))
@@ -123,7 +123,7 @@ template< class Graph, class VChooser, class EChooser > typename Subgraph< Graph
 
 template< class Graph, class VChooser, class EChooser >
     int Subgraph< Graph,VChooser,EChooser >::getEdgeNo( PVertex vert, EdgeDirection mask ) const
-{   
+{
     bool bv,be;
     EdgeType amask;
     if (isBoolChooser(vchoose,bv) && isBoolChooser(echoose,be))
@@ -159,7 +159,7 @@ template< class Graph, class VChooser, class EChooser > typename Subgraph< Graph
 
 template< class Graph, class VChooser, class EChooser >
     int Subgraph< Graph,VChooser,EChooser >::getEdgeNo( PVertex vert1, PVertex vert2, EdgeDirection mask ) const
-{   
+{
     bool bv,be;
     EdgeType amask;
     if (isBoolChooser(vchoose,bv) && isBoolChooser(echoose,be))
@@ -199,36 +199,36 @@ template< class Graph, class VChooser, class EChooser >
 
 template< class Graph, class VChooser, class EChooser >
     bool Subgraph< Graph,VChooser,EChooser >::isEdgeTypeChooser( const EdgeTypeChooser &x, Koala::EdgeDirection &val )
-{ 
+{
     val = x.mask;
-    return true; 
+    return true;
 }
 
 template< class Graph, class VChooser, class EChooser >
     bool Subgraph< Graph,VChooser,EChooser >::isBoolChooser( const BoolChooser &x, bool &val )
-{ 
-    val = x.val; 
+{
+    val = x.val;
     return true;
-} 
+}
 
 // UndirView
 
 template< class Graph > const typename UndirView< Graph >::ParentGrType &UndirView< Graph >::up() const
-{ 
-    const typename UndirView< Graph >::ParentGrType *res = getParentPtr(); 
+{
+    const typename UndirView< Graph >::ParentGrType *res = getParentPtr();
     koalaAssert( res,GraphExc );
-    return *res; 
+    return *res;
 }
 
 template< class Graph > const typename UndirView< Graph >::RootGrType &UndirView< Graph >::root() const
-{ 
-    const typename UndirView< Graph >::RootGrType *res = getRootPtr(); 
-    koalaAssert( res,GraphExc ); 
+{
+    const typename UndirView< Graph >::RootGrType *res = getRootPtr();
+    koalaAssert( res,GraphExc );
     return *res;
 }
 
 template< class Graph > EdgeDirection UndirView< Graph >::getEdgeDir( PEdge edge, PVertex v ) const
-{ 
+{
     EdgeDirection dir = up().getEdgeDir( edge,v );
     return (dir == EdNone || dir == EdLoop) ? dir : EdUndir;
 }
@@ -236,24 +236,24 @@ template< class Graph > EdgeDirection UndirView< Graph >::getEdgeDir( PEdge edge
 // RevView
 
 template< class Graph > const typename RevView< Graph >::ParentGrType &RevView< Graph >::up() const
-{ 
+{
     const typename RevView< Graph >::ParentGrType *res = getParentPtr();
-    koalaAssert( res,GraphExc ); 
-    return *res; 
+    koalaAssert( res,GraphExc );
+    return *res;
 }
 template< class Graph > const typename RevView< Graph >::RootGrType &RevView< Graph >::root() const
-{ 
-    const RevView< Graph >::RootGrType *res = getRootPtr(); 
-    koalaAssert( res,GraphExc ); 
-    return *res; 
+{
+    const RevView< Graph >::RootGrType *res = getRootPtr();
+    koalaAssert( res,GraphExc );
+    return *res;
 }
 
 template< class Graph > std::pair< typename RevView< Graph >::PVertex,typename RevView< Graph >::PVertex >
     RevView< Graph >::getEdgeEnds( PEdge edge ) const
-{   
+{
     std::pair< typename RevView< Graph >::PVertex,typename RevView< Graph >::PVertex > res = up().getEdgeEnds( edge );
     switch (up().getEdgeType( edge ))
-    {   
+    {
         case EdNone:
         case Loop:
         case Undirected: return res;
@@ -262,10 +262,10 @@ template< class Graph > std::pair< typename RevView< Graph >::PVertex,typename R
 }
 
 template< class Graph > typename RevView< Graph >::PVertex RevView< Graph >::getEdgeEnd1( PEdge edge ) const
-{   
+{
     std::pair< typename RevView< Graph >::PVertex,typename RevView< Graph >::PVertex > res = up().getEdgeEnds( edge );
     switch (up().getEdgeType( edge ))
-    {   
+    {
         case EdNone:
         case Loop:
         case Undirected: return res.first;
@@ -274,10 +274,10 @@ template< class Graph > typename RevView< Graph >::PVertex RevView< Graph >::get
 }
 
 template< class Graph > typename RevView< Graph >::PVertex RevView< Graph >::getEdgeEnd2( PEdge edge ) const
-{   
+{
     std::pair< typename RevView< Graph >::PVertex,typename RevView< Graph >::PVertex > res = up().getEdgeEnds( edge );
     switch (up().getEdgeType( edge ))
-    {   
+    {
         case EdNone:
         case Loop:
         case Undirected : return res.second;
@@ -286,7 +286,7 @@ template< class Graph > typename RevView< Graph >::PVertex RevView< Graph >::get
 }
 
 template< class Graph > EdgeDirection RevView< Graph >::getEdgeDir( PEdge edge, PVertex v ) const
-{   
+{
     EdgeDirection dir = up().getEdgeDir( edge,v );
     switch (dir)
     {
@@ -297,7 +297,7 @@ template< class Graph > EdgeDirection RevView< Graph >::getEdgeDir( PEdge edge, 
 }
 
 template< class Graph > EdgeDirection RevView< Graph >::transl( EdgeDirection mask )
-{   
+{
     EdgeDirection dirmask = mask & Directed;
     switch (dirmask)
     {
@@ -306,7 +306,7 @@ template< class Graph > EdgeDirection RevView< Graph >::transl( EdgeDirection ma
         case EdDirIn:
             dirmask = EdDirOut;
             break;
-        case EdDirOut: 
+        case EdDirOut:
             dirmask = EdDirIn;
             break;
     }
@@ -314,7 +314,7 @@ template< class Graph > EdgeDirection RevView< Graph >::transl( EdgeDirection ma
 }
 
 template< class Graph > EdgeDirection RevView< Graph >::nextDir( EdgeDirection dir )
-{   
+{
     switch (dir)
     {
         case EdLoop: return EdUndir;

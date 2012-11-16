@@ -60,7 +60,6 @@ int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
 	typename DefaultStructs::template
 		AssocCont<Vert, int>::Type vertId(graph.getVertNo());
 
-	VIter cur = beg;
 	int lenVertTab = 0;
 	for(VIter cur = beg; cur!=end; ++cur)
 		vertId[*cur] = lenVertTab++;
@@ -231,7 +230,6 @@ int IntervalVertColoringPar<DefaultStructs>::maxColor(
 		const Graph &graph, const ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
-	Vert vv = graph.getVert();
 	int maxCol = 0;
 	for(Vert vv = graph.getVert(); vv;
 		vv = graph.getVertNext(vv))
@@ -338,7 +336,6 @@ int IntervalEdgeColoringPar<DefaultStructs>::hf(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	std::pair<int, Edge> LOCALARRAY(edgeTab, graph.getEdgeNo(Mask));
-	EIter cur = beg;
 	int lenEdgeTab = 0;
 	for(EIter cur = beg; cur!=end; ++cur)
 		edgeTab[lenEdgeTab++] = std::make_pair( weights[*cur], *cur );
@@ -391,7 +388,6 @@ int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 	typename DefaultStructs::template
 		AssocCont<Edge, int>::Type edgeId(graph.getEdgeNo(Mask));
 
-	EIter cur = beg;
 	int lenEdgeTab = 0;
 	for(EIter cur = beg; cur!=end; ++cur)
 		edgeId[*cur] = lenEdgeTab++;
@@ -647,8 +643,8 @@ int IntervalEdgeColoringPar<DefaultStructs>::getWDegs(
 	int max = 0;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		int tmp = 0;
-		for(Edge ee = graph.getEdge(vv); ee;
-			ee = graph.getEdgeNext(vv, ee))
+		for(Edge ee = graph.getEdge(vv, Mask); ee;
+			ee = graph.getEdgeNext(vv, ee, Mask))
 		{
 			tmp += weights[ee];
 		}

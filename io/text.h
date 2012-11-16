@@ -223,7 +223,7 @@ bool writeGraphText(const Graph &g, std::string &out, int format)
 {
     Privates::EmptyMap2 em;
     writeGraphText(g,out,format,em,em);
-
+    //TODO: no return!!
 }
 
 template<class Graph,class VMap, class EMap>

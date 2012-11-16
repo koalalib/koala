@@ -9,10 +9,7 @@
 
 #include "../base/defs.h"
 #include "../graph/view.h"
-#include "../container/heap.h"
 #include "../algorithm/search.h"
-#include <algorithm>
-#include <cassert>
 
 namespace Koala {
 

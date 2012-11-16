@@ -2,7 +2,7 @@
 #define KOALA_PRIVATE_STRUCTS
 
 /* privates.h
- * 
+ *
  */
 
 #include <map>
@@ -15,6 +15,11 @@
 #include "localarray.h"
 #include "simple.h"
 
+#ifndef UNUSED
+#define UNUSED(x) ((void)(x))
+#endif
+
+
 namespace Koala
 {
     template< class Container > class VectorInterface;
@@ -22,7 +27,7 @@ namespace Koala
     namespace Privates
     {
         /* BlockOfBlockList
-         * 
+         *
          */
         template< class Element > struct BlockOfBlockList
         {
@@ -33,7 +38,7 @@ namespace Koala
 
         template< class T > class BlockListVectInerfTest { };
         template< class T > class BlockListVectInerfTest< VectorInterface< T > >
-        {   
+        {
           public:
             BlockListVectInerfTest( bool ) { }
           private:
@@ -65,8 +70,8 @@ namespace Koala
             // BlockList moze tez dzialac na dostarczonej z zewnatrz tablicy ustalonego rozmiaru, na ktorej operuje wowczas
             // poprzez VectorInterface, wylapujac bledy ew. przepelnienia
             BlockList( BlockOfBlockList< Element > *wsk, int asize ):
-                cont( wsk,asize ), siz( 0 ), first( -1 ), last( -1 ), ffree( -1 ),
-                Privates::BlockListVectInerfTest< Container >( true ) { cont.clear(); }
+                Privates::BlockListVectInerfTest< Container >( true ),
+                siz( 0 ), first( -1 ), last( -1 ), ffree( -1 ), cont( wsk,asize ) { cont.clear(); }
 
             bool ready( int pos ) { return pos >= 0 && pos < cont.size() && cont[pos].prev != -2; }
             void clear();
@@ -84,7 +89,7 @@ namespace Koala
             void delPos( int );
             void defrag();
             bool test();
-        };  
+        };
 
         /* DefaultCPPAllocator
          * Domyslny alokator pamieci uzywajacy new

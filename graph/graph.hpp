@@ -72,12 +72,12 @@ bool SubgraphBase::link(const SubgraphBase *wsk )
 // Graph
 
 template< class VertInfo, class EdgeInfo, class Settings > Graph< VertInfo,EdgeInfo,Settings >::Graph():
-    first_vert( NULL ), last_vert( NULL ), first_edge( NULL ), last_edge( NULL ), no_vert( 0 ), pAdj( NULL ),
-    SubgraphBase() { }
+    SubgraphBase(), pAdj( NULL ), first_vert( NULL ), last_vert( NULL ),
+    first_edge( NULL ), last_edge( NULL ), no_vert( 0 ) { }
 
 template< class VertInfo, class EdgeInfo, class Settings > Graph< VertInfo,EdgeInfo,Settings >::Graph( const Graph &graph ):
-    first_vert( NULL ), last_vert( NULL ), first_edge( NULL ), last_edge( NULL ), no_vert( 0 ), pAdj( NULL ),
-    SubgraphBase()
+    SubgraphBase(), pAdj( NULL ), first_vert( NULL ), last_vert( NULL ),
+    first_edge( NULL ), last_edge( NULL ), no_vert( 0 )
 {
     this->copy( graph );
 }

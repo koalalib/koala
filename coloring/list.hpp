@@ -6,6 +6,7 @@ bool ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 {
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
+	//'(ChV) (const Koala::Graph<int, int>&, Koala::Set<int>, Koala::AssocArray<Koala::Vertex<int, int, Koala::GrDefaultSettings<15u, true> >*, int>&, Koala::GraphInternalTypes<Koala::Graph<int, int> >::Vertex*&)'|
 	int res = chooser(graph, colLists[vert], colors, vert);
 	if(res<0 || !colLists[vert].isElement(res))
 		return false;
@@ -408,7 +409,7 @@ std::pair<int,int> ListEdgeColoringPar<DefaultStructs>::listMinMax(
 		if(min>tmp) min = tmp;
 		tmp = colLists[ee].last();
 		if(max<tmp) max = tmp;
-		ee = graph.getVertNext(ee, Mask);
+		ee = graph.getEdgeNext(ee, Mask);
 	}
 	return std::make_pair(min, max);
 }
