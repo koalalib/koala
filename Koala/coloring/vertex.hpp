@@ -335,7 +335,7 @@ biconnected(int bVert, int bEdge) {
 template <class DefaultStructs>
 template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::brooks(
-	typename SeqVertColoringPar<DefaultStructs>::template BrooksState<Graph, ColorMap> &bState,
+	BrooksState<Graph, ColorMap> &bState,
 	typename Graph::PVertex vert, int depth)
 {
 	typedef typename Graph::PVertex Vert;
@@ -375,7 +375,7 @@ int SeqVertColoringPar<DefaultStructs>::brooks(
 template <class DefaultStructs>
 template<typename Graph, typename ColorMap>
 void SeqVertColoringPar<DefaultStructs>::brooksBiconnected(
-	typename SeqVertColoringPar<DefaultStructs>::template BrooksState<Graph, ColorMap> &bState)
+	BrooksState<Graph, ColorMap> &bState)
 {
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
@@ -1539,6 +1539,7 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	Map map(graph.getVertNo());
 
 	for(;beg!=end; ++beg) {
+		if( map.hasKey(*beg) ) continue;
 		VertSub uu = subgraph.addVert(*beg);
 		map[*beg] = uu;
 	}
@@ -1546,9 +1547,9 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	for(Edge ee = graph.getEdge(Mask); ee;
 		ee = graph.getEdgeNext(ee, Mask))
 	{
-		Vert v1 = graph.getEdgeEnd1(ee);
-		Vert v2 = graph.getEdgeEnd2(ee);
-		subgraph.addEdge(map[v1], map[v2]);
+		VertSub v1 = map[ graph.getEdgeEnd1(ee) ];
+		VertSub v2 = map[ graph.getEdgeEnd2(ee) ];
+		subgraph.addEdge(v1, v2);
 	}
 
 	int col = -1;
