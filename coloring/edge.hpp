@@ -231,7 +231,7 @@ altPathRecoloring(int ivert, int col)
 template<class DefaultStructs>
 template<typename Graph, typename ColorMap>
 void SeqEdgeColoringPar<DefaultStructs>::vizingSimple(
-	typename SeqEdgeColoringPar<DefaultStructs>::template VizingState<Graph, ColorMap> &vState,
+	VizingState<Graph, ColorMap> &vState,
 	typename Graph::PEdge edge)
 {
 	typedef typename Graph::PVertex Vert;
@@ -385,7 +385,7 @@ void SeqEdgeColoringPar<DefaultStructs>::vizingSimple(
 template<class DefaultStructs>
 template<typename Graph, typename ColorMap>
 void SeqEdgeColoringPar<DefaultStructs>::vizing(
-	typename SeqEdgeColoringPar<DefaultStructs>::template VizingState<Graph, ColorMap> &vState,
+	VizingState<Graph, ColorMap> &vState,
 	typename Graph::PEdge edge)
 {
 	typedef typename Graph::PVertex Vert;
