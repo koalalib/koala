@@ -6,6 +6,12 @@ bool ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 {
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
+	assert( colLists.hasKey(vert) );
+	if( colors.hasKey(vert) ) {
+		int col = colors[vert];
+		if( col>=0 && colLists[vert].isElement(col) )
+			return true;
+	}
 	//'(ChV) (const Koala::Graph<int, int>&, Koala::Set<int>, Koala::AssocArray<Koala::Vertex<int, int, Koala::GrDefaultSettings<15u, true> >*, int>&, Koala::GraphInternalTypes<Koala::Graph<int, int> >::Vertex*&)'|
 	int res = chooser(graph, colLists[vert], colors, vert);
 	if(res<0 || !colLists[vert].isElement(res))
@@ -233,6 +239,12 @@ bool ListEdgeColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, typename Graph::PEdge edge,
 	ColorChooser chooser )
 {
+	assert( colLists.hasKey(edge) );
+	if(colors.hasKey(edge)) {
+		int col = colors[edge];
+		if(col>=0 && colLists[edge].isElement(col))
+			return true;
+	}
 	int res = chooser(graph, colLists[edge], colors, edge);
 	if(res<0 || !colLists[edge].isElement(res))
 		return false;
