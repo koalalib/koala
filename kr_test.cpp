@@ -62,4 +62,5 @@ Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Kruskal::Edge
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << ":"<<tabE[i]->info.dlugosc << "}";
 
     std::cout << "\n" << sets.size() << " " << sets.getSetNo();
+    return 0;
 }

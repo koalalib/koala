@@ -61,8 +61,10 @@ int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
 		AssocCont<Vert, int>::Type vertId(graph.getVertNo());
 
 	int lenVertTab = 0;
-	for(VIter cur = beg; cur!=end; ++cur)
+	for(VIter cur = beg; cur!=end; ++cur) {
+		if( vertId.hasKey(*cur) ) continue;
 		vertId[*cur] = lenVertTab++;
+	}
 
 	std::pair<Vert,Color> LOCALARRAY(freeColors, lenVertTab);
 	for(VIter cur = beg; cur!=end; ++cur) {
@@ -335,10 +337,16 @@ int IntervalEdgeColoringPar<DefaultStructs>::hf(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	std::pair<int, Edge> LOCALARRAY(edgeTab, graph.getEdgeNo(Mask));
+
 	int lenEdgeTab = 0;
-	for(EIter cur = beg; cur!=end; ++cur)
+	for(EIter cur = beg; cur!=end; ++cur, ++lenEdgeTab);
+
+	std::pair<int, Edge> LOCALARRAY(edgeTab, lenEdgeTab);
+	lenEdgeTab = 0;
+	for(EIter cur = beg; cur!=end; ++cur) {
+		if( !(cur->getType()&Mask) ) continue;
 		edgeTab[lenEdgeTab++] = std::make_pair( weights[*cur], *cur );
+	}
 	DefaultStructs::sort(edgeTab, edgeTab+lenEdgeTab);
 
 	int maxCol = 0;
@@ -389,8 +397,10 @@ int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 		AssocCont<Edge, int>::Type edgeId(graph.getEdgeNo(Mask));
 
 	int lenEdgeTab = 0;
-	for(EIter cur = beg; cur!=end; ++cur)
+	for(EIter cur = beg; cur!=end; ++cur) {
+		if( edgeId.hasKey(*cur) ) continue;
 		edgeId[*cur] = lenEdgeTab++;
+	}
 
 	std::pair<Edge,Color> LOCALARRAY(freeColors, lenEdgeTab);
 	//create minimal colorings for each edge (it's not coloring yet)

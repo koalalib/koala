@@ -136,10 +136,11 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
 // DijkstraMainPar
 
+/*
 template< class DefaultStructs, class DijBase > template< class GraphType, class EdgeContainer, class VIter, class EIter >
-    DijkstraMainPar< DefaultStructs,DijBase >::PathLengths< typename EdgeContainer::ValType::DistType >
+    typename DijkstraMainPar< DefaultStructs,DijBase >::template PathLengths< typename EdgeContainer::ValType::DistType >
     DijkstraMainPar< DefaultStructs,DijBase >::findPath( const GraphType &g, const EdgeContainer &edgeTab,
-        typename GraphType::PVertex start, typename GraphType::PVertex end, ShortPathStructs::OutPath< VIter,EIter > iters )
+        typename GraphType::PVertex start, typename GraphType::PVertex end, typename ShortPathStructs::template OutPath< VIter,EIter > iters )
 {   
     koalaAssert( start && end,AlgExcNullVert );
     const typename EdgeContainer::ValType::DistType PlusInfty = DefaultStructs:: template
@@ -158,6 +159,7 @@ template< class DefaultStructs, class DijBase > template< class GraphType, class
     return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
     // dlugosc najkr. siezki i jej liczba krawedzi
 }
+*/
 
 // DAGCritPathPar
 
@@ -252,7 +254,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         ::isMinusInfty( vertTab[end].distance )) return -1;
     return ShortPathStructs::getOutPath( g,vertTab,iters,end );
 }
-
+/*
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VIter, class EIter >
     typename DAGCritPathPar< DefaultStructs >::template PathLengths< typename EdgeContainer::ValType::DistType >
     DAGCritPathPar< DefaultStructs >::findPath( const GraphType &g, const EdgeContainer &edgeTab,
@@ -272,6 +274,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     int len = getPath( g,vertTab,end,iters );
     return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
 }
+*/
 
 // BellmanFordPar
 
@@ -391,6 +394,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     return ShortPathStructs::getOutPath( g,vertTab,iters,end );
 }
 
+/*
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VIter, class EIter >
     typename BellmanFordPar< DefaultStructs >::template PathLengths< typename EdgeContainer::ValType::DistType >
     BellmanFordPar< DefaultStructs >::findPath( const GraphType &g, const EdgeContainer &edgeTab,
@@ -413,6 +417,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
     // dlugosc najkr. siezki i jej liczba krawedzi
 }
+*/
 
 template< class DefaultStructs > template< class GraphType, class TwoDimVertContainer, class VIter, class EIter > int
     FloydPar< DefaultStructs >::getOutPathFromMatrix( const GraphType &g, const TwoDimVertContainer &vertMatrix,
@@ -549,6 +554,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 
 // KruskalPar
 
+/*
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer >
     typename KruskalPar< DefaultStructs >::template Result< typename EdgeContainer::ValType::WeightType >
     KruskalPar< DefaultStructs >::getForest( const GraphType &g, const EdgeContainer &edgeTab, Iter out,
@@ -602,3 +608,4 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
     return res;
 }
+*/

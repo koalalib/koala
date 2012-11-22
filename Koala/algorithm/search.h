@@ -1129,8 +1129,10 @@ namespace Koala
         template< class GraphType, class VertIter, class EdgeIter > static void
             eulerResult( EulerState< GraphType > &state, OutPath< VertIter,EdgeIter > &out );
 
-        template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
-            ends( const GraphType &g, EdgeType mask );
+//        template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
+//            _ends( const GraphType &g, EdgeType mask );
+        template< class GraphType > static  void
+            _ends( const GraphType &g, EdgeType mask, typename GraphType::PVertex &,typename GraphType::PVertex &);
 
       public:
         // Uwaga: wersje bez dir uwzgledniaja jedynie podgraf zlozony z petli i krawedzi nieskierowanych ignorujac reszte
@@ -1140,14 +1142,21 @@ namespace Koala
         // (NULL,NULL) w przciwnym razie
         template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
             ends( const GraphType &g )
-            { return ends( g,EdUndir | EdLoop ); }
+            { std::pair< typename GraphType::PVertex, typename GraphType::PVertex > res;
+	      _ends( g,EdUndir | EdLoop, res.first,res.second );
+	      return res;
+	    }
 
         // para zawierajaca 2 razy ten sam wierzcholek - jesli graf ma skierowany cykl Eulera
         // para zawierajaca 2 rozne wierzcholki - konce skierowanej sciezki Eulera - jesli ta istnieje
         // (NULL,NULL) w przciwnym razie
         template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
             dirEnds( const GraphType &g )
-            { return ends( g,EdDirOut | EdLoop ); }
+//            { return _ends( g,EdDirOut | EdLoop ); }
+            { std::pair< typename GraphType::PVertex, typename GraphType::PVertex > res;
+	      _ends( g,EdUndir | EdLoop, res.first,res.second );
+	      return res;
+	    }
 
         /** test if graph has an undirected Eulerian cycle
         * @param[in] g graph

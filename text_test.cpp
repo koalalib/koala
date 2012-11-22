@@ -187,4 +187,5 @@ struct bezop {
 //    cin << bz1;
 
 
+return 0;
 }

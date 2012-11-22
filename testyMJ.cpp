@@ -1228,5 +1228,6 @@ int critPath2(const char* napis)
 
 
 
+    return 0;
 }
 

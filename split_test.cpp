@@ -21,6 +21,7 @@ const char* print(ModPartType x)
         case mpPrime : return "Prime";
     };
     assert(0);
+    return NULL;
 }
 
 #include "main.hpp"

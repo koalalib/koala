@@ -35,8 +35,8 @@ struct Cmp {
 };
 
 Koala::Graph<OpisV,OpisE> g;
-Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,tabV[11];
-Koala::Graph<OpisV,OpisE>::PEdge e,tabE[12];
+Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,tabV[32];
+Koala::Graph<OpisV,OpisE>::PEdge e,tabE[32];
 
 
 Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex,

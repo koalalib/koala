@@ -48,6 +48,7 @@ std::map<std::string,Koala::IO::GraphMLKeyTypes::Type> keymap;
 	        case Koala::IO::GraphMLKeyTypes::Edge : return 'e';
 	        case Koala::IO::GraphMLKeyTypes::Unknown : return '?';
 	    }
+	return '?';
 	}
 
 	static char what(Koala::IO::GraphMLKeyTypes::Type arg)

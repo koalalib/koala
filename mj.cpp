@@ -179,4 +179,5 @@ using namespace Koala;
     std::cout << std::endl;
     for(e=subgr.getEdge(EdUndir);e!=NULL;e=subgr.getEdgeNext(e,EdUndir)) std::cout << e-> info << ' ';
 
+    return 0;
 }

@@ -242,4 +242,5 @@ double kwadrat(int arg) { return arg*arg; }
     }
 
 
+    return 0;
 }

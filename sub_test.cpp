@@ -138,4 +138,5 @@ Koala::Subgraph<Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koal
                                !Koala::stdChoose(Koala::Set<Koala::Edge<OpisV,OpisE>* >()+=EE)))
                 ,std::cout,Koala::IO::RG_EdgeList);
 
+    return 0;
 }

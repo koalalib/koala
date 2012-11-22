@@ -139,5 +139,6 @@ struct InfoE2 {
 //    cout << g1.ch2Archs(g1.getEdgeSet());
 //    cout << endl <<g1.getEdgeNo() << endl;
 
+    return 0;
 }
 

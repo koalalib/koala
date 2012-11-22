@@ -171,5 +171,6 @@ void t( Cont /*AssocArray<Vert*,std::string>*/ & arr)
     }
 
 
+    return 0;
 }
 

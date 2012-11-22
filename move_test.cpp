@@ -161,5 +161,6 @@ struct InfoE1 {
 
 //    cout << g1.glue(g1.getClNeighSet(B),true,A);
 
+    return 0;
 }
 

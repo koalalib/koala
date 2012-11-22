@@ -372,5 +372,6 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
     }
 
 
+    return 0;
 }
 

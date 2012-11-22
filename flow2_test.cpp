@@ -447,4 +447,5 @@ void ghTest2()
     }
 
     cout << g.getVertNo() << ' ' << g.getEdgeNo();
+    return 0;
 }
