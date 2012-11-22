@@ -16,6 +16,7 @@
 
 #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__)
 #define atoll		_atoi64
+#define lltoa		_i64toa
 typedef __int64 int64_t;
 #endif
 

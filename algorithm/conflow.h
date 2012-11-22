@@ -10,6 +10,7 @@
 #include <limits>
 #include <map>
 #include <vector>
+#include <utility>
 
 #include "../algorithm/search.h"
 #include "../base/defs.h"
@@ -53,10 +54,19 @@ namespace Koala
             CostType cost;
 
             // agrs: przepustowosc i koszt krawedzi
-            EdgeLabs( CapacType arg = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
-                CostType arg2 = DefaultStructs:: template NumberTypeBounds< CostType >::zero() ):
+            EdgeLabs():
+                    capac(DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), cost( DefaultStructs:: template NumberTypeBounds< CostType >::zero() ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() )
+                { }
+            EdgeLabs( CapacType arg):
+                    capac( arg ), cost(DefaultStructs:: template NumberTypeBounds< CostType >::zero()), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() )
+                { }
+            EdgeLabs( CapacType arg, CostType arg2):
                     capac( arg ), cost( arg2 ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() )
                 { }
+//            EdgeLabs( CapacType arg = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
+//                CostType arg2 = DefaultStructs:: template NumberTypeBounds< CostType >::zero() ):
+//                    capac( arg ), cost( arg2 ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() )
+//                { }
         };
 
         // j.w. ale nadaje domyslne jednostkowe przepustowosci i koszty
@@ -115,9 +125,15 @@ namespace Koala
             CapacType hi,lo;
 
             //(dopuszczalne dodatnie i ujemne np. przeplyw to trans. z hi=lo=0 wszedzie poza zrodlem i ujsciem)
-            TrsVertLoss( CapacType alo = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
-                 CapacType ahi = DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ): hi( ahi ), lo( alo )
+            TrsVertLoss(): hi(DefaultStructs:: template NumberTypeBounds< CapacType >::zero()), lo(DefaultStructs:: template NumberTypeBounds< CapacType >::zero())
                  { }
+            TrsVertLoss( CapacType alo): hi(DefaultStructs:: template NumberTypeBounds< CapacType >::zero()), lo( alo )
+                 { }
+            TrsVertLoss( CapacType alo, CapacType ahi): hi( ahi ), lo( alo )
+                 { }
+//            TrsVertLoss( CapacType alo = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
+//                 CapacType ahi = DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ): hi( ahi ), lo( alo )
+//                 { }
         };
 
         // rekord  opisujacy krawedz dla wyszukiwania transhipmentow
@@ -136,11 +152,30 @@ namespace Koala
             // koszt jednostkowy przeplywu dla luku, jesli wymagany to wymagany nieujemny z wyjatkiem petli
             CostType cost;
 
-            TrsEdgeLabs( CapacType alo = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
-                CapacType ahi = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
-                CostType c = DefaultStructs:: template NumberTypeBounds< CostType >::zero() ): hi( ahi ), lo( alo ),
-                    cost( c )
+            TrsEdgeLabs():
+	            hi(DefaultStructs:: template NumberTypeBounds< CapacType >::zero()),
+	            lo(DefaultStructs:: template NumberTypeBounds< CapacType >::zero()),
+                    cost(DefaultStructs:: template NumberTypeBounds< CostType >::zero())
                     { }
+            TrsEdgeLabs( CapacType alo):
+	            hi(DefaultStructs:: template NumberTypeBounds< CapacType >::zero()),
+	            lo( alo ),
+                    cost(DefaultStructs:: template NumberTypeBounds< CostType >::zero())
+                    { }
+            TrsEdgeLabs( CapacType alo, CapacType ahi):
+	            hi( ahi ),
+		    lo( alo ),
+                    cost(DefaultStructs:: template NumberTypeBounds< CostType >::zero())
+                    { }
+            TrsEdgeLabs( CapacType alo,
+                CapacType ahi,
+                CostType c): hi( ahi ), lo( alo ), cost( c )
+                    { }
+//            TrsEdgeLabs( CapacType alo = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
+//                CapacType ahi = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
+//                CostType c = DefaultStructs:: template NumberTypeBounds< CostType >::zero() ): hi( ahi ), lo( alo ),
+//                    cost( c )
+//                    { }
         };
 
         // TODO: w ostatecznej wersji   protected: (ale na razie wystepuje w testach)
@@ -191,9 +226,13 @@ namespace Koala
                 typename GraphType::PVertex first, typename GraphType::PVertex last, Iter &iterout );
         // pomocnicza dla maxFlowMKM
         // wyznaczanie potencjalow przeplywu wierzcholkow w sieci warstwowej miedzy ends
+//        template< class GraphType, class VertContainer, class EdgeContainer > static void
+//            findPot( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
+//                std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends,
+//                typename GraphType::PVertex v, bool pin, bool pout );
         template< class GraphType, class VertContainer, class EdgeContainer > static void
             findPot( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
-                std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends,
+                typename GraphType::PVertex fends,typename GraphType::PVertex sends,
                 typename GraphType::PVertex v, bool pin, bool pout );
         // na uzytek maxFlowMKM
         // przepchniecie przeplywu z wierzcholka v do przodu lub do tylu
@@ -309,10 +348,17 @@ namespace Koala
             const EdgeContainer &edgeTab, typename GraphType::PVertex S, typename GraphType::PVertex T );
         // znajduje maksymalny przeplyw start->end (ale nie wiekszy, niz limit)
         // zwraca jego wielkosc
+//        template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
+//            maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
+//                typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType limit = DefaultStructs::
+//		template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
         template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
             maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
-                typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType limit = DefaultStructs::
-                template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
+                typename GraphType::PVertex end)
+		    { return maxFlow(g, edgeTab, start, end, DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() ); };
+        template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
+            maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
+                typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType limit);
         // zwraca koszt podanego przeplywu lub transship.
         template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CostType
             flowCost( const GraphType &g, const EdgeContainer &edgeTab );
@@ -326,11 +372,112 @@ namespace Koala
         // znajdowanie minimalnego (pod wzgledem objetosci) rozciecia krawedziowego start-end
         template< class GraphType, class EdgeContainer, class VIter, class EIter > static
             EdgeCut< typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g, EdgeContainer &edgeTab,
-                typename GraphType::PVertex start, typename GraphType::PVertex end, OutPath< VIter,EIter > iters );
+                typename GraphType::PVertex start, typename GraphType::PVertex end, OutPath< VIter,EIter > iters )
+                {
+                    EdgeCut< typename EdgeContainer::ValType::CapacType > res;
+                    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
+                	VertLabs< GraphType,typename EdgeContainer::ValType::CapacType > >::Type vertTab( g.getVertNo() );
+                    res.capac = maxFlow( g,edgeTab,start,end );
+                    BFSFlow( g,edgeTab,vertTab,start,end,true,blackHole );
+                    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+                    if (std::numeric_limits< int >::max() > vertTab[v].distance)
+                    {
+                	res.vertNo++;
+                	if (!isBlackHole( iters.vertIter ))
+                	{
+                	    *iters.vertIter = v;
+                	    ++iters.vertIter;
+                	}
+                	for( typename GraphType::PEdge e = g.getEdge( v,EdDirOut | EdUndir ); e;
+                	    e = g.getEdgeNext( v,e,EdDirOut | EdUndir ) )
+                	    if (vertTab[g.getEdgeEnd( e,v )].distance == std::numeric_limits< int >::max())
+                	    {
+                		res.edgeNo++;
+                		if (!isBlackHole( iters.edgeIter ))
+                		{
+                		    *iters.edgeIter = e;
+                		    ++iters.edgeIter;
+                		}
+                	    }
+                    }
+                    return res;
+                }
         // j.w. ale szuka najmniejszego rozciecia miedzy kazda para wierzcholkow (zwracane w polach first, second)
         template< class GraphType, class EdgeContainer, class VIter, class EIter > static
             EdgeCut2< GraphType,typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g,
-                EdgeContainer &edgeTab, OutPath< VIter,EIter > iters );
+                EdgeContainer &edgeTab, OutPath< VIter,EIter > iters )
+                {
+                    int n,m;
+                    koalaAssert( g.getVertNo() >= 2,AlgExcWrongArg );
+                    EdgeCut< typename EdgeContainer::ValType::CapacType > res,buf;
+                    typename GraphType::PVertex a,b;
+                    typename GraphType::PVertex LOCALARRAY( vres,(n = g.getVertNo()) - 1 );
+                    typename GraphType::PVertex LOCALARRAY( vbuf,n - 1 );
+                    typename GraphType::PEdge LOCALARRAY( eres,m = g.getEdgeNo(Directed | Undirected) );
+                    typename GraphType::PEdge LOCALARRAY( ebuf,m );
+                    res.capac = DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty();
+                
+                    for( typename GraphType::PVertex s = g.getVert(); s != g.getVertLast(); s = g.getVertNext( s ) )
+                        for( typename GraphType::PVertex t = g.getVertNext( s ); t; t = g.getVertNext( t ) )
+                        {
+                            if (isBlackHole( iters.vertIter ) && isBlackHole( iters.edgeIter ))
+                                buf = minEdgeCut( g,edgeTab,s,t,outPath( blackHole,blackHole ) );
+                            else if (isBlackHole( iters.vertIter ) && !isBlackHole( iters.edgeIter ))
+                                buf = minEdgeCut( g,edgeTab,s,t,outPath( blackHole,ebuf ) );
+                            else if (!isBlackHole( iters.vertIter ) && isBlackHole( iters.edgeIter ))
+                                buf = minEdgeCut( g,edgeTab,s,t,outPath( vbuf,blackHole ) );
+                            else buf = minEdgeCut( g,edgeTab,s,t,outPath( vbuf,ebuf ) );
+                            if (buf.capac < res.capac)
+                            {
+                                res = buf;
+                                a = s;
+                                b = t;
+                                if (!isBlackHole( iters.vertIter ))
+                                    for( int i = 0; i < buf.vertNo; i++ ) vres[i] = vbuf[i];
+                                if (!isBlackHole( iters.edgeIter ))
+                                    for( int i = 0; i < buf.edgeNo; i++ ) eres[i] = ebuf[i];
+                            }
+                            if (g.getEdgeNo( EdDirIn | EdDirOut ))
+                            {
+                                if (isBlackHole( iters.vertIter ) && isBlackHole( iters.edgeIter ))
+                                    buf = minEdgeCut( g,edgeTab,t,s,outPath( blackHole,blackHole ) );
+                                else if (isBlackHole( iters.vertIter ) && !isBlackHole( iters.edgeIter ))
+                                    buf = minEdgeCut( g,edgeTab,t,s,outPath( blackHole,ebuf ) );
+                                else if (!isBlackHole( iters.vertIter ) && isBlackHole( iters.edgeIter ))
+                                    buf = minEdgeCut( g,edgeTab,t,s,outPath( vbuf,blackHole ) );
+                                else buf = minEdgeCut( g,edgeTab,t,s,outPath( vbuf,ebuf ) );
+                                if (buf.capac < res.capac)
+                                {
+                                    res = buf;
+                                    a = t;
+                                    b = s;
+                                    if (!isBlackHole( iters.vertIter ))
+                                        for( int i = 0; i < buf.vertNo; i++ ) vres[i] = vbuf[i];
+                                    if (!isBlackHole( iters.edgeIter ))
+                                        for( int i = 0; i < buf.edgeNo; i++ ) eres[i] = ebuf[i];
+                                }
+                            }
+                        }
+                    if (!isBlackHole( iters.vertIter ))
+                        for( int i = 0; i < res.vertNo; i++ )
+                        {
+                            *iters.vertIter = vres[i];
+                            ++iters.vertIter;
+                        }
+                    if (!isBlackHole( iters.edgeIter ))
+                        for( int i = 0; i < res.edgeNo; i++ )
+                        {
+                            *iters.edgeIter = eres[i];
+                            ++iters.edgeIter;
+                        }
+                    EdgeCut2< GraphType,typename EdgeContainer::ValType::CapacType > res2;
+                    res2.capac = res.capac;
+                    res2.edgeNo = res.edgeNo;
+                    res2.vertNo = res.vertNo;
+                    res2.first = a;
+                    res2.second = b;
+                    return res2;
+                }
         // szuka transship. w grafie o podanych warunkach na wierzcholki i krawedzie
         // zwraca false w razie braku
         template< class GraphType, class EdgeContainer, class VertContainer > static bool transship( GraphType &g,
@@ -391,7 +538,20 @@ namespace Koala
             typename GraphType::PVertex start, typename GraphType::PVertex end, EIter iter );
         // znajduje najmniejsze rozciecie krawedziowe miedzy para roznych wierzcholkow
         // krawedzie sa wypisywane na iter
-        template< class GraphType, class EIter > static EdgeCut< GraphType > minEdgeCut( const GraphType &g, EIter iter );
+        template< class GraphType, class EIter > static EdgeCut< GraphType > minEdgeCut( const GraphType &g, EIter iter )
+                {
+                    EdgeCut< GraphType > res;
+                    typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,
+                        typename FlowPar< DefaultStructs >:: template EdgeLabs< int > >::Type edgeLabs( g.getEdgeNo() );
+                    for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) ) edgeLabs[e].capac = 1;
+                    typename FlowPar< DefaultStructs >:: template EdgeCut2< GraphType,int > res2 =
+                        FlowPar< DefaultStructs >:: template minEdgeCut( g,edgeLabs,FlowPar< DefaultStructs >::template
+                            outPath( blackHole,iter ) );
+                    res.edgeNo = res2.capac;
+                    res.first = res2.first;
+                    res.second = res2.second;
+                    return res;
+                }
         // znajduje najwiekszy zbior krawedziowo rozlaczych sciezek start->end
         // zwraca ich liczbe. Parametry: badany graf,
         // iteratory wyjsciowe na kolejne wierz znalezionych sciezek

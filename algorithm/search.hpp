@@ -167,8 +167,9 @@ template< class T > const T* SearchStructs::CompStoreTool< T >::operator[]( int 
 
 template< class T > void SearchStructs::CompStoreTool< T >::insert( int i )
 {
+    int t;
     koalaAssert( i >= 0 && i <= size(),ContExcOutpass );
-    idx.insert( idx.begin() + i,idx[i] );
+    idx.insert( idx.begin() + i,t = idx[i] );
     return;// operator[]( i );
 }
 
@@ -1281,8 +1282,10 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
 }
 
 template< class DefaultStructs > template< class GraphType >
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > EulerPar< DefaultStructs >::ends(
-        const GraphType &g, EdgeType mask )
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > EulerPar< DefaultStructs >::_ends(
+//        const GraphType &g, EdgeType mask )
+     void EulerPar< DefaultStructs >::_ends(
+        const GraphType &g, EdgeType mask , typename GraphType::PVertex &resa,typename GraphType::PVertex &resb)
 {
     EdgeDirection symmask = mask | ((mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0);
     bool dir = (mask & (EdDirIn | EdDirOut)) == EdDirIn || (mask & (EdDirIn | EdDirOut)) == EdDirOut;
@@ -1298,15 +1301,20 @@ template< class DefaultStructs > template< class GraphType >
             licz++;
             x = v;
         }
-    if (licz == 0) return zero;
-    if (licz != BFSPar< DefaultStructs >::scanAttainable( g,x,blackHole,symmask & ~EdLoop )) return zero;
+//    if (licz == 0) return zero;
+    resa = (typename GraphType::PVertex)NULL;
+    resb = (typename GraphType::PVertex)NULL;
+    if (licz == 0) { return; };
+//    if (licz != BFSPar< DefaultStructs >::scanAttainable( g,x,blackHole,symmask & ~EdLoop )) return zero;
+    if (licz != BFSPar< DefaultStructs >::scanAttainable( g,x,blackHole,symmask & ~EdLoop )) return;
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
         if (!dir)
         {
             if (g.deg( v,symmask ) & 1) {
                 if (res.first == 0) res.first = v;
                 else if (res.second == 0) res.second = v;
-                else return zero;
+//                else return zero;
+	        else { return; };
             }
         }
         else
@@ -1314,47 +1322,64 @@ template< class DefaultStructs > template< class GraphType >
             {
                 case 1:
                     if (res.first == 0) res.first = v;
-                    else return zero;
+//                    else return zero;
+                    else return;
                     break;
                 case 0: break;
                 case -1:
                     if (res.second == 0) res.second = v;
-                    else return zero;
+//                    else return zero;
+                    else return;
                     break;
-                default: return zero;
+//                default: return zero;
+	        default: return;
             }
 
+//    if (res.first)
+//        if (dir && (mask & EdDirIn)) return std::make_pair( res.second,res.first );
+//        else return res;
+//    else return std::pair< typename GraphType::PVertex,typename GraphType::PVertex >( x,x );
     if (res.first)
-        if (dir && (mask & EdDirIn)) return std::make_pair( res.second,res.first );
-        else return res;
-    else return std::pair< typename GraphType::PVertex,typename GraphType::PVertex >( x,x );
+        if (dir && (mask & EdDirIn)) res = std::make_pair( res.second,res.first );
+        else /*result = res*/;
+    else res = std::pair< typename GraphType::PVertex,typename GraphType::PVertex >( x,x );
+resa = res.first;
+resb = res.second;
 }
 
 template< class DefaultStructs > template< class GraphType >
     bool EulerPar< DefaultStructs >::hasCycle( const GraphType &g )
 {
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdUndir | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdUndir | EdLoop,res.first,res.second );
     return res.first != 0 && res.first == res.second;
 }
 
 template< class DefaultStructs > template< class GraphType >
     bool EulerPar< DefaultStructs >::hasDirCycle( const GraphType &g )
 {
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdDirOut | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdDirOut | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdDirOut | EdLoop,res.first,res.second );
     return res.first != 0 && res.first == res.second;
 }
 
 template< class DefaultStructs > template< class GraphType >
     bool EulerPar< DefaultStructs >::hasPath( const GraphType &g )
 {
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdUndir | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdUndir | EdLoop,res.first,res.second );
     return res.first != 0 && res.first != res.second;
 }
 
 template< class DefaultStructs > template< class GraphType >
     bool EulerPar< DefaultStructs >::hasDirPath( const GraphType &g )
 {
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdDirOut | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdDirOut | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdDirOut | EdLoop,res.first,res.second );
     return res.first != 0 && res.first != res.second;
 }
 
@@ -1362,7 +1387,9 @@ template< class DefaultStructs > template< class GraphType >
     bool EulerPar< DefaultStructs >::hasPath( const GraphType &g, typename GraphType::PVertex u )
 {
     koalaAssert( u,AlgExcNullVert );
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdUndir | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdUndir | EdLoop,res.first,res.second );
     return (res.first == u || res.second == u);
 }
 
@@ -1370,7 +1397,9 @@ template< class DefaultStructs > template< class GraphType >
     bool EulerPar< DefaultStructs >::hasDirPath( const GraphType &g, typename GraphType::PVertex u )
 {
     koalaAssert( u,AlgExcNullVert );
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdDirOut | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdDirOut | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdDirOut | EdLoop,res.first,res.second );
     return res.first == u;
 }
 
@@ -1392,7 +1421,9 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     bool EulerPar< DefaultStructs >::getCycle( const GraphType &g, OutPath< VertIter,EdgeIter > out )
 {
     int n,m;
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdUndir | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdUndir | EdLoop,res.first,res.second );
     if (res.first == 0 || res.first != res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
         LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
@@ -1407,7 +1438,9 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     bool EulerPar< DefaultStructs >::getDirCycle( const GraphType &g, OutPath< VertIter,EdgeIter > out )
 {
     int n,m;
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdDirOut | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdDirOut | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdDirOut | EdLoop, res.first, res.second );
     if (res.first == 0 || res.first != res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
         LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) );
@@ -1423,7 +1456,9 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
         OutPath< VertIter,EdgeIter > out )
 {
     int n,m;
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdUndir | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdUndir | EdLoop, res.first, res.second );
     if (res.first == 0 || res.first != res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
         LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
@@ -1439,7 +1474,9 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
         OutPath< VertIter,EdgeIter > out )
 {
     int n,m;
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdDirOut | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdDirOut | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdDirOut | EdLoop,res.first,res.second );
     if (res.first == 0 || res.first != res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
         LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) );
@@ -1454,7 +1491,9 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     bool EulerPar< DefaultStructs >::getPath( const GraphType &g, OutPath< VertIter,EdgeIter > out )
 {
     int n,m;
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdUndir | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdUndir | EdLoop,res.first,res.second );
     if (res.first == 0 || res.first == res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
         LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
@@ -1469,7 +1508,9 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
     bool EulerPar< DefaultStructs >::getDirPath( const GraphType &g, OutPath< VertIter,EdgeIter > out )
 {
     int n,m;
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdDirOut | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdDirOut | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdDirOut | EdLoop, res.first, res.second );
     if (res.first == 0 || res.first == res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
         LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) );
@@ -1485,7 +1526,9 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
         OutPath< VertIter,EdgeIter > out )
 {
     int n,m;
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = ends( g,EdUndir | EdLoop );
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res = _ends( g,EdUndir | EdLoop );
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
+    _ends( g,EdUndir | EdLoop,res.first,res.second );
     if (res.first == 0 || res.first == res.second) return false;
     std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
         LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );

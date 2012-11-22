@@ -115,7 +115,8 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EdgeContainer > void
     FlowPar< DefaultStructs >::findPot( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
-        std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends, typename GraphType::PVertex v,
+//        std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends, typename GraphType::PVertex v,
+        typename GraphType::PVertex fends, typename GraphType::PVertex sends, typename GraphType::PVertex v,
         bool pin, bool pout )
 {
     assert( vertTab[v].used );
@@ -130,8 +131,10 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
     if (pin)
     {
-        vertTab[v].inPot = (v == ends.first) ? PlusInfty : Zero;
-        if (v != ends.first)
+//        vertTab[v].inPot = (v == ends.first) ? PlusInfty : Zero;
+        vertTab[v].inPot = (v == fends) ? PlusInfty : Zero;
+//        if (v != ends.first)
+        if (v != fends)
             for( typename GraphType::PEdge e = g.getEdge( v,mask ); e; e = g.getEdgeNext( v,e,mask ) )
                 if (vertTab[u = g.getEdgeEnd( e,v )].used && vertTab[u].distance == vertTab[v].distance - 1 &&
                     (Zero != (d = usedCap( g,edgeTab,e,v,false ) )))
@@ -139,8 +142,10 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     }
     if (pout)
     {
-        vertTab[v].outPot = (v == ends.second) ? PlusInfty : Zero;
-        if (v != ends.second)
+//        vertTab[v].outPot = (v == ends.second) ? PlusInfty : Zero;
+        vertTab[v].outPot = (v == sends) ? PlusInfty : Zero;
+//        if (v != ends.second)
+        if (v != sends)
             for( typename GraphType::PEdge e = g.getEdge( v,mask ); e; e = g.getEdgeNext( v,e,mask ) )
                 if (vertTab[u = g.getEdgeEnd( e,v )].used && vertTab[u].distance == vertTab[v].distance + 1 &&
                     (Zero != (d = usedCap( g,edgeTab,e,v,true ))))
@@ -220,9 +225,11 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     if (vertTab[u = g.getEdgeEnd( e,tab[minpos] )].used)
     {
         if (vertTab[u].distance == vertTab[tab[minpos]].distance + 1)
-            findPot( g,edgeTab,vertTab,std::make_pair( tab[0],tab[size-1] ),u,true,false );
+//            findPot( g,edgeTab,vertTab,std::make_pair( tab[0],tab[size-1] ),u,true,false );
+            findPot( g,edgeTab,vertTab,tab[0],tab[size-1],u,true,false );
         if (vertTab[u].distance == vertTab[tab[minpos]].distance - 1)
-            findPot( g,edgeTab,vertTab,std::make_pair( tab[0],tab[size-1] ),u,false,true );
+//            findPot( g,edgeTab,vertTab,std::make_pair( tab[0],tab[size-1] ),u,false,true );
+            findPot( g,edgeTab,vertTab,tab[0],tab[size-1],u,false,true );
     }
     return minpot;
 }
@@ -243,7 +250,8 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     if (!layers( g,edgeTab,vertTab,start,end,bufend )) return res;
     int size = bufend - buf;
     for( int i = 0; i < size; i++ )
-        if (vertTab[buf[i]].used) findPot( g,edgeTab,vertTab,std::make_pair( start,end ),buf[i],true,true );
+//        if (vertTab[buf[i]].used) findPot( g,edgeTab,vertTab,std::make_pair( start,end ),buf[i],true,true );
+        if (vertTab[buf[i]].used) findPot( g,edgeTab,vertTab,start,end,buf[i],true,true );
     do
     {
         typename EdgeContainer::ValType::CapacType x = onevert( g,edgeTab,vertTab,buf,size,limit );
@@ -811,6 +819,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
         if (g.getEdgeType( e ) == Undirected)
             res += std::max( edgeTab[e].flow,-edgeTab[e].flow ) * edgeTab[e].cost;
         else res += edgeTab[e].flow * edgeTab[e].cost;
+    return res;
 }
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
@@ -850,6 +859,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
     return res;
 }
 
+/*
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VIter, class EIter >
     typename FlowPar< DefaultStructs >::template EdgeCut< typename EdgeContainer::ValType::CapacType >
     FlowPar< DefaultStructs >::minEdgeCut( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
@@ -883,7 +893,9 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     }
     return res;
 }
+*/
 
+/*
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VIter, class EIter >
     typename FlowPar< DefaultStructs >::template EdgeCut2< GraphType,typename EdgeContainer::ValType::CapacType >
     FlowPar< DefaultStructs >::minEdgeCut( const GraphType &g, EdgeContainer &edgeTab, OutPath< VIter,EIter > iters )
@@ -959,6 +971,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     res2.second = b;
     return res2;
 }
+*/
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VertContainer >
     bool FlowPar< DefaultStructs >::transship( GraphType &g, EdgeContainer &edgeTab, const VertContainer &vertTab )
@@ -1140,6 +1153,7 @@ template< class DefaultStructs > template< class GraphType, class EIter > int Co
         FlowPar< DefaultStructs >::outPath( blackHole,iter )).capac;
 }
 
+/*
 template< class DefaultStructs > template< class GraphType, class EIter >
     typename ConnectPar< DefaultStructs >::template EdgeCut< GraphType >
     ConnectPar< DefaultStructs >::minEdgeCut( const GraphType &g, EIter iter )
@@ -1156,6 +1170,7 @@ template< class DefaultStructs > template< class GraphType, class EIter >
     res.second = res2.second;
     return res;
 }
+*/
 
 template< class DefaultStructs > template< class GraphType, class VIter, class EIter, class LenIterV, class LenIterE >
     int ConnectPar< DefaultStructs >::edgeDisjPaths( GraphType &g, typename GraphType::PVertex start,
@@ -1242,7 +1257,6 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,
         std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed >::Type Image;
     Image ig;
-
     int n,m;
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
         std::pair< typename Image::PVertex,typename Image::PVertex > >::Type images( n = g.getVertNo() );
@@ -1251,7 +1265,6 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     typename Image::PEdge LOCALARRAY( icut,n );
 
     makeImage( g,ig,images );
-    ig.makeAdjMatrix();
     for( typename Image::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
         imageFlow[e].capac = (e->info.first) ? 1 : 2;
 
@@ -1273,7 +1286,6 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,
         std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed >::Type Image;
     Image ig;
-
     int n;
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
         std::pair< typename Image::PVertex,typename Image::PVertex> >::Type images( n = g.getVertNo() );
@@ -1283,7 +1295,6 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     typename Image::PEdge LOCALARRAY( bestcut,n );
 
     makeImage( g,ig,images );
-    ig.makeAdjMatrix();
     for( typename Image::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
         imageFlow[e].capac = (e->info.first) ? 1 : 2;
 
@@ -1347,7 +1358,6 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
     int LOCALARRAY( impos, 2 * m + 2 );
 
     makeImage( g,ig,images );
-    ig.makeAdjMatrix();
     for( typename Image::PEdge e = ig.getEdge( images[start].second,images[end].first ); e;
         e = ig.getEdge( images[start].second,images[end].first ) ) ig.delEdge( e );
     for( typename Image::PEdge e = ig.getEdge( images[end].second,images[start].first ); e;

@@ -1,13 +1,10 @@
-
-// TODO: uaktualnic opisu formatow po zmianach
-
 /* functions:
  *
  * readGraphText(graph, text, format, [vertexmap, [edgemap]])
  *  read graph from text in a given format
  *  graph	- graph to read to (will not be cleared before reading)
  *  text	- descrioption of graph (const char *, string or std::istream)
- *  format	- one of RG_* constants
+ *  format	- combination of RG_* constants
  *  vertexmap	- place to store selected vertices (with output-id), usually
  *		  table or map (need to implement "writable" operator[](unsigned int)
  *  edgemap	- place to store selected edges (with output-id), usually
@@ -17,60 +14,70 @@
  *  write graph in a given format (RG_*) to text
  *  graph	- graph to write
  *  text	- output buffer (string or std::ostream)
- *  format	- one of RG_* constants
+ *  format	- combination of RG_* constants
  *
  * writeGraphText(graph, text, maxlength, format)
  *  write graph in a given format (RG_*) to text
  *  graph	- graph to write
  *  text	- char *
  *  maxlength	- size of the text buffer
- *  format	- one of RG_* constants
+ *  format	- combination of RG_* constants
  *
  *
  * supported formats:
  *
- * VertexLists:
+ * RG_VertexLists:
+ *  n
  *  <vertex-1> <k_1> <edge-1> <edge-2> ... <edge-k_1>
  *  ...
  *  <vertex-n> <k_n> <edge-1> <edge-2> ... <edge-k_n>
  *
- *  each line descibes edges with coming from vertex-i
+ *  first line defines number of vertices
+ *  each other line descibes edges adjecent to vertex-i
+ *
+ *  Each edge should appear exactly once (since parallel edges are allowed).
+ *  To describe P2 use:
+ *  2
+ *  0 1 -1
+ *  1 0
+ *  the following text:
+ *  2
+ *  0 1 -1
+ *  1 1 -0
+ *  gives graph with two vertices and two parallel edges between them
  *
  *
  *  vertex-i can have one of the following formats:
  *  <vertex-id> ( <vertex-info> ) @ <output-id>
- *  <vertex-id>: (nonnegative integer) vertex identifier (arbitrary)
+ *  where:
+ *  <vertex-id>: vertex identifier (nonnegative integer in range 0..n-1)
  *  <vertex-info>: string with matched parentheses (use \ to escape unmatched ones)
  *                 describing the VertexInfo (istream >> VertexInfo should work)
  *                 (optional)
- *  <output-id>: (nonnegative integer) key in the output map of the vertex
- *  		(optional)
+ *  <output-id>: key in the output map of the vertex (nonnegative integer, optional)
  *
  *  edge-i can have of the following formats:
  *  <type> <vertex-id> ( <edge-info> ) @ <output-id>
- *  <type> <vertex-id>: (nonnegative integer) vertex identifier (arbitrary)
- *  <type>: (optional) d - directed, u - undirected
+ *  <type>: defines edge direction: - (undirected), > (to vertex-id), < (from vertex-id), * (loop)
+ *  <vertex-id>: vertex identifier of the second end of the edge (loop should have starting vertex repeated here)
  *  <edge-info>: string with matched parentheses (use \ to escape unmatched ones)
  *               describing the EdgeInfo (istream >> EdgeInfo should work)
  *               (optional)
- *  <output-id>: (nonnegative integer) key in the output map of the edge
- *               (optional)
- *
- *  RG_UndirectedVertexLists - edges without type are undirected
- *  RG_DirectedVertexLists - edges without type are directed
+ *  <output-id>: key in the output map of the edge (nonnegative integer, optional)
  *
  *  examples:
- *  0 3 1 2 3		- edges (0, 1), (0, 2), (0, 3) with default type
- *  0 4 d1 d2 u3	0	- directed edges (0, 1), (0, 2), undirected edge (0, 3)
+ *  0 3 -1 -2 -3	- undirected edges (0, 1), (0, 2), (0, 3)
+ *  0 4 >1 >2 -3 *0	- directed edges (0, 1), (0, 2), undirected edge (0, 3)
  *  			  and loop (0, 0)
- *  3(v3) 1 d0(e0)@5	- vertex 3 has vertex info "v3", add directed edge
- *  			  (3, 0) with edge info "e0" and remember that edge
- *  			  under key 5
- *  2(vertex-2)@1 0	- vertex with info "vertex-2" and no edge, remembered
- *  			  under key 1
+ *  3(v3) 1 <0(e0)@5	- vertex 3 has vertex info "v3", add directed edge
+ *  			  (0, 3) with edge info "e0" and remember that edge
+ *  			  under key 5 in output edge map
+ *  2(vertex-2)@1 0	- vertex with info "vertex-2" and no edges, remembered
+ *  			  under key 1 in output vertex map
  *
  * EdgeList:
  *  a list of edges, followed by a list of vertices:
+ *  n m
  *  <vertex-id-1a> <direction> <vertex-id-1b> <edge-info> <output-id>
  *  ...
  *  <vertex-id-ma> <direction> <vertex-id-mb> <edge-info> <output-id>
@@ -78,27 +85,35 @@
  *  ...
  *  <vertex-n> <vertex-info> <output-id>
  *
+ *  first line defines number of vertices (n) and number of edges (m)
+ *  following m lines describe edges and another n lines define vertices
+ *
  *  vertex-i has the same format as in VertexLists
  *
- *  <vertex-id-ia>, <vertex-id-ib>	- identifiers of edge ends
- *  <direction>				- "<-", "->" (directed edge)
- *   					  "<->" (undirected edge)
- *   					  if absentm use default direction
+ *  <vertex-id-ia>, <vertex-id-ib>	- identifiers of edge ends (integers from range 0..n-1)
+ *  <direction>				- "<", ">" (directed edge, < means edge ib to ia, > means edge from ia to ib)
+ *   					  "-" (undirected edge)
+ *   					  "@" (loop)
  *
  *  examples:
- *  1 2			- edge from 1 to 2
- *  1 2 (edge-0)	- edge from 1 to 2 with info "edge-0"
- *  1 2 @3		- edge from 1 to 2 to be remembered under key 3
- *  1 2 (edge-0) @3	- edge from 1 to 2 to be remembered under key 3 with info "edge-0"
- *  1 -> 2		- directed edge from 1 to 2
- *  1 <- 2		- directed edge from 2 to 1
- *  1 <-> 2		- undirected edge between 1 and 2
- *  1 <- 1		- loop
- *  1 -> 1		- loop
- *  1 <-> 1		- loop
+ *  1 - 2		- undirected edge between 1 to 2
+ *  1 - 2 (edge-0)	- undirected edge between 1 to 2 with info "edge-0"
+ *  1 - 2 @3		- undirected edge between 1 to 2 to be remembered under key 3
+ *  1 - 2 (edge-0) @3	- undirected edge between 1 to 2 to be remembered under key 3 with info "edge-0"
+ *  1 > 2		- directed edge from 1 to 2
+ *  1 < 2		- directed edge from 2 to 1
+ *  1 @ 1		- loop attached to vertex 1
  *
- *  RG_UndirectedEdgeList - edges without direction are undirected
- *  RG_DirectedEdgeList - edges without direction are directed
+ * writeGraph* functions allow you to specify, whether the vertex and edge info
+ * should be written, eg.:
+ * writeGraphText(..., ..., RG_VertexLists)
+ *   will print graph in vertex lists format without information
+ * writeGraphText(..., ..., RG_VertexLists | RG_Info)
+ *   will print graph in vertex lists format with vertex and edge infos
+ * writeGraphText(..., ..., RG_VertexLists | RG_EInfo)
+ *   will print graph in vertex lists format with edge info only
+ * writeGraphText(..., ..., RG_VertexLists | RG_VInfo)
+ *   will print graph in vertex lists format with vertex info only
  *
  */
 #ifndef KOALA_IO_TEXT_H
@@ -222,8 +237,8 @@ template<class Graph>
 bool writeGraphText(const Graph &g, std::string &out, int format)
 {
     Privates::EmptyMap2 em;
-    writeGraphText(g,out,format,em,em);
-    //TODO: no return!!
+    return writeGraphText(g,out,format,em,em);
+
 }
 
 template<class Graph,class VMap, class EMap>

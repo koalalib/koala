@@ -243,9 +243,9 @@ int EquitEdgeColoringPar<DefaultStructs>::repair(const Graph &graph, ColorMap &c
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv), ++ii)
 		vertToTab[vv] = ii;
 
-	typedef std::map<int, CountStruct> MapZlicz;
-	MapZlicz cntCol;
-	typename MapZlicz::iterator iBeg, iCur;
+	typedef std::map<int, CountStruct> MapCountStruct;
+	MapCountStruct cntCol;
+	typename MapCountStruct::iterator iBeg, iCur;
 	int cnt = 0;
 
 	ii=1; //we assume that colors are not set to any edge
@@ -289,7 +289,7 @@ int EquitEdgeColoringPar<DefaultStructs>::repair(const Graph &graph, ColorMap &c
 	}
 	//przechodzenie po kolorach
 
-	typename MapZlicz::iterator colSubgraph[2];
+	typename MapCountStruct::iterator colSubgraph[2];
 	iBeg = iCur = cntCol.begin();
 	while(minPar!=MinColPar || maxPar!=MaxColPar) {
 		while( (minPar<=MinColPar && iBeg->second.cnt>=MinColCnt)

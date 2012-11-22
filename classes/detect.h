@@ -181,77 +181,15 @@ namespace Koala
             // DFSPostorder da: A B C E D
             // a poni¿sza funkcja mo¿e zwróciæ np.: A E B C D
 
-            template <class Elem> class RekSet {
-
-                    Elem a;
-                    Koala::Set<RekSet<Elem>* > children;
-
-                public:
-
-                RekSet() : a(0), children() {}
-
-                void clear()
-                    { a=0; children.clear(); }
-
-                RekSet& operator+=(RekSet<Elem>& X)
-                {
-                    if (&X==this) return *this;
-                    children+=& X;
-                    return *this;
-                }
-
-                RekSet& operator+=(Elem e)
-                {
-                    assert(!a);
-                    a=e;
-                    return *this;
-                }
-
-                int size()
-                {
-                    int res=(a) ? 1 : 0;
-                    for(RekSet<Elem>* w=children.first();w;w=children.next(w))
-                            res+=w->size();
-                    return res;
-                }
-
-                template <class Iter>
-                void getElements(Iter& out)
-                {
-                    if (a)
-                    {
-                        *out=a; ++out;
-                    }
-                    for(RekSet<Elem>* w=children.first();w;w=children.next(w))
-                        w->getElements(out);
-                }
-
-            };
-
-
             static void SemiPostOrderTree( int *parent, int n, int *out );
 
             template< class Graph > struct QTRes
             {
                 int size;
-                RekSet< typename Graph::PVertex > trees;
+                Set< typename Graph::PVertex > trees;
                 QTRes(): size( 0 )
                     { }
             };
-
-
-            template <class Cont>
-            struct AssocArrSwitch {
-
-                typedef Cont Type;
-            };
-
-            template <class K, class E, class Cont>
-            struct AssocArrSwitch<AssocArray<K,E,Cont> > {
-
-                typedef AssocTable<std::map< K, E> > Type;
-            };
-
 
           public:
             // wyrzuca na iterator odwrotny perf. ellimination order chordal grafu tj. porzadek doklejania nowych wierzcholkow za podkliki
@@ -321,7 +259,7 @@ namespace Koala
                     {
                         case EdDirIn: return first;
                         case EdDirOut: return second;
-                        default: assert( 0 );
+                        default: assert( 0 ); return first;
                     }
                 }
             };
@@ -480,8 +418,8 @@ namespace Koala
 
             struct LBSData
             {
-                bool visiteda;
-                bool visitedb;
+                int visiteda;
+                int visitedb;
                 int aOrder;
                 int bOrder;
             };
@@ -508,7 +446,8 @@ namespace Koala
          * @param[in] g graph
          * @return true if g is interval, false otherwise */
         template< class GraphType > static bool interval( const GraphType &g )
-            { return chordal( g ) && cocomparability( g ); }
+//            { return chordal( g ) && cocomparability( g ); }
+            { return Interval::graph2segs(g, blackHole); }
 
         // czy pierwszy
         template< class GraphType > static bool prime( const GraphType &g );
@@ -526,7 +465,8 @@ namespace Koala
             // znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
             template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
 
-    //        TODO: template<class Graph, class AssocTab> static int color(const Graph &g,AssocTab out);
+    //        TODO: template<class Graph, class AssocTab>
+    //        static int color(const Graph &g,AssocTab out);
 
           protected:
             template< class GraphType, class Assoc > static bool cograph( const GraphType &ag, Assoc &subset );

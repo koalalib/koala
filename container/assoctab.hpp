@@ -491,7 +491,7 @@ inline std::pair< int,int > AssocMatrixAddr< AMatrTriangle >::pos2wsp( int pos )
 }
 
 // AssocMatrix
-
+/*
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::klucz2pos(
     Klucz v )
@@ -499,7 +499,7 @@ int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::klucz2
     if (!v) return -1;
     return IndexContainer::keyPos( v );
 }
-
+*/
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
     Klucz AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::pos2klucz( int arg )
 {

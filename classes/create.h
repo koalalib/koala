@@ -477,7 +477,10 @@ namespace Koala
         // przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
         // TODO: nieefektywne, zamiast Floyda nalezy uzyc BFS z kazdego wierzcholka
         template< class Graph > static void
-            transClousure( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
+            transClousure( Graph &g)
+	        { transClousure(g, typename Graph::EdgeInfoType()); };
+        template< class Graph > static void
+            transClousure( Graph &g, const typename Graph::EdgeInfoType &einfo);
 
         //    Oferuje te same operacje na relacjach reprezentowanych inaczej niz przez graf.
         //    Wersje 2-argumentowe: kontener obslugiwany jak tablica 2-wymiarowa o wartosciach konwertowalnych z bool
