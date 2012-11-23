@@ -550,10 +550,10 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
     int IsItPar< DefaultStructs >::Chordal::maxStable( const Graph& g, int qn, QIter begin, VIter vbegin,
         QTEIter ebegin, IterOut out )
 {
-    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes< Graph > >::Type LOCALARRAY( tabtab,qn );
+    typename AssocArrSwitch<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes< Graph > >::Type>::Type LOCALARRAY( tabtab,qn );
     QTRes< Graph > LOCALARRAY( tabnull,qn );
-    typedef typename DefaultStructs::template LocalGraph< std::pair< typename DefaultStructs:: template AssocCont<
-        typename Graph::PVertex,QTRes< Graph > >::Type *,QTRes< Graph > * >,char,EdAll>:: Type ImageGraph;
+    typedef typename DefaultStructs::template LocalGraph< std::pair< typename AssocArrSwitch<typename DefaultStructs:: template AssocCont<
+        typename Graph::PVertex,QTRes< Graph > >::Type>::Type *,QTRes< Graph > * >,char,Directed|Undirected >:: Type ImageGraph;
     ImageGraph tree;
     typename ImageGraph::PVertex LOCALARRAY( treeverts,qn );
     QIter it = begin, it2 = it;
@@ -580,7 +580,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
         {
             typename ImageGraph::PVertex child = tree.getEdgeEnd( e,vert );
             int maxs = child->info.second->size, tmpsize;
-            Set< typename Graph::PVertex > *maxset = &child->info.second->trees;
+            RekSet< typename Graph::PVertex > *maxset = &child->info.second->trees;
             for( typename Graph::PVertex key = child->info.first->firstKey(); key; key = child->info.first->nextKey( key ) )
                 if ((!vert->info.first->hasKey( key )) && (tmpsize = (*child->info.first)[key].size) > maxs)
                 {
@@ -605,7 +605,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
                 else
                 {
                     int maxs = child->info.second->size, tmpsize;
-                    Set< typename Graph::PVertex > *maxset = &child->info.second->trees;
+                    RekSet< typename Graph::PVertex > *maxset = &child->info.second->trees;
                     for( typename Graph::PVertex childkey = child->info.first->firstKey(); childkey;
                         childkey = child->info.first->nextKey( childkey ) )
                         if ((!vert->info.first->hasKey( childkey )) && (tmpsize = (*child->info.first)[childkey].size) > maxs)
@@ -621,7 +621,7 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
 
     typename ImageGraph::PVertex root = treeverts[qn - 1];
     int maxs = root->info.second->size, tmpsize;
-    Set< typename Graph::PVertex > *maxset = &root->info.second->trees;
+    RekSet< typename Graph::PVertex > *maxset = &root->info.second->trees;
     for( typename Graph::PVertex key = root->info.first->firstKey(); key; key = root->info.first->nextKey( key ) )
     if ((tmpsize = (root->info.first->operator[]( key ).size)) > maxs)
     {
@@ -689,7 +689,7 @@ template< class DefaultStructs > template< class GraphType >
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) cg.addVert( u );
     for( typename ImageGraph::PVertex u = cg.getVert(); u != cg.getVertLast(); u = cg.getVertNext( u ) )
     for( typename ImageGraph::PVertex v = cg.getVertNext( u ); v; v = cg.getVertNext( v ) )
-        if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v,EdUndir );
+        if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v );
     return chordal( cg );
 }
 
@@ -714,8 +714,10 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
 
 //    int mm = 0;
 //    for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) mm += g.deg( v ) * (g.deg( v ) - 1);
-    std::pair< typename Graph::PEdge,EdgeDirection > LOCALARRAY( buf,m + 2 );    //TODO: size?
-    QueueInterface< std::pair< typename Graph::PEdge,EdgeDirection > * > cont( buf,m+ 1 );   //TODO: size?
+    std::pair< typename Graph::PEdge,EdgeDirection > LOCALARRAY( buf,m + 2 );
+    //TODO: size?
+    QueueInterface< std::pair< typename Graph::PEdge,EdgeDirection > * > cont( buf,m+ 1 );
+    //TODO: size?
     typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EDir >::Type visited( m );
 
     int comp = 1;
@@ -786,6 +788,7 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
         for( typename Graph::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
             if (dirmap[e] == EdDirOut) ig.addArc( org2image[g.getEdgeEnd1( e )],org2image[g.getEdgeEnd2( e )],e );
             else ig.addArc( org2image[g.getEdgeEnd2( e )],org2image[g.getEdgeEnd1( e )],e );
+    ig.makeAdjMatrix();
 
     typename DefaultStructs:: template AssocCont< typename Image::PVertex,typename
         DAGCritPathPar< DefaultStructs >:: template VertLabs< int,Image > >::Type vertCont( n );
@@ -873,6 +876,7 @@ template< class DefaultStructs > template< class GraphType, class VIterOut >
         edgecont[cg.addArc( cg.getEdgeEnd2( mapa[u] ),cg.getEdgeEnd1( mapa[v] ),(typename GraphType::PVertex)0 )] =
             typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int >( 0,1 );
     }
+    cg.makeAdjMatrix();
     int a = 0, b = n, c;
     while (b - a > 1)
     {
@@ -925,7 +929,8 @@ template< class DefaultStructs > template< class GraphType >
     for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) cg.addVert( u );
     for( typename ImageGraph::PVertex u = cg.getVert(); u != cg.getVertLast(); u = cg.getVertNext( u ) )
         for( typename ImageGraph::PVertex v = cg.getVertNext( u ); v; v = cg.getVertNext( v ) )
-            if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v,EdUndir );
+            if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v );
+    cg.makeAdjMatrix();
     return comparability( cg );
 }
 
@@ -985,10 +990,13 @@ template< class DefaultStructs > template< class GraphType, class IntMap >
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,IvData >::Type data( n );
 
     Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< typename LexBFSPar< DefaultStructs >::
-        template LVCNode< GraphType > > > > allocat( 2 * n + 4 ); //TODO: size?
+        template LVCNode< GraphType > > > > allocat( 2 * n + 4 );
+    //TODO: size?
     Privates::BlockListAllocator< Privates::ListNode< typename LexBFSPar< DefaultStructs >::
-        template LVCNode< GraphType > > > allocat2( 4 * n + 4 ); //TODO: size?
-    Privates::BlockListAllocator< Privates::ListNode< typename Sets::Elem > > allocat3( 2 * n * n ); //TODO: size?
+        template LVCNode< GraphType > > > allocat2( 4 * n + 4 );
+    //TODO: size?
+    Privates::BlockListAllocator< Privates::ListNode< typename Sets::Elem > > allocat3( 2 * n * n );
+    //TODO: size?
 
     std::pair< typename Sets::Entry,typename Sets::Entry::iterator > LOCALARRAY( Abuf,n );
     std::pair< typename Sets::Entry,typename Sets::Entry::iterator > LOCALARRAY( Bbuf,n );

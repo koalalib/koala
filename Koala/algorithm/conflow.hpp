@@ -1265,6 +1265,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     typename Image::PEdge LOCALARRAY( icut,n );
 
     makeImage( g,ig,images );
+    ig.makeAdjMatrix();
     for( typename Image::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
         imageFlow[e].capac = (e->info.first) ? 1 : 2;
 
@@ -1295,6 +1296,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     typename Image::PEdge LOCALARRAY( bestcut,n );
 
     makeImage( g,ig,images );
+    ig.makeAdjMatrix();
     for( typename Image::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
         imageFlow[e].capac = (e->info.first) ? 1 : 2;
 
@@ -1358,6 +1360,7 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
     int LOCALARRAY( impos, 2 * m + 2 );
 
     makeImage( g,ig,images );
+    ig.makeAdjMatrix();
     for( typename Image::PEdge e = ig.getEdge( images[start].second,images[end].first ); e;
         e = ig.getEdge( images[start].second,images[end].first ) ) ig.delEdge( e );
     for( typename Image::PEdge e = ig.getEdge( images[end].second,images[start].first ); e;
