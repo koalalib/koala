@@ -930,7 +930,7 @@ template< class DefaultStructs > template< class GraphType, class VertIter >
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,VisitVertLabs< GraphType > >::Type
         visited( g.getVertNo() );
     DFSPostorderPar< DefaultStructs >:: template visitAllBase( g,visited,
-        Visitors::StoreTargetToVertIter< typename GraphType::PVertex* >( out ),EdDirIn );
+        Visitors::StoreTargetToVertIter< VertIter >( out ),EdDirIn );
 }
 
 template< class DefaultStructs > template< class GraphType, class Iter >
