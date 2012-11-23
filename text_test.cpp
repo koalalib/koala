@@ -153,6 +153,7 @@ struct bezop {
 	g.clear();
 
 	writeGraphText(gr, cout, Mask|RG_Info );
+	pliki.clear();
 	pliki.open("plik.txt");
 	readGraphText(g, pliki, RG_EdgeList,int2v,int2e);
     cout << "\n!!!!!!!!!!!!!!!!\n";
