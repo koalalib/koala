@@ -431,11 +431,11 @@ int mis(const char* g6)
 int clique(const char* g6)
 {
     MyGraph g;
-    g.makeAdjMatrix();
+//    g.makeAdjMatrix();
     Set<MyGraph::PVertex> res;
     Set<int> ires;
     IO::readG6(g,g6);
-    g.neg();
+    g.neg(EdUndir);
     MISPar< Settings >::get(g,setInserter(res));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
@@ -1172,16 +1172,16 @@ int critPath2(const char* napis)
 
     {   cout <<"Undirected (g6 or matrix format):\n";
         MyGraph g;
-        MyGraph::PVertex A,B,C,D;
-        A=g.addVert(0);B=g.addVert(1);C=g.addVert(2);D=g.addVert(3);
-        g.addEdge(C,D);g.addEdge(A,B);g.addEdge(B,C);
-        g.addEdge(A,D);
+//        MyGraph::PVertex A,B,C,D;
+//        A=g.addVert(0);B=g.addVert(1);C=g.addVert(2);D=g.addVert(3);
+//        g.addEdge(C,D);g.addEdge(A,B);g.addEdge(B,C);
+//        g.addEdge(A,D);
+//
+//        g.addEdge(C,A);
+//        g.addEdge(B,D);
 
-        g.addEdge(C,A);
-        g.addEdge(B,D);
-
-        IO::writeG6(g,napis,20);
-        outerplanar(napis);
+//        IO::writeG6(g,napis,20);
+        clique("FhCKG");
 
 //        g.clear();
 //        kruskal("{{0,3,2},{3,0,5},{2,5,1}}");
@@ -1228,6 +1228,5 @@ int critPath2(const char* napis)
 
 
 
-    return 0;
 }
 

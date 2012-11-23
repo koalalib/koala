@@ -90,14 +90,11 @@ namespace Koala
             typedef FibonHeapNode< Key > NodeType;
         };
 
-        // Czy grafy pomocnicze maja uzywac macierzy sasiedztwa?
-        enum { LocalGraphAdjMatr = false };
-
         // Typ grafu pomocniczego stosowanego wewnątrz procedury.
         template< class A, class B, EdgeType mask> class LocalGraph
         {
           public:
-            typedef Graph< A,B,GrDefaultSettings< mask,bool(LocalGraphAdjMatr) > > Type;
+            typedef Graph< A,B,GrDefaultSettings< mask,false > > Type;
         };
 
         // Czy dostosowywać rozmiar pamięci wyjściowych tablic asocjacyjnych?
