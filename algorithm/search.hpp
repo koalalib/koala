@@ -603,8 +603,11 @@ template< class DefaultStructs > template< class Graph, class Allocator, class C
     newGrp = grp->block;
     if (newGrp == m_data.end())
     {
+//        if(elem.prev() == grp
+//            && (elem.next() != m_data.end() || elem.next()->v == NULL)
+//            && grp != m_openBlock) return;
         if(elem.prev() == grp
-            && (elem.next() != m_data.end() || elem.next()->v == NULL)
+            && (elem.next() == m_data.end() || elem.next()->v == NULL)
             && grp != m_openBlock) return;
         newGrp = m_data.insert_before( grp,Node( NULL ) );
         grp->block = newGrp;

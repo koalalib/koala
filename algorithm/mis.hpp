@@ -607,13 +607,15 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
         ++out;
         g.delVerts( minFoldableNeigh );
         typename GraphType::VertInfoType LOCALARRAY( outInner,g.getVertNo() );
-        unsigned MISInner = __getMaximumIndependentSet( g,outInner,false) + 1;
+//KG:zmiana        unsigned MISInner = __getMaximumIndependentSet( g,outInner,false) + 1;
+        unsigned MISInner = __getMaximumIndependentSet( g,outInner,false);
         for( unsigned i = 0; i < MISInner; i++)
         {
             *out = outInner[i];
             ++out;
         }
-        return MISInner;
+//KG:zmiana        return MISInner;
+            return MISInner + 1;
     }
 
     // ==============================
@@ -645,15 +647,17 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
     typename GraphType::VertInfoType LOCALARRAY( bOut,g.getVertNo() );
 
     *aOut = graph1.getVert()->info;
-    ++aOut;
+//KG:zmiana    ++aOut;
     graph1.delVerts( graph1.getClNeighSet( graph1.getVert() ) );
-    a = __getMaximumIndependentSet( graph1,aOut,false ) + 1;
+//KG:zmiana    a = __getMaximumIndependentSet( graph1,aOut,false ) + 1;
+    a = __getMaximumIndependentSet( graph1,aOut + 1,false ) + 1;
 
     g.delVerts( getMirrors( g,g.getVert() ) );
     b = __getMaximumIndependentSet( g,bOut,false );
 
     if (a > b)
-        for( unsigned int i = 0; i < a; i++)
+    for( unsigned int i = 0; i < a; i++)
+
         {
             *out = aOut[i];
             ++out;
