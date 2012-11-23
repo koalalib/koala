@@ -344,7 +344,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::hf(const Graph &graph,
 	std::pair<int, Edge> LOCALARRAY(edgeTab, lenEdgeTab);
 	lenEdgeTab = 0;
 	for(EIter cur = beg; cur!=end; ++cur) {
-		if( !(cur->getType()&Mask) ) continue;
+		if( !(graph.getEdgeType(*cur)&Mask) ) continue;
 		edgeTab[lenEdgeTab++] = std::make_pair( weights[*cur], *cur );
 	}
 	DefaultStructs::sort(edgeTab, edgeTab+lenEdgeTab);
