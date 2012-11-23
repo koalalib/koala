@@ -1,0 +1,48 @@
+Graph1
+Exact: 
+wierzcholkow: 6
+C, F, H, O, K, S, 
+	Is independent set: YES
+	Is maximal independent set: YES
+
+
+Graph2:
+Exact: 
+wierzcholkow: 4
+A, E, F, G, 
+	Is independent set: YES
+	Is maximal independent set: YES
+
+WMIN: 
+wierzcholkow: 4
+H, F, E, A, 
+wierzcholkow: 4
+H, F, E, A, 
+wierzcholkow: 3
+C, F, G, 
+wierzcholkow: 4
+A, E, F, H, 
+wierzcholkow: 3
+A, D, G, 
+wierzcholkow: 3
+D, G, A, 
+WMAX: 
+wierzcholkow: 4
+B, E, F, G, 
+wierzcholkow: 4
+B, E, F, H, 
+wierzcholkow: 4
+A, E, F, H, 
+Graph3
+Exact: 
+wierzcholkow: 13
+E, H, M, P, R, U, X, V, C, Y, I, K, O, 
+	Is independent set: YES
+	Is maximal independent set: YES
+
+WMIN: 
+wierzcholkow: 13
+V, X, U, R, O, I, H, M, K, C, Y, P, E, 
+	Is independent set: YES
+	Is maximal independent set: YES
+

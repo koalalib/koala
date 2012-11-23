@@ -48,7 +48,7 @@ using namespace std;
 //    g.addEdge(u1,u4);
 //    g.addEdge(u4,u3);
 //    g.addEdge(u2,u4);
-//    g.addEdge(u1,u5);
+    g.addEdge(u1,u5);
 
 //xxx
         g.addEdge(u1,u4);

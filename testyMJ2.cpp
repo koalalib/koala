@@ -1,6 +1,6 @@
 //KG: GLOWNE USTAWIENIA TYPOW STRUKTUR:
 //KG: SPRAWDZIC ZAROWNO DLA true JAK I false
-#define AdjAllow    true
+#define AdjAllow    false
 
 //KG: SPRAWDZIC WE WSZYSTKICH 3 PRZYPADKACH TJ. GDY DOKLADNIE JEDNA Z PONIZSZYCH LINII JEST NIEZAKOMENTOWANA
 #define ArrayMapTest
@@ -223,31 +223,31 @@ int readDigraph(MyDigraph& g,const char *napis)
     return n;
 }
 
-int readGraph(MyGraph& g,const char *napis)
-{
-    int n=1;
-    for(int i=0;napis[i]!='}';i++)
-        if (napis[i]==',') n++;
-    MyGraph::PVertex LOCALARRAY(tabv,n);
-    for(int i=0;i<n;i++)
-        tabv[i]=g.addVert(i);
-    string str=napis;
-    stringstream input(str);
-    char c;
-
-    input >> c; assert(c=='{');
-    for(int i=0;i<n;i++)
-    {   input >> c; assert(c=='{');
-        for(int j=0;j<n;j++)
-        {   int flag;
-            input >> flag >> c;
-            if (flag!=0 && i==j) g.addLoop(tabv[i],flag);
-            if (flag!=0 && i<j) g.addLink(tabv[i],tabv[j],flag);
-        }
-        input >> c;
-    }
-    return n;
-}
+//int readGraph(MyGraph& g,const char *napis)
+//{
+//    int n=1;
+//    for(int i=0;napis[i]!='}';i++)
+//        if (napis[i]==',') n++;
+//    MyGraph::PVertex LOCALARRAY(tabv,n);
+//    for(int i=0;i<n;i++)
+//        tabv[i]=g.addVert(i);
+//    string str=napis;
+//    stringstream input(str);
+//    char c;
+//
+//    input >> c; assert(c=='{');
+//    for(int i=0;i<n;i++)
+//    {   input >> c; assert(c=='{');
+//        for(int j=0;j<n;j++)
+//        {   int flag;
+//            input >> flag >> c;
+//            if (flag!=0 && i==j) g.addLoop(tabv[i],flag);
+//            if (flag!=0 && i<j) g.addLink(tabv[i],tabv[j],flag);
+//        }
+//        input >> c;
+//    }
+//    return n;
+//}
 
 //bool bipartite(const char* g6)
 //{
@@ -394,15 +394,15 @@ int readGraph(MyGraph& g,const char *napis)
 //    return res;
 //}
 //
-//bool split(const char* g6)
-//{
-//    MyGraph g;
-//    g.makeAdjMatrix();
-//    IO::readG6(g,g6);
-//    bool res=IsItPar< Settings >::split(g);
-//    cout << int(res);
-//    return res;
-//}
+bool split(const char* g6)
+{
+    MyGraph g;
+    g.makeAdjMatrix();
+    IO::readG6(g,g6);
+    bool res=IsItPar< Settings >::split(g);
+    cout << int(res);
+    return res;
+}
 //
 //bool cograph(const char* g6)
 //{
@@ -414,154 +414,154 @@ int readGraph(MyGraph& g,const char *napis)
 //    return res;
 //}
 
-int mis(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    MISPar< Settings >::get(g,setInserter(res));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-int clique(const char* g6)
-{
-    MyGraph g;
+//int mis(const char* g6)
+//{
+//    MyGraph g;
 //    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    g.neg(EdUndir);
-    MISPar< Settings >::get(g,setInserter(res));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-
-int misBipartite(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    IsItPar< Settings >::Bipartite::maxStable(g,setInserter(res));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-int misChordal(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    IsItPar< Settings >::Chordal::maxStable(g,setInserter(res));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-int cliqueChordal(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    IsItPar< Settings >::Chordal::maxClique(g,setInserter(res));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-int misComparability(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    IsItPar< Settings >::Comparability::maxStable(g,setInserter(res));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-int cliqueComparability(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    IsItPar< Settings >::Comparability::maxClique(g,setInserter(res));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-
-int misCograph(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    IsItPar< Settings >::Cograph::maxStable(g,setInserter(res));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-int cliqueCograph(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    IsItPar< Settings >::Cograph::maxClique(g,setInserter(res));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-int matching(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    IO::readG6(g,g6);
-    MyGraph::PEdge LOCALARRAY(tabe,g.getEdgeNo());
-    int res=MatchingPar< Settings >::findMax(g,blackHole,tabe);
-    cout << '{';
-    for(int i=0;i<res;i++)
-    {
-        cout << '{';
-        std::pair<int,int> pair=pairMinMax(g.vertPos(g.getEdgeEnd1(tabe[i])),g.vertPos(g.getEdgeEnd2(tabe[i])));
-        cout << pair.first << ',' << pair.second;
-        cout << '}';
-        if (i!=res-1) cout << ',';
-    }
-    cout << '}';
-    return res;
-}
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    MISPar< Settings >::get(g,setInserter(res));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//int clique(const char* g6)
+//{
+//    MyGraph g;
+////    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    g.neg(EdUndir);
+//    MISPar< Settings >::get(g,setInserter(res));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//
+//int misBipartite(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    IsItPar< Settings >::Bipartite::maxStable(g,setInserter(res));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//int misChordal(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    IsItPar< Settings >::Chordal::maxStable(g,setInserter(res));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//int cliqueChordal(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    IsItPar< Settings >::Chordal::maxClique(g,setInserter(res));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//int misComparability(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    IsItPar< Settings >::Comparability::maxStable(g,setInserter(res));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//int cliqueComparability(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    IsItPar< Settings >::Comparability::maxClique(g,setInserter(res));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//
+//int misCograph(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    IsItPar< Settings >::Cograph::maxStable(g,setInserter(res));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//int cliqueCograph(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    IsItPar< Settings >::Cograph::maxClique(g,setInserter(res));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//int matching(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    IO::readG6(g,g6);
+//    MyGraph::PEdge LOCALARRAY(tabe,g.getEdgeNo());
+//    int res=MatchingPar< Settings >::findMax(g,blackHole,tabe);
+//    cout << '{';
+//    for(int i=0;i<res;i++)
+//    {
+//        cout << '{';
+//        std::pair<int,int> pair=pairMinMax(g.vertPos(g.getEdgeEnd1(tabe[i])),g.vertPos(g.getEdgeEnd2(tabe[i])));
+//        cout << pair.first << ',' << pair.second;
+//        cout << '}';
+//        if (i!=res-1) cout << ',';
+//    }
+//    cout << '}';
+//    return res;
+//}
 
 //int componentsBFS(const char* g6)
 //{
@@ -1172,7 +1172,7 @@ int matching(const char* g6)
 
     {   cout <<"Undirected (g6 or matrix format):\n";
         MyGraph g;
-        MyGraph::PVertex A,B,C,D;
+        MyGraph::PVertex A,B,C,D,tabv[100]={0,0,0,0,0,0,0};
 //        A=g.addVert(0);B=g.addVert(1);C=g.addVert(2);D=g.addVert(3);
 //        g.addEdge(C,D);g.addEdge(A,B);g.addEdge(B,C);
 //        g.addEdge(A,D);
@@ -1182,24 +1182,28 @@ int matching(const char* g6)
 
 //        IO::writeG6(g,napis,20);
 
-        IO::readG6(g,"FhCKG");
+//        IO::readG6(g,"JA?A???????");
 
 //        g.clear();
 //        kruskal("{{0,3,2},{3,0,5},{2,5,1}}");
 //        dijkstraPairUndir("{{0,3,2},{3,0,5},{2,5,1}}");
 
-        IO::writeGraphText(g, cout, IO::RG_VertexLists );
+//        IO::writeGraphText(g, cout, IO::RG_VertexLists );
+        const int u=1, v=3, w=6;
+//        const int u=0, v=1, w=2;
+        for(int i=0;i<11;i++) tabv[i]=g.addVert();
+        for(int i=0;i<10;i++) for(int j=i+1;j<11;j++)
+        {
+            if ((i==u) && (j==v)) continue;
+            if ((i==u) && (j==w)) continue;
+            g.addEdge(tabv[i],tabv[j]);
+        }
+
+//        g.addEdge(tabv[1],tabv[3]);g.addEdge(tabv[1],tabv[6]);
+//        g.neg(EdUndir);
 
 //    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    MISPar< Settings >::get(g,setInserter(res));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << res << "\n" << g.getVertSet();
-    cout << res.size();
-
-//        cout << "\n\n" << MISPar< Settings >::get(g,blackHole);
+    cout << boolalpha << IsItPar< Settings >::chordal(g);
 
 
     }

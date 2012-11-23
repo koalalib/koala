@@ -664,7 +664,7 @@ int blocks(const char* g6)
     MyGraph g;
     g.makeAdjMatrix();
     IO::readG6(g,g6);
-    MyGraph::PVertex LOCALARRAY(tabv,g.getVertNo());
+    MyGraph::PVertex LOCALARRAY(tabv,g.getVertNo()+g.getEdgeNo()+1);
     int LOCALARRAY(tabpos,g.getVertNo()+g.getEdgeNo()+1);
     int res=BlocksPar< Settings >::split(g,blackHole,blackHole,SearchStructs::compStore(tabpos,tabv),blackHole);
     cout << '{';
