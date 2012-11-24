@@ -158,6 +158,22 @@ namespace Koala
         template< class GraphType > static bool compMPartite( const GraphType &g )
             { return CompMPartite::split( g,compStore( blackHole,blackHole )) != -1; }
 
+        protected:
+
+          template <class Cont>
+            struct AssocArrSwitch {
+
+                typedef Cont Type;
+            };
+
+            template <class K, class E, class Cont>
+            struct AssocArrSwitch<AssocArray<K,E,Cont> > {
+
+                typedef AssocTable<std::map< K, E> > Type;
+            };
+
+        public:
+
         /* Chordal
          * M. Habib, R. McConnel, C. Paul, L.Viennot
          * Lex-BFS and Partition Refinement, with Applications to Transitive
@@ -181,78 +197,18 @@ namespace Koala
             // DFSPostorder da: A B C E D
             // a poni¿sza funkcja mo¿e zwróciæ np.: A E B C D
 
-            template <class Elem> class RekSet {
-
-                    Elem a;
-                    Koala::Set<RekSet<Elem>* > children;
-
-                public:
-
-                RekSet() : a(0), children() {}
-
-                void clear()
-                    { a=0; children.clear(); }
-
-                RekSet& operator+=(RekSet<Elem>& X)
-                {
-                    if (&X==this) return *this;
-                    children+=& X;
-                    return *this;
-                }
-
-                RekSet& operator+=(Elem e)
-                {
-                    assert(!a);
-                    a=e;
-                    return *this;
-                }
-
-                int size()
-                {
-                    int res=(a) ? 1 : 0;
-                    for(RekSet<Elem>* w=children.first();w;w=children.next(w))
-                            res+=w->size();
-                    return res;
-                }
-
-                template <class Iter>
-                void getElements(Iter& out)
-                {
-                    if (a)
-                    {
-                        *out=a; ++out;
-                    }
-                    for(RekSet<Elem>* w=children.first();w;w=children.next(w))
-                        w->getElements(out);
-                }
-
-            };
-
-
             static void SemiPostOrderTree( int *parent, int n, int *out );
 
             template< class Graph > struct QTRes
             {
                 int size;
-                RekSet< typename Graph::PVertex > trees;
+                Set< typename Graph::PVertex > trees;
                 QTRes(): size( 0 )
                     { }
             };
 
-
-            template <class Cont>
-            struct AssocArrSwitch {
-
-                typedef Cont Type;
-            };
-
-            template <class K, class E, class Cont>
-            struct AssocArrSwitch<AssocArray<K,E,Cont> > {
-
-                typedef AssocTable<std::map< K, E> > Type;
-            };
-
           public:
+
             // wyrzuca na iterator odwrotny perf. ellimination order chordal grafu tj. porzadek doklejania nowych wierzcholkow za podkliki
             // false gdy graf nie byl chordal
             template< class Graph, class VIter2 > static bool getOrder( const Graph &g, VIter2 riter );
@@ -540,41 +496,12 @@ namespace Koala
         // czy cograph
         template< class GraphType > static bool cograph( const GraphType &g );
 
-        // Planarne
-
-        protected:
-
-            class Planar {
-
-                public:
-
-                template <class Graph>
-                struct DFSOutput
-                {
-                    int licznik;
-                    int cflag;
-                    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,int >::Type& cycle;
-                    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,int >::Type num;
-                    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,typename Graph::PVertex >::Type father;
-
-                    DFSOutput(int n, typename DefaultStructs:: template AssocCont< typename Graph::PVertex,int >::Type & cycp)
-                    : cycle(cycp), num (n), father(n) {}
-                };
-
-                template<class Graph, class DFSOut>
-                static void dfs(typename Graph::PVertex v,typename Graph::PVertex u,const Graph &sg,DFSOut &dfso);
-
-                template <class Graph>
-                static bool bicomponentplanarity(const Graph &sg);
-            };
-
-        public:
-
-            template <class Graph>
-            static bool planar(const Graph &g);
-
-            template <class Graph>
-            static bool outerplanar(Graph &g);
+//TODO:
+//            template <class Graph>
+//            static bool planar(const Graph &g);
+//
+//            template <class Graph>
+//            static bool outerplanar(Graph &g);
 
     };
 
