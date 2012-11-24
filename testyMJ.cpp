@@ -374,25 +374,25 @@ bool intervalRepr(const char* g6)
     return res;
 }
 
-bool planar(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    IO::readG6(g,g6);
-    bool res=IsItPar< Settings >::planar(g);
-    cout << int(res);
-    return res;
-}
-
-bool outerplanar(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    IO::readG6(g,g6);
-    bool res=IsItPar< Settings >::outerplanar(g);
-    cout << int(res);
-    return res;
-}
+//bool planar(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    IO::readG6(g,g6);
+//    bool res=IsItPar< Settings >::planar(g);
+//    cout << int(res);
+//    return res;
+//}
+//
+//bool outerplanar(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    IO::readG6(g,g6);
+//    bool res=IsItPar< Settings >::outerplanar(g);
+//    cout << int(res);
+//    return res;
+//}
 
 bool split(const char* g6)
 {

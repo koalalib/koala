@@ -1189,21 +1189,21 @@ bool split(const char* g6)
 //        dijkstraPairUndir("{{0,3,2},{3,0,5},{2,5,1}}");
 
 //        IO::writeGraphText(g, cout, IO::RG_VertexLists );
-        const int u=1, v=3, w=6;
+//        const int u=1, v=3, w=6;
 //        const int u=0, v=1, w=2;
-        for(int i=0;i<11;i++) tabv[i]=g.addVert();
-        for(int i=0;i<10;i++) for(int j=i+1;j<11;j++)
-        {
-            if ((i==u) && (j==v)) continue;
-            if ((i==u) && (j==w)) continue;
-            g.addEdge(tabv[i],tabv[j]);
-        }
+//        for(int i=0;i<11;i++) tabv[i]=g.addVert();
+//        for(int i=0;i<10;i++) for(int j=i+1;j<11;j++)
+//        {
+//            if ((i==u) && (j==v)) continue;
+//            if ((i==u) && (j==w)) continue;
+//            g.addEdge(tabv[i],tabv[j]);
+//        }
 
 //        g.addEdge(tabv[1],tabv[3]);g.addEdge(tabv[1],tabv[6]);
 //        g.neg(EdUndir);
 
 //    g.makeAdjMatrix();
-    cout << boolalpha << IsItPar< Settings >::chordal(g);
+    split("L~~~~n~~~~~~~~");
 
 
     }
