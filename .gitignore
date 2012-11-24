@@ -4,4 +4,4 @@
 *.prv
 *.layout
 *.depend
-
+*.out

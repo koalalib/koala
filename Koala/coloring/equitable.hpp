@@ -1,6 +1,6 @@
 template<class DefaultStructs> template <typename Graph, typename ColorMap>
 int EquitVertColoringPar<DefaultStructs>::
-repairSimple(const Graph &graph, ColorMap &colors)
+repair1(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
@@ -19,7 +19,7 @@ repairSimple(const Graph &graph, ColorMap &colors)
 		k; k = colors.nextKey(k))
 	{
 		int col = colors[k];
-		assert(col<VertNo);
+		koalaAssert(col<VertNo, AlgExcWrongArg);
 		if(maxCol<col) maxCol = col;
 		++colCount[ col ];
 	}
@@ -76,7 +76,7 @@ repairSimple(const Graph &graph, ColorMap &colors)
 
 template<class DefaultStructs> template <typename Graph, typename ColorMap>
 int EquitVertColoringPar<DefaultStructs>::
-repairSubgraph(const Graph &graph, ColorMap &colors)
+repair2(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
 	const EdgeDirection Mask = EdDirIn | EdDirOut | EdUndir;
@@ -95,7 +95,7 @@ repairSubgraph(const Graph &graph, ColorMap &colors)
 		k; k = colors.nextKey(k))
 	{
 		int col = colors[k];
-		assert(col<VertNo);
+		koalaAssert(col<VertNo, AlgExcWrongArg);
 		++colCount[col];
 		if( maxCol<col ) maxCol = col;
 	}
@@ -182,7 +182,7 @@ int EquitVertColoringPar<DefaultStructs>::test(const Graph &graph, const ColorMa
 	typedef typename Graph::PEdge Edge;
 	//const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
-	if( !SeqVertColoring::test(graph, colors) )
+	if( !SeqVertColoringPar<DefaultStructs>::test(graph, colors) )
 		return -1;
 
 	std::map<int, int> cntMap;
@@ -478,7 +478,7 @@ int EquitEdgeColoringPar<DefaultStructs>::test(const Graph &graph, const ColorMa
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
-	if( !SeqEdgeColoring::test(graph, colors) )
+	if( !SeqEdgeColoringPar<DefaultStructs>::test(graph, colors) )
 		return -1;
 
 	std::map<int, int> cntMap;

@@ -10,8 +10,6 @@ using namespace std;
 using namespace Koala;
 using namespace Koala::IO;
 
-typedef Subgraph<Graph<char,std::string>,AssocHasChooser<AssocArray<Graph<char,std::string>::PVertex, int>*> ,BoolChooser> SubgraphA;
-
 template <class DefaultStructs> class IsPar
 {
 
@@ -38,9 +36,9 @@ template <class DefaultStructs> class IsPar
         {
             int licznik;
             int cflag;
-            AssocArray<typename GraphType::PVertex, int> cycle;
-            AssocArray<typename GraphType::PVertex, int> num;
-            AssocArray<typename GraphType::PVertex, typename GraphType::PVertex> father;
+            typename DefaultStructs::template AssocCont<typename GraphType::PVertex, char>::Type cycle;
+            typename DefaultStructs::template AssocCont<typename GraphType::PVertex, int>::Type num;
+            typename DefaultStructs::template AssocCont<typename GraphType::PVertex, typename GraphType::PVertex>::Type father;
 
             DFSOutput(int n) : licznik(0), cflag(0), cycle(n), num(n), father(n)
             { }
@@ -88,22 +86,17 @@ template <class DefaultStructs> class IsPar
             dfso.father[x]=x0;
             dfs(x,x0,sg,dfso);
 
-            AssocArray<typename SubgraphA::PVertex, int>& hv=dfso.cycle;
-            AssocArray<typename SubgraphA::PVertex, int> hvcr(n);
-            AssocArray<typename SubgraphA::PVertex, int> componentV(n);
-            AssocArray<typename SubgraphA::PVertex, int> vis(n);
-            AssocArray<typename SubgraphA::PVertex, int> fragmV(n);
-            AssocArray<typename SubgraphA::PVertex, int> face1(n);
-            AssocArray<typename SubgraphA::PVertex, int> face2(n);
+            typename DefaultStructs::template AssocCont<typename SubgraphA::PVertex, char>::Type & hv=dfso.cycle;
+            typename DefaultStructs::template AssocCont<typename SubgraphA::PVertex, char>::Type
+                hvcr(n), componentV(n), vis(n), fragmV(n), face1(n), face2(n);
 
 
-            AssocArray<typename SubgraphA::PEdge, int> he(m);
-            AssocArray<typename SubgraphA::PEdge, int> componentE(m);
-            AssocArray<typename SubgraphA::PEdge, int> fragmE(m);
+            typename DefaultStructs::template AssocCont<typename SubgraphA::PEdge, char>::Type
+                he(m), componentE(m), fragmE(m);
 
-            vector<AssocArray<typename SubgraphA::PVertex, int> > faces;
-            vector<AssocArray<typename SubgraphA::PVertex,int> > fragmentsV;
-            vector<AssocArray<typename SubgraphA::PEdge,int> > fragmentsE;
+            vector<typename DefaultStructs::template AssocCont<typename SubgraphA::PVertex, char>::Type > faces;
+            vector<typename DefaultStructs::template AssocCont<typename SubgraphA::PVertex,char>::Type > fragmentsV;
+            vector<typename DefaultStructs::template AssocCont<typename SubgraphA::PEdge,char>::Type > fragmentsE;
             vector<Set<typename SubgraphA::PVertex> > attachmentsV;
 
 
@@ -137,7 +130,7 @@ template <class DefaultStructs> class IsPar
                     componentE.clear();
                 }
 
-            Subgraph<SubgraphA,AssocHasChooser<AssocArray<typename SubgraphA::PVertex, int>*> ,BoolChooser> sgcr=makeSubgraph(sg,std::make_pair(extAssocKeyChoose(&hvcr),stdChoose(true)));
+            Subgraph<SubgraphA,AssocHasChooser<typename DefaultStructs::template AssocCont<typename SubgraphA::PVertex, char>::Type *> ,BoolChooser> sgcr=makeSubgraph(sg,std::make_pair(extAssocKeyChoose(&hvcr),stdChoose(true)));
 
             typename SubgraphA::PVertex LOCALARRAY(tabV,n);
             typename SubgraphA::PEdge LOCALARRAY(tabE,m);
@@ -182,7 +175,7 @@ template <class DefaultStructs> class IsPar
 
             int pathlength=0;
             int fragmentnumber=fragmentsV.size()-1;
-            Subgraph<SubgraphA,AssocHasChooser<AssocArray<typename SubgraphA::PVertex, int>*> ,AssocHasChooser<AssocArray<typename SubgraphA::PEdge, int>*> > sgp; //podgraf do szukania sciezki
+            Subgraph<SubgraphA,AssocHasChooser<typename DefaultStructs::template AssocCont<typename SubgraphA::PVertex, char>::Type *> ,AssocHasChooser<typename DefaultStructs::template AssocCont<typename SubgraphA::PEdge, char>::Type*> > sgp; //podgraf do szukania sciezki
             if(fragmentsV.empty()==true)
               return true;
             else
@@ -433,9 +426,7 @@ template <class DefaultStructs> class IsPar
         int liczbaBlokow=BlocksPar<DefaultStructs>::split(makeSubgraph(g,stdChoose(true)&extAssocKeyChoose(&eds)),blackHole,blackHole,SearchStructs::compStore(tabcomp,tabV),blackHole);
 
         typename DefaultStructs:: template AssocCont< typename Graph::PVertex,char >::Type subgrTab(g.getVertNo());
-//        Subgraph<Graph,AssocHasChooser<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,char >::Type*> ,
-//                AssocHasChooser<typename DefaultStructs:: template AssocCont< typename Graph::PEdge,char >::Type*> > sg;
-//
+
         int liczbaWierzcholkow=0;
         int liczbaKrawedzi=0;
 
@@ -461,6 +452,61 @@ template <class DefaultStructs> class IsPar
 
 };
 
+class DefSettings : public AlgsDefaultSettings {};
+
+class StdMapSettings : public AlgsDefaultSettings {
+
+      public:
+
+        template< class A, class B > class AssocCont
+        {
+          public:
+            typedef AssocTable < std::map<A,B> > Type;
+
+        };
+
+        template< class A, class B, AssocMatrixType type > class TwoDimAssocCont
+        {
+          public:
+            typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,PseudoAssocArray<A,int,AssocTable<std::map<A,int> > > > Type;
+        };
+
+};
+
+
+class HashMapSettings : public AlgsDefaultSettings {
+
+      public:
+
+        template< class A, class B > class AssocCont
+        {
+          public:
+            typedef AssocTable < BiDiHashMap<A,B> > Type;
+
+        };
+
+        template< class A, class B, AssocMatrixType type > class TwoDimAssocCont
+        {
+          public:
+            typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
+        };
+};
+
+
+#define ArrayMapTest
+//#define StdMapTest
+//#define HashMapTest
+
+
+#if defined(ArrayMapTest)
+#define  Settings DefSettings
+#endif
+#if defined(StdMapTest)
+#define  Settings StdMapSettings
+#endif
+#if defined(HashMapTest)
+#define  Settings HashMapSettings
+#endif
 
 
 int main(int argc, char *argv[]) {
@@ -469,37 +515,41 @@ int main(int argc, char *argv[]) {
     //readG6(g, txt);
    Graph<char,std::string>::PVertex A,B,C,D,E,F,G,H,I;//,J,K,L; // to beda wierzcholki
 
-     A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');
+     A=g.addVert('A');
+     cout << "1:"<<IsPar<Settings>::planar(g) << endl;
+     B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');
      E=g.addVert('E');F=g.addVert('F');G=g.addVert('G');H=g.addVert('H');
      I=g.addVert('I');//J=g.addVert('J');K=g.addVert('K');L=g.addVert('L');
 
-     //KG: to nie moze byc planarne, jesli nie jest bez g.putVert
-     g.putVert(g.addEdge(A,B,"ab",EdUndir));g.addEdge(B,C,"bc",EdUndir);g.addEdge(A,C,"ac",EdUndir);
+
+     g.putVert(g.addEdge(A,B,"ab",EdUndir));
+     cout << "1:"<<IsPar<Settings>::planar(g) << endl;
+     g.addEdge(B,C,"bc",EdUndir);g.addEdge(A,C,"ac",EdUndir);
      g.addEdge(D,A,"da",EdUndir);g.addEdge(D,B,"db",EdUndir);g.addEdge(D,C,"dc",EdUndir);
      g.addEdge(A,E,"ae",EdUndir);g.addEdge(B,E,"be",EdUndir);g.addEdge(E,C,"ec",EdUndir);g.addEdge(E,D,"ed",EdUndir);
-   cout << "0:"<<IsPar<AlgsDefaultSettings>::planar(g) << endl;
+   cout << "0:"<<IsPar<Settings>::planar(g) << endl;
 
    g.del(A);
-   cout << "1:"<<IsPar<AlgsDefaultSettings>::planar(g) << endl;
+   cout << "1:"<<IsPar<Settings>::planar(g) << endl;
    {    g.clear();
-        char* napis="GFBkpS";
+        const char* napis="GFBkpS";
         IO::readG6(g,napis);
-        cout << "1:"<<IsPar<AlgsDefaultSettings>::planar(g) << endl;
+        cout << "1:"<<IsPar<Settings>::planar(g) << endl;
    }
    {    g.clear();
-        char* napis="HG@VgLM";
+        const char* napis="HG@VgLM";
         IO::readG6(g,napis);
-        cout << "1:"<<IsPar<AlgsDefaultSettings>::planar(g) << endl;
+        cout << "1:"<<IsPar<Settings>::planar(g) << endl;
    }
    {    g.clear();
-        char* napis="ICxLWKGj_";
+        const char* napis="ICxLWKGj_";
         IO::readG6(g,napis);
-        cout << "0:"<<IsPar<AlgsDefaultSettings>::planar(g) << endl;
+        cout << "0:"<<IsPar<Settings>::planar(g) << endl;
    }
    {    g.clear();
-        char* napis="HeewBv?";
+        const char* napis="HeewBv?";
         IO::readG6(g,napis);
-        cout << "0:"<<IsPar<AlgsDefaultSettings>::planar(g) << endl;
+        cout << "0:"<<IsPar<Settings>::planar(g) << endl;
    }
 
 

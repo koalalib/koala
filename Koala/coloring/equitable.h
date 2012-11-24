@@ -23,10 +23,10 @@ protected:
 
 public:
 	template<typename Graph, typename ColorMap>
-	static int repairSimple(const Graph &graph, ColorMap &colors);
+	static int repair1(const Graph &graph, ColorMap &colors);
 
 	template<typename Graph, typename ColorMap>
-	static int repairSubgraph(const Graph &graph, ColorMap &colors);
+	static int repair2(const Graph &graph, ColorMap &colors);
 
 	template<typename Graph, typename ColorMap>
 	static int test(const Graph &graph, const ColorMap &colors);

@@ -208,7 +208,7 @@ int SeqVertColoringPar<DefaultStructs>::lfSort(const Graph &graph,
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	typedef VertDeg<Vert> LfStr;
 
-	assert(beg!=end);
+	koalaAssert(beg!=end, AlgExcWrongArg);
 	int atablen=end-beg;
 	LfStr LOCALARRAY(lfStr, atablen);
 	int lenLfStr = 0;
@@ -235,7 +235,7 @@ int SeqVertColoringPar<DefaultStructs>::slSort(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	typedef VertDeg<Vert> SlStruct;
 
-	assert(beg!=end);
+	koalaAssert(beg!=end, AlgExcWrongArg);
 
 	typedef Privates::BlockListAllocator< typename DefaultStructs:: template
 		HeapCont< SlStruct,void,void >::NodeType > Allocator;
@@ -1213,7 +1213,7 @@ int SeqVertColoringPar<DefaultStructs>::slf(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	typedef VertDegSat<Vert> SlfStruct;
 
-	assert(beg!=end);
+	koalaAssert(beg!=end, AlgExcWrongArg);
 
 	typedef Privates::BlockListAllocator< typename DefaultStructs:: template
 		HeapCont< SlfStruct,void,void >::NodeType > Allocator;
@@ -1305,7 +1305,7 @@ int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	typedef VertDegSat<Vert> SlfStruct;
 
-	assert(beg!=end);
+	koalaAssert(beg!=end, AlgExcWrongArg);
 
 	typedef Privates::BlockListAllocator< typename DefaultStructs:: template
 		HeapCont< SlfStruct,void,void >::NodeType > Allocator;
