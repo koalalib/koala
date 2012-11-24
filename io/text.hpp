@@ -135,7 +135,7 @@ template<class Graph, class VMap, class EMap>
 bool readGraphVL(Graph &g, std::istream &strm,
 		 VMap &vertexMap, EMap &edgeMap) {
 	char c;
-	unsigned int i, id, m, iu, iv, n,ix;
+	unsigned int i, m, iu, iv, n,ix;
 	std::istringstream ostrm;
 	EdgeDirection dir;
 	typename Graph::PEdge e;
@@ -194,7 +194,7 @@ bool readGraphEL(Graph &g, std::istream &strm,
 	std::string str;
 	std::istringstream ostrm;
 	EdgeDirection dir;
-	unsigned int id, iu, iv, n, m,ie,ix;
+	unsigned int id, iu, iv, n, m,ix;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u, v;
 	std::map<unsigned int, typename Graph::PVertex> idxToPtr;
@@ -202,7 +202,7 @@ bool readGraphEL(Graph &g, std::istream &strm,
 
 	if (!(bool)(strm >> n >> m)) return false;
 	for(id=0;id<n;id++) idxToPtr[id] = g.addVert();
-	for(int i=0;i<m;i++) {
+	for(unsigned int i=0;i<m;i++) {
 	    strm >> iu;
 		it = idxToPtr.find(iu);
 		if(it == idxToPtr.end()) return false;

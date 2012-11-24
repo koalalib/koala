@@ -825,7 +825,7 @@ namespace Koala
                 AssocCont< typename Graph::PVertex,Privates::List_iterator< Node > >::Type m_vertexToPos;
 
             LexVisitContainer( Allocator& a, ContAllocator& ca, int n):
-                m_data( ca ), m_splits( a ), m_openBlock(), m_vertexToPos( n )
+                m_data( ca ), m_openBlock(), m_splits( a ),  m_vertexToPos( n )
                 { }
 
             ~LexVisitContainer()
@@ -910,7 +910,7 @@ namespace Koala
           public:
             SCCState( CompStore< CompIter,VertIter > _i, CompMap &cm, typename GraphType::PVertex *buf1,
                 typename GraphType::PVertex *buf2, int n ): vmap( n ), s( buf1,n ), p( buf2,n ), iters( _i ),
-                idx( 0 ), count( 0 ), c( 0 ), compMap( cm )
+                 compMap( cm ), idx( 0 ), count( 0 ), c( 0 )
                     { }
 
             void addVert( typename GraphType::PVertex );
@@ -1016,8 +1016,8 @@ namespace Koala
 
             BiConState( CompStore< CompIter,VertIter > _i, EdgeMap &em, EdgeDirection _m,
                 std::pair< typename GraphType::PEdge *,int > st, VertBlockList *_vbl, int vno ):
-                vmap( vno ), emap( st.second - 1 ), estk( st.first,st.second ), iters( _i ), idx( 0 ), count( 0 ),
-                mask( _m ), vbl( _vbl ), vblAlloc( 0 ), outEMap( em )
+                vmap( vno ), emap( st.second - 1 ), estk( st.first,st.second ), iters( _i ), outEMap( em ),
+                vbl( _vbl ), vblAlloc( 0 ), idx( 0 ), count( 0 ), mask( _m )
                 { }
 
             void addVert( typename GraphType::PVertex );

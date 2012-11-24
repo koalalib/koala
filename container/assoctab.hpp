@@ -751,8 +751,9 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
     AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocMatrix( int asize,
         typename AssocMatrixInternalTypes< Klucz,Elem >::BlockType *contBuf,
         typename AssocMatrixInternalTypes<Klucz,Elem>::IndexBlockType *indBuf ):
-            index( asize,indBuf), siz( 0 ), first( -1 ), last( -1 ),
-            bufor( contBuf,AssocMatrixAddr< aType >::bufLen( asize ) )
+            index( asize,indBuf),
+            bufor( contBuf,AssocMatrixAddr< aType >::bufLen( asize ) ),
+            siz( 0 ), first( -1 ), last( -1 )
 {
     bufor.clear();
     bufor.reserve( AssocMatrixAddr< aType >::bufLen( asize ) );

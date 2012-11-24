@@ -630,7 +630,7 @@ template< class DefaultStructs > template< class GraphType, class EIterIn > bool
     // liczba wierzcholkow w grafie
     int vertNo = g.getVertNo();
     // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
-    int expo = vertNo;
+//    int expo = vertNo;
     typename GraphType::PVertex U,V;
      //jezeli true - wierzcholek nalezy do matchingu
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type vertTabMatch( vertNo );

@@ -47,7 +47,7 @@ namespace Koala
       public:
         typedef T ElemType;
 
-        StackInterface( T *bufor, int max ): buf( bufor ), maxsize( max ), siz( 0 ) { }
+        StackInterface( T *bufor, int max ): buf( bufor ), siz( 0 ), maxsize( max )  { }
         int size() { return siz; }
         bool empty() { return siz == 0; }
         bool operator!() const { return empty(); }
@@ -156,7 +156,7 @@ namespace Koala
         typedef T ElemType;
 
         PriQueueInterface( T *bufor, int max, Comp acomp = Comp() ):
-            buf( bufor ), maxsize( max ), siz( 0 ), comp( acomp ) { }
+            buf( bufor ), siz( 0 ), maxsize( max ),  comp( acomp ) { }
         PriQueueInterface( T *bufor, T *end, int max, Comp acomp = Comp() );
         int size() { return siz; }
         bool empty() { return siz == 0; }

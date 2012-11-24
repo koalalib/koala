@@ -2,7 +2,7 @@
 #define KOALA_JOINABLE_SETS_H
 
 /* joinsets.h
- * 
+ *
  */
 
 #include <cassert>
@@ -19,7 +19,7 @@ namespace Koala
      * struktura pomocnicza dla zbiorow zlaczalnych o elementach typu Klucz
      */
     template< class Klucz > class JSPartDesrc
-    {   
+    {
         template< class K,class Cont > friend class JoinableSets;
 
         JSPartDesrc *parent,*next,*first,*last;
@@ -30,7 +30,7 @@ namespace Koala
     template< class Container > class VectorInterface;
 
     /* JoinableSetsInternalTypes
-     * 
+     *
      */
     template< class ITEM > struct JoinableSetsInternalTypes
     {
@@ -38,7 +38,7 @@ namespace Koala
         typedef JSPartDesrc< ITEM > BufElementType;
     } ;
 
-    /* JoinableSets 
+    /* JoinableSets
      * Klasa zbioru rozlacznych zbiorow zlaczalnych o elementach typu wskaznikowego ITEM
      * AssocContainer to typ wewnetrznej tablicy asoc. ITEM->JSPartDesrc< ITEM > *
      */
@@ -51,12 +51,12 @@ namespace Koala
 
       public:
         // typ reprezentanta pojedynczego zbioru
-        typedef JSPartDesrc< ITEM > *Repr; 
+        typedef JSPartDesrc< ITEM > *Repr;
         // typ elementow zbiorow
-        typedef ITEM ElemType; 
+        typedef ITEM ElemType;
 
         // pierwszy argument - maks. liczba elementow wszystkich zbiorow, pozostale arg. ignorowane
-        JoinableSets( unsigned int = 0, void* p = 0, void *q = 0 ); 
+        JoinableSets( unsigned int = 0, void* p = 0, void *q = 0 );
         JoinableSets( const JoinableSets< ITEM,AssocContainer > & );
         JoinableSets &operator=( const JoinableSets< ITEM,AssocContainer > & );
         ~JoinableSets() { resize( 0 ); }
@@ -66,18 +66,18 @@ namespace Koala
         // TODO: sprawdzic niekopiowalnosc obiektu w tym przypadku
         // TODO: rozwazyc usuniecie z finalnej wersji biblioteki
         JoinableSets( unsigned int n, JSPartDesrc< ITEM > * buf,
-            typename JoinableSetsInternalTypes< ITEM >::AssocBlockType * mapbuf ): mapa( n,mapbuf ), siz( 0 ),
-                bufor( buf ), part_no( 0 ), maxsize( n ) { }
+            typename JoinableSetsInternalTypes< ITEM >::AssocBlockType * mapbuf ): mapa( n,mapbuf ), bufor( buf ),
+            siz( 0 ), part_no( 0 ), maxsize( n ) { }
 
         // czysci kontener i zmienia maks. liczbe elementow wszystkich zbiorow
-        void resize( unsigned int ); 
+        void resize( unsigned int );
 
         // liczba wszystkich elementow w kontenerze
-        int size() const { return siz; } 
+        int size() const { return siz; }
         // liczba elementow w zbiorze o podanym reprezentancie
-        int size( typename JoinableSets< ITEM >::Repr ) const; 
+        int size( typename JoinableSets< ITEM >::Repr ) const;
         // liczba elementow zbioru zawierajacego argument, 0 jesli argument nie byl jeszcze wprowadzony
-        int size( const ITEM & ) const; 
+        int size( const ITEM & ) const;
 
         // sprawdzenie, czy kontener jest pusty
         bool empty() const { return siz == 0; }
@@ -85,14 +85,14 @@ namespace Koala
 
         void clear() { resize( 0 ); }
         // liczba zbiorow
-        int getSetNo() const { return part_no; } 
+        int getSetNo() const { return part_no; }
         // wpisuje elementy wszystkich zbiorow na podany iterator, zwraca size()
-        template< class Iter > int getElements( Iter ) const; 
+        template< class Iter > int getElements( Iter ) const;
 
         // wypisuje na podany iterator reprezentatow wszystkich zbiorow
-        template< class Iter > int getSetIds( Iter ) const; 
+        template< class Iter > int getSetIds( Iter ) const;
         // wypisuje na podany iterator elementy zbioru o podanym reprezencie
-        template< class Iter > int getSet( typename JoinableSets< ITEM >::Repr, Iter ) const; 
+        template< class Iter > int getSet( typename JoinableSets< ITEM >::Repr, Iter ) const;
         // wypisuje na podany iterator elementy zbioru zawierajaccego podany element
         template< class Iter > int getSet( const ITEM &i, Iter iter ) const { return getSet( getSetId( i ),iter ); }
 

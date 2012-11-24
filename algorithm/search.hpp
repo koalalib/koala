@@ -32,7 +32,7 @@ template< class GraphType, class VertContainer, class VIter, class EIter > int
 {
     koalaAssert( end,AlgExcNullVert );
     int n;
-    typename GraphType::PVertex u,v = vertTab[end].vPrev;
+    typename GraphType::PVertex v = vertTab[end].vPrev;
     typename GraphType::PEdge e = vertTab[end].ePrev;
     typename GraphType::PVertex LOCALARRAY( tabV,n = g.getVertNo() );
     typename GraphType::PEdge LOCALARRAY( tabE,n );

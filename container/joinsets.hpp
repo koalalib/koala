@@ -2,7 +2,7 @@
 
 template< class ITEM, class AssocContainer >
     JoinableSets< ITEM,AssocContainer >::JoinableSets( unsigned int n, void *p, void *q ):
-        mapa( n ), siz( 0 ), bufor( NULL ), part_no( 0 ), maxsize( n )
+        mapa( n ), bufor( NULL ), siz( 0 ),  part_no( 0 ), maxsize( n )
 {
     if (n) bufor = new JSPartDesrc< ITEM >[n];
 }

@@ -120,7 +120,7 @@ template< class Graph > int writeG6( const Graph &graph, char *str_graph, int le
 	typedef typename Graph::PVertex Vert;
 	if (len_str < 5) return 0;
 
-	int mask = 0;
+//	int mask = 0;
 	int wrt_len= 0;
 
 	int order = graph.getVertNo();

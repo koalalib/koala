@@ -163,7 +163,7 @@ template< class DefaultStructs > template< class GraphType, class Iter >
     koalaAssert(-1 != getPart( g,assocInserter( setL, constFun( true ) ),true ),AlgExcWrongArg );
     for( typename GraphType::PVertex v=g.getVert(); v; v=g.getVertNext(v))
         if (! setL.hasKey( v ) ) setR[v];
-    int matchno = MatchingPar< DefaultStructs >::findMax( g,vertTab,assocInserter( matching,constFun( true ) ) );
+    MatchingPar< DefaultStructs >::findMax( g,vertTab,assocInserter( matching,constFun( true ) ) );
 
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type setT( n ), setnew( n );
 
@@ -477,7 +477,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
     for( int j=i = 0; i<kliki.size(); ++i )
     {
         kliki[i].getElements(out.vertIter);
-        for(int k=0;k<kliki[i].size();++k) ++out.vertIter;
+        for(unsigned int k=0;k<kliki[i].size();++k) ++out.vertIter;
         j+=kliki[i].size();
         *out.compIter = j;
         ++out.compIter;
@@ -703,7 +703,7 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
         OutIter cliqueiter)
 {
     if (!undir( g,false )) return -1;
-    int b,i,m = g.getEdgeNo(),h,n = g.getVertNo();
+    int m = g.getEdgeNo(),n = g.getVertNo();
     if (n == 1)
     {
         if (!isBlackHole( aheightmap )) aheightmap[g.getVert()] = 0;
@@ -1040,7 +1040,7 @@ template< class DefaultStructs > template< class GraphType, class IntMap >
         {
             if (DefaultStructs::ReserveOutAssocCont) outmap.reserve( n );
             CalculateI( g,sigma,data,&IvData::posSigma,&IvData::ip );
-            for( int i = 0; i < n; i++ ) outmap[sigma[i]] = Segment( i,data[sigma[i]].ip );
+            for( unsigned int i = 0; i < n; i++ ) outmap[sigma[i]] = Segment( i,data[sigma[i]].ip );
         }
         return true;
     }
@@ -1105,7 +1105,7 @@ template< class DefaultStructs > template< class GraphType, class Map, class Set
     void IsItPar< DefaultStructs >::Interval::BuildSet( const GraphType &g, SetsType &sets, Map &data,
         unsigned int IvData::*order, unsigned int IvData::*ifn )
 {
-    unsigned int i,n,vord,zord;
+    unsigned int n,vord,zord;
     typename GraphType::PEdge e;
     typename GraphType::PVertex z,v;
     n = g.getVertNo();
