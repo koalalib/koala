@@ -63,10 +63,10 @@ namespace Koala
       public:
         // podajemy komparator, alokacja new/delete
         inline BinomHeap( const Compare &function = Compare() ):
-            root( 0 ), minimum( 0 ), nodes( 0 ), allocator( 0 ), function( function ) { }
+            root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( 0 ) { }
         // podajemy komparator, kolejka powiazana z alokatorem zewnetrznym
         inline BinomHeap( Allocator *all, const Compare &function = Compare() ):
-            root( 0 ), minimum( 0 ), nodes( 0 ), allocator( all ), function( function ) { }
+            root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( all )  { }
         // konstruktor kopiujacy, obiekt wiaze sie z tym samym alokatorem, co oryginal
         inline BinomHeap( const BinomHeap< Key,Compare,Allocator > & );
         BinomHeap &operator=( const BinomHeap &X );
@@ -232,9 +232,9 @@ namespace Koala
         void clear( Node * );
 	public:
         inline PairHeap( const Compare &function = Compare() ):
-            root( 0 ), nodes( 0 ), allocator( 0 ), function( function ) { }
+            root( 0 ), nodes( 0 ), function( function ), allocator( 0 )  { }
         inline PairHeap( Allocator *all, const Compare &function = Compare() ):
-            root( 0 ), nodes( 0 ), allocator( all ), function( function ) { }
+            root( 0 ), nodes( 0 ), function( function ), allocator( all ) { }
         inline PairHeap( const PairHeap< Key,Compare,Allocator > & );
         PairHeap& operator=( const PairHeap< Key,Compare,Allocator > &X );
         ~PairHeap() { clear(); }

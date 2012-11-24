@@ -55,13 +55,13 @@ namespace Koala
 
             // agrs: przepustowosc i koszt krawedzi
             EdgeLabs():
-                    capac(DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), cost( DefaultStructs:: template NumberTypeBounds< CostType >::zero() ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() )
+                    capac(DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), cost( DefaultStructs:: template NumberTypeBounds< CostType >::zero() )
                 { }
             EdgeLabs( CapacType arg):
-                    capac( arg ), cost(DefaultStructs:: template NumberTypeBounds< CostType >::zero()), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() )
+                    capac( arg ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), cost(DefaultStructs:: template NumberTypeBounds< CostType >::zero())
                 { }
             EdgeLabs( CapacType arg, CostType arg2):
-                    capac( arg ), cost( arg2 ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() )
+                    capac( arg ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), cost( arg2 )
                 { }
 //            EdgeLabs( CapacType arg = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
 //                CostType arg2 = DefaultStructs:: template NumberTypeBounds< CostType >::zero() ):
@@ -195,7 +195,7 @@ namespace Koala
 
             VertLabs( typename GraphType::PVertex pv = 0, typename GraphType::PEdge pe = 0,
                 int d = std::numeric_limits< int >::max(), int bd = std::numeric_limits< int >::max() ):
-                    vPrev( pv ), ePrev( pe ), distance( d ), backdist( bd ),
+                    distance( d ), backdist( bd ),vPrev( pv ), ePrev( pe ),
                     mass( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ),
                     inPot( DefaultStructs:: template NumberTypeBounds< CapacType >::plusInfty() ),
                     outPot( DefaultStructs:: template NumberTypeBounds< CapacType >::plusInfty() ),
@@ -280,9 +280,10 @@ namespace Koala
             typename GraphType::PVertex vPrev;
             typename GraphType::PEdge  ePrev;
 
-            VertLabsCost(): vPrev( 0 ), ePrev( 0 ),
+            VertLabsCost():
                 distance( DefaultStructs:: template NumberTypeBounds< CostType >::plusInfty() ),
-                pot( DefaultStructs:: template NumberTypeBounds< CostType >::zero() )
+                pot( DefaultStructs:: template NumberTypeBounds< CostType >::zero() ),
+                vPrev( 0 ), ePrev( 0 )
                 { }
         };
 
@@ -305,7 +306,8 @@ namespace Koala
             typename GraphType::PVertex vPrev;
             typename GraphType::PEdge  ePrev;
 
-            CycLabs(): vPrev( 0 ), ePrev( 0 ), dist( DefaultStructs::template NumberTypeBounds< CostType >::plusInfty() )
+            CycLabs(): dist( DefaultStructs::template NumberTypeBounds< CostType >::plusInfty() ),
+                        vPrev( 0 ), ePrev( 0 )
                 { }
         };
 
@@ -416,7 +418,7 @@ namespace Koala
                     typename GraphType::PEdge LOCALARRAY( eres,m = g.getEdgeNo(Directed | Undirected) );
                     typename GraphType::PEdge LOCALARRAY( ebuf,m );
                     res.capac = DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty();
-                
+
                     for( typename GraphType::PVertex s = g.getVert(); s != g.getVertLast(); s = g.getVertNext( s ) )
                         for( typename GraphType::PVertex t = g.getVertNext( s ); t; t = g.getVertNext( t ) )
                         {

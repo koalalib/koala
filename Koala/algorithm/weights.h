@@ -39,8 +39,9 @@ namespace Koala
             typename GraphType::PVertex vPrev;
             typename GraphType::PEdge ePrev;
 
-            VertLabs(): vPrev( 0 ), ePrev( 0 ),
-                distance( DefaultStructs::template NumberTypeBounds< DType >::plusInfty() )
+            VertLabs():
+                distance( DefaultStructs::template NumberTypeBounds< DType >::plusInfty() ),
+                vPrev( 0 ), ePrev( 0 )
                 { }
 
             template< class Rec > void copy( Rec &rec ) const;
@@ -127,20 +128,20 @@ namespace Koala
             PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType& g,
                 const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
                 ShortPathStructs::OutPath< VIter,EIter > iters )
-                {   
+                {
                     koalaAssert( start && end,AlgExcNullVert );
                     const typename EdgeContainer::ValType::DistType PlusInfty = DefaultStructs:: template
                 	NumberTypeBounds< typename EdgeContainer::ValType::DistType >::plusInfty();
-                
+
                     typename EdgeContainer::ValType::DistType dist;
                     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,typename DijBase::
                 	template VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
-                
+
                     dist = DijBase::distances( g,vertTab,edgeTab,start,end );
-                
+
                     if (PlusInfty == dist)
                 	return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
-                
+
                     int len = DijBase::getPath( g,vertTab,end,iters );
                     return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
                     // dlugosc najkr. siezki i jej liczba krawedzi
@@ -189,8 +190,9 @@ namespace Koala
             typename GraphType::PVertex vPrev;
             typename GraphType::PEdge  ePrev;
 
-            VertLabs(): vPrev( 0 ), ePrev( 0 ),
-                distance( DefaultStructs:: template NumberTypeBounds< DType >::minusInfty() )
+            VertLabs():
+                distance( DefaultStructs:: template NumberTypeBounds< DType >::minusInfty() ),
+                vPrev( 0 ), ePrev( 0 )
                 { }
         };
 
@@ -240,14 +242,14 @@ namespace Koala
                 {
                     const typename EdgeContainer::ValType::DistType MinusInfty = DefaultStructs:: template
                 	NumberTypeBounds< typename EdgeContainer::ValType::DistType >::minusInfty();
-                
+
                     typename EdgeContainer::ValType::DistType dist;
                     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,VertLabs< typename
                 	EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
-                
+
                     if (MinusInfty == (dist = critPathLength( g,vertTab,edgeTab,start,end )))
                 	return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
-                
+
                     int len = getPath( g,vertTab,end,iters );
                     return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
                 }
@@ -282,8 +284,9 @@ namespace Koala
             typename GraphType::PVertex vPrev;
             typename GraphType::PEdge ePrev;
 
-            VertLabs(): vPrev( 0 ), ePrev( 0 ),
-                distance( DefaultStructs:: template NumberTypeBounds< DType >::plusInfty() )
+            VertLabs():
+                distance( DefaultStructs:: template NumberTypeBounds< DType >::plusInfty() ),
+                vPrev( 0 ), ePrev( 0 )
                 { }
         };
 
@@ -322,19 +325,19 @@ namespace Koala
             PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
                 const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
                 ShortPathStructs::OutPath< VIter,EIter > iters )
-                {   
+                {
                     koalaAssert( start && end,AlgExcNullVert );
                     typename EdgeContainer::ValType::DistType dist;
                     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
                 	VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
-                
+
                     if (DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::DistType >
                 	::isPlusInfty(dist = distances( g,vertTab,edgeTab,start,end )))
                 	return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
                     else if (DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::DistType >
                 	::isMinusInfty( dist ))
                 	return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-2 ); // w grafie jest cykl ujemny
-                
+
                     int len = getPath( g,vertTab,end,iters );
                     return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
                     // dlugosc najkr. siezki i jej liczba krawedzi
@@ -375,8 +378,9 @@ namespace Koala
             typename GraphType::PVertex vPrev;
             typename GraphType::PEdge ePrev;
 
-            VertLabs(): vPrev( 0 ), ePrev( 0 ),
-                    distance( DefaultStructs:: template NumberTypeBounds< DType >::plusInfty() )
+            VertLabs():
+                    distance( DefaultStructs:: template NumberTypeBounds< DType >::plusInfty() ),
+                    vPrev( 0 ), ePrev( 0 )
                     { }
         };
 
@@ -434,7 +438,7 @@ namespace Koala
         template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
             Result< typename EdgeContainer::ValType::WeightType > getForest( const GraphType &g,
                 const EdgeContainer &edgeTab, Iter out, VertCompContainer &asets, int edgeNo, bool minWeight )
-                {   
+                {
                     JoinableSets< typename GraphType::PVertex,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
                 	JSPartDesrc< typename GraphType::PVertex > *>::Type > localSets;
                     typename BlackHoleSwitch< VertCompContainer,JoinableSets< typename GraphType::PVertex,
@@ -443,7 +447,7 @@ namespace Koala
                 	    BlackHoleSwitch< VertCompContainer,JoinableSets< typename GraphType::PVertex,
                 	    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
                 	    JSPartDesrc< typename GraphType::PVertex> *>::Type > >::get( asets,localSets );
-                
+
                     Result< typename EdgeContainer::ValType::WeightType > res;
                     res.edgeNo = 0;
                     res.weight = DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::WeightType >::zero();
@@ -453,10 +457,10 @@ namespace Koala
                     if (n == 0) return res;
                     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ))
                 	sets.makeSinglet( v );
-                
+
                     edgeNo = (edgeNo >= 0) ? edgeNo : n-1;
                     if (m == 0|| edgeNo == 0) return res;
-                
+
                     std::pair< typename EdgeContainer::ValType::WeightType,typename GraphType::PEdge > LOCALARRAY( edges,m );
                     int i = 0;
                     typename GraphType::PEdge e;
@@ -464,9 +468,9 @@ namespace Koala
                 	edges[i++] = std::make_pair( edgeTab[e].weight,e );
                     DefaultStructs::sort( edges,edges + m );
                     if (!minWeight) std::reverse( edges,edges + m );
-                
+
                     for( i = 0; i < m && edgeNo > 0; i++ )
-                    {   
+                    {
                 	std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends;
                 	e = edges[i].second;
                 	ends = g.getEdgeEnds( e );
@@ -480,7 +484,7 @@ namespace Koala
                 	    edgeNo--;
                 	}
                     }
-                
+
                     return res;
                 }
 

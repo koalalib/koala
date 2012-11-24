@@ -87,8 +87,9 @@ class DijkstraPar : public ShortPathStructs {
         typename GraphType::PVertex vPrev;
         typename GraphType::PEdge  ePrev;
 
-        VertLabs() : vPrev(0), ePrev(0),
-        distance(DefaultStructs:: template NumberTypeBounds<DType>::plusInfty()) {}
+        VertLabs() :
+        distance(DefaultStructs:: template NumberTypeBounds<DType>::plusInfty()),
+        vPrev(0), ePrev(0) {}
     };
 
     // wlasciwa procedura: odleglosc miedzy para wierzcholkow

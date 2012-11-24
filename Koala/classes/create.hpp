@@ -275,7 +275,7 @@ template< class GraphType, class VInfoGen, class EInfoGen, class Iter, class Ite
         j += k;
     }
 
-    int nextPart = 0, startPart = 0, endPart = 0;
+    int startPart = 0, endPart = 0;
 
     for( i = 0; i < size-1; i++ )
     {

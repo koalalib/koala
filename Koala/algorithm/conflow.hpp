@@ -271,8 +271,6 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 {
     koalaAssert( start && end,AlgExcNullVert );
     koalaAssert( start != end,AlgExcWrongConn );
-    const typename EdgeContainer::ValType::CapacType PlusInfty = DefaultStructs:: template NumberTypeBounds
-        < typename EdgeContainer::ValType::CapacType >::plusInfty();
     const typename EdgeContainer::ValType::CapacType Zero = DefaultStructs:: template NumberTypeBounds
         < typename EdgeContainer::ValType::CapacType >::zero();
 
@@ -667,7 +665,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 
     int len;
     res = maxFlow( g,edgeTab,start,end,val );
-    while (len = minMeanCycle( g,edgeTab,outPath( vTab,eTab ) ))
+    while ((len = minMeanCycle( g,edgeTab,outPath( vTab,eTab ) )) != 0)
     {
         typename EdgeContainer::ValType::CapacType delta = PlusInfty;
         for( int i = 0; i < len; i++ )
@@ -1257,7 +1255,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,
         std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed >::Type Image;
     Image ig;
-    int n,m;
+    int n;
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
         std::pair< typename Image::PVertex,typename Image::PVertex > >::Type images( n = g.getVertNo() );
     typename DefaultStructs:: template AssocCont< typename Image::PEdge,

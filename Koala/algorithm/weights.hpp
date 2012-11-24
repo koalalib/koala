@@ -2,18 +2,18 @@
 
 template< class DefaultStructs > template< class DType, class GraphType > template< class Rec >
     void DijkstraBasePar< DefaultStructs >::VertLabs< DType,GraphType >::copy( Rec &rec ) const
-{ 
+{
     rec.distance = distance;
     rec.vPrev = vPrev;
     rec.ePrev = ePrev;
-    
+
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EdgeContainer >
     typename EdgeContainer::ValType::DistType DijkstraBasePar< DefaultStructs >::distances( const GraphType &g,
         VertContainer &avertTab, const EdgeContainer &edgeTab, typename GraphType::PVertex start,
         typename GraphType::PVertex end )
-{   
+{
     koalaAssert( start,AlgExcNullVert );
     const typename EdgeContainer::ValType::DistType Zero = DefaultStructs:: template
         NumberTypeBounds< typename EdgeContainer::ValType::DistType >::zero();
@@ -47,7 +47,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
             E = g.getEdgeNext( U,E,Koala::EdDirOut | Koala::EdUndir ) )
             if (!vertTab.hasKey( V = g.getEdgeEnd( E,U ) ))
                 if ((nd = vertTab[U].distance + edgeTab[E].length) < Q[V].distance)
-                { 
+                {
                     Q[V].distance = nd;
                     Q[V].ePrev = E;
                     Q[V].vPrev = U;
@@ -59,7 +59,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 template< class DefaultStructs > template< class GraphType, class VertContainer, class VIter, class EIter >
     int DijkstraBasePar< DefaultStructs >::getPath( const GraphType &g, const VertContainer &vertTab,
         typename GraphType::PVertex end, ShortPathStructs::OutPath< VIter,EIter > iters )
-{   
+{
     koalaAssert( end,AlgExcNullVert );
     const typename VertContainer::ValType::DistType PlusInfty = DefaultStructs:: template
         NumberTypeBounds< typename VertContainer::ValType::DistType >::plusInfty();
@@ -74,7 +74,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     typename EdgeContainer::ValType::DistType DijkstraBasePar< DefaultStructs >::distancesOnHeap( const GraphType &g,
         VertContainer &avertTab, const EdgeContainer &edgeTab, typename GraphType::PVertex start,
         typename GraphType::PVertex end )
-{    
+{
     koalaAssert( start,AlgExcNullVert );
     const typename EdgeContainer::ValType::DistType Zero = DefaultStructs:: template
         NumberTypeBounds< typename EdgeContainer::ValType::DistType >::zero();
@@ -121,7 +121,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
             E = g.getEdgeNext( U,E,Koala::EdDirOut | Koala::EdUndir ) )
             if (!vertTab.hasKey( V = g.getEdgeEnd( E,U ) ))
                 if ((nd = vertTab[U].distance + edgeTab[E].length) < Q[V].distance)
-                {   
+                {
                     if (Q[V].repr)
                         heap.del( (typename DefaultStructs::template HeapCont<
                             typename GraphType::PVertex,void,void >::NodeType*)Q[V].repr );
@@ -141,7 +141,7 @@ template< class DefaultStructs, class DijBase > template< class GraphType, class
     typename DijkstraMainPar< DefaultStructs,DijBase >::template PathLengths< typename EdgeContainer::ValType::DistType >
     DijkstraMainPar< DefaultStructs,DijBase >::findPath( const GraphType &g, const EdgeContainer &edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end, typename ShortPathStructs::template OutPath< VIter,EIter > iters )
-{   
+{
     koalaAssert( start && end,AlgExcNullVert );
     const typename EdgeContainer::ValType::DistType PlusInfty = DefaultStructs:: template
         NumberTypeBounds< typename EdgeContainer::ValType::DistType >::plusInfty();
@@ -166,7 +166,7 @@ template< class DefaultStructs, class DijBase > template< class GraphType, class
 template< class DefaultStructs > template< class DType > template< class T >
     typename DAGCritPathPar< DefaultStructs >::template UnitLengthEdges< DType >::ValType
     DAGCritPathPar< DefaultStructs >::UnitLengthEdges< DType >::operator[]( T e ) const
-{ 
+{
     ValType res;
     res.length = DefaultStructs:: template NumberTypeBounds< DType >::one();
     return res;
@@ -179,8 +179,6 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 {
     const typename EdgeContainer::ValType::DistType Zero = DefaultStructs:: template
         NumberTypeBounds< typename EdgeContainer::ValType::DistType >::zero();
-    const typename EdgeContainer::ValType::DistType PlusInfty = DefaultStructs:: template
-        NumberTypeBounds< typename EdgeContainer::ValType::DistType >::plusInfty();
     const typename EdgeContainer::ValType::DistType MinusInfty = DefaultStructs:: template
         NumberTypeBounds< typename EdgeContainer::ValType::DistType >::minusInfty();
 
@@ -208,15 +206,15 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,char >::Type followers( start ? n : 0 );
     typename GraphType::PVertex LOCALARRAY( tabV,n );
     if (start)
-    {   
+    {
         Koala::BFSPar< DefaultStructs >::scanAttainable( g,start,assocInserter( followers,constFun< char >( 0 )),EdDirOut );
         Koala::DAGAlgsPar< DefaultStructs >::topOrd( makeSubgraph( g,std::make_pair( assocKeyChoose( followers ),
             stdChoose( true ) ) ),tabV );
         ibeg = 1;
         iend = followers.size();
-    } 
+    }
     else
-    {   
+    {
         Koala::DAGAlgsPar< DefaultStructs >::topOrd( g,tabV );
         ibeg = 0;
         iend = n;
@@ -230,11 +228,11 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         vertTab[U].distance = (g.getEdgeNo( U,EdDirIn )) ? MinusInfty : Zero;
 
         for( typename GraphType::PEdge E = g.getEdge( U,Koala::EdDirIn ); E; E = g.getEdgeNext( U,E,Koala::EdDirIn ) )
-        {   
+        {
             V = g.getEdgeEnd( E,U );
             if ((!start) || followers.hasKey( V ))
                 if ((nd = vertTab[V].distance + edgeTab[E].length) > vertTab[U].distance)
-                { 
+                {
                     vertTab[U].distance = nd;
                     vertTab[U].ePrev = E;
                     vertTab[U].vPrev = V;
@@ -248,7 +246,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 template< class DefaultStructs > template< class GraphType, class VertContainer, class VIter, class EIter > int
     DAGCritPathPar< DefaultStructs >::getPath( GraphType &g, const VertContainer &vertTab,
         typename GraphType::PVertex end, ShortPathStructs::OutPath< VIter,EIter > iters )
-{   
+{
     koalaAssert( end,AlgExcNullVert );
     if (DefaultStructs:: template NumberTypeBounds< typename VertContainer::ValType::DistType >
         ::isMinusInfty( vertTab[end].distance )) return -1;
@@ -282,7 +280,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     typename EdgeContainer::ValType::DistType BellmanFordPar< DefaultStructs >::distances( const GraphType &g,
         VertContainer &avertTab, const EdgeContainer &edgeTab, typename GraphType::PVertex start,
         typename GraphType::PVertex end )
-{   
+{
     koalaAssert( start,AlgExcNullVert );
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
         VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type localvertTab;
@@ -329,14 +327,14 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         {
             if (vertTab[U = g.getEdgeEnd1( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
                 vertTab[V = g.getEdgeEnd2( E )].distance)
-            { 
+            {
                 vertTab[V].distance = nd;
                 vertTab[V].ePrev = E;
                 vertTab[V].vPrev = U;
             }
             else if (vertTab[U = g.getEdgeEnd2( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
                 vertTab[V = g.getEdgeEnd1( E )].distance)
-            { 
+            {
                 vertTab[V].distance = nd;
                 vertTab[V].ePrev = E;
                 vertTab[V].vPrev = U;
@@ -346,7 +344,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         for( typename GraphType::PEdge E = g.getEdge( Koala::EdDirOut ); E; E = g.getEdgeNext( E,Koala::EdDirOut ) )
             if (vertTab[U = g.getEdgeEnd1( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
                 vertTab[V = g.getEdgeEnd2( E )].distance)
-            { 
+            {
                 vertTab[V].distance = nd;
                 vertTab[V].ePrev = E;
                 vertTab[V].vPrev = U;
@@ -357,13 +355,13 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     for( typename GraphType::PEdge E = g.getEdge( Koala::EdUndir ); E; E = g.getEdgeNext( E,Koala::EdUndir ) )
         if (vertTab[U = g.getEdgeEnd1( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
             vertTab[V = g.getEdgeEnd2( E )].distance)
-        { 
+        {
             existNegCycle = true;
             break;
         }
         else if (vertTab[U = g.getEdgeEnd2( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
             vertTab[V = g.getEdgeEnd1( E )].distance)
-        { 
+        {
             existNegCycle = true;
             break;
         }
@@ -385,7 +383,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 template< class DefaultStructs > template< class GraphType, class VertContainer, class VIter, class EIter > int
     BellmanFordPar< DefaultStructs >::getPath( const GraphType &g, VertContainer &vertTab,
         typename GraphType::PVertex end, ShortPathStructs::OutPath< VIter,EIter > iters )
-{   
+{
     koalaAssert( end,AlgExcNullVert );
     if (DefaultStructs:: template NumberTypeBounds< typename VertContainer::ValType::DistType >
         ::isPlusInfty(vertTab[end].distance)) return -1; // wierzcholek end jest nieosiagalny
@@ -400,7 +398,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     BellmanFordPar< DefaultStructs >::findPath( const GraphType &g, const EdgeContainer &edgeTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end,
         ShortPathStructs::OutPath< VIter,EIter > iters )
-{   
+{
     koalaAssert( start && end,AlgExcNullVert );
     typename EdgeContainer::ValType::DistType dist;
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
@@ -422,9 +420,9 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 template< class DefaultStructs > template< class GraphType, class TwoDimVertContainer, class VIter, class EIter > int
     FloydPar< DefaultStructs >::getOutPathFromMatrix( const GraphType &g, const TwoDimVertContainer &vertMatrix,
      OutPath< VIter,EIter > iters, typename GraphType::PVertex start, typename GraphType::PVertex end )
-{   
+{
     koalaAssert( end,AlgExcNullVert );
-    typename GraphType::PVertex u,v = vertMatrix( start,end ).vPrev;
+    typename GraphType::PVertex v = vertMatrix( start,end ).vPrev;
     typename GraphType::PEdge e = vertMatrix( start,end ).ePrev;
     typename GraphType::PVertex LOCALARRAY( tabV,g.getVertNo() );
     typename GraphType::PEdge LOCALARRAY( tabE,g.getVertNo() );
@@ -432,7 +430,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 
     if (end != start)
         for( ; v; len++ )
-        { 
+        {
             tabV[len] = v;
             tabE[len] = e;
             e = vertMatrix( start,v ).ePrev;
@@ -440,7 +438,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
         }
 
     for( int i = len - 1; i >= 0; i-- )
-    { 
+    {
         *iters.vertIter = tabV[i];
         *iters.edgeIter = tabE[i];
         ++iters.vertIter;
@@ -454,7 +452,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 template< class DefaultStructs > template< class DType > template< class T >
     typename FloydPar< DefaultStructs >::template UnitLengthEdges< DType >::ValType
     FloydPar< DefaultStructs >::UnitLengthEdges< DType >::operator[]( T e ) const
-{ 
+{
     ValType res;
     res.length = DefaultStructs:: template NumberTypeBounds< DType >::one();
     return res;
@@ -485,10 +483,10 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 
     for( typename GraphType::PEdge E = g.getEdge( Koala::EdDirOut ); E;
         E = g.getEdgeNext( E,Koala::EdDirOut ) )
-    {   
+    {
         typename GraphType::PVertex U = g.getEdgeEnd1( E ), V = g.getEdgeEnd2( E );
         if (edgeTab[E].length < vertMatrix(U,V).distance)
-        { 
+        {
             vertMatrix( U,V ).distance = edgeTab[E].length;
             vertMatrix( U,V ).ePrev = E;
             vertMatrix(U,V).vPrev = U;
@@ -496,10 +494,10 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
     }
 
     for( typename GraphType::PEdge E = g.getEdge( Koala::EdUndir ); E; E = g.getEdgeNext( E,Koala::EdUndir ) )
-    {   
+    {
         typename GraphType::PVertex U = g.getEdgeEnd1( E ), V = g.getEdgeEnd2( E ), X;
         if (edgeTab[E].length < vertMatrix( U,V ).distance)
-        { 
+        {
             vertMatrix( U,V ).distance = edgeTab[E].length;
             vertMatrix( U,V ).ePrev = E;
             vertMatrix( U,V ).vPrev = U;
@@ -508,7 +506,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
         U = V;
         V = X;
         if (edgeTab[E].length < vertMatrix( U,V ).distance)
-        { 
+        {
             vertMatrix( U,V ).distance = edgeTab[E].length;
             vertMatrix( U,V ).ePrev = E;
             vertMatrix( U,V ).vPrev = U;
@@ -526,14 +524,14 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
                 for( typename GraphType::PVertex Vj = g.getVert(); Vj; Vj = g.getVertNext( Vj ) )
                     if (inf > vertMatrix(Vl,Vj).distance &&
                        ((nd = vertMatrix( Vi,Vl ).distance + vertMatrix( Vl,Vj ).distance) < vertMatrix(Vi,Vj).distance))
-                    { 
+                    {
                         vertMatrix( Vi,Vj ).distance = nd;
                         vertMatrix( Vi,Vj ).ePrev = vertMatrix( Vl,Vj ).ePrev;
                         vertMatrix( Vi,Vj ).vPrev = vertMatrix( Vl,Vj ).vPrev;
                     }
             //sprawdzenie czy nie ma cykli ujemnych
             if (zero > vertMatrix( Vi,Vi ).distance)
-            { 
+            {
                 existNegCycle = true;
                 break;
             }
@@ -545,7 +543,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 template< class DefaultStructs > template< class GraphType, class TwoDimVertContainer, class VIter, class EIter > int
     FloydPar< DefaultStructs >::getPath( const GraphType &g, const TwoDimVertContainer &vertMatrix,
         typename GraphType::PVertex start, typename GraphType::PVertex end, PathStructs::OutPath< VIter,EIter > iters )
-{   
+{
     koalaAssert( start && end,AlgExcNullVert );
     if (DefaultStructs:: template NumberTypeBounds< typename TwoDimVertContainer::ValType::DistType >
         ::isPlusInfty(vertMatrix( start,end ).distance)) return -1; // wierzcholek end jest nieosiagalny
@@ -559,7 +557,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     typename KruskalPar< DefaultStructs >::template Result< typename EdgeContainer::ValType::WeightType >
     KruskalPar< DefaultStructs >::getForest( const GraphType &g, const EdgeContainer &edgeTab, Iter out,
         VertCompContainer &asets, int edgeNo, bool minWeight )
-{   
+{
     JoinableSets< typename GraphType::PVertex,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
         JSPartDesrc< typename GraphType::PVertex > *>::Type > localSets;
     typename BlackHoleSwitch< VertCompContainer,JoinableSets< typename GraphType::PVertex,
@@ -591,7 +589,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     if (!minWeight) std::reverse( edges,edges + m );
 
     for( i = 0; i < m && edgeNo > 0; i++ )
-    {   
+    {
         std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends;
         e = edges[i].second;
         ends = g.getEdgeEnds( e );

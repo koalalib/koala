@@ -69,7 +69,7 @@ template< typename Element > inline Set< Element > &Set< Element >::operator+=( 
 {
     if (&s == this) return *this;
     Element LOCALARRAY(buf,this->size()+s.size());
-    Element * bufend=(buf, std::set_union( this->begin(),this->end(),s.begin(),s.end(),buf ));
+    Element * bufend=std::set_union( this->begin(),this->end(),s.begin(),s.end(),buf );
     this->assign(buf,bufend);
     return *this;
 }

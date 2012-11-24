@@ -12,6 +12,7 @@ template< class Element, class Container > BlockList< Element,Container > &
 {
     if (&X == this) return *this;
     Privates::BlockListVectInerfTest< Container > error; // wymuszony blad kompilacji
+    (void) error;
     siz = X.siz;
     first = X.first;
     last = X.last;
@@ -250,7 +251,7 @@ template< class T, class Allocator > void List< T,Allocator >::swap( List &o )
 
 template< class T, class Allocator > void List< T,Allocator >::sort()
 {
-    ListNode< T > *a,*b,*pa;
+    ListNode< T > *a,*b;
     size_t i;
     if (m_count < 2) return;
     if (m_count == 2)

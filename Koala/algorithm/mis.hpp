@@ -91,8 +91,6 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
     unsigned int nMaxs = 0;
     unsigned int randomIndex = 0;
     unsigned int deg = 0;
-    double max = std::numeric_limits< double >::min();
-    double value = 0.0;
     typename GraphType::PVertex LOCALARRAY( vMaxs,g.getVertNo() );
 
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
@@ -132,8 +130,6 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
     unsigned int nMaxs = 0;
     unsigned int randomIndex = 0;
     unsigned int deg = 0;
-    double max = std::numeric_limits< double >::min();
-    double value = 0.0;
     typename GraphType::PVertex LOCALARRAY( vMaxs,g.getVertNo() );
 
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
@@ -245,7 +241,6 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
     unsigned int nMins = 0;
     unsigned int randomIndex = 0;
     unsigned int deg = 0;
-    double min = std::numeric_limits< double >::max();
     double value = 0.0;
     typename GraphType::PVertex LOCALARRAY( vMins,g.getVertNo() );
 

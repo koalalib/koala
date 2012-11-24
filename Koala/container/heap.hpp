@@ -81,7 +81,7 @@ template< class Key, class Compare, class Allocator > template< class InputItera
 
 template< class Key, class Compare,class Allocator > inline
     BinomHeap< Key,Compare,Allocator >::BinomHeap( const BinomHeap< Key,Compare,Allocator > &other ):
-    root( 0 ), minimum( 0 ), nodes( other.nodes ), allocator( other.allocator ), function( other.function )
+    root( 0 ), minimum( 0 ), nodes( other.nodes ), function( other.function ), allocator( other.allocator )
 {
     if (!other.nodes) return;
     root = copy( other.root,0 );
@@ -501,7 +501,7 @@ template< class Key, class Compare, class Allocator > template< class InputItera
 
 template< class Key, class Compare,class Allocator > inline
     FibonHeap< Key,Compare,Allocator >::FibonHeap( const FibonHeap< Key,Compare,Allocator > &other ):
-        root( 0 ), nodes( other.nodes ), allocator( other.allocator ), function( other.function )
+        root( 0 ), nodes( other.nodes ), function( other.function ), allocator( other.allocator )
 {
     if (!other.nodes) return;
     root = copy( other.root,0 );
@@ -835,7 +835,7 @@ template< class Key, class Compare, class Allocator > template< class InputItera
 
 template< class Key, class Compare,class Allocator > inline
     PairHeap< Key,Compare,Allocator >::PairHeap( const PairHeap< Key,Compare,Allocator > &other ):
-        root( 0 ), nodes( other.nodes ), allocator( other.allocator ), function( other.function )
+        root( 0 ), nodes( other.nodes ), function( other.function ), allocator( other.allocator )
 {
     if (!other.nodes) return;
     root = copy( other.root,0 );

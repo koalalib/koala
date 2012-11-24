@@ -51,8 +51,8 @@ namespace Koala
             TaskWindow() { }
 
             template< class GraphType > TaskWindow( Task< GraphType > task, int start, int finish ):
-                earliestStart( start ), latestFinish( finish ), earliestFinish( start + task.length ),
-                latestStart( finish - task.length )
+                earliestStart( start ), earliestFinish( start + task.length ),
+                latestStart( finish - task.length ), latestFinish( finish )
                 { }
         };
 

@@ -383,7 +383,7 @@ namespace Koala
                     int value;
                     Privates::List< Elem,Privates::BlockListAllocator< Privates::ListNode< Elem > > > *cont;
                     Privates::List_iterator< Elem > next;
-                    Elem( int _v = -1 ): value( _v ), next(), cont( NULL )
+                    Elem( int _v = -1 ): value( _v ), cont( NULL ), next()
                     { }
                 };
                 typedef Privates::List< Elem,Privates::BlockListAllocator< Privates::ListNode< Elem > > > Entry;
