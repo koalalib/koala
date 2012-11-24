@@ -109,7 +109,7 @@ VizingState(const Graph &g, ColorMap &c, int maxCol):
 	listEdgeCol[ii-1].next = 0;
 	if(colors.size()<=0) return;
 
-	int LOCALARRAY(tmpTab, notColored);
+//	int LOCALARRAY(tmpTab, notColored);
 	for(Edge ee = graph.getEdge(Mask); ee;
 		ee = graph.getEdgeNext(ee, Mask))
 	{

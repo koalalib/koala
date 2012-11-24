@@ -6,7 +6,7 @@ bool ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 {
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
-	assert( colLists.hasKey(vert) );
+	koalaAssert( colLists.hasKey(vert), AlgExcWrongArg );
 	if( colors.hasKey(vert) ) {
 		int col = colors[vert];
 		if( col>=0 && colLists[vert].isElement(col) )
@@ -239,7 +239,7 @@ bool ListEdgeColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, typename Graph::PEdge edge,
 	ColorChooser chooser )
 {
-	assert( colLists.hasKey(edge) );
+	koalaAssert( colLists.hasKey(edge), AlgExcWrongArg );
 	if(colors.hasKey(edge)) {
 		int col = colors[edge];
 		if(col>=0 && colLists[edge].isElement(col))
