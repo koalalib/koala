@@ -6,9 +6,8 @@
 #include "../../Koala/graph/view.h"
 #include "../../Koala/algorithm/search.h"
 
-using namespace std;
-using namespace Koala;
-using namespace Koala::IO;
+
+namespace Koala {
 
 template <class DefaultStructs> class IsPar
 {
@@ -94,10 +93,10 @@ template <class DefaultStructs> class IsPar
             typename DefaultStructs::template AssocCont<typename SubgraphA::PEdge, char>::Type
                 he(m), componentE(m), fragmE(m);
 
-            vector<typename DefaultStructs::template AssocCont<typename SubgraphA::PVertex, char>::Type > faces;
-            vector<typename DefaultStructs::template AssocCont<typename SubgraphA::PVertex,char>::Type > fragmentsV;
-            vector<typename DefaultStructs::template AssocCont<typename SubgraphA::PEdge,char>::Type > fragmentsE;
-            vector<Set<typename SubgraphA::PVertex> > attachmentsV;
+            std::vector<typename DefaultStructs::template AssocCont<typename SubgraphA::PVertex, char>::Type > faces;
+            std::vector<typename DefaultStructs::template AssocCont<typename SubgraphA::PVertex,char>::Type > fragmentsV;
+            std::vector<typename DefaultStructs::template AssocCont<typename SubgraphA::PEdge,char>::Type > fragmentsE;
+            std::vector<Set<typename SubgraphA::PVertex> > attachmentsV;
 
 
             for(typename SubgraphA::PVertex v=hv.firstKey();v!=NULL;v=hv.nextKey(v))
@@ -230,7 +229,7 @@ template <class DefaultStructs> class IsPar
 
             int k;
             int fb;
-            typename vector<Set<typename SubgraphA::PVertex> >::iterator itat;
+            typename std::vector<Set<typename SubgraphA::PVertex> >::iterator itat;
             Set<typename SubgraphA::PVertex> faceset;
 
             for(int f=3;f<m-n+2;f++)
@@ -451,6 +450,12 @@ template <class DefaultStructs> class IsPar
     }
 
 };
+
+}
+
+using namespace std;
+using namespace Koala;
+using namespace Koala::IO;
 
 class DefSettings : public AlgsDefaultSettings {};
 

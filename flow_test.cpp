@@ -271,8 +271,8 @@ void conTest()
     cout << "\n\n-----------\n\n";
     dijTest3();
         for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeCont[e].capac=1;
-    Koala::Flow::EdgeCut<int> res=Koala::Flow::minEdgeCut(g,edgeCont,S,T,Koala::Flow::outPath(tabV,tabE));
-    Koala::Flow::minEdgeCut(g,unitedgeCont,S,T,Koala::Flow::outPath(blackHole,blackHole));
+    Koala::Flow::EdgeCut<int> res=Koala::Flow::minEdgeCut(g,edgeCont,S,T,Koala::Flow::outCut(tabV,tabE));
+    Koala::Flow::minEdgeCut(g,unitedgeCont,S,T,Koala::Flow::outCut(blackHole,blackHole));
     cout << res.capac << endl;
     for(int i=0;i<res.vertNo;i++) cout << tabV[i]->info;
     cout << endl;
@@ -282,7 +282,7 @@ void conTest()
     dijTest3();
 
     Koala::Flow::EdgeCut2<Koala::Graph<char,OpisE>, int> res2
-        =Koala::Flow::minEdgeCut(g,edgeCont,Koala::Flow::outPath(tabV,tabE));
+        =Koala::Flow::minEdgeCut(g,edgeCont,Koala::Flow::outCut(tabV,tabE));
     cout << res2.capac << ' ' << res2.first->info << res2.second->info << endl;
     for(int i=0;i<res2.vertNo;i++) if (tabV[i]) cout << tabV[i]->info;
     cout << endl;
@@ -292,7 +292,7 @@ void conTest()
     cout << "\n\n(((((((((((\n\n";
     dijTest4();
     res2
-        =Koala::Flow::minEdgeCut(g,edgeCont,Koala::Flow::outPath(tabV,tabE));
+        =Koala::Flow::minEdgeCut(g,edgeCont,Koala::Flow::outCut(tabV,tabE));
     cout << res2.capac << ' ' << res2.first->info << res2.second->info << endl;
     for(int i=0;i<res2.vertNo;i++) if (tabV[i]) cout << tabV[i]->info;
     cout << endl;

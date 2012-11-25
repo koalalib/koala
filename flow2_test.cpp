@@ -439,7 +439,7 @@ void ghTest2()
     {   int len=Koala::BFS::getPath(ghcopy,ghlink[U],ghlink[V],Koala::BFS::outPath(blackHole,ecopytab));
         gtmin=std::numeric_limits<int>::max();
         for(int i=0;i<len;i++) gtmin=std::min(gtmin,ecopytab[i]->info);
-        truemin=Koala::Flow::minEdgeCut(g,edgeCont,U,V,Koala::Flow::outPath(blackHole,blackHole)).capac;
+        truemin=Koala::Flow::minEdgeCut(g,edgeCont,U,V,Koala::Flow::outCut(blackHole,blackHole)).capac;
 
 //        std::cout << truemin << ' ' << gtmin << "\n";
         assert(truemin==gtmin);

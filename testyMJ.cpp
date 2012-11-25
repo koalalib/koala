@@ -288,7 +288,7 @@ bool chordalRepr(const char* g6)
     IO::readG6(g,g6);
     bool res=IsItPar< Settings >::chordal(g);
     cout << int(res);
-    if (res)//xxx
+    if (res)
     {
         Settings::LocalGraph< Set<MyGraph::PVertex> ,char,EdUndir >::Type tree;
         tree.makeAdjMatrix();
@@ -422,27 +422,55 @@ int mis(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     MISPar< Settings >::get(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
+    return res.size();
+}
+
+int mis_SimpleOut(const char* g6)
+{
+    MyGraph g;
+    g.makeAdjMatrix();
+    Set<MyGraph::PVertex> res;
+    Set<int> ires;
+    IO::readG6(g,g6);
+    MISPar< Settings >::get(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+    cout << res.size();
     return res.size();
 }
 
 int clique(const char* g6)
 {
     MyGraph g;
-//    g.makeAdjMatrix();
+    g.makeAdjMatrix();
     Set<MyGraph::PVertex> res;
     Set<int> ires;
     IO::readG6(g,g6);
     g.neg(EdUndir);
     MISPar< Settings >::get(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
     return res.size();
 }
 
+int clique_simpleOut(const char* g6)
+{
+    MyGraph g;
+    g.makeAdjMatrix();
+    Set<MyGraph::PVertex> res;
+    Set<int> ires;
+    IO::readG6(g,g6);
+    g.neg(EdUndir);
+    MISPar< Settings >::get(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+    cout << res.size();
+    return res.size();
+}
 
 int misBipartite(const char* g6)
 {
@@ -452,9 +480,23 @@ int misBipartite(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Bipartite::maxStable(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
+    return res.size();
+}
+
+int misBipartite_SimpleOut(const char* g6)
+{
+    MyGraph g;
+    g.makeAdjMatrix();
+    Set<MyGraph::PVertex> res;
+    Set<int> ires;
+    IO::readG6(g,g6);
+    IsItPar< Settings >::Bipartite::maxStable(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+    cout << res.size();
     return res.size();
 }
 
@@ -466,9 +508,23 @@ int misChordal(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Chordal::maxStable(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
+    return res.size();
+}
+
+int misChordal_SimpleOut(const char* g6)
+{
+    MyGraph g;
+    g.makeAdjMatrix();
+    Set<MyGraph::PVertex> res;
+    Set<int> ires;
+    IO::readG6(g,g6);
+    IsItPar< Settings >::Chordal::maxStable(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+    cout << res.size();
     return res.size();
 }
 
@@ -483,6 +539,22 @@ int cliqueChordal(const char* g6)
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
+        g.neg(EdUndir);
+        assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+    return res.size();
+}
+
+int cliqueChordal_SimpleOut(const char* g6)
+{
+    MyGraph g;
+    g.makeAdjMatrix();
+    Set<MyGraph::PVertex> res;
+    Set<int> ires;
+    IO::readG6(g,g6);
+    IsItPar< Settings >::Chordal::maxClique(g,setInserter(res));
+    cout << res.size();
+        g.neg(EdUndir);
+        assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
     return res.size();
 }
 
@@ -494,9 +566,23 @@ int misComparability(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Comparability::maxStable(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
+    return res.size();
+}
+
+int misComparability_SimpleOut(const char* g6)
+{
+    MyGraph g;
+    g.makeAdjMatrix();
+    Set<MyGraph::PVertex> res;
+    Set<int> ires;
+    IO::readG6(g,g6);
+    IsItPar< Settings >::Comparability::maxStable(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+    cout << res.size();
     return res.size();
 }
 
@@ -510,7 +596,25 @@ int cliqueComparability(const char* g6)
     IsItPar< Settings >::Comparability::maxClique(g,setInserter(res));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
+
+        g.neg(EdUndir);
+        assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
     cout << ires;
+    return res.size();
+}
+
+int cliqueComparability_SimpleOut(const char* g6)
+{
+    MyGraph g;
+    g.makeAdjMatrix();
+    Set<MyGraph::PVertex> res;
+    Set<int> ires;
+    IO::readG6(g,g6);
+    IsItPar< Settings >::Comparability::maxClique(g,setInserter(res));
+
+        g.neg(EdUndir);
+        assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+    cout << res.size();
     return res.size();
 }
 
@@ -550,6 +654,7 @@ int matching(const char* g6)
     IO::readG6(g,g6);
     MyGraph::PEdge LOCALARRAY(tabe,g.getEdgeNo());
     int res=MatchingPar< Settings >::findMax(g,blackHole,tabe);
+    assert(res>=0 && MatchingPar< Settings >::test(g,tabe,tabe+res));
     cout << '{';
     for(int i=0;i<res;i++)
     {
@@ -560,6 +665,18 @@ int matching(const char* g6)
         if (i!=res-1) cout << ',';
     }
     cout << '}';
+    return res;
+}
+
+int matching_SimpleOut(const char* g6)
+{
+    MyGraph g;
+    g.makeAdjMatrix();
+    IO::readG6(g,g6);
+    MyGraph::PEdge LOCALARRAY(tabe,g.getEdgeNo());
+    int res=MatchingPar< Settings >::findMax(g,blackHole,tabe);
+    assert(res>=0 && MatchingPar< Settings >::test(g,tabe,tabe+res));
+    cout << res;
     return res;
 }
 
@@ -1181,7 +1298,17 @@ int critPath2(const char* napis)
 //        g.addEdge(B,D);
 
 //        IO::writeG6(g,napis,20);
-        clique("FhCKG");
+        const char* napis="R??????????????????????????G??";
+        mis_SimpleOut(napis); cout << "\n";
+         clique_simpleOut(napis); cout << "\n";
+        misBipartite_SimpleOut(napis);
+         cout << "\n"; misChordal_SimpleOut(napis);
+          cout << "\n"; cliqueChordal_SimpleOut(napis);
+           cout << "\n"; misComparability_SimpleOut(napis);
+            cout << "\n"; cliqueComparability_SimpleOut(napis);
+             cout << "\n"; matching_SimpleOut(napis);
+
+
 
 //        g.clear();
 //        kruskal("{{0,3,2},{3,0,5},{2,5,1}}");
