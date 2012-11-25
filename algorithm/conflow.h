@@ -98,6 +98,22 @@ namespace Koala
             typename GraphType::PVertex first,second;
         };
 
+        // Do odczytu rozciecia krawedziowego miedzy para wierzcholkow
+        // Uzytkownik podaje, pare iteratorow, gdzie wpisac krawedzie znalezionego rozciecia
+        // i wierzcholki osiagalne ze startowego po usunieciu krawedzi rozciecia
+        template< class VIter, class EIter > struct OutCut
+        {
+            VIter vertIter;
+            EIter edgeIter;
+
+            OutCut( VIter av, EIter ei ): vertIter( av ), edgeIter( ei ) { }
+        };
+
+        // funkcja tworzaca, analogia make_pair
+        // Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
+        template< class VIter, class EIter > static OutCut< VIter,EIter > outCut( VIter av, EIter ei )
+            { return OutCut< VIter,EIter >( av,ei ); }
+
         // "krawedz" drzewa Gomory-Hu
         template< class GraphType, class CType > struct GHTreeEdge
         {
@@ -374,7 +390,7 @@ namespace Koala
         // znajdowanie minimalnego (pod wzgledem objetosci) rozciecia krawedziowego start-end
         template< class GraphType, class EdgeContainer, class VIter, class EIter > static
             EdgeCut< typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g, EdgeContainer &edgeTab,
-                typename GraphType::PVertex start, typename GraphType::PVertex end, OutPath< VIter,EIter > iters )
+                typename GraphType::PVertex start, typename GraphType::PVertex end, OutCut< VIter,EIter > iters )
                 {
                     EdgeCut< typename EdgeContainer::ValType::CapacType > res;
                     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
@@ -407,7 +423,7 @@ namespace Koala
         // j.w. ale szuka najmniejszego rozciecia miedzy kazda para wierzcholkow (zwracane w polach first, second)
         template< class GraphType, class EdgeContainer, class VIter, class EIter > static
             EdgeCut2< GraphType,typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g,
-                EdgeContainer &edgeTab, OutPath< VIter,EIter > iters )
+                EdgeContainer &edgeTab, OutCut< VIter,EIter > iters )
                 {
                     int n,m;
                     koalaAssert( g.getVertNo() >= 2,AlgExcWrongArg );
@@ -423,12 +439,12 @@ namespace Koala
                         for( typename GraphType::PVertex t = g.getVertNext( s ); t; t = g.getVertNext( t ) )
                         {
                             if (isBlackHole( iters.vertIter ) && isBlackHole( iters.edgeIter ))
-                                buf = minEdgeCut( g,edgeTab,s,t,outPath( blackHole,blackHole ) );
+                                buf = minEdgeCut( g,edgeTab,s,t,outCut( blackHole,blackHole ) );
                             else if (isBlackHole( iters.vertIter ) && !isBlackHole( iters.edgeIter ))
-                                buf = minEdgeCut( g,edgeTab,s,t,outPath( blackHole,ebuf ) );
+                                buf = minEdgeCut( g,edgeTab,s,t,outCut( blackHole,ebuf ) );
                             else if (!isBlackHole( iters.vertIter ) && isBlackHole( iters.edgeIter ))
-                                buf = minEdgeCut( g,edgeTab,s,t,outPath( vbuf,blackHole ) );
-                            else buf = minEdgeCut( g,edgeTab,s,t,outPath( vbuf,ebuf ) );
+                                buf = minEdgeCut( g,edgeTab,s,t,outCut( vbuf,blackHole ) );
+                            else buf = minEdgeCut( g,edgeTab,s,t,outCut( vbuf,ebuf ) );
                             if (buf.capac < res.capac)
                             {
                                 res = buf;
@@ -442,12 +458,12 @@ namespace Koala
                             if (g.getEdgeNo( EdDirIn | EdDirOut ))
                             {
                                 if (isBlackHole( iters.vertIter ) && isBlackHole( iters.edgeIter ))
-                                    buf = minEdgeCut( g,edgeTab,t,s,outPath( blackHole,blackHole ) );
+                                    buf = minEdgeCut( g,edgeTab,t,s,outCut( blackHole,blackHole ) );
                                 else if (isBlackHole( iters.vertIter ) && !isBlackHole( iters.edgeIter ))
-                                    buf = minEdgeCut( g,edgeTab,t,s,outPath( blackHole,ebuf ) );
+                                    buf = minEdgeCut( g,edgeTab,t,s,outCut( blackHole,ebuf ) );
                                 else if (!isBlackHole( iters.vertIter ) && isBlackHole( iters.edgeIter ))
-                                    buf = minEdgeCut( g,edgeTab,t,s,outPath( vbuf,blackHole ) );
-                                else buf = minEdgeCut( g,edgeTab,t,s,outPath( vbuf,ebuf ) );
+                                    buf = minEdgeCut( g,edgeTab,t,s,outCut( vbuf,blackHole ) );
+                                else buf = minEdgeCut( g,edgeTab,t,s,outCut( vbuf,ebuf ) );
                                 if (buf.capac < res.capac)
                                 {
                                     res = buf;
@@ -548,7 +564,7 @@ namespace Koala
                     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) ) edgeLabs[e].capac = 1;
                     typename FlowPar< DefaultStructs >:: template EdgeCut2< GraphType,int > res2 =
                         FlowPar< DefaultStructs >:: template minEdgeCut( g,edgeLabs,FlowPar< DefaultStructs >::template
-                            outPath( blackHole,iter ) );
+                            outCut( blackHole,iter ) );
                     res.edgeNo = res2.capac;
                     res.first = res2.first;
                     res.second = res2.second;

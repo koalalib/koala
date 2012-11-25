@@ -642,7 +642,8 @@ template< class DefaultStructs > template< class GraphType, class EIterIn > bool
         V = g.getEdgeEnd2( *itE );
         //jezeli ktorykolwiek z wierzcholkow tworzacych krawedz nie jest wolny to nie mamy matchingu
         if (vertTabMatch.hasKey( U ) || vertTabMatch.hasKey( V )) return false;
-        vertTabMatch[U] = vertTabMatch[V] = true;
+        vertTabMatch[U] = true;
+        vertTabMatch[V] = true;
     }
     return true;
 }

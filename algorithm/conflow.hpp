@@ -692,7 +692,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
         vsub.clear();
         V.getElements(assocInserter(vsub,constFun('A')));
         capac = minEdgeCut( makeSubgraph( g,std::make_pair( extAssocKeyChoose(&vsub),edgeTypeChoose( Undirected ) ) ),
-            edgeTab,s,t,outPath( setInserter( W1 ),blackHole )).capac;
+            edgeTab,s,t,outCut( setInserter( W1 ),blackHole )).capac;
         W2 = V - W1;
         *out = GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType >( s,t,capac );
         return;
@@ -702,7 +702,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     V.getElements(assocInserter(vsub,constFun('A')));
 
     capac = minEdgeCut( makeSubgraph( g,std::make_pair( extAssocKeyChoose(&vsub),edgeTypeChoose( Undirected ) ) ),
-        edgeTab,s,t,outPath( setInserter( W1 ),blackHole )).capac;
+        edgeTab,s,t,outCut( setInserter( W1 ),blackHole )).capac;
     W2 = V - W1;
 
     typename GraphType::PVertex vnew = g.addVert();
@@ -1148,7 +1148,7 @@ template< class DefaultStructs > template< class GraphType, class EIter > int Co
         typename FlowPar<DefaultStructs>:: template EdgeLabs< int > >::Type edgeLabs( g.getEdgeNo() );
     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) ) edgeLabs[e].capac = 1;
     return FlowPar< DefaultStructs >::minEdgeCut( g,edgeLabs,start,end,
-        FlowPar< DefaultStructs >::outPath( blackHole,iter )).capac;
+        FlowPar< DefaultStructs >::outCut( blackHole,iter )).capac;
 }
 
 /*
@@ -1268,7 +1268,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
         imageFlow[e].capac = (e->info.first) ? 1 : 2;
 
     int res = FlowPar< DefaultStructs >::minEdgeCut( ig,imageFlow,images[start].second,images[end].first,
-        FlowPar< DefaultStructs >::outPath( blackHole,icut )).edgeNo;
+        FlowPar< DefaultStructs >::outCut( blackHole,icut )).edgeNo;
     if (!isBlackHole( iter ))
         for( int i = 0; i < res; i++ )
         {
@@ -1308,7 +1308,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
                 if (!g.getEdge( u,v,EdDirOut | EdUndir ))
                 {
                     int res = FlowPar< DefaultStructs >::minEdgeCut( ig,imageFlow,images[u].second,images[v].first,
-                        FlowPar< DefaultStructs >::outPath( blackHole,icut )).edgeNo;
+                        FlowPar< DefaultStructs >::outCut( blackHole,icut )).edgeNo;
                     if (res < best)
                     {
                         best = res;
@@ -1318,7 +1318,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
                 if (!g.getEdge( v,u,EdDirOut | EdUndir ))
                 {
                     int res = FlowPar< DefaultStructs >::minEdgeCut( ig,imageFlow,images[v].second,images[u].first,
-                        FlowPar< DefaultStructs >::outPath( blackHole,icut )).edgeNo;
+                        FlowPar< DefaultStructs >::outCut( blackHole,icut )).edgeNo;
                     if (res < best)
                     {
                         best = res;
