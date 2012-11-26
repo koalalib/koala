@@ -18,11 +18,11 @@ class IntervalVertColoringPar {
 public:
 	//Weights: Graph::PVertex -> int (length of interval)
 	//ColorMap: Graph::PVertex -> Color
-	struct Color { //interval [min, max)
+	struct Color { //interval [min, max]
 		int min, max;
 		Color(int l=0, int r=1): min(l), max(r) { koalaAssert(l<=r,ContExcWrongArg); }
 		Color(const Color &in): min(in.min), max(in.max) { }
-		int size() const {return max - min;}
+		int size() const {return max - min + 1;}
 		friend bool operator<(const Color &a, const Color &b) {
 			return a.min<b.min || (a.min==b.min && a.max<b.max);
 		}
@@ -76,11 +76,11 @@ class IntervalEdgeColoringPar {
 public:
 	//Weights: Graph::PEdge -> int (length of interval)
 	//ColorMap: Graph::PEdge -> Color
-	struct Color { //interval [min, max)
+	struct Color { //interval [min, max]
 		int min, max;
 		Color(int l=0, int r=1): min(l), max(r) { koalaAssert(l<=r,ContExcWrongArg); }
 		Color(const Color &in): min(in.min), max(in.max) { }
-		int size() const {return max - min;}
+		int size() const {return max - min + 1;}
 		friend bool operator<(const Color &a, const Color &b) {
 			return a.min<b.min || (a.min==b.min && a.max<b.max);
 		}

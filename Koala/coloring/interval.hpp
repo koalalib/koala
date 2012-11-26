@@ -8,7 +8,7 @@ int IntervalVertColoringPar<DefaultStructs>::greedy(const Graph &graph,
 {
 	Color col = simulColor(graph, weights, colors, vert);
 	colors[vert] = col;
-	return col.max-1;
+	return col.max;
 }
 
 template<class DefaultStructs>
@@ -16,7 +16,7 @@ template<typename Graph, typename Weights, typename ColorMap, typename VIter>
 int IntervalVertColoringPar<DefaultStructs>::greedy(const Graph &graph,
 	const Weights &weights, ColorMap &colors, VIter beg, VIter end)
 {
-	int maxCol = 0;
+	int maxCol = -1;
 	while(beg!=end) {
 		Color col = simulColor(graph, weights, colors, *beg);
 		colors[*beg] = col;
@@ -24,7 +24,7 @@ int IntervalVertColoringPar<DefaultStructs>::greedy(const Graph &graph,
 		if(maxCol<col.max)
 			maxCol = col.max;
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 template<class DefaultStructs>
@@ -33,14 +33,14 @@ int IntervalVertColoringPar<DefaultStructs>::greedy(const Graph &graph,
 	const Weights &weights, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
-	int maxCol = 0;
+	int maxCol = -1;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		Color col = simulColor(graph, weights, colors, vv);
 		colors[vv] = col;
 		if(maxCol<col.max)
 			maxCol = col.max;
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 //Regula LI:
@@ -74,7 +74,7 @@ int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
 	}
 
 	Color curColor;
-	int maxCol = 0;
+	int maxCol = -1;
 	while(lenVertTab>0) {
 		int idMinColor = 0;
 		for(int ii=1; ii<lenVertTab; ii++) {
@@ -105,11 +105,11 @@ int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
 			if( !vertId.hasKey(u) ) continue;
 			int idU = vertId[u];
 			Color tmpColor = freeColors[idU].second;
-			if(tmpColor.min<curColor.max && curColor.min<tmpColor.max)
+			if(tmpColor.min<=curColor.max && curColor.min<=tmpColor.max)
 				freeColors[ idU ].second = simulColor(graph, weights, colors, u);
 		}
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 //- badamy wszystkie niepokolorowane wierzcholki
@@ -136,7 +136,7 @@ int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
 	}
 
 	Color curColor;
-	int maxCol = 0;
+	int maxCol = -1;
 	while(lenVertTab>0) {
 		int idMinColor = 0;
 		for(int ii=1; ii<lenVertTab; ii++) {
@@ -167,11 +167,11 @@ int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
 			if( !vertId.hasKey(u) ) continue;
 			int idU = vertId[u];
 			Color tmpColor = freeColors[idU].second;
-			if(tmpColor.min<curColor.max && curColor.min<tmpColor.max)
+			if(tmpColor.min<=curColor.max && curColor.min<=tmpColor.max)
 				freeColors[ idU ].second = simulColor(graph, weights, colors, u);
 		}
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 //- test poprawnosci podanego kolorowania
@@ -194,7 +194,7 @@ bool IntervalVertColoringPar<DefaultStructs>::testPart(const Graph &graph,
 			if(u<vv) continue;
 			if(!colors.hasKey(u)) continue;
 			Color tstColor = colors[u];
-			if( curColor.min<tstColor.max && tstColor.min<curColor.max) return false;
+			if( curColor.min<=tstColor.max && tstColor.min<=curColor.max) return false;
 		}
 	}
 	return true;
@@ -220,7 +220,7 @@ bool IntervalVertColoringPar<DefaultStructs>::test(const Graph &graph,
 			if(u<vv) continue;
 			if(!colors.hasKey(u)) return false;
 			Color tstColor = colors[u];
-			if( curColor.min<tstColor.max && tstColor.min<curColor.max) return false;
+			if( curColor.min<=tstColor.max && tstColor.min<=curColor.max) return false;
 		}
 	}
 	return true;
@@ -232,7 +232,7 @@ int IntervalVertColoringPar<DefaultStructs>::maxColor(
 		const Graph &graph, const ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
-	int maxCol = 0;
+	int maxCol = -1;
 	for(Vert vv = graph.getVert(); vv;
 		vv = graph.getVertNext(vv))
 	{
@@ -256,7 +256,7 @@ IntervalVertColoringPar<DefaultStructs>::simulColor(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	int range = weights[ vert ];
+	int range = weights[ vert ]-1;
 	Color LOCALARRAY(interv, graph.getEdgeNo(vert, Mask));
 	int lenInterv = 0;
 
@@ -271,11 +271,11 @@ IntervalVertColoringPar<DefaultStructs>::simulColor(const Graph &graph,
 
 	int colBase = 0;
 	for(int iInterv = 0; iInterv<lenInterv; ++iInterv) {
-		if(colBase+range<=interv[iInterv].min)
+		if(colBase+range<interv[iInterv].min)
 			break;
 		else
-			if(colBase<interv[iInterv].max)
-				colBase = interv[iInterv].max;
+			if(colBase<=interv[iInterv].max)
+				colBase = interv[iInterv].max+1;
 	}
 	return Color(colBase, colBase+range);
 }
@@ -292,7 +292,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph,
 {
 	Color col = simulColor(graph, weights, colors, edge);
 	colors[ edge ] = col;
-	return col.max-1;
+	return col.max;
 }
 
 template<class DefaultStructs>
@@ -300,7 +300,7 @@ template<typename Graph, typename Weights, typename ColorMap, typename EIter>
 int IntervalEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph,
 	const Weights &weights, ColorMap &colors, EIter beg, EIter end)
 {
-	int maxCol = 0;
+	int maxCol = -1;
 	while(beg!=end) {
 		Color col = simulColor(graph, weights, colors, *beg);
 		colors[*beg] = col;
@@ -308,7 +308,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph,
 		if(maxCol<col.max)
 			maxCol=col.max;
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 template<class DefaultStructs>
@@ -318,14 +318,14 @@ int IntervalEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph,
 {
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	int maxCol = 0;
+	int maxCol = -1;
 	for(Edge ee = graph.getEdge(Mask); ee; ee = graph.getEdgeNext(ee, Mask)) {
 		Color col = simulColor(graph, weights, colors, ee);
 		colors[ee] = col;
 		if(maxCol<col.max)
 			maxCol = col.max;
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 //regula HF: podany zakres lub wszystkie niepokolorowane wierzcholki koloruj zachlannie wg. sekwencji nierosnacych wag
@@ -349,7 +349,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::hf(const Graph &graph,
 	}
 	DefaultStructs::sort(edgeTab, edgeTab+lenEdgeTab);
 
-	int maxCol = 0;
+	int maxCol = -1;
 	for(int iEdgeTab=lenEdgeTab-1; iEdgeTab>=0; --iEdgeTab) {
 		Edge ee = edgeTab[iEdgeTab].second;
 		Color col = simulColor(graph, weights, colors, ee);
@@ -357,7 +357,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::hf(const Graph &graph,
 		if(maxCol<col.max)
 			maxCol = col.max;
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 template<class DefaultStructs>
@@ -374,7 +374,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::hf(const Graph &graph,
 		edgeTab[lenEdgeTab++] = std::make_pair( weights[ee], ee );
 	DefaultStructs::sort(edgeTab, edgeTab+lenEdgeTab);
 
-	int maxCol = 0;
+	int maxCol = -1;
 	for(int iEdgeTab=lenEdgeTab-1; iEdgeTab>=0; --iEdgeTab) {
 		Edge ee = edgeTab[iEdgeTab].second;
 		Color col = simulColor(graph, weights, colors, ee);
@@ -382,7 +382,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::hf(const Graph &graph,
 		if(maxCol<col.max)
 			maxCol = col.max;
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 template<class DefaultStructs>
@@ -411,7 +411,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 	}
 
 	Color curColor;
-	int maxCol = 0;
+	int maxCol = -1;
 	while(lenEdgeTab>0) {
 		int idMinColor = 0;
 		//from colorings choose smallest one (smallest first number of interval
@@ -448,7 +448,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 				continue;
 			int idEE = edgeId[ee];
 			Color tmpColor = freeColors[idEE].second;
-			if(tmpColor.min<curColor.max && curColor.min<tmpColor.max)
+			if(tmpColor.min<=curColor.max && curColor.min<=tmpColor.max)
 				freeColors[ idEE ].second = simulColor(graph, weights, colors, ee);
 		}
 		vv = graph.getEdgeEnd2(curEdge);
@@ -459,11 +459,11 @@ int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 				continue;
 			int idEE = edgeId[ee];
 			Color tmpColor = freeColors[idEE].second;
-			if(tmpColor.min<curColor.max && curColor.min<tmpColor.max)
+			if(tmpColor.min<=curColor.max && curColor.min<=tmpColor.max)
 				freeColors[ idEE ].second = simulColor(graph, weights, colors, ee);
 		}
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 template<class DefaultStructs>
@@ -489,7 +489,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 	}
 
 	Color curColor;
-	int maxCol=0;
+	int maxCol = -1;
 	while(lenEdgeTab>0) {
 		int idMinColor = 0;
 		//from colorings choose smallest one (smallest first number of interval
@@ -526,7 +526,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 				continue;
 			int idEE = edgeId[ee];
 			Color tmpColor = freeColors[idEE].second;
-			if(tmpColor.min<curColor.max && curColor.min<tmpColor.max)
+			if(tmpColor.min<=curColor.max && curColor.min<=tmpColor.max)
 				freeColors[ idEE ].second = simulColor(graph, weights, colors, ee);
 		}
 		vv = graph.getEdgeEnd2(curEdge);
@@ -537,11 +537,11 @@ int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 				continue;
 			int idEE = edgeId[ee];
 			Color tmpColor = freeColors[idEE].second;
-			if(tmpColor.min<curColor.max && curColor.min<tmpColor.max)
+			if(tmpColor.min<=curColor.max && curColor.min<=tmpColor.max)
 				freeColors[ idEE ].second = simulColor(graph, weights, colors, ee);
 		}
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 //- test poprawnosci podanego kolorowania
@@ -566,7 +566,7 @@ bool IntervalEdgeColoringPar<DefaultStructs>::testPart(const Graph &graph,
 			if(ee==edge || !colors.hasKey(ee))
 				continue;
 			Color tstColor = colors[ee];
-			if( curColor.min<tstColor.max && tstColor.min<curColor.max)
+			if( curColor.min<=tstColor.max && tstColor.min<=curColor.max)
 				return false;
 		}
 		vv = graph.getEdgeEnd2(edge);
@@ -576,7 +576,7 @@ bool IntervalEdgeColoringPar<DefaultStructs>::testPart(const Graph &graph,
 			if(ee==edge || !colors.hasKey(ee))
 				continue;
 			Color tstColor = colors[ee];
-			if( curColor.min<tstColor.max && tstColor.min<curColor.max)
+			if( curColor.min<=tstColor.max && tstColor.min<=curColor.max)
 				return false;
 		}
 	}
@@ -605,7 +605,7 @@ bool IntervalEdgeColoringPar<DefaultStructs>::test(const Graph &graph,
 				continue;
 			if(!colors.hasKey(ee)) return false;
 			Color tstColor = colors[ee];
-			if( curColor.min<tstColor.max && tstColor.min<curColor.max)
+			if( curColor.min<=tstColor.max && tstColor.min<=curColor.max)
 				return false;
 		}
 		vv = graph.getEdgeEnd2(edge);
@@ -616,7 +616,7 @@ bool IntervalEdgeColoringPar<DefaultStructs>::test(const Graph &graph,
 				continue;
 			if(!colors.hasKey(ee)) return false;
 			Color tstColor = colors[ee];
-			if( curColor.min<tstColor.max && tstColor.min<curColor.max)
+			if( curColor.min<=tstColor.max && tstColor.min<=curColor.max)
 				return false;
 		}
 	}
@@ -630,7 +630,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::maxColor(const Graph &graph,
 {
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	int maxCol = 0;
+	int maxCol = -1;
 	for(Edge edge = graph.getEdge(Mask); edge;
 		edge = graph.getEdgeNext(edge, Mask))
 	{
@@ -639,7 +639,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::maxColor(const Graph &graph,
 		if(maxCol<col.max)
 			maxCol = col.max;
 	}
-	return maxCol-1;
+	return maxCol;
 }
 
 template<class DefaultStructs>
@@ -675,7 +675,7 @@ IntervalEdgeColoringPar<DefaultStructs>::simulColor(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	int range = weights[ edge ];
+	int range = weights[ edge ] - 1;
 	Vert v = graph.getEdgeEnd1(edge);
 	int lenInterv = graph.deg(v);
 	v = graph.getEdgeEnd2(edge);
@@ -701,11 +701,11 @@ IntervalEdgeColoringPar<DefaultStructs>::simulColor(const Graph &graph,
 
 	int colBase = 0;
 	for(int iInterv = 0; iInterv<lenInterv; ++iInterv) {
-		if(colBase+range<=interv[iInterv].min)
+		if(colBase+range<interv[iInterv].min)
 			break;
 		else
-			if(colBase<interv[iInterv].max)
-				colBase = interv[iInterv].max;
+			if(colBase<=interv[iInterv].max)
+				colBase = interv[iInterv].max+1;
 	}
 	return Color(colBase, colBase+range);
 }
