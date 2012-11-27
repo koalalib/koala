@@ -618,7 +618,7 @@ void SeqVertColoringPar<DefaultStructs>::brooksBiconnectedColor(
 	}
 
 	int col = 0;
-	while( neighCol[col] ) col++;
+	while( col<deg && neighCol[col] ) col++;
 	vert->info = col;
 }
 
