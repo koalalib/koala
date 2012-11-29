@@ -1,9 +1,6 @@
 #ifndef KOALA__HASHCONTAINERS__H__
 #define KOALA__HASHCONTAINERS__H__
 
-/* hashcont.h
- *
- */
 
 #include <stddef.h>
 #include <new>
@@ -45,7 +42,7 @@ namespace Koala
     template< class T, class H, class A > class HashSet;
     template< class T, class H, class A > class HashSet_const_iterator;
 
-    /*
+    /** \brief wrapper class for allocating memory
     * HashDefaultCPPAllocator
     */
     class HashDefaultCPPAllocator
@@ -192,12 +189,18 @@ namespace Koala
     template<> class DefaultHashFunction< const wchar_t * >: public Privates::CStringHash< wchar_t > { };
     template<> class DefaultHashFunction< std::string >: public Privates::StringHash { };
 
-    /*
-    * HashSet
+    /** \brief set on a hash table
+    * template arguments
     * KeyType - type of element
-    * HashFunction - hash object
-    *  -> size_t operator()(const KeyType &key, size_t m) const
-    *     or size_t operator()(KeyType key, size_t m) const
+    * HashFunction - hash functor; it should implement either
+    * size_t operator()(const KeyType &key, size_t m) const
+    * or
+    * size_t operator()(KeyType key, size_t m) const
+    * for hashing a given key; m is the size of the hashtable so
+    * returned value has to be in range 0..(m-1)
+    * Allocator - give different allocator (see HashDefaultCPPAllocator) to
+    * use custom memory management
+    * warning: iterators and references may be invalidated by insertion
     */
     template< class KeyType, class HashFunction = DefaultHashFunction< KeyType >, class Allocator = HashDefaultCPPAllocator >
         class HashSet
@@ -217,8 +220,12 @@ namespace Koala
         typedef HashSet_const_iterator< KeyType,HashFunction,Allocator > const_iterator;
 
       public:
+	/** default constructor; initial size = 8 */
         HashSet(): m_count( 0 ), m_size( 0 ), m_resizeFactor( 205 ) { initialize( 8 ); }
+	/** constructor
+	 * \param[in] size the size of hashtable */
         HashSet( size_t size ): m_count( 0 ), m_size( 0 ), m_resizeFactor( 205 ) { initialize( size ); }
+	/** copy constructor */
         HashSet( const HashSet &t );
         template< class HF, class Alloc > HashSet( const HashSet< KeyType,HF,Alloc > &t );
 
@@ -233,26 +240,52 @@ namespace Koala
         const_iterator begin() const { return const_iterator( m_table ); }
         const_iterator end() const { return const_iterator( m_table + m_size,true ); }
 
+	/** return the number of elements in set */
         size_t size() const { return m_count; }
+	/** return the number of elements in set */
         size_t capacity() const { return (size_t)(-1); }
+	/** return the size of hashtable */
         size_t slots() const { return m_size; };
 
+	/** test if the set is empty */
         bool empty() const { return m_count == 0; }
 
+	/** return an iterator to given key or end() if key is not in the set */
         iterator find( const KeyType &key ) { return Find( key ); }
+	/** return an iterator to given key or end() if key is not in the set */
         const_iterator find( const KeyType &key ) const { return const_iterator( Find( key ) ); }
+	/** find a key in set or insert it if does not exists
+	 * \param[in] key to lookup or insert
+	 * \return pair of iterator to inserted/found element and a boolean
+	 * that is true if insert occurred */
         std::pair< iterator,bool > insert( const KeyType &key ) { return find_or_insert( key ); }
 
+	/** resize the hashtable */
         void resize( size_t size );
+	/** ensure the hashtable has a size at least the given one */
         void reserve( size_t size ) { if (size > m_size) this->resize( size ); }
+	/** remove all elements from set */
         void clear();
+	/** swap the contents with other set */
         void swap( HashSet &other );
+	/** find a key in set or insert it if does not exists
+	 * \param[in] key to lookup or insert
+	 * \return pair of iterator to inserted/found element and a boolean
+	 * that is true if insert occurred */
         std::pair< iterator,bool > find_or_insert( const KeyType &key );
+	/** test if a set contains the given key */
         bool contains( const KeyType &key ) const;
+	/** remove given key */
         void erase( const KeyType &key );
+	/** remove a key pointed by the iterator */
         void erase( const_iterator pos ) { erase( pos.m_cur->key ); }
 
+	/** set the resize threshold
+	 * if size() exceeds value * slots(), the size of hashtable is
+	 * enlarged by a factor of two
+	 * set threshold equal to zero to disable automatic resizing */
         void set_threshold( double value ) { if( value <= 0 ) m_resizeFactor = value <= 0 ? 0 : value * 256 + 0.5; };
+	/** return the current resize threshold */
         double get_threshold() { return (double)m_resizeFactor / 256.0; };
 
       private:
@@ -352,8 +385,19 @@ namespace Koala
         };
     }
 
-    /*
-    * HashMap
+    /** \brief map on a hash table
+    * template arguments
+    * KeyType - type of key
+    * ValueType - type of element
+    * HashFunction - hash functor; it should implement either
+    * size_t operator()(const KeyType &key, size_t m) const
+    * or
+    * size_t operator()(KeyType key, size_t m) const
+    * for hashing a given key; m is the size of the hashtable so
+    * returned value has to be in range 0..(m-1)
+    * Allocator - give different allocator (see HashDefaultCPPAllocator) to
+    * use custom memory management
+    * warning: iterators and references may be invalidated by insertion
     */
     template< typename KeyType, typename ValueType, class HashFunction = DefaultHashFunction< KeyType >,
         class Allocator = HashDefaultCPPAllocator > class HashMap: public
@@ -367,6 +411,7 @@ namespace Koala
             Privates::HashMapHashWrapper< HashFunction,KeyType,ValueType >,Allocator> > baseType;
       public:
         HashMap( size_t size = HASHMAPDEFAULTSIZE ): baseType() { baseType::resize( size ); }
+	/** devVal is the value returned by the operator[] access to nonexisting element */
         HashMap( size_t size, const ValueType &defVal ): baseType( defVal ) { baseType::resize( size ); }
         HashMap( const HashMap &t ): baseType( (const baseType &)t ) { }
 
@@ -452,8 +497,20 @@ namespace Koala
         friend class BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >;
     };
 
-    /*
-    * BiDiHashMap
+    /** \brief map on a hash table
+     * iteration over all elements takes O(n) time
+    * template arguments
+    * KeyType - type of key
+    * ValueType - type of element
+    * HashFunction - hash functor; it should implement either
+    * size_t operator()(const KeyType &key, size_t m) const
+    * or
+    * size_t operator()(KeyType key, size_t m) const
+    * for hashing a given key; m is the size of the hashtable so
+    * returned value has to be in range 0..(m-1)
+    * Allocator - give different allocator (see HashDefaultCPPAllocator) to
+    * use custom memory management
+    * warning: iterators and references may be invalidated by insertion
     */
     template< typename KeyType, typename ValueType, class HashFunction = DefaultHashFunction< KeyType >,
         class Allocator = HashDefaultCPPAllocator > class BiDiHashMap: public
@@ -471,6 +528,7 @@ namespace Koala
         typedef BiDiHashMap_const_iterator< KeyType,ValueType,HashFunction,Allocator > const_iterator;
 
         BiDiHashMap( size_t size = HASHMAPDEFAULTSIZE );
+        /** devVal is the value returned by the operator[] access to nonexisting element */
         BiDiHashMap( size_t size, const ValueType &defVal );
         BiDiHashMap( const BiDiHashMap &t );
 
@@ -489,25 +547,46 @@ namespace Koala
 
         const ValueType &operator[]( const KeyType &key ) const;
 
+	/** find a key in map or insert it with a given value if does not exists
+	 * \param[in] key to lookup or insert
+	 * \param[in] value to assign to the key
+	 * \return pair of iterator to inserted/found element and a boolean
+	 * that is true if insert occurred */
         std::pair< iterator,bool > insert( const KeyType &key, const ValueType &value );
+	/** find a key in map or insert it with a given value if does not exists
+	 * \param[in] elem key-value pair
+	 * \return pair of iterator to inserted/found element and a boolean
+	 * that is true if insert occurred */
         std::pair< iterator,bool > insert( const std::pair< KeyType,ValueType > &elem );
+	/** return an iterator to given key or end() if key is not in the set */
         const_iterator find( const KeyType &key ) const;
 
+	/** remove all elements from set */
         void clear();
+	/** remove given key */
         void erase( const KeyType &key ) { erase( find( key ) ); }
+	/** remove a key pointed by the iterator */
         void erase( const_iterator pos );
+	/** resize the hashtable */
         void resize( size_t size );
+	/** ensure the hashtable has a size at least the given one */
         void reserve( size_t size ) { if (size > this->slots()) this->resize( size ); }
+        /** swap the contents with other set */
         void swap( BiDiHashMap &other );
 
+	/** set the resize threshold
+	 * if size() exceeds value * slots(), the size of hashtable is
+	 * enlarged by a factor of two
+	 * set threshold equal to zero to disable automatic resizing */
         void set_threshold( double value ) { if( value <= 0 ) m_resizeFactor = value <= 0 ? 0 : value * 256 + 0.5; };
+	/** return the current resize threshold */
         double get_threshold() { return (double)m_resizeFactor / 256.0; };
 
       private:
         void initialize();
         void AddToList( const Privates::BiDiHashMapPair< KeyType,ValueType > *ptr );
         void DelFromList( const Privates::BiDiHashMapPair< KeyType,ValueType > *ptr );
-        void EnlargeIfNeeded();
+	void EnlargeIfNeeded();
 
       private:
         Privates::BiDiHashMapPair< KeyType,ValueType > m_begin,m_end;

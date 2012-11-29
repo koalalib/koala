@@ -385,8 +385,14 @@ namespace Koala
         template< class GraphType, class EdgeContainer > static
             std::pair< typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType >
             minCostFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
-                typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val = DefaultStructs::
-                template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
+                typename GraphType::PVertex end)
+		{ return minCostFlow(g, edgeTab, start, end, DefaultStructs::template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() ); };
+        template< class GraphType, class EdgeContainer > static
+            std::pair< typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType >
+            minCostFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
+                typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val);
+//                typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val = DefaultStructs::
+//                template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
         // znajdowanie minimalnego (pod wzgledem objetosci) rozciecia krawedziowego start-end
         template< class GraphType, class EdgeContainer, class VIter, class EIter > static
             EdgeCut< typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g, EdgeContainer &edgeTab,

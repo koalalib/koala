@@ -50,7 +50,8 @@ template< class DefaultStructs > template< class GraphType >
 }
 
 template< class DefaultStructs > template< class GraphType >
-    std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
+//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
+    VertexPair< GraphType >
     IsItPar< DefaultStructs >::Path::ends( const GraphType &g )
 {
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
@@ -70,7 +71,8 @@ template< class DefaultStructs > template< class GraphType >
 }
 
 template< class DefaultStructs > template< class GraphType >
-    std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
+//    std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
+    VertexPair< GraphType >
     IsItPar< DefaultStructs >::Caterpillar::spineEnds( const GraphType &g )
 {
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
@@ -87,7 +89,7 @@ template< class DefaultStructs > template< class GraphType >
     int m;
     int LOCALARRAY( comptab,g.getVertNo() + (m = g.getEdgeNo()) + 1 );
     int e = 0, comp = BlocksPar< DefaultStructs >::split( g,blackHole,blackHole,
-        SearchStructs::compStore( comptab,blackHole ),blackHole,EdUndir );
+        SearchStructs::compStore( comptab,blackHole ),blackHole );
     for( int i = 1; i <= comp; i++ ) e += (comptab[i] - comptab[i - 1]) * (comptab[i] - comptab[i - 1] - 1) / 2;
     return e == m;
 }
@@ -102,7 +104,7 @@ template< class DefaultStructs > template< class GraphType >
     for( int i = 0; i < n + m + 1; i++ ) compE[i] = 0;
     typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,int >::Type edgeCont( n );
     int res = 0, comp = BlocksPar< DefaultStructs >::split( g,blackHole,edgeCont,
-        SearchStructs::compStore( comptab,blackHole ),blackHole,EdUndir );
+        SearchStructs::compStore( comptab,blackHole ),blackHole );
     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) ) compE[edgeCont[e]]++;
     for( int i = 0; i < comp; i++) res = std::max( res,compE[i] - (comptab[i + 1] - comptab[i] - 1) );
     return res;

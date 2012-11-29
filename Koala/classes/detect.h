@@ -18,6 +18,17 @@ namespace Koala
     //wprowadza sie dodatkowo podklase Family z metodami realizujacymi te funkcje. Generalnie nie maja one obowiazku
     // sprawdzania poprawnosci danych (tj. przynaleznosci grafu do tej rodziny), choc czasem tak czynia.
 
+    /** simple wrapper for std::pair of two vertices
+     * this class is maily used as a worakound to Visual Studio <=2010 bugs
+     */
+    template<class GraphType>
+    class VertexPair: public std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
+    {
+      public:
+        VertexPair(): std::pair< typename GraphType::PVertex,typename GraphType::PVertex >() {};
+        VertexPair(const std::pair< typename GraphType::PVertex,typename GraphType::PVertex > &p): std::pair< typename GraphType::PVertex,typename GraphType::PVertex >(p) {};
+    };
+
     /* IsItPar
      * DefaultStructs - wytyczne dla wewnetrznych procedur
      */
@@ -62,7 +73,8 @@ namespace Koala
         {
           public:
             // Konce podanej sciezki, (NULL,NULL) w razie bledu
-            template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
+//            template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
+            template< class GraphType > static VertexPair<GraphType>
                 ends( const GraphType &g );
         };
 
@@ -77,7 +89,8 @@ namespace Koala
         {
           public:
             // Konce grzbietu gasienicy, (NULL,NULL) w razie bledu
-            template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
+//            template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
+            template< class GraphType > static VertexPair<GraphType>
                 spineEnds( const GraphType &g );
         };
 
