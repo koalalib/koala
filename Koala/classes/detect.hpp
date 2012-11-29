@@ -302,7 +302,7 @@ template< class DefaultStructs > void
     IsItPar< DefaultStructs >::Chordal::SemiPostOrderTree( int *parent, int n, int *out )
 {
     int i,k;
-    int LOCALARRAY( sons,n );
+    int LOCALARRAY( sons, n + 1 );
     for( i = 0; i < n; i++ ) sons[i] = 0;
     for( i = 0; i < n; i++ )
         if (parent[i] >= 0) sons[parent[i]]++;
@@ -332,13 +332,13 @@ template< class DefaultStructs > template< class Graph, class VIter2 >
     n = g.getVertNo();
     m = g.getEdgeNo( EdUndir );
 
-    int LOCALARRAY( parent,n );
-    int LOCALARRAY( postOrd,n );
+    int LOCALARRAY( parent,n + 1 );
+    int LOCALARRAY( postOrd,n + 1 );
     int LOCALARRAY( RNp,n + 1 );
     int LOCALARRAY( RN2,n + m );
     typename Graph::PEdge e;
     typename Graph::PVertex u,v;
-    typename Graph::PVertex LOCALARRAY( pi,n );
+    typename Graph::PVertex LOCALARRAY( pi,n + 1 );
     std::pair< int,int > LOCALARRAY( RN,n + m );
     typename DefaultStructs::template AssocCont< typename Graph::PVertex,int >::Type vidx( n );
 
@@ -718,10 +718,8 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
 
 //    int mm = 0;
 //    for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) mm += g.deg( v ) * (g.deg( v ) - 1);
-    std::pair< typename Graph::PEdge,EdgeDirection > LOCALARRAY( buf,m + 2 );
-    //TODO: size?
-    QueueInterface< std::pair< typename Graph::PEdge,EdgeDirection > * > cont( buf,m+ 1 );
-    //TODO: size?
+    std::pair< typename Graph::PEdge,EdgeDirection > LOCALARRAY( buf,2*m + 2 );    //TODO: size?
+    QueueInterface< std::pair< typename Graph::PEdge,EdgeDirection > * > cont( buf,2*m+ 1 );   //TODO: size?
     typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EDir >::Type visited( m );
 
     int comp = 1;
@@ -994,13 +992,10 @@ template< class DefaultStructs > template< class GraphType, class IntMap >
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,IvData >::Type data( n );
 
     Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< typename LexBFSPar< DefaultStructs >::
-        template LVCNode< GraphType > > > > allocat( 2 * n + 4 );
-    //TODO: size?
+        template LVCNode< GraphType > > > > allocat( 2 * n + 6 ); //TODO: size?
     Privates::BlockListAllocator< Privates::ListNode< typename LexBFSPar< DefaultStructs >::
-        template LVCNode< GraphType > > > allocat2( 4 * n + 4 );
-    //TODO: size?
-    Privates::BlockListAllocator< Privates::ListNode< typename Sets::Elem > > allocat3( 2 * n * n );
-    //TODO: size?
+        template LVCNode< GraphType > > > allocat2( 4 * n + 4 ); //TODO: size?
+    Privates::BlockListAllocator< Privates::ListNode< typename Sets::Elem > > allocat3( 2 * n * n + 2); //TODO: size?
 
     std::pair< typename Sets::Entry,typename Sets::Entry::iterator > LOCALARRAY( Abuf,n );
     std::pair< typename Sets::Entry,typename Sets::Entry::iterator > LOCALARRAY( Bbuf,n );
@@ -1205,7 +1200,6 @@ template< class DefaultStructs > template< class GraphType, class MapType, class
     {
         av = alpha.top();
         bv = beta.top();
-
         aidx = data[av].posSigmap;
         bidx = data[bv].posSigmapp;
         if (data[av].ip > aidx) u = bv;
@@ -1247,6 +1241,7 @@ template< class DefaultStructs > template< class GraphType, class MapType, class
             //vertData[v].visiteda = 1;
             alpha.move( v );
         }
+		alpha.done();
 
         j = vertData[u].bOrder;
         for( i = firstb[j]; i < firstb[j + 1]; i++ )
@@ -1256,8 +1251,7 @@ template< class DefaultStructs > template< class GraphType, class MapType, class
             //vertData[v].visitedb = 1;
             beta.move( v );
         }
-
-        alpha.done();
+        
         beta.done();
     }
 }

@@ -249,7 +249,7 @@ bool readGraphEL(Graph &g, std::istream &strm,
  * @return true on success, false otherwise
  */
 template<typename Graph, class VMap, class EMap>
-bool readGraphText(Graph &g, std::istream &strm, RG_Format format,
+bool readGraphText(Graph &g, std::istream &strm, int format,
 		   VMap &vertexMap, EMap &edgeMap) {
     Privates::EmptyMap<typename Graph::PVertex> tv;
 	Privates::EmptyMap<typename Graph::PEdge> te;
