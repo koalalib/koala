@@ -1562,11 +1562,14 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
     typename ModulesPar< DefaultStructs >::Partition ModulesPar< DefaultStructs >::split( const GraphType &g,
         CompStore< CompIter,VertIter > out, CompMap &avmap, bool skipifprime )
 {
+//KMO: test dla n = 0
+	int n = g.getVertNo(), m=g.getEdgeNo(EdUndir);
+	if (n == 0) return Partition( 0,mpTrivial );
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,int >::Type localvtab;
     typename BlackHoleSwitch< CompMap,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
         int >::Type >::Type &vmap = BlackHoleSwitch< CompMap,typename DefaultStructs:: template AssocCont<
             typename GraphType::PVertex,int >::Type >::get( avmap,localvtab );
-    int n = g.getVertNo(), m=g.getEdgeNo(EdUndir);
+//KMO: przeniesione wyzej    int n = g.getVertNo(), m=g.getEdgeNo(EdUndir);
     if (isBlackHole( avmap ) || DefaultStructs::ReserveOutAssocCont) vmap.reserve( n );
     if (n == 1)
     {
