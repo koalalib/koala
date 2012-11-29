@@ -500,13 +500,18 @@ namespace Koala
         void reserve( size_t size ) { if (size > this->slots()) this->resize( size ); }
         void swap( BiDiHashMap &other );
 
+        void set_threshold( double value ) { if( value <= 0 ) m_resizeFactor = value <= 0 ? 0 : value * 256 + 0.5; };
+        double get_threshold() { return (double)m_resizeFactor / 256.0; };
+
       private:
         void initialize();
         void AddToList( const Privates::BiDiHashMapPair< KeyType,ValueType > *ptr );
         void DelFromList( const Privates::BiDiHashMapPair< KeyType,ValueType > *ptr );
+        void EnlargeIfNeeded();
 
       private:
         Privates::BiDiHashMapPair< KeyType,ValueType > m_begin,m_end;
+        size_t m_resizeFactor;
     };
 
     template< class T > class AssocTabConstInterface;

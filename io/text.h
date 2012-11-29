@@ -165,12 +165,12 @@ public:
 
 
 template<class Graph, class VMap, class EMap>
-bool readGraphText(Graph &g, std::istream &s, RG_Format format,
+bool readGraphText(Graph &g, std::istream &s, int format,
 		   VMap &vertexMap, EMap &edgeMap);
 
 
 template<class Graph, class VMap, class EMap>
-bool readGraphText(Graph &g, const std::string &desc, RG_Format format,
+bool readGraphText(Graph &g, const std::string &desc, int format,
 		   VMap &vertexMap, EMap &edgeMap) {
 	std::istringstream s;
 	s.str(desc);
@@ -179,7 +179,7 @@ bool readGraphText(Graph &g, const std::string &desc, RG_Format format,
 
 
 template<class Graph, class VMap, class EMap>
-bool readGraphText(Graph &g, const char *desc, RG_Format format,
+bool readGraphText(Graph &g, const char *desc, int format,
 		   VMap &vertexMap, EMap &edgeMap) {
 	std::istringstream s;
 	s.str(std::string(desc));
@@ -188,7 +188,7 @@ bool readGraphText(Graph &g, const char *desc, RG_Format format,
 
 
 template<class Graph>
-bool readGraphText(Graph &g, std::istream &s, RG_Format format) {
+bool readGraphText(Graph &g, std::istream &s, int format) {
 	Privates::EmptyMap<typename Graph::PVertex> tv;
 	Privates::EmptyMap<typename Graph::PEdge> te;
 	return readGraphText(g, s, format, tv, te);
@@ -196,7 +196,7 @@ bool readGraphText(Graph &g, std::istream &s, RG_Format format) {
 
 
 template<class Graph>
-bool readGraphText(Graph &g, const std::string &desc, RG_Format format) {
+bool readGraphText(Graph &g, const std::string &desc, int format) {
 	std::istringstream s;
 	s.str(desc);
 	return readGraphText(g, s, format);
@@ -204,7 +204,7 @@ bool readGraphText(Graph &g, const std::string &desc, RG_Format format) {
 
 
 template<class Graph>
-bool readGraphText(Graph &g, const char *desc, RG_Format format) {
+bool readGraphText(Graph &g, const char *desc, int format) {
 	std::istringstream s;
 	s.str(std::string(desc));
 	return readGraphText(g, s, format);

@@ -523,7 +523,8 @@ template< class KeyType, class ValueType, class HashFunction, class Allocator >
 // BiDiHashMap
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator >
-    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::BiDiHashMap( size_t size ): baseType()
+    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::BiDiHashMap( size_t size ):
+        baseType(), m_resizeFactor(205)
 {
     baseType::resize( size );
     initialize();
@@ -531,8 +532,9 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator >
     BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::BiDiHashMap( size_t size, const ValueType &defVal ):
-        baseType( defVal )
+        baseType( defVal ), m_resizeFactor(0)
 {
+    baseType::set_threshold(0);
     baseType::resize( size );
     initialize();
 }
@@ -541,6 +543,8 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
     BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::BiDiHashMap( const BiDiHashMap &t ):
         baseType( t.m_defaultValue )
 {
+    m_resizeFactor = t.m_resizeFactor;
+    baseType::set_threshold(0);
     baseType::resize( t.slots() );
     initialize();
     *this = t;
@@ -570,6 +574,7 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator > ValueType
     &BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::operator[]( const KeyType &key )
 {
+    EnlargeIfNeeded();
     std::pair< iterator,bool > res = insert( key,this->m_defaultValue );
     return const_cast< ValueType & >( res.first->second );
 }
@@ -586,6 +591,7 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
     std::pair< typename BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::iterator,bool >
     BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::insert( const KeyType &key, const ValueType &value )
 {
+    EnlargeIfNeeded();
     std::pair< typename baseType::iterator,bool > res = baseType::insert( key,value );
     if (res.second) AddToList( res.first.operator->() );
     return std::make_pair( iterator( res.first ),res.second );
@@ -595,6 +601,7 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
     std::pair< typename BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::iterator,bool >
     BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::insert( const std::pair< KeyType,ValueType > &elem )
 {
+    EnlargeIfNeeded();
     std::pair< typename baseType::iterator,bool > res = baseType::insert( elem );
     if (res.second) AddToList( res.first.operator->() );
     return std::make_pair( iterator( res.first ),res.second );
@@ -621,6 +628,14 @@ template< typename KeyType, typename ValueType, class HashFunction, class Alloca
 {
     DelFromList( pos.operator->() );
     baseType::erase( pos->first );
+}
+
+template< typename KeyType, typename ValueType, class HashFunction, class Allocator > void
+    BiDiHashMap< KeyType,ValueType,HashFunction,Allocator >::EnlargeIfNeeded()
+{
+    if( m_resizeFactor == 0 ) return;
+    if( ((this->slots() * m_resizeFactor) >> 8) > this->size() ) return;
+    resize( this->slots() * 2 );
 }
 
 template< typename KeyType, typename ValueType, class HashFunction, class Allocator > void
