@@ -50,8 +50,7 @@ template< class DefaultStructs > template< class GraphType >
 }
 
 template< class DefaultStructs > template< class GraphType >
-//    std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
-    VertexPair< GraphType >
+    std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
     IsItPar< DefaultStructs >::Path::ends( const GraphType &g )
 {
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
@@ -71,8 +70,7 @@ template< class DefaultStructs > template< class GraphType >
 }
 
 template< class DefaultStructs > template< class GraphType >
-//    std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
-    VertexPair< GraphType >
+    std::pair<typename GraphType::PVertex,typename GraphType::PVertex>
     IsItPar< DefaultStructs >::Caterpillar::spineEnds( const GraphType &g )
 {
     std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
@@ -1253,7 +1251,7 @@ template< class DefaultStructs > template< class GraphType, class MapType, class
             //vertData[v].visitedb = 1;
             beta.move( v );
         }
-        
+
         beta.done();
     }
 }
