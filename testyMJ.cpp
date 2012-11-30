@@ -1,6 +1,6 @@
 //KG: GLOWNE USTAWIENIA TYPOW STRUKTUR:
 //KG: SPRAWDZIC ZAROWNO DLA true JAK I false
-#define AdjAllow    true
+#define AdjAllow    false
 
 //KG: SPRAWDZIC WE WSZYSTKICH 3 PRZYPADKACH TJ. GDY DOKLADNIE JEDNA Z PONIZSZYCH LINII JEST NIEZAKOMENTOWANA
 #define ArrayMapTest
@@ -1298,62 +1298,56 @@ int critPath2(const char* napis)
 //        g.addEdge(B,D);
 
 //        IO::writeG6(g,napis,20);
-        const char* napis="R??????????????????????????G??";
-        mis_SimpleOut(napis); cout << "\n";
-         clique_simpleOut(napis); cout << "\n";
-        misBipartite_SimpleOut(napis);
-         cout << "\n"; misChordal_SimpleOut(napis);
-          cout << "\n"; cliqueChordal_SimpleOut(napis);
-           cout << "\n"; misComparability_SimpleOut(napis);
-            cout << "\n"; cliqueComparability_SimpleOut(napis);
-             cout << "\n"; matching_SimpleOut(napis);
+        const char* napis="GR@CHS";
 
 
+
+//IO::readG6(g,"GR@CHS");
 
 //        g.clear();
 //        kruskal("{{0,3,2},{3,0,5},{2,5,1}}");
 //        dijkstraPairUndir("{{0,3,2},{3,0,5},{2,5,1}}");
-//        IO::writeGraphText(g, cout, IO::RG_VertexLists | IO::RG_EInfo);
-
+        IO::writeGraphText(g, cout, IO::RG_VertexLists | IO::RG_EInfo);
+        mis("GR@CHS");
     }
 
-    {   cout <<"\nDirected (matrix format):\n";
-        MyDigraph g;
-        MyDigraph::PVertex A,B,C,D;
-
-        critPath2("{{0,3,0},{0,0,4},{0,0,0}}");
-    }
-    {   cout <<"\nOthers:\n";
-        Graph<char,int,GrDefaultSettings<Directed,true> > digraph;
-        digraph.makeAdjMatrix();
-        digraph.addVert('C');digraph.addVert('D');
-        digraph.addArc(digraph.getVert(),digraph.getVertLast());
-                IO::writeGraphText(digraph, cout, IO::RG_VertexLists | IO::RG_VInfo);
-
-        cout << "\n***************\n";
-
-        Graph<char,int,GrDefaultSettings<Undirected,true> > graph;
-        graph.makeAdjMatrix();
-        graph.addVert('A');graph.addVert('B');
-        graph.addEdge(graph.getVert(),graph.getVertLast());
-                IO::writeGraphText(graph, cout, IO::RG_VertexLists | IO::RG_VInfo);
-        cout << "\n***************\n";
-
-//        Graph<char,int,GrDefaultSettings<Undirected,true> > graph2;
-//        graph2.makeAdjMatrix();
-//        graph2.move(graph);
-//                IO::writeGraphText(graph2, cout, IO::RG_VertexLists | IO::RG_VInfo);
+//    {   cout <<"\nDirected (matrix format):\n";
+//        MyDigraph g;
+//        MyDigraph::PVertex A,B,C,D;
+//
+//        critPath2("{{0,3,0},{0,0,4},{0,0,0}}");
+//    }
+//    {   cout <<"\nOthers:\n";
+//        Graph<char,int,GrDefaultSettings<Directed,true> > digraph;
+//        digraph.makeAdjMatrix();
+//        digraph.addVert('C');digraph.addVert('D');
+//        digraph.addArc(digraph.getVert(),digraph.getVertLast());
+//                IO::writeGraphText(digraph, cout, IO::RG_VertexLists | IO::RG_VInfo);
+//
 //        cout << "\n***************\n";
+//
+//        Graph<char,int,GrDefaultSettings<Undirected,true> > graph;
+//        graph.makeAdjMatrix();
+//        graph.addVert('A');graph.addVert('B');
+//        graph.addEdge(graph.getVert(),graph.getVertLast());
 //                IO::writeGraphText(graph, cout, IO::RG_VertexLists | IO::RG_VInfo);
 //        cout << "\n***************\n";
-
-        graph.substitute(graph.getVertLast(),makeUndirView(digraph),stdChoose(true)&stdChoose(true),stdCast()&stdCast());
-                IO::writeGraphText(graph, cout, IO::RG_VertexLists | IO::RG_VInfo);
-        cout << "\n***************\n";
-
-    }
-
-
+//
+////        Graph<char,int,GrDefaultSettings<Undirected,true> > graph2;
+////        graph2.makeAdjMatrix();
+////        graph2.move(graph);
+////                IO::writeGraphText(graph2, cout, IO::RG_VertexLists | IO::RG_VInfo);
+////        cout << "\n***************\n";
+////                IO::writeGraphText(graph, cout, IO::RG_VertexLists | IO::RG_VInfo);
+////        cout << "\n***************\n";
+//
+//        graph.substitute(graph.getVertLast(),makeUndirView(digraph),stdChoose(true)&stdChoose(true),stdCast()&stdCast());
+//                IO::writeGraphText(graph, cout, IO::RG_VertexLists | IO::RG_VInfo);
+//        cout << "\n***************\n";
+//
+//    }
+//
+//
 
 }
 

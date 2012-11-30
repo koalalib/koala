@@ -586,8 +586,7 @@ template< class DefaultStructs > template< class Graph, class Allocator, class C
     if (m_openBlock == m_data.end())
     {
         m_data.push_back( Node( NULL ) );
-        m_data.back().block = m_data.end();//.prev();
-		m_openBlock = m_data.end().prev();
+        m_data.back().block = m_data.end().prev();
     }
     m_data.push_back( Node( v,m_openBlock ) );
     m_vertexToPos[v] = m_data.end().prev();
@@ -598,7 +597,6 @@ template< class DefaultStructs > template< class Graph, class Allocator, class C
 {
     Privates::List_iterator< Node > grp,newGrp;
     Privates::List_iterator< Node > elem;
-	bool add = false;
     if (!m_vertexToPos.hasKey( v )) push( v );
     elem = m_vertexToPos[v];
     grp = elem->block;
@@ -609,21 +607,14 @@ template< class DefaultStructs > template< class Graph, class Allocator, class C
 //            && (elem.next() != m_data.end() || elem.next()->v == NULL)
 //            && grp != m_openBlock) return;
         if(elem.prev() == grp
-			&& (elem.next() == m_data.end() || elem.next()->v == NULL))
-		{
-			if(grp == m_openBlock) m_openBlock = m_data.end();
-			return;
-		}
-		newGrp = m_data.insert_before( grp,Node( NULL ) );
+            && (elem.next() == m_data.end() || elem.next()->v == NULL)
+            && grp != m_openBlock) return;
+        newGrp = m_data.insert_before( grp,Node( NULL ) );
         grp->block = newGrp;
-        //m_splits.push_back( grp );
-		add = true;
+        m_splits.push_back( grp );
         newGrp->block = m_data.end();
     }
     m_data.move_before( grp,elem );
-
-    if(grp.next() != m_data.end() && grp.next()->v == NULL) m_data.erase(grp); // erase empty group
-    else if(add) m_splits.push_back( grp );
     elem->block = newGrp;
 }
 
@@ -662,7 +653,7 @@ template< class DefaultStructs > template< class GraphType, class OutVertIter >
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,std::pair< int,int > >::Type
         orderData( n );
     Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< LVCNode< GraphType > > > >
-        allocat(  n + 3 );
+        allocat( n + 1 );
     //TODO: size? - spr, j.w. 2n+1 -> n + 1 - oj! raczej nie!
     Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 2 );
     LexVisitContainer< GraphType,Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator<
@@ -775,7 +766,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     if (DefaultStructs::ReserveOutAssocCont) visited.reserve( n );
     koalaAssert( ((mask & Directed) == 0) || ((mask & Directed) == Directed),AlgExcWrongMask );
     Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< LVCNode< GraphType > > > >
-        allocat( n + 3 );
+        allocat( n + 1 );
         //TODO: size? - spr:2n+1 -> n+1 - oj! raczej nie!
     Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 2 );
     LexVisitContainer< GraphType,Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator<
@@ -1167,24 +1158,21 @@ template< class DefaultStructs > template< class GraphType, class VertDataMap, c
     class VertIter, class VertBlockIter > int BlocksPar< DefaultStructs >::split( const GraphType &g,
         VertDataMap &vertMap, EdgeDataMap &edgeMap, CompStore< CompIter,VertIter > blocks, VertBlockIter vertBlocks )
 {
-    int rv,n = g.getVertNo(),m = g.getEdgeNo();
+    int rv,n,m = g.getEdgeNo();
     const EdgeType mask = EdAll;
-
-	if(n == 0) return 0;
-
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,VisitVertLabs< GraphType > >::Type
-        visited( n );
+        visited( n = g.getVertNo() );
     if (DefaultStructs::ReserveOutAssocCont)
     {
-        vertMap.reserve( n + 1 );
-        edgeMap.reserve( m + 1 );
+        vertMap.reserve( n );
+        edgeMap.reserve( m );
     }
-    typename GraphType::PEdge LOCALARRAY( stbuf,m + n + 1 );
+    typename GraphType::PEdge LOCALARRAY( stbuf,m + 1 );
     // TODO: size?
-    VertBlockList LOCALARRAY( vertBlockList,m * 2 + n + 1 );
+    VertBlockList LOCALARRAY( vertBlockList,m * 2 + n );
     // TODO: size?
     BiConState< GraphType,CompIter,VertIter,EdgeDataMap >
-        state( blocks,edgeMap,mask,std::make_pair( stbuf,m + n + 1 ),vertBlockList,m * 2 + n + 1 );
+        state( blocks,edgeMap,mask,std::make_pair( stbuf,m + 1 ),vertBlockList,m * 2 + n );
     BiConVisitor< GraphType,CompIter,VertIter,EdgeDataMap > visit( state );
 
     rv = DFSPostorderPar< DefaultStructs >::visitAllBase( g,visited,visit,mask );
@@ -1562,14 +1550,11 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
     typename ModulesPar< DefaultStructs >::Partition ModulesPar< DefaultStructs >::split( const GraphType &g,
         CompStore< CompIter,VertIter > out, CompMap &avmap, bool skipifprime )
 {
-//KMO: test dla n = 0
-	int n = g.getVertNo(), m=g.getEdgeNo(EdUndir);
-	if (n == 0) return Partition( 0,mpTrivial );
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,int >::Type localvtab;
     typename BlackHoleSwitch< CompMap,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
         int >::Type >::Type &vmap = BlackHoleSwitch< CompMap,typename DefaultStructs:: template AssocCont<
             typename GraphType::PVertex,int >::Type >::get( avmap,localvtab );
-//KMO: przeniesione wyzej    int n = g.getVertNo(), m=g.getEdgeNo(EdUndir);
+    int n = g.getVertNo(), m=g.getEdgeNo(EdUndir);
     if (isBlackHole( avmap ) || DefaultStructs::ReserveOutAssocCont) vmap.reserve( n );
     if (n == 1)
     {

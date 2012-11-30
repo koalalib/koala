@@ -1,6 +1,6 @@
 //KG: GLOWNE USTAWIENIA TYPOW STRUKTUR:
 //KG: SPRAWDZIC ZAROWNO DLA true JAK I false
-#define AdjAllow    true
+#define AdjAllow    false
 
 //KG: SPRAWDZIC WE WSZYSTKICH 3 PRZYPADKACH TJ. GDY DOKLADNIE JEDNA Z PONIZSZYCH LINII JEST NIEZAKOMENTOWANA
 #define ArrayMapTest
@@ -197,25 +197,94 @@ class PairHeapSettings : public Settings {
         };
 };
 
+int readDigraph(MyDigraph& g,const char *napis)
+{
+    int n=1;
+    for(int i=0;napis[i]!='}';i++)
+        if (napis[i]==',') n++;
+    MyDigraph::PVertex LOCALARRAY(tabv,n);
+    for(int i=0;i<n;i++)
+        tabv[i]=g.addVert(i);
+    string str=napis;
+    stringstream input(str);
+    char c;
+
+    input >> c; assert(c=='{');
+    for(int i=0;i<n;i++)
+    {   input >> c; assert(c=='{');
+        for(int j=0;j<n;j++)
+        {   int flag;
+            input >> flag >> c;
+            if (flag!=0 && i==j) g.addLoop(tabv[i],flag);
+            if (flag!=0 && i!=j) g.addArc(tabv[i],tabv[j],flag);
+        }
+        input >> c;
+    }
+    return n;
+}
+
+int readGraph(MyGraph& g,const char *napis)
+{
+    int n=1;
+    for(int i=0;napis[i]!='}';i++)
+        if (napis[i]==',') n++;
+    MyGraph::PVertex LOCALARRAY(tabv,n);
+    for(int i=0;i<n;i++)
+        tabv[i]=g.addVert(i);
+    string str=napis;
+    stringstream input(str);
+    char c;
+
+    input >> c; assert(c=='{');
+    for(int i=0;i<n;i++)
+    {   input >> c; assert(c=='{');
+        for(int j=0;j<n;j++)
+        {   int flag;
+            input >> flag >> c;
+            if (flag!=0 && i==j) g.addLoop(tabv[i],flag);
+            if (flag!=0 && i<j) g.addLink(tabv[i],tabv[j],flag);
+        }
+        input >> c;
+    }
+    return n;
+}
+
+
+int mis(const char* g6)
+{
+    MyGraph g;
+    g.makeAdjMatrix();
+    Set<MyGraph::PVertex> res;
+    Set<int> ires;
+    IO::readG6(g,g6);
+    MISPar< Settings >::get(g,setInserter(res));
+    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+        ires+=g.vertPos(i);
+    cout << ires;
+    return res.size();
+}
 
 
 #include "../../main.hpp"
 
     char napis[20],napis2[20];
+    const int N=100;
 
     {   cout <<"Undirected (g6 or matrix format):\n";
         MyGraph g;
-        MyGraph::PVertex A,B,C,D,tabv[10]={0,0,0,0,0,0,0};
+        MyGraph::PVertex A,B,C,D,tabv[N];
 
+        const char* napis="GR@CHS";
+        for(int i=0;i<N;i++) tabv[i]=(MyGraph::PVertex) napis;
 
-        IO::readG6(g,"FhCKG");
+        IO::readG6(g,"GR@CHS");
 
-        IO::writeGraphText(g, cout, IO::RG_VertexLists );
-
-
-    cout <<  "\n" << g.getVertSet() << "\n" << MISPar< Settings >::get(g,tabv) << "\n";
-     for(int i=0;i<10;i++) cout << tabv[i] << ' ';
-
+        IO::writeGraphText(g, cout, IO::RG_VertexLists | IO::RG_EInfo);
+        cout << g.getVertSet() << "\n\nRozmiar: " << MISPar< Settings >::get(g,tabv) << "\n\n";
+        for(int i=0;i<N;i++) if (((char*)tabv[i])==napis) cout << "null,"; else cout << tabv[i] << ',';
+        cout << "\n\n";
+        mis(napis);
 
     }
 
