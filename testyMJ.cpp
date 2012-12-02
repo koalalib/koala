@@ -1307,8 +1307,15 @@ int critPath2(const char* napis)
 //        g.clear();
 //        kruskal("{{0,3,2},{3,0,5},{2,5,1}}");
 //        dijkstraPairUndir("{{0,3,2},{3,0,5},{2,5,1}}");
-        IO::writeGraphText(g, cout, IO::RG_VertexLists | IO::RG_EInfo);
-        mis("GR@CHS");
+//        IO::writeGraphText(g, cout, IO::RG_VertexLists | IO::RG_EInfo);
+//        mis("GR@CHS");
+
+componentsLex("j~~~~~~~~~v~~~~~~~~~lz~~~~|~~~~~~~~~~|~~~~}~v~||~~~~~~~~^z~~~~~v~~~~~~~~\
+|~~~n~~~~~~~~~^~~~~~~~~~n~~~~~~~~~~~~~~~|n~~~}^~z~~|~~~~~~~~~~~~~~~~~~\
+z~~n~~~~~w");
+
+//matching_SimpleOut("__??O@?C?SO???WG?OD@G?`_@??os?oG??C??J??_???_GQSOB?OCW@C_?_?_?????_OG?EO?G?AG???WAac");
+
     }
 
 //    {   cout <<"\nDirected (matrix format):\n";
