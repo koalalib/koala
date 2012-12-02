@@ -435,12 +435,12 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
     ig.makeAdjMatrix();
     // ALG: copy contains all vertices and edges
     assert( g.getEdgeNo() == ig.getEdgeNo() && g.getVertNo() == ig.getVertNo() );
-    return __getMaximumIndependentSet( ig,out,false );
+    return __getMaximumIndependentSet( ig,out,false, isBlackHole(out) );
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
     unsigned MISPar< DefaultStructs >::__getMaximumIndependentSet( GraphType &g, OutputIterator out,
-        bool isConnectedComponent )
+        bool isConnectedComponent, bool outblackhole )
 {
     // ==============================
     // (1) empty graph
@@ -496,7 +496,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
                 }
 
                 typename GraphType::VertInfoType LOCALARRAY( outInner,g.getVertNo() );
-                unsigned MISInner = __getMaximumIndependentSet( gComponent,outInner,true );
+                unsigned MISInner = __getMaximumIndependentSet( gComponent,outInner,true, outblackhole );
                 for( unsigned i = 0; i < MISInner; i++ )
                 {
                     *out = outInner[i];
@@ -518,7 +518,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
         {
             g.delVert( g.getEdgeEnd2( e ) );
             typename GraphType::VertInfoType LOCALARRAY( outInner,g.getVertNo() );
-            unsigned MISInner = __getMaximumIndependentSet( g,outInner,false );
+            unsigned MISInner = __getMaximumIndependentSet( g,outInner,false, outblackhole );
             for( unsigned i = 0; i < MISInner; i++ )
             {
                 *out = outInner[i];
@@ -530,7 +530,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
         {
             g.delVert( g.getEdgeEnd1( e ) );
             typename GraphType::VertInfoType LOCALARRAY( outInner,g.getVertNo() );
-            unsigned MISInner = __getMaximumIndependentSet( g,outInner,false );
+            unsigned MISInner = __getMaximumIndependentSet( g,outInner,false, outblackhole );
             for( unsigned i = 0; i < MISInner; i++ )
             {
                 *out = outInner[i];
@@ -550,8 +550,17 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
         degree = g.deg(pV);
 
         if( degree < minFoldableDeg ) {
-            // note that all verties of degree at most two are foldable
-            if( degree <= 2 || isFoldable(g, pV) ) {
+            // Note #1: All verties of degree at most two are foldable.
+            // Note #2: Folding veritces of degree > 1 implies adding a new vertex to the graph.
+            //          Such vertex might be later chosen to the final solution, what is correct
+            //          from the result point of view. Unfortunately such solution might not
+            //          correspond to the original graph vertices.
+            //          So if we need both, size of the maximum independent set and the subset
+            //          of verices belonging to it, we have to assure that there will be no new
+            //          vertices added to the graph. For this approach we might fold vertices
+            //          only if their degree is <= 1.
+            if( ( !outblackhole && degree <= 1 ) ||
+                (  outblackhole && (degree <= 2 || isFoldable(g, pV)) ) ) {
                 minFoldableVert = pV;
                 minFoldableDeg = degree;
             }
@@ -602,14 +611,12 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
         ++out;
         g.delVerts( minFoldableNeigh );
         typename GraphType::VertInfoType LOCALARRAY( outInner,g.getVertNo() );
-//KG:zmiana        unsigned MISInner = __getMaximumIndependentSet( g,outInner,false) + 1;
-        unsigned MISInner = __getMaximumIndependentSet( g,outInner,false);
+        unsigned MISInner = __getMaximumIndependentSet( g,outInner,false, outblackhole);
         for( unsigned i = 0; i < MISInner; i++)
         {
             *out = outInner[i];
             ++out;
         }
-//KG:zmiana        return MISInner;
             return MISInner + 1;
     }
 
@@ -642,17 +649,15 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
     typename GraphType::VertInfoType LOCALARRAY( bOut,g.getVertNo() );
 
     *aOut = graph1.getVert()->info;
-//KG:zmiana    ++aOut;
+    ++aOut;
     graph1.delVerts( graph1.getClNeighSet( graph1.getVert() ) );
-//KG:zmiana    a = __getMaximumIndependentSet( graph1,aOut,false ) + 1;
-    a = __getMaximumIndependentSet( graph1,aOut + 1,false ) + 1;
+    a = __getMaximumIndependentSet( graph1,aOut,false, outblackhole ) + 1;
 
     g.delVerts( getMirrors( g,g.getVert() ) );
-    b = __getMaximumIndependentSet( g,bOut,false );
+    b = __getMaximumIndependentSet( g,bOut,false, outblackhole );
 
     if (a > b)
-    for( unsigned int i = 0; i < a; i++)
-
+        for( unsigned int i = 0; i < a - 1; i++)
         {
             *out = aOut[i];
             ++out;

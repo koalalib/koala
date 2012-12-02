@@ -274,7 +274,7 @@ namespace Koala
         * Maximum independent set - inner, recursive.
         */
         template< class GraphType, class OutputIterator > static unsigned
-            __getMaximumIndependentSet( GraphType &g, OutputIterator out, bool isConnectedComponent );
+            __getMaximumIndependentSet( GraphType &g, OutputIterator out, bool isConnectedComponent, bool outblackhole );
 
         template< class GraphType > static bool isDominated( const GraphType &g,
             typename GraphType::PVertex v, typename GraphType::PVertex w );
