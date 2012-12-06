@@ -293,6 +293,24 @@ bool GraphML::delKeyGlobal(const char *name) {
 	return true;
 }
 
+bool GraphML::setKeyAttrName(const char *name, const char *attrName) {
+	NameDefs::iterator ndIter = nameDefs.find(name);
+	if(ndIter==nameDefs.end())
+		return false;
+
+	ndIter->second.xml->SetAttribute("attr.name", attrName);
+	ndIter->second.attrName = attrName;
+	return true;
+}
+
+std::string GraphML::getKeyAttrName(const char *name) {
+	NameDefs::iterator ndIter = nameDefs.find(name);
+	if(ndIter!=nameDefs.end())
+		return ndIter->second.attrName;
+
+	return "";
+}
+
 //GraphML read/write
 bool GraphML::readFile( const char *fileName )
 {
@@ -574,7 +592,7 @@ bool GraphML::readXMLKey(TiXmlElement *xml) {
 
 	nameDef.id = keyId;
 	if(keyName!=NULL)
-		nameDef.name = keyName;
+		nameDef.attrName = keyName;
 	nameDef.xml = xml;
 	nameDef.isDef = false;
 

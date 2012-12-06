@@ -1,11 +1,9 @@
 #ifndef KOALA__EQUITABLECOLORING__H__
 #define KOALA__EQUITABLECOLORING__H__
 
-#include "../base/defs.h"
 #include "../graph/view.h"
-#include "../algorithm/search.h"
-#include "vertex.h"
-#include "edge.h"
+#include "./vertex.h"
+#include "./edge.h"
 
 namespace Koala {
 
