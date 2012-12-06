@@ -6,7 +6,7 @@ namespace Koala
     namespace Privates
     {
         /* NormalVertLink
-         * 
+         *
          */
         template< class VertInfo, class EdgeInfo, class Settings > struct NormalVertLink
         {
@@ -14,15 +14,15 @@ namespace Koala
             int degree;
 
             NormalVertLink(): first( NULL ), last( NULL ), degree( 0 ) { }
-            
+
             Edge< VertInfo,EdgeInfo,Settings > *&getFirst() { return first; }
             Edge< VertInfo,EdgeInfo,Settings > *&getLast() { return last; }
-            
+
             int &getDegree() { return degree; }
         };
 
         /* EmptyVertLink
-         * 
+         *
          */
         template< class VertInfo, class EdgeInfo, class Settings > struct EmptyVertLink
         {
@@ -37,7 +37,7 @@ namespace Koala
 
 
         /* VertLinkEdDirIn
-         * 
+         *
          */
         template< class VertInfo, class EdgeInfo, class Settings, EdgeType Present > struct VertLinkEdDirIn;
         template< class VertInfo, class EdgeInfo, class Settings >
@@ -48,7 +48,7 @@ namespace Koala
             public EmptyVertLink< VertInfo,EdgeInfo,Settings > { };
 
         /* VertLinkEdDirOut
-         * 
+         *
          */
         template< class VertInfo, class EdgeInfo, class Settings, EdgeType Present > struct VertLinkEdDirOut;
         template< class VertInfo, class EdgeInfo, class Settings >
@@ -59,7 +59,7 @@ namespace Koala
             public EmptyVertLink< VertInfo,EdgeInfo,Settings > { };
 
         /* VertLinkEdUndir
-         * 
+         *
          */
         template< class VertInfo, class EdgeInfo, class Settings, EdgeType Present > struct VertLinkEdUndir;
         template< class VertInfo, class EdgeInfo, class Settings >
@@ -68,9 +68,9 @@ namespace Koala
         template< class VertInfo, class EdgeInfo, class Settings >
             struct VertLinkEdUndir< VertInfo,EdgeInfo,Settings,0 >:
             public EmptyVertLink< VertInfo,EdgeInfo,Settings > { };
-        
+
         /* VertLinkEdLoop
-         * 
+         *
          */
         template< class VertInfo, class EdgeInfo, class Settings, EdgeType Present > struct VertLinkEdLoop;
         template< class VertInfo, class EdgeInfo, class Settings >
@@ -98,19 +98,19 @@ namespace Koala
       public:
         //Additional user information in the vertex.
         VertInfo info;
-    
+
         VertInfo getInfo() { return info; }
         void setInfo( const VertInfo &info ) { this->info = info; }
 
       private:
         // klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
         /** Standard constructor*/
-        Vertex(): next( NULL ), prev( NULL ) { }
+        Vertex(): info (), next( NULL ), prev( NULL ) { }
         /** Constructor sets info variable */
         Vertex( const VertInfo &infoExt ): info( infoExt ), next( NULL ), prev( NULL ) { }
         Vertex( const Vertex & X) {}
         Vertex &operator=( const Vertex &X ) { }
-        
+
         ~Vertex() { }
 
         Vertex *next,*prev;

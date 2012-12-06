@@ -520,13 +520,11 @@ namespace Koala
 
         PVertex first_vert,last_vert;
         PEdge first_edge,last_edge;
-        //        int&
+
         typename Privates::EdgeCounterLoop< Settings::EdAllow &Loop >::NoType
             no_loop_edge() const { return this->Privates::EdgeCounterLoop< Settings::EdAllow &Loop >::no(); }
-        //        int&
         typename Privates::EdgeCounterDir< Settings::EdAllow & (EdDirIn|EdDirOut) >::NoType
             no_dir_edge() const { return this->Privates::EdgeCounterDir< Settings::EdAllow & (EdDirIn|EdDirOut) >::no(); }
-        //        int&
         typename Privates::EdgeCounterUndir< Settings::EdAllow & Undirected >::NoType
             no_undir_edge() const { return this->Privates::EdgeCounterUndir< Settings::EdAllow & Undirected >::no(); }
         int no_vert;

@@ -496,12 +496,6 @@ namespace Koala
         // czy cograph
         template< class GraphType > static bool cograph( const GraphType &g );
 
-//TODO:
-//            template <class Graph>
-//            static bool planar(const Graph &g);
-//
-//            template <class Graph>
-//            static bool outerplanar(Graph &g);
 
     };
 

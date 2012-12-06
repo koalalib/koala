@@ -15,10 +15,6 @@
 #include "localarray.h"
 #include "simple.h"
 
-#ifndef UNUSED
-#define UNUSED(x) ((void)(x))
-#endif
-
 
 namespace Koala
 {
@@ -34,6 +30,8 @@ namespace Koala
           public:
             Element blob;
             int prev,next;
+
+            BlockOfBlockList() : blob() {}
         };
 
         template< class T > class BlockListVectInerfTest { };

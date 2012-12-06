@@ -235,6 +235,8 @@ namespace Koala
         Elem val;
         Klucz key;
         AssocContReg assocReg;
+
+        BlockOfAssocArray() : val(), key() {}
     };
 
     namespace Privates
@@ -244,7 +246,7 @@ namespace Koala
         template< class Klucz > class KluczTest
         {
           public:
-            KluczTest( Klucz v = 0 ) { AssocKeyContReg *ptr = &v->assocReg; UNUSED(ptr);}
+            KluczTest( Klucz v = 0 ) { AssocKeyContReg *ptr = &v->assocReg; (void)(ptr);}
         } ;
     }
 
@@ -275,7 +277,7 @@ namespace Koala
         typedef Container ContainerType;
 
         // asize - rozmiar poczatkowy, drugi arg. ignorowany
-        AssocArray( int asize = 0, void *p = 0 ): tab( asize ) { UNUSED(p); }
+        AssocArray( int asize = 0, void *p = 0 ): tab( asize ) { (void)(p); }
         AssocArray( const AssocArray< Klucz,Elem,Container > & );
 
         AssocArray< Klucz,Elem,Container > &operator=( const AssocArray< Klucz,Elem,Container > & );

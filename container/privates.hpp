@@ -11,7 +11,8 @@ template< class Element, class Container > BlockList< Element,Container > &
     BlockList< Element,Container >::operator=( const BlockList< Element,Container > &X )
 {
     if (&X == this) return *this;
-    Privates::BlockListVectInerfTest< Container > error; // wymuszony blad kompilacji
+    Privates::BlockListVectInerfTest< Container > error;
+    // wymuszony blad kompilacji, kontenery BlockList z Container=VectorInterface sa niekopiowalne
     (void) error;
     siz = X.siz;
     first = X.first;
@@ -111,13 +112,13 @@ template< class Element > BlockListAllocator< Element >::~BlockListAllocator()
 
 template< class Element > template< class U > U *BlockListAllocator< Element >::allocate()
 {
-    TestEqTypes< U,Element > x; UNUSED(x);
+    TestEqTypes< U,Element > x; (void)(x);
     return alloc();
 }
 
 template< class Element > template< class U > void BlockListAllocator< Element >::deallocate( U *p )
 {
-    TestEqTypes< U,Element > x; UNUSED(x);
+    TestEqTypes< U,Element > x; (void)(x);
     dealloc( p );
 }
 

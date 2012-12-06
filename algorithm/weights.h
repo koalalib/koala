@@ -128,6 +128,7 @@ namespace Koala
             PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType& g,
                 const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
                 ShortPathStructs::OutPath< VIter,EIter > iters )
+        // Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
                 {
                     koalaAssert( start && end,AlgExcNullVert );
                     const typename EdgeContainer::ValType::DistType PlusInfty = DefaultStructs:: template
@@ -239,6 +240,7 @@ namespace Koala
             PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
                 const EdgeContainer& edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
                 ShortPathStructs::OutPath< VIter,EIter > iters )
+                // Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
                 {
                     const typename EdgeContainer::ValType::DistType MinusInfty = DefaultStructs:: template
                 	NumberTypeBounds< typename EdgeContainer::ValType::DistType >::minusInfty();
@@ -438,6 +440,7 @@ namespace Koala
         template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
             Result< typename EdgeContainer::ValType::WeightType > getForest( const GraphType &g,
                 const EdgeContainer &edgeTab, Iter out, VertCompContainer &asets, int edgeNo, bool minWeight )
+                // Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
                 {
                     JoinableSets< typename GraphType::PVertex,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
                 	JSPartDesrc< typename GraphType::PVertex > *>::Type > localSets;

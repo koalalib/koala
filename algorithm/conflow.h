@@ -63,10 +63,6 @@ namespace Koala
             EdgeLabs( CapacType arg, CostType arg2):
                     capac( arg ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), cost( arg2 )
                 { }
-//            EdgeLabs( CapacType arg = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
-//                CostType arg2 = DefaultStructs:: template NumberTypeBounds< CostType >::zero() ):
-//                    capac( arg ), cost( arg2 ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() )
-//                { }
         };
 
         // j.w. ale nadaje domyslne jednostkowe przepustowosci i koszty
@@ -147,9 +143,6 @@ namespace Koala
                  { }
             TrsVertLoss( CapacType alo, CapacType ahi): hi( ahi ), lo( alo )
                  { }
-//            TrsVertLoss( CapacType alo = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
-//                 CapacType ahi = DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ): hi( ahi ), lo( alo )
-//                 { }
         };
 
         // rekord  opisujacy krawedz dla wyszukiwania transhipmentow
@@ -187,11 +180,6 @@ namespace Koala
                 CapacType ahi,
                 CostType c): hi( ahi ), lo( alo ), cost( c )
                     { }
-//            TrsEdgeLabs( CapacType alo = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
-//                CapacType ahi = DefaultStructs:: template NumberTypeBounds< CapacType >::zero(),
-//                CostType c = DefaultStructs:: template NumberTypeBounds< CostType >::zero() ): hi( ahi ), lo( alo ),
-//                    cost( c )
-//                    { }
         };
 
         // TODO: w ostatecznej wersji   protected: (ale na razie wystepuje w testach)
@@ -242,10 +230,6 @@ namespace Koala
                 typename GraphType::PVertex first, typename GraphType::PVertex last, Iter &iterout );
         // pomocnicza dla maxFlowMKM
         // wyznaczanie potencjalow przeplywu wierzcholkow w sieci warstwowej miedzy ends
-//        template< class GraphType, class VertContainer, class EdgeContainer > static void
-//            findPot( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
-//                std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends,
-//                typename GraphType::PVertex v, bool pin, bool pout );
         template< class GraphType, class VertContainer, class EdgeContainer > static void
             findPot( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
                 typename GraphType::PVertex fends,typename GraphType::PVertex sends,
@@ -366,10 +350,6 @@ namespace Koala
             const EdgeContainer &edgeTab, typename GraphType::PVertex S, typename GraphType::PVertex T );
         // znajduje maksymalny przeplyw start->end (ale nie wiekszy, niz limit)
         // zwraca jego wielkosc
-//        template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
-//            maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
-//                typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType limit = DefaultStructs::
-//		template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
         template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
             maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
                 typename GraphType::PVertex end)
@@ -391,12 +371,11 @@ namespace Koala
             std::pair< typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType >
             minCostFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
                 typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val);
-//                typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val = DefaultStructs::
-//                template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
         // znajdowanie minimalnego (pod wzgledem objetosci) rozciecia krawedziowego start-end
         template< class GraphType, class EdgeContainer, class VIter, class EIter > static
             EdgeCut< typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g, EdgeContainer &edgeTab,
                 typename GraphType::PVertex start, typename GraphType::PVertex end, OutCut< VIter,EIter > iters )
+                // Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
                 {
                     EdgeCut< typename EdgeContainer::ValType::CapacType > res;
                     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
@@ -430,6 +409,7 @@ namespace Koala
         template< class GraphType, class EdgeContainer, class VIter, class EIter > static
             EdgeCut2< GraphType,typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g,
                 EdgeContainer &edgeTab, OutCut< VIter,EIter > iters )
+                // Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
                 {
                     int n,m;
                     koalaAssert( g.getVertNo() >= 2,AlgExcWrongArg );
@@ -563,6 +543,7 @@ namespace Koala
         // znajduje najmniejsze rozciecie krawedziowe miedzy para roznych wierzcholkow
         // krawedzie sa wypisywane na iter
         template< class GraphType, class EIter > static EdgeCut< GraphType > minEdgeCut( const GraphType &g, EIter iter )
+        // Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
                 {
                     EdgeCut< GraphType > res;
                     typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,

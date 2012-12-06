@@ -255,13 +255,13 @@ template< typename Element > template< class Iter >
 
 template< typename Element >
     Element Set< Element >::first() const
-    {   if (this->size()==0) return this->badValue();//(Element)0;
+    {   if (this->size()==0) return this->badValue();
         return *(this->begin());
     }
 
 template< typename Element >
     Element Set< Element >::last() const
-    {   if (this->size()==0) return this->badValue();//(Element)0;;
+    {   if (this->size()==0) return this->badValue();
         return *(--this->end());
     }
 

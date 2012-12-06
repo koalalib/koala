@@ -129,7 +129,7 @@ namespace Koala
         static bool isEdgeTypeChooser( const EdgeTypeChooser &x, Koala::EdgeDirection &val );
 
         template <class T> static bool isBoolChooser( const T &x, bool &val )
-            { UNUSED(x); UNUSED(val); return false; }
+            { (void)(x); (void)(val); return false; }
         static bool isBoolChooser( const BoolChooser &x, bool &val );
     };
 

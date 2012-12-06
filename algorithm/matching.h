@@ -2,103 +2,277 @@
 #define KOALA_DEF_FACTOR_H
 
 #include "../base/defs.h"
+#include "../container/privates.h"
+#include "../container/joinsets.h"
 #include "../graph/view.h"
+
 
 namespace Koala
 {
+namespace Privates {
+
+    template<class Cont>
+    class MatchingBlackHoleWriter {
+    public:
+        template<class V, class E>
+        static void Write(Cont &vertTab, V u, V v, E e) {
+            vertTab[u].vMatch = v;
+            vertTab[u].eMatch = e;
+            vertTab[v].vMatch = u;
+            vertTab[v].eMatch = e;
+            };
+    };
+
+    template<>
+    class MatchingBlackHoleWriter<BlackHole> {
+    public:
+        template<class V, class E>
+        static void Write(BlackHole &c, V u, V v, E e) {};
+    };
+
+};
+
     /* MatchingPar
      * algorytm szukajacy najliczniejszego skojarzenia w grafie dowolnym
      */
-    template< class DefaultStructs > class MatchingPar
-    {
-      public:
-        template< class GraphType > struct VertLabs
-        {
-                template <class D> friend class MatchingPar;
-                //wierzcholek skojarzany
-                typename GraphType::PVertex vMatch;
-                //i krawedz skojarzenia
-                typename GraphType::PEdge eMatch;
+template< class DefaultStructs > class MatchingPar
+{
+      private:
 
-                VertLabs(): vMatch( 0 ), eMatch( 0 ), vLabS( 0 ), vLabB( 0 ), bS( false ), bT( false )
-                    { vLabT[0] = vLabT[1] = 0; }
+        template<class GraphType>
+        struct PrvVertLabs {
+            typename GraphType::PVertex labS;
+            typename GraphType::PVertex labT1;
+            typename GraphType::PVertex labT2;
+            typename GraphType::PVertex mate;
+            bool labTB;
+        };
 
-            protected:
-                // parametry do uzytku wewnetrznego algorytmu
-                //cecha T (VertLabs[Vi].T=Vj oznacza, ze istnieje parzysta droga naprzemienna z wierzcholka wolnego Vr do Vi, gdzie poprzednikiem Vi jest Vj)
-                typename GraphType::PVertex vLabT[2];
-                //cecha S (VertLabs[Vi].S=Vj -||- nieparzysta droga -||-)
-                typename GraphType::PVertex vLabS;
-                //cecha b (VertLabs[Vi].b=Vj oznacza, ze najbardziej zewnetrzny kielich, do ktorego nalezy wierzcholek Vi jest reprezentowany przez wierzcholek Vj, ktory jest podstawa tego kielicha)
-                typename GraphType::PVertex vLabB;
-                //jezeli S niezbadana true, jezeli nie ma S lub S zbadana false (moze powinnam to trzymac na liscie cech?)
-                bool bS;
-                //jezeli T niezbadana true, jezeli nie ma T lub T zbadana false (moze to powinnam trzymac na liscie cech?)
-                bool bT;
+        template<class GraphType>
+        class MatchingData: public DefaultStructs::template
+                AssocCont< typename GraphType::PVertex, PrvVertLabs<GraphType> >::Type {};
+
+        template<class T>
+        struct Node {
+                Node *next;
+                Node *prev;
+                T elem;
+        };
+
+        template<class T, class Allocator = Privates::DefaultCPPAllocator>
+        class CyclicList {
+        public:
+
+            class iterator {
+                public:
+                    iterator(): m_ptr(0)		{};
+                    iterator(Node<T> *n): m_ptr(n)	{};
+                    iterator next()			{ return iterator(m_ptr->next); };
+                    iterator prev()			{ return iterator(m_ptr->prev); };
+                    void moveNext()			{ m_ptr = m_ptr->next; };
+                    void movePrev()			{ m_ptr = m_ptr->prev; };
+                    T &operator *()			{ return m_ptr->elem; };
+                    T *operator ->()		{ return &(m_ptr->elem); };
+                    bool operator ==(const iterator &i)	{ return m_ptr == i.m_ptr; };
+                    bool operator !=(const iterator &i)	{ return m_ptr != i.m_ptr; };
+                private:
+                    Node<T> *m_ptr;
+            };
+
+            CyclicList(Allocator& alloc=0): m_cur(0), allocator(&alloc) {};
+            ~CyclicList()	{ erase(); };
+            T &curr()	{ return m_cur->elem; };
+
+            iterator cur()	{ return iterator(m_cur); };
+
+            void clear()	{ while(m_cur != 0) erase(); };
+            void next()	{ m_cur = m_cur->next; };
+            void prev()	{ m_cur = m_cur->prev; };
+
+            void add_before(const T &v) {
+                //Node<T> *n = new Node<T>;
+                Node<T> *n = allocator->template allocate<Node<T> >();
+                n->elem = v;
+                if(m_cur == 0) {
+                    n->prev = n;
+                    n->next = n;
+                    m_cur = n;
+                    return;
+                } else {
+                    n->prev = m_cur->prev;
+                    n->next = m_cur;
+                    n->next->prev = n;
+                    n->prev->next = n;
+                    };
+            };
+
+            void erase() {
+                Node<T> *t;
+                if(m_cur == 0) return;
+                t = m_cur->next;
+                if(t == m_cur) //{ delete m_cur; t = 0; }
+                    { allocator-> deallocate( m_cur); t = 0; }
+                else {
+                    m_cur->prev->next = m_cur->next;
+                    m_cur->next->prev = m_cur->prev;
+                    //delete m_cur;
+                    allocator-> deallocate( m_cur);
+                    };
+                m_cur = t;
+            };
+
+            void Conc(CyclicList &l) {
+                Node<T> *e, *ee, *p2, *p3, *p4, *e0;
+                e = m_cur->prev;
+                ee = l.m_cur->prev;
+                e0 = ee;
+                p2 = l.m_cur->next;
+                p3 = p2->next;
+                m_cur->prev = p2;
+                p2->next = m_cur;
+                while(p3 != l.m_cur) {
+                    p2->prev = p3; p4 = p3->next; p3->next = p2;
+                    p2 = p2;
+                    p3 = p4;
+                    };
+                ee->prev = e;
+                e->next = ee;
+                m_cur = e0;
+                l.m_cur = 0;
+            };
+
+
+            Allocator* allocator;
+
+        private:
+            Node<T> *m_cur;
 
         };
 
-      protected:
-        //procedura wypelnia vertTabNeights - kazdemu wierzcholkowi przybisuje zbior jego sasiadow
-        template< class GraphType, class AssocTab >
-            static void fillVertTabNeights( const GraphType &g, AssocTab &vertTabNeights );
-        //skojarzenie poczatkowe
-        template< class GraphType, class VertContainer, class AssocTab > static int firstMatching( const GraphType &g,
-            VertContainer &vertTab, AssocTab &vertTabNeights, int matchSize );
-        //utworzenie skojarzenia poczatkowego ze podanego na wejsciu strumienia wierzcholkow tworzacych skojarzone krawedzie
-        template< class GraphType, class VertContainer, class EIterIn > static int firstMaching( const GraphType &g,
-            VertContainer &vertTab, EIterIn begin, EIterIn end );
-        //funcja czysci wszystkie etykiety na wierzcholkach
-        template< class GraphType, class VertContainer > static void clearLabels( const GraphType &g,
-            VertContainer &vertTab );
-        //funkcja realizuje powiekszenie skojarzenia, gdy zostala znaleziona naprzeminna droga powiekszajaca
-        template< class GraphType, class VertContainer >  static int augmentation( const GraphType &g,
-            VertContainer &vertTab, typename GraphType::PVertex tabPath1[], int len1,
-            typename GraphType::PVertex tabPath2[], int len2, int expo );
-        //reverse table
-        template< class PVertex > static void reverseTable( PVertex tabPath[], int from, int to );
-        //funkcja, ktora zwraca korzen oraz zapisuje do tabPath liste wierzcholkow na drodze od vCurr do Root
-        // Parametry: graf, wierzcholki, tablica do ktorej zapisujemy kolejne wierzcholki na sciezce do korzenia,
-        // pozycja w tablicy tabPath do ktorej teraz bedziemy zapisywac kolejny wierzcholek,
-        //od tego wierzcholka zaczynamy wedrowke, jezeli true - zaczynamy od cechy S w vStart, jezeli false to od cechy T
-        //warunek stopu - gdy dotrzemy do wierzcholka vStop konczymy wedrowke po wierzcholkach w danym kierunku,jezeli vStop==0 to konczymy gdy dotrzemy do korzenia
-        template< class GraphType, class VertContainer > static typename GraphType::PVertex backtracking(
-            const GraphType &g, VertContainer& vertTab, typename GraphType::PVertex tabPath[], int &iCurr,
-            typename GraphType::PVertex vStart, bool isS, typename GraphType::PVertex vStop );
-        //obrobka znalezionego kielicha
-        template< class GraphType, class VertContainer > static void blossoming( const GraphType &g,
-            VertContainer &vertTab, typename GraphType::PVertex tabPath1[], int len1,
-            typename GraphType::PVertex tabPath2[], int len2 );
-        //etykietowanie kolejnych wierzcholkow
-        template< class GraphType, class VertContainer, class AssocTab > static int labeling( const GraphType &g,
-            VertContainer &vertTab, AssocTab &vertTabNeights, bool isS, typename GraphType::PVertex vCurr, int expo );
-        //algorytm Edmondsa
-        template< class GraphType, class VertContainer, class AssocTab > static int edmonsAlg( const GraphType &g,
-            VertContainer &vertTab, AssocTab &vertTabNeights, int matchSize, int &expo );
-        //wpisanie wyniku do edgeIterOut dla maxMatching and minEdgeCover, zwraca liczbe wpisan
-        //jezeli ifEdgeCover ustawiony (true) to rozszerzemy skojarzenie do pokrycia krawedziowego
-        template< class GraphType, class VertContainer, class EIterOut > static int printResultToIterators(
-            const GraphType &g, VertContainer &vertTab, EIterOut edgeIterOut, bool ifEdgeCover = false );
+
+        template<class T>
+        class SimpleQueue : public QueueInterface< std::pair<T, bool> * >
+        {
+            public:
+
+                SimpleQueue(std::pair<T, bool> *p, int size) : QueueInterface< std::pair<T, bool> * > (p,size)
+                    {}
+
+                void push(const T &v, bool b)
+                { this->QueueInterface< std::pair<T, bool> * >::push(std::pair<T, bool>(v,b)); }
+        };
+
+	template<class GraphType,class CList>
+	static void BackRec(MatchingData<GraphType> &data,
+			    typename GraphType::PVertex &vert,
+			    bool &st,
+			    CList &path);
+
+	template<class GraphType,class CList>
+	static void BackT(MatchingData<GraphType> &data,
+			  typename GraphType::PVertex &vert,
+			  bool &st,
+			  CList &path);
+
+	template<class GraphType, class CList>
+	static typename GraphType::PVertex Backtracking(MatchingData<GraphType> &data,
+							typename GraphType::PVertex vert,
+							bool st,
+							CList &path);
+
+	template<class GraphType,class CList>
+	static void Augmentation(MatchingData<GraphType> &data,
+				 JoinableSets<typename GraphType::PVertex> &sets,
+				 CList &pathl,
+				 CList &pathr,
+				 bool &noaugment,
+				 int &expo);
+
+	template<class GraphType, class CList>
+	static void Relabel(MatchingData<GraphType> &data,
+			    JoinableSets<typename GraphType::PVertex> &sets,
+			    typename CList::iterator start,
+			    CList &path,
+			    SimpleQueue<typename GraphType::PVertex> &q,
+			    CList &otherPath);
+
+	template<class PVERT,class CListIterator>
+	static void BaseChange(JoinableSets<PVERT> &sets,
+			       typename JoinableSets<PVERT>::Repr &base,
+			       CListIterator e1,
+			       CListIterator e2);
+
+	template<class GraphType, class CList>
+	static void Blossoming(MatchingData<GraphType> &data,
+			       JoinableSets<typename GraphType::PVertex> &sets,
+			       CList &pathl,
+			       CList &pathr,
+			       SimpleQueue<typename GraphType::PVertex> &q);
+
+    template< class GraphType, class VertContainer, class EIterIn, class EIterOut >
+	static int matchingTool( const GraphType &g,
+				 VertContainer &vertTab,
+				 EIterIn initialBegin,
+				 EIterIn initialEnd,
+				 EIterOut matching,
+				 int matchSize = -1,
+				 bool makeCover = false);
 
       public:
-        // wlasciwa procedura - szuka skojarzenia o zadanym rozmiarze matchSize, zwraca znaleziony rozmiar skojarzenia
-        // Parametry: graf, wyjsciowa tablica asocjacyjna PVertex->VertLabs, w plach vMatch tych rekordow jest wierzcholek skojarzony z danym lub 0 w razie braku (lub BlackHole)
-        //iterator wyjsciowy, na ktory wyrzucamy krawedzie matchingu
-        //Do ilu krawedzi wlacznie szukac. Tj. ilo-krawedziowy matching znalezc lub najwiekszy, gdy jest mniejszy od tego parametru. Gdy matchSize=-1 to znajdz najwiekszy.
-        template< class GraphType, class VertContainer, class EIterOut > static int findMax( const GraphType &g,
-            VertContainer &avertTab, EIterOut edgeIterOut, int matchSize = -1 );
-        // wlasciwa procedura - szuka skojarzenia o zadanym rozmiarze matchSize, zaczynajac od podanego skojarzenia poczatkowego, zwraca znaleziony rozmiar skojarzenia
-        // vertIterInBegin iterator wejsciowy, zawiera poczatek strumienia z wierzcholkami tworzacymi poczatkowy matching
-        // edgeIterOut iterator wyjsciowy, na ktory wyrzucamy krawedzie matchingu
-        // edgeIterOut, iterator wyjsciowy, na ktory wyrzucamy krawedzie matchingu
-        template< class GraphType, class VertContainer, class EIterIn, class EIterOut > static int findMax(
-            const GraphType &g, VertContainer &avertTab, EIterIn vertIterInBegin, EIterIn vertIterInEnd,
-            EIterOut edgeIterOut, int matchSize = -1 );
-        // wlasciwa procedura - szuka minimalnego pokrycia krawedziowego
-        // najpierw realizuje Edmondsa - szuka maksymalnego skojarzenia, nastepnie rozszerza je do pokrycia krawedziowego
-        template< class GraphType, class VertContainer, class EIterOut > static int minEdgeCover( const GraphType &g,
-            VertContainer &avertTab, EIterOut edgeIterOut );
-        // wlasciwa procedura - zachlannie szuka skojarzenia
+
+        template< class GraphType > struct VertLabs
+        {
+                typename GraphType::PVertex vMatch;
+                typename GraphType::PEdge eMatch;
+                VertLabs(): vMatch( 0 ), eMatch( 0 ) {}
+        };
+
+	/** find maximum matching in a given graph
+	 * @param[in] graph
+	 * @param[out] matching list of edges in found matching
+	 * @return actual number of edges in found matching */
+        template< class GraphType, class EIterOut >
+	static int findMax( const GraphType &g, EIterOut matching)
+		{ return findMax( g,blackHole,matching ); }
+
+	/** find maximum matching in a given graph
+	 * @param[in] graph
+	 * @param[out] map from PVertex to VertLabs or BlackHole
+	 * @param[out] matching list of edges in found matching
+	 * @param[in] matchSize desired size of a matching, leave out for a maximum
+	 * @return actual number of edges in found matching */
+        template< class GraphType, class VertContainer, class EIterOut >
+	static int findMax( const GraphType &g,
+			    VertContainer &vertTab,
+			    EIterOut matching,
+			    int matchSize = -1 )
+		{
+		    typename GraphType::PEdge edges[1];
+            return matchingTool(g, vertTab, edges, edges, matching, matchSize, false);
+        }
+
+	/**
+	 * @param[in] initialBegin iterator to give an initial list of edges in a matching
+	 * @param[in] initialEnd
+	 * @return additionally, can return -1 if initial matching is invalid */
+        template< class GraphType, class VertContainer, class EIterIn, class EIterOut >
+	static int findMax( const GraphType &g,
+			    VertContainer &vertTab,
+			    EIterIn initialBegin,
+			    EIterIn initialEnd,
+			    EIterOut matching, int matchSize = -1 )
+		{ return matchingTool(g, vertTab, initialBegin, initialEnd, matching, matchSize, false); }
+
+	/** find minimim edge cover of a given graph
+	 * @param[in] graph
+	 * @param[out] cover list of edges in found cover
+	 * @return actual number of edges in found cover */
+        template< class GraphType, class EIterOut >
+	static int minEdgeCover( const GraphType &g, EIterOut cover)
+		{ typename GraphType::PEdge edges[1];
+		  return matchingTool(g, blackHole, edges, edges, cover, -1, true);
+        }
+
         template< class GraphType, class VertContainer, class EIterOut > static int greedy( const GraphType &g,
             VertContainer &avertTab, EIterOut edgeIterOut, int matchSize = -1 );
         // wlasciwa procedura - zachlannie szuka skojarzenia, rozwarzajac krawedzie podane na wejsciu
@@ -108,8 +282,7 @@ namespace Koala
         // wlasciwa procedura - testuje czy podane na wejsciu krawedzie tworza skojarzenie
         template< class GraphType, class EIterIn > static bool test( const GraphType &g, EIterIn edgeIterInBegin,
             EIterIn edgeIterInEnd );
-    };
-
+};
     /* Matching
      *
      */
