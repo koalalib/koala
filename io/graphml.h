@@ -87,6 +87,8 @@ public:
 
 	//key type modifications
 	bool delKeyGlobal(const char *name);
+	bool setKeyAttrName(const char *name, const char *attrName);
+	std::string getKeyAttrName(const char *name);
 
 	//GraphML read/write
 	bool readFile( const char *fileName );
@@ -129,7 +131,7 @@ private:
 		template<typename T> T get();
 	};
 	struct NameDef : public KeyHolder {
-		std::string id, name;
+		std::string id, attrName;
 		TiXmlElement *xml;
 		GraphMLKeyTypes::ForKey forKey;
 		bool isDef;
