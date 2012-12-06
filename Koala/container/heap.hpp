@@ -985,7 +985,6 @@ void PairHeap<Key, Compare,Allocator>::clear(Node* n)
 {
 	if(n->next) clear(n->next);
 	if(n->child) clear(n->child);
-	//allocator->deallocate(n);
 	delNode(n);
 }
 

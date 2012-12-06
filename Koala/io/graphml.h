@@ -127,8 +127,6 @@ private:
 		bool set(const char *val);
 		bool set(const std::string &val);
 		template<typename T> T get();
-		/*bool get(); int get(); int64_t get();
-			double get(); std::string get();*/
 	};
 	struct NameDef : public KeyHolder {
 		std::string id, name;

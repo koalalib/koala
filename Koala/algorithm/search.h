@@ -269,15 +269,15 @@ namespace Koala
 
         template< class GraphType, class Visitor > static bool visitVertexPre( const GraphType &g, Visitor &v,
             typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, simple_preorder_visitor_tag &s )
-             { UNUSED(s); return v( g,u,r ); }
+             { (void)(s); return v( g,u,r ); }
 
         template< class GraphType, class Visitor > static bool visitVertexPre( const GraphType &g, Visitor &v,
             typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, simple_postorder_visitor_tag &s )
-            { UNUSED(g); UNUSED(v); UNUSED(u); UNUSED(r); UNUSED(s); return true; }
+            { (void)(g); (void)(v); (void)(u); (void)(r); (void)(s); return true; }
 
         template< class GraphType, class Visitor > static bool visitVertexPre( const GraphType &g, Visitor &v,
             typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, complex_visitor_tag &c )
-            { UNUSED(c); return v.visitVertexPre( g,u,r ); }
+            { (void)(c); return v.visitVertexPre( g,u,r ); }
 
         template< class GraphType, class Visitor > static bool visitVertexPre( const GraphType &g, Visitor &v,
             typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, ... )
@@ -285,15 +285,15 @@ namespace Koala
 
         template< class GraphType, class Visitor > static bool visitVertexPost( const GraphType &g, Visitor &v,
             typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, simple_preorder_visitor_tag &s )
-            { UNUSED(g); UNUSED(v); UNUSED(u); UNUSED(r); UNUSED(s); return true; }
+            { (void)(g); (void)(v); (void)(u); (void)(r); (void)(s); return true; }
 
         template< class GraphType, class Visitor > static bool visitVertexPost( const GraphType &g, Visitor &v,
             typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, simple_postorder_visitor_tag &s )
-            { UNUSED(s); return v( g,u,r ); }
+            { (void)(s); return v( g,u,r ); }
 
         template< class GraphType, class Visitor > static bool visitVertexPost( const GraphType &g, Visitor &v,
             typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, complex_visitor_tag &c )
-            { UNUSED(c); return v.visitVertexPost( g,u,r); }
+            { (void)(c); return v.visitVertexPost( g,u,r); }
 
         template< class GraphType, class Visitor > static bool visitVertexPost( const GraphType &g, Visitor &v,
             typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, ... )
@@ -301,54 +301,54 @@ namespace Koala
 
         template< class GraphType, class Visitor > static bool visitEdgePre( const GraphType &g, Visitor &v,
             typename GraphType::PEdge e, typename GraphType::PVertex u, complex_visitor_tag &c )
-            { UNUSED(c); return v.visitEdgePre( g,e,u ); }
+            { (void)(c); return v.visitEdgePre( g,e,u ); }
 
         template< class GraphType, class Visitor > static bool visitEdgePre( const GraphType &g, Visitor &v,
             typename GraphType::PEdge e, typename GraphType::PVertex u, simple_visitor_tag &s )
-            { UNUSED(g); UNUSED(v); UNUSED(e); UNUSED(u); UNUSED(s); return true; }
+            { (void)(g); (void)(v); (void)(e); (void)(u); (void)(s); return true; }
 
         template< class GraphType, class Visitor > static bool visitEdgePre( const GraphType &g, Visitor &v,
             typename GraphType::PEdge e, typename GraphType::PVertex u, ... )
-            { UNUSED(g); UNUSED(v); UNUSED(e); UNUSED(u); return true; }
+            { (void)(g); (void)(v); (void)(e); (void)(u); return true; }
 
         template< class GraphType, class Visitor > static bool visitEdgePost( const GraphType &g, Visitor &v,
             typename GraphType::PEdge e, typename GraphType::PVertex u, complex_visitor_tag &c )
-            { UNUSED(c); return v.visitEdgePost( g,e,u ); }
+            { (void)(c); return v.visitEdgePost( g,e,u ); }
 
         template< class GraphType, class Visitor > static bool visitEdgePost( const GraphType &g, Visitor &v,
             typename GraphType::PEdge e, typename GraphType::PVertex u, simple_visitor_tag &s )
-            { UNUSED(g); UNUSED(v); UNUSED(e); UNUSED(u); UNUSED(s); return true; }
+            { (void)(g); (void)(v); (void)(e); (void)(u); (void)(s); return true; }
 
         template< class GraphType, class Visitor > static bool visitEdgePost( const GraphType &g, Visitor &v,
             typename GraphType::PEdge e, typename GraphType::PVertex u, ... )
-            { UNUSED(g); UNUSED(v); UNUSED(e); UNUSED(u); return true; }
+            { (void)(g); (void)(v); (void)(e); (void)(u); return true; }
 
         template< class GraphType, class Visitor > static bool beginComponent( const GraphType &g, Visitor &v,
             unsigned comp, component_visitor_tag &c )
-            { UNUSED(c); return v.beginComponent( g,comp ); }
+            { (void)(c); return v.beginComponent( g,comp ); }
 
         template< class GraphType, class Visitor > static bool beginComponent( const GraphType &g, Visitor &v,
             unsigned comp, no_component_visitor_tag &c )
-            { UNUSED(g); UNUSED(v); UNUSED(comp); UNUSED(c); return true; }
+            { (void)(g); (void)(v); (void)(comp); (void)(c); return true; }
 
         template< class GraphType, class Visitor > static bool beginComponent( const GraphType &g, Visitor &v,
             unsigned comp, ... )
-            { UNUSED(g); UNUSED(v); UNUSED(comp); return true; }
+            { (void)(g); (void)(v); (void)(comp); return true; }
 
         static bool beginComponent( ... )
         { return true; }
 
         template< class GraphType, class Visitor > static bool endComponent( const GraphType &g, Visitor &v,
             unsigned comp, component_visitor_tag &c )
-            { UNUSED(c); return v.endComponent( g,comp ); }
+            { (void)(c); return v.endComponent( g,comp ); }
 
         template< class GraphType, class Visitor > static bool endComponent( const GraphType &g, Visitor &v,
             unsigned comp, no_component_visitor_tag &c )
-            { UNUSED(g); UNUSED(v); UNUSED(comp); UNUSED(c); return true; }
+            { (void)(g); (void)(v); (void)(comp); (void)(c); return true; }
 
         template< class GraphType, class Visitor > static bool endComponent( const GraphType &g, Visitor &v,
             unsigned, ... )
-            { UNUSED(g); UNUSED(v); return true; }
+            { (void)(g); (void)(v); return true; }
 
         static bool endComponent( ... )
         { return true; }
@@ -436,7 +436,7 @@ namespace Koala
                 VisitVertLabs< GraphType > & );
 
             template< class GraphType > bool beginComponent( const GraphType &g, unsigned u )
-                { UNUSED(g); UNUSED(u); return true; }
+                { (void)(g); (void)(u); return true; }
             template< class GraphType > bool endComponent( const GraphType &, unsigned );
 
           private:
@@ -1129,8 +1129,6 @@ namespace Koala
         template< class GraphType, class VertIter, class EdgeIter > static void
             eulerResult( EulerState< GraphType > &state, OutPath< VertIter,EdgeIter > &out );
 
-//        template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
-//            _ends( const GraphType &g, EdgeType mask );
         template< class GraphType > static  void
             _ends( const GraphType &g, EdgeType mask, typename GraphType::PVertex &,typename GraphType::PVertex &);
 
@@ -1152,7 +1150,6 @@ namespace Koala
         // (NULL,NULL) w przciwnym razie
         template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
             dirEnds( const GraphType &g )
-//            { return _ends( g,EdDirOut | EdLoop ); }
             { std::pair< typename GraphType::PVertex, typename GraphType::PVertex > res;
 	      _ends( g,EdUndir | EdLoop, res.first,res.second );
 	      return res;

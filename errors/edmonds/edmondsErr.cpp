@@ -28,12 +28,16 @@ Koala::AssocTable<std::map<Koala::Graph<int,int>::PVertex,
     pliki.open("ed2.txt");
     Koala::IO::readGraphText(g, pliki, RG_VertexLists|RG_Info);
     pliki.close();
-    writeGraphText(g, cout, RG_VertexLists|RG_Info);
+    Koala::IO::writeGraphText(g, cout, RG_VertexLists|RG_Info);
     int matchSize;
-//    matchSize = Koala::Matching::findMax (g,vertCont,tabE,-1);
+    Koala::Graph<int,int>::PEdge e,tabE2[2*g.getEdgeNo()];
+    for(int i=0;i<2*g.getEdgeNo();i++) tabE2[i]=(Koala::Graph<int,int>::PEdge)&std::cout;
+    matchSize = Koala::Matching::findMax (g,vertCont,tabE2,-1);
 
     g.clear();
     IO::readG6(g,"__??O@?C?SO???WG?OD@G?`_@??os?oG??C??J??_???_GQSOB?OCW@C_?_?_?????_OG?EO?G?AG???WAac");
+    for(Koala::Graph<int,int>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) cout << e->info << endl;
+
     writeGraphText(g, cout, RG_VertexLists|RG_Info);
     matchSize = Koala::Matching::findMax (g,vertCont,tabE,-1);
     return 0;

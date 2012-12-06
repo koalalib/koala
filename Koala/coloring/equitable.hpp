@@ -367,24 +367,6 @@ int EquitEdgeColoringPar<DefaultStructs>::repair(const Graph &graph, ColorMap &c
 			tabVert[iV].vc[0] = -1;
 			tabVert[iV].vc[1] = -1;
 
-			/* TEST: table checking
-			{
-				int tCnt = 0;
-				for(int t=0; t<VertNo; ++t) {
-					int vc = tabVert[t].vc[0];
-					if(vc>=0) {
-						assert(tabVert[vc].vc[0]==t);
-						assert(tabVert[vc].ec[0]==tabVert[t].ec[0]);
-					}
-					vc = tabVert[t].vc[1];
-					if(vc>=0) {
-						assert(tabVert[vc].vc[1]==t);
-						assert(tabVert[vc].ec[1]==tabVert[t].ec[1]);
-					}
-				}
-			}
-			//*/
-
 			//fix counters
 			if(colSubgraph[0]->second.cnt == MinColCnt) --minPar;
 			else if(colSubgraph[0]->second.cnt == MaxColCnt) --maxPar;
@@ -397,36 +379,6 @@ int EquitEdgeColoringPar<DefaultStructs>::repair(const Graph &graph, ColorMap &c
 			if(colSubgraph[1]->second.cnt == MinColCnt) ++minPar;
 			else if(colSubgraph[1]->second.cnt == MaxColCnt) ++maxPar;
 			//check if it should be more recoloring
-
-			/* TEST: list checking
-			{
-				int tCnt = 0;
-				int tMaxPar = 0, tMinPar = 0;
-				for(typename MapZlicz::iterator iter = cntCol.begin();
-					iter!=cntCol.end(); iter++)
-				{
-					int col = iter->first;
-					int iE = iter->second.listEdge;
-					int cnt = 0;
-					assert(iter->second.cnt>0);
-					assert(listEdgeCol[iE].prev == 0);
-					while(iE>0) {
-						++cnt;
-						assert(col == colors[ listEdgeCol[iE].edge ]);
-						int tmp = listEdgeCol[iE].next;
-						assert(tmp==0 || listEdgeCol[tmp].prev==iE); //list
-						iE = tmp;
-					}
-					tCnt += cnt;
-					assert(cnt == iter->second.cnt);
-					if(cnt==MinColCnt) tMinPar++;
-					if(cnt==MaxColCnt) tMaxPar++;
-				}
-				assert(tCnt==EdgeNo);
-				assert(tMinPar==minPar);
-				assert(tMaxPar==maxPar);
-			}
-			//*/
 
 			/* Description for comments below:
 			*  1(2)-element lower(equal) than MinColCnt,

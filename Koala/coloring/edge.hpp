@@ -109,7 +109,6 @@ VizingState(const Graph &g, ColorMap &c, int maxCol):
 	listEdgeCol[ii-1].next = 0;
 	if(colors.size()<=0) return;
 
-//	int LOCALARRAY(tmpTab, notColored);
 	for(Edge ee = graph.getEdge(Mask); ee;
 		ee = graph.getEdgeNext(ee, Mask))
 	{
@@ -533,8 +532,6 @@ int SeqEdgeColoringPar<DefaultStructs>::colorInterchange(const Graph &graph, Col
 	int oldColor = colors[ edge ];
 	colors.delKey( edge );
 
-//	typename DefaultStructs::template
-//		AssocCont<Vert, int>::Type compMap(graph.getVertNo());
 	Vert vert1 = graph.getEdgeEnd1(edge);
 	Vert vert2 = graph.getEdgeEnd2(edge);
 	int deg = graph.deg(vert1, Mask) + graph.deg(vert2, Mask);

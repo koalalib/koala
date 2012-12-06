@@ -178,66 +178,6 @@ namespace Koala
             static unsigned getWMax( const GraphType &g, OutputIterator out, ChoiceFunction choose,
                 const VertContainer &vertTab );
 
-      private:
-        /*
-        * Template:    WMIN
-        *
-        * In general in each step it (until the graph has no more vertices):
-        *   - chooses a vertex according to the choice function
-        *   - adds this vertex to the independent set
-        *   - removes the closed neighbourhood of this vertex
-        * After all it outputs the independent set which is maximal.
-        *
-        */
-        template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
-            static unsigned TemplateWMIN( GraphType &g, OutputIterator out, ChoiceFunction choose,
-                const VertContainer &vertTab );
-
-        /*
-        * Template:    WMAX
-        *
-        * In general in each step it (until the graph has no more edges):
-        *   - chooses a vertex according to the choice function
-        *   - removes the choosen vertex with adjacent edges
-        * All vertices not removed are outputed and this is an independent set wich is maximal.
-        *
-        */
-        template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
-            static unsigned TemplateWMAX( GraphType &g, OutputIterator out, ChoiceFunction choose,
-                const VertContainer &vertTab );
-    };
-
-    /*
-    * Max independent set.
-    */
-    class MISHeuristic: public MISHeuristicPar< Koala::AlgsDefaultSettings > {};
-
-    /*
-    * Class for maximum independent set - exact algorithm.
-    *
-    * Based on:
-    * F. V. Fomin, F. Grandoni i D. Kratsch.
-    * Measure & conquer: A simple O(2^0.288n) independent set algorithm.
-    * ACM-SIAM Symposium on Discrete Algorithms (SODA), 18–25, 2006.
-    *
-    */
-    template< class DefaultStructs > class MISPar
-    {
-      public:
-        /*
-        * Calculate maximum independent set.
-        *
-        * Input:
-        *   g    - graph to process
-        *   out  - iterator to the output independent set
-        *
-        * Output:
-        *   number of vertices in the maximum independent set
-        *
-        */
-        template< class GraphType, class OutputIterator > static unsigned
-            get( GraphType & g, OutputIterator out );
-
         /*
         * Determinate if a set of vertices is independent.
         *
@@ -269,24 +209,40 @@ namespace Koala
             static bool isMaxStable( const GraphType &g, Iterator first, Iterator last, bool stabilitytest=true );
 
       private:
+        /*
+        * Template:    WMIN
+        *
+        * In general in each step it (until the graph has no more vertices):
+        *   - chooses a vertex according to the choice function
+        *   - adds this vertex to the independent set
+        *   - removes the closed neighbourhood of this vertex
+        * After all it outputs the independent set which is maximal.
+        *
+        */
+        template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
+            static unsigned TemplateWMIN( GraphType &g, OutputIterator out, ChoiceFunction choose,
+                const VertContainer &vertTab );
 
         /*
-        * Maximum independent set - inner, recursive.
+        * Template:    WMAX
+        *
+        * In general in each step it (until the graph has no more edges):
+        *   - chooses a vertex according to the choice function
+        *   - removes the choosen vertex with adjacent edges
+        * All vertices not removed are outputed and this is an independent set wich is maximal.
+        *
         */
-        template< class GraphType, class OutputIterator > static unsigned
-            __getMaximumIndependentSet( GraphType &g, OutputIterator out, bool isConnectedComponent, bool outblackhole );
+        template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
+            static unsigned TemplateWMAX( GraphType &g, OutputIterator out, ChoiceFunction choose,
+                const VertContainer &vertTab );
 
-        template< class GraphType > static bool isDominated( const GraphType &g,
-            typename GraphType::PVertex v, typename GraphType::PVertex w );
-        template< class GraphType > static Koala::Set< typename GraphType::PVertex >
-            getMirrors( const GraphType &g, typename GraphType::PVertex v );
-        template< class GraphType > static bool isFoldable( const GraphType &g, typename GraphType::PVertex v );
-        template< class GraphType > static bool isClique( const GraphType &g, const Set< typename GraphType::PVertex > &verts );
-        template< class GraphType > static Set< typename GraphType::PVertex >
-            getSecondNeighSet( const GraphType &g, typename GraphType::PVertex vert );
     };
 
-    class MIS: public MISPar< Koala::AlgsDefaultSettings > {};
+    /*
+    * Max independent set.
+    */
+    class MISHeuristic: public MISHeuristicPar< Koala::AlgsDefaultSettings > {};
+
 
 #include "mis.hpp"
 }

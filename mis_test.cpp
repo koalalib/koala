@@ -124,21 +124,21 @@ int main(void) {
     // -------------------------------------------------------------------
     // Exact:
 
-    std::cout << "Exact: " << std::endl;
-    MIS = Koala::MIS::get(g, tabV);
-    std::cout << "wierzcholkow: " << MIS << std::endl;
-    for(unsigned i = 0; i < MIS; i++) {
-        std::cout << tabV[i]->info.name << ", ";
-    } std::cout << std::endl;
-
-    // TODO: try with set output
-    // TODO: make (it, number) functions?
-    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
-    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
-    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
-    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
-
-    std::cout << std::endl; clearOutput();
+//    std::cout << "Exact: " << std::endl;
+//    MIS = Koala::MIS::get(g, tabV);
+//    std::cout << "wierzcholkow: " << MIS << std::endl;
+//    for(unsigned i = 0; i < MIS; i++) {
+//        std::cout << tabV[i]->info.name << ", ";
+//    } std::cout << std::endl;
+//
+//    // TODO: try with set output
+//    // TODO: make (it, number) functions?
+//    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
+//    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
+//    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
+//    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
+//
+//    std::cout << std::endl; clearOutput();
 
     // -------------------------------------------------------------------
     std::cout << std::endl << "Graph2:" << std::endl;
@@ -172,19 +172,19 @@ int main(void) {
     // -------------------------------------------------------------------
     // Exact:
 
-    std::cout << "Exact: " << std::endl;
-    MIS = Koala::MIS::get(g, tabV);
-    std::cout << "wierzcholkow: " << MIS << std::endl;
-    for(unsigned i = 0; i < MIS; i++) {
-        std::cout << tabV[i]->info.name << ", ";
-    } std::cout << std::endl;
-
-    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
-    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
-    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
-    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
-
-    std::cout << std::endl; clearOutput();
+//    std::cout << "Exact: " << std::endl;
+//    MIS = Koala::MIS::get(g, tabV);
+//    std::cout << "wierzcholkow: " << MIS << std::endl;
+//    for(unsigned i = 0; i < MIS; i++) {
+//        std::cout << tabV[i]->info.name << ", ";
+//    } std::cout << std::endl;
+//
+//    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
+//    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
+//    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
+//    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
+//
+//    std::cout << std::endl; clearOutput();
 
 
 
@@ -407,17 +407,17 @@ int main(void) {
     // -------------------------------------------------------------------
     // Exact:
 
-    std::cout << "Exact: " << std::endl;
-    MIS = Koala::MIS::get(g, tabV);
-    std::cout << "wierzcholkow: " << MIS << std::endl;
-    for(unsigned i = 0; i < MIS; i++) {
-        std::cout << tabV[i]->info.name << ", ";
-    } std::cout << std::endl;
-    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
-    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
-    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
-    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
-    std::cout << std::endl; clearOutput();
+//    std::cout << "Exact: " << std::endl;
+//    MIS = Koala::MIS::get(g, tabV);
+//    std::cout << "wierzcholkow: " << MIS << std::endl;
+//    for(unsigned i = 0; i < MIS; i++) {
+//        std::cout << tabV[i]->info.name << ", ";
+//    } std::cout << std::endl;
+//    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
+//    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
+//    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
+//    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
+//    std::cout << std::endl; clearOutput();
 
     std::cout << "WMIN: " << std::endl;
     result = Koala::MISHeuristic::getWMin(
@@ -429,8 +429,8 @@ int main(void) {
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
     } std::cout << std::endl;
-    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[result])) ? "YES" : "NO";
-    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isIndependentStr = (Koala::MISHeuristic::isStable(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MISHeuristic::isMaxStable(g, tabV, &tabV[result])) ? "YES" : "NO";
     std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
     std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
     std::cout << std::endl; clearOutput();

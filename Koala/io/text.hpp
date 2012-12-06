@@ -15,8 +15,8 @@ class OperTest {
     int tab[5];
     OperTest() {}
 
-    OperTest(std::ostream& os) { UNUSED(os); }
-    OperTest(std::istream& os) { UNUSED(os); }
+    OperTest(std::ostream& os) { (void)(os); }
+    OperTest(std::istream& os) { (void)(os); }
 };
 
 
@@ -318,7 +318,6 @@ bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 			else if(g.getType(e) == Loop) out << '*';
 			else out << '>';
 			out << ptrToIdx[v];
-//			if (printinf.second) out << '(' << e->info << ')';
             if (printinf.second && HasOperOut<typename Graph::EdgeInfoType >::res)
             { out << '('; ReadWriteHlp<HasOperOut<typename Graph::EdgeInfoType >::res>::write(out,e->info); out << ')'; }
 
@@ -359,7 +358,6 @@ bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 		else if(g.getType(e) == Directed) out << ">";
 		else out << "*";
 		out << ' ' << ptrToIdx[vs.second];
-//		if (printinf.second) out << "(" << e->info << ")";
 		if (printinf.second && HasOperOut<typename Graph::EdgeInfoType >::res)
 		{ out << '('; ReadWriteHlp<HasOperOut<typename Graph::EdgeInfoType >::res>::write(out,e->info); out << ')'; }
 
@@ -369,7 +367,6 @@ bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 
 	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
 		out << ptrToIdx[u];
-//		if (printinf.first) out << '(' << u->info << ")";
 		if (printinf.first && HasOperOut<typename Graph::VertInfoType >::res)
 		{ out << '('; ReadWriteHlp<HasOperOut<typename Graph::VertInfoType >::res>::write(out,u->info); out << ')'; }
 		if (vmap.hasKey(u)) out << '@' << vmap[u];

@@ -28,10 +28,6 @@ namespace Koala
     template< class T > std::pair< T,T > pairMinMax( std::pair< T,T > arg )
         { return pairMinMax( arg.first,arg.second ); }
 
-    //TODO: przewidywano interfejsy innych typow, niz tylko dzialajace na buforze tablicowym, stad deklaracja ogolna
-    //i specjalizacja klas dla T*. Jednak raczej pozostaniemy przy tablicach. Nalezy zamienic te szablony np. na
-    //template <class T> class StackInterface<T> (bez specjalizacji). Wymaga modyfikacji deklaracji we wszystkich modulach
-    //biblioteki korzystajacych z tych interfejsow!
     /* StackInterface
      *
      */
@@ -142,7 +138,6 @@ namespace Koala
      *
      */
     template< class Container, class Comp > class PriQueueInterface;
-    // TODO: po usunieciu specjalizacji dac wartosc domyslna Comp=std::greater<T>
     template< class T, class Comp > class PriQueueInterface< T *,Comp >
     {
         T *buf;

@@ -278,7 +278,7 @@ int mis(const char* g6)
         const char* napis="GR@CHS";
         for(int i=0;i<N;i++) tabv[i]=(MyGraph::PVertex) napis;
 
-        IO::readG6(g,"GR@CHS");
+        IO::readG6(g,"UTKkQZdx[n?QAGhmJt@fLRXWBr}rHTYaK_xG@IWO");
 
         IO::writeGraphText(g, cout, IO::RG_VertexLists | IO::RG_EInfo);
         cout << g.getVertSet() << "\n\nRozmiar: " << MISPar< Settings >::get(g,tabv) << "\n\n";

@@ -134,32 +134,6 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     return end ? PlusInfty : Zero;
 }
 
-// DijkstraMainPar
-
-/*
-template< class DefaultStructs, class DijBase > template< class GraphType, class EdgeContainer, class VIter, class EIter >
-    typename DijkstraMainPar< DefaultStructs,DijBase >::template PathLengths< typename EdgeContainer::ValType::DistType >
-    DijkstraMainPar< DefaultStructs,DijBase >::findPath( const GraphType &g, const EdgeContainer &edgeTab,
-        typename GraphType::PVertex start, typename GraphType::PVertex end, typename ShortPathStructs::template OutPath< VIter,EIter > iters )
-{
-    koalaAssert( start && end,AlgExcNullVert );
-    const typename EdgeContainer::ValType::DistType PlusInfty = DefaultStructs:: template
-        NumberTypeBounds< typename EdgeContainer::ValType::DistType >::plusInfty();
-
-    typename EdgeContainer::ValType::DistType dist;
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,typename DijBase::
-        template VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
-
-    dist = DijBase::distances( g,vertTab,edgeTab,start,end );
-
-    if (PlusInfty == dist)
-        return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
-
-    int len = DijBase::getPath( g,vertTab,end,iters );
-    return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
-    // dlugosc najkr. siezki i jej liczba krawedzi
-}
-*/
 
 // DAGCritPathPar
 
@@ -252,27 +226,6 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         ::isMinusInfty( vertTab[end].distance )) return -1;
     return ShortPathStructs::getOutPath( g,vertTab,iters,end );
 }
-/*
-template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VIter, class EIter >
-    typename DAGCritPathPar< DefaultStructs >::template PathLengths< typename EdgeContainer::ValType::DistType >
-    DAGCritPathPar< DefaultStructs >::findPath( const GraphType &g, const EdgeContainer &edgeTab,
-        typename GraphType::PVertex start, typename GraphType::PVertex end,
-        ShortPathStructs::OutPath< VIter,EIter > iters )
-{
-    const typename EdgeContainer::ValType::DistType MinusInfty = DefaultStructs:: template
-        NumberTypeBounds< typename EdgeContainer::ValType::DistType >::minusInfty();
-
-    typename EdgeContainer::ValType::DistType dist;
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,VertLabs< typename
-        EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
-
-    if (MinusInfty == (dist = critPathLength( g,vertTab,edgeTab,start,end )))
-        return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
-
-    int len = getPath( g,vertTab,end,iters );
-    return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
-}
-*/
 
 // BellmanFordPar
 
@@ -392,30 +345,6 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     return ShortPathStructs::getOutPath( g,vertTab,iters,end );
 }
 
-/*
-template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VIter, class EIter >
-    typename BellmanFordPar< DefaultStructs >::template PathLengths< typename EdgeContainer::ValType::DistType >
-    BellmanFordPar< DefaultStructs >::findPath( const GraphType &g, const EdgeContainer &edgeTab,
-        typename GraphType::PVertex start, typename GraphType::PVertex end,
-        ShortPathStructs::OutPath< VIter,EIter > iters )
-{
-    koalaAssert( start && end,AlgExcNullVert );
-    typename EdgeContainer::ValType::DistType dist;
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
-        VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
-
-    if (DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::DistType >
-        ::isPlusInfty(dist = distances( g,vertTab,edgeTab,start,end )))
-        return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
-    else if (DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::DistType >
-        ::isMinusInfty( dist ))
-        return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-2 ); // w grafie jest cykl ujemny
-
-    int len = getPath( g,vertTab,end,iters );
-    return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
-    // dlugosc najkr. siezki i jej liczba krawedzi
-}
-*/
 
 template< class DefaultStructs > template< class GraphType, class TwoDimVertContainer, class VIter, class EIter > int
     FloydPar< DefaultStructs >::getOutPathFromMatrix( const GraphType &g, const TwoDimVertContainer &vertMatrix,
@@ -550,60 +479,3 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
     return getOutPathFromMatrix( g,vertMatrix,iters,start,end );
 }
 
-// KruskalPar
-
-/*
-template< class DefaultStructs > template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer >
-    typename KruskalPar< DefaultStructs >::template Result< typename EdgeContainer::ValType::WeightType >
-    KruskalPar< DefaultStructs >::getForest( const GraphType &g, const EdgeContainer &edgeTab, Iter out,
-        VertCompContainer &asets, int edgeNo, bool minWeight )
-{
-    JoinableSets< typename GraphType::PVertex,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
-        JSPartDesrc< typename GraphType::PVertex > *>::Type > localSets;
-    typename BlackHoleSwitch< VertCompContainer,JoinableSets< typename GraphType::PVertex,
-        typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
-        JSPartDesrc< typename GraphType::PVertex > *>::Type > >::Type &sets =
-            BlackHoleSwitch< VertCompContainer,JoinableSets< typename GraphType::PVertex,
-            typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
-            JSPartDesrc< typename GraphType::PVertex> *>::Type > >::get( asets,localSets );
-
-    Result< typename EdgeContainer::ValType::WeightType > res;
-    res.edgeNo = 0;
-    res.weight = DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::WeightType >::zero();
-    const EdgeDirection mask = Directed | Undirected;
-    int n,m = g.getEdgeNo( mask );
-    sets.resize( n = g.getVertNo() );
-    if (n == 0) return res;
-    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ))
-        sets.makeSinglet( v );
-
-    edgeNo = (edgeNo >= 0) ? edgeNo : n-1;
-    if (m == 0|| edgeNo == 0) return res;
-
-    std::pair< typename EdgeContainer::ValType::WeightType,typename GraphType::PEdge > LOCALARRAY( edges,m );
-    int i = 0;
-    typename GraphType::PEdge e;
-    for( e = g.getEdge( mask ); e != NULL; e = g.getEdgeNext( e,mask ) )
-        edges[i++] = std::make_pair( edgeTab[e].weight,e );
-    DefaultStructs::sort( edges,edges + m );
-    if (!minWeight) std::reverse( edges,edges + m );
-
-    for( i = 0; i < m && edgeNo > 0; i++ )
-    {
-        std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends;
-        e = edges[i].second;
-        ends = g.getEdgeEnds( e );
-        if (sets.getSetId( ends.first ) != sets.getSetId( ends.second ))
-        {
-            res.weight = res.weight + edgeTab[e].weight;
-            res.edgeNo++;
-            sets.join( ends.first,ends.second );
-            *out = e;
-            ++out;
-            edgeNo--;
-        }
-    }
-
-    return res;
-}
-*/

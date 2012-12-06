@@ -550,11 +550,8 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
     int IsItPar< DefaultStructs >::Chordal::maxStable( const Graph& g, int qn, QIter begin, VIter vbegin,
         QTEIter ebegin, IterOut out )
 {
-//    typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes< Graph > >::Type LOCALARRAY( tabtab,qn );
     typename AssocArrSwitch<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes< Graph > >::Type>::Type LOCALARRAY( tabtab,qn );
     QTRes< Graph > LOCALARRAY( tabnull,qn );
-//    typedef typename DefaultStructs::template LocalGraph< std::pair< typename DefaultStructs:: template AssocCont<
-//        typename Graph::PVertex,QTRes< Graph > >::Type *,QTRes< Graph > * >,char,EdAll>:: Type ImageGraph;
     typedef typename DefaultStructs::template LocalGraph< std::pair< typename AssocArrSwitch<typename DefaultStructs:: template AssocCont<
         typename Graph::PVertex,QTRes< Graph > >::Type>::Type *,QTRes< Graph > * >,char,Directed|Undirected >:: Type ImageGraph;
     ImageGraph tree;
@@ -716,8 +713,6 @@ template< class DefaultStructs > template< class Graph, class DirMap, class OutM
         adjmatr( n );
     g.getAdj( adjmatr,EdUndir );
 
-//    int mm = 0;
-//    for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) mm += g.deg( v ) * (g.deg( v ) - 1);
     std::pair< typename Graph::PEdge,EdgeDirection > LOCALARRAY( buf,2*m + 2 );    //TODO: size?
     QueueInterface< std::pair< typename Graph::PEdge,EdgeDirection > * > cont( buf,2*m+ 1 );   //TODO: size?
     typename DefaultStructs:: template AssocCont< typename Graph::PEdge,EDir >::Type visited( m );
@@ -1018,13 +1013,11 @@ template< class DefaultStructs > template< class GraphType, class IntMap >
     CalculateI( g,sigmap,data,&IvData::posSigmap,&IvData::ip );
     BuildSet( g,A,data,&IvData::posSigmap,&IvData::ip );
 
-  //  reverse( sigmap,n );
     LexBFSPar< DefaultStructs >::order2( g,n,sigmap,EdUndir,sigmapp );
 
     CalculateI( g,sigmapp,data,&IvData::posSigmapp,&IvData::ipp );
     BuildSet( g,B,data,&IvData::posSigmapp,&IvData::ipp );
 
- //   reverse( sigmapp,n );
     LBFSStar( g,A,B,data,sigmap,sigmapp,sigma,allocat,allocat2 );
 
     for( i = 0; i < n; i++ ) data[sigma[i]].posSigma = i;
@@ -1479,13 +1472,3 @@ template< class DefaultStructs > template< class GraphType >
 }
 
 
-//template< class DefaultStructs > template<class Graph>
-//    bool IsItPar< DefaultStructs >::outerplanar(Graph &g)
-//{
-//    typename Graph::PVertex vnew=g.addVert();
-//    for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v))
-//        if (v!=vnew) g.addEdge(vnew,v);
-//    bool res=planar(g);
-//    g.delVert(vnew,true);
-//    return res;
-//}

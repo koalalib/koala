@@ -16,7 +16,7 @@ using namespace Koala;
 using namespace Koala::IO;
 using namespace std;
 
-#define TEST_1
+#define TEST_3
 // TEST_ 1-3
 
 /*

@@ -12,7 +12,6 @@ bool ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 		if( col>=0 && colLists[vert].isElement(col) )
 			return true;
 	}
-	//'(ChV) (const Koala::Graph<int, int>&, Koala::Set<int>, Koala::AssocArray<Koala::Vertex<int, int, Koala::GrDefaultSettings<15u, true> >*, int>&, Koala::GraphInternalTypes<Koala::Graph<int, int> >::Vertex*&)'|
 	int res = chooser(graph, colLists[vert], colors, vert);
 	if(res<0 || !colLists[vert].isElement(res))
 		return false;
@@ -27,9 +26,6 @@ bool ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	colors[vert] = res;
 	return true;
 }
-//, gdzie Mapa:PVertex->Set<int> a CholorChooser choose to obiekt funkcyjny podany przez uzytkownika, dzialajacy jako:
-//int chooser(const Graph&,PVertex V,const& Set<int>) - dla niepusteg zbioru kolorow dozwolnych przy v wybiera jeden element.
-//Funkcja color zwraca true jesli udalo sie wybrac poprawny kolor
 
 template <class DefaultStructs>
 template<typename Graph, typename ColLists, typename ColorMap>
@@ -38,7 +34,6 @@ bool ListVertColoringPar<DefaultStructs>::color(const Graph &graph,
 {
 	return colorChoose(graph, colLists, colors, vert, FirstFit());
 }
-//takie samo dzialanie, jakby z funktorem zwracajacym jakikolwiek element dozwolonego zbioru barw
 
 template <class DefaultStructs>
 template<typename Graph, typename ColLists, typename ColorMap,
@@ -70,7 +65,6 @@ int ListVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	}
 	return cnt;
 }
-// - dla zakresow kolejno kolorowanych wierzcholkow.	Zwraca: czy udalo sie pokolorowac caly zakres?
 
 template <class DefaultStructs>
 template<typename Graph, typename ColLists, typename ColorMap, typename ColorChooser>
@@ -268,9 +262,6 @@ bool ListEdgeColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	colors[edge] = res;
 	return true;
 }
-//, gdzie Mapa:PVertex->Set<int> a CholorChooser choose to obiekt funkcyjny podany przez uzytkownika, dzialajacy jako:
-//int chooser(const Graph&,PVertex V,const& Set<int>) - dla niepusteg zbioru kolorow dozwolnych przy v wybiera jeden element.
-//Funkcja color zwraca true jesli udalo sie wybrac poprawny kolor
 
 template <class DefaultStructs>
 template<typename Graph, typename ColLists, typename ColorMap>
@@ -279,7 +270,6 @@ bool ListEdgeColoringPar<DefaultStructs>::color(const Graph &graph,
 {
 	return colorChoose(graph, colLists, colors, edge, FirstFit());
 }
-//takie samo dzialanie, jakby z funktorem zwracajacym jakikolwiek element dozwolonego zbioru barw
 
 template <class DefaultStructs>
 template<typename Graph, typename ColLists, typename ColorMap, typename EIter,
@@ -311,7 +301,6 @@ int ListEdgeColoringPar<DefaultStructs>::color(const Graph &graph,
 	}
 	return cnt;
 }
-// - dla zakresow kolejno kolorowanych wierzcholkow.	Zwraca: czy udalo sie pokolorowac caly zakres?
 
 template <class DefaultStructs>
 template<typename Graph, typename ColLists, typename ColorMap, typename ColorChooser>

@@ -296,7 +296,7 @@ void HKTest()
 
     edmTest2();
     std::cout<< "\n2. Chcemy minimalne pokrycie krawedziowe dla tego samego grafu.\n";
-    edgeCoverSize = Koala::Matching::minEdgeCover (g,vertCont,tabE);
+    edgeCoverSize = Koala::Matching::minEdgeCover (g,/*vertCont,*/tabE);
     std::cout<< "Rozmiar minimalnego pokrycia krawedziowego: " << edgeCoverSize << std::endl;
     std::cout<< "Minimalne pokrycie krawedziowe-strumien krawedzi nalezacych do skojarzenia" << std::endl;
     for(int i=0;i<edgeCoverSize;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
@@ -304,7 +304,7 @@ void HKTest()
 
     edmTest2();
     std::cout<< "\n3. To samo, ale na wyjsciu tylko rozmiar.\n";
-    edgeCoverSize = Koala::Matching::minEdgeCover (g,vertCont,blackHole);
+    edgeCoverSize = Koala::Matching::minEdgeCover (g,/*vertCont,*/blackHole);
     std::cout<< "Rozmiar minimalnego pokrycia krawedziowego: " << edgeCoverSize << std::endl;
 
     std::cout << "\n\nGrafy dwudzielne\n\n";

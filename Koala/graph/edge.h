@@ -4,7 +4,7 @@
 namespace Koala
 {
     /* EdgeConst
-     * 
+     *
      */
     class EdgeConst
     {
@@ -21,8 +21,8 @@ namespace Koala
     namespace Privates
     {
         /* NormalParalLink
-         * 
-         */ 
+         *
+         */
         template< class VertInfo, class EdgeInfo, class Settings > class NormalParalLink
         {
           protected:
@@ -30,18 +30,18 @@ namespace Koala
 
           public:
             NormalParalLink(): n( NULL ), p( NULL ) { }
-            
+
             Edge< VertInfo,EdgeInfo,Settings > *&nParal() { return n; }
             Edge< VertInfo,EdgeInfo,Settings > *&pParal() { return p; }
         };
 
         /* EmptyParalLink
-         * 
+         *
          */
         template< class VertInfo, class EdgeInfo, class Settings > struct EmptyParalLink
         {
             EmptyParalLink() { }
-            
+
             DummyVar< Edge< VertInfo,EdgeInfo,Settings > * > nParal()
                 { return DummyVar< Edge< VertInfo,EdgeInfo,Settings > * >(); }
             DummyVar< Edge< VertInfo,EdgeInfo,Settings > * > pParal()
@@ -49,7 +49,7 @@ namespace Koala
         };
 
         /* ParalLink
-         * 
+         *
          */
         template< class VertInfo, class EdgeInfo, class Settings, bool Present > struct ParalLink;
         template< class VertInfo, class EdgeInfo, class Settings > struct ParalLink< VertInfo,EdgeInfo,Settings,true >:
@@ -72,7 +72,7 @@ namespace Koala
 
       public:
         // Additional user information in the edge.
-        EdgeInfo info; 
+        EdgeInfo info;
 
         // zwracaja wierzcholki koncowe krawedzi
         std::pair< Vertex< VertInfo,EdgeInfo,Settings > *,Vertex< VertInfo,EdgeInfo,Settings > * > getEnds()
@@ -91,20 +91,20 @@ namespace Koala
         EdgeInfo getInfo() { return info; }
 
         void setInfo( const EdgeInfo &info ) { this->info=info; }
-    
+
     private:
         // powiazania do list krawedzi tego samego rodzaju przy wierzcholku koncowym tej krawedzi
         //0==U==out; 1==V==in;
         struct EdgeLink {
             Vertex< VertInfo,EdgeInfo,Settings > *vert;
             Edge *next,*prev;
-        
+
             EdgeLink(): vert( NULL ), next( NULL ), prev( NULL ) { }
-        } vert[2]; 
-    
+        } vert[2];
+
         // klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
         /** Standard constructor. */
-        Edge(): next( NULL ), prev( NULL ), type( Detached ) { }
+        Edge(): info( ), next( NULL ), prev( NULL ), type( Detached ) { }
         /** Constructor sets info variable. */
         Edge( const EdgeInfo &infoExt ): info( infoExt ), next( NULL ), prev( NULL ), type( Detached ) { }
 
@@ -115,9 +115,9 @@ namespace Koala
         ~Edge() { }
 
         // powiazania na liscie wszystkich krawedzi grafu
-        Edge *next,*prev; 
+        Edge *next,*prev;
         // typ krawedzi
-        EdgeType type; 
+        EdgeType type;
     };
 
 #include "edge.hpp"
