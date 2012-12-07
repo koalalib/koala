@@ -79,7 +79,7 @@ template< class DefaultStructs > class MatchingPar
                     Node<T> *m_ptr;
             };
 
-            CyclicList(Allocator& alloc=0): m_cur(0), allocator(&alloc) {};
+            CyclicList(Allocator& alloc=0):  allocator(&alloc), m_cur(0) {};
             ~CyclicList()	{ erase(); };
             T &curr()	{ return m_cur->elem; };
 

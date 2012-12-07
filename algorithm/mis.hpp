@@ -292,7 +292,6 @@ template< class DefaultStructs >
         for( typename ImageGraph::PVertex v = ig.getVertNext( u ); v ; v = ig.getVertNext( v ) )
             if (g.getEdge( u->info,v->info )) ig.addEdge( u,v );
     }
-    ig.makeAdjMatrix();
     // ALG: copy contains all vertices and edges
     assert( g.getEdgeNo() == ig.getEdgeNo() && g.getVertNo() == ig.getVertNo() );
     return TemplateWMIN( ig,out,choose,vertTab);
@@ -315,7 +314,6 @@ template< class DefaultStructs >
         for( typename ImageGraph::PVertex v = ig.getVertNext( u ); v; v = ig.getVertNext( v ) )
             if (g.getEdge( u->info,v->info )) ig.addEdge( u,v );
     }
-    ig.makeAdjMatrix();
     // ALG: copy contains all vertices and edges
     assert( g.getEdgeNo() == ig.getEdgeNo() && g.getVertNo() == ig.getVertNo() );
     return TemplateWMAX( ig,out,choose,vertTab );

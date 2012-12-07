@@ -8,13 +8,13 @@ template< class Graph > void PathStructs::OutPathTool< Graph >::clear()
 
 template< class Graph > typename Graph::PEdge PathStructs::OutPathTool< Graph >::edge( int i ) const
 {
-    koalaAssert( (i >= 0 && i <= this->lenght() - 1),ContExcOutpass );
+    koalaAssert( (i >= 0 && i <= this->length() - 1),ContExcOutpass );
     return edges[i];
 }
 
 template< class Graph > typename Graph::PVertex PathStructs::OutPathTool< Graph >::vertex( int i ) const
 {
-    koalaAssert( (i >= 0 && i <= this->lenght()),ContExcOutpass );
+    koalaAssert( (i >= 0 && i <= this->length()),ContExcOutpass );
     return verts[i];
 }
 
@@ -144,7 +144,7 @@ template< class T > int SearchStructs::CompStoreTool< T >::size( int i ) const
     return idx[i + 1] - idx[i];
 }
 
-template< class T > int SearchStructs::CompStoreTool< T >::lenght() const
+template< class T > int SearchStructs::CompStoreTool< T >::length() const
 {
     int res = 0;
     for( int i = 0; i < size(); i++ ) res += size( i );

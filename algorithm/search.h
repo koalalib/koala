@@ -50,7 +50,7 @@ namespace Koala
             OutPathTool() { clear(); }
             void clear();
             // dlugosc wpisanej sciezki, -1 w razie bledu (jeszcze zadnej nie wpisano)
-            int lenght() const { return verts.size() - 1; }
+            int length() const { return verts.size() - 1; }
             // i-ta krawedz
             PEdge edge( int i ) const;
             // i-ta wierzcholek
@@ -171,7 +171,7 @@ namespace Koala
              // dlugosc i-tego ciagu
             int size( int i ) const;
              // laczna dlugosc wszystkich ciagow
-            int lenght() const;
+            int length() const;
             // wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
             T *operator[]( int i );
             // wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty

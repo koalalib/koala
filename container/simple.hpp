@@ -176,7 +176,7 @@ template< class T, class Comp > void PriQueueInterface< T *,Comp >::pop()
     siz--;
 }
 
-template< class T, class Comp > T PriQueueInterface< T *,Comp >::top()
+template< class T, class Comp > T PriQueueInterface< T *,Comp >::top() const
 {
     koalaAssert( siz,ContExcOutpass );
     return buf[0];
