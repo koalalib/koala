@@ -63,7 +63,7 @@ int vinfo(Graph<int>::PVertex v)
 
     cout << "size: "<< res.size << " type: " << print(res.type) << endl;
     for(Graph<int>::PVertex v=_g.getVert();v;v=_g.getVertNext(v)) cout << v->info << ":" << vertTab[v] <<"\t";
-    cout << "\nsize: " << tool.size() << "\tlen:" <<tool.lenght();
+    cout << "\nsize: " << tool.size() << "\tlen:" <<tool.length();
     for(int i=0;i<tool.size();i++)
     {
         cout << "\n"<<tool.size(i) << ":";

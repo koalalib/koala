@@ -414,63 +414,63 @@ bool cograph(const char* g6)
     return res;
 }
 
-int mis(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    MISPar< Settings >::get(g,setInserter(res));
-    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-int mis_SimpleOut(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    MISPar< Settings >::get(g,setInserter(res));
-    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
-    cout << res.size();
-    return res.size();
-}
-
-int clique(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    g.neg(EdUndir);
-    MISPar< Settings >::get(g,setInserter(res));
-    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
-    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
-        ires+=g.vertPos(i);
-    cout << ires;
-    return res.size();
-}
-
-int clique_simpleOut(const char* g6)
-{
-    MyGraph g;
-    g.makeAdjMatrix();
-    Set<MyGraph::PVertex> res;
-    Set<int> ires;
-    IO::readG6(g,g6);
-    g.neg(EdUndir);
-    MISPar< Settings >::get(g,setInserter(res));
-    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
-    cout << res.size();
-    return res.size();
-}
+//int mis(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    MISPar< Settings >::get(g,setInserter(res));
+//    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//int mis_SimpleOut(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    MISPar< Settings >::get(g,setInserter(res));
+//    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+//    cout << res.size();
+//    return res.size();
+//}
+//
+//int clique(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    g.neg(EdUndir);
+//    MISPar< Settings >::get(g,setInserter(res));
+//    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+//    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
+//        ires+=g.vertPos(i);
+//    cout << ires;
+//    return res.size();
+//}
+//
+//int clique_simpleOut(const char* g6)
+//{
+//    MyGraph g;
+//    g.makeAdjMatrix();
+//    Set<MyGraph::PVertex> res;
+//    Set<int> ires;
+//    IO::readG6(g,g6);
+//    g.neg(EdUndir);
+//    MISPar< Settings >::get(g,setInserter(res));
+//    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+//    cout << res.size();
+//    return res.size();
+//}
 
 int misBipartite(const char* g6)
 {
@@ -480,7 +480,7 @@ int misBipartite(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Bipartite::maxStable(g,setInserter(res));
-    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
@@ -495,7 +495,7 @@ int misBipartite_SimpleOut(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Bipartite::maxStable(g,setInserter(res));
-    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
     cout << res.size();
     return res.size();
 }
@@ -523,7 +523,7 @@ int misBipartite_SimpleOut(const char* g6)
 IO::readG6(g,"UTKkQZdx[n?QAGhmJt@fLRXWBr}rHTYaK_xG@IWO");
             Set<MyGraph::PVertex> res;
             A=g.addVert();//B=g.addVert();
-            cout << MISPar< Settings >::get(g,setInserter(res)) << endl;
+//            cout << MISHeuristicPar< Settings >::get(g,setInserter(res)) << endl;
             cout << res <<endl <<g.getVertSet()<<endl<<endl;
 
 //        g.clear();
@@ -537,7 +537,7 @@ IO::readG6(g,"UTKkQZdx[n?QAGhmJt@fLRXWBr}rHTYaK_xG@IWO");
 //z~~n~~~~~w");
 //IO::readG6(g,"M???O?KGA_@?_?O??");
 //cout << boolalpha << IsIt::bipartite(g);
-mis_SimpleOut("UTKkQZdx[n?QAGhmJt@fLRXWBr}rHTYaK_xG@IWO");
+//mis_SimpleOut("UTKkQZdx[n?QAGhmJt@fLRXWBr}rHTYaK_xG@IWO");
 //matching_SimpleOut("__??O@?C?SO???WG?OD@G?`_@??os?oG??C??J??_???_GQSOB?OCW@C_?_?_?????_OG?EO?G?AG???WAac");
 
     }

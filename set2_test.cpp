@@ -7,7 +7,7 @@ using namespace std;
 
 template<class T> void print(const SearchStructs::CompStoreTool<T>& cont)
 {
-    cout << "\nsize: " << cont.size() << "\tlen:" <<cont.lenght();;
+    cout << "\nsize: " << cont.size() << "\tlen:" <<cont.length();;
     for(int i=0;i<cont.size();i++)
     {
         cout << "\n"<<cont.size(i) << ":";

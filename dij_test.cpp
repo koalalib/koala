@@ -76,17 +76,17 @@ void dijTest()
         std:: cout << "\n\n!!!!!!!!!!!!!\n";
         Koala::PathStructs::OutPathTool<Koala::Graph<OpisV,OpisE> > tool;
         Koala::Dijkstra::getPath(g,vertCont,V,tool.input());
-        std::cout << tool.lenght();
+        std::cout << tool.length();
 
-        for(int i=0;i<=tool.lenght();i++) std::cout<< tool.vertex(i)->info.name;
+        for(int i=0;i<=tool.length();i++) std::cout<< tool.vertex(i)->info.name;
         std:: cout << "^";
-        for(int i=0;i<tool.lenght();i++) std::cout << "{"<< g.getEdgeEnds(tool.edge(i)).first->info.name <<
+        for(int i=0;i<tool.length();i++) std::cout << "{"<< g.getEdgeEnds(tool.edge(i)).first->info.name <<
                             "," << g.getEdgeEnds(tool.edge(i)).second->info.name << "}";
         std:: cout << "\n";
         Koala::Dijkstra::getPath(g,vertCont,V,tool.input());
-        std::cout << tool.lenght();
-        for(int i=0;i<=tool.lenght();i++) std::cout<< tool.vertex(i)->info.name;
-        for(int i=0;i<tool.lenght();i++) std::cout << "{"<< g.getEdgeEnds(tool.edge(i)).first->info.name <<
+        std::cout << tool.length();
+        for(int i=0;i<=tool.length();i++) std::cout<< tool.vertex(i)->info.name;
+        for(int i=0;i<tool.length();i++) std::cout << "{"<< g.getEdgeEnds(tool.edge(i)).first->info.name <<
                             "," << g.getEdgeEnds(tool.edge(i)).second->info.name << "}";
         std:: cout << "\n\n!!!!!!!!!!!!!\n";
         std::cout<<"Liczba krawedzi: "<<l<<std::endl;

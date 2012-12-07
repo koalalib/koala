@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<key id="nx_0" for="node" attr.name="x" attr.type="double"></key>
+<key id="ny_0" for="node" attr.name="y" attr.type="double"></key>
+<key id="nvbuf_0" for="node" attr.name="vbuf" attr.type="string"></key>
+<key id="nvchar_0" for="node" attr.name="vchar" attr.type="string"></key>
+<key id="nvflag_0" for="node" attr.name="vflag" attr.type="double"></key>
+<key id="nvvv_0" for="node" attr.name="vvv" attr.type="double"></key>
+<key id="eechar_0" for="edge" attr.name="echar" attr.type="int"></key>
+<key id="eedoub_0" for="edge" attr.name="edoub" attr.type="double"></key>
+<key id="eename_0" for="edge" attr.name="ename" attr.type="string"></key>
+<graph id="first" edgedefault="undirected">
+<node id="v0"><data key="nx_0">231</data><data key="ny_0">279</data><data key="nvbuf_0">Adam</data><data key="nvchar_0">A</data><data key="nvflag_0">1</data><data key="nvvv_0">5</data></node>
+<node id="v1"><data key="nx_0">474</data><data key="ny_0">200</data><data key="nvbuf_0">Piotr</data><data key="nvchar_0">B</data><data key="nvflag_0">0</data><data key="nvvv_0">7</data></node>
+<node id="v2"><data key="nx_0">636</data><data key="ny_0">245</data></node>
+<edge id="e0" source="v0" target="v1"><data key="eechar_0">101</data><data key="eedoub_0">0.1</data><data key="eename_0">Ala</data></edge>
+<edge id="e1" source="v1" target="v0" directed="true"><data key="eechar_0">100</data><data key="eedoub_0">0.5</data><data key="eename_0">Ola</data></edge>
+<edge id="e2" source="v1" target="v1"><data key="eechar_0">102</data><data key="eedoub_0">1.5</data><data key="eename_0">Ewa</data></edge>
+</graph>
+</graphml>

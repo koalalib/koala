@@ -122,6 +122,9 @@
 #include<stdio.h>
 #include"../graph/graph.h"
 
+#include<stdlib.h>
+#include<map>
+#include<vector>
 #include<string>
 #include<sstream>
 #include<iostream>
@@ -271,6 +274,254 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int forma
     return writeGraphText(g,out,maxlength,format,em,em);
 }
 
+
+// Wygodna mapa paramterow roznych wlasnosci, przydatna np. jako typ VertexInfo, EdgeInfo grafu
+// wypisywanego/wczytywanego w formatach tekstowych
+
+enum PSType {
+	PST_NoType = -1,
+	PST_Bool = 0,
+	PST_Int,
+	PST_Double,
+	PST_String
+	};
+
+
+template<class T>   bool PSIsType(PSType t)
+            { return false; };
+template<>   bool PSIsType<bool>(PSType t)
+            { return t == PST_Bool; };
+template<>   bool PSIsType<int>(PSType t)
+            { return t == PST_Int; };
+template<>   bool PSIsType<double>(PSType t)
+            { return t == PST_Double; };
+template<>   bool PSIsType<std::string>(PSType t)
+            { return t == PST_String; };
+template<>   bool PSIsType<const char *>(PSType t)
+            { return t == PST_String; };
+
+template<class T, class V>   T PSCast(const V &val)
+            { return val; };
+
+template<>   bool PSCast<bool, std::string>(const std::string &val)
+            { return val == "true" || val == "TRUE" || val == "True"; };
+template<>   int PSCast<int, std::string>(const std::string &val)
+            { return atoi(val.c_str()); };
+template<>   double PSCast<double, std::string>(const std::string &val)
+            { return atof(val.c_str()); };
+
+template<>   std::string PSCast<std::string, bool>(const bool &val)
+            { return val ? "true" : "false"; };
+template<>   std::string PSCast<std::string, int>(const int &val)
+            { char t[64]; sprintf(t, "%d", val); return t; };
+template<>   std::string PSCast<std::string, double>(const double &val)
+            { char t[64]; sprintf(t, "%lf", val); return t; };
+
+
+/*
+ * ParSet
+ */
+class ParSet {
+private:
+	struct ParSetValue {
+		PSType type;
+		std::string sval;
+		union {
+			int ival;
+			bool bval;
+			double dval;
+			};
+		};
+
+public:
+	ParSet(): m_params()			{};
+	ParSet(const ParSet &p):m_params()	{ *this = p; };
+
+	ParSet &operator =(const ParSet &p) {
+		if(&p == this) return *this;
+		m_params = p.m_params;
+		return *this;
+		};
+
+	template<class T>
+	bool is(const std::string &k) const {
+		const_iterator it;
+		it = m_params.find(k);
+		if(it == m_params.end()) return false;
+		return PSIsType<T>(it->second.first);
+		};
+	bool isBool(const std::string &k)	const
+            { return is<bool>(k); };
+	bool isInt(const std::string &k)	const
+            { return is<int>(k); };
+	bool isDouble(const std::string &k)	const
+            { return is<double>(k); };
+	bool isString(const std::string &k)	const
+            { return is<std::string>(k); };
+
+	PSType getType(const std::string &k) const {
+		const_iterator it;
+		it = m_params.find(k);
+		if(it == m_params.end()) return PST_NoType;
+		return it->second.first;
+    };
+
+	ParSet &set(const std::string &k, bool v) {
+		m_params[k].first = PST_Bool;
+		m_params[k].second.bval = v;
+		return *this;
+    };
+
+	ParSet &set(const std::string &k, int v) {
+		m_params[k].first = PST_Int;
+		m_params[k].second.ival = v;
+		return *this;
+    };
+
+	ParSet &set(const std::string &k, double v) {
+		m_params[k].first = PST_Double;
+		m_params[k].second.dval = v;
+		return *this;
+    };
+
+	ParSet &set(const std::string &k, const std::string &v) {
+		m_params[k].first = PST_String;
+		m_params[k].second.sval = v;
+		return *this;
+    };
+
+	ParSet &set(const std::string &k, const char *v) {
+		m_params[k].first = PST_String;
+		m_params[k].second.sval = v;
+		return *this;
+    };
+
+	template<class T>
+	T get(const std::string &k, const T &def = T()) const {
+		const_iterator it;
+		it = m_params.find(k);
+		if(it == m_params.end()) return def;
+		switch(it->second.first) {
+			case PST_Bool:   return PSCast<T>(it->second.second.bval);
+			case PST_Int:    return PSCast<T>(it->second.second.ival);
+			case PST_Double: return PSCast<T>(it->second.second.dval);
+			case PST_String: return PSCast<T>(it->second.second.sval);
+			default : assert(0);
+			};
+		return def;
+    };
+
+	bool getBool(const std::string &k, bool def = false) const
+			{ return get<bool>(k, def); };
+	int getInt(const std::string &k, int def = 0) const
+            { return get<int>(k, def); };
+	double getDouble(const std::string &k, double def = 0) const
+			{ return get<double>(k, def); };
+	std::string getString(const std::string &k, const std::string &def = "") const
+            { return get<std::string>(k, def); };
+
+	void del(const std::string &p)
+            { m_params.erase(p); };
+
+	void getKeys(std::vector<std::string> &keys) const {
+		const_iterator it;
+		for(it = m_params.begin(); it != m_params.end(); ++it)
+			keys.push_back(it->first);
+    };
+
+    void clear()
+    {   m_params.clear();   }
+
+    int size() const
+    {   return m_params.size(); }
+
+    bool empty() const
+    {   return this->size()==0; }
+
+    bool operator!() const
+    {   return this->size()==0; }
+
+	friend std::istream &operator >>(std::istream &sin, ParSet &p);
+	friend std::ostream &operator <<(std::ostream &sout, const ParSet &p);
+
+private:
+	typedef std::map<std::string, std::pair<PSType, ParSetValue> >::iterator iterator;
+	typedef std::map<std::string, std::pair<PSType, ParSetValue> >::const_iterator const_iterator;
+	std::map<std::string, std::pair<PSType, ParSetValue> > m_params;
+};
+
+
+namespace Privates {
+
+bool PSTestBool(const std::string &s, bool *v) {
+	if(s == "true" || s == "TRUE" || s == "True") { *v = true; return true; };
+	if(s == "false" || s == "FALSE" || s == "False") { *v = false; return true; };
+	return false;
+};
+
+bool PSTestInt(const std::string &s, int *v) {
+	return s.find('.')==std::string::npos && sscanf(s.c_str(), "%d", v) == 1;
+};
+
+  bool PSTestDouble(const std::string &s, double *v) {
+	return s.find('.')!=std::string::npos && sscanf(s.c_str(), "%lf", v) == 1;
+};
+
+std::string addDot(double d)
+{
+    std::stringstream s (std::stringstream::in | std::stringstream::out);
+    s << d;
+    if (s.str().find('.')==std::string::npos) return s.str()+std::string(".0");
+    else return s.str();
+}
+
+}
+
+
+std::istream &operator >>(std::istream &sin, ParSet &p) {
+	char comma, colon;
+	bool bv;
+	int iv;
+	double dv;
+	std::string k, v;
+	ParSet::iterator it, e;
+	while(true) {
+		k = "";
+		do {
+			if(!sin.get(colon)) { sin.clear(std::ios_base::eofbit); return sin; };
+			if(colon != ':') k += colon;
+		} while(colon != ':');
+		v = "";
+		do {
+			if(!sin.get(comma)) break;
+			if(comma != ',') v += comma;
+		} while(comma != ',');
+		if(Privates::PSTestBool(v, &bv)) p.set(k, bv);
+		else if(Privates::PSTestInt(v, &iv)) p.set(k, iv);
+		else if(Privates::PSTestDouble(v, &dv)) p.set(k, dv);
+		else p.set(k, v);
+		};
+	return sin;
+};
+
+
+ std::ostream &operator <<(std::ostream &sout, const ParSet &p) {
+	bool first = true;
+	ParSet::const_iterator it, e;
+	for(it = p.m_params.begin(), e = p.m_params.end(); it != e; ++it) {
+		if(!first) sout << ",";
+		first = false;
+		sout << it->first << ":";
+		switch(it->second.first) {
+			case PST_Bool:   sout << (it->second.second.bval ? "true" : "false"); break;
+			case PST_Int:    sout << it->second.second.ival; break;
+			case PST_Double: sout << Privates::addDot(it->second.second.dval); break;
+			case PST_String: sout << it->second.second.sval; break;
+			default : assert(0);
+			};
+		};
+	return sout;
+};
 
 }; // namespace InOut
 }; // namespace Koala

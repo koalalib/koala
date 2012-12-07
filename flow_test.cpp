@@ -30,7 +30,7 @@ Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Fl
 template <class T>
 void printInfo(const SearchStructs::CompStoreTool<T>& cont)
 {
-    cout << "\nsize: " << cont.size() << "\tlen:" <<cont.lenght();;
+    cout << "\nsize: " << cont.size() << "\tlen:" <<cont.length();;
     for(int i=0;i<cont.size();i++)
     {
         cout << "\n"<<cont.size(i) << ":";
@@ -41,7 +41,7 @@ void printInfo(const SearchStructs::CompStoreTool<T>& cont)
 template <class T>
 void printInfoName(const SearchStructs::CompStoreTool<T>& cont)
 {
-    cout << "\nsize: " << cont.size() << "\tlen:" <<cont.lenght();;
+    cout << "\nsize: " << cont.size() << "\tlen:" <<cont.length();;
     for(int i=0;i<cont.size();i++)
     {
         cout << "\n"<<cont.size(i) << ":";
