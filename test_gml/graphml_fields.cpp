@@ -105,7 +105,7 @@ int main() {
 	GraphII g1;
 	Koala::IO::GraphML gml;
 	Koala::IO::GraphMLGraph *gmlg;
-	gml.newGraphML();
+	gml.clearGraphML();
 
 
 
@@ -117,7 +117,7 @@ int main() {
         Koala::IO::writeGraphText(g,std::cout,Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
 
         std::cout << "\n\n***\n\n";
-        gml.newGraphML();
+        gml.clearGraphML();
         gmlg = gml.createGraph("first");
         gmlg->writeGraph(g,
                          Koala::IO::gmlLongField(&OpisV::licz,"vint") & Koala::IO::gmlStringField(&OpisV::lit,"vchar") & Koala::IO::gmlBoolField(&OpisV::flag,"vflag") & Koala::IO::gmlStringField(&OpisV::buf,"vbuf")
@@ -126,7 +126,7 @@ int main() {
                          );
         gml.writeFile("abc.xml");
 
-        gml.newGraphML();
+        gml.clearGraphML();
         gml.readFile("abc.xml");
         gmlg = gml.getGraph(0);
         gmlg->readGraph(g1,
@@ -146,7 +146,7 @@ int main() {
         Koala::IO::writeGraphText(g,std::cout,Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
 
         std::cout << "\n\n***\n\n";
-        gml.newGraphML();
+        gml.clearGraphML();
         gmlg = gml.createGraph("first");
         gmlg->writeGraph(g,
                          Koala::IO::gmlIntField("vchar")
@@ -155,7 +155,7 @@ int main() {
                          );
         gml.writeFile("abcd.xml");
 
-        gml.newGraphML();
+        gml.clearGraphML();
         gml.readFile("abcd.xml");
         gmlg = gml.getGraph(0);
         gmlg->readGraph(g1,
@@ -175,7 +175,7 @@ int main() {
         Koala::IO::writeGraphText(g,std::cout,Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
 
         std::cout << "\n\n***\n\n";
-        gml.newGraphML();
+        gml.clearGraphML();
         gmlg = gml.createGraph("first");
         gmlg->writeGraph(g,
                          Koala::IO::gmlStringField("vchar")
@@ -185,7 +185,7 @@ int main() {
         gml.setKeyAttrName("edoub","attrname");
         gml.writeFile("abcde.xml");
 
-        gml.newGraphML();
+        gml.clearGraphML();
         gml.readFile("abcde.xml");
         gmlg = gml.getGraph(0);
         gmlg->readGraph(g1,

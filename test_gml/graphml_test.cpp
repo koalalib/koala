@@ -161,7 +161,7 @@ int main() {
 	GraphII g1;
 	Koala::IO::GraphML gml;
 	Koala::IO::GraphMLGraph *gmlg;
-	gml.newGraphML();
+	gml.clearGraphML();
 
 //	gml.newKey("kv", "kolorV", Koala::IO::GraphMLKeyTypes::Int,
 //		Koala::IO::GraphMLKeyTypes::Node);
@@ -189,7 +189,7 @@ int main() {
 	gml.setInt("graphML", 4);
 	gml.writeFile("xyz.xml");
 
-	gml.newGraphML();
+	gml.clearGraphML();
 	g1.clear();
 
 	gml.readFile("xyz.xml");
@@ -213,12 +213,12 @@ int main() {
         Koala::IO::writeGraphText(g,std::cout,Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
 
         std::cout << "\n\n***\n\n";
-        gml.newGraphML();
+        gml.clearGraphML();
         gmlg = gml.createGraph("first");
         gmlg->writeGraph(g,OpisVWrite(v),OpisEWrite(d));
         gml.writeFile("xyz.xml");
 
-        gml.newGraphML();
+        gml.clearGraphML();
         gml.readFile("xyz.xml");
         gmlg = gml.getGraph(0);
         gmlg->readGraph(g1,OpisVRead(),OpisERead());

@@ -16,14 +16,14 @@ int main() {
 	Koala::IO::GraphMLGraph *gmlg;
 
 	Koala::IO::readGraphText(g, "2 0(x:3.14,y:4.1) 1 >1(lab:xyz) 1(x:5,y:6)", Koala::IO::RG_VertexLists);
-	gml.newGraphML();
+	gml.clearGraphML();
         gmlg = gml.createGraph("gr");
         gmlg->writeGraph(g, Koala::IO::ParSetVertWrite<G>(), Koala::IO::ParSetEdgeWrite<G>());
         gml.writeFile("out.xml");
 
 	g.clear();
 
-	gml.newGraphML();
+	gml.clearGraphML();
         gml.readFile("rev.xml");
         gmlg = gml.getGraph(0);
         gmlg->readGraph(g, Koala::IO::ParSetVertRead(gml), Koala::IO::ParSetEdgeRead(gml));
