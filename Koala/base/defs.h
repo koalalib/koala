@@ -135,9 +135,12 @@ namespace Koala
 
         T operator()() { return val; }
 
-        template< class A > T operator()(const A&) { return val; }
-        template< class A, class B > T operator()(const A&, const B& ) { return val; }
-        template< class A, class B, class C > T operator()( const A&,const B&,const C& ) { return val; }
+        template< class A > T operator()(const A&)
+                { return val; }
+        template< class A, class B > T operator()(const A&, const B& )
+                { return val; }
+        template< class A, class B, class C > T operator()( const A&,const B&,const C& )
+                { return val; }
         template< class A, class B, class C, class D > T operator()( const A&,const B&,const C&,const D& )
                 { return val; }
         template< class A, class B, class C,class D, class E > T operator()( const A&,const B&,const C&,const D&,const E& )
@@ -147,7 +150,8 @@ namespace Koala
     };
 
     // Funkcja tworząca powyższy funktor.
-    template< class T > ConstFunctor< T > constFun( const T &a = T() ) { return ConstFunctor< T >( a ); }
+    template< class T > ConstFunctor< T > constFun( const T &a = T() )
+                { return ConstFunctor< T >( a ); }
 
     /* BlackHole
      * Jesli metoda chce dostac argument wyjsciowy (np. iterator do zapisu ciagu, tablice asocjacyjna) a nas te
@@ -172,7 +176,20 @@ namespace Koala
         // BlackHole potrafi przekonwertować się na dowolny typ - uwaga j.w.
         template< class T > operator T();
 
+        template< class T > bool hasKey(T) const;
+        BlackHole firstKey() const;
+        BlackHole lastKey() const;
+        template< class T > BlackHole nextKey(T) const;
+        template< class T > BlackHole prevKey(T) const;
+        template< class T > int getKeys(T) const;
         void reserve( int ) { }
+        bool empty() const { return true; }
+        bool operator!() const { return true; }
+        unsigned size() const;
+        int capacity() const;
+        template< class T > bool delKey(T) { return false; };
+        void clear() { }
+
     };
 
 

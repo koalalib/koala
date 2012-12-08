@@ -107,7 +107,7 @@ class DijkstraPar : public ShortPathStructs {
         const typename EdgeContainer::ValType::DistType PlusInfty=
             DefaultStructs:: template NumberTypeBounds<typename EdgeContainer::ValType::DistType>::plusInfty();
 
-        int bufsize=AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+        int bufsize=Privates::AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::isAAVI() ? g.getVertNo():0;
         Privates::BlockOfBlockList< BlockOfAssocArray< typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> > >
@@ -118,9 +118,9 @@ class DijkstraPar : public ShortPathStructs {
         {
             typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                     VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type
-                        localvertTab((isBlackHole(avertTab)? g.getVertNo():0),(typename AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                        localvertTab((isBlackHole(avertTab)? g.getVertNo():0),(typename Privates::AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                             VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::BufType)buforl),
-                        Q(g.getVertNo(),(typename AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
+                        Q(g.getVertNo(),(typename Privates::AssocArrayVectIntSwitch<typename DefaultStructs:: template AssocCont<typename GraphType::PVertex,
                             VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::BufType)buforQ);
             typename BlackHoleSwitch<VertContainer,typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                     VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::Type &
@@ -199,12 +199,12 @@ class DijkstraPar : public ShortPathStructs {
         typename EdgeContainer::ValType::DistType dist;
         Privates::BlockOfBlockList< BlockOfAssocArray< typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> > >
-                    LOCALARRAY(bufor,(AssocArrayVectIntSwitch<typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
+                    LOCALARRAY(bufor,(Privates::AssocArrayVectIntSwitch<typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::isAAVI() ? g.getVertNo():0));
 
         typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                 VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type
-                    vertTab(g.getVertNo(),(typename AssocArrayVectIntSwitch<typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
+                    vertTab(g.getVertNo(),(typename Privates::AssocArrayVectIntSwitch<typename DefaultStructs::template AssocCont<typename GraphType::PVertex,
                         VertLabs<typename EdgeContainer::ValType::DistType ,GraphType> >::Type >::BufType)bufor);
 
         dist=distances(g,vertTab,edgeTab,start,end);

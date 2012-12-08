@@ -671,8 +671,8 @@ template< class DefaultStructs > template< class Cont > void
         for( int j = i + 1; j < size; ++j )
             if (cont[i][j] != cont[j][i])
             {
-                bool tmp = (bool)cont[i][j];
-                cont[i][j] = cont[j][i];
+                bool tmp = (bool)cont[i][j], tmp2 = (bool)cont[j][i];
+                cont[i][j] = tmp2;
                 cont[j][i] = tmp;
             }
 }
@@ -710,7 +710,11 @@ template< class DefaultStructs > template< class Cont > void
 {
     for( int i = 0; i < size - 1; ++i )
         for( int j = i + 1; j < size; ++j )
-            cont[i][j] = cont[j][i] = cont[i][j] || cont[j][i];
+        {
+            bool tmp = (bool)(cont[i][j] || cont[j][i]);
+            cont[i][j] = cont[j][i] = tmp;
+        }
+
 }
 
 template< class DefaultStructs > template< class Cont,class Iter > void
@@ -718,7 +722,12 @@ template< class DefaultStructs > template< class Cont,class Iter > void
 {
     for( Iter i = beg; i != end; ++i )
         for( Iter j = i; j != end; ++j )
-            if (i != j) cont( *i,*j ) = cont( *j,*i ) = cont( *i,*j ) || cont( *j,*i );
+            if (i != j)
+            {
+                bool tmp = (bool)(cont( *i,*j ));
+                tmp = tmp || cont( *j,*i );
+                cont( *i,*j ) = cont( *j,*i ) = tmp;
+            }
 }
 
 template< class DefaultStructs > template< class Cont > void
@@ -736,7 +745,11 @@ template< class DefaultStructs > template< class Cont, class Iter > void
     for( Iter k = beg; k != end; ++k )
         for( Iter i = beg; i != end; ++i )
             for( Iter j = beg; j != end; ++j )
-                cont( *i,*j )= cont( *i,*j ) || (cont( *i,*k ) && cont( *k,*j ));
+            {
+                bool tmp=(bool)(cont( *i,*k ));
+                tmp = tmp && ((bool)cont( *k,*j ));
+                cont( *i,*j )= cont( *i,*j ) || tmp;
+            }
 }
 
 // LineGraphPar

@@ -38,8 +38,10 @@ namespace Koala
         template< class T > class BlockListVectInerfTest< VectorInterface< T > >
         {
           public:
+            //wylaczenie konstruktora domyslnego
             BlockListVectInerfTest( bool ) { }
           private:
+            //wylaczenie konstruktora kopiujacego
             BlockListVectInerfTest( const BlockListVectInerfTest< VectorInterface< T > > & ) { }
         };
 
@@ -112,6 +114,7 @@ namespace Koala
             BlockOfBlockList< Element >* wsk;
             BlockList< Element,VectorInterface< BlockOfBlockList< Element > * > > *manager;
 
+            //Obiekt niekopiowalny
             BlockListAllocator( const BlockListAllocator & ) { }
             const BlockListAllocator &operator=( const BlockListAllocator & ) { }
 
@@ -238,6 +241,7 @@ namespace Koala
 
              // niebezpieczny, do tworzenia tablic list, nalezy natychmiast wykonac init
             List(): allocator()	{ Zero(); }
+
             void init( Allocator &a ) { allocator = &a; }
             List( Allocator &a ): allocator( &a ) { Zero(); }
             List( const List &lst );

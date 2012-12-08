@@ -28,7 +28,7 @@ void FibonTest1()
 	FibonHeap<int>::Repr test2 = heap2.push(35);
 
     FibonHeap<int> heap3(heap);
-	heap3.check();
+//	heap3.check();
 
 	heap.decrease(test, 11);
 	heap.del(test);
@@ -58,7 +58,7 @@ void FibonTest1Loc()
 	FibonHeap<int>::Repr test2 = heap2.push(35);
 
     FibonHeap<int,std::less<int>,Privates::BlockListAllocator<FibonHeapNode<int> > > heap3(heap);
-	heap3.check();
+//	heap3.check();
 
 	heap.decrease(test, 11);
 	heap.del(test);
@@ -108,7 +108,7 @@ void BinomTest1()
 	BinomHeap<int>::Repr test2 = heap2.push(35);
 
     BinomHeap<int> heap3(heap);
-	heap3.check();
+//	heap3.check();
 
 	heap.decrease(test, 11);
 	heap.del(test);
@@ -141,7 +141,7 @@ void BinomTest1Loc()
 	BinomHeap<int>::Repr test2 = heap2.push(35);
 
     BinomHeap<int,std::less<int>,Privates::BlockListAllocator<BinomHeapNode<int> > > heap3(heap);
-	heap3.check();
+//	heap3.check();
 
 	heap.decrease(test, 11);
 	heap.del(test);
@@ -192,7 +192,7 @@ void PairTest1()
 	PairHeap<int>::Repr test2 = heap2.push(35);
 
     PairHeap<int> heap3(heap);
-	heap3.check();
+//	heap3.check();
 
 	heap.decrease(test, 11);
 	heap.del(test);
@@ -222,7 +222,7 @@ void PairTest1Loc()
 	PairHeap<int>::Repr test2 = heap2.push(35);
 
     PairHeap<int,std::less<int>,Privates::BlockListAllocator<PairHeapNode<int> > > heap3(heap);
-	heap3.check();
+//	heap3.check();
 
 	heap.decrease(test, 11);
 	heap.del(test);

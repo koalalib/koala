@@ -182,6 +182,7 @@ int main() {
                          ,
                         Koala::IO::gmlStringField("edoub")
                          );
+        gml.setKeyAttrName("edoub","attrname");
         gml.writeFile("abcde.xml");
 
         gml.newGraphML();
@@ -194,5 +195,7 @@ int main() {
                         );
         Koala::IO::writeGraphText(g1,std::cout,Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
 
+        std::string sname=gml.getKeyAttrName("edoub");
+        std::cout << "\n\n" << sname;
 	}
 }

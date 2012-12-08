@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
     <key id="vchar" attr.type="string" for="node" />
-    <key id="edoub" attr.type="string" for="edge" />
+    <key id="edoub" attr.type="string" for="edge" attr.name="attrname" />
     <graph id="first" edgedefault="undirected">
-        <node id="n00398A20">
+        <node id="n007EEF70">
             <data key="vchar">A</data>
         </node>
-        <node id="n003988B0">
+        <node id="n003F7690">
             <data key="vchar">B</data>
         </node>
-        <edge id="e00398900" source="n00398A20" target="n003988B0">
+        <edge id="e003F7568" source="n007EEF70" target="n003F7690">
             <data key="edoub">Ala</data>
         </edge>
-        <edge id="e006CEED0" source="n003988B0" target="n00398A20" directed="true">
+        <edge id="e007EEE08" source="n003F7690" target="n007EEF70" directed="true">
             <data key="edoub">Ola</data>
         </edge>
-        <edge id="e006CEF10" source="n003988B0" target="n003988B0">
+        <edge id="e007EEE48" source="n003F7690" target="n003F7690">
             <data key="edoub">Ewa</data>
         </edge>
     </graph>

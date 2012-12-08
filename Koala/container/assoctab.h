@@ -261,7 +261,8 @@ namespace Koala
     // Szybka tablica asocjacyjna np. dla wierz/kraw
     // Wiekszosc interfejsu jak w innych tabl. assocjacyjnych
     template< class Klucz, class Elem, class Container = std::vector< typename
-        AssocArrayInternalTypes<Klucz,Elem>::BlockType > > class AssocArray: public AssocContBase,
+        AssocArrayInternalTypes<Klucz,Elem>::BlockType > > class AssocArray:
+            public AssocContBase,
             protected Privates::KluczTest< Klucz >, public Privates::AssocTabTag< Klucz >
     {
       protected:
@@ -290,12 +291,18 @@ namespace Koala
         // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
         AssocArray( int asize, typename AssocArrayInternalTypes< Klucz,Elem >::BlockType *wsk ): tab( wsk,asize ) { }
 
-        int size() const { return tab.size(); }
-        bool empty() const { return tab.empty(); }
-        bool operator!() const { return empty(); }
-        void reserve( int arg ) { tab.reserve( arg ); }
-        int capacity() const { return tab.capacity(); }
-        bool hasKey( Klucz v ) const { return keyPos( v ) != -1; }
+        int size() const
+            { return tab.size(); }
+        bool empty() const
+            { return tab.empty(); }
+        bool operator!() const
+            { return empty(); }
+        void reserve( int arg )
+            { tab.reserve( arg ); }
+        int capacity() const
+            { return tab.capacity(); }
+        bool hasKey( Klucz v ) const
+            { return keyPos( v ) != -1; }
         Elem *valPtr( Klucz v );
         // pozycja klucza w wewnetrznym indeksie tablicy, -1 w razie jego braku
         int keyPos( Klucz ) const;
@@ -312,8 +319,12 @@ namespace Koala
 
         template< class Iterator > int getKeys( Iterator ) const;
 
-        ~AssocArray() { clear(); }
+        ~AssocArray()
+            { clear(); }
     };
+
+
+    namespace Privates {
 
     // Test w kodzie szablonu, czy typ kontenera to AssocArray zorganizowany na zewnwetrznej tablicy.
     // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
@@ -329,6 +340,8 @@ namespace Koala
         typedef typename AssocArrayInternalTypes< K,E >::BlockType *BufType;
         static bool isAAVI() { return true; }
     };
+
+    }
 
 // Kontener udajacy AssocArray np. dla kluczy nie wspolpracujacych z tym kontenerem. Uzywa dodatkowego
 // wewnetrznego kontenera typu AssocCont (mapa: Klucz->int). Nie oferuje automatycznego wypisywania kluczy bedacych
@@ -355,12 +368,17 @@ template< class Klucz, class Elem, class AssocCont, class Container =
 
         template< class AssocCont2 >
             PseudoAssocArray< Klucz,Elem,AssocCont,Container > &operator=( const AssocCont2 &arg );
-        int size() const { return tab.size(); }
-        bool empty() const  { return tab.empty(); }
-        bool operator!() const { return empty(); }
+        int size() const
+            { return tab.size(); }
+        bool empty() const
+            { return tab.empty(); }
+        bool operator!() const
+            { return empty(); }
         void reserve( int arg );
-        int capacity() const { return tab.capacity(); }
-        bool hasKey( Klucz v ) const { return keyPos( v ) != -1; }
+        int capacity() const
+            { return tab.capacity(); }
+        bool hasKey( Klucz v ) const
+            { return keyPos( v ) != -1; }
         Elem *valPtr( Klucz v );
         int keyPos( Klucz ) const;
         bool delKey( Klucz );
@@ -375,7 +393,8 @@ template< class Klucz, class Elem, class AssocCont, class Container =
 
         template< class Iterator > int getKeys( Iterator ) const;
 
-        ~PseudoAssocArray() { clear(); }
+        ~PseudoAssocArray()
+            { clear(); }
     };
 
     // Typy pomocnicze 2-wymiarowych tablic asocjacyjnych (oba wymiary tego samego typu)
@@ -404,12 +423,14 @@ template< class Klucz, class Elem, class AssocCont, class Container =
         // ... i odwrotnie
         inline std::pair< int,int > pos2wsp( int ) const;
         // test, czy klucz danej postaci jest akceptowany przez ten typ tablicy
-        template< class T > bool correctPos( T, T ) const { return true; }
+        template< class T > bool correctPos( T, T ) const
+            { return true; }
 
         // przerabia klucz 2-wymiarowy (tj. pare kluczy) na postac standardowa dla danego typu tablicy
         template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz u, Klucz v ) const
             { return std::pair< Klucz,Klucz >( u,v ); }
-        template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > k ) const { return k; }
+        template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > k ) const
+            { return k; }
     };
 
     template<> class AssocMatrixAddr< AMatrNoDiag >
@@ -483,7 +504,7 @@ template< class Klucz, class Elem, class AssocCont, class Container =
             AssocArray< Klucz,int,std::vector< typename AssocMatrixInternalTypes< Klucz,Elem >::IndexBlockType > > >
 // Container - typ wewnetrznego bufora - tablicy przechowujacej opakowany ciag wartosci przypisanych roznym parom kluczy
 // IndexContainer - typ indeksu tj. tablicy asocjacyjnej przypisujacej pojedynczym kluczom ich liczby wystapien we wpisach oraz (rozne) numery.
-            class AssocMatrix: public AssocMatrixAddr< aType >, public Privates::AssocMatrixTag< Klucz,aType >
+    class AssocMatrix: public AssocMatrixAddr< aType >, public Privates::AssocMatrixTag< Klucz,aType >
     {
         template< class A, class B, AssocMatrixType C, class D, class E > friend class AssocMatrix;
 
@@ -620,24 +641,27 @@ template< class Klucz, class Elem, class AssocCont, class Container =
         template< class Iterator > int getKeys( Iterator ) const;
     };
 
+    namespace Privates {
     // Klasa testujaca, czy typ T jest macierza asocjacyjna zorganizowana na zewnetrznych buforach tablicowych
     // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
-    template< class T > struct AssocMatrixVectIntSwitch
-    {
-        typedef void *BufType;
-        typedef void *IndBufType;
-        static bool isAMVI() { return false; }
-    };
+        template< class T > struct AssocMatrixVectIntSwitch
+        {
+            typedef void *BufType;
+            typedef void *IndBufType;
+            static bool isAMVI() { return false; }
+        };
 
-    template< class K, class E, AssocMatrixType aType > struct
-        AssocMatrixVectIntSwitch< AssocMatrix< K,E,aType,
-        VectorInterface< typename AssocMatrixInternalTypes< K,E >::BlockType * >,AssocArray<K,int,
-        VectorInterface< typename AssocMatrixInternalTypes< K,E >::IndexBlockType * > > > >
-    {
-        typedef typename AssocMatrixInternalTypes< K,E >::BlockType *BufType;
-        typedef typename AssocMatrixInternalTypes< K,E >::IndexBlockType *IndBufType;
-        static bool isAMVI() { return true; }
-    };
+        template< class K, class E, AssocMatrixType aType > struct
+            AssocMatrixVectIntSwitch< AssocMatrix< K,E,aType,
+            VectorInterface< typename AssocMatrixInternalTypes< K,E >::BlockType * >,AssocArray<K,int,
+            VectorInterface< typename AssocMatrixInternalTypes< K,E >::IndexBlockType * > > > >
+        {
+            typedef typename AssocMatrixInternalTypes< K,E >::BlockType *BufType;
+            typedef typename AssocMatrixInternalTypes< K,E >::IndexBlockType *IndBufType;
+            static bool isAMVI() { return true; }
+        };
+
+    }
 
     /* AssocInserter
      * iterator wstawiajacy do podanego przez adres kontenera asocjacyjnego pary (klucz, wartosc)

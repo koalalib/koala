@@ -434,6 +434,5 @@ int main(void) {
     std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
     std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
     std::cout << std::endl; clearOutput();
-
     return 0;
 }

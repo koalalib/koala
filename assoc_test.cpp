@@ -146,7 +146,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
 
 
     std::cout << "\nMatrixy:\n";
-    AssocMatrix<Vert*,std::string,AMatrClTriangle> m,m1(0,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle> >::BufType)matbuf,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle> >::BufType)indbuf);
+    AssocMatrix<Vert*,std::string,AMatrClTriangle> m,m1(0,(Koala::Privates::AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle> >::BufType)matbuf,(Koala::Privates::AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle> >::BufType)indbuf);
 
     m(A,B)="Wpis wspolny";
     m(A,A)="Wpis pojedynczy";
@@ -189,8 +189,8 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
     std::cout << "\nMatrixy3:\n";
     AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
          ,AssocArray<Vert*,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > >
-        lpm(4,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
-         ,AssocArray<Vert*,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::BufType)matbuf,(AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
+        lpm(4,(Koala::Privates::AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
+         ,AssocArray<Vert*,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::BufType)matbuf,(Koala::Privates::AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
          ,AssocArray<Vert*,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::IndBufType)indbuf);
 
 
@@ -273,7 +273,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
     vitab[D]="Dagmara";
     t(vitab);
 
-    std::cout << "\n\n" << AssocArrayVectIntSwitch<AssocArray<Vert*,std::string,VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >  >::isAAVI();
+    std::cout << "\n\n" << Koala::Privates::AssocArrayVectIntSwitch<AssocArray<Vert*,std::string,VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >  >::isAAVI();
 
     cout << "\n\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n";
 

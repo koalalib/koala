@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<key id="nx_0" for="node" attr.name="x" attr.type="double"></key>
+<key id="ny_0" for="node" attr.name="y" attr.type="double"></key>
+<key id="elab_0" for="edge" attr.name="lab" attr.type="string"></key>
+<graph id="gr" edgedefault="undirected">
+<node id="v0"><data key="nx_0">57</data><data key="ny_0">-7</data></node>
+<node id="v1"><data key="nx_0">75</data><data key="ny_0">93</data></node>
+<edge id="e0" source="v0" target="v1" directed="true"><data key="elab_0">xyz</data></edge>
+</graph>
+</graphml>

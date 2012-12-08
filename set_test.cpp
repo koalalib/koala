@@ -157,10 +157,10 @@ double kwadrat(int arg) { return arg*arg; }
     Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc< Vert* > * > > buf2[20];
     JoinableSets<Vert*, AssocArray<Vert*, JSPartDesrc<Vert*>*,
         VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > >
-            locjset(4,(JoinableSetsVectIntSwitch<JoinableSets<Vert*,
+            locjset(4,(Koala::Privates::JoinableSetsVectIntSwitch<JoinableSets<Vert*,
                         AssocArray<Vert*, JSPartDesrc<Vert*>*,
                             VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > > >::BufType)
-                        buf1,(JoinableSetsVectIntSwitch<JoinableSets<Vert*,
+                        buf1,(Koala::Privates::JoinableSetsVectIntSwitch<JoinableSets<Vert*,
                               AssocArray<Vert*, JSPartDesrc<Vert*>*,
                                 VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > > >::MapBufType)
                         buf2);

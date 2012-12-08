@@ -6,7 +6,7 @@
  *Proste interfejsy udajace kontenery stosu, vectora, kolejki FIFO i kolejki priorytetowej z elementami typu T
  * Interfejs wzorowany na STLu
  *Dzialaja dostarczonej w konstruktorze na zewnetrznej tablicy gotowych elementow typu T o podanym rozmiarze
- *(np. tablica statyczna, dynamiczna new lub LOCALARRAY). Ew. przekraczanie zakresow testowane assertami.
+ *(np. tablica statyczna, dynamiczna new lub LOCALARRAY). Ew. przekraczanie zakresow sygnalizowane wyjatkiem.
  * Interfejsy sa obiektami niekopiowalnymi.
  *Przydatne wewnatrz procedur
  */

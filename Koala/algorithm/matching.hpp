@@ -200,7 +200,7 @@ void MatchingPar<DefaultStructs>::BaseChange(JoinableSets<PVERT> &sets,
 			bel = sets.getSetId(*s);
 			if(bel != base) base = sets.join(base, bel);
 		} while(s != e2);
-		};
+    };
 };
 
 template<class DefaultStructs>
@@ -248,7 +248,7 @@ int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
 	typename GraphType::PVertex u, v, i, j, ix, jx;
 	EdgeDirection mask = EdUndir | EdDirOut | EdDirIn;
 	Privates::BlockListAllocator< Node<typename GraphType::PVertex> > allocat(3*n+3);
-//TODO:size?
+    //TODO:size?
 
 	CyclicList<typename GraphType::PVertex,Privates::BlockListAllocator< Node<typename GraphType::PVertex> > > pathl(allocat), pathr(allocat);
 	std::pair<typename GraphType::PVertex, bool> LOCALARRAY(qdata, 2 * n + 4);
@@ -417,8 +417,8 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     {
         //jezeli osiagniemy zadany rozmiar skojarzenia - koniec
         if (matchSize == (vertNo - expo) / 2) break;
-        U = g.getEdgeEnd1( E );
-        V = g.getEdgeEnd2( E );
+        vertTab[U = g.getEdgeEnd1( E )];
+        vertTab[V = g.getEdgeEnd2( E )];
         //jezeli U i V sa wolne tzn. ze mozna E dodac do skojarzenia
         if (vertTab[U].vMatch == 0 && vertTab[V].vMatch == 0)
         {
@@ -454,8 +454,8 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
     {
         //jezeli osiagniemy zadany rozmiar skojarzenia - koniec
         if (matchSize == (vertNo - expo) / 2) break;
-        U = g.getEdgeEnd1( *itE );
-        V = g.getEdgeEnd2( *itE );
+        vertTab[U = g.getEdgeEnd1( *itE )];
+        vertTab[V = g.getEdgeEnd2( *itE )];
         //jezeli U i V sa wolne tzn. ze mozna E dodac do skojarzenia
         if (vertTab[U].vMatch == 0 && vertTab[V].vMatch == 0)
         {
@@ -569,8 +569,8 @@ template< class DefaultStructs > template< class GraphType, class VIterIn, class
         if (!isBlackHole( verttab ))
         {
             VertLabs< GraphType > lu( u,match[u] ), ln( g.getEdgeEnd( match[u],u ),match[u] );
-            verttab[u] = lu;
-            verttab[g.getEdgeEnd( match[u],u )] = ln;
+            lu.copy(verttab[u]);
+            ln.copy(verttab[g.getEdgeEnd( match[u],u )]);
         }
     }
     return licz;

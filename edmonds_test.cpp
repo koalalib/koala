@@ -347,6 +347,9 @@ void HKTest()
         Koala::Graph<char,OpisE2>::PVertex A,B,C,D,E,F,tabV[11];
         Koala::Graph<char,OpisE2>::PEdge e,tabE[12];
 
+        Koala::AssocTable<std::map<Koala::Graph<char,OpisE2>::PVertex,
+            Koala::StableMatching::VertLabs<Koala::Graph<char,OpisE2> > > > vertCont;
+
         A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');E=g.addVert('E');
         Koala::Graph<char,OpisE2>::PEdge
             eac=g.addEdge(A,C,OpisE2(1,1,"eac")),
@@ -357,7 +360,7 @@ void HKTest()
 
         Koala::Graph<char,OpisE2>::PVertex vpart[]={A,B,E};
 
-        scope = Koala::StableMatching::bipartFind(g,vpart,vpart+3,Cmp(),blackHole,tabE);
+        scope = Koala::StableMatching::bipartFind(g,vpart,vpart+3,Cmp(),vertCont,tabE);
 
 //        tabE[0]=ebd;
 //        tabE[1]=ebd2;

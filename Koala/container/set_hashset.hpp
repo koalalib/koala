@@ -27,7 +27,7 @@ template< typename Element > inline
     void Set< Element >::assign( const Element *t, unsigned s )
     {
         this->clear();
-	this->InsertRange(t, t + s);
+        this->InsertRange(t, t + s);
     }
 
 template< typename Element >

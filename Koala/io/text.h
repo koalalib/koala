@@ -287,34 +287,34 @@ enum PSType {
 	};
 
 
-template<class T>   bool PSIsType(PSType t)
+template<class T> inline  bool PSIsType(PSType t)
             { return false; };
-template<>   bool PSIsType<bool>(PSType t)
+template<> inline  bool PSIsType<bool>(PSType t)
             { return t == PST_Bool; };
-template<>   bool PSIsType<int>(PSType t)
+template<>  inline  bool PSIsType<int>(PSType t)
             { return t == PST_Int; };
-template<>   bool PSIsType<double>(PSType t)
+template<>  inline  bool PSIsType<double>(PSType t)
             { return t == PST_Double; };
-template<>   bool PSIsType<std::string>(PSType t)
+template<>  inline  bool PSIsType<std::string>(PSType t)
             { return t == PST_String; };
-template<>   bool PSIsType<const char *>(PSType t)
+template<>  inline  bool PSIsType<const char *>(PSType t)
             { return t == PST_String; };
 
-template<class T, class V>   T PSCast(const V &val)
+template<class T, class V> inline  T PSCast(const V &val)
             { return val; };
 
-template<>   bool PSCast<bool, std::string>(const std::string &val)
+template<>  inline bool PSCast<bool, std::string>(const std::string &val)
             { return val == "true" || val == "TRUE" || val == "True"; };
-template<>   int PSCast<int, std::string>(const std::string &val)
+template<>  inline  int PSCast<int, std::string>(const std::string &val)
             { return atoi(val.c_str()); };
-template<>   double PSCast<double, std::string>(const std::string &val)
+template<>  inline  double PSCast<double, std::string>(const std::string &val)
             { return atof(val.c_str()); };
 
-template<>   std::string PSCast<std::string, bool>(const bool &val)
+template<>  inline std::string PSCast<std::string, bool>(const bool &val)
             { return val ? "true" : "false"; };
-template<>   std::string PSCast<std::string, int>(const int &val)
+template<>  inline std::string PSCast<std::string, int>(const int &val)
             { char t[64]; sprintf(t, "%d", val); return t; };
-template<>   std::string PSCast<std::string, double>(const double &val)
+template<>  inline std::string PSCast<std::string, double>(const double &val)
             { char t[64]; sprintf(t, "%lf", val); return t; };
 
 
@@ -453,21 +453,21 @@ private:
 
 namespace Privates {
 
-bool PSTestBool(const std::string &s, bool *v) {
+inline bool PSTestBool(const std::string &s, bool *v) {
 	if(s == "true" || s == "TRUE" || s == "True") { *v = true; return true; };
 	if(s == "false" || s == "FALSE" || s == "False") { *v = false; return true; };
 	return false;
 };
 
-bool PSTestInt(const std::string &s, int *v) {
+inline bool PSTestInt(const std::string &s, int *v) {
 	return s.find('.')==std::string::npos && sscanf(s.c_str(), "%d", v) == 1;
 };
 
-  bool PSTestDouble(const std::string &s, double *v) {
+inline  bool PSTestDouble(const std::string &s, double *v) {
 	return s.find('.')!=std::string::npos && sscanf(s.c_str(), "%lf", v) == 1;
 };
 
-std::string addDot(double d)
+inline std::string addDot(double d)
 {
     std::stringstream s (std::stringstream::in | std::stringstream::out);
     s << d;
@@ -477,8 +477,8 @@ std::string addDot(double d)
 
 }
 
-
-std::istream &operator >>(std::istream &sin, ParSet &p) {
+//TODO: ale z klawiatury nie wczytuje
+inline std::istream &operator >>(std::istream &sin, ParSet &p) {
 	char comma, colon;
 	bool bv;
 	int iv;
@@ -505,7 +505,7 @@ std::istream &operator >>(std::istream &sin, ParSet &p) {
 };
 
 
- std::ostream &operator <<(std::ostream &sout, const ParSet &p) {
+inline std::ostream &operator <<(std::ostream &sout, const ParSet &p) {
 	bool first = true;
 	ParSet::const_iterator it, e;
 	for(it = p.m_params.begin(), e = p.m_params.end(); it != e; ++it) {

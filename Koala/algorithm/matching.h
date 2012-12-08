@@ -315,6 +315,16 @@ template< class DefaultStructs > class MatchingPar
 
             VertLabs( typename GraphType::PVertex v = 0, typename GraphType::PEdge e = 0 ): vMatch( v ), eMatch( e )
                 { }
+
+            template <class T> void copy(T& arg) const
+            {
+                arg.vMatch=vMatch;
+                arg.eMatch=eMatch;
+            }
+
+            void copy(BlackHole&) const
+            { }
+
         };
 
         // wlasciwa procedura - testuje czy podane na wejsciu krawedzie tworza skojarzenie stabilne
