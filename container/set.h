@@ -8,9 +8,10 @@
 // Set jest szablonem matematycznego zbioru z dostepnymi operacjami mnogosciowymi.
 //Z zalozenia nie jest zbyt efektywny, ale wygodny (przeznaczony dla uzytkownika), dlatego unikamy
 //jego stosowania we wlasnych procedurach
-//Sa dwie implementacje:
-//dziedziczaca publicznie stlowy set (domyslna) i zawierajca vector (z wartosciami uporzadkowanymi).
-//Wersje na vectorze wlacza zdefiniowanie stalej czasu kompilacji KOALA_SET_ON_VECTOR
+//Sa trzy implementacje:
+//dziedziczaca publicznie stlowy set (domyslna), zawierajca vector (z wartosciami uporzadkowanymi)
+// oraz bazujaca na koalowej tablicy haszujacej
+//Wersje niedomyslne wlacza zdefiniowanie stalej czasu kompilacji KOALA_SET_ON_VECTOR lub KOALA_SET_ON_HASHSET
 
 // TODO: przebadac obie implementacje pod katem efektywnosci np. niepotrzebne kopiowanie kontenerow
 
@@ -23,7 +24,7 @@ namespace Koala
 {
 
     /* SetElemForbidValue
-     * Dotychczas Set dzialal tylko dla typow wskaznikowych
+     * Pierwotnie Set dzialal tylko dla typow wskaznikowych
      * Teraz mozna go uzywac takze z numerycznymi i innymi, jesli dopisze sie odpowiednia specjalizacje tej klasy
      */
     template< class Element > struct SetElemForbidValue

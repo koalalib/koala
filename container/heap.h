@@ -36,8 +36,10 @@ namespace Koala
 
       public:
 
-        BinomHeapNode( const Key &key = Key() ): parent( 0 ), child( 0 ), next( 0 ), degree( 0 ), key( key ) { }
-        Key get() { return key; }
+        BinomHeapNode( const Key &key = Key() ): parent( 0 ), child( 0 ), next( 0 ), degree( 0 ), key( key )
+            { }
+        Key get()
+            { return key; }
     };
 
     /* BinomHeap
@@ -63,20 +65,24 @@ namespace Koala
       public:
         // podajemy komparator, alokacja new/delete
         inline BinomHeap( const Compare &function = Compare() ):
-            root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( 0 ) { }
+            root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( 0 )
+                { }
         // podajemy komparator, kolejka powiazana z alokatorem zewnetrznym
         inline BinomHeap( Allocator *all, const Compare &function = Compare() ):
-            root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( all )  { }
+            root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( all )
+                { }
         // konstruktor kopiujacy, obiekt wiaze sie z tym samym alokatorem, co oryginal
         inline BinomHeap( const BinomHeap< Key,Compare,Allocator > & );
         BinomHeap &operator=( const BinomHeap &X );
-        ~BinomHeap() { clear(); }
+        ~BinomHeap()
+            { clear(); }
 
         // metody STLowego kopca maja to samo znaczenie
         // najmniejszy klucz
         Key top() const;
         // i jego reprezentant
-        Node* topRepr() const { return minimum; }
+        Node* topRepr() const
+            { return minimum; }
 
         // wstawienie klucza, zwracany wskaznik to jego reprezentant wewnatrz kolejki
         Node* push( const Key & );
@@ -94,12 +100,12 @@ namespace Koala
 
         template< class InputIterator > void assign( InputIterator first, InputIterator last );
 
-        unsigned size() const { return nodes; }
+        unsigned size() const
+            { return nodes; }
 
-        bool empty() const { return root == 0; }
+        bool empty() const
+            { return root == 0; }
 
-        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
-        bool check() const;
 
       protected:
         Node* copy( Node*,Node* );
@@ -111,6 +117,9 @@ namespace Koala
 
         Node *newNode( Key key );
         void delNode( Node *node );
+
+        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
+        bool check() const;
 
         template< class InputIterator > void assign2( InputIterator &first, int len );
     };
@@ -133,7 +142,8 @@ namespace Koala
 
       public:
         Key get() { return key; }
-        FibonHeapNode( const Key &_key = Key() ) { init( _key ); }
+        FibonHeapNode( const Key &_key = Key() )
+            { init( _key ); }
     };
 
     /* FibonHeap
@@ -158,15 +168,19 @@ namespace Koala
 
       public:
         inline FibonHeap( const Compare &function = Compare() ):
-            root( 0 ), nodes( 0 ), function( function ), allocator( 0 ) { }
+            root( 0 ), nodes( 0 ), function( function ), allocator( 0 )
+                { }
         inline FibonHeap( Allocator *all, const Compare &function = Compare() ):
-            root( 0 ), nodes( 0 ), function( function ), allocator( all ) { }
+            root( 0 ), nodes( 0 ), function( function ), allocator( all )
+                { }
         inline FibonHeap( const FibonHeap< Key,Compare,Allocator > & );
         FibonHeap& operator=( const FibonHeap< Key,Compare,Allocator > &X );
-        ~FibonHeap() { clear(); }
+        ~FibonHeap()
+            { clear(); }
 
         Key top() const;
-        Node *topRepr() const { return root; }
+        Node *topRepr() const
+            { return root; }
         Node *push( const Key & );
         void pop();
 
@@ -180,11 +194,11 @@ namespace Koala
 
         unsigned size() const { return nodes; }
         bool empty() const { return !root; }
-        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
-        bool check() const;
 
       protected:
         Node* copy( Node *, Node * );
+        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
+        bool check() const;
     };
 
 
@@ -207,8 +221,10 @@ namespace Koala
         void init( const Key & =Key() );
 
       public:
-        Key get() { return key; }
-        PairHeapNode( const Key &_key = Key() ) { init( _key ); }
+        Key get()
+            { return key; }
+        PairHeapNode( const Key &_key = Key() )
+            { init( _key ); }
     };
 
     /* PairHeap
@@ -232,15 +248,19 @@ namespace Koala
         void clear( Node * );
 	public:
         inline PairHeap( const Compare &function = Compare() ):
-            root( 0 ), nodes( 0 ), function( function ), allocator( 0 )  { }
+            root( 0 ), nodes( 0 ), function( function ), allocator( 0 )
+                { }
         inline PairHeap( Allocator *all, const Compare &function = Compare() ):
-            root( 0 ), nodes( 0 ), function( function ), allocator( all ) { }
+            root( 0 ), nodes( 0 ), function( function ), allocator( all )
+                { }
         inline PairHeap( const PairHeap< Key,Compare,Allocator > & );
         PairHeap& operator=( const PairHeap< Key,Compare,Allocator > &X );
-        ~PairHeap() { clear(); }
+        ~PairHeap()
+            { clear(); }
 
         Key top() const;
-        Node *topRepr() const { return root; }
+        Node *topRepr() const
+            { return root; }
         Node *push( const Key & );
         void pop();
 
@@ -252,13 +272,15 @@ namespace Koala
 
         template< class InputIterator > void assign( InputIterator first, InputIterator last );
 
-        unsigned size() const { return nodes; }
-        bool empty() const { return !root; }
-        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
-        bool check() const;
+        unsigned size() const
+            { return nodes; }
+        bool empty() const
+            { return !root; }
 
       protected:
         Node* copy( Node *, Node * );
+        // TODO: rozwazyc usuniecie w finalnej wersji biblioteki
+        bool check() const;
 	};
 
 

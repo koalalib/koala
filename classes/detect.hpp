@@ -59,7 +59,7 @@ template< class DefaultStructs > template< class GraphType >
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
         switch (g.deg( v ))
         {
-            case 0: return make_pair( v,v );
+            case 0: return std::make_pair( v,v );
             case 1: if (!res.first) res.first = v;
                     else if (!res.second) res.second = v;
                     else return null;
@@ -100,7 +100,7 @@ template< class DefaultStructs > template< class GraphType >
     int LOCALARRAY( comptab,(n = g.getVertNo()) + (m = g.getEdgeNo()) + 1 );
     int LOCALARRAY( compE,n + m + 1 );
     for( int i = 0; i < n + m + 1; i++ ) compE[i] = 0;
-    typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,int >::Type edgeCont( n );
+    typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,int >::Type edgeCont( m );
     int res = 0, comp = BlocksPar< DefaultStructs >::split( g,blackHole,edgeCont,
         SearchStructs::compStore( comptab,blackHole ),blackHole );
     for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) ) compE[edgeCont[e]]++;
@@ -428,7 +428,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
     typename DefaultStructs:: template AssocCont< typename Graph::PVertex,int >::Type pi( n ), kno(n);
     typename DefaultStructs:: template AssocCont< typename Graph::PVertex,typename Graph::PVertex >::Type parent( n );
     typename Graph::PVertex LOCALARRAY( verts,n );
-    std::pair<int,int> LOCALARRAY( ebufs,n -1 );
+    std::pair<int,int> LOCALARRAY( ebufs,n - 1 );
     Set< typename Graph::PVertex> LOCALARRAY( bufs,n );
     VectorInterface<Set< typename Graph::PVertex>*> kliki(bufs,n);
     VectorInterface<std::pair<int,int>*> qedges(ebufs,n-1);
@@ -550,7 +550,8 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
     int IsItPar< DefaultStructs >::Chordal::maxStable( const Graph& g, int qn, QIter begin, VIter vbegin,
         QTEIter ebegin, IterOut out )
 {
-    typename AssocArrSwitch<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes< Graph > >::Type>::Type LOCALARRAY( tabtab,qn );
+    typename AssocArrSwitch<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes< Graph > >
+                    ::Type>::Type LOCALARRAY( tabtab,qn );
     QTRes< Graph > LOCALARRAY( tabnull,qn );
     typedef typename DefaultStructs::template LocalGraph< std::pair< typename AssocArrSwitch<typename DefaultStructs:: template AssocCont<
         typename Graph::PVertex,QTRes< Graph > >::Type>::Type *,QTRes< Graph > * >,char,Directed|Undirected >:: Type ImageGraph;
@@ -656,6 +657,7 @@ template< class DefaultStructs > template< class Graph, class IterOut >
 {
     int n = g.getVertNo();
     typename Graph::PVertex LOCALARRAY( vbegin,n * n );
+    //TODO: size?
     int LOCALARRAY( begin,n + 1 );
     std::pair< int,int > LOCALARRAY( ebegin,n );
     int qn = maxCliques( g,compStore( begin,vbegin ),ebegin );

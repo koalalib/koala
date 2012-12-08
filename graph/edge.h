@@ -8,14 +8,10 @@ namespace Koala
      */
     class EdgeConst
     {
-      protected:
+      public:
         //do not change constans
-        static const int V_U = 0;
-        static const int V_out = 0;
-        static const int V_loop = 0;
-        static const int V_V = 1;
-        static const int V_in = 1;
-        static const int V_Nloop = 1;
+        enum { V_U = 0, V_out = 0, V_loop = 0};
+        enum { V_V = 1, V_in = 1, V_Nloop = 1};
     };
 
     namespace Privates

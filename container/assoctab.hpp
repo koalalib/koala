@@ -515,6 +515,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
     }
     IndexContainer::tab.delPos( pos );
     Klucz k,n;
+    //TODO: niebezpiecznie!
     for( k = IndexContainer ::firstKey(); k; k = n )
     {
         n = IndexContainer::nextKey( k );

@@ -61,7 +61,6 @@ template< class Element, class Container > int BlockList< Element,Container >::n
     else cont[x].prev = pos;
     if (x == first) first = pos;
     else cont[cont[pos].prev].next = pos;
-//    cont[pos].blob=Element(); //TODO:???
     return pos;
 }
 
@@ -112,13 +111,15 @@ template< class Element > BlockListAllocator< Element >::~BlockListAllocator()
 
 template< class Element > template< class U > U *BlockListAllocator< Element >::allocate()
 {
-    TestEqTypes< U,Element > x; (void)(x);
+    TestEqTypes< U,Element > x;
+    (void)(x);
     return alloc();
 }
 
 template< class Element > template< class U > void BlockListAllocator< Element >::deallocate( U *p )
 {
-    TestEqTypes< U,Element > x; (void)(x);
+    TestEqTypes< U,Element > x;
+    (void)(x);
     dealloc( p );
 }
 

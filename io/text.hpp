@@ -258,6 +258,7 @@ bool readGraphText(Graph &g, std::istream &strm, int format,
     typename  BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::Type &aemap =
                 BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::get(edgeMap ,te );
 
+    //TODO: flaga RG_Info nie powinna byc ignorowana, tylko ew. dane o infach w wejsciu tekstowym
 	switch(format & (~RG_Info)) {
 		case RG_VertexLists:	return Privates::readGraphVL(g, strm, avmap, aemap);
 		case RG_EdgeList:	return Privates::readGraphEL(g, strm, avmap, aemap);

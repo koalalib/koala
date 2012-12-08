@@ -376,6 +376,7 @@ template< class GraphType> bool ConstGraphMethods< GraphType>::areParallel(
     typename ConstGraphMethods< GraphType >::PEdge e1,
     typename ConstGraphMethods< GraphType >::PEdge e2, EdgeDirection reltype ) const
 {
+    //TODO: uproscic kod - switch po reltype
     koalaAssert( e1 && e2,GraphExcNullEdge );
     koalaAssert( reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir,GraphExcWrongMask );
     std::pair< PVertex,PVertex > ends1 = self.getEdgeEnds( e1 ),ends2 = self.getEdgeEnds( e2 );

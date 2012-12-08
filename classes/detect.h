@@ -8,7 +8,6 @@
 #include "../algorithm/weights.h"
 #include "../algorithm/matching.h"
 #include "../algorithm/conflow.h"
-#include "../container/joinsets.h"
 
 namespace Koala
 {
@@ -150,6 +149,7 @@ namespace Koala
         {
           public:
             // wyrzuca na out ciagi wierzcholkow tworzacych partycje grafu pelnego M-dzielnego. Zwraca liczbe partycji M lub -1 w razie bledu
+            //TODO: argument w postaci kontenera wyjsciowego PVertex->int (tj. numer partycji)
             template< class GraphType, class Iter, class VIter >
                 static int split( const GraphType &g, CompStore< Iter,VIter > out );
         };
@@ -203,7 +203,7 @@ namespace Koala
             {
                 int size;
                 Set< typename Graph::PVertex > trees;
-                QTRes(): size( 0 )
+                QTRes(): size( 0 ), trees()
                     { }
             };
 

@@ -609,7 +609,8 @@ namespace Koala
 
         typedef BiDiHashMap< K,V > OriginalType;
 
-        bool hasKey( K arg ) const { return cont.find( arg ) != cont.end(); }
+        bool hasKey( K arg ) const
+            { return cont.find( arg ) != cont.end(); }
 
         K firstKey() const;
         K lastKey() const;
@@ -617,10 +618,13 @@ namespace Koala
         K nextKey( K )const ;
 
         V operator[]( K arg );
-        unsigned size() const { return cont.size(); }
-        bool empty() const { return this->size() == 0; }
+        unsigned size() const
+            { return cont.size(); }
+        bool empty() const
+            { return this->size() == 0; }
         template< class Iterator > int getKeys( Iterator ) const;
-        int capacity () const { return std::numeric_limits< int >::max(); }
+        int capacity () const
+            { return std::numeric_limits< int >::max(); }
 
         const BiDiHashMap< K,V > &cont;
 
@@ -651,9 +655,12 @@ namespace Koala
         K nextKey( K ) const;
 
         V operator[]( K arg );
-        unsigned size() const { return cont.size(); }
-        bool empty() const { return this->size() == 0; }
-        int capacity () const { return std::numeric_limits< int >::max(); }
+        unsigned size() const
+            { return cont.size(); }
+        bool empty() const
+            { return this->size() == 0; }
+        int capacity () const
+            { return std::numeric_limits< int >::max(); }
         template< class Iterator > int getKeys( Iterator ) const;
 
         const HashMap< K,V > &cont;

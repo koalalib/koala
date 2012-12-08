@@ -118,10 +118,11 @@ namespace Koala
     template< typename Element, typename Cont >
         std::ostream &operator<<( std::ostream &,const JoinableSets< Element,Cont > & );
 
+namespace Privates {
     /* JoinableSetsVectIntSwitch
      * test, czy kontener dziala na tablicach zewnetrznych
      */
-    // TODO: rozwazyc usuniecie z finalnej wersji biblioteki
+
     template< class T > struct JoinableSetsVectIntSwitch
     {
         typedef void* BufType;
@@ -136,6 +137,8 @@ namespace Koala
         typedef Privates::BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc< ITEM > * > > *MapBufType;
         static bool isJSVI() { return true; }
     };
+
+}
 
 #include "joinsets.hpp"
 }

@@ -464,7 +464,8 @@ namespace Koala
             total( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
         // zamienia w relacje odwrotna
-        template< class Graph > static void inv( Graph &g ) { g.rev(); }
+        template< class Graph > static void inv( Graph &g )
+            { g.rev(); }
 
         // przeprowadza domkniecie zwrotne. Mozna podac pole info wprowadzanych krawedzi
         template< class Graph > static void
@@ -479,6 +480,7 @@ namespace Koala
         template< class Graph > static void
             transClousure( Graph &g)
 	        { transClousure(g, typename Graph::EdgeInfoType()); };
+
         template< class Graph > static void
             transClousure( Graph &g, const typename Graph::EdgeInfoType &einfo);
 

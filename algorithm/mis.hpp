@@ -8,6 +8,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
     while (random--) v = g.getVertNext( v );
     // ALG: no vertex chosen
     assert( v != NULL );
+    (void)(vertTab);
     return v;
 }
 
@@ -41,6 +42,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
     }
 
      // ALG: no vertex chosen
+    (void)(vertTab);
     assert( nMaxs > 0 );
     randomIndex = rand() % nMaxs;
     return vMaxs[randomIndex];
@@ -195,6 +197,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
     // ALG: no vertex chosen
     assert( nMins > 0 );
     randomIndex = rand() % nMins;
+    (void)vertTab;
     return vMins[randomIndex];
 }
 

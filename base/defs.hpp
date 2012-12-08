@@ -9,7 +9,7 @@ template< class Iterator > void AlgsDefaultSettings::sort( Iterator first, Itera
 template< class Iterator, class Comp > void AlgsDefaultSettings::sort( Iterator first, Iterator last, Comp comp )
 {
     std::make_heap( first,last,comp );
-    std::sort_heap( first,last,comp );        
+    std::sort_heap( first,last,comp );
 }
 
 // BlackHole
@@ -19,11 +19,11 @@ template< class T > BlackHole &BlackHole::operator[]( T )
     assert( 0 );
     return *this;
 }
-    
+
 template< class T, class R > BlackHole &BlackHole::operator()( T,R )
 {
     assert( 0 );
-    return *this; 
+    return *this;
 }
 
 template< class T > BlackHole::operator T()
@@ -31,6 +31,55 @@ template< class T > BlackHole::operator T()
     assert( 0 );
     return T();
 }
+
+BlackHole BlackHole::firstKey() const
+{
+    assert( 0 );
+    return BlackHole();
+}
+
+BlackHole BlackHole::lastKey() const
+{
+    assert( 0 );
+    return BlackHole();
+}
+
+template< class T > BlackHole BlackHole::nextKey(T) const
+{
+    assert( 0 );
+    return BlackHole();
+}
+
+template< class T > BlackHole BlackHole::prevKey(T) const
+{
+    assert( 0 );
+    return BlackHole();
+}
+
+template< class T > int BlackHole::getKeys(T) const
+{
+    assert( 0 );
+    return 0;
+}
+
+unsigned BlackHole::size() const
+{
+    assert( 0 );
+    return 0;
+}
+
+int BlackHole::capacity() const
+{
+    assert( 0 );
+    return 0;
+}
+
+template< class T > bool BlackHole::hasKey(T) const
+{
+    assert( 0 );
+    return false;
+}
+
 
 // AssocContainerChooser
 
@@ -59,7 +108,7 @@ Std2Linker< Std1NoLinker,Std1NoLinker > stdLink( bool a1, bool a2 )
 { return Std2Linker< Std1NoLinker,Std1NoLinker >( Std1NoLinker( a1 ),Std1NoLinker( a2 )); }
 
 template< class Info,class T > Std2Linker< Std1NoLinker,Std1FieldLinker< Info,T > > stdLink( bool a1, T Info:: *awsk )
-{ 
+{
     return Std2Linker< Std1NoLinker,Std1FieldLinker< Info,T > >( Std1NoLinker( a1 ),Std1FieldLinker< Info,T >( awsk ) );
 }
 

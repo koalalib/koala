@@ -141,6 +141,7 @@ template< class T > template< class InputIterator >
         ile++;
     }
     if (!ile) return;
+//TODO: nieefektywne, usunac odwracanie
     rev( where,start + siz );
     rev( where,where + ile );
     rev( where + ile,start + siz );
