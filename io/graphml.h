@@ -41,7 +41,7 @@ public:
 	~GraphML();
 
 	//use this method to create new GraphML structure
-	void newGraphML();
+	void clearGraphML();
 
 	int graphNo(); //number of graphs in GraphML structure
 	std::string getGraphName(int);

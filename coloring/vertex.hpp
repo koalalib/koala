@@ -91,6 +91,7 @@ int SeqVertColoringPar<DefaultStructs>::satDeg(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int deg = graph.deg(vert, Mask);
+	if(deg==0) return 0;
 	int LOCALARRAY(tabColors, deg);
 	int lenColors = 0;
 
@@ -208,7 +209,7 @@ int SeqVertColoringPar<DefaultStructs>::lfSort(const Graph &graph,
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	typedef VertDeg<Vert> LfStr;
 
-	koalaAssert(beg!=end, AlgExcWrongArg);
+	if(beg==end) return 0;
 	int atablen=end-beg;
 	LfStr LOCALARRAY(lfStr, atablen);
 	int lenLfStr = 0;
@@ -235,7 +236,7 @@ int SeqVertColoringPar<DefaultStructs>::slSort(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	typedef VertDeg<Vert> SlStruct;
 
-	koalaAssert(beg!=end, AlgExcWrongArg);
+	if(beg==end) return 0;
 
 	typedef Privates::BlockListAllocator< typename DefaultStructs:: template
 		HeapCont< SlStruct,void,void >::NodeType > Allocator;
@@ -836,8 +837,11 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::lf(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
+	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
-	Vert LOCALARRAY(verts, graph.getVertNo());
+
+	if(vertNo==0) return -1;
+	Vert LOCALARRAY(verts, vertNo);
 
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		if(colors.hasKey(vv) && colors[vv]>=0)
@@ -854,8 +858,11 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
+	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
-	Vert LOCALARRAY(verts, graph.getVertNo());
+
+	if(vertNo==0) return -1;
+	Vert LOCALARRAY(verts, vertNo);
 
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		if(colors.hasKey(vv) && colors[vv]>=0)
@@ -873,8 +880,11 @@ int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph,
 	ColorMap &colors, int maxCol)
 {
 	typedef typename Graph::PVertex Vert;
+	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
-	Vert LOCALARRAY(verts, graph.getVertNo());
+
+	if(vertNo==0) return -1;
+	Vert LOCALARRAY(verts, vertNo);
 
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		if(colors.hasKey(vv) && colors[vv]>=0)
@@ -896,6 +906,7 @@ int SeqVertColoringPar<DefaultStructs>::lf(const Graph &graph, ColorMap &colors,
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
 
+	if(n==0) return -1;
 	Vert LOCALARRAY(verts, n);
 	int lenVerts =0;
 	for(; beg!=end; ++beg) {
@@ -918,6 +929,7 @@ int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph, ColorMap &co
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
 
+	if(n==0) return -1;
 	Vert LOCALARRAY(verts, n);
 	int lenVerts =0;
 	for(; beg!=end; ++beg) {
@@ -940,6 +952,7 @@ int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph, ColorMap &co
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
 
+	if(n==0) return -1;
 	Vert LOCALARRAY(verts, n);
 	int lenVerts =0;
 	for(; beg!=end; ++beg) {
@@ -964,6 +977,7 @@ int SeqVertColoringPar<DefaultStructs>::lfSort(const Graph &graph,
 	int n=0;
 	for(VInIter cur=beg; cur!=end; ++cur, ++n);
 
+	if(n==0) return 0;
 	LfStr LOCALARRAY(lfStr, n);
 	int lenLfStr = 0;
 
@@ -986,8 +1000,11 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::sl(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
+	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
-	Vert LOCALARRAY(verts, graph.getVertNo());
+
+	if(vertNo==0) return -1;
+	Vert LOCALARRAY(verts, vertNo);
 
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		if(colors.hasKey(vv) && colors[vv]>=0)
@@ -1005,8 +1022,11 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
+	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
-	Vert LOCALARRAY(verts, graph.getVertNo());
+
+	if(vertNo==0) return -1;
+	Vert LOCALARRAY(verts, vertNo);
 
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		if(colors.hasKey(vv) && colors[vv]>=0)
@@ -1025,8 +1045,11 @@ int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph,
 	ColorMap &colors, int maxCol)
 {
 	typedef typename Graph::PVertex Vert;
+	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
-	Vert LOCALARRAY(verts, graph.getVertNo());
+
+	if(vertNo==0) return -1;
+	Vert LOCALARRAY(verts, vertNo);
 
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		if(colors.hasKey(vv) && colors[vv]>=0)
@@ -1049,6 +1072,7 @@ int SeqVertColoringPar<DefaultStructs>::sl(const Graph &graph, ColorMap &colors,
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
 
+	if(n==0) return -1;
 	Vert LOCALARRAY(verts, n);
 	int lenVerts = 0;
 	for(; beg!=end; ++beg) {
@@ -1072,6 +1096,7 @@ int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph,
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
 
+	if(n==0) return -1;
 	Vert LOCALARRAY(verts, n);
 	int lenVerts =0;
 	for(; beg!=end; ++beg) {
@@ -1095,6 +1120,7 @@ int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph,
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
 
+	if(n==0) return -1;
 	Vert LOCALARRAY(verts, n);
 	int lenVerts =0;
 	for(; beg!=end; ++beg) {
@@ -1118,6 +1144,7 @@ int SeqVertColoringPar<DefaultStructs>::slSort(const Graph &graph,
 	int n=0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
 
+	if(n==0) return 0;
 	Vert LOCALARRAY(tab, n);
 	for(int i=0; i<n; ++beg, ++i)
 		tab[i] = *beg;
@@ -1136,8 +1163,11 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::slf(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
+	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
-	Vert LOCALARRAY(verts, graph.getVertNo());
+
+	if(vertNo==0) return -1;
+	Vert LOCALARRAY(verts, vertNo);
 
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		if(colors.hasKey(vv) && colors[vv]>=0)
@@ -1154,8 +1184,11 @@ template<typename Graph, typename ColorMap>
 int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
+	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
-	Vert LOCALARRAY(verts, graph.getVertNo());
+
+	if(vertNo==0) return -1;
+	Vert LOCALARRAY(verts, vertNo);
 
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		if(colors.hasKey(vv) && colors[vv]>=0)
@@ -1173,8 +1206,11 @@ int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph,
 	ColorMap &colors, int maxCol)
 {
 	typedef typename Graph::PVertex Vert;
+	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
-	Vert LOCALARRAY(verts, graph.getVertNo());
+
+	if(vertNo==0) return -1;
+	Vert LOCALARRAY(verts, vertNo);
 
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		if(colors.hasKey(vv) && colors[vv]>=0)
@@ -1196,7 +1232,7 @@ int SeqVertColoringPar<DefaultStructs>::slf(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	typedef VertDegSat<Vert> SlfStruct;
 
-	koalaAssert(beg!=end, AlgExcWrongArg);
+	if(beg==end) return -1;
 
 	typedef Privates::BlockListAllocator< typename DefaultStructs:: template
 		HeapCont< SlfStruct,void,void >::NodeType > Allocator;
@@ -1209,6 +1245,7 @@ int SeqVertColoringPar<DefaultStructs>::slf(const Graph &graph,
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
+	if(n==0) return -1;
 
 	Allocator alloc( n );
 	PriQueue priQueue(&alloc);
@@ -1288,7 +1325,7 @@ int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	typedef VertDegSat<Vert> SlfStruct;
 
-	koalaAssert(beg!=end, AlgExcWrongArg);
+	if(beg==end) return -1;
 
 	typedef Privates::BlockListAllocator< typename DefaultStructs:: template
 		HeapCont< SlfStruct,void,void >::NodeType > Allocator;
@@ -1301,6 +1338,7 @@ int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph,
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
+	if(n==0) return -1;
 
 	Allocator alloc( n );
 	PriQueue priQueue(&alloc);
@@ -1454,7 +1492,9 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, VertSub>::Type Map;
 
-	Map map(graph.getVertNo());
+	int vertNo = graph.getVertNo();
+	if(vertNo==0) return -1;
+	Map map(vertNo);
 
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		VertSub uu = subgraph.addVert(vv);
@@ -1517,7 +1557,9 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, VertSub>::Type Map;
 
-	Map map(graph.getVertNo());
+	int vertNo = graph.getVertNo();
+	if(vertNo==0) return -1;
+	Map map(vertNo);
 
 	for(;beg!=end; ++beg) {
 		if( map.hasKey(*beg) ) continue;

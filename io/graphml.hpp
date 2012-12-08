@@ -3,7 +3,7 @@ GraphML::GraphML() {
 	doc = NULL;
 	xml = NULL;
 	graphs = NULL;
-	newGraphML();
+	clearGraphML();
 }
 
 GraphML::~GraphML() {
@@ -16,7 +16,7 @@ GraphML::~GraphML() {
 	if(doc) delete doc;
 }
 
-void GraphML::newGraphML() {
+void GraphML::clearGraphML() {
 	clear();
 	if(doc) delete doc;
 	doc = NULL;
@@ -906,7 +906,6 @@ std::string GraphMLGraph::getName() {
 template<typename Graph>
 bool GraphMLGraph::readGraph(Graph &graph)
 {
-	graph.clear(); //?? should it be cleared?
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	bool isDirected = true;
@@ -957,7 +956,6 @@ bool GraphMLGraph::readGraph(Graph &graph, BlackHole, BlackHole)
 template<typename Graph, typename InfoVertex>
 bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, BlackHole)
 {
-	graph.clear(); //?? should it be cleared?
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 
@@ -1020,7 +1018,6 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, BlackHole)
 template<typename Graph, typename InfoEdge>
 bool GraphMLGraph::readGraph(Graph &graph, BlackHole, InfoEdge infoEdge)
 {
-	graph.clear(); //?? should it be cleared?
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 
@@ -1084,7 +1081,6 @@ bool GraphMLGraph::readGraph(Graph &graph, BlackHole, InfoEdge infoEdge)
 template<typename Graph, typename InfoVertex, typename InfoEdge>
 bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdge)
 {
-	graph.clear(); //?? should it be cleared?
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 
