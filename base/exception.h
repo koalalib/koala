@@ -2,7 +2,7 @@
 #define KOALA_EXCEPTION_H
 
 /* exception.h
- * 
+ *
  */
 
 #include <cassert>
@@ -30,7 +30,7 @@ namespace Koala
     namespace Error
     {
         /* ExcBase
-         * Klasa bazowa dla wyjątków Koali.                                          
+         * Klasa bazowa dla wyjątków Koali.
          */
         class ExcBase
         {
@@ -42,15 +42,19 @@ namespace Koala
             ExcBase( const char *adesc = "", const char *afile = "", int aline = -1);
 
             // Wiersz w kodzie, gdzie wystapił błąd.
-            inline int line() const { return _line; }
+            inline int line() const
+                { return _line; }
             // Opis wyjątku.
-            inline const char *descr() const { return buf; }
+            inline const char *descr() const
+                { return buf; }
             // Plik źrodłowy, w którym wystąpił błąd.
-            inline const char *file() const { return buf + std::strlen( buf ) + 1; }
+            inline const char *file() const
+                { return buf + std::strlen( buf ) + 1; }
             // Nazwa typu wyjątku.
-            inline const char *type() const { return "ExcBase"; }
+            inline const char *type() const
+                { return "ExcBase"; }
         };
-        
+
         /* ExcWrongArg
          * Wyjątek typu "niepoprawny argument".
          */
@@ -58,8 +62,10 @@ namespace Koala
         {
           public:
             inline ExcWrongArg( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "ExcWrongArg"; }
+                ExcBase( adesc,afile,aline )
+                    { }
+            inline const char *type() const
+                { return "ExcWrongArg"; }
         };
 
         /* ExcNullVert
@@ -69,8 +75,10 @@ namespace Koala
         {
           public:
             inline ExcNullVert( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "ExcNullVert"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "ExcNullVert"; }
         };
 
         /* ExcNullEdge
@@ -80,10 +88,12 @@ namespace Koala
         {
           public:
             inline ExcNullEdge( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "ExcNullEdge"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "ExcNullEdge"; }
         };
-        
+
         /* ExcWrongConn
          * Wyjątek typu "błędne połączenie w grafie między wierzchołkami lub krawędziami".
          */
@@ -91,8 +101,10 @@ namespace Koala
         {
           public:
             inline ExcWrongConn( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "ExcWrongConn"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "ExcWrongConn"; }
         };
 
         /* ExcWrongMask
@@ -102,8 +114,10 @@ namespace Koala
         {
           public:
             inline ExcWrongMask( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "ExcWrongMask"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "ExcWrongMask"; }
         };
 
         /* ContExc
@@ -113,10 +127,12 @@ namespace Koala
         {
           public:
             inline ContExc( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "ContExc"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "ContExc"; }
         };
-        
+
         /* ContExcWrongArg
          * Wyjątek typu "zły argument metody kontenera".
          */
@@ -124,10 +140,12 @@ namespace Koala
         {
           public:
             inline ContExcWrongArg( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "ContExcWrongArg"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "ContExcWrongArg"; }
         };
-        
+
         /* ContExcFull
          * Wyjątek typu "przepełnienie kontenera".
          */
@@ -135,8 +153,10 @@ namespace Koala
         {
           public:
             inline ContExcFull( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "ContExcFull"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "ContExcFull"; }
         };
 
         /* ContExcOutpass
@@ -146,8 +166,10 @@ namespace Koala
         {
           public:
             inline ContExcOutpass( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "ContExcOutpass"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "ContExcOutpass"; }
         };
 
         /* GraphExc
@@ -157,8 +179,10 @@ namespace Koala
         {
           public:
             inline GraphExc( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "GraphExc"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "GraphExc"; }
         };
 
         /* GraphExcWrongArg
@@ -168,8 +192,10 @@ namespace Koala
         {
           public:
             inline GraphExcWrongArg( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "GraphExcWrongArg"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "GraphExcWrongArg"; }
         };
 
         /* GraphExcWrongConn
@@ -179,10 +205,12 @@ namespace Koala
         {
           public:
             inline GraphExcWrongConn( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "GraphExcWrongConn"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "GraphExcWrongConn"; }
         };
-        
+
         /* GraphExcNullVert
          * Wyjątek typu "zły argument metody struktury grafu, podano zerowy wierzchołek".
          */
@@ -190,10 +218,12 @@ namespace Koala
         {
           public:
             inline GraphExcNullVert( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "GraphExcNullVert"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "GraphExcNullVert"; }
         };
-        
+
         /* GraphExcNullEdge
          * Wyjątek typu "zły argument metody struktury grafu, podano zerową krawędź".
          */
@@ -201,8 +231,10 @@ namespace Koala
         {
           public:
             inline GraphExcNullEdge( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "GraphExcNullEdge"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "GraphExcNullEdge"; }
         };
 
         /* GraphExcWrongMask
@@ -212,10 +244,12 @@ namespace Koala
         {
           public:
             inline GraphExcWrongMask( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "GraphExcWrongMask"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "GraphExcWrongMask"; }
         };
-        
+
         /* AlgExc
          * Klasa bazowa dla błędów algorytmów biblioteki.
          */
@@ -223,10 +257,12 @@ namespace Koala
         {
           public:
             inline AlgExc( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "AlgExc"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "AlgExc"; }
         };
-        
+
         /* AlgExcWrongArg
          * Wyjątek typu "zły argument algorytmu biblioteki".
          */
@@ -234,10 +270,12 @@ namespace Koala
         {
           public:
             inline AlgExcWrongArg( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "AlgExcWrongArg"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "AlgExcWrongArg"; }
         };
-        
+
         /* AlgExcNullVert
          * Wyjątek typu "zły argument algorytmu biblioteki, podano zerowy wierzchołek".
          */
@@ -245,10 +283,12 @@ namespace Koala
         {
           public:
             inline AlgExcNullVert( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "AlgExcNullVert"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "AlgExcNullVert"; }
         };
-        
+
         /* AlgExcNullEdge
          * Wyjątek typu "zły argument algorytmu biblioteki, podano zerową krawędź".
          */
@@ -256,8 +296,10 @@ namespace Koala
         {
           public:
             inline AlgExcNullEdge( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "AlgExcNullEdge"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "AlgExcNullEdge"; }
         };
 
         /* AlgExcWrongMask
@@ -267,10 +309,12 @@ namespace Koala
         {
           public:
             inline AlgExcWrongMask( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "AlgExcWrongMask"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "AlgExcWrongMask"; }
         };
-        
+
         /* AlgExcWrongConn
          * Wyjątek typu "zły argument metody struktury grafu, błędne połączenie".
          */
@@ -278,8 +322,10 @@ namespace Koala
         {
           public:
             inline AlgExcWrongConn( const char *adesc = "", const char *afile = "", int aline = -1):
-                ExcBase( adesc,afile,aline ) { }
-            inline const char *type() const { return "GraphExcWrongConn"; }
+                ExcBase( adesc,afile,aline )
+                { }
+            inline const char *type() const
+                { return "GraphExcWrongConn"; }
         };
     }
 }

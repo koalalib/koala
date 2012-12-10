@@ -1,3 +1,5 @@
+// Funktory pozwalajace na wygodny zapis/odczyt grafow z VertInfo=EdgeInfo=ParSet przez modul graphml
+
 #ifndef KOALA_PARSET_GML_H
 #define KOALA_PARSET_GML_H
 #include<map>
@@ -75,6 +77,7 @@ struct ParSetVertWrite {
 				case PST_Int: gmlkw->setInt(keys[i].c_str(), vert->info.template get<int>(keys[i])); break;
 				case PST_Double: gmlkw->setDouble(keys[i].c_str(), vert->info.template get<double>(keys[i])); break;
 				case PST_String: gmlkw->setString(keys[i].c_str(), vert->info.template get<std::string>(keys[i])); break;
+				default : ;
 				};
 			};
 		}
@@ -92,6 +95,7 @@ struct ParSetEdgeWrite {
 				case PST_Int: gmlkw->setInt(keys[i].c_str(), edge->info.template get<int>(keys[i])); break;
 				case PST_Double: gmlkw->setDouble(keys[i].c_str(), edge->info.template get<double>(keys[i])); break;
 				case PST_String: gmlkw->setString(keys[i].c_str(), edge->info.template get<std::string>(keys[i])); break;
+				default: ;
 				};
 			};
 		}

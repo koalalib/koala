@@ -31,7 +31,10 @@ namespace Koala
         {
           public:
             template< class GraphType, class VertContainer > typename GraphType::PVertex
-                operator()( const GraphType &g, const VertContainer& vertTab ) { return g.getVert(); }
+                operator()( const GraphType &g, const VertContainer& vertTab )
+                {
+                    return g.getVert();
+                }
         };
 
         /* ----------------------------------------------------------------------

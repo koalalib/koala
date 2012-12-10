@@ -51,7 +51,7 @@ namespace Koala
           public:
             typedef AssocMatrix< K,V,AMatrNoDiag > Type;
             // - przyklad uzycia, nie usuwac
-            // typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+            // typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
         };
 
         // typ macierzy sasiedztwa dla krawedzi nieskierowanych - zbedne przy edAllow=false
@@ -60,7 +60,7 @@ namespace Koala
           public:
             typedef AssocMatrix< K,V,AMatrTriangle > Type;
             // - przyklad uzycia, nie usuwac
-            // typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+            // typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
         };
 
         // Dodatkowe pola (poza info) wprowadzane do obiektu wierzcholka
@@ -145,8 +145,10 @@ namespace Koala
             typedef int &NoType;
 
             mutable int n;
-            int &no() const { return n; }
-            EdgeCounterLoop(): n( 0 ) { }
+            int &no() const
+                { return n; }
+            EdgeCounterLoop(): n( 0 )
+                { }
         };
 
         template <> class EdgeCounterLoop< 0 >
@@ -154,7 +156,8 @@ namespace Koala
           protected:
             typedef DummyVar< int > NoType;
 
-            DummyVar< int > no() const { return DummyVar< int >(); }
+            DummyVar< int > no() const
+                { return DummyVar< int >(); }
         };
 
         /* EdgeCounterDir
@@ -167,8 +170,10 @@ namespace Koala
             typedef int &NoType;
 
             mutable int n;
-            int &no() const { return n; }
-            EdgeCounterDir(): n( 0 ) { }
+            int &no() const
+                { return n; }
+            EdgeCounterDir(): n( 0 )
+                { }
         };
 
         template <> class EdgeCounterDir< 0 >
@@ -176,7 +181,8 @@ namespace Koala
           protected:
             typedef DummyVar< int > NoType;
 
-            DummyVar< int > no() const { return DummyVar< int >(); }
+            DummyVar< int > no() const
+                { return DummyVar< int >(); }
         };
 
         /* EdgeCounterUndir
@@ -188,8 +194,10 @@ namespace Koala
             typedef int &NoType;
 
             mutable int n;
-            int &no() const { return n; }
-            EdgeCounterUndir(): n( 0 ) { }
+            int &no() const
+                { return n; }
+            EdgeCounterUndir(): n( 0 )
+                { }
         };
 
         template <> class EdgeCounterUndir< 0 >
@@ -197,7 +205,8 @@ namespace Koala
           protected:
             typedef DummyVar< int > NoType;
 
-            DummyVar< int > no() const { return DummyVar< int >(); }
+            DummyVar< int > no() const
+                { return DummyVar< int >(); }
         };
 
     }
@@ -269,7 +278,8 @@ namespace Koala
             { return Settings::EdAllow ; }
 
         // metody przekazywane do ConstGraphMethods
-        int getVertNo() const { return this->no_vert; }
+        int getVertNo() const
+            { return this->no_vert; }
         inline typename GraphType::PVertex getVertNext( PVertex ) const;
         inline typename GraphType::PVertex getVertPrev( PVertex ) const;
         int getEdgeNo( EdgeType = EdAll ) const;

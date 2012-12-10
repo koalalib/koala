@@ -66,9 +66,9 @@ namespace Koala
         {
           public:
             typedef AssocArray< A,B > Type;
-            // TODO: nie usuwac komentarzy (przykladowa uzycia)
+            //  Nie usuwac komentarzy (przykladowa uzycia)
             //   typedef AssocTable < BiDiHashMap<A,B> > Type;
-            //   typedef PseudoAssocArray<A,B,AssocTable<std::map<A,int> > > Type;
+            //   typedef Privates::PseudoAssocArray<A,B,AssocTable<std::map<A,int> > > Type;
         };
 
         // Typ 2-wymiarowej tablicy assocjacyjnej o kluczu A i wartości B. Kluczami są pary uporzadkowane lub
@@ -77,8 +77,8 @@ namespace Koala
         {
           public:
             typedef AssocMatrix< A,B,type > Type;
-            // TODO: nie usuwac komentarza (przykladowe uzycia)
-            // typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
+            // Nie usuwac komentarza (przykladowe uzycia)
+            // typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
         };
 
         // typ struktury kopca i jego wezla
@@ -105,13 +105,20 @@ namespace Koala
         template< class T > class NumberTypeBounds
         {
           public:
-            static T plusInfty() { return std::numeric_limits< T >::max(); }
-            static bool isPlusInfty( T arg ) { return arg == plusInfty(); }
-            static T minusInfty() { return std::numeric_limits< T >::min(); }
-            static bool isMinusInfty( T arg ) { return arg == minusInfty(); }
-            static T zero() { return (T)0; }
-            static T one() { return (T)1; }
-            static bool isZero( T arg ) { return arg == zero(); }
+            static T plusInfty()
+                { return std::numeric_limits< T >::max(); }
+            static bool isPlusInfty( T arg )
+                { return arg == plusInfty(); }
+            static T minusInfty()
+                { return std::numeric_limits< T >::min(); }
+            static bool isMinusInfty( T arg )
+                { return arg == minusInfty(); }
+            static T zero()
+                { return (T)0; }
+            static T one()
+                { return (T)1; }
+            static bool isZero( T arg )
+                { return arg == zero(); }
         };
 
         // Wybrany do użytku wewnętrznego algorytm sortowania tablic.
@@ -133,7 +140,8 @@ namespace Koala
       public:
         ConstFunctor( const T &aval = T() ): val( aval ) { }
 
-        T operator()() { return val; }
+        T operator()()
+            { return val; }
 
         template< class A > T operator()(const A&)
                 { return val; }
@@ -160,13 +168,18 @@ namespace Koala
      */
     struct BlackHole: public std::iterator< std::output_iterator_tag,void,void,void,void >
     {
-        template< class T > BlackHole &operator=( T ) { return *this; }
+        template< class T > BlackHole &operator=( T )
+            { return *this; }
 
-        BlackHole &operator*() { return *this; }
-        BlackHole &operator++() { return *this; }
-        BlackHole operator++( int ) { return *this; }
+        BlackHole &operator*()
+            { return *this; }
+        BlackHole &operator++()
+            { return *this; }
+        BlackHole operator++( int )
+            { return *this; }
 
-        BlackHole() {}
+        BlackHole()
+            {}
 
         // BlackHole również może służyć jako zaślepka dla nie interesujacego nas kontenera asocjacyjnego wymaganego
         // w procedurze; te metody nigdy nie powinny być wykonane, są potrzebne jedynie by kod się kompilował.
@@ -182,13 +195,18 @@ namespace Koala
         template< class T > BlackHole nextKey(T) const;
         template< class T > BlackHole prevKey(T) const;
         template< class T > int getKeys(T) const;
-        void reserve( int ) { }
-        bool empty() const { return true; }
-        bool operator!() const { return true; }
+        void reserve( int )
+            { }
+        bool empty() const
+            { return true; }
+        bool operator!() const
+            { return true; }
         unsigned size() const;
         int capacity() const;
-        template< class T > bool delKey(T) { return false; };
-        void clear() { }
+        template< class T > bool delKey(T)
+            { return false; };
+        void clear()
+            { }
 
     };
 
@@ -197,8 +215,10 @@ namespace Koala
     #define blackHole ((*((Koala::BlackHole*)( &std::cout ))))
 
     // Test na to, czy argument jest typu BlackHole.
-    template< class T > bool isBlackHole( const T & ) { return false; }
-    bool isBlackHole( const BlackHole & ) { return true; }
+    template< class T > bool isBlackHole( const T & )
+        { return false; }
+    bool isBlackHole( const BlackHole & )
+        { return true; }
 
     /* BlackHoleSwitch
      * Jeśli szablon procedury dostal BlackHole zamiast argumentu (kontenera), a procedura potrzebuje do działania
@@ -210,16 +230,20 @@ namespace Koala
         // Typ kontenera, na którym będziemy działać.
         typedef Cont1 Type;
 
-        static Cont1 &get( Cont1 &a, Cont2 &b ) { return a; }
-        static const Cont1 &get(const Cont1 &a, const Cont2 &b ) {  return a; }
+        static Cont1 &get( Cont1 &a, Cont2 &b )
+            { return a; }
+        static const Cont1 &get(const Cont1 &a, const Cont2 &b )
+            {  return a; }
     };
 
     template< class Cont2 > struct BlackHoleSwitch< BlackHole,Cont2 >
     {
         typedef Cont2 Type;
 
-        static Cont2 &get( BlackHole &a, Cont2 &b ) { return b; }
-        static const Cont2 &get(const BlackHole &a,const Cont2 &b ) {  return b; }
+        static Cont2 &get( BlackHole &a, Cont2 &b )
+            { return b; }
+        static const Cont2 &get(const BlackHole &a,const Cont2 &b )
+            {  return b; }
     };
 
     // Choosery są strukturami funkcyjnymi zwracającymi true/false (poprzez operator()) dla wierzchołków/krawędzi
@@ -1284,15 +1308,21 @@ namespace Koala
     // wygodne laczenie chooserow, casterow i linkerow w pary za pomoca &
     template <class  Ch1, class Ch2> std::pair< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >
         operator&( Ch1 a, Ch2 b )
-        { return std::pair< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >(a,b); }
+        {
+            return std::pair< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >(a,b);
+        }
 
     template <class  Ch1, class Ch2> std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >
         operator&( Ch1 a, Ch2 b )
-        { return std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >(a,b); }
+        {
+            return std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >(a,b);
+        }
 
     template <class  Ch1, class Ch2> std::pair< typename Ch1::LinkersSelfType,typename Ch2::LinkersSelfType >
         operator&( Ch1 a, Ch2 b )
-        { return std::pair< typename Ch1::LinkersSelfType,typename Ch2::LinkersSelfType >(a,b); }
+        {
+            return std::pair< typename Ch1::LinkersSelfType,typename Ch2::LinkersSelfType >(a,b);
+        }
 
 
 #include "defs.hpp"

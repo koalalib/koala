@@ -119,10 +119,10 @@
 #ifndef KOALA_IO_TEXT_H
 #define KOALA_IO_TEXT_H
 
-#include<stdio.h>
+#include<cstdio>
 #include"../graph/graph.h"
 
-#include<stdlib.h>
+#include<cstdlib>
 #include<map>
 #include<vector>
 #include<string>
@@ -306,16 +306,16 @@ template<class T, class V> inline  T PSCast(const V &val)
 template<>  inline bool PSCast<bool, std::string>(const std::string &val)
             { return val == "true" || val == "TRUE" || val == "True"; };
 template<>  inline  int PSCast<int, std::string>(const std::string &val)
-            { return atoi(val.c_str()); };
+            { return std::atoi(val.c_str()); };
 template<>  inline  double PSCast<double, std::string>(const std::string &val)
-            { return atof(val.c_str()); };
+            { return std::atof(val.c_str()); };
 
 template<>  inline std::string PSCast<std::string, bool>(const bool &val)
             { return val ? "true" : "false"; };
 template<>  inline std::string PSCast<std::string, int>(const int &val)
-            { char t[64]; sprintf(t, "%d", val); return t; };
+            { char t[64]; std::sprintf(t, "%d", val); return t; };
 template<>  inline std::string PSCast<std::string, double>(const double &val)
-            { char t[64]; sprintf(t, "%lf", val); return t; };
+            { char t[64]; std::sprintf(t, "%lf", val); return t; };
 
 
 /*
@@ -460,11 +460,11 @@ inline bool PSTestBool(const std::string &s, bool *v) {
 };
 
 inline bool PSTestInt(const std::string &s, int *v) {
-	return s.find('.')==std::string::npos && sscanf(s.c_str(), "%d", v) == 1;
+	return s.find('.')==std::string::npos && std::sscanf(s.c_str(), "%d", v) == 1;
 };
 
 inline  bool PSTestDouble(const std::string &s, double *v) {
-	return s.find('.')!=std::string::npos && sscanf(s.c_str(), "%lf", v) == 1;
+	return s.find('.')!=std::string::npos && std::sscanf(s.c_str(), "%lf", v) == 1;
 };
 
 inline std::string addDot(double d)

@@ -343,59 +343,63 @@ namespace Koala
 
     }
 
-// Kontener udajacy AssocArray np. dla kluczy nie wspolpracujacych z tym kontenerem. Uzywa dodatkowego
-// wewnetrznego kontenera typu AssocCont (mapa: Klucz->int). Nie oferuje automatycznego wypisywania kluczy bedacych
-// wskaznikami na znikajace obiekty. Chyba jedyne sensowne zastosowanie, to wykorzystanie jako IndexContainer
-// w ponizszejh AssocMatrix w sytuacji, gdy jej klucz nie obsluguje AssocArray
+    namespace Privates {
 
-// TODO: sprawdzic, czy ponizsza AssocMatrix nadal dziala wyposazona w indeks tego typu
-template< class Klucz, class Elem, class AssocCont, class Container =
-    std::vector< typename AssocArrayInternalTypes< Klucz,Elem >::BlockType > > class PseudoAssocArray:
-        public Privates::AssocTabTag< Klucz >
-    {
-      protected:
-        mutable Privates::BlockList< BlockOfAssocArray< Klucz,Elem >,Container > tab;
-        AssocCont assocTab;
+    // Kontener udajacy AssocArray np. dla kluczy nie wspolpracujacych z tym kontenerem. Uzywa dodatkowego
+    // wewnetrznego kontenera typu AssocCont (mapa: Klucz->int). Nie oferuje automatycznego wypisywania kluczy bedacych
+    // wskaznikami na znikajace obiekty. Chyba jedyne sensowne zastosowanie, to wykorzystanie jako IndexContainer
+    // w ponizszejh AssocMatrix w sytuacji, gdy jej klucz nie obsluguje AssocArray
 
-      public:
-        typedef Klucz KeyType;
-        typedef Elem ValType;
+    // TODO: sprawdzic, czy ponizsza AssocMatrix nadal dziala wyposazona w indeks tego typu
+    template< class Klucz, class Elem, class AssocCont, class Container =
+        std::vector< typename AssocArrayInternalTypes< Klucz,Elem >::BlockType > > class PseudoAssocArray:
+            public Privates::AssocTabTag< Klucz >
+        {
+          protected:
+            mutable Privates::BlockList< BlockOfAssocArray< Klucz,Elem >,Container > tab;
+            AssocCont assocTab;
 
-        typedef Container ContainerType;
-        typedef AssocCont AssocContainerType;
+          public:
+            typedef Klucz KeyType;
+            typedef Elem ValType;
 
-        PseudoAssocArray( int asize = 0, void *p = 0 ): tab( asize ), assocTab( asize ) { }
+            typedef Container ContainerType;
+            typedef AssocCont AssocContainerType;
 
-        template< class AssocCont2 >
-            PseudoAssocArray< Klucz,Elem,AssocCont,Container > &operator=( const AssocCont2 &arg );
-        int size() const
-            { return tab.size(); }
-        bool empty() const
-            { return tab.empty(); }
-        bool operator!() const
-            { return empty(); }
-        void reserve( int arg );
-        int capacity() const
-            { return tab.capacity(); }
-        bool hasKey( Klucz v ) const
-            { return keyPos( v ) != -1; }
-        Elem *valPtr( Klucz v );
-        int keyPos( Klucz ) const;
-        bool delKey( Klucz );
-        Klucz firstKey() const;
-        Klucz lastKey() const;
-        Klucz nextKey( Klucz ) const;
-        Klucz prevKey( Klucz ) const;
-        Elem &operator[]( Klucz );
-        Elem operator[]( Klucz ) const;
-        void defrag();
-        void clear();
+            PseudoAssocArray( int asize = 0, void *p = 0 ): tab( asize ), assocTab( asize ) { }
 
-        template< class Iterator > int getKeys( Iterator ) const;
+            template< class AssocCont2 >
+                PseudoAssocArray< Klucz,Elem,AssocCont,Container > &operator=( const AssocCont2 &arg );
+            int size() const
+                { return tab.size(); }
+            bool empty() const
+                { return tab.empty(); }
+            bool operator!() const
+                { return empty(); }
+            void reserve( int arg );
+            int capacity() const
+                { return tab.capacity(); }
+            bool hasKey( Klucz v ) const
+                { return keyPos( v ) != -1; }
+            Elem *valPtr( Klucz v );
+            int keyPos( Klucz ) const;
+            bool delKey( Klucz );
+            Klucz firstKey() const;
+            Klucz lastKey() const;
+            Klucz nextKey( Klucz ) const;
+            Klucz prevKey( Klucz ) const;
+            Elem &operator[]( Klucz );
+            Elem operator[]( Klucz ) const;
+            void defrag();
+            void clear();
 
-        ~PseudoAssocArray()
-            { clear(); }
-    };
+            template< class Iterator > int getKeys( Iterator ) const;
+
+            ~PseudoAssocArray()
+                { clear(); }
+        };
+
+    }
 
     // Typy pomocnicze 2-wymiarowych tablic asocjacyjnych (oba wymiary tego samego typu)
     enum AssocMatrixType
@@ -726,7 +730,7 @@ template< class Klucz, class Elem, class AssocCont, class Container =
         { return Privates::printAssoc( out,cont ); }
 
     template< typename K, typename V, typename A, typename C >
-        std::ostream &operator<<( std::ostream &out, const PseudoAssocArray< K,V,A,C > & cont )
+        std::ostream &operator<<( std::ostream &out, const Privates::PseudoAssocArray< K,V,A,C > & cont )
         { return Privates::printAssoc( out,cont ); }
 
     template< class Klucz, class Elem, AssocMatrixType aType, class C, class IC >

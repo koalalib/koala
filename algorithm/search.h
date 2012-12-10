@@ -47,10 +47,12 @@ namespace Koala
             typedef std::back_insert_iterator< std::vector< typename Graph::PEdge > > EdgeIterType;
             typedef std::back_insert_iterator< std::vector< typename Graph::PVertex > > VertIterType;
 
-            OutPathTool() { clear(); }
+            OutPathTool()
+                { clear(); }
             void clear();
             // dlugosc wpisanej sciezki, -1 w razie bledu (jeszcze zadnej nie wpisano)
-            int length() const { return verts.size() - 1; }
+            int length() const
+                { return verts.size() - 1; }
             // i-ta krawedz
             PEdge edge( int i ) const;
             // i-ta wierzcholek
@@ -147,7 +149,9 @@ namespace Koala
         template< class T, class InputIter, class CIter, class IntIter, class ElemIter >
             static int revCompStore( InputIter begin, const T *sbegin, int size, CompStore< CIter,IntIter > out,
                 ElemIter eout )
-            { return revCompStore< T,InputIter,const T *,CIter,IntIter,ElemIter >( begin,sbegin,size,out,eout ); }
+            {
+                return revCompStore< T,InputIter,const T *,CIter,IntIter,ElemIter >( begin,sbegin,size,out,eout );
+            }
 
         //        CompStore moze wspolpracowac z dowolnymi sekwencyjnymi kontenerami, ale ponizsza struktura
         //        ulatwia obrobke takich danych
@@ -254,9 +258,12 @@ namespace Koala
      * template< class GraphType >
      * bool endComponent(const GraphType &g, unsigned compid);
      * where g is the visited graph and compid is the component number (starting from 0)
-     * return values are ignored (TODO: u¿yæ albo zmieniæ na void)
+     * return values are ignored
+     * TODO: uzyc albo zmienic na void
      *
      */
+     //TODO: vizytory nie powinny zakladac, ze dostaja rekord VisitVertLabs< GraphType > tylko cokolwiek o takiej
+     //strukturze tzn. dodac parametr szablonu. To samo dotyczy implementacji konkretnych przeszukiwan
     class Visitors: public SearchStructs
     {
       public:
@@ -524,6 +531,8 @@ namespace Koala
 
       public:
         typedef SearchImpl SearchStrategy;
+
+        //TODO: przeszukiwania powinny dzialac na lokalnej mapie i pozwalac na blackHole - mniej przeciazen
 
         /** visit all vertices in a graph tj. w kolejnosci zgodnej ze strategia SearchImpl
          * @param[in] g graph containing vertices to visit
@@ -1067,6 +1076,14 @@ namespace Koala
             // ten wierzcholek (jego pozostale bloki wystepuja kolejno za nim)
             VertData( int b = 0, int f = -1 ): blockNo( b ), firstBlock( f )
                 { }
+
+            template <class T> void copy(T& arg) const
+            {
+                arg.blockNo=blockNo;
+                arg.firstBlock=firstBlock;
+            }
+            void copy(BlackHole&) const
+                { }
         };
 
         /** split graph into blocks
@@ -1140,20 +1157,22 @@ namespace Koala
         // (NULL,NULL) w przciwnym razie
         template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
             ends( const GraphType &g )
-            { std::pair< typename GraphType::PVertex, typename GraphType::PVertex > res;
-	      _ends( g,EdUndir | EdLoop, res.first,res.second );
-	      return res;
-	    }
+            {
+                std::pair< typename GraphType::PVertex, typename GraphType::PVertex > res;
+                _ends( g,EdUndir | EdLoop, res.first,res.second );
+                return res;
+            }
 
         // para zawierajaca 2 razy ten sam wierzcholek - jesli graf ma skierowany cykl Eulera
         // para zawierajaca 2 rozne wierzcholki - konce skierowanej sciezki Eulera - jesli ta istnieje
         // (NULL,NULL) w przciwnym razie
         template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
             dirEnds( const GraphType &g )
-            { std::pair< typename GraphType::PVertex, typename GraphType::PVertex > res;
-	      _ends( g,EdUndir | EdLoop, res.first,res.second );
-	      return res;
-	    }
+            {
+                std::pair< typename GraphType::PVertex, typename GraphType::PVertex > res;
+                _ends( g,EdUndir | EdLoop, res.first,res.second );
+                return res;
+            }
 
         /** test if graph has an undirected Eulerian cycle
         * @param[in] g graph
