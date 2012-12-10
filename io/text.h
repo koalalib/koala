@@ -157,21 +157,49 @@ public:
 
 class EmptyMap2 {
 public:
-    template <class T>
-        bool hasKey(T) const { return false; }
-    template <class T>
-        int &operator[](T)	const { return m_dummy; };
+	template <class T>
+		bool hasKey(T) const { return false; }
+	template <class T>
+		int &operator[](T)	const { return m_dummy; };
 	mutable int m_dummy;
 	};
 
 }
 
-
+/** \brief Read graph from stream.
+ *
+ *  The template method reads graph from text in a given format.
+ *  \param g	- graph to read to (not be cleared before reading).
+ *  \param s	- std::stream with encoded graph.
+ *  \param format	- RG_Format, see \ref DMiotxtformat.
+ *  \param vertexMap	- a place to store selected vertices (<output-id>->PVertex), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \param edgeMap	- place to store selected edges (<output-id>->PEdge), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \return true if graph is properly read.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, std::istream &s, int format,
 		   VMap &vertexMap, EMap &edgeMap);
 
-
+/** \brief Read graph from string.
+ *
+ *  The template method reads graph from text in a given format.
+ *  \param g	- graph to read to (not be cleared before reading).
+ *  \param s	- std::string with encoded graph.
+ *  \param format	- RG_Format, see \ref DMiotxtformat.
+ *  \param vertexMap	- a place to store selected vertices (<output-id>->PVertex), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \param edgeMap	- place to store selected edges (<output-id>->PEdge), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \return true if graph is properly read.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, const std::string &desc, int format,
 		   VMap &vertexMap, EMap &edgeMap) {
@@ -180,7 +208,21 @@ bool readGraphText(Graph &g, const std::string &desc, int format,
 	return readGraphText(g, s, format, vertexMap, edgeMap);
 	};
 
-
+/** \brief Read graph from table of chars.
+ *
+ *  The template method reads graph from text in a given format.
+ *  \param g	- graph to read to (not be cleared before reading).
+ *  \param s	- table of chars with encoded graph.
+ *  \param format	- RG_Format, see \ref DMiotxtformat.
+ *  \param vertexMap	- a place to store selected vertices (<output-id>->PVertex), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \param edgeMap	- place to store selected edges (<output-id>->PEdge), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \return true if graph is properly read.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, const char *desc, int format,
 		   VMap &vertexMap, EMap &edgeMap) {
@@ -189,7 +231,17 @@ bool readGraphText(Graph &g, const char *desc, int format,
 	return readGraphText(g, s, format, vertexMap, edgeMap);
 	};
 
-
+/** \brief Read graph from stream.
+ *
+ *  The template method reads graph from text in a given format.
+ *  \param g	- graph to read to (not be cleared before reading).
+ *  \param s	- std::stream with encoded graph.
+ *  \param format	- RG_Format, see \ref DMiotxtformat.
+ *  \return true if graph is properly read.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph>
 bool readGraphText(Graph &g, std::istream &s, int format) {
 	Privates::EmptyMap<typename Graph::PVertex> tv;
@@ -197,7 +249,17 @@ bool readGraphText(Graph &g, std::istream &s, int format) {
 	return readGraphText(g, s, format, tv, te);
 	};
 
-
+/** \brief Read graph from string.
+ *
+ *  The template method reads graph from text in a given format.
+ *  \param g	- graph to read to (not be cleared before reading).
+ *  \param s	- std::string with encoded graph.
+ *  \param format	- RG_Format, see \ref DMiotxtformat.
+ *  \return true if graph is properly read.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph>
 bool readGraphText(Graph &g, const std::string &desc, int format) {
 	std::istringstream s;
@@ -205,7 +267,17 @@ bool readGraphText(Graph &g, const std::string &desc, int format) {
 	return readGraphText(g, s, format);
 	};
 
-
+/** \brief Read graph from table of chars.
+ *
+ *  The template method reads graph from text in a given format.
+ *  \param g	- graph to read to (not be cleared before reading).
+ *  \param s	- table of chars with encoded graph.
+ *  \param format	- RG_Format, see \ref DMiotxtformat.
+ *  \return true if graph is properly read.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph>
 bool readGraphText(Graph &g, const char *desc, int format) {
 	std::istringstream s;
@@ -213,21 +285,61 @@ bool readGraphText(Graph &g, const char *desc, int format) {
 	return readGraphText(g, s, format);
 	};
 
-
+/** \brief Write graph as text to std::ostream.
+ *
+ *  The method writes graph in a given format (RG_*) to text.
+ *  \param graph	- graph to write
+ *  \param out - output buffer (std::ostream)
+ *  \param format	- see \ref DMiotxtformat.
+ *  \param vertexMap	- a place with stored selected vertices (<output-id>->PVertex), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \param edgeMap	- place with stored selected edges (<output-id>->PEdge), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \return true if everything worked as planed.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vmap,const EMap& emap);
 
+/** \brief Write graph as text to std::ostream.
+ *
+ *  The method writes graph in a given format (RG_*) to text.
+ *  \param graph	- graph to write
+ *  \param out - output buffer (std::ostream)
+ *  \param format	- see \ref DMiotxtformat.
+ *  \return true if everything worked as planed.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph>
 bool writeGraphText(const Graph &g, std::ostream &out, int format)
 {
-    Privates::EmptyMap2 em;
-    return writeGraphText(g,out,format,em,em);
+	Privates::EmptyMap2 em;
+	return writeGraphText(g,out,format,em,em);
 }
 
 
+/** \brief Write graph as text to std::string.
+ *
+ *  The method writes graph in a given format (RG_*) to text.
+ *  \param graph	- graph to write
+ *  \param out - output buffer (std::string)
+ *  \param format	- see \ref DMiotxtformat.
+ *  \param vmap	- a place with stored selected vertices (<output-id>->PVertex), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \param emap	- place with stored selected edges (<output-id>->PEdge), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \return true if everything worked as planed.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::string &out, int format,
-                    const VMap& vmap,const EMap& emap) {
+					const VMap& vmap,const EMap& emap) {
 	bool rv;
 	std::ostringstream s;
 	rv = writeGraphText(g, s, format,vmap,emap);
@@ -235,18 +347,44 @@ bool writeGraphText(const Graph &g, std::string &out, int format,
 	return rv;
 	};
 
-
+/** \brief Write graph as text to std::string.
+ *
+ *  The method writes graph in a given format (RG_*) to text.
+ *  \param graph	- graph to write
+ *  \param out - output buffer (std::string)
+ *  \param format	- see \ref DMiotxtformat.
+ *  \return true if everything worked as planed.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph>
 bool writeGraphText(const Graph &g, std::string &out, int format)
 {
-    Privates::EmptyMap2 em;
-    return writeGraphText(g,out,format,em,em);
+	Privates::EmptyMap2 em;
+	return writeGraphText(g,out,format,em,em);
 
 }
 
+/** \brief Write graph as text to table of chars.
+ *
+ *  The method writes graph in a given format (RG_*) to text.
+ *  \param graph	- graph to write
+ *  \param out - output buffer (table of chars)
+ *  \param maxlength - maximal size of buffer.
+ *  \param format	- see \ref DMiotxtformat.
+ *  \param vertexMap	- a place with stored selected vertices (<output-id>->PVertex), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \param edgeMap	- place with stored selected edges (<output-id>->PEdge), usually
+ *     table or map (need to implement "writable" operator[](unsigned int)
+ *  \return true if everything worked as planed.
+ * \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph,class VMap, class EMap>
 bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int format,
-                    const VMap& vmap,const EMap& emap)
+					const VMap& vmap,const EMap& emap)
 {
 	bool rv;
 	const char *o;
@@ -267,17 +405,29 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int forma
 	return true;
 	};
 
+/** \brief Write graph as text to table of chars.
+ *
+ *  The method writes graph in a given format (RG_*) to text.
+ *  \param graph	- graph to write
+ *  \param out - output buffer (table of chars)
+ *  \param maxlength - maximal size of buffer.
+ *  \param format	- see \ref DMiotxtformat.
+ *  \return true if everything worked as planed.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/text/text.html)
+ */
 template<class Graph>
 bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int format)
 {
-    Privates::EmptyMap2 em;
-    return writeGraphText(g,out,maxlength,format,em,em);
+	Privates::EmptyMap2 em;
+	return writeGraphText(g,out,maxlength,format,em,em);
 }
 
 
 // Wygodna mapa paramterow roznych wlasnosci, przydatna np. jako typ VertexInfo, EdgeInfo grafu
 // wypisywanego/wczytywanego w formatach tekstowych
-
+//DOCUMENT
 enum PSType {
 	PST_NoType = -1,
 	PST_Bool = 0,
@@ -288,37 +438,37 @@ enum PSType {
 
 
 template<class T> inline  bool PSIsType(PSType t)
-            { return false; };
+			{ return false; };
 template<> inline  bool PSIsType<bool>(PSType t)
-            { return t == PST_Bool; };
+			{ return t == PST_Bool; };
 template<>  inline  bool PSIsType<int>(PSType t)
-            { return t == PST_Int; };
+			{ return t == PST_Int; };
 template<>  inline  bool PSIsType<double>(PSType t)
-            { return t == PST_Double; };
+			{ return t == PST_Double; };
 template<>  inline  bool PSIsType<std::string>(PSType t)
-            { return t == PST_String; };
+			{ return t == PST_String; };
 template<>  inline  bool PSIsType<const char *>(PSType t)
-            { return t == PST_String; };
+			{ return t == PST_String; };
 
 template<class T, class V> inline  T PSCast(const V &val)
-            { return val; };
+			{ return val; };
 
 template<>  inline bool PSCast<bool, std::string>(const std::string &val)
-            { return val == "true" || val == "TRUE" || val == "True"; };
+			{ return val == "true" || val == "TRUE" || val == "True"; };
 template<>  inline  int PSCast<int, std::string>(const std::string &val)
-            { return std::atoi(val.c_str()); };
+			{ return std::atoi(val.c_str()); };
 template<>  inline  double PSCast<double, std::string>(const std::string &val)
-            { return std::atof(val.c_str()); };
+			{ return std::atof(val.c_str()); };
 
 template<>  inline std::string PSCast<std::string, bool>(const bool &val)
-            { return val ? "true" : "false"; };
+			{ return val ? "true" : "false"; };
 template<>  inline std::string PSCast<std::string, int>(const int &val)
-            { char t[64]; std::sprintf(t, "%d", val); return t; };
+			{ char t[64]; std::sprintf(t, "%d", val); return t; };
 template<>  inline std::string PSCast<std::string, double>(const double &val)
-            { char t[64]; std::sprintf(t, "%lf", val); return t; };
+			{ char t[64]; std::sprintf(t, "%lf", val); return t; };
 
 
-/*
+/* DOCUMENT
  * ParSet
  */
 class ParSet {
@@ -351,50 +501,50 @@ public:
 		return PSIsType<T>(it->second.first);
 		};
 	bool isBool(const std::string &k)	const
-            { return is<bool>(k); };
+			{ return is<bool>(k); };
 	bool isInt(const std::string &k)	const
-            { return is<int>(k); };
+			{ return is<int>(k); };
 	bool isDouble(const std::string &k)	const
-            { return is<double>(k); };
+			{ return is<double>(k); };
 	bool isString(const std::string &k)	const
-            { return is<std::string>(k); };
+			{ return is<std::string>(k); };
 
 	PSType getType(const std::string &k) const {
 		const_iterator it;
 		it = m_params.find(k);
 		if(it == m_params.end()) return PST_NoType;
 		return it->second.first;
-    };
+	};
 
 	ParSet &set(const std::string &k, bool v) {
 		m_params[k].first = PST_Bool;
 		m_params[k].second.bval = v;
 		return *this;
-    };
+	};
 
 	ParSet &set(const std::string &k, int v) {
 		m_params[k].first = PST_Int;
 		m_params[k].second.ival = v;
 		return *this;
-    };
+	};
 
 	ParSet &set(const std::string &k, double v) {
 		m_params[k].first = PST_Double;
 		m_params[k].second.dval = v;
 		return *this;
-    };
+	};
 
 	ParSet &set(const std::string &k, const std::string &v) {
 		m_params[k].first = PST_String;
 		m_params[k].second.sval = v;
 		return *this;
-    };
+	};
 
 	ParSet &set(const std::string &k, const char *v) {
 		m_params[k].first = PST_String;
 		m_params[k].second.sval = v;
 		return *this;
-    };
+	};
 
 	template<class T>
 	T get(const std::string &k, const T &def = T()) const {
@@ -409,37 +559,37 @@ public:
 			default : assert(0);
 			};
 		return def;
-    };
+	};
 
 	bool getBool(const std::string &k, bool def = false) const
 			{ return get<bool>(k, def); };
 	int getInt(const std::string &k, int def = 0) const
-            { return get<int>(k, def); };
+			{ return get<int>(k, def); };
 	double getDouble(const std::string &k, double def = 0) const
 			{ return get<double>(k, def); };
 	std::string getString(const std::string &k, const std::string &def = "") const
-            { return get<std::string>(k, def); };
+			{ return get<std::string>(k, def); };
 
 	void del(const std::string &p)
-            { m_params.erase(p); };
+			{ m_params.erase(p); };
 
 	void getKeys(std::vector<std::string> &keys) const {
 		const_iterator it;
 		for(it = m_params.begin(); it != m_params.end(); ++it)
 			keys.push_back(it->first);
-    };
+	};
 
-    void clear()
-    {   m_params.clear();   }
+	void clear()
+	{   m_params.clear();   }
 
-    int size() const
-    {   return m_params.size(); }
+	int size() const
+	{   return m_params.size(); }
 
-    bool empty() const
-    {   return this->size()==0; }
+	bool empty() const
+	{   return this->size()==0; }
 
-    bool operator!() const
-    {   return this->size()==0; }
+	bool operator!() const
+	{   return this->size()==0; }
 
 	friend std::istream &operator >>(std::istream &sin, ParSet &p);
 	friend std::ostream &operator <<(std::ostream &sout, const ParSet &p);
@@ -469,10 +619,10 @@ inline  bool PSTestDouble(const std::string &s, double *v) {
 
 inline std::string addDot(double d)
 {
-    std::stringstream s (std::stringstream::in | std::stringstream::out);
-    s << d;
-    if (s.str().find('.')==std::string::npos) return s.str()+std::string(".0");
-    else return s.str();
+	std::stringstream s (std::stringstream::in | std::stringstream::out);
+	s << d;
+	if (s.str().find('.')==std::string::npos) return s.str()+std::string(".0");
+	else return s.str();
 }
 
 }

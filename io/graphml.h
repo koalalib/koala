@@ -3,7 +3,7 @@
 
 /* ------------------------------------------------------------------------- *
  * graphml.h
- *
+ * Class for handling GraphML format. http://graphml.graphdrawing.org/
  * ------------------------------------------------------------------------- */
 
 #include "../graph/graph.h"
@@ -27,77 +27,384 @@ class GraphMLGraph;
 class GraphMLKeysRead;
 class GraphMLKeysWrite;
 
+/** \brief Defines [GraphML](http://graphml.graphdrawing.org/)
+ *  [key type](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
+ *  and [keys for](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='...'").
+*/
 struct GraphMLKeyTypes {
+	/** \brief Define value of [GraphML type](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'").
+	*/
 	enum Type { NotDefined, Bool, Int, Long, Float, Double, String };
+	/** \brief Define [place](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='...'")
+	 *  where value can be putted.
+	 */
 	enum ForKey { Unknown, All, GraphML, Graph, Node, Edge };
 };
 
+/** \brief GraphML sequence of graphs.
+ *
+ *  The class provides a set of methods to manage [GraphML format](http://graphml.graphdrawing.org/).
+ *  \ingroup DMiographml */
 class GraphML {
 	friend class GraphMLGraph;
 	friend class GraphMLKeysRead;
 	friend class GraphMLKeysWrite;
 public:
+	/** \brief Constructor.
+	 *
+	 *  Create empty GraphML object. */
 	GraphML();
 	~GraphML();
 
 	//use this method to create new GraphML structure
+	/** \brief Clear.
+	 *
+	 *  Clear current GraphML object. */
 	void clearGraphML();
 
-	int graphNo(); //number of graphs in GraphML structure
-	std::string getGraphName(int);
-	int getGraphNo(const char *name); //get graph number, -1 if there is no graph with id==name
-	bool isGraphName(const char *name); //test if there is a graph with id==name
-	//createGraph: get graph named name or create one if there is no in GraphML
-	// the new graph is set at the end of GraphML
-	GraphMLGraph* createGraph(const char *name);
-	GraphMLGraph* getGraph(const char *name); //is there is no graph with id==name then it returns NULL
-	GraphMLGraph* getGraph(int n); //nth graph
-	bool deleteGraph(const char *graphName);
+	//GraphML read/write
+	/** \brief Read from file.
+	 *
+	 *  The method reads the [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
+	 *  from the file to the current GraphML object.
+	 *  \param fileName the name of read file.
+	 *  \return true if file was successfully read, false if any error occur.
+	 *
+	 *  [See example](examples/text/graphml.html).
+	 */
+	bool readFile( const char *fileName );
+	/** \brief Write to file.
+	 *
+	 *  The method writes the current [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
+	 *  to a file.
+	 *  \param fileName the name of written file.
+	 *  \return true if file was successfully written, false otherwise.
+	 *
+	 *  [See example](examples/text/graphml.html).
+	 */
+	bool writeFile( const char *fileName );
 
-	//faster way to read/write graph than getGraph, readGraph/writeGraph (GraphMLGraph)
+	/** \brief Read from C string.
+	 *
+	 *  The method reads the [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
+	 *  from C string to the current GraphML object.
+	 *  \param str the pointer to C string.
+	 *  \return true if string was successfully read, false otherwise.*/
+	bool readString(const char *str);
+	/** \brief Read from string.
+	 *
+	 *  The method reads the [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
+	 *  from string to the current GraphML object.
+	 *  \param str the read string.
+	 *  \return true if string was successfully read, false otherwise.*/
+	bool readString(const std::string &str);
+	/** \brief Write to C string
+	 *
+	 *  The method writes the current GraphML object to a C string.
+	 *  \param str the pointer to written C string.
+	 *  \param maxlen the maximal length of the string (size of char table).
+	 *  \return the number of written chars.*/
+	int writeString(char *str, int maxlen);
+	/** \brief Write to string.
+	 *
+	 *  The method writes the current GraphML object to string and returns it.
+	 *  \return the string with [GraphML](http://graphml.graphdrawing.org/primer/graphml-primer.html).*/
+	std::string writeString();
+
+	/** \brief Get number of graphs
+	 *
+	 *  The method gets the number of graphs in the current GraphML object.*/
+	int graphNo();
+
+	/** \brief Get i-th graph name.
+	 *
+	 *  The method gets and returns the [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>")
+	 *  of i-th (starting with 0) graph in the
+	 *  [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
+	 *  kept in current object.
+	 *  \return the string with the name of i-th graph.*/
+	std::string getGraphName(int i);
+
+	/** \brief Get graph number.
+	 *
+	 *  The method gets the index of the graph with
+	 *  [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>")
+	 *  in the the current GraphML object.
+	 *  \param name the name of checked graph.
+	 *  \return the index number of the graph with proper
+	 *  [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>")
+	 *  of -1 if the is no such graph.*/
+	int getGraphNo(const char *name);
+	/** \brief Test graph name.
+	 *
+	 *  The method tests if the graph with
+	 *  [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>")
+	 *  exists in the the current GraphML object.
+	 *  \param name the tested name.
+	 *  \return true if there exist a graph with proper
+	 *  [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>"),
+	 *  false otherwise.*/
+	bool isGraphName(const char *name);
+	/** \brief Create graph named \a name.
+	 *
+	 *  The method gets a [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>")
+	 *  with proper [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>")
+	 *  or create new if there was no such graph.
+	 *  \param name the name of searched graph.
+	 *  \return the pointer to GraphMLGraph object with the name \a name.
+	 *
+	 *  [See example](examples/text/graphml.html).
+	 */
+	GraphMLGraph* createGraph(const char *name);
+	/** \brief Get graph named \a name.
+	 *
+	 *  The method gets a [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>")
+	 *  with proper [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>").
+	 *  If there was no such graph, NULL is returned.
+	 *  \param name the name of searched graph.
+	 *  \return the pointer to GraphMLGraph object with the name \a name, or NULL if there is no such graph.*/
+	GraphMLGraph* getGraph(const char *name); //is there is no graph with id==name then it returns NULL
+	/** \brief Get n-th graph.
+	 *
+	 *  The method gets the n-th [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>").
+	 *  If there was no such graph, NULL is returned.
+	 *  \param n the index of searched graph.
+	 *  \return the pointer to GraphMLGraph object with the name \a name, or NULL if there is no such graph.
+	 *
+	 *  [See example](examples/text/graphml.html).
+	 */
+	GraphMLGraph* getGraph(int n); //get nth graph
+	/** \brief Delete graph named \a name.
+	 *
+	 *  The method deletes the [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>")
+	 *  with proper [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>").
+	 *  If there was no such graph, false is returned.
+	 *  \param name the name of deleted graph.
+	 *  \return true if graph is deleted, false if there was no such graph.*/
+	bool deleteGraph(const char *name);
+
+	/** \brief Read graph.
+	 *
+	 *  The method reads graph with proper
+	 *  [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>")
+	 *  and adds it directly to the graph.\n
+	 *  It is shortes version of \code{.cpp}
+	 *  GraphML gml;
+	 *  GraphMLGraph *gmlg = gml.getGraph(name);
+	 *  gmlg->readGraph(graph);\endcode
+	 *  \param graph the target graph object.
+	 *  \param name the name of read graph.
+	 *  \return true if graph was successfully read, false otherwise.
+	 *
+	 *  [See example](examples/text/graphml.html).
+	 */
 	template< class Graph >
 	bool readGraph( Graph &graph, const char *name);
+
+	/** \brief Read graph.
+	 *
+	 *  The method reads graph with proper
+	 *  [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>")
+	 *  and adds it directly to the graph.\n
+	 *  It is shortes version of \code{.cpp}
+	 *  GraphML gml;
+	 *  GraphMLGraph *gmlg = gml.getGraph(name);
+	 *  gmlg->readGraph(graph, infoVert, infoEdge);\endcode
+	 *  \param graph the target graph object.
+	 *  \param infoVertex the object function that generates vertices info, functor should take pointer to GraphMLKeysRead as a parameter.
+	 *  \param infoEdge the object function that generates edges info, functor should take pointer to GraphMLKeysRead as a parameter.
+	 *  \param name the name of read graph.
+	 *  \return true if graph was successfully read, false otherwise.*/
 	template<typename Graph, typename InfoVertex, typename InfoEdge>
 	bool readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdge, const char *name);
+
+	/** \brief Write graph.
+	 *
+	 *  The method writes the graph to
+	 *  [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>")
+	 *  with proper [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>").
+	 *  If in GraphML exists graph named \a name then it will be overwritten.
+	 *  It is shortes version of \code{.cpp}
+	 *  GraphML gml;
+	 *  GraphMLGraph *gmlg = gml.createGraph(name);
+	 *  gmlg->writeGraph(graph);\endcode
+	 *  \param graph the considered graph.
+	 *  \param name the name of written graph.
+	 *  \return true if graph was successfully written, false otherwise.
+	 *
+	 *  [See example](examples/text/graphml.html).
+	 */
 	template< class Graph >
 	bool writeGraph(const Graph &graph, const char *name); //@return false if there is no graph named name
 	template<typename Graph, typename InfoVertex, typename InfoEdge>
+
+	/** \brief Write graph.
+	 *
+	 *  The method writes the graph to
+	 *  [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>")
+	 *  with proper [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>").
+	 *  If in GraphML exists graph named \a name then it will be overwritten.
+	 *  It is shortes version of \code{.cpp}
+	 *  GraphML gml;
+	 *  GraphMLGraph *gmlg = gml.createGraph(name);
+	 *  gmlg->writeGraph(graph, infoVert, infoEdge);\endcode
+	 *  \param graph the considered graph.
+	 *  \param infoVertex the object function that generates vertices info, functor should take pointer to vertex and pointer to GraphMLKeysWrite as a parameters.
+	 *  \param infoEdge the object function that generates edges info, functor should take pointer to edge and pointer to GraphMLKeysWrite as a parameters.
+	 *  \param name the name of written graph.
+	 *  \return true if graph was successfully written, false otherwise.*/
 	bool writeGraph(const Graph &graph, InfoVertex infoVert, InfoEdge infoEdge, const char *name);
 
+	/** \brief Get [key type](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
+	 *  ( NotDefined, Bool, Int, Long, Float, Double, String)*/
 	GraphMLKeyTypes::Type getKeyType(const char *name);
+	/** \brief Get [key for](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='...'")
+	 *  (Unknown, All, GraphML, Graph, Node, Edge)*/
 	GraphMLKeyTypes::ForKey getKeyFor(const char *name);
 
-	//return all defined keys for GraphML or All
-	//res is a map : string->GraphMLKeyTypes::Type
+	/** \brief  Get all keys.
+	 *
+	 *  The method gets all the keys for [GraphML](GraphMLKeyTypes::ForKey) or [All]((GraphMLKeyTypes::ForKey).
+	 *  and writes them down to the associative container \a res (key name -> type of the key).
+	 *  \param res the target associative container with keys.*/
 	template <class AssocCont> void getKeys(AssocCont& res);
-	//reading and writing graphML properties
+
+	/** \brief Set boolean value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graphml] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graphml'")
+	 *  with the type [boolean](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='boolean'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setBool(const char *name, bool val);
+	/** \brief Set integer value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graphml] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graphml'")
+	 *  with the type [int](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='int'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setInt(const char *name, int val);
+	/** \brief Set long value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graphml] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graphml'")
+	 *  with the type [long](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='long'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setLong(const char *name, int64_t val);
+	/** \brief Set double value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graphml] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graphml'")
+	 *  with the type [double](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='double'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setDouble(const char *name, double val);
+	/** \brief Set string value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graphml] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graphml'")
+	 *  with the type [string](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='string'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setString(const char *name, const char *val);
+	/** \brief Set string value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graphml] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graphml'")
+	 *  with the type [string](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='string'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setString(const char *name, const std::string &val);
 
+	/** \brief Test existence of value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  \param name the name of tested key.
+	 *  \return true if there exists a value \a name, false otherwise.*/
 	bool isValue(const char *name); //check if value is set
+
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked value.
+	 *  \return the value associated with key \a name.*/
 	bool getBool(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	int getInt(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	int64_t getLong(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	double getDouble(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	std::string getString(const char *name);
 
-	//key type modifications
+	//--------key type modifications-----------
+	/** \brief Delete key.
+	 *
+	 *  \return true if the key was deleted, false if there wasn't any.*/
 	bool delKeyGlobal(const char *name);
+	/** \brief Set attr.name for key.
+	 *
+	 *  The method sets the [attr.name](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.name='...'")
+	 *  of the [key name](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key id='...'").
+	 *  \param name the considered key.
+	 *  \param attrName the name for attr.name.
+	 *  \return true if the name was successfully set, false otherwise.*/
 	bool setKeyAttrName(const char *name, const char *attrName);
+
+	/** \brief Get attr.name associated with key.
+	 *
+	 *  The method gets the [attr.name](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.name='...'")
+	 *  of the [key name](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key id='...'").
+	 *  \param name the checked key.
+	 *  \return the string with the attr.name of the key \a name.*/
 	std::string getKeyAttrName(const char *name);
-
-	//GraphML read/write
-	bool readFile( const char *fileName );
-	bool writeFile( const char *fileName );
-
-	bool readString(const char *str);
-	bool readString(const std::string &str);
-	int writeString(char *str, int maxlen);
-	std::string writeString();
 private:
 	template<GraphMLKeyTypes::Type, typename InType>
 	bool set(const char *name, InType val);
@@ -154,21 +461,37 @@ private:
 	NameVals nameVals;
 };
 
-/* ------------------------------------------------------------------------- *
- * GraphMLGraph
+/** \brief %GraphML graph representation.
  *
- * ------------------------------------------------------------------------- */
-
+ *  The class provides a set of methods to manage
+ *  [GraphML graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html#Graph "see <graph").
+ *  \ingroup DMiographml */
 class GraphMLGraph {
 	friend class GraphML;
 public:
+	/** \brief Get name.
+	 *
+	 *  The method gets [the name](http://graphml.graphdrawing.org/primer/graphml-primer.html#Graph "see <graph id='...'")
+	 *  of current graph.
+	 *  \return the string with the name of current graph.*/
 	std::string getName();
 
-	//read from graph to graphml
+	/** \brief Read graph.
+	 *
+	 *  The method converts the current object to graph and adds the result to \a graph.
+	 *  \param graph the changed graph.
+	 *  \return true if graph was properly read. */
 	template<typename Graph>
 	bool readGraph(Graph &graph);
-	//InfoVertex has to have Graph::VertInfoType operator()(GraphMLKeysRead *)
-	//InfoEdge has to have Graph::EdgeInfoType operator()(GraphMLKeysRead *)
+	/** \brief Read graph.
+	 *
+	 *  The method converts the current object to graph and adds the result to \a graph.
+	 *  \param graph the changed graph.
+	 *  \param infoVert the object function converting GraphMLKeysRead object to the vertex info in \a graph.
+	 *  It should overload <tt>Graph::VertInfoType operator()(GraphMLKeysRead *)</tt> (BlackHole possible).
+	 *  \param infoEdge the object function converting GraphMLKeysRead object to the edge info in \a graph.
+	 *   It should overload <tt>Graph::EdgeInfoType operator()(GraphMLKeysRead *)</tt> (BlackHole possible).
+	 *  \return true if graph was properly read.*/
 	template<typename Graph, typename InfoVertex, typename InfoEdge>
 	bool readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdge);
 	template<typename Graph>
@@ -178,11 +501,26 @@ public:
 	template<typename Graph, typename InfoVertex>
 	bool readGraph(Graph &graph, InfoVertex infoVert, BlackHole);
 
-	//write to graph from graphml
+	/** \brief Write graph.
+	 *
+	 *  The method converts the graph to the standard of GraphML and saves in the current object.
+	 *  The previous content if existed is deleted.
+	 *  \param graph the written graph.
+	 *  \return true if graph was successfully written.*/
 	template<typename Graph>
 	bool writeGraph(const Graph &graph);
 	//InfoVertex has to have void operator()(Graph::PVertex, GraphMLKeysWrite *)
-	//InfoEdge has to have void operator()(Graph::PEdge, GraphMLKeysRead *)
+	//InfoEdge has to have void operator()(Graph::PEdge, GraphMLKeysWrite *)
+	/** \brief Write graph.
+	 *
+	 *  The method converts the graph to the standard of GraphML and saves in the current object.
+	 *  The previous content if existed is deleted.
+	 *  \param graph the written graph.
+	 *  \param infoVert the object function converting the vertex info in \a graph to the GraphMLKeysWrite object.
+	 *  It should overload <tt> void operator()(Graph::PVertex, GraphMLKeysWrite *) </tt> (BlackHole possible).
+	 *  \param infoEdge the object function converting the edge info in \a graph to the GraphMLKeysWrite object.
+	 *   It should overload <tt> void operator()(Graph::PEdge, GraphMLKeysWrite *) </tt> (BlackHole possible).
+	 *  \return true if graph was successfully written.*/
 	template<typename Graph, typename InfoVertex, typename InfoEdge>
 	bool writeGraph(const Graph &graph, InfoVertex infoVert, InfoEdge infoEdge);
 	template<typename Graph>
@@ -192,25 +530,130 @@ public:
 	template<typename Graph, typename InfoVertex>
 	bool writeGraph(const Graph &graph, InfoVertex infoVert, BlackHole);
 
+	/** \brief Get key value type (NotDefined, Bool, Int, Long, Float, Double, String).*/
 	GraphMLKeyTypes::Type getKeyType(const char *name);
+	/** \brief Get key value placement (Unknown, All, GraphML, Graph, Node, Edge).*/
 	GraphMLKeyTypes::ForKey getKeyFor(const char *name);
 
-	//return all defined keys for Graph or All
-	//res is a map : string->GraphMLKeyTypes::Type
+	/** \brief  Get all keys.
+	 *
+	 *  The method gets all the keys for [Graph](GraphMLKeyTypes::ForKey) or [All]((GraphMLKeyTypes::ForKey).
+	 *  and writes them down to the associative container res: key name -> type of the key.
+	 *  \param res the target associative container with keys.*/
 	template <class AssocCont> void getKeys(AssocCont& res);
-	//reading and writing graphML properties
+	/** \brief Set boolean value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graph] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graph'")
+	 *  with the type [boolean](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='boolean'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setBool(const char *name, bool val);
+	/** \brief Set integer value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graph] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graph'")
+	 *  with the type [int](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='int'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setInt(const char *name, int val);
+	/** \brief Set long value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graph] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graph'")
+	 *  with the type [long](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='long'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setLong(const char *name, int64_t val);
+	/** \brief Set double value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graph] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graph'")
+	 *  with the type [double](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='double'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setDouble(const char *name, double val);
+	/** \brief Set string value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graph] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graph'")
+	 *  with the type [string](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='string'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setString(const char *name, const char *val);
+	/** \brief Set string value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [graph] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='graph'")
+	 *  with the type [string](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='string'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setString(const char *name, const std::string &val);
 
+	/** \brief Test existence of value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  \param name the name of tested key.
+	 *  \return true if there exists a value \a name, false otherwise.*/
 	bool isValue(const char *name);
+
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	bool getBool(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	int getInt(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	int64_t getLong(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	double getDouble(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	std::string getString(const char *name);
 private:
 	GraphMLGraph();
@@ -230,22 +673,73 @@ private:
 /* ------------------------------------------------------------------------- *
  * GraphMLKeyVal
  *
+ * Keys values - methods for writing and reading values from node and edge.
  * ------------------------------------------------------------------------- */
-
+/** \brief Auxiliary class for reading values for edges and nodes.
+ *
+ * \ingroup DMiographmlA */
 class GraphMLKeysRead {
 	friend class GraphMLGraph;
 public:
+	/** \brief Get [key type](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
+	 *  ( NotDefined, Bool, Int, Long, Float, Double, String)*/
 	GraphMLKeyTypes::Type getKeyType(const char *name);
+	/** \brief Get [key for](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='...'")
+	 *  (Unknown, All, GraphML, Graph, Node, Edge)*/
 	GraphMLKeyTypes::ForKey getKeyFor(const char *name);
 
-	//return all defined keys for this->forKey or All
-	//res is a map : string->GraphMLKeyTypes::Type
+	/** \brief  Get all keys.
+	 *
+	 *  The method gets all the keys for [Node or Edge](GraphMLKeyTypes::ForKey) or [All]((GraphMLKeyTypes::ForKey).
+	 *  and writes them down to the associative container res: key name -> type of the key.
+	 *  \param res the target associative container with keys.*/
 	template <class AssocCont> void getKeys(AssocCont& res);
+
+	/** \brief Test existence of value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  \param name the name of tested key.
+	 *  \return true if there exists a value \a name, false otherwise.*/
 	bool isValue(const char *name);
+
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	bool getBool(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	int getInt(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	int64_t getLong(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	double getDouble(const char *name);
+	/** \brief Get the value of key.
+	 *
+	 *  The method gets the value of the key named \a name for
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
+	 *  \param name the name of checked key.
+	 *  \return the value associated with key \a name.*/
 	std::string getString(const char *name);
 private:
 	template<typename InOutType>
@@ -257,20 +751,103 @@ private:
 	int cnt;
 };
 
+/** \brief Auxiliary class for writing  values to edges and nodes
+ *
+ * \ingroup DMiographmlA */
 class GraphMLKeysWrite {
 	friend class GraphMLGraph;
 public:
+	/** \brief Get [key type](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
+	 *  ( NotDefined, Bool, Int, Long, Float, Double, String)*/
 	GraphMLKeyTypes::Type getKeyType(const char *name);
+	/** \brief Get [key for](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='...'")
+	 *  (Unknown, All, GraphML, Graph, Node, Edge)*/
 	GraphMLKeyTypes::ForKey getKeyFor(const char *name);
 
-	//return all defined keys for this->forKey or All
-	//res is a map : string->GraphMLKeyTypes::Type
+	/** \brief  Get all keys.
+	 *
+	 *  The method gets all the keys for [Node or Edge](GraphMLKeyTypes::ForKey) or [All]((GraphMLKeyTypes::ForKey).
+	 *  and writes them down to the associative container res: key name -> type of the key.
+	 *  \param res the target associative container with keys.*/
 	template <class AssocCont> void getKeys(AssocCont& res);
+
+	/** \brief Set boolean value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [node or edge] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
+	 *  with the type [boolean](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='boolean'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setBool(const char *name, bool val);
+	/** \brief Set integer value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [node or edge] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
+	 *  with the type [integer](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='integer'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setInt(const char *name, int val);
+	/** \brief Set long value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [node or edge] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
+	 *  with the type [long](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='long'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setLong(const char *name, int64_t val);
+	/** \brief Set double value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [node or edge] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
+	 *  with the type [double](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='double'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setDouble(const char *name, double val);
+	/** \brief Set string value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [node or edge] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
+	 *  with the type [string](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='string'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setString(const char *name, const char *val);
+	/** \brief Set string value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
+	 *
+	 *  The method sets the value named \a name with value \a val.
+	 *  If there was no key \a name, then it is created as a key for
+	 *  [node or edge] (http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
+	 *  with the type [string](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='string'").
+	 *  \param name the name of key.
+	 *  \param val the value assigned to key \a name.
+	 *  \return false if the key is not set to
+	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
+	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
+	 *  true otherwise.  */
 	bool setString(const char *name, const std::string &val);
 private:
 	template<GraphMLKeyTypes::Type, typename InType>
@@ -381,8 +958,8 @@ struct GMLStringFieldPlain {
 	}
 	template <class T>
 	void operator()( T vertedge, Koala::IO::GraphMLKeysWrite *gmlkw) {
-	    std::string str;
-	    str+=vertedge->info;
+	   std::string str;
+	   str+=vertedge->info;
 		gmlkw->setString(name.c_str(), str);
 	}
 };
@@ -592,67 +1169,163 @@ struct GMLStringField<Info,unsigned char[N]> : public GMLCharField <Info, char, 
 
 } //namespace Privates
 
-//these function can be used in readGraph/writeGraph as InfoVertex/InfoEdge
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set bool value of graphs InfoVert/InfoEdge to GraphML's value named \a name.
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA */
 Privates::GMLBoolFieldPlain
 gmlBoolField(std::string name) {
 	return Privates::GMLBoolFieldPlain(name);
 }
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set bool value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA */
 template <class Info, class FieldType>
 Privates::GMLBoolField<Info,FieldType>
 gmlBoolField(FieldType Info::*wsk,std::string name) {
 	return Privates::GMLBoolField<Info,FieldType>(wsk,name);
 }
 
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set int value of graphs InfoVert/InfoEdge to GraphML's value named \a name.
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ * \ingroup DMiographmlA */
 Privates::GMLIntFieldPlain
 gmlIntField(std::string name) {
 	return Privates::GMLIntFieldPlain(name);
 }
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set int value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA */
 template <class Info, class FieldType>
 Privates::GMLIntField<Info,FieldType>
 gmlIntField(FieldType Info::*wsk,std::string name) {
 	return Privates::GMLIntField<Info,FieldType>(wsk,name);
 }
 
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set double value of graphs InfoVert/InfoEdge to GraphML's value named \a name.
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ * \ingroup DMiographmlA */
 Privates::GMLDoubleFieldPlain
 gmlDoubleField(std::string name) {
 	return Privates::GMLDoubleFieldPlain(name);
 }
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set double value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA */
 template <class Info, class FieldType>
 Privates::GMLDoubleField<Info,FieldType>
 gmlDoubleField(FieldType Info::*wsk,std::string name) {
 	return Privates::GMLDoubleField<Info,FieldType>(wsk,name);
 }
 
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set long(64-bit) value of graphs InfoVert/InfoEdge to GraphML's value named \a name.
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ * \ingroup DMiographmlA */
 Privates::GMLLongFieldPlain
 gmlLongField(std::string name) {
 	return Privates::GMLLongFieldPlain(name);
 }
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set long(64-bit) value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA */
 template <class Info, class FieldType>
 Privates::GMLLongField<Info,FieldType>
 gmlLongField(FieldType Info::*wsk,std::string name) {
 	return Privates::GMLLongField<Info,FieldType>(wsk,name);
 }
 
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set string value of graphs InfoVert/InfoEdge to GraphML's value named \a name.
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ * \ingroup DMiographmlA */
 Privates::GMLStringFieldPlain
 gmlStringField(std::string name) {
 	return Privates::GMLStringFieldPlain(name);
 }
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set string value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA */
 template <class Info, class FieldType>
 Privates::GMLStringField<Info,FieldType>
 gmlStringField(FieldType Info::*wsk,std::string name) {
 	return Privates::GMLStringField<Info,FieldType>(wsk,name);
 }
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set string value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA */
 template <class Info,int N>
 Privates::GMLStringField<Info,char[N]>
 gmlStringField(char (Info::*wsk)[N],std::string name) {
 	return Privates::GMLStringField<Info,char [N]>(wsk,name);
 }
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *
+ *  Get/set string value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA */
 template <class Info,int N>
 Privates::GMLStringField<Info,unsigned char[N]>
 gmlStringField(unsigned char (Info::*wsk)[N],std::string name) {
 	return Privates::GMLStringField<Info,unsigned char [N]>(wsk,name);
 }
-
 
 /* ------------------------------------------------------------------------- *
  * GraphML

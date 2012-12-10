@@ -9,9 +9,9 @@
 template<class DefaultStructs>
 template<class GraphType,class CList>
 void MatchingPar<DefaultStructs>::BackRec(MatchingData<GraphType> &data,
-					  typename GraphType::PVertex &vert,
-					  bool &st,
-					  CList &path)
+					typename GraphType::PVertex &vert,
+					bool &st,
+					CList &path)
 {
 	typename GraphType::PVertex vert1;
 	CList path1(*path.allocator);
@@ -85,11 +85,11 @@ typename GraphType::PVertex MatchingPar<DefaultStructs>::Backtracking(MatchingDa
 template<class DefaultStructs>
 template<class GraphType,class CList>
 void MatchingPar<DefaultStructs>::Augmentation(MatchingData<GraphType> &data,
-					       JoinableSets<typename GraphType::PVertex> &sets,
-					       CList &pathl,
-					       CList &pathr,
-					       bool &noaugment,
-					       int &expo)
+					JoinableSets<typename GraphType::PVertex> &sets,
+					CList &pathl,
+					CList &pathr,
+					bool &noaugment,
+					int &expo)
 {
 	typename GraphType::PVertex i, j;
 	typename CList::iterator p, q;
@@ -133,11 +133,11 @@ void MatchingPar<DefaultStructs>::Augmentation(MatchingData<GraphType> &data,
 template<class DefaultStructs>
 template<class GraphType,class CList>
 void MatchingPar<DefaultStructs>::Relabel(MatchingData<GraphType> &data,
-					  JoinableSets<typename GraphType::PVertex> &sets,
-					  typename CList::iterator start,
-					  CList &path,
-					  SimpleQueue<typename GraphType::PVertex> &q,
-					  CList &otherPath)
+					JoinableSets<typename GraphType::PVertex> &sets,
+					typename CList::iterator start,
+					CList &path,
+					SimpleQueue<typename GraphType::PVertex> &q,
+					CList &otherPath)
 {
 	typename CList::iterator p, s, s1, s2, s3;
 	typename GraphType::PVertex v, v1;
@@ -187,9 +187,9 @@ void MatchingPar<DefaultStructs>::Relabel(MatchingData<GraphType> &data,
 template<class DefaultStructs>
 template<class PVERT,class CListIterator>
 void MatchingPar<DefaultStructs>::BaseChange(JoinableSets<PVERT> &sets,
-					     typename JoinableSets<PVERT>::Repr &base,
-					     CListIterator e1,
-					     CListIterator e2)
+					typename JoinableSets<PVERT>::Repr &base,
+					CListIterator e1,
+					CListIterator e2)
 {
 	CListIterator s;
 	typename JoinableSets<PVERT>::Repr bel;
@@ -200,16 +200,16 @@ void MatchingPar<DefaultStructs>::BaseChange(JoinableSets<PVERT> &sets,
 			bel = sets.getSetId(*s);
 			if(bel != base) base = sets.join(base, bel);
 		} while(s != e2);
-    };
+	};
 };
 
 template<class DefaultStructs>
 template<class GraphType,class CList>
 void MatchingPar<DefaultStructs>::Blossoming(MatchingData<GraphType> &data,
-					     JoinableSets<typename GraphType::PVertex> &sets,
-					     CList &pathl,
-					     CList &pathr,
-					     SimpleQueue<typename GraphType::PVertex> &q)
+						JoinableSets<typename GraphType::PVertex> &sets,
+						CList &pathl,
+						CList &pathr,
+						SimpleQueue<typename GraphType::PVertex> &q)
 {
 	typename CList::iterator p, pp;
 	typename GraphType::PVertex i, j;
@@ -233,12 +233,12 @@ void MatchingPar<DefaultStructs>::Blossoming(MatchingData<GraphType> &data,
 template<class DefaultStructs>
 template< class GraphType, class VertContainer, class EIterIn, class EIterOut >
 int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
-					      VertContainer &vertTab,
-					      EIterIn initialBegin,
-					      EIterIn initialEnd,
-					      EIterOut matching,
-					      int matchSize,
-					      bool makeCover) {
+						VertContainer &vertTab,
+						EIterIn initialBegin,
+						EIterIn initialEnd,
+						EIterOut matching,
+						int matchSize,
+						bool makeCover) {
 	int n = g.getVertNo();
 	if(n == 0 || matchSize == 0) return 0;
 
@@ -248,7 +248,7 @@ int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
 	typename GraphType::PVertex u, v, i, j, ix, jx;
 	EdgeDirection mask = EdUndir | EdDirOut | EdDirIn;
 	Privates::BlockListAllocator< Node<typename GraphType::PVertex> > allocat(3*n+3);
-    //TODO:size?
+	//TODO:size?
 
 	CyclicList<typename GraphType::PVertex,Privates::BlockListAllocator< Node<typename GraphType::PVertex> > > pathl(allocat), pathr(allocat);
 	std::pair<typename GraphType::PVertex, bool> LOCALARRAY(qdata, 2 * n + 4);
@@ -307,7 +307,7 @@ int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
 			data[u].labT1 = KOALA_MATCHING_MZERO;
 			data[u].labTB = false;
 			sets.makeSinglet(u);
-        };
+		};
 		q.clear();
 		for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
 			if(data[u].mate == KOALA_MATCHING_MZERO && g.deg(u, mask) > 0) {
@@ -396,182 +396,182 @@ int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
 };
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EIterOut >
-    int MatchingPar< DefaultStructs >::greedy( const GraphType &g, VertContainer &avertTab, EIterOut edgeIterOut,
-        int matchSize )
+	int MatchingPar< DefaultStructs >::greedy( const GraphType &g, VertContainer &avertTab, EIterOut edgeIterOut,
+		int matchSize )
 {
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type localvertTab;
-    typename BlackHoleSwitch< VertContainer,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
-        VertLabs< GraphType > >::Type >::Type &vertTab = BlackHoleSwitch< VertContainer,typename DefaultStructs::
-        template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type >::get( avertTab,localvertTab );
+	typename DefaultStructs::template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type localvertTab;
+	typename BlackHoleSwitch< VertContainer,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
+		VertLabs< GraphType > >::Type >::Type &vertTab = BlackHoleSwitch< VertContainer,typename DefaultStructs::
+		template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type >::get( avertTab,localvertTab );
 
-    // liczba wierzcholkow w grafie
-    int vertNo = g.getVertNo();
-    if (DefaultStructs::ReserveOutAssocCont ||isBlackHole( avertTab )) vertTab.reserve( vertNo );
-    // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
-    int expo = vertNo;
-    typename GraphType::PVertex U,V;
+	// liczba wierzcholkow w grafie
+	int vertNo = g.getVertNo();
+	if (DefaultStructs::ReserveOutAssocCont ||isBlackHole( avertTab )) vertTab.reserve( vertNo );
+	// expo zawierac bedzie liczba wierzcholkow wolnych w grafie
+	int expo = vertNo;
+	typename GraphType::PVertex U,V;
 
-    //przegladamy krawedzie grafu
-    for( typename GraphType::PEdge E = g.getEdge( EdUndir | EdDirIn | EdDirOut ); E;
-        E = g.getEdgeNext( E,EdUndir | EdDirIn | EdDirOut ) )
-    {
-        //jezeli osiagniemy zadany rozmiar skojarzenia - koniec
-        if (matchSize == (vertNo - expo) / 2) break;
-        vertTab[U = g.getEdgeEnd1( E )];
-        vertTab[V = g.getEdgeEnd2( E )];
-        //jezeli U i V sa wolne tzn. ze mozna E dodac do skojarzenia
-        if (vertTab[U].vMatch == 0 && vertTab[V].vMatch == 0)
-        {
-            vertTab[U].vMatch = V;
-            vertTab[V].vMatch = U;
-            *edgeIterOut = vertTab[V].eMatch = vertTab[U].eMatch = E;
-            ++edgeIterOut;
-            expo -= 2;
-        }
-    }
-    //zwracamy rozmiar matchingu
-    return ((vertNo - expo) / 2);
+	//przegladamy krawedzie grafu
+	for( typename GraphType::PEdge E = g.getEdge( EdUndir | EdDirIn | EdDirOut ); E;
+		E = g.getEdgeNext( E,EdUndir | EdDirIn | EdDirOut ) )
+	{
+		//jezeli osiagniemy zadany rozmiar skojarzenia - koniec
+		if (matchSize == (vertNo - expo) / 2) break;
+		vertTab[U = g.getEdgeEnd1( E )];
+		vertTab[V = g.getEdgeEnd2( E )];
+		//jezeli U i V sa wolne tzn. ze mozna E dodac do skojarzenia
+		if (vertTab[U].vMatch == 0 && vertTab[V].vMatch == 0)
+		{
+			vertTab[U].vMatch = V;
+			vertTab[V].vMatch = U;
+			*edgeIterOut = vertTab[V].eMatch = vertTab[U].eMatch = E;
+			++edgeIterOut;
+			expo -= 2;
+		}
+	}
+	//zwracamy rozmiar matchingu
+	return ((vertNo - expo) / 2);
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EIterIn, class EIterOut >
-    int MatchingPar< DefaultStructs >::greedy( const GraphType &g, VertContainer &avertTab, EIterIn edgeIterInBegin,
-        EIterIn edgeIterInEnd, EIterOut edgeIterOut, int matchSize )
+	int MatchingPar< DefaultStructs >::greedy( const GraphType &g, VertContainer &avertTab, EIterIn edgeIterInBegin,
+		EIterIn edgeIterInEnd, EIterOut edgeIterOut, int matchSize )
 {
-    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type localvertTab;
-    typename BlackHoleSwitch< VertContainer,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
-        VertLabs< GraphType > >::Type >::Type &vertTab = BlackHoleSwitch< VertContainer,typename DefaultStructs::
-        template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type >::get( avertTab,localvertTab );
+	typename DefaultStructs::template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type localvertTab;
+	typename BlackHoleSwitch< VertContainer,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
+		VertLabs< GraphType > >::Type >::Type &vertTab = BlackHoleSwitch< VertContainer,typename DefaultStructs::
+		template AssocCont< typename GraphType::PVertex,VertLabs< GraphType > >::Type >::get( avertTab,localvertTab );
 
-    // liczba wierzcholkow w grafie
-    int vertNo = g.getVertNo();
-    if (DefaultStructs::ReserveOutAssocCont ||isBlackHole( avertTab )) vertTab.reserve( vertNo );
-    // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
-    int expo = vertNo;
-    typename GraphType::PVertex U,V;
+	// liczba wierzcholkow w grafie
+	int vertNo = g.getVertNo();
+	if (DefaultStructs::ReserveOutAssocCont ||isBlackHole( avertTab )) vertTab.reserve( vertNo );
+	// expo zawierac bedzie liczba wierzcholkow wolnych w grafie
+	int expo = vertNo;
+	typename GraphType::PVertex U,V;
 
-    //przeglasamy podane krawedzie
-    for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )
-    {
-        //jezeli osiagniemy zadany rozmiar skojarzenia - koniec
-        if (matchSize == (vertNo - expo) / 2) break;
-        vertTab[U = g.getEdgeEnd1( *itE )];
-        vertTab[V = g.getEdgeEnd2( *itE )];
-        //jezeli U i V sa wolne tzn. ze mozna E dodac do skojarzenia
-        if (vertTab[U].vMatch == 0 && vertTab[V].vMatch == 0)
-        {
-            vertTab[U].vMatch = V;
-            vertTab[V].vMatch = U;
-            *edgeIterOut = vertTab[V].eMatch = vertTab[U].eMatch = *itE;
-            ++edgeIterOut;
-            expo -= 2;
-        }
-    }
-    //zwracamy rozmiar matchingu
-    return ((vertNo - expo) / 2);
+	//przeglasamy podane krawedzie
+	for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )
+	{
+		//jezeli osiagniemy zadany rozmiar skojarzenia - koniec
+		if (matchSize == (vertNo - expo) / 2) break;
+		vertTab[U = g.getEdgeEnd1( *itE )];
+		vertTab[V = g.getEdgeEnd2( *itE )];
+		//jezeli U i V sa wolne tzn. ze mozna E dodac do skojarzenia
+		if (vertTab[U].vMatch == 0 && vertTab[V].vMatch == 0)
+		{
+			vertTab[U].vMatch = V;
+			vertTab[V].vMatch = U;
+			*edgeIterOut = vertTab[V].eMatch = vertTab[U].eMatch = *itE;
+			++edgeIterOut;
+			expo -= 2;
+		}
+	}
+	//zwracamy rozmiar matchingu
+	return ((vertNo - expo) / 2);
 }
 
 template< class DefaultStructs > template< class GraphType, class EIterIn > bool MatchingPar< DefaultStructs >::test(
-    const GraphType &g, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd )
+	const GraphType &g, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd )
 {
-    // liczba wierzcholkow w grafie
-    int vertNo = g.getVertNo();
-    // expo zawierac bedzie liczba wierzcholkow wolnych w grafie
-//    int expo = vertNo;
-    typename GraphType::PVertex U,V;
-     //jezeli true - wierzcholek nalezy do matchingu
-    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type vertTabMatch( vertNo );
+	// liczba wierzcholkow w grafie
+	int vertNo = g.getVertNo();
+	// expo zawierac bedzie liczba wierzcholkow wolnych w grafie
+//	int expo = vertNo;
+	typename GraphType::PVertex U,V;
+	 //jezeli true - wierzcholek nalezy do matchingu
+	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type vertTabMatch( vertNo );
 
-    //przeglasamy podane krawedzie
-    for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )
-    {
-        U = g.getEdgeEnd1( *itE );
-        V = g.getEdgeEnd2( *itE );
-        //jezeli ktorykolwiek z wierzcholkow tworzacych krawedz nie jest wolny to nie mamy matchingu
-        if (vertTabMatch.hasKey( U ) || vertTabMatch.hasKey( V )) return false;
-        vertTabMatch[U] = true;
-        vertTabMatch[V] = true;
-    }
-    return true;
+	//przeglasamy podane krawedzie
+	for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )
+	{
+		U = g.getEdgeEnd1( *itE );
+		V = g.getEdgeEnd2( *itE );
+		//jezeli ktorykolwiek z wierzcholkow tworzacych krawedz nie jest wolny to nie mamy matchingu
+		if (vertTabMatch.hasKey( U ) || vertTabMatch.hasKey( V )) return false;
+		vertTabMatch[U] = true;
+		vertTabMatch[V] = true;
+	}
+	return true;
 }
 
 // StableMatchingPar
 
 template< class DefaultStructs > template< class GraphType, class EIterIn, class Comp >
-    std::pair< bool,typename GraphType::PEdge > StableMatchingPar< DefaultStructs >::test( const GraphType &g,
-        Comp compare, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd )
+	std::pair< bool,typename GraphType::PEdge > StableMatchingPar< DefaultStructs >::test( const GraphType &g,
+		Comp compare, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd )
 {
-    std::pair< bool,typename GraphType::PEdge > res;
-    res.second = 0;
-    if (!(res.first = MatchingPar< DefaultStructs >::template test( g,edgeIterInBegin,edgeIterInEnd ))) return res;
-    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge >::Type
-        match( g.getVertNo() );
-    for( ; edgeIterInBegin != edgeIterInEnd; ++edgeIterInBegin )
-        match[g.getEdgeEnd1( *edgeIterInBegin )] = match[g.getEdgeEnd2( *edgeIterInBegin )] = *edgeIterInBegin;
-    for( typename GraphType::PEdge e = g.getEdge( Directed | Undirected ); e; e = g.getEdgeNext( e,Directed | Undirected ) )
-        if (match[g.getEdgeEnd1( e )] != e)
-            if ((!match[g.getEdgeEnd1( e )] || compare( g.getEdgeEnd1( e ),match[g.getEdgeEnd1( e )],e )) &&
-               (!match[g.getEdgeEnd2( e )] || compare( g.getEdgeEnd2( e ),match[g.getEdgeEnd2( e )],e )))
-                return std::make_pair( false,e );
-    return std::make_pair( true,(typename GraphType::PEdge)0 );
+	std::pair< bool,typename GraphType::PEdge > res;
+	res.second = 0;
+	if (!(res.first = MatchingPar< DefaultStructs >::template test( g,edgeIterInBegin,edgeIterInEnd ))) return res;
+	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge >::Type
+		match( g.getVertNo() );
+	for( ; edgeIterInBegin != edgeIterInEnd; ++edgeIterInBegin )
+		match[g.getEdgeEnd1( *edgeIterInBegin )] = match[g.getEdgeEnd2( *edgeIterInBegin )] = *edgeIterInBegin;
+	for( typename GraphType::PEdge e = g.getEdge( Directed | Undirected ); e; e = g.getEdgeNext( e,Directed | Undirected ) )
+		if (match[g.getEdgeEnd1( e )] != e)
+			if ((!match[g.getEdgeEnd1( e )] || compare( g.getEdgeEnd1( e ),match[g.getEdgeEnd1( e )],e )) &&
+			   (!match[g.getEdgeEnd2( e )] || compare( g.getEdgeEnd2( e ),match[g.getEdgeEnd2( e )],e )))
+				return std::make_pair( false,e );
+	return std::make_pair( true,(typename GraphType::PEdge)0 );
 }
 
 template< class DefaultStructs > template< class GraphType, class VIterIn, class Comp, class vertCont, class EIterOut >
-    int StableMatchingPar< DefaultStructs >::bipartFind( const GraphType &g, VIterIn begin, VIterIn end, Comp compare,
-        vertCont &verttab, EIterOut out )
+	int StableMatchingPar< DefaultStructs >::bipartFind( const GraphType &g, VIterIn begin, VIterIn end, Comp compare,
+		vertCont &verttab, EIterOut out )
 {
-    int licz = 0, n1 = 0, n;
-    for( VIterIn it = begin; it != end; ++it )
-        if (g.deg( *it,Directed | Undirected )) n1++;
-    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge* >::Type
-        bufs( n1 );
-    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,int > ::Type love( n1 );
-    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,char > ::Type free( n1 );
-    typename GraphType::PEdge LOCALARRAY( incids,g.getEdgeNo( Directed | Undirected ) );
-    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge >::Type
-        match( (n=g.getVertNo()) - n1 );
+	int licz = 0, n1 = 0, n;
+	for( VIterIn it = begin; it != end; ++it )
+		if (g.deg( *it,Directed | Undirected )) n1++;
+	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge* >::Type
+		bufs( n1 );
+	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,int > ::Type love( n1 );
+	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,char > ::Type free( n1 );
+	typename GraphType::PEdge LOCALARRAY( incids,g.getEdgeNo( Directed | Undirected ) );
+	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge >::Type
+		match( (n=g.getVertNo()) - n1 );
 
-    for( VIterIn it = begin; it != end; ++it )
-        if (g.deg( *it,Directed | Undirected ))
-        {
-            love[*it] = 0;
-            free[*it];
-            int deg = g.getEdges( bufs[*it] = incids + licz,*it,Directed | Undirected );
-            DefaultStructs::sort( incids + licz,incids + licz + deg,SortCmp< GraphType,Comp >( *it,compare ) );
-            licz += deg;
-        }
+	for( VIterIn it = begin; it != end; ++it )
+		if (g.deg( *it,Directed | Undirected ))
+		{
+			love[*it] = 0;
+			free[*it];
+			int deg = g.getEdges( bufs[*it] = incids + licz,*it,Directed | Undirected );
+			DefaultStructs::sort( incids + licz,incids + licz + deg,SortCmp< GraphType,Comp >( *it,compare ) );
+			licz += deg;
+		}
 
-    while (!free.empty())
-    {
-        typename GraphType::PVertex u = free.firstKey(),v,w;
-        typename GraphType::PEdge e = bufs[u][love[u]];
-        v = g.getEdgeEnd( e,u );
-        if (match.hasKey( v ))
-            if (compare( v,match[v],e ))
-            {
-                w = g.getEdgeEnd( match[v],v );
-                if (++love[w] < g.deg( w,Directed | Undirected )) free[w];
-                match.delKey( v );
-            }
-        if (!match.hasKey( v ))
-        {
-            match[v] = e;
-            free.delKey( u );
-        }
-        else if (++love[u] == g.deg( u,Directed | Undirected )) free.delKey( u );
-    }
-    licz = 0;
-    if (DefaultStructs::ReserveOutAssocCont) verttab.reserve(n);
-    for( typename GraphType::PVertex u = match.firstKey(); u; u = match.nextKey( u ) )
-    {
-        licz++;
-        *out = match[u];
-        ++out;
-        if (!isBlackHole( verttab ))
-        {
-            VertLabs< GraphType > lu( u,match[u] ), ln( g.getEdgeEnd( match[u],u ),match[u] );
-            lu.copy(verttab[u]);
-            ln.copy(verttab[g.getEdgeEnd( match[u],u )]);
-        }
-    }
-    return licz;
+	while (!free.empty())
+	{
+		typename GraphType::PVertex u = free.firstKey(),v,w;
+		typename GraphType::PEdge e = bufs[u][love[u]];
+		v = g.getEdgeEnd( e,u );
+		if (match.hasKey( v ))
+			if (compare( v,match[v],e ))
+			{
+				w = g.getEdgeEnd( match[v],v );
+				if (++love[w] < g.deg( w,Directed | Undirected )) free[w];
+				match.delKey( v );
+			}
+		if (!match.hasKey( v ))
+		{
+			match[v] = e;
+			free.delKey( u );
+		}
+		else if (++love[u] == g.deg( u,Directed | Undirected )) free.delKey( u );
+	}
+	licz = 0;
+	if (DefaultStructs::ReserveOutAssocCont) verttab.reserve(n);
+	for( typename GraphType::PVertex u = match.firstKey(); u; u = match.nextKey( u ) )
+	{
+		licz++;
+		*out = match[u];
+		++out;
+		if (!isBlackHole( verttab ))
+		{
+			VertLabs< GraphType > lu( u,match[u] ), ln( g.getEdgeEnd( match[u],u ),match[u] );
+			lu.copy(verttab[u]);
+			ln.copy(verttab[g.getEdgeEnd( match[u],u )]);
+		}
+	}
+	return licz;
 }

@@ -328,10 +328,10 @@ int IntervalEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph,
 	return maxCol;
 }
 
-//regula HF: podany zakres lub wszystkie niepokolorowane wierzcholki koloruj zachlannie wg. sekwencji nierosnacych wag
+//regula LF: podany zakres lub wszystkie niepokolorowane wierzcholki koloruj zachlannie wg. sekwencji nierosnacych wag
 template<class DefaultStructs>
 template<typename Graph, typename Weights, typename ColorMap, typename EIter>
-int IntervalEdgeColoringPar<DefaultStructs>::hf(const Graph &graph,
+int IntervalEdgeColoringPar<DefaultStructs>::lf(const Graph &graph,
 	const Weights &weights, ColorMap &colors, EIter beg, EIter end)
 {
 	typedef typename Graph::PVertex Vert;
@@ -362,7 +362,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::hf(const Graph &graph,
 
 template<class DefaultStructs>
 template<typename Graph, typename Weights, typename ColorMap>
-int IntervalEdgeColoringPar<DefaultStructs>::hf(const Graph &graph,
+int IntervalEdgeColoringPar<DefaultStructs>::lf(const Graph &graph,
 	const Weights &weights, ColorMap &colors)
 {
 	typedef typename Graph::PVertex Vert;
