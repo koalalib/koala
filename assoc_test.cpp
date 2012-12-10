@@ -168,7 +168,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
 
     std::cout << "\nMatrixy2:\n";
     AssocMatrix<Vert*,std::string,AMatrClTriangle,std::vector< BlockOfAssocMatrix< std::string > >
-         ,PseudoAssocArray<Vert*,int,AssocTable<std::map<Vert*,int> > > > pm,pm1;
+         ,Koala::Privates::PseudoAssocArray<Vert*,int,AssocTable<std::map<Vert*,int> > > > pm,pm1;
 
     pm(A,B)="Wpis wspolny";
     pm(A,A)="Wpis pojedynczy";
@@ -220,7 +220,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
 //    AssocTable<std::map<std::string,int> > atab;
 //    AssocTabInterface< AssocTable<std::map<std::string,int> > > iatab=atab,tatab2=iatab;
     std::cout << "\n*************\n";
-    PseudoAssocArray<Vert*,std::string,AssocTable<std::map<Vert*,int> > > pst,pst2(1);
+    Koala::Privates::PseudoAssocArray<Vert*,std::string,AssocTable<std::map<Vert*,int> > > pst,pst2(1);
     t(pst);
     std::cout << "\nCapac:" << pst.capacity() << '\n';
     pst[A]="ala";
@@ -240,7 +240,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
     pst.defrag();
     t(pst);
     std::cout << "\nCapac:" << pst.capacity() << '\n';
-    PseudoAssocArray<Vert*,std::string,AssocTable<std::map<Vert*,int> > > pst3=pst;
+    Koala::Privates::PseudoAssocArray<Vert*,std::string,AssocTable<std::map<Vert*,int> > > pst3=pst;
     t(pst3);
 //    assocTabInterf(pst3).getKeys(blackHole);
 
@@ -340,9 +340,9 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
         AssocArrSwitch<AssocArray<Vert*,std::string> >::Type  hmp2;
         hmp2=aa;
 
-        PseudoAssocArray<Vert*,std::string,AssocTable<std::map<Vert*,int> > >  pa;
+        Koala::Privates::PseudoAssocArray<Vert*,std::string,AssocTable<std::map<Vert*,int> > >  pa;
         pa[B]="BB";
-        PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int> > >  pa2(pa);
+        Koala::Privates::PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int> > >  pa2(pa);
         pa2=pa;
         aa=pa2;
         t(aa);
@@ -351,7 +351,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
         t(hmapa);
 
         AssocMatrix<Vert*,std::string,AMatrFull,std::vector< BlockOfAssocMatrix< std::string > >
-         ,PseudoAssocArray<Vert*,int,AssocTable<std::map<Vert*,int> > > > mat,mat2;
+         ,Koala::Privates::PseudoAssocArray<Vert*,int,AssocTable<std::map<Vert*,int> > > > mat,mat2;
         mat(A,B)="AB";
         mat2=mat;
         t(mat2);

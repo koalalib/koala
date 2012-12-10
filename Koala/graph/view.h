@@ -60,7 +60,8 @@ namespace Koala
 
         // Konstruktory
         // tworzy podgraf nie podlaczony do zadnego grafu
-        Subgraph() {}
+        Subgraph()
+            { }
         // tworzy podgraf danego grafu i ustawia wartosci obu chooserow
         Subgraph( const Graph &, std::pair< VChooser,EChooser > = std::make_pair( VChooser(),EChooser() ) );
         // ustawia wartosci obu chooserow, tworzy podgraf niepodlaczony
@@ -171,7 +172,8 @@ namespace Koala
 
         // Konstruktory
         // tworzy widok niepodlaczony do zadnej struktury
-        UndirView() { }
+        UndirView()
+            { }
         UndirView( const Graph &g )
             { SubgraphBase::link( &g ); }
 
@@ -278,7 +280,8 @@ namespace Koala
         typedef Graph ParentGrType;
 
         // Konstruktory
-        RevView() { }
+        RevView()
+            { }
         RevView( const Graph &g )
             { SubgraphBase::link( &g ); }
 

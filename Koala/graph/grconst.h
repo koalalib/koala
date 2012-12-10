@@ -46,8 +46,10 @@ template< class GraphType > class ConstGraphMethods
         PEdge edge;
 
         Parals3( PVertex av1, PVertex av2, EdgeDirection adirect, int anr, PEdge aedge):
-            v1( av1 ), v2( av2 ), direct( adirect ), nr( anr ), edge( aedge ) { }
-        Parals3() { }
+            v1( av1 ), v2( av2 ), direct( adirect ), nr( anr ), edge( aedge )
+            { }
+        Parals3()
+            { }
     };
 
     struct Parals3cmp
@@ -61,9 +63,12 @@ template< class GraphType > class ConstGraphMethods
     };
 
   public:
-    ConstGraphMethods(): self( (const GraphType &)*this ) { }
-    ConstGraphMethods( const ConstGraphMethods & ): self( (const GraphType &)*this ) { }
-    ConstGraphMethods &operator=( const ConstGraphMethods & ) { return *this; }
+    ConstGraphMethods(): self( (const GraphType &)*this )
+        { }
+    ConstGraphMethods( const ConstGraphMethods & ): self( (const GraphType &)*this )
+        { }
+    ConstGraphMethods &operator=( const ConstGraphMethods & )
+        { return *this; }
 
 //    Uwaga: metody, ktore musza byc dostarczane przez GraphType:
 //         int getVertNo() const;

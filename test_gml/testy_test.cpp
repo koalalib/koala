@@ -50,7 +50,7 @@ class StdMapSettings : public AlgsDefaultSettings {
         template< class A, class B, AssocMatrixType type > class TwoDimAssocCont
         {
           public:
-            typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,PseudoAssocArray<A,int,AssocTable<std::map<A,int> > > > Type;
+            typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Koala::Privates::PseudoAssocArray<A,int,AssocTable<std::map<A,int> > > > Type;
         };
 
 };
@@ -70,7 +70,7 @@ class HashMapSettings : public AlgsDefaultSettings {
         template< class A, class B, AssocMatrixType type > class TwoDimAssocCont
         {
           public:
-            typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
+            typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Koala::Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
         };
 };
 
@@ -99,13 +99,13 @@ template< EdgeType edAllow, bool adjMatrixAllowed > class GrStdMapSettings :
         template< class K, class V > class AdjMatrixDirEdges
         {
           public:
-             typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,PseudoAssocArray<K,int,AssocTable<std::map<K,int> > > > Type;
+             typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,Koala::Privates::PseudoAssocArray<K,int,AssocTable<std::map<K,int> > > > Type;
         };
 
         template< class K, class V > class AdjMatrixUndirEdges
         {
           public:
-            typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,PseudoAssocArray<K,int,AssocTable<std::map<K,int> > > > Type;
+            typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,Koala::Privates::PseudoAssocArray<K,int,AssocTable<std::map<K,int> > > > Type;
         };
 };
 
@@ -130,13 +130,13 @@ template< EdgeType edAllow, bool adjMatrixAllowed > class GrHashMapSettings :
         template< class K, class V > class AdjMatrixDirEdges
         {
           public:
-             typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+             typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,Koala::Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
         };
 
         template< class K, class V > class AdjMatrixUndirEdges
         {
           public:
-            typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+            typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,Koala::Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
         };
 };
 

@@ -205,12 +205,15 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         {
             V = g.getEdgeEnd( E,U );
             if ((!start) || followers.hasKey( V ))
-                if ((nd = vertTab[V].distance + edgeTab[E].length) > vertTab[U].distance)
+            {
+                nd = vertTab[V].distance + edgeTab[E].length;
+                if (nd > vertTab[U].distance)
                 {
                     vertTab[U].distance = nd;
                     vertTab[U].ePrev = E;
                     vertTab[U].vPrev = V;
                 }
+            }
         }
         if (U == end) return vertTab[U].distance;
     }
@@ -252,7 +255,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         NumberTypeBounds< typename EdgeContainer::ValType::DistType >::minusInfty();
     typename EdgeContainer::ValType::DistType nd;
     int n = g.getVertNo();
-    if (DefaultStructs::ReserveOutAssocCont || isBlackHole( avertTab )) vertTab.reserve( n );
+    vertTab.reserve( n );
 
     bool existNegCycle = false;
 
@@ -402,7 +405,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
         E = g.getEdgeNext( E,Koala::EdLoop | Koala::EdUndir ) )
         if (edgeTab[E].length < zero) return false;
 
-    if (DefaultStructs::ReserveOutAssocCont) vertMatrix.reserve( g.getVertNo() );
+    vertMatrix.reserve( g.getVertNo() );
 
     //inicjalizacja - ustawiam wartosci poczatkowe odleglosci w tablicy asocjacyjnej
     for( typename GraphType::PVertex U = g.getVert(); U; U = g.getVertNext( U ) )

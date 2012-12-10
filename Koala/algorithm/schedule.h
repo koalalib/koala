@@ -48,7 +48,8 @@ namespace Koala
         {
             int earliestStart,earliestFinish,latestStart,latestFinish;
 
-            TaskWindow() { }
+            TaskWindow()
+                { }
 
             template< class GraphType > TaskWindow( Task< GraphType > task, int start, int finish ):
                 earliestStart( start ), earliestFinish( start + task.length ),
@@ -76,15 +77,21 @@ namespace Koala
 
         template< typename TaskIterator, typename Iterator >
             static int sortLPT( TaskIterator begin, TaskIterator end, Iterator out )
-            { return sortByComp< compareLPT< std::pair< TaskIterator,int > > >( begin,end,out ); }
+            {
+                return sortByComp< compareLPT< std::pair< TaskIterator,int > > >( begin,end,out );
+            }
 
         template< typename TaskIterator, typename Iterator >
             static int sortSPT( TaskIterator begin, TaskIterator end, Iterator out )
-            { return sortByComp< compareSPT< std::pair< TaskIterator,int > > >( begin,end,out ); }
+            {
+                return sortByComp< compareSPT< std::pair< TaskIterator,int > > >( begin,end,out );
+            }
 
         template< typename TaskIterator, typename Iterator >
             static int sortEDD( TaskIterator begin, TaskIterator end, Iterator out )
-            { return sortByComp< compareEDD< std::pair< TaskIterator,int > > >( begin,end,out ); }
+            {
+                return sortByComp< compareEDD< std::pair< TaskIterator,int > > >( begin,end,out );
+            }
 
         template< typename TaskIterator >
             static int CMax( TaskIterator, TaskIterator, const Schedule & );
@@ -138,29 +145,41 @@ namespace Koala
         template< typename Pair > struct compareLPT
         {
             bool operator()( Pair a, Pair b )
-                { return a.first->length > b.first->length || (a.first->length == b.first->length && a.second < b.second); }
+            {
+                return a.first->length > b.first->length || (a.first->length == b.first->length && a.second < b.second);
+            }
         };
 
         template< typename Pair > struct compareSPT
         {
             bool operator()( Pair a, Pair b )
-                { return a.first->length < b.first->length || (a.first->length == b.first->length && a.second < b.second); }
+            {
+                return a.first->length < b.first->length || (a.first->length == b.first->length && a.second < b.second);
+            }
         };
 
         template< typename Pair > struct compareEDD
         {
             bool operator()( Pair a, Pair b )
-                { return a.first->duedate < b.first->duedate || (a.first->duedate == b.first->duedate && a.second < b.second); }
+            {
+                return a.first->duedate < b.first->duedate || (a.first->duedate == b.first->duedate && a.second < b.second);
+            }
         };
 
         template< typename Pair > struct compareSecondFirst
         {
-            bool operator()( Pair a, Pair b ) { return a.second < b.second; }
+            bool operator()( Pair a, Pair b )
+            {
+                return a.second < b.second;
+            }
         };
 
         template< typename Pair > struct compareSecondLast
         {
-            bool operator()( Pair a, Pair b ) { return a.second > b.second; }
+            bool operator()( Pair a, Pair b )
+            {
+                return a.second > b.second;
+            }
         };
 
         template< typename Task > struct Triple

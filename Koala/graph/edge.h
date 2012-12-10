@@ -25,10 +25,13 @@ namespace Koala
             Edge< VertInfo,EdgeInfo,Settings > *n,*p;
 
           public:
-            NormalParalLink(): n( NULL ), p( NULL ) { }
+            NormalParalLink(): n( NULL ), p( NULL )
+                { }
 
-            Edge< VertInfo,EdgeInfo,Settings > *&nParal() { return n; }
-            Edge< VertInfo,EdgeInfo,Settings > *&pParal() { return p; }
+            Edge< VertInfo,EdgeInfo,Settings > *&nParal()
+                { return n; }
+            Edge< VertInfo,EdgeInfo,Settings > *&pParal()
+                { return p; }
         };
 
         /* EmptyParalLink
@@ -73,8 +76,10 @@ namespace Koala
         // zwracaja wierzcholki koncowe krawedzi
         std::pair< Vertex< VertInfo,EdgeInfo,Settings > *,Vertex< VertInfo,EdgeInfo,Settings > * > getEnds()
             { return std::make_pair( vert[0].vert,vert[1].vert ); }
-        Vertex< VertInfo,EdgeInfo,Settings > *getEnd1() { return vert[0].vert; }
-        Vertex< VertInfo,EdgeInfo,Settings > *getEnd2() { return vert[1].vert; }
+        Vertex< VertInfo,EdgeInfo,Settings > *getEnd1()
+            { return vert[0].vert; }
+        Vertex< VertInfo,EdgeInfo,Settings > *getEnd2()
+            { return vert[1].vert; }
         // czy podany wierzcholek jest koncem krawedzi
         bool isEnd(Vertex<VertInfo,EdgeInfo,Settings>* v);
 
@@ -83,10 +88,13 @@ namespace Koala
 
         // sposob orientacji krawedzi wzgledem jej podanego konca
         EdgeDirection getDir( Vertex< VertInfo,EdgeInfo,Settings > *v );
-        EdgeType getType() { return type; }
-        EdgeInfo getInfo() { return info; }
+        EdgeType getType()
+            { return type; }
+        EdgeInfo getInfo()
+            { return info; }
 
-        void setInfo( const EdgeInfo &info ) { this->info=info; }
+        void setInfo( const EdgeInfo &info )
+            { this->info=info; }
 
     private:
         // powiazania do list krawedzi tego samego rodzaju przy wierzcholku koncowym tej krawedzi
@@ -95,20 +103,25 @@ namespace Koala
             Vertex< VertInfo,EdgeInfo,Settings > *vert;
             Edge *next,*prev;
 
-            EdgeLink(): vert( NULL ), next( NULL ), prev( NULL ) { }
+            EdgeLink(): vert( NULL ), next( NULL ), prev( NULL )
+                { }
         } vert[2];
 
         // klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
         /** Standard constructor. */
-        Edge(): info( ), next( NULL ), prev( NULL ), type( Detached ) { }
+        Edge(): info( ), next( NULL ), prev( NULL ), type( Detached )
+            { }
         /** Constructor sets info variable. */
-        Edge( const EdgeInfo &infoExt ): info( infoExt ), next( NULL ), prev( NULL ), type( Detached ) { }
+        Edge( const EdgeInfo &infoExt ): info( infoExt ), next( NULL ), prev( NULL ), type( Detached )
+            { }
 
         // klasa niekopiowalna
-        Edge( const Edge &X ) { }
-        Edge &operator=( const Edge &X ) { }
-
-        ~Edge() { }
+        Edge( const Edge &X )
+            { }
+        Edge &operator=( const Edge &X )
+            { }
+        ~Edge()
+            { }
 
         // powiazania na liscie wszystkich krawedzi grafu
         Edge *next,*prev;

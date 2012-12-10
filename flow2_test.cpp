@@ -25,7 +25,7 @@ Koala::Graph<char,OpisE>::PVertex A,B,C,D,E,F,V,U,S,T,G,tabV[20],*tabVit;
 Koala::Graph<char,OpisE>::PEdge tabE[20];
 
 Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeLabs<int> >  edgeCont;
-Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::VertLabs<Koala::Graph<char,OpisE>,int> > vertCont;
+//Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::VertLabs<Koala::Graph<char,OpisE>,int> > vertCont;
 
 Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::TrsEdgeLabs<int> > tedgeCont;
 Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsVertLoss<int> > tvertCont;
@@ -33,7 +33,7 @@ Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsVertLoss<int
 
 void dijTest()
 {   g.clear();edgeCont.clear();
-    vertCont.clear();
+//    vertCont.clear();
 
     A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
     D=g.addVert('D');E=g.addVert('E');
@@ -62,7 +62,7 @@ void dijTest()
 
 void dijTest2()
 {   g.clear();edgeCont.clear();
-    vertCont.clear();
+//    vertCont.clear();
 
     A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
     D=g.addVert('D');E=g.addVert('E');
@@ -90,7 +90,7 @@ void dijTest2()
 
 void dijTest3()
 {   g.clear();edgeCont.clear();
-    vertCont.clear();
+//    vertCont.clear();
 
     A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
     D=g.addVert('D');E=g.addVert('E');
@@ -122,7 +122,7 @@ void dijTest3()
 
 void costTest()
 {   g.clear();edgeCont.clear();
-    vertCont.clear();
+//    vertCont.clear();
 
     A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
     S=g.addVert('S');T=g.addVert('T');
@@ -157,7 +157,7 @@ void costTest()
 
 void costTest2()
 {   g.clear();edgeCont.clear();
-    vertCont.clear();
+//    vertCont.clear();
 
     A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
     S=g.addVert('S');T=g.addVert('T');
@@ -191,7 +191,7 @@ void costTest2()
 
 void costTest3()
 {   g.clear();edgeCont.clear();
-    vertCont.clear();
+//    vertCont.clear();
 
     A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
     S=g.addVert('S');T=g.addVert('T');
@@ -235,7 +235,7 @@ void costTest3()
 
 void transTest()
 {   g.clear();edgeCont.clear();
-    vertCont.clear();
+//    vertCont.clear();
 
     A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
     S=g.addVert('S');T=g.addVert('T');
@@ -274,7 +274,7 @@ void transTest()
 
 void ghTest()
 {   g.clear();edgeCont.clear();
-    vertCont.clear();
+//    vertCont.clear();
 
     A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
     D=g.addVert('D');E=g.addVert('E');
@@ -301,7 +301,7 @@ void ghTest()
 
 void ghTest2()
 {   g.clear();edgeCont.clear();
-    vertCont.clear();
+//    vertCont.clear();
 
     for(int i=0;i<10;i++) g.addVert();
     for(U=g.getVert();U!=g.getVertLast();U=g.getVertNext(U))

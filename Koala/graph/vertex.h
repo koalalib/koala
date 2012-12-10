@@ -13,12 +13,16 @@ namespace Koala
             Edge< VertInfo,EdgeInfo,Settings > *first,*last;
             int degree;
 
-            NormalVertLink(): first( NULL ), last( NULL ), degree( 0 ) { }
+            NormalVertLink(): first( NULL ), last( NULL ), degree( 0 )
+                { }
 
-            Edge< VertInfo,EdgeInfo,Settings > *&getFirst() { return first; }
-            Edge< VertInfo,EdgeInfo,Settings > *&getLast() { return last; }
+            Edge< VertInfo,EdgeInfo,Settings > *&getFirst()
+                { return first; }
+            Edge< VertInfo,EdgeInfo,Settings > *&getLast()
+                { return last; }
 
-            int &getDegree() { return degree; }
+            int &getDegree()
+                { return degree; }
         };
 
         /* EmptyVertLink
@@ -26,7 +30,8 @@ namespace Koala
          */
         template< class VertInfo, class EdgeInfo, class Settings > struct EmptyVertLink
         {
-            EmptyVertLink() { }
+            EmptyVertLink()
+                { }
 
             DummyVar< Edge< VertInfo,EdgeInfo,Settings > * > getFirst()
                 { return DummyVar< Edge< VertInfo,EdgeInfo,Settings > * >(); }
@@ -99,19 +104,25 @@ namespace Koala
         //Additional user information in the vertex.
         VertInfo info;
 
-        VertInfo getInfo() { return info; }
-        void setInfo( const VertInfo &info ) { this->info = info; }
+        VertInfo getInfo()
+            { return info; }
+        void setInfo( const VertInfo &info )
+            { this->info = info; }
 
       private:
         // klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
         /** Standard constructor*/
-        Vertex(): info (), next( NULL ), prev( NULL ) { }
+        Vertex(): info (), next( NULL ), prev( NULL )
+            { }
         /** Constructor sets info variable */
-        Vertex( const VertInfo &infoExt ): info( infoExt ), next( NULL ), prev( NULL ) { }
-        Vertex( const Vertex & X) {}
-        Vertex &operator=( const Vertex &X ) { }
-
-        ~Vertex() { }
+        Vertex( const VertInfo &infoExt ): info( infoExt ), next( NULL ), prev( NULL )
+            { }
+        Vertex( const Vertex & X)
+            { }
+        Vertex &operator=( const Vertex &X )
+            { }
+        ~Vertex()
+            { }
 
         Vertex *next,*prev;
     };

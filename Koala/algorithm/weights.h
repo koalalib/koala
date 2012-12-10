@@ -101,7 +101,9 @@ namespace Koala
         template< class GraphType, class VertContainer, class EdgeContainer >
             static typename EdgeContainer::ValType::DistType distances( const GraphType &g, VertContainer &avertTab,
             const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end = 0 )
-            { return DijkstraBasePar< DefaultStructs >::distancesOnHeap( g,avertTab,edgeTab,start,end ); }
+            {
+                return DijkstraBasePar< DefaultStructs >::distancesOnHeap( g,avertTab,edgeTab,start,end );
+            }
     };
 
     /* DijkstraMainPar
@@ -128,7 +130,7 @@ namespace Koala
             PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType& g,
                 const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
                 ShortPathStructs::OutPath< VIter,EIter > iters )
-        // Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
+                // Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
                 {
                     koalaAssert( start && end,AlgExcNullVert );
                     const typename EdgeContainer::ValType::DistType PlusInfty = DefaultStructs:: template
@@ -327,6 +329,7 @@ namespace Koala
             PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
                 const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
                 ShortPathStructs::OutPath< VIter,EIter > iters )
+                // Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
                 {
                     koalaAssert( start && end,AlgExcNullVert );
                     typename EdgeContainer::ValType::DistType dist;
@@ -334,11 +337,11 @@ namespace Koala
                 	VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
 
                     if (DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::DistType >
-                	::isPlusInfty(dist = distances( g,vertTab,edgeTab,start,end )))
-                	return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
+                        ::isPlusInfty(dist = distances( g,vertTab,edgeTab,start,end )))
+                            return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
                     else if (DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::DistType >
-                	::isMinusInfty( dist ))
-                	return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-2 ); // w grafie jest cykl ujemny
+                        ::isMinusInfty( dist ))
+                            return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-2 ); // w grafie jest cykl ujemny
 
                     int len = getPath( g,vertTab,end,iters );
                     return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
@@ -474,18 +477,18 @@ namespace Koala
 
                     for( i = 0; i < m && edgeNo > 0; i++ )
                     {
-                	std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends;
-                	e = edges[i].second;
-                	ends = g.getEdgeEnds( e );
-                	if (sets.getSetId( ends.first ) != sets.getSetId( ends.second ))
-                	{
-                	    res.weight = res.weight + edgeTab[e].weight;
-                	    res.edgeNo++;
-                	    sets.join( ends.first,ends.second );
-                	    *out = e;
-                	    ++out;
-                	    edgeNo--;
-                	}
+                        std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends;
+                        e = edges[i].second;
+                        ends = g.getEdgeEnds( e );
+                        if (sets.getSetId( ends.first ) != sets.getSetId( ends.second ))
+                        {
+                            res.weight = res.weight + edgeTab[e].weight;
+                            res.edgeNo++;
+                            sets.join( ends.first,ends.second );
+                            *out = e;
+                            ++out;
+                            edgeNo--;
+                        }
                     }
 
                     return res;
@@ -502,13 +505,17 @@ namespace Koala
         template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
             Result< typename EdgeContainer::ValType::WeightType > getMinForest( const GraphType &g,
                 const EdgeContainer &edgeTab, Iter out, VertCompContainer &asets, int edgeNo = -1 )
-            { return getForest( g,edgeTab,out,asets,edgeNo,true ); }
+            {
+                return getForest( g,edgeTab,out,asets,edgeNo,true );
+            }
 
         // znajduje najciezszy las
         template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
             Result< typename EdgeContainer::ValType::WeightType > getMaxForest( const GraphType &g,
                 const EdgeContainer &edgeTab, Iter out, VertCompContainer &asets, int edgeNo = -1 )
-            { return getForest( g,edgeTab,out,asets,edgeNo,false ); }
+            {
+                return getForest( g,edgeTab,out,asets,edgeNo,false );
+            }
     };
 
     // wersja dzialajaca na DefaultStructs=AlgsDefaultSettings

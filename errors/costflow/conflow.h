@@ -22,11 +22,14 @@ namespace Koala
     /* FlowAlgsDefaultSettings
      * Domyslne wytyczne dla procedur przeplywowych:
      * czy do wyznaczania maks. przeplywu uzywac FulkersonaForda, czy MKM
+     * czy do wyznaczania najtanszego przeplywu uzywac sciezek powiekszajacych (pseudowielomianowa), czy
+     * cykli z min. srednia dlugoscia (wielomianowa)
      */
-    template< bool FF = false > class FlowAlgsDefaultSettings: public AlgsDefaultSettings
+    template< bool FF = false, bool costFF = true > class FlowAlgsDefaultSettings: public AlgsDefaultSettings
     {
       public:
         enum { useFulkersonFord = FF };
+        enum { useCostAugmPath = costFF };
     };
 
 
@@ -52,47 +55,23 @@ namespace Koala
 
             // agrs: przepustowosc i koszt krawedzi
             EdgeLabs():
-                    capac(DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ),
-                    flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ),
-                    cost( DefaultStructs:: template NumberTypeBounds< CostType >::zero() )
+                    capac(DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), cost( DefaultStructs:: template NumberTypeBounds< CostType >::zero() )
                 { }
             EdgeLabs( CapacType arg):
-                    capac( arg ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ),
-                    cost(DefaultStructs:: template NumberTypeBounds< CostType >::zero())
+                    capac( arg ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), cost(DefaultStructs:: template NumberTypeBounds< CostType >::zero())
                 { }
             EdgeLabs( CapacType arg, CostType arg2):
-                    capac( arg ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ),
-                    cost( arg2 )
+                    capac( arg ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), cost( arg2 )
                 { }
         };
 
         // j.w. ale nadaje domyslne jednostkowe przepustowosci i koszty
-        template< class DType, class CType = DType > struct UnitEdgeLabs
+        template< class DType, class CType = DType > struct UnitEdgeLabs: public EdgeLabs< DType,CType >
         {
-            // typ liczbowy przepustowosci luku i objetosci przeplywu
-            typedef DType CapacType;
-            // typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
-            typedef CType CostType;
-
-            // przepustowosc (dana wejsciowa), wartosc znalezionego przeplywu w kierunku getEdgeEnd1->getEdgeEnd2
-            CapacType capac,flow;
-            // koszt jednostkowy przeplywu przez luk (dana wejsciowa)
-            CostType cost;
-
-            // agrs: przepustowosc i koszt krawedzi
-            UnitEdgeLabs():
-                    capac(DefaultStructs:: template NumberTypeBounds< CapacType >::one() ),
-                    flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ),
-                    cost( DefaultStructs:: template NumberTypeBounds< CostType >::one() )
-                { }
-            UnitEdgeLabs( CapacType arg):
-                    capac( arg ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ),
-                    cost(DefaultStructs:: template NumberTypeBounds< CostType >::one())
-                { }
-            UnitEdgeLabs( CapacType arg, CostType arg2):
-                    capac( arg ), flow( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ),
-                    cost( arg2 )
-                { }
+            UnitEdgeLabs( DType arg = DefaultStructs:: template NumberTypeBounds< DType >::one(),
+                CType arg2 = DefaultStructs:: template NumberTypeBounds< CType >::one() ):
+                    EdgeLabs< DType,CType >( arg,arg2 )
+                    { }
         };
 
         // rekord wynikowy opisujacy rozciecie krawedziowe w grafie miedzy para wierzcholkow
@@ -105,8 +84,7 @@ namespace Koala
             // liczba krawedzi rozciecia
             int edgeNo;
 
-            EdgeCut():  capac( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ),
-                        vertNo( 0 ), edgeNo( 0 )
+            EdgeCut(): capac( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ), vertNo( 0 ), edgeNo( 0 )
                 { }
         };
 
@@ -143,16 +121,10 @@ namespace Koala
             CapacType capac;
 
             // args: oba wierzcholki koncowe i przepustowosc
-            GHTreeEdge( ): first( 0 ), second( 0 ),
-                capac( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() )
-                { }
-            GHTreeEdge( typename GraphType::PVertex f ): first( f ), second( 0 ),
-                capac( DefaultStructs:: template NumberTypeBounds< CapacType >::zero() )
-                { }
-            GHTreeEdge( typename GraphType::PVertex f, typename GraphType::PVertex s, CapacType c  ):
-                first( f ), second( s ), capac( c )
-                { }
-
+            GHTreeEdge( typename GraphType::PVertex f = 0, typename GraphType::PVertex s = 0,
+                CapacType c = DefaultStructs:: template NumberTypeBounds< CapacType >::zero() ): first( f ),
+                    second( s ), capac( c )
+                    { }
         };
 
         // Transshipment - uogolnienie przeplywu (por. Schrijver)
@@ -165,14 +137,10 @@ namespace Koala
             CapacType hi,lo;
 
             //(dopuszczalne dodatnie i ujemne np. przeplyw to trans. z hi=lo=0 wszedzie poza zrodlem i ujsciem)
-            TrsVertLoss():
-                hi(DefaultStructs:: template NumberTypeBounds< CapacType >::zero()),
-                lo(DefaultStructs:: template NumberTypeBounds< CapacType >::zero())
-                { }
-            TrsVertLoss( CapacType alo):
-                hi(DefaultStructs:: template NumberTypeBounds< CapacType >::zero()),
-                lo( alo )
-                { }
+            TrsVertLoss(): hi(DefaultStructs:: template NumberTypeBounds< CapacType >::zero()), lo(DefaultStructs:: template NumberTypeBounds< CapacType >::zero())
+                 { }
+            TrsVertLoss( CapacType alo): hi(DefaultStructs:: template NumberTypeBounds< CapacType >::zero()), lo( alo )
+                 { }
             TrsVertLoss( CapacType alo, CapacType ahi): hi( ahi ), lo( alo )
                  { }
         };
@@ -236,20 +204,6 @@ namespace Koala
                     outPot( DefaultStructs:: template NumberTypeBounds< CapacType >::plusInfty() ),
                     used( false )
                     { }
-        };
-
-        // pomocnicza etykieta wierzcholka na uzytek alg. Dijkstry w sieci tymczasowej
-        template< class GraphType, class CostType > struct VertLabsCost
-        {
-            CostType distance,pot;
-            typename GraphType::PVertex vPrev;
-            typename GraphType::PEdge  ePrev;
-
-            VertLabsCost():
-                distance( DefaultStructs:: template NumberTypeBounds< CostType >::plusInfty() ),
-                pot( DefaultStructs:: template NumberTypeBounds< CostType >::zero() ),
-                vPrev( 0 ), ePrev( 0 )
-                { }
         };
 
         // przepustowosc uzyteczna krawedzi w sieci tymczasowej z danymi przeplywami
@@ -317,24 +271,64 @@ namespace Koala
             costFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PEdge e,
                 typename GraphType::PVertex v );
 
+        // pomocnicza etykieta wierzcholka na uzytek alg. Dijkstry w sieci tymczasowej
+        template< class GraphType, class CostType > struct VertLabsCost
+        {
+            CostType distance,pot;
+            typename GraphType::PVertex vPrev;
+            typename GraphType::PEdge  ePrev;
+
+            VertLabsCost():
+                distance( DefaultStructs:: template NumberTypeBounds< CostType >::plusInfty() ),
+                pot( DefaultStructs:: template NumberTypeBounds< CostType >::zero() ),
+                vPrev( 0 ), ePrev( 0 )
+                { }
+        };
+
         // Korekta kosztu luku na uzytek Dijkstry z potencjalami wierzcholkow (nowe koszty nie wprowadzaja ujemnych cykli)
         template< class GraphType, class EdgeContainer, class VertContainer >
             static typename EdgeContainer::ValType::CostType costFlowDij( const GraphType &g, EdgeContainer &edgeTab,
                 VertContainer& vertTab, typename GraphType::PEdge e, typename GraphType::PVertex v )
-            {
-                return costFlow( g,edgeTab,e,v ) + vertTab[v].pot - vertTab[g.getEdgeEnd( e,v )].pot;
-            }
+            {   return costFlow( g,edgeTab,e,v ) + vertTab[v].pot - vertTab[g.getEdgeEnd( e,v )].pot; }
+
         // Dijkstra w sieci tymczasowej z kosztami lukow skorygowanymi przez potencjaly wierzcholkow
         // Zwraca: czy istnieje przejscie start->end
         // TODO: rozwazyc przejscie na kopce
         template< class GraphType, class VertContainer, class EdgeContainer > static bool
             DijkstraFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
                 typename GraphType::PVertex start, typename GraphType::PVertex end );
+        // pomocniczza etykieta wierzcholka dla minMeanCycle
+        template< class GraphType, class CostType > struct CycLabs
+        {
+            CostType dist;
+            typename GraphType::PVertex vPrev;
+            typename GraphType::PEdge  ePrev;
+
+            CycLabs(): dist( DefaultStructs::template NumberTypeBounds< CostType >::plusInfty() ),
+                        vPrev( 0 ), ePrev( 0 )
+                { }
+        };
+
+        // znajdowanie w sieci tymczasowej cyklu o najmniejszej sredniej dlugosci krawedzi
+        // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
+        // TODO: nie testowane, sprawdzic!
+        template< class GraphType, class EdgeContainer, class EIter, class VIter >
+            static int minMeanCycle( const GraphType &g, EdgeContainer &edgeTab, OutPath< VIter,EIter > iters );
+
+        template< class GraphType, class VertContainer, class EdgeContainer > static bool
+            BellmanFordFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
+                typename GraphType::PVertex start, typename GraphType::PVertex end );
+
         // znajdowanie przeplywu start->end o maksymalnej objetosci (ale nie przekraczajacej limitu val) i najmniejszym koszcie
-        // procedura pseudowielomianowa (sciezki powiekszajace)
+        // procedura pseudowielomianowa (sciezki powiekszajace typu FulkersonFord)
         // zwraca pare wielkosc przeplywu
         template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
             minCostFlowFF( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
+                typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val = DefaultStructs::
+                template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
+        // procedura o interfejsie j.w. ale wielomianowa
+        template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CostType
+            minCostFlowGT( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
                 typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val = DefaultStructs::
                 template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
         // TODO: nieefektywna, zrezygnowac z Setow
@@ -357,10 +351,7 @@ namespace Koala
         template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
             maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
                 typename GraphType::PVertex end)
-            {
-		        return maxFlow(g, edgeTab, start, end, DefaultStructs::
-                        template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
-            }
+		    { return maxFlow(g, edgeTab, start, end, DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() ); };
         template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
             maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
                 typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType limit);
@@ -373,10 +364,7 @@ namespace Koala
             std::pair< typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType >
             minCostFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
                 typename GraphType::PVertex end)
-            {
-                return minCostFlow(g, edgeTab, start, end, DefaultStructs::
-                         template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
-            }
+		{ return minCostFlow(g, edgeTab, start, end, DefaultStructs::template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() ); };
         template< class GraphType, class EdgeContainer > static
             std::pair< typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType >
             minCostFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
@@ -389,30 +377,30 @@ namespace Koala
                 {
                     EdgeCut< typename EdgeContainer::ValType::CapacType > res;
                     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
-                        VertLabs< GraphType,typename EdgeContainer::ValType::CapacType > >::Type vertTab( g.getVertNo() );
+                	VertLabs< GraphType,typename EdgeContainer::ValType::CapacType > >::Type vertTab( g.getVertNo() );
                     res.capac = maxFlow( g,edgeTab,start,end );
                     BFSFlow( g,edgeTab,vertTab,start,end,true,blackHole );
                     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-                        if (std::numeric_limits< int >::max() > vertTab[v].distance)
-                        {
-                            res.vertNo++;
-                            if (!isBlackHole( iters.vertIter ))
-                            {
-                                *iters.vertIter = v;
-                                ++iters.vertIter;
-                            }
-                            for( typename GraphType::PEdge e = g.getEdge( v,EdDirOut | EdUndir ); e;
-                                e = g.getEdgeNext( v,e,EdDirOut | EdUndir ) )
-                                if (vertTab[g.getEdgeEnd( e,v )].distance == std::numeric_limits< int >::max())
-                                {
-                                    res.edgeNo++;
-                                    if (!isBlackHole( iters.edgeIter ))
-                                    {
-                                        *iters.edgeIter = e;
-                                        ++iters.edgeIter;
-                                    }
-                            }
-                        }
+                    if (std::numeric_limits< int >::max() > vertTab[v].distance)
+                    {
+                	res.vertNo++;
+                	if (!isBlackHole( iters.vertIter ))
+                	{
+                	    *iters.vertIter = v;
+                	    ++iters.vertIter;
+                	}
+                	for( typename GraphType::PEdge e = g.getEdge( v,EdDirOut | EdUndir ); e;
+                	    e = g.getEdgeNext( v,e,EdDirOut | EdUndir ) )
+                	    if (vertTab[g.getEdgeEnd( e,v )].distance == std::numeric_limits< int >::max())
+                	    {
+                		res.edgeNo++;
+                		if (!isBlackHole( iters.edgeIter ))
+                		{
+                		    *iters.edgeIter = e;
+                		    ++iters.edgeIter;
+                		}
+                	    }
+                    }
                     return res;
                 }
         // j.w. ale szuka najmniejszego rozciecia miedzy kazda para wierzcholkow (zwracane w polach first, second)
@@ -508,10 +496,10 @@ namespace Koala
     };
 
     // wersja dzialajaca na DefaultStructs=FlowAlgsDefaultSettings
-    template< bool FF > class FlowFl: public FlowPar< FlowAlgsDefaultSettings< FF > > { };
+    template< bool FF, bool costFF > class FlowFl: public FlowPar< FlowAlgsDefaultSettings< FF,costFF > > { };
 
-    // i z domyslnyna flaga wyboru algorytmow
-    class Flow: public FlowFl< false > { };
+    // i z domyslnymi flagami wyboru algorytmow
+    class Flow: public FlowFl< false,true > { };
 
     /* ConnectPar
      * Procedury badania spojnosci grafu (bez wag na wierz/kraw)
@@ -533,7 +521,6 @@ namespace Koala
         };
 
       protected:
-
         struct EdgeLabs
         {
             int capac,flow;
@@ -555,19 +542,19 @@ namespace Koala
         // krawedzie sa wypisywane na iter
         template< class GraphType, class EIter > static EdgeCut< GraphType > minEdgeCut( const GraphType &g, EIter iter )
         // Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
-        {
-            EdgeCut< GraphType > res;
-            typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,
-                typename FlowPar< DefaultStructs >:: template EdgeLabs< int > >::Type edgeLabs( g.getEdgeNo() );
-            for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) ) edgeLabs[e].capac = 1;
-            typename FlowPar< DefaultStructs >:: template EdgeCut2< GraphType,int > res2 =
-                FlowPar< DefaultStructs >:: template minEdgeCut( g,edgeLabs,FlowPar< DefaultStructs >::template
-                    outCut( blackHole,iter ) );
-            res.edgeNo = res2.capac;
-            res.first = res2.first;
-            res.second = res2.second;
-            return res;
-        }
+                {
+                    EdgeCut< GraphType > res;
+                    typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,
+                        typename FlowPar< DefaultStructs >:: template EdgeLabs< int > >::Type edgeLabs( g.getEdgeNo() );
+                    for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) ) edgeLabs[e].capac = 1;
+                    typename FlowPar< DefaultStructs >:: template EdgeCut2< GraphType,int > res2 =
+                        FlowPar< DefaultStructs >:: template minEdgeCut( g,edgeLabs,FlowPar< DefaultStructs >::template
+                            outCut( blackHole,iter ) );
+                    res.edgeNo = res2.capac;
+                    res.first = res2.first;
+                    res.second = res2.second;
+                    return res;
+                }
         // znajduje najwiekszy zbior krawedziowo rozlaczych sciezek start->end
         // zwraca ich liczbe. Parametry: badany graf,
         // iteratory wyjsciowe na kolejne wierz znalezionych sciezek
@@ -590,7 +577,7 @@ namespace Koala
     };
 
     // wersja dzialajaca na DefaultStructs=FlowAlgsDefaultSettings<false, true>
-    class Connect: public ConnectPar< FlowAlgsDefaultSettings< false > > { };
+    class Connect: public ConnectPar< FlowAlgsDefaultSettings< false,true > > { };
 
 #include "conflow.hpp"
 }

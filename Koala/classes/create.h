@@ -457,7 +457,8 @@ namespace Koala
         template< class Graph > static void repair( Graph &g );
 
         // wpisz relacje pusta na istniejacych wierzcholkach
-        template< class Graph > static void empty( Graph &g ) { g.clearEdges(); }
+        template< class Graph > static void empty( Graph &g )
+            { g.clearEdges(); }
 
         // wpisz relacje kazdy z kazdym na istniejacych wierzcholkach. Mozna podac pole info wprowadzanych krawedzi
         template< class Graph > static void
@@ -550,12 +551,16 @@ namespace Koala
         // jw. bez linkerow
         template< class GraphIn, class GraphOut, class VCaster, class ECaster >
             static typename GraphOut::PVertex dir( const GraphIn &g, GraphOut &lg, std::pair< VCaster,ECaster > casters )
-            { return dir( g,lg,casters,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) ); }
+            {
+                return dir( g,lg,casters,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+            }
         // jw. ale tylko tworzy linegraph
         template< class GraphIn, class GraphOut >
             static typename GraphOut::PVertex dir( const GraphIn &g, GraphOut &lg )
-            { return dir( g,lg,std::make_pair( stdCast( false ),stdCast( false ) ),
-                std::make_pair( stdLink( false,false ),stdLink( false,false ) ) ); }
+            {
+                return dir( g,lg,std::make_pair( stdCast( false ),stdCast( false ) ),
+                std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+            }
     };
 
     // wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
@@ -618,12 +623,16 @@ namespace Koala
         template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster >
             static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g,
                 std::pair< VCaster,ECaster > cast )
-            { return cart( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) ); }
+            {
+                return cart( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+            }
         // j.w. ale tylko tworzy iloczyn
         template< class Graph1, class Graph2, class Graph >
             static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g )
-            { return cart( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
-                std::make_pair( stdLink( false,false ),stdLink( false,false ) ) ); }
+            {
+                return cart( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+                std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+            }
 
         //    Dopisuje iloczyn    leksykograficzny
         //    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
@@ -634,12 +643,16 @@ namespace Koala
         template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster >
             static typename Graph::PVertex lex( const Graph1 &g1, const Graph2 &g2, Graph &g,
                 std::pair< VCaster,ECaster > cast )
-            { return lex( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) ); }
+            {
+                return lex( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+            }
         // j.w. ale tylko tworzy iloczyn
         template< class Graph1, class Graph2, class Graph >
             static typename Graph::PVertex lex( const Graph1 &g1, const Graph2 &g2, Graph &g )
-            { return lex( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
-                std::make_pair( stdLink( false,false ),stdLink( false,false ) ) ); }
+            {
+                return lex( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+                std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+            }
 
         //    Dopisuje iloczyn    tensorowy
         //    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
@@ -650,12 +663,16 @@ namespace Koala
         template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster >
             static typename Graph::PVertex tensor( const Graph1 &g1, const Graph2 &g2, Graph &g,
                 std::pair< VCaster,ECaster > cast )
-            { return tensor( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) ); }
+            {
+                return tensor( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+            }
         // j.w. ale tylko tworzy iloczyn
         template< class Graph1, class Graph2, class Graph >
             static typename Graph::PVertex tensor( const Graph1 &g1, const Graph2 &g2, Graph &g )
-            { return tensor( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
-                std::make_pair( stdLink( false,false ),stdLink( false,false ) ) ); }
+            {
+                return tensor( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+                std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+            }
 
         //    Dopisuje strong
         //    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
@@ -666,12 +683,16 @@ namespace Koala
         template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster >
             static typename Graph::PVertex strong( const Graph1 &g1, const Graph2 &g2, Graph &g,
                 std::pair< VCaster,ECaster > cast )
-            { return strong( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) ); }
+            {
+                return strong( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+            }
         // j.w. ale tylko tworzy iloczyn
         template< class Graph1, class Graph2, class Graph >
             static typename Graph::PVertex strong( const Graph1 &g1, const Graph2 &g2, Graph &g )
-            { return strong( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
-                std::make_pair( stdLink( false,false ),stdLink( false,false ) ) ); }
+            {
+                return strong( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+                std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+            }
     };
 
     // wersja dzialajaca na DefaultStructs=AlgsDefaultSettings

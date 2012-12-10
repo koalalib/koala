@@ -27,7 +27,8 @@ namespace Privates {
     class MatchingBlackHoleWriter<BlackHole> {
     public:
         template<class V, class E>
-        static void Write(BlackHole &c, V u, V v, E e) {};
+        static void Write(BlackHole &c, V u, V v, E e)
+            {};
     };
 
 };
@@ -79,15 +80,22 @@ template< class DefaultStructs > class MatchingPar
                     Node<T> *m_ptr;
             };
 
-            CyclicList(Allocator& alloc=0):  allocator(&alloc), m_cur(0) {};
-            ~CyclicList()	{ erase(); };
-            T &curr()	{ return m_cur->elem; };
+            CyclicList(Allocator& alloc=0):  allocator(&alloc), m_cur(0)
+                {};
+            ~CyclicList()
+                { erase(); };
+            T &curr()
+                { return m_cur->elem; };
 
-            iterator cur()	{ return iterator(m_cur); };
+            iterator cur()
+                { return iterator(m_cur); };
 
-            void clear()	{ while(m_cur != 0) erase(); };
-            void next()	{ m_cur = m_cur->next; };
-            void prev()	{ m_cur = m_cur->prev; };
+            void clear()
+                { while(m_cur != 0) erase(); };
+            void next()
+                { m_cur = m_cur->next; };
+            void prev()
+                { m_cur = m_cur->prev; };
 
             void add_before(const T &v) {
                 //Node<T> *n = new Node<T>;
@@ -159,7 +167,9 @@ template< class DefaultStructs > class MatchingPar
                     {}
 
                 void push(const T &v, bool b)
-                { this->QueueInterface< std::pair<T, bool> * >::push(std::pair<T, bool>(v,b)); }
+                {
+                    this->QueueInterface< std::pair<T, bool> * >::push(std::pair<T, bool>(v,b));
+                }
         };
 
 	template<class GraphType,class CList>
@@ -224,7 +234,8 @@ template< class DefaultStructs > class MatchingPar
         {
                 typename GraphType::PVertex vMatch;
                 typename GraphType::PEdge eMatch;
-                VertLabs(): vMatch( 0 ), eMatch( 0 ) {}
+                VertLabs(): vMatch( 0 ), eMatch( 0 )
+                    {}
         };
 
 	/** find maximum matching in a given graph
@@ -233,7 +244,9 @@ template< class DefaultStructs > class MatchingPar
 	 * @return actual number of edges in found matching */
         template< class GraphType, class EIterOut >
 	static int findMax( const GraphType &g, EIterOut matching)
-		{ return findMax( g,blackHole,matching ); }
+        {
+		    return findMax( g,blackHole,matching );
+        }
 
 	/** find maximum matching in a given graph
 	 * @param[in] graph
@@ -246,7 +259,7 @@ template< class DefaultStructs > class MatchingPar
 			    VertContainer &vertTab,
 			    EIterOut matching,
 			    int matchSize = -1 )
-		{
+        {
 		    typename GraphType::PEdge edges[1];
             return matchingTool(g, vertTab, edges, edges, matching, matchSize, false);
         }
@@ -261,7 +274,9 @@ template< class DefaultStructs > class MatchingPar
 			    EIterIn initialBegin,
 			    EIterIn initialEnd,
 			    EIterOut matching, int matchSize = -1 )
-		{ return matchingTool(g, vertTab, initialBegin, initialEnd, matching, matchSize, false); }
+        {
+		    return matchingTool(g, vertTab, initialBegin, initialEnd, matching, matchSize, false);
+        }
 
 	/** find minimim edge cover of a given graph
 	 * @param[in] graph
@@ -269,8 +284,9 @@ template< class DefaultStructs > class MatchingPar
 	 * @return actual number of edges in found cover */
         template< class GraphType, class EIterOut >
 	static int minEdgeCover( const GraphType &g, EIterOut cover)
-		{ typename GraphType::PEdge edges[1];
-		  return matchingTool(g, blackHole, edges, edges, cover, -1, true);
+		{
+		    typename GraphType::PEdge edges[1];
+            return matchingTool(g, blackHole, edges, edges, cover, -1, true);
         }
 
         template< class GraphType, class VertContainer, class EIterOut > static int greedy( const GraphType &g,
@@ -323,7 +339,7 @@ template< class DefaultStructs > class MatchingPar
             }
 
             void copy(BlackHole&) const
-            { }
+                { }
 
         };
 
@@ -333,6 +349,7 @@ template< class DefaultStructs > class MatchingPar
         // bool compare(v,e1,e2) jest true jesli e2 jest lepsze od e1 z punktu widzenia ich koncowki v
         template< class GraphType, class EIterIn, class Comp > static std::pair< bool,typename GraphType::PEdge >
             test( const GraphType &g, Comp compare, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd );
+        //TODO: niepewny, przetestowac poprawnosc na duzych przykladach
         template< class GraphType, class VIterIn, class Comp, class vertCont, class EIterOut >
             static int bipartFind( const GraphType &g, VIterIn begin, VIterIn end, Comp compare, vertCont &verttab,
                 EIterOut out );

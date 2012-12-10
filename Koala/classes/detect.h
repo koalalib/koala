@@ -268,7 +268,8 @@ namespace Koala
 
             struct EDir: public std::pair< int,int >
             {
-                EDir(): std::pair< int,int >( 0,0 ) { }
+                EDir(): std::pair< int,int >( 0,0 )
+                    { }
 
                 int& operator()( EdgeDirection arg )
                 {

@@ -114,13 +114,13 @@ void t( Cont /*AssocArray<Vert*,std::string>*/ & arr)
 
     {
 
-        PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int > > > a(5);
+        Koala::Privates::PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int > > > a(5);
 
         t(a);
         a[C]="Ca";
         a[B]="Ba";
         t(a);
-        PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int > > > b;
+        Koala::Privates::PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int > > > b;
         b[C]="x";
         b=a;
         t(a);
@@ -133,11 +133,11 @@ void t( Cont /*AssocArray<Vert*,std::string>*/ & arr)
         t(a);
         t(b);
 
-        PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int > > > a2=a;
-        PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int > > > a3;
+        Koala::Privates::PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int > > > a2=a;
+        Koala::Privates::PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int > > > a3;
         a3=a;
 
-        const PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int > > > cb=b;
+        const Koala::Privates::PseudoAssocArray<Vert*,std::string, AssocTable<std::map<Vert*,int > > > cb=b;
         t(cb);
 
         cout << cb[A];
