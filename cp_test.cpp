@@ -136,7 +136,7 @@ struct InfoE2 {
 //    Set<Edge<InfoV1,InfoE1>*> vset;
 ////    vset+=A; vset+=D;
 //    cout << endl <<g1.getEdgeNo() << endl;
-//    cout << g1.ch2Archs(g1.getEdgeSet());
+//    cout << g1.ch2Arcs(g1.getEdgeSet());
 //    cout << endl <<g1.getEdgeNo() << endl;
 
     return 0;

@@ -11,12 +11,12 @@ namespace Privates {
 namespace OperTestSubSpace {
 
 class OperTest {
-    public:
-    int tab[5];
-    OperTest() {}
+	public:
+	int tab[5];
+	OperTest() {}
 
-    OperTest(std::ostream& os) { (void)(os); }
-    OperTest(std::istream& os) { (void)(os); }
+	OperTest(std::ostream& os) { (void)(os); }
+	OperTest(std::istream& os) { (void)(os); }
 };
 
 
@@ -34,13 +34,13 @@ OperTest makeOper(const OperTest&) { return OperTest(); }
 template <class T>
 struct PrivHasOperOut {
 
-    enum { res= (sizeof(makeOper(*((std::ostream*)0)<<  *((T*)0) ))==1) };
+	enum { res= (sizeof(makeOper(*((std::ostream*)0)<<  *((T*)0) ))==1) };
 };
 
 template <class T>
 struct PrivHasOperIn {
 
-    enum { res= (sizeof(makeOper( *((std::istream*)0)>>  (*((T*)0)) ))==1) };
+	enum { res= (sizeof(makeOper( *((std::istream*)0)>>  (*((T*)0)) ))==1) };
 };
 
 
@@ -53,20 +53,20 @@ template <class T>
 class HasOperIn : public OperTestSubSpace::PrivHasOperIn<T> {};
 
 template <bool> struct ReadWriteHlp {
-    template <class A, class B>
-    static void write(A& a,B& b) {  }
+	template <class A, class B>
+	static void write(A& a,B& b) {  }
 
-    template <class A, class B>
-    static bool read(A& a,B& b) {  return true; }
+	template <class A, class B>
+	static bool read(A& a,B& b) {  return true; }
 };
 
 template<>
 struct ReadWriteHlp<true> {
-    template <class A, class B>
-    static void write(A& a,B& b) { a << b; }
+	template <class A, class B>
+	static void write(A& a,B& b) { a << b; }
 
-    template <class A, class B>
-    static bool read(A& a,B& b) {  return (bool)(a >> b); }
+	template <class A, class B>
+	static bool read(A& a,B& b) {  return (bool)(a >> b); }
 };
 
 
@@ -143,10 +143,10 @@ bool readGraphVL(Graph &g, std::istream &strm,
 	std::map<unsigned int, typename Graph::PVertex > idxToPtr;
 	typename std::map<unsigned int, typename Graph::PVertex >::iterator it;
 
-    if (!(bool)(strm >> n)) return false;
-    for(i=0;i<n;i++) idxToPtr[i] = u = g.addVert();
+	if (!(bool)(strm >> n)) return false;
+	for(i=0;i<n;i++) idxToPtr[i] = u = g.addVert();
 	for (iu=0;iu<n;iu++) {
-	    if (!(bool)(strm >> i) || i!=iu) return false;
+		if (!(bool)(strm >> i) || i!=iu) return false;
 		it = idxToPtr.find(iu);
 		if(it == idxToPtr.end()) return false;
 		else u = it->second;
@@ -203,12 +203,12 @@ bool readGraphEL(Graph &g, std::istream &strm,
 	if (!(bool)(strm >> n >> m)) return false;
 	for(id=0;id<n;id++) idxToPtr[id] = g.addVert();
 	for(unsigned int i=0;i<m;i++) {
-	    strm >> iu;
+		strm >> iu;
 		it = idxToPtr.find(iu);
 		if(it == idxToPtr.end()) return false;
 		else u = it->second;
 
-		 		// read edges with edge data
+				// read edges with edge data
 			if(!(bool)(strm >> c)) return false;
 				if(c == '-') dir = EdUndir;
 				else if(c == '<') dir = EdDirIn;
@@ -216,7 +216,7 @@ bool readGraphEL(Graph &g, std::istream &strm,
 				else if(c == '*') dir = EdLoop;
 				else return false;
 
-            strm >> iv;
+			strm >> iv;
 			it = idxToPtr.find(iv);
 			if(it == idxToPtr.end()) return false;
 			else v = it->second;
@@ -227,11 +227,11 @@ bool readGraphEL(Graph &g, std::istream &strm,
 			if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::EdgeInfoType >::res>::read(ostrm,e->info)) return false;
 			if(readOutputId(strm, ix)) edgeMap[ix] = e;
 			};
-        for(id=0;id<n;id++) {
-            strm >> iu; if (iu!=id) return false;
-            it = idxToPtr.find(id);
-            u = it->second;
-            if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::VertInfoType >::res>::read(ostrm,u->info)) return false;
+		for(id=0;id<n;id++) {
+			strm >> iu; if (iu!=id) return false;
+			it = idxToPtr.find(id);
+			u = it->second;
+			if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::VertInfoType >::res>::read(ostrm,u->info)) return false;
 			if(readOutputId(strm, ix)) vertexMap[ix] = u;
 		};
 	return true;
@@ -251,14 +251,14 @@ bool readGraphEL(Graph &g, std::istream &strm,
 template<typename Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, std::istream &strm, int format,
 		   VMap &vertexMap, EMap &edgeMap) {
-    Privates::EmptyMap<typename Graph::PVertex> tv;
+	Privates::EmptyMap<typename Graph::PVertex> tv;
 	Privates::EmptyMap<typename Graph::PEdge> te;
-    typename  BlackHoleSwitch< VMap, Privates::EmptyMap<typename Graph::PVertex> >::Type &avmap =
-                BlackHoleSwitch< VMap, Privates::EmptyMap<typename Graph::PVertex> >::get(vertexMap ,tv );
-    typename  BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::Type &aemap =
-                BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::get(edgeMap ,te );
+	typename  BlackHoleSwitch< VMap, Privates::EmptyMap<typename Graph::PVertex> >::Type &avmap =
+				BlackHoleSwitch< VMap, Privates::EmptyMap<typename Graph::PVertex> >::get(vertexMap ,tv );
+	typename  BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::Type &aemap =
+				BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::get(edgeMap ,te );
 
-    //TODO: flaga RG_Info nie powinna byc ignorowana, tylko ew. dane o infach w wejsciu tekstowym
+	//TODO: flaga RG_Info nie powinna byc ignorowana, tylko ew. dane o infach w wejsciu tekstowym
 	switch(format & (~RG_Info)) {
 		case RG_VertexLists:	return Privates::readGraphVL(g, strm, avmap, aemap);
 		case RG_EdgeList:	return Privates::readGraphEL(g, strm, avmap, aemap);
@@ -278,7 +278,7 @@ namespace Privates {
  */
 template<class Graph, class VMap, class EMap>
 bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf,
-                  const VMap& vmap,const EMap& emap) {
+				  const VMap& vmap,const EMap& emap) {
 	unsigned int i;
 	EdgeDirection flags;
 	typename Graph::PEdge e;
@@ -319,8 +319,8 @@ bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 			else if(g.getType(e) == Loop) out << '*';
 			else out << '>';
 			out << ptrToIdx[v];
-            if (printinf.second && HasOperOut<typename Graph::EdgeInfoType >::res)
-            { out << '('; ReadWriteHlp<HasOperOut<typename Graph::EdgeInfoType >::res>::write(out,e->info); out << ')'; }
+			if (printinf.second && HasOperOut<typename Graph::EdgeInfoType >::res)
+			{ out << '('; ReadWriteHlp<HasOperOut<typename Graph::EdgeInfoType >::res>::write(out,e->info); out << ')'; }
 
 			if (emap.hasKey(e)) out << '@' << emap[e];
 			used.insert(e);
@@ -342,7 +342,7 @@ bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
  */
 template<class Graph, class VMap, class EMap>
 bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf,
-                  const VMap& vmap,const EMap& emap) {
+				  const VMap& vmap,const EMap& emap) {
 	unsigned int idx,i=0;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u;
@@ -388,13 +388,13 @@ bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
  */
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::ostream &out, int format,
-                    const VMap& vmap,const EMap& emap) {
+					const VMap& vmap,const EMap& emap) {
 
-    Privates::EmptyMap2 em;
-    const typename  BlackHoleSwitch< VMap, Privates::EmptyMap2 >::Type &avmap =
-            BlackHoleSwitch< VMap, Privates::EmptyMap2 >::get(( vmap ),em );
-    const typename  BlackHoleSwitch< EMap, Privates::EmptyMap2 >::Type &aemap =
-            BlackHoleSwitch< EMap, Privates::EmptyMap2 >::get(( emap ),em );
+	Privates::EmptyMap2 em;
+	const typename  BlackHoleSwitch< VMap, Privates::EmptyMap2 >::Type &avmap =
+			BlackHoleSwitch< VMap, Privates::EmptyMap2 >::get(( vmap ),em );
+	const typename  BlackHoleSwitch< EMap, Privates::EmptyMap2 >::Type &aemap =
+			BlackHoleSwitch< EMap, Privates::EmptyMap2 >::get(( emap ),em );
 
 	switch(format & (~RG_Info)) {
 		case RG_VertexLists:	return Privates::writeGraphVL(g, out, std::make_pair((bool)(format&RG_VInfo),(bool)(format&RG_EInfo)),avmap,aemap);

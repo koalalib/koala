@@ -126,15 +126,15 @@ int main(int argc, char **argv) {
 			}
 		}
 
-		if( !(gmlg->getInt("hf")&1) ) {
-			cout << "IntervalEdgeColoring::hf\n";
+		if( !(gmlg->getInt("lf")&1) ) {
+			cout << "IntervalEdgeColoring::lf\n";
 			tmpColors = colors;
-			int res = Koala::IntervalEdgeColoring::hf(graph, weights, tmpColors);
+			int res = Koala::IntervalEdgeColoring::lf(graph, weights, tmpColors);
 			if(param==1) cout<<"maxColor:"<<res<<"\n";
 			else if(param==2) print(graph, tmpColors);
 			res = Koala::IntervalEdgeColoring::test(graph, weights, tmpColors);
 			if(res==0) {
-				cout<<"TEST " << testId << " - IntervalEdgeColoring::hf wrong coloring\n";
+				cout<<"TEST " << testId << " - IntervalEdgeColoring::lf wrong coloring\n";
 				testPass = false;
 			}
 		}

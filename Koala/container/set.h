@@ -62,37 +62,47 @@ namespace Koala
 namespace Koala
 {
 
-    /* SetInserter
-     * Iterator wstawiajacy elementy do podanego przez adres zewnetrznego zbioru
-     */
-    template< class Element > class SetInserter;
+	/* SetInserter DOCUMENT
+	 * Iterator wstawiajacy elementy do podanego przez adres zewnetrznego zbioru
+	 *
+	 *  [See example](examples/set/setInserter.html)
+	 */
+	template< class Element > class SetInserter;
 
-    template< class Element > class SetInserter< Set< Element > >:
-        public std::iterator< std::output_iterator_tag,void,void,void,void >
-    {
-      protected:
-        Set< Element > *container;
+	template< class Element > class SetInserter< Set< Element > >:
+		public std::iterator< std::output_iterator_tag,void,void,void,void >
+	{
+	protected:
+		Set< Element > *container;
 
-      public:
-        typedef Set< Element > container_type;
-        SetInserter( Set< Element > &x ): container( &x ) { }
-        SetInserter< Set< Element > > &operator= ( const Element &value );
-        SetInserter< Set< Element > > &operator*() { return *this; }
-        SetInserter< Set< Element > > &operator++() { return *this; }
-        SetInserter< Set<Element> > operator++( int ) { return *this; }
-    };
+	public:
+		typedef Set< Element > container_type;
+		SetInserter( Set< Element > &x ): container( &x ) { }
+		SetInserter< Set< Element > > &operator= ( const Element &value );
+		SetInserter< Set< Element > > &operator*() { return *this; }
+		SetInserter< Set< Element > > &operator++() { return *this; }
+		SetInserter< Set<Element> > operator++( int ) { return *this; }
+	};
 
-    // funkcja tworzaca interator wstawiajacy do podanego zbioru
-    template< class Element > SetInserter< Set< Element > > setInserter( Set< Element > &x )
-        { return SetInserter< Set< Element > >( x ); }
+	// funkcja tworzaca interator wstawiajacy do podanego zbioru
+	template< class Element > SetInserter< Set< Element > > setInserter( Set< Element > &x )
+		{ return SetInserter< Set< Element > >( x ); }
 
-    // wylicza obraz zbioru w podanym przeksztalceniu
-    // niestety sama nie zajdzie dedukcja typu wyniku przy wywolaniu ( trzeba np. imageSet<double>(iset,kwadrat);)
-    template< class ValType, class ArgType, class Funktor >
-        Set< ValType > imageSet( const Set< ArgType > &arg, Funktor f );
-    // wylicza przeciwobraz zbioru w podanym przeksztalceniu i danej dziedzinie
-    template< class ValType, class ArgType, class Funktor >
-        Set< ArgType > preimageSet( const Set< ValType > &arg, const Set< ArgType > &domain, Funktor f );
+	// wylicza obraz zbioru w podanym przeksztalceniu
+	// niestety sama nie zajdzie dedukcja typu wyniku przy wywolaniu ( trzeba np. imageSet<double>(iset,kwadrat);)
+	/**
+	 *
+	 *  [See example](examples/set/setFunction.html)
+	 */
+	template< class ValType, class ArgType, class Funktor >
+		Set< ValType > imageSet( const Set< ArgType > &arg, Funktor f );
+	// wylicza przeciwobraz zbioru w podanym przeksztalceniu i danej dziedzinie
+	/**
+	 *
+	 *  [See example](examples/set/setFunction.html)
+	 */
+	template< class ValType, class ArgType, class Funktor >
+		Set< ArgType > preimageSet( const Set< ValType > &arg, const Set< ArgType > &domain, Funktor f );
 
 // hashset ma implementacje operatorow inne niz te stl-owe
 #include "set.hpp"

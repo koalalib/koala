@@ -17,7 +17,7 @@
 	<!-- for all keys below: 0-make test; 1-don't make test-->
 	<key id="testColor" for="graph" attr.type="int"/>
 	<key id="greedy" for="graph" attr.type="int"/>
-	<key id="hf" for="graph" attr.type="int"/>
+	<key id="lf" for="graph" attr.type="int"/>
 	<key id="li" for="graph" attr.type="int"/>
 	<!-- TEST 0 -->
 	<graph id="Petersen" edgedefault="undirected">
