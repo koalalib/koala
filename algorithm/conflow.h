@@ -153,12 +153,12 @@ namespace Koala
 		// Uzytkownik podaje, pare iteratorow, gdzie wpisac krawedzie znalezionego rozciecia
 		// i wierzcholki osiagalne ze startowego po usunieciu krawedzi rozciecia
 
-		/** \brief Auxiliary class to represent the edge cut.
+		/** \brief Auxiliary class to represent the edge cut.*/
 		template< class VIter, class EIter > struct OutCut
 		{
 			VIter vertIter;/**<\brief Iterator to the container with vertexes (accessible after the cut)*/
 			EIter edgeIter;/**<\brief Iterator to the container with edges of the cat.*/
-			/**\brief Constructor*/ 
+			/**\brief Constructor*/
 			OutCut( VIter av, EIter ei ): vertIter( av ), edgeIter( ei ) { }
 		};
 
