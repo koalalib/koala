@@ -377,54 +377,171 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EdgeContainer >
-    bool FlowPar< DefaultStructs >::DijkstraFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
+    bool FlowPar< DefaultStructs >::BellmanFordFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
         typename GraphType::PVertex start, typename GraphType::PVertex end )
 {
-    koalaAssert( start && end,AlgExcNullVert );
-    koalaAssert( start != end,AlgExcWrongConn );
-    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
-        VertLabsCost< GraphType,typename EdgeContainer::ValType::CostType > >::Type Q( g.getVertNo() );
+    assert( start && end && start != end);
+    const typename EdgeContainer::ValType::CostType inf = DefaultStructs:: template NumberTypeBounds
+        < typename EdgeContainer::ValType::CostType >::plusInfty();
+    const typename EdgeContainer::ValType::CostType zero = DefaultStructs:: template NumberTypeBounds
+        < typename EdgeContainer::ValType::CostType >::zero();
+    const EdgeDirection mask = Koala::EdUndir | Koala::EdDirIn | Koala::EdDirOut;
+
+    typename EdgeContainer::ValType::CostType nd;
     typename GraphType::PVertex U,V;
 
-    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-        vertTab[v].distance = DefaultStructs:: template NumberTypeBounds
-            < typename EdgeContainer::ValType::CostType >::plusInfty();
-    Q[start].vPrev = 0;
-    Q[start].ePrev = 0;
-    Q[start].distance = DefaultStructs:: template NumberTypeBounds
-        < typename EdgeContainer::ValType::CostType >::zero();
-    while (!Q.empty())
+    //inicjalizacja
+    //for each v: d[v] <- INF (to jest zrealizowane juz przy tworzeniu vertTab)
+    //f[s] <- NIL
+    vertTab[start].vPrev = 0;
+    vertTab[start].ePrev = 0;
+    //d[s] <- 0
+    vertTab[start].distance = zero;
+
+    //for 1 to n-1:
+    //  for each (u,v):
+    //      if  d[u]+w(u,v) < d[v]:
+    //          d[v] <- d[u]+w(u,v) and vPrev[v] <- u and ePrev[v] <- (u,v)
+    int n = g.getVertNo();
+    for( int i = 1; i < n; i++ )
     {
-        typename EdgeContainer::ValType::CostType d = DefaultStructs:: template NumberTypeBounds
-            < typename EdgeContainer::ValType::CostType >::plusInfty(), nd;
-        for( V = Q.firstKey(); V; V = Q.nextKey( V ) )
-            if (d > Q[V].distance) d = Q[U = V].distance;
-        vertTab[U].distance = Q[U].distance;
-        vertTab[U].ePrev = Q[U].ePrev;
-        vertTab[U].vPrev = Q[U].vPrev;
-        Q.delKey( U );
-        for( typename GraphType::PEdge E = g.getEdge( U,Koala::EdUndir | Koala::EdDirIn | Koala::EdDirOut ); E;
-            E = g.getEdgeNext( U,E,Koala::EdUndir | Koala::EdDirIn | Koala::EdDirOut ) )
-            if (usedCapCost( g,edgeTab,E,U ) > DefaultStructs:: template NumberTypeBounds
-                <typename EdgeContainer::ValType::CapacType >::zero())
-                if (vertTab[V = g.getEdgeEnd( E,U )].distance == DefaultStructs:: template NumberTypeBounds
-                    < typename EdgeContainer::ValType::CostType >::plusInfty())
-                    if ((nd = vertTab[U].distance + costFlowDij( g,edgeTab,vertTab,E,U )) < Q[V].distance)
-                    {
-                        Q[V].distance = nd;
-                        Q[V].ePrev = E;
-                        Q[V].vPrev = U;
-                    }
+        //relaksacja krawedzi nieskierowanych
+        for( typename GraphType::PEdge E = g.getEdge( mask ); E; E = g.getEdgeNext( E,mask ) )
+        {
+            if (usedCapCost( g,edgeTab,E,U = g.getEdgeEnds( E ).first ) >
+                DefaultStructs::template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::zero()
+                && vertTab[U].distance < inf &&
+                (nd = vertTab[U].distance + costFlow( g,edgeTab,E,U )) < vertTab[V = g.getEdgeEnds( E ).second].distance)
+                {
+                    vertTab[V].distance = nd;
+                    vertTab[V].ePrev = E;
+                    vertTab[V].vPrev = U;
+                }
+            if (usedCapCost( g,edgeTab,E,U = g.getEdgeEnds( E ).second)>
+                DefaultStructs::template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::zero()
+                && vertTab[U].distance < inf &&
+                (nd = vertTab[U].distance + costFlow( g,edgeTab,E,U )) < vertTab[V = g.getEdgeEnds( E ).first].distance)
+                {
+                    vertTab[V].distance = nd;
+                    vertTab[V].ePrev = E;
+                    vertTab[V].vPrev = U;
+                }
+        }
     }
-    bool res = DefaultStructs:: template NumberTypeBounds
-        < typename EdgeContainer::ValType::CostType >::plusInfty() > vertTab[end].distance;
-    // powrot do "prawdziwego" dystansu - usuniecie wkladu potencjalow
+
+    return vertTab[end].distance < inf;
+}
+
+template< class DefaultStructs > template< class GraphType, class EdgeContainer, class EIter, class VIter >
+    int FlowPar< DefaultStructs >::minMeanCycle( const GraphType &g, EdgeContainer &edgeTab,
+        OutPath< VIter,EIter > iters )
+{
+    const typename EdgeContainer::ValType::CostType PlusInfty = DefaultStructs:: template NumberTypeBounds
+        < typename EdgeContainer::ValType::CostType >::plusInfty();
+    const typename EdgeContainer::ValType::CostType Zero = DefaultStructs:: template NumberTypeBounds
+        < typename EdgeContainer::ValType::CostType >::zero();
+    int n = g.getVertNo();
+    VertLabsCost< GraphType,typename EdgeContainer::ValType::CostType > LOCALARRAY( buf,n * n + n );
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
+        std::pair< VertLabsCost< GraphType,typename EdgeContainer::ValType::CostType > *,int > >::Type vTab( n );
+
+    typename GraphType::PVertex LOCALARRAY( vBuf,n + 1 );
+    typename GraphType::PEdge LOCALARRAY( eBuf,n + 1 );
+
+    VertLabsCost< GraphType,typename EdgeContainer::ValType::CostType > *buf2 = buf;
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-        vertTab[v].distance += vertTab[v].pot - vertTab[start].pot;
-    // nowe potencjaly wierzcholkow na uzytek kolejnej iteracji procedury
+    {
+        vTab[v].second = 0;
+        vTab[v].first = buf2;
+        buf2 += n + 1;
+    }
+
     for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-        vertTab[v].pot = vertTab[v].distance;
-    return res;
+        vTab[v].first->distance = Zero;
+    for( int k = 1; k <= n; k++ )
+        for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+        {
+            typename EdgeContainer::ValType::CostType nd;
+            typename GraphType::PVertex U;
+            (vTab[v].first+k)->distance = PlusInfty;
+            for( typename GraphType::PEdge E = g.getEdge( v,EdUndir | EdDirIn | EdDirOut ); E;
+                E = g.getEdgeNext( v,E,EdUndir | EdDirIn | EdDirOut ) )
+                if ((vTab[U = g.getEdgeEnd( E,v )].first + k - 1)->distance < PlusInfty &&
+                    usedCapCost( g,edgeTab,E,U ) > DefaultStructs:: template NumberTypeBounds
+                        < typename EdgeContainer::ValType::CapacType >::zero() &&
+                    (nd = (vTab[U].first + k - 1)->distance + costFlow( g,edgeTab,E,U )) < (vTab[v].first + k)->distance)
+                {
+                    (vTab[v].first+k)->distance = nd;
+                    (vTab[v].first+k)->ePrev = E;
+                    (vTab[v].first+k)->vPrev = U;
+                }
+        }
+
+    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+        if ((vTab[v].first + n)->distance < PlusInfty)
+            for( int k = 1; k <= n - 1; k++ )
+                if (((vTab[v].first + n)->distance - (vTab[v].first + k)->distance) * (n - vTab[v].second) >
+                    ((vTab[v].first + n)->distance - (vTab[v].first + vTab[v].second)->distance) * (n - k))
+                    vTab[v].second = k;
+
+    std::pair< typename EdgeContainer::ValType::CostType,int > minval,tmpval;
+    typename GraphType::PVertex minv = 0;
+    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+        if ((vTab[v].first + n)->distance < PlusInfty)
+        {
+            if (!minv)
+            {
+                minv = v;
+                minval = std::make_pair( (vTab[v].first + n)->distance - (vTab[v].first + vTab[v].second)->distance,
+                    n - vTab[v].second );
+            }
+            else
+            {
+                tmpval = std::make_pair( (vTab[v].first + n)->distance - (vTab[v].first + vTab[v].second)->distance,
+                    n - vTab[v].second );
+                if (minval.first * tmpval.second > minval.second * tmpval.first)
+                {
+                    minval = tmpval;
+                    minv = v;
+                }
+            }
+        }
+
+    if (!minv || minval.first >= Zero) return 0;
+
+    int licz = 0;
+    for( int i = n; i > 0; i-- )
+    {
+        vBuf[licz] = minv;
+        eBuf[licz] = (vTab[minv].first + i)->ePrev;
+        minv = (vTab[minv].first + i)->vPrev;
+        licz++;
+    }
+    vBuf[licz] = minv;
+
+    int fpos = -1, lpos = -1;
+    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+        vTab[v].second = -1;
+    for( int i = 0; i <= n; i++ )
+        if (vTab[vBuf[i]].second == -1) vTab[vBuf[i]].second = i;
+        else
+        {
+            fpos = vTab[vBuf[i]].second;
+            lpos = i;
+            break;
+        }
+    assert( fpos != -1 && lpos != -1 && fpos < lpos );
+    licz = 0;
+    for( int i = lpos; i > fpos; i-- )
+    {
+        *iters.vertIter = vBuf[i];
+        ++iters.vertIter;
+        *iters.edgeIter = eBuf[i - 1];
+        ++iters.edgeIter;
+        licz++;
+    }
+
+    return licz;
 }
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
@@ -442,7 +559,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
     typename GraphType::PVertex LOCALARRAY( vTab,n );
     typename GraphType::PEdge LOCALARRAY( eTab,n );
 
-    while (DijkstraFlow( g,edgeTab,vertTab,start,end ))
+    while (BellmanFordFlow( g,edgeTab,vertTab,start,end ))
     {
         int len = ShortPathStructs::getOutPath( g,vertTab,outPath( vTab,eTab ),end );
         typename EdgeContainer::ValType::CapacType delta = val - res;
@@ -454,6 +571,35 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
     }
     return res;
 }
+
+template< class DefaultStructs > template< class GraphType, class EdgeContainer >
+    typename EdgeContainer::ValType::CapacType FlowPar< DefaultStructs >::minCostFlowGT( const GraphType &g,
+        EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
+        typename EdgeContainer::ValType::CapacType val )
+{
+    const typename EdgeContainer::ValType::CapacType Zero = DefaultStructs:: template NumberTypeBounds
+        < typename EdgeContainer::ValType::CapacType >::zero();
+    const typename EdgeContainer::ValType::CapacType PlusInfty = DefaultStructs:: template NumberTypeBounds
+        < typename EdgeContainer::ValType::CapacType >::plusInfty();
+
+    typename EdgeContainer::ValType::CapacType res = Zero;
+    int n;
+    typename GraphType::PVertex LOCALARRAY( vTab,(n = g.getVertNo())+1 );
+    typename GraphType::PEdge LOCALARRAY( eTab,n+1 );
+
+
+    int len;
+    res = maxFlow( g,edgeTab,start,end,val );
+    while ((len = minMeanCycle( g,edgeTab,outPath( vTab,eTab ) )) != 0)
+    {
+        typename EdgeContainer::ValType::CapacType delta = PlusInfty;
+        for( int i = 0; i < len; i++ )
+            delta = std::min( delta,usedCapCost( g,edgeTab,eTab[i],vTab[i] ));
+        for( int i = 0; i < len; i++ ) addFlow( g,edgeTab,eTab[i],vTab[i],delta,true );
+    }
+    return res;
+}
+
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class AssocSub >
     void FlowPar< DefaultStructs >::ghtree( GraphType &g, EdgeContainer &edgeTab,
@@ -623,7 +769,8 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
             < typename EdgeContainer::ValType::CostType >::zero(),AlgExcWrongArg );
 
     std::pair< typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType > res;
-    res.second = minCostFlowFF( g,edgeTab,start,end,val );
+    if (DefaultStructs::useCostAugmPath) res.second = minCostFlowFF( g,edgeTab,start,end,val );
+    else res.second = minCostFlowGT( g,edgeTab,start,end,val );
 
     // dla petli o ujemnym koszcie przeplyw jest ustalany na przepustowosc
     for( typename GraphType::PEdge e = g.getEdge( EdLoop ); e; e = g.getEdgeNext( e,EdLoop ) )

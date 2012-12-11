@@ -12,8 +12,8 @@ using namespace Koala;
 
 const int N=15;
 
-typedef FlowPar< FlowAlgsDefaultSettings< false > >  MyFlow;
-typedef FlowPar< FlowAlgsDefaultSettings< true > >  MyFlow2;
+typedef FlowPar< FlowAlgsDefaultSettings< false,true > >  MyFlow;
+typedef FlowPar< FlowAlgsDefaultSettings< false,false > >  MyFlow2;
 
 Koala::Graph<int,Koala::IO::ParSet> g;
 Koala::Graph<int,Koala::IO::ParSet>::PVertex A,B,C,D,E,F,V,U,S,T,tabV[N+1];
@@ -101,13 +101,13 @@ void test1()
         g.clear();
         for(int i=0;i<N;i++) g.addVert(i);
         assert(g.getVertNo()==N);
-//        assert(N==g.getVertNo());
-//        for(int i=0;i<N-1;i++) for(int j=i+1;j<N;j++)
-//            if (((double)rand() / (double)RAND_MAX)<P) g.addEdge(g.vertByNo(i),g.vertByNo(j));
-//        for(int i=0;i<N-1;i++) for(int j=i+1;j<N;j++)
-//            if (((double)rand() / (double)RAND_MAX)<P) g.addEdge(g.vertByNo(i),g.vertByNo(j));
-//        for(int i=0;i<N;i++) for(int j=1;j<N;j++) if (i!=j)
-//            if (((double)rand() / (double)RAND_MAX)<P) g.addArc(g.vertByNo(i),g.vertByNo(j));
+        assert(N==g.getVertNo());
+        for(int i=0;i<N-1;i++) for(int j=i+1;j<N;j++)
+            if (((double)rand() / (double)RAND_MAX)<P) g.addEdge(g.vertByNo(i),g.vertByNo(j));
+        for(int i=0;i<N-1;i++) for(int j=i+1;j<N;j++)
+            if (((double)rand() / (double)RAND_MAX)<P) g.addEdge(g.vertByNo(i),g.vertByNo(j));
+        for(int i=0;i<N;i++) for(int j=1;j<N;j++) if (i!=j)
+            if (((double)rand() / (double)RAND_MAX)<P) g.addArc(g.vertByNo(i),g.vertByNo(j));
         for(int i=0;i<N-1;i++) for(int j=1;j<N;j++) if (i!=j)
             if (((double)rand() / (double)RAND_MAX)<P)
              if (!g.getEdgeNo(g.vertByNo(i),g.vertByNo(j)))
@@ -225,7 +225,7 @@ void test2()
 
 #include "main.hpp"
 
-    test0();
+    test1();
 
     return 0;
 }
