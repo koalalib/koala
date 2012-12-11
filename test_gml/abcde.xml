@@ -3,19 +3,19 @@
     <key id="vchar" attr.type="string" for="node" />
     <key id="edoub" attr.type="string" for="edge" attr.name="attrname" />
     <graph id="first" edgedefault="undirected">
-        <node id="n00778A20">
+        <node id="n00798A20">
             <data key="vchar">A</data>
         </node>
-        <node id="n007788B0">
+        <node id="n007988B0">
             <data key="vchar">B</data>
         </node>
-        <edge id="e00778900" source="n00778A20" target="n007788B0">
+        <edge id="e00798900" source="n00798A20" target="n007988B0">
             <data key="edoub">Ala</data>
         </edge>
-        <edge id="e0089EED0" source="n007788B0" target="n00778A20" directed="true">
+        <edge id="e008CEED0" source="n007988B0" target="n00798A20" directed="true">
             <data key="edoub">Ola</data>
         </edge>
-        <edge id="e0089EF10" source="n007788B0" target="n007788B0">
+        <edge id="e008CEF10" source="n007988B0" target="n007988B0">
             <data key="edoub">Ewa</data>
         </edge>
     </graph>

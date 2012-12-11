@@ -178,11 +178,16 @@ struct bezop {
         bezop bz1,bz2;
         {   char tab[100];
             g.clear();
+            cout << "\n\n*******\n";
             A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
-            g.addArc(A,B);g.addArc(B,C);
-//            g.addEdge(A,B);g.addEdge(B,C);
-            writeG6(g,tab,99);
-            cout << "\n" << tab;
+            g.addEdge(A,B);g.addEdge(B,C);
+            writeGraphText(g, cout, RG_VertexLists|RG_Info);
+            cout << "\n" << g.getVertNo() << "\n*******\n";
+            g.pickVert(B);
+            writeGraphText(g, cout, RG_VertexLists|RG_Info);
+
+            cout << "\n" << g.getVertNo() << "\n*******\n";
+
         }
 
 //    cin << bz1;

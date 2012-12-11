@@ -5,21 +5,21 @@
     <key id="elitera" attr.type="int" for="edge" />
     <key id="vlitera" attr.type="int" for="node" />
     <graph id="first" edgedefault="undirected">
-        <node id="n00888DC8">
+        <node id="n00818DC8">
             <data key="liczint">1</data>
             <data key="vlitera">65</data>
         </node>
-        <node id="n00888E18">
+        <node id="n00818E18">
             <data key="liczint">2</data>
         </node>
-        <edge id="e00888E68" source="n00888DC8" target="n00888E18">
+        <edge id="e00818E68" source="n00818DC8" target="n00818E18">
             <data key="elitera">101</data>
             <data key="liczdouble">0.000000</data>
         </edge>
-        <edge id="e00888EB8" source="n00888E18" target="n00888DC8" directed="true">
+        <edge id="e00818EB8" source="n00818E18" target="n00818DC8" directed="true">
             <data key="liczdouble">0.500000</data>
         </edge>
-        <edge id="e00888F08" source="n00888E18" target="n00888E18">
+        <edge id="e00818F08" source="n00818E18" target="n00818E18">
             <data key="elitera">102</data>
             <data key="liczdouble">1.500000</data>
         </edge>

@@ -40,7 +40,6 @@
 
 #include <new>
 #include <malloc.h>
-#include <stdio.h>
 
 #ifdef __INTEL_COMPILER
 #include <alloca.h>

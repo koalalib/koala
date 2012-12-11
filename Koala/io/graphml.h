@@ -10,9 +10,7 @@
 #include "../tinyxml/tinyxml.h"
 #include <map>
 #include <string>
-#include <math.h>
 #include <stdlib.h>
-#include <time.h>
 
 #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__)
 #define atoll		_atoi64

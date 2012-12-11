@@ -4,15 +4,15 @@
     <key id="lab" attr.type="string" for="edge" />
     <key id="y" attr.type="double" for="node" />
     <graph id="gr" edgedefault="undirected">
-        <node id="n008B2F10">
+        <node id="n00362F10">
             <data key="x">3.140000</data>
             <data key="y">4.100000</data>
         </node>
-        <node id="n008B2F70">
+        <node id="n00362F70">
             <data key="x">5.000000</data>
             <data key="y">6.000000</data>
         </node>
-        <edge id="e008B0FE8" source="n008B2F10" target="n008B2F70" directed="true">
+        <edge id="e00360FE8" source="n00362F10" target="n00362F70" directed="true">
             <data key="lab">xyz</data>
         </edge>
     </graph>

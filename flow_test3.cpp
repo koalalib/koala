@@ -95,8 +95,8 @@ void test0()
 
 void test1()
 {
-    for(int k=0;k<50000;k++)
-    {   const double P=0.2;
+    for(int k=0;k<5000;k++)
+    {   const double P=0.03;
 
         g.clear();
         for(int i=0;i<N;i++) g.addVert(i);
@@ -121,7 +121,7 @@ void test1()
         if (!BFS::getAttainableSet(g,u).isElement(v))
         {
 //          cout << "---\n";
-          continue;
+//          continue;
         }
         for(Graph<int,Koala::IO::ParSet>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeCap[e]=1+(rand()%10);
         for(Graph<int,Koala::IO::ParSet>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeCost[e]=3+(rand()%20);
@@ -172,7 +172,11 @@ void test1()
 //               );
         if (!(
                  cfres.second==cfres2.second
-            )) cout << " Blad_2!!!";
+            ))
+            {
+                cout << " Blad_2!!!";
+                return;
+            }
 
 
          cout<< endl;
