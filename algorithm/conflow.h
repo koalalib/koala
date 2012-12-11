@@ -22,11 +22,14 @@ namespace Koala
     /* FlowAlgsDefaultSettings
      * Domyslne wytyczne dla procedur przeplywowych:
      * czy do wyznaczania maks. przeplywu uzywac FulkersonaForda, czy MKM
+     * czy do wyznaczania najtanszego przeplywu uzywac sciezek powiekszajacych (pseudowielomianowa), czy
+     * cykli z min. srednia dlugoscia (wielomianowa)
      */
-    template< bool FF = false > class FlowAlgsDefaultSettings: public AlgsDefaultSettings
+    template< bool FF = false, bool costFF = true  > class FlowAlgsDefaultSettings: public AlgsDefaultSettings
     {
       public:
         enum { useFulkersonFord = FF };
+        enum { useCostAugmPath = costFF };
     };
 
 
@@ -238,16 +241,15 @@ namespace Koala
                     { }
         };
 
-        // pomocnicza etykieta wierzcholka na uzytek alg. Dijkstry w sieci tymczasowej
+        // pomocnicza etykieta wierzcholka na uzytek alg. Bellmana w sieci tymczasowej
         template< class GraphType, class CostType > struct VertLabsCost
         {
-            CostType distance,pot;
+            CostType distance;
             typename GraphType::PVertex vPrev;
             typename GraphType::PEdge  ePrev;
 
             VertLabsCost():
                 distance( DefaultStructs:: template NumberTypeBounds< CostType >::plusInfty() ),
-                pot( DefaultStructs:: template NumberTypeBounds< CostType >::zero() ),
                 vPrev( 0 ), ePrev( 0 )
                 { }
         };
@@ -317,19 +319,17 @@ namespace Koala
             costFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PEdge e,
                 typename GraphType::PVertex v );
 
-        // Korekta kosztu luku na uzytek Dijkstry z potencjalami wierzcholkow (nowe koszty nie wprowadzaja ujemnych cykli)
-        template< class GraphType, class EdgeContainer, class VertContainer >
-            static typename EdgeContainer::ValType::CostType costFlowDij( const GraphType &g, EdgeContainer &edgeTab,
-                VertContainer& vertTab, typename GraphType::PEdge e, typename GraphType::PVertex v )
-            {
-                return costFlow( g,edgeTab,e,v ) + vertTab[v].pot - vertTab[g.getEdgeEnd( e,v )].pot;
-            }
-        // Dijkstra w sieci tymczasowej z kosztami lukow skorygowanymi przez potencjaly wierzcholkow
+        // Bellman-Ford w sieci tymczasowej z kosztami lukow skorygowanymi przez potencjaly wierzcholkow
         // Zwraca: czy istnieje przejscie start->end
         // TODO: rozwazyc przejscie na kopce
         template< class GraphType, class VertContainer, class EdgeContainer > static bool
-            DijkstraFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
+            BellmanFordFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
                 typename GraphType::PVertex start, typename GraphType::PVertex end );
+        // znajdowanie w sieci tymczasowej cyklu o najmniejszej sredniej dlugosci krawedzi
+        // pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
+        // TODO: nie testowane, sprawdzic!
+        template< class GraphType, class EdgeContainer, class EIter, class VIter >
+            static int minMeanCycle( const GraphType &g, EdgeContainer &edgeTab, OutPath< VIter,EIter > iters );
         // znajdowanie przeplywu start->end o maksymalnej objetosci (ale nie przekraczajacej limitu val) i najmniejszym koszcie
         // procedura pseudowielomianowa (sciezki powiekszajace)
         // zwraca pare wielkosc przeplywu
@@ -337,6 +337,13 @@ namespace Koala
             minCostFlowFF( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
                 typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val = DefaultStructs::
                 template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
+
+        // procedura o interfejsie j.w. ale wielomianowa
+        template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
+            minCostFlowGT( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
+                typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val = DefaultStructs::
+                template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
+
         // TODO: nieefektywna, zrezygnowac z Setow
         template< class GraphType, class EdgeContainer, class AssocSub >
             static void ghtree( GraphType &g, EdgeContainer &edgeTab,
@@ -508,10 +515,10 @@ namespace Koala
     };
 
     // wersja dzialajaca na DefaultStructs=FlowAlgsDefaultSettings
-    template< bool FF > class FlowFl: public FlowPar< FlowAlgsDefaultSettings< FF > > { };
+    template< bool FF, bool costFF > class FlowFl: public FlowPar< FlowAlgsDefaultSettings< FF,costFF > > { };
 
-    // i z domyslnyna flaga wyboru algorytmow
-    class Flow: public FlowFl< false > { };
+    // i z domyslnymi flagami wyboru algorytmow
+    class Flow: public FlowFl< false,true > { };
 
     /* ConnectPar
      * Procedury badania spojnosci grafu (bez wag na wierz/kraw)
