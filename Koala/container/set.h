@@ -62,13 +62,15 @@ namespace Koala
 namespace Koala
 {
 
-	/* SetInserter DOCUMENT
-	 * Iterator wstawiajacy elementy do podanego przez adres zewnetrznego zbioru
+	template< class Element > class SetInserter;
+	//Iterator wstawiajacy elementy do podanego przez adres zewnetrznego zbioru
+	/** \briefn Set inserter.
+	 *
+	 * The iterator with ability to insert elements to set  given by pointer.
+	 * \ingroup cont
 	 *
 	 *  [See example](examples/set/setInserter.html)
 	 */
-	template< class Element > class SetInserter;
-
 	template< class Element > class SetInserter< Set< Element > >:
 		public std::iterator< std::output_iterator_tag,void,void,void,void >
 	{
@@ -76,10 +78,14 @@ namespace Koala
 		Set< Element > *container;
 
 	public:
-		typedef Set< Element > container_type;
+		typedef Set< Element > container_type;/**<\brief Type of container.*/
+		/**\brief Constructor.*/
 		SetInserter( Set< Element > &x ): container( &x ) { }
+		/**\brief Copy content operator*/
 		SetInserter< Set< Element > > &operator= ( const Element &value );
+		/**\brief Dereference operator*/
 		SetInserter< Set< Element > > &operator*() { return *this; }
+		/**\brief Increment operator*/
 		SetInserter< Set< Element > > &operator++() { return *this; }
 		SetInserter< Set<Element> > operator++( int ) { return *this; }
 	};
@@ -90,14 +96,20 @@ namespace Koala
 
 	// wylicza obraz zbioru w podanym przeksztalceniu
 	// niestety sama nie zajdzie dedukcja typu wyniku przy wywolaniu ( trzeba np. imageSet<double>(iset,kwadrat);)
-	/**
+	/** \brief Image of set
 	 *
+	 * The method generate the image given by functor \a f of the set \a arg. The function is unable to guess the type of returned value so calls like <tt>imageSet<double>(iset,kwadrat);</tt> are obligatory.
+	 * \ingroup cont
+	 *   
 	 *  [See example](examples/set/setFunction.html)
 	 */
 	template< class ValType, class ArgType, class Funktor >
 		Set< ValType > imageSet( const Set< ArgType > &arg, Funktor f );
 	// wylicza przeciwobraz zbioru w podanym przeksztalceniu i danej dziedzinie
-	/**
+	/** \brief Preimage
+	 *
+	 * The method gets the preimage of the given set \a domain and the functor \a f. The function is unable to guess the type of returned value so calls like <tt>imageSet<double>(iset,kwadrat);</tt> are obligatory.
+	 * \ingroup cont
 	 *
 	 *  [See example](examples/set/setFunction.html)
 	 */

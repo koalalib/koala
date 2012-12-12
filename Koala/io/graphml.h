@@ -8,9 +8,6 @@
 
 #include "../graph/graph.h"
 #include "../tinyxml/tinyxml.h"
-#include <map>
-#include <string>
-#include <stdlib.h>
 
 #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__)
 #define atoll		_atoi64

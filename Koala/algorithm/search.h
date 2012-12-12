@@ -126,10 +126,10 @@ namespace Koala
 		template< class GraphType > struct VisitVertLabs
 		{
 			// rodzic danego wierzcholka w drzewie (lesie), NULL dla korzenia
-			/** \brief Paren of vertx.*/
+			/** \brief Parent of vertex.*/
 			typename GraphType::PVertex vPrev;
 			// krawedz prowadzaca do rodzica
-			/** \brief Edge leading to paren of vertx.*/
+			/** \brief Edge leading to parent of vertex.*/
 			typename GraphType::PEdge ePrev;
 
 			// odleglosc od korzenia (liczba krawedzi) i numer skladowej spojnosci (od 0)
@@ -548,8 +548,8 @@ namespace Koala
 	/** \brief Basic graph search algorithms (parametrized).
 	 *
 	 *  The general implementation of graph search strategies (DFS, BFS, LexBFS).
-	 *  \tparam SearchImpl the class should delivert a method visitBase, which decides about the order of visiting vertices.
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
+	 *  \tparam SearchImpl the class should deliver a method visitBase, which decides about the order of visiting vertices.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup search */
 	template< class SearchImpl, class DefaultStructs > class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	{
@@ -573,10 +573,10 @@ namespace Koala
 		 *  Visit all vertices in a graph in order given by the strategy SearchImpl
 		 *  @param[in] g the graph containing vertices to visit
 		 *  @param[in] visited the container to store data (np. map PVertex -> VisitVertLabs), BlackHole forbidden.
-		 *   After the execution of the method, the associoative container represent the search tree (forst)
-		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distace keeps the distance from the root.
+		 *   After the execution of the method, the associative container represent the search tree (forst)
+		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distance keeps the distance from the root.
 		 *   finally field component keeps the index of the connected component of graph.
-		 *  @param[in] visitor object that delivers a set of fucncions which are called for each vertex and for various stages of algorithm.
+		 *  @param[in] visitor object that delivers a set of functions which are called for each vertex and for various stages of algorithm.
 		 *  @param[in] dir the direction of edges to consider.
 		 *  @return the number of components.
 		 *  \sa SearchStructs::VisitVertLabs
@@ -593,8 +593,8 @@ namespace Koala
 		 *  @param[out] out the iterator to write visited vertices in order given by the strategy  SearchImpl.
 		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
 		 *  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole forbidden.
-		 *   After the execution of the method, the associoative container represent the search tree (forst)
-		 *   where fields \p vPrev and \p ePrev keep the previous vertex and edge, and the field \p distace keeps the distance from the root.
+		 *   After the execution of the method, the associative container represent the search tree (forst)
+		 *   where fields \p vPrev and \p ePrev keep the previous vertex and edge, and the field \p distance keeps the distance from the root.
 		 *   finally \p field component = 0.
 		 *  @return the number of visited vertices.
 		 *  \sa SearchStructs::VisitVertLabs
@@ -615,17 +615,17 @@ namespace Koala
 		template< class GraphType, class VertIter > static int scanAttainable( const GraphType &g,
 			typename GraphType::PVertex src, VertIter out, EdgeDirection dir = EdUndir | EdDirOut );
 
-		/** \brief Visit all vetexes.
+		/** \brief Visit all vertices.
 		 *
 		 *  Visit all vertices in a graph
 		 *  @param[in] g the graph containing vertices to visit
 		 *  @param[out] out the iterator to write visited vertices to, in order given by the strategy SearchImpl
 		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
 		 *  @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole forbidden.
-		 *   After the execution of the method, the associoative container represent the search tree (forst)
+		 *   After the execution of the method, the associative container represent the search tree (forest)
 		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distace keeps the distance from the root.
 		 *   finally field component keeps the index of the connected component of graph.
-		 *  @param[in] sym if true arcs are treated as undirectes edes.
+		 *  @param[in] sym if true arcs are treated as undirected edges.
 		 *  @return the number of components.
 		 *  \sa SearchStructs::VisitVertLabs */
 		template< class GraphType, class VertContainer, class VertIter > static int scan( const GraphType &g,
@@ -646,7 +646,7 @@ namespace Koala
 		 *
 		 *  The method gets the cyclomatic number of graph, concerning only edges congruent with \a mask.
 		 *  \param g the considered graph.
-		 *  \param mask determines the types and directon of edges to be considered.
+		 *  \param mask determines the types and direction of edges to be considered.
 		 *  \return the cyclomatic number of graph.  */
 		template< class GraphType > static int cyclNo( const GraphType &g, EdgeDirection mask = EdAll )
 			{ return g.getEdgeNo( mask ) - g.getVertNo() + scan( g,blackHole,mask ); }
@@ -684,8 +684,8 @@ namespace Koala
 		 *  @param[out] out CompStore object that is a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
 		 *  @param[in] dir direction of edges to consider, loops are ignored.
 		 *  @param[out] visited container to store data (map PVertex -> VisitVertLabs), BlackHole forbidden.
-		 *   After the execution of the method, the associoative container represent the search tree (forst)
-		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distace keeps the distance from the root.
+		 *   After the execution of the method, the associative container represent the search tree (forst)
+		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distance keeps the distance from the root.
 		 *   finally field component keeps the index of the connected component of graph.
 		 *  @return the number of components.
 		 *  \sa CompStore
@@ -740,15 +740,14 @@ namespace Koala
 		 *  Visit all vertices in the same component as a given vertex
 		 *  @param[in] g graph containing vertices to visit
 		 *  @param[in] src given vertex
-		 *  @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-		???Po wykonaniu  postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
-		component jest ustawiane na compid
+		 *  @param[in] visited container to store data (map PVertex -> VisitVertLabs),  (BlackHole forbidden). The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
 		 *  @param[in] visitor visitor called for each vertex
-		 *  @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
-		???zgodnych z maska, a pozostale kraw. ignorowane. Mozna
-		sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
+		 *  @param[in] dir direction of edges to consider.
+		 * - EdDirOut arcs are traversed according to their direction,
+		 * - EdDirIn arcs are traversed upstream, 
+		 * - Directed arcs may be traversed in both directions.
 		 *  @param[in] compid component identifier (give 0 if don't know)
-		 *  @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
+		 *  @return number of visited vertices or -number if  visitor interrupted the search.
 		 */
 		template< class GraphType, class VertContainer, class Visitor > static int dfsVisitBase( const GraphType &g,
 			typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
@@ -757,7 +756,7 @@ namespace Koala
 
 	/** \brief Preorder Depth-First-Search (parametrized)
 	 *
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup search
 	 */
 	template< class DefaultStructs > class DFSPreorderPar: public DFSBase< DFSPreorderPar< DefaultStructs >,DefaultStructs >
@@ -772,18 +771,19 @@ namespace Koala
 			Visitors::simple_visitor_tag & );
 
 	public:
-		/* visit all vertices in the same component as a given vertex DOCUMENT
-		* @param[in] g graph containing vertices to visit
-		* @param[in] src given vertex
-		* @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-		Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
-		component jest ustawiane na compid
+		/** \brief Visit all vertexes from component.
+		* 
+		*  The method visits all the vertices in the same component as a given vertex.
+		* @param[in] g the graph containing vertices to visit
+		* @param[in] src the given vertex
+		* @param[in] visited the container to store data (map PVertex -> VisitVertLabs), (BlackHole forbidden). The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
 		* @param[in] visitor visitor called for each vertex
-		* @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
-		zgodnych z maska, a pozostale kraw. ignorowane. Mozna
-		sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
+		* @param[in] dir direction of edges to consider
+		 * - EdDirOut arcs are traversed according to their direction,
+		 * - EdDirIn arcs are traversed upstream, 
+		 * - Directed arcs may be traversed in both directions.
 		* @param[in] compid component identifier (give 0 if don't know)
-		* @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
+		* @return number of visited vertices or -number if the visitor interrupted the search.
 		*/
 		template< class GraphType, class VertContainer, class Visitor > static int visitBase( const GraphType &g,
 			typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
@@ -813,25 +813,26 @@ namespace Koala
 			typename GraphType::PVertex, VertContainer &, Visitor, EdgeDirection, int, Visitors::simple_visitor_tag & );
 
 	public:
-		/* visit all vertices in the same component as a given vertex DOCUMENT
+		/** \brief Visit all vertexes of component. 
+		*
+		* Visit all vertices in the same component as a given vertex.
 		* @param[in] g graph containing vertices to visit
 		* @param[in] src given vertex
-		* @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-		Po wykonaniu  postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
-		component jest ustawiane na compid
+		* @param[in] visited container to store data (map PVertex -> VisitVertLabs),  (BlackHole forbidden). The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
 		* @param[in] visitor visitor called for each vertex
-		* @param[in] dir direction of edges to considertzn. przegladany jest podgraf zlozony z krawedzi
-		zgodnych z maska, a pozostale kraw. ignorowane. Mozna
-		sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
+		* @param[in] dir direction of edges to consider.
+		 * - EdDirOut arcs are traversed according to their direction,
+		 * - EdDirIn arcs are traversed upstream, 
+		 * - Directed arcs may be traversed in both directions.
 		* @param[in] compid component identifier (give 0 if don't know)
-		* @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
+		* @return number of visited vertices of -number if the visitor interrupted the search.
 		*/
 		template< class GraphType, class VertContainer, class Visitor > static int visitBase( const GraphType &g,
 			typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
 	};
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
-	/** \brief Postorder Depth-First-Search (dafault)
+	/** \brief Postorder Depth-First-Search (default)
 	 *
 	 *  By default DefaultStructs = AlgsDefaultSettings.
 	 *  \ingroup search
@@ -840,7 +841,8 @@ namespace Koala
 
 	/** \brief Breadth-First-Search (parametrized).
 	 *
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
+	 *  \ingroup search
 	 */
 	template< class DefaultStructs > class BFSPar: public GraphSearchBase< BFSPar< DefaultStructs >,DefaultStructs >
 	{
@@ -849,18 +851,19 @@ namespace Koala
 			typename GraphType::PVertex, VertContainer &, Visitor, EdgeDirection, int );
 
 	public:
-		/* visit all vertices in the same component as a given vertex DOCUMENT
+		/** \brief Visit all vertexes from component.
+		*
+		* visit all vertices in the same component as a given vertex.
 		* @param[in] g graph containing vertices to visit
 		* @param[in] src given vertex
-		* @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-		Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
-		component jest ustawiane na compid
+		* @param[in] visited container to store data (map PVertex -> VisitVertLabs), (BlackHole forbidden). The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
 		* @param[in] visitor visitor called for each vertex
-		* @param[in] dir direction of edges to consider tzn. przegladany jest podgraf zlozony z krawedzi
-		zgodnych z maska, a pozostale kraw. ignorowane. Mozna
-		sobie zazyczyc, by kraw. skierowane byly przejezde zgodnie z ich zwrotem (EdDirOut), pod prad (EdDirIn) lub w obie strony (Directed)
+		* @param[in] dir direction of edges to consider.
+		 * - EdDirOut arcs are traversed according to their direction,
+		 * - EdDirIn arcs are traversed upstream, 
+		 * - Directed arcs may be traversed in both directions.
 		* @param[in] compid component identifier (give 0 if don't know)
-		* @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
+		* @return number of visited vertices of -number if the visitor interrupted the search.
 		*/
 		template< class GraphType, class VertContainer, class Visitor > static int visitBase( const GraphType &g,
 			typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
@@ -878,7 +881,7 @@ namespace Koala
 	*/
 	/** \brief Lexicographical Breadth-First-Search (parametrized).
 	 *
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup search */
 	template< class DefaultStructs > class LexBFSPar:
 		public GraphSearchBase< LexBFSPar< DefaultStructs >,DefaultStructs >
@@ -947,11 +950,11 @@ namespace Koala
 	public:
 		/** Get LexBFS sequence.
 		 *
-		 *  The method arranges vertices with LexBFS order, starting with a given sequenc and writes it down to the \a out container.
+		 *  The method arranges vertices with LexBFS order, starting with a given sequence and writes it down to the \a out container.
 		 *  @param[in] g the considered graph,
 		 *  @param[in] in the number of vertices in table \a tab.
 		 *  @param[in] tab table containing initial order of vertices
-		 *  @param[in] mask the direction of edges to consider, LexBFS only simmetric masks are allowed.
+		 *  @param[in] mask the direction of edges to consider, LexBFS only symmetric masks are allowed.
 		 *  @param[out] out the iterator to write the output ordered vertices sequence.
 		 *  @return the number of vertices written to \a out. */
 		template< class GraphType, class OutVertIter > static int order2( const GraphType & g, size_t in,
@@ -959,16 +962,16 @@ namespace Koala
 
 		template< class T > static void StableRadixSort( T *data, int n, int nb, int T::*field, T *out );
 
-		/* visit all vertices in the same component as a given vertex DOCUMENT
+		/** \brief Visit all vertexes of component.
+		*
+		* Visit all vertices in the same component as a given vertex.
 		* @param[in] g graph containing vertices to visit
 		* @param[in] src given vertex
-		* @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole niedozwolony
-			???Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia,
-		component jest ustawiane na component
+		* @param[in] visited container to store data (map PVertex -> VisitVertLabs),  (BlackHole forbidden). The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
 		* @param[in] visitor visitor called for each vertex
-		* @param[in] dir direction of edges to consider, uwaga: LexBFS akceptuje tylko maski symetryczne
+		* @param[in] dir direction of edges to consider, only symmetric masks are acceptable.
 		* @param[in] compid component identifier (give 0 if don't know)
-		* @return number of visited vertices lub -number jesli przeszukiwanie przerwano z polecenia visitora
+		* @return number of visited vertices or -number if the visitor interrupted the search.
 		*/
 		template< class GraphType, class VertContainer, class Visitor > static int visitBase( const GraphType & g,
 			typename GraphType::PVertex start, VertContainer &visited, Visitor visit, EdgeDirection mask,
@@ -1060,9 +1063,9 @@ namespace Koala
 		/** \brief Get connections between components.
 		 *
 		 *  The method gets connections between strongly connected components and writes it down to the container \a iter
-		 *    as pairs of indexes of componetns in \a comp.
+		 *    as pairs of indexes of components in \a comp.
 		 *  \param g the considered graph
-		 *  \param comp the map achived by the above \p split method.
+		 *  \param comp the map achieved by the above \p split method.
 		 *  \param[out] iter the iterator to the container with pairs of integers that represent the numbers of components in
 		 *   \a comp that share a vertex.
 		 *  \return the number of pairs in \a iter.	 */
@@ -1082,7 +1085,7 @@ namespace Koala
 	//Procedury na digrafach acykliczych
 	/** \brief Procedures for directed acyclic graphs (DAG).
 	 *
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \sa RelDiagramPar
 	 *  \ingroup search    */
 	template< class DefaultStructs > class DAGAlgsPar: protected SearchStructs
@@ -1091,7 +1094,7 @@ namespace Koala
 		// wyrzuca na iterator wierzcholki grafu w porzadku topologicznym
 		/** \brief Get topological order.
 		 *
-		 *  The method seartches the graph \a g in postorder DFS. The result is wirten to out iterator.
+		 *  The method searches the graph \a g in postorder DFS. The result is written to out iterator.
 		 *  \param g the considered graph.
 		 *  \param out the iterator of container with output sequence of vertices.
 		 *  \n
@@ -1103,10 +1106,10 @@ namespace Koala
 		// sprawdza, czy graf jest DAGiem korzystajac z podanego para iteratorow ciagu wierzcholkow z wyjscia poprzedniej procedury
 		/** \brief Test if directed acyclic graph.
 		 *
-		 *  The method uses the sequence of vertices achived by the above topOrd function to test if the graph \a g is a directed acyclic graph.
+		 *  The method uses the sequence of vertices achieved by the above topOrd function to test if the graph \a g is a directed acyclic graph.
 		 *  \param g the tested graph.
-		 *  \param beg the iterstor to the first element of the container with topoligical oreder.
-		 *  \param end the iterstor to the past-the-end element of the container with topoligical oreder.
+		 *  \param beg the iterator to the first element of the container with topological order.
+		 *  \param end the iterator to the past-the-end element of the container with topological order.
 		 *  \return true if \a g is directed acyclic graph, false otherwise.
 		 *  \n
 		 *
@@ -1157,7 +1160,7 @@ namespace Koala
 
 	/** \brief Searching blocks = biconnected components.
 	 *
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup search    */
 	template< class DefaultStructs > class BlocksPar: public SearchStructs
 	{
@@ -1229,25 +1232,25 @@ namespace Koala
 
 	public:
 		// wynikowa etykieta wierzcholka
-		/**\brief Vertex data used to represent bloks. */
+		/**\brief Vertex data used to represent blocks. */
 		struct VertData {
 			// w ilu blokach lezy ten wierzcholek
-			int blockNo; /**< Number of blocks the vertex is in.*/
+			int blockNo; /**<\brief Number of blocks the vertex is in.*/
 			// pozycja pierwszego w sekwencji numerow blokow (por. viter nizej) bloku zawierajacego
-			/** \brief First block possition.
+			/** \brief First block position.
 			 *
 			 *  The position of the first block the vertex belongs to in the sequence \a viter in \p split method.*/
 			int firstBlock;
 			// ten wierzcholek (jego pozostale bloki wystepuja kolejno za nim)
 			VertData( int b = 0, int f = -1 ): blockNo( b ), firstBlock( f )
 				{ }
-			//DOCUMENT
+			/** \brief Copy.*/
 			template <class T> void copy(T& arg) const
 			{
 				arg.blockNo=blockNo;
 				arg.firstBlock=firstBlock;
 			}
-			//DOCUMENT
+			/** \brief Copy.*/
 			void copy(BlackHole&) const
 				{ }
 		};
@@ -1260,7 +1263,7 @@ namespace Koala
 		 *  @param[out] emap the map PEdge->int associating each edge with a block number. (BlackHole possible)
 		 *  @param[out] out the CompStore object with a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
 		 *  @param[out] viter the iterator to the container with concatenated sequences of blocks to which the each vertex belongs to.
-		 *   For each vertex the starting point of swquence of blocks is given by \a vmap in the VertData field firstBlock.
+		 *   For each vertex the starting point of sequence of blocks is given by \a vmap in the VertData field firstBlock.
 		 *  @return the number of biconnected components.
 		 *  \sa CompStore   */
 		template< class GraphType, class VertDataMap, class EdgeDataMap, class CompIter, class VertIter,
@@ -1276,7 +1279,7 @@ namespace Koala
 		 *  @param[out] emap the map PEdge->int associating each edge with a block number. (BlackHole possible)
 		 *  @param[out] out the CompStore object with a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
 		 *  @param[out] viter the iterator to the container with concatenated sequences of blocks to which the each vertex belongs to.
-		 *   For each vertex the starting point of swquence of blocks is given by \a vmap in the VertData field firstBlock.
+		 *   For each vertex the starting point of sequence of blocks is given by \a vmap in the VertData field firstBlock.
 		 *  @return the number of biconnected components in the connected component given by vertex \a src.
 		 *  \sa CompStore
 		 *
@@ -1291,7 +1294,7 @@ namespace Koala
 		// TODO: przejsc na kopiec
 		/** \brief Get core.
 		 *
-		 *  The method writes to \a out a sequence of vertex that make a core of graph i.e. remains after recursive delitions of vertices of deg < 2.
+		 *  The method writes to \a out a sequence of vertex that make a core of graph i.e. remains after recursive deletions of vertices of deg < 2.
 		 *  \param g the considered graph
 		 *  \param out the iterator to the container with vertices of the core of graph.
 		 *  \return the number of vertices in the core of graph.*/
@@ -1308,7 +1311,7 @@ namespace Koala
 
 	/** Algorithms for Eulerian cycle and path.
 	 *
-	 * \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
+	 * \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  Warning: for graphs with overt 4000 edges you may need to increase the program stuck size.
 	 *  \ingroup search */
 	template< class DefaultStructs > class EulerPar: public PathStructs, protected SearchStructs
@@ -1343,9 +1346,9 @@ namespace Koala
 		// (NULL,NULL) w przciwnym razie
 		/** \brief Get Eulerian path end.
 		 *
-		 *  The method gets the ends of Eulerian path and returns it as standard pair (u,v). If there exists an eulerian cycle u == v.
+		 *  The method gets the ends of Eulerian path and returns it as standard pair (u,v). If there exists an Eulerian cycle u == v.
 		 *  If the Eulerian path doesn't exist pair (NULL,NULL) is returned.\n
-		 *  The method consideres only undirected edges and loops, directed edges are ignored.
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  \param g the considered graph.
 		 *  \return the standard pair of pointers to vertices that are the ends of the Euler path. If the Euler path does not exist the pair (NULL,NULL) is returned. */
 		template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
@@ -1361,7 +1364,7 @@ namespace Koala
 		// (NULL,NULL) w przciwnym razie
 		/** \brief Get directed Eulerian path end.
 		 *
-		 *  The method gets the ends of an directed Eulerian path and returns it as standard pair (u,v). If there exists an eulerian cycle u == v.
+		 *  The method gets the ends of an directed Eulerian path and returns it as standard pair (u,v). If there exists an Eulerian cycle u == v.
 		 *  If the directed Eulerian path doesn't exist pair (NULL,NULL) is returned.
 		 *  \param g the considered graph.
 		 *  \return the standard pair of pointers to vertices that are the ends of the directed Euler path. If the Euler path does not exist the pair (NULL,NULL) is returned. */
@@ -1418,7 +1421,7 @@ namespace Koala
 		 */
 		template< class GraphType > static bool hasDirPath( const GraphType &g );
 
-		/** \brief Test the begining of  undirested Euretest path.
+		/** \brief Test the beginning of  undirected Eulerian path.
 		 *
 		 *  The method tests if the graph \a g has an undirected Eulerian path starting at the vertex \a u.
 		 *  @param[in] g the considered graph.
@@ -1426,7 +1429,7 @@ namespace Koala
 		 *  @return true if it has an undirected Eulerian path starting at the vertex \a u, false otherwise.*/
 		template< class GraphType > static bool hasPath( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Test the begining of dirested Euretest path.
+		/** \brief Test the beginning of directed Eulerian path.
 		 *
 		 *  The method tests if the graph \a g has an directed Eulerian path starting at the vertex \a u.
 		 *  @param[in] g the considered graph.
@@ -1434,15 +1437,15 @@ namespace Koala
 		 *  @return true if it has an directed Eulerian path starting at the vertex \a u, false otherwise */
 		template< class GraphType > static bool hasDirPath( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Test if Ealerian cycle containing \a u.
+		/** \brief Test if Eulerian cycle containing \a u.
 		 *
-		 *  The method tests if the graph \a g has an undirected Eulerian cycle containing the vertex \a u. ???ke
+		 *  The method tests if the graph \a g has an undirected Eulerian cycle containing the vertex \a u. 
 		 *  @param[in] g the considered graph.
 		 *  @param[in] u the given vertex.
 		 *  @return true if it has an undirected Eulerian cycle containing the vertex \a u, false otherwise */
 		template< class GraphType > static bool hasCycle( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Test if directed Ealerian cycle containing \a u.
+		/** \brief Test if directed Eulerian cycle containing \a u.
 		 *
 		 *  The method tests if the graph \a g has an directed Eulerian cycle containing the vertex \a u.
 		 *  @param[in] g the considered graph.
@@ -1450,7 +1453,7 @@ namespace Koala
 		 *  @return true if it has an directed Eulerian cycle containing the vertex \a u, false otherwise */
 		template< class GraphType > static bool hasDirCycle( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Get undirected Euleria cycle
+		/** \brief Get undirected Eulerian cycle
 		 *
 		 *  The method gets an undirected Eulerian cycle of the graph \a g.
 		 *  @param[in] g the considered graph.
@@ -1548,9 +1551,9 @@ namespace Koala
 	enum ModPartType { mpTrivial,mpConnected,mpDisconnected,mpPrime };
 
 	// Znajdowanie robicia grafow na maksymalne silne moduly
-	/** \brief Maximal strong modules decomposition.
+	/** \brief Maximal strong modules decomposition (parametrized).
 	 *
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup search
 	 */
 	template< class DefaultStructs > class ModulesPar: public SearchStructs
@@ -1568,9 +1571,9 @@ namespace Koala
 			 *
 			 *  Possible values:
 			 * - mpTrivial = 0 - only one vertex,
-			 * - mpConnected = 1 - connected but wiht disconnected complement,
-			 * - mpDisconnected = 2 - diconnected,
-			 * - mpPrime = 3 - storng modules unfold??? prime graph.
+			 * - mpConnected = 1 - connected but with disconnected complement,
+			 * - mpDisconnected = 2 - disconnected,
+			 * - mpPrime = 3 - strong modules unfold prime graph.
 			 */
 			ModPartType type;
 
@@ -1583,14 +1586,14 @@ namespace Koala
 		// tyle ze chodzi o rozbicie na moduly, a nie skladowe spojnosci
 		// avmap, wyjsciowa tablica asocjacyjna PVertex->int do ktorej zapisuje sie numery modulow,
 		// do ktorych naleza wierzcholki (lub BlackHole)
-		// skipifprime, pomija badanie modulow jesli wynik ma type=mpPrime
+		// skipifprime, pomija badanie modulow jesli wynik ma type=mpPrime???
 		/** \brief Get modular decomposithon of graph.
 		 *
 		 *  The method splits the vertices of \a g into maximal strong modules.
 		 *  \param g the teste graph, should be simple and undirected.
-		 *  \param[out] out an CompStore object storing the modular decompositon.
-		 *  \param[out] avmap the associative table PVertex->int, where integers represent the indeks of module to which vertex belongs to. (BlackHole possible)
-		 *  \param skipifprine ???
+		 *  \param[out] out an CompStore object storing the modular decomposition.
+		 *  \param[out] avmap the associative table PVertex->int, where integers represent the index of module to which vertex belongs to. (BlackHole possible)
+		 *  \param skipifprine if true the modules with the outcome type mpPrime are skipped.
 		 *  \return a Partition object.
 		 *  \n
 		 *
@@ -1601,6 +1604,11 @@ namespace Koala
 	};
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+	/** \brief Maximal strong modules decomposition (default).
+	 *
+	 *  Version of ModulesPar with default settings.
+	 *  \ingroup search
+	 */
 	class Modules: public ModulesPar< AlgsDefaultSettings > { };
 
 #include "search.hpp"

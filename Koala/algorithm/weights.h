@@ -48,7 +48,7 @@ namespace Koala
 				distance( DefaultStructs::template NumberTypeBounds< DType >::plusInfty() ),
 				vPrev( 0 ), ePrev( 0 )
 				{ }
-			//???
+			/**\brief Copy VertLabs*/
 			template< class Rec > void copy( Rec &rec ) const;
 		};
 
@@ -223,7 +223,7 @@ namespace Koala
 	 *  \ingroup DMweight
 	 *  \sa Koala::DijkstraHeapBasePar */
 	template< class DefaultStructs > class DijkstraHeapPar:
-		public DijkstraMainPar< DefaultStructs,DijkstraHeapBasePar< DefaultStructs > > { };//mozna dopisac przestrzen nazw ???
+		public DijkstraMainPar< DefaultStructs,DijkstraHeapBasePar< DefaultStructs > > { };
 
 	// wersje dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Dijkstra algorithm with table (default).
@@ -740,4 +740,3 @@ namespace Koala
 }
 
 #endif
-

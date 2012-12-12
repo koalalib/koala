@@ -293,7 +293,8 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  The method returns the maximum value element of the set.
 		 *  \return the maximum element of the set.		 */
 		Element max() const;
-
+		
+		/** \brief Reserve memory.*/
 		void reserve(int) {}
 private:
 	template<class Iter>

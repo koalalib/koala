@@ -1273,7 +1273,7 @@ namespace Koala
 		 */
 		bool hasKey( Klucz u, Klucz v ) const;
 
-		/** \brief Test whether a pair of keys associate an element in matrix.???
+		/** \brief Test whether a pair of keys associate an element in matrix.
 		 *
 		 *  \param k the searched pair, the standard pair of keys.
 		 *  \return true if there is an element associated with the pair \a k, false otherwise.
@@ -1304,11 +1304,11 @@ namespace Koala
 		// referencja do wartosc przypisanej kluczowi 2-wymiarowemu, jesli klucza nie bylo - tworzona jest wartosc domyslna typu ValType
 		/** \brief Access element.
 		 *
-		 *  The method gets the reference of the element associated with the pair \t (u,v). If there wasn't any new element is created.
+		 *  The method gets the reference of the element associated with the pair \p (u,v). If there wasn't any new element is created.
 		 *  The mapped value of the element is assigned by the empty constructor of ValType.
 		 *  \param u the first key of the key pair of element.
 		 *  \param v the second key of the key pair of element.
-		 *  \return the reference to the element associated with pair \t (u,v).
+		 *  \return the reference to the element associated with pair \p (u,v).
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_operator_brackets.html">See example</a>.
 		 */
@@ -1318,7 +1318,7 @@ namespace Koala
 		 *  The method gets the reference of the element associated with the pair \a k. If there wasn't any new element is created.
 		 *  The mapped value of the element is assigned by the empty constructor of ValType.
 		 *  \param k the key pair of element.
-		 *  \return the reference to the element associated with pair \t k.
+		 *  \return the reference to the element associated with pair \p k.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_operator_brackets.html">See example</a>.
 		 */
@@ -1327,19 +1327,19 @@ namespace Koala
 		// wartosc przypisana kluczowi 2-wymiarowemu, jesli klucza nie bylo - wartosc domyslna typu ValType
 		/** \brief Get element.
 		 *
-		 *  The constant ??? method gets the value of the element associated with the pair \t (u,v). If there wasn't any the empty constructor of ValType is called.
+		 *  The constant method gets the value of the element associated with the pair \p (u,v). If there wasn't any the empty constructor of ValType is called.
 		 *  \param u the first key of the key pair of element.
 		 *  \param v the second key of the key pair of element.
-		 *  \return the value of to the element associated with pair \t (u,v).
+		 *  \return the value of to the element associated with pair \p (u,v).
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_operator_brackets.html">See example</a>.
 		 */
 		Elem operator()( Klucz, Klucz ) const ;
 		/** \brief Get element.
 		 *
-		 *  The constant ??? method gets the value of the element associated with the pair \a k. If there wasn't any the empty constructor of ValType is called.
+		 *  The constant method gets the value of the element associated with the pair \a k. If there wasn't any the empty constructor of ValType is called.
 		 *  \param k the key pair of element.
-		 *  \return the value of to the element associated with pair \t (u,v).
+		 *  \return the value of to the element associated with pair \p (u,v).
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_operator_brackets.html">See example</a>.
 		 */
@@ -1348,10 +1348,10 @@ namespace Koala
 		// wskaznik do wartosci przypisanej kluczowi 2-wymiarowemu, NULL w razie braku wpisu
 		/** \brief Get element.
 		 *
-		 *  The method gets the pointer to the element associated with the pair \t (u,v).
+		 *  The method gets the pointer to the element associated with the pair \p (u,v).
 		 *  \param u the first key of the key pair of element.
 		 *  \param v the second key of the key pair of element.
-		 *  \return the pointer to the element associated with pair \t (u,v).
+		 *  \return the pointer to the element associated with pair \p (u,v).
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_valPtr.html">See example</a>.
 		 */
@@ -1386,10 +1386,10 @@ namespace Koala
 
 		/** \brief Get next element.
 		 *
-		 *  The method gets the keys of the element next to the one associated with \t (u,v).
+		 *  The method gets the keys of the element next to the one associated with \p (u,v).
 		 *  \param u the reference element first key.
 		 *  \param v the reference element second key.
-		 *  \return the standard pair representing the keys of element next after \t (u,v), or (0,0) it matrix is empty.
+		 *  \return the standard pair representing the keys of element next after \p (u,v), or (0,0) it matrix is empty.
 		 *    If \a u == 0 and \a v == 0 the first element key is returned.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_nextKey.html">See example</a>.
@@ -1397,9 +1397,9 @@ namespace Koala
 		std::pair< Klucz,Klucz > nextKey( Klucz u, Klucz v ) const ; // dla pary zerowej zwraca pierwszy klucz
 		/** \brief Get next element.
 		 *
-		 *  The method gets the keys of element next to the one associated with \t k.
+		 *  The method gets the keys of element next to the one associated with \p k.
 		 *  \param k the reference element key.
-		 *  \return the standard pair representing the keys of element next after \t k, or (0,0) it matrix is empty.
+		 *  \return the standard pair representing the keys of element next after \p k, or (0,0) it matrix is empty.
 		 *    If \a k == (0,0) the first element key is returned.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_nextKey2.html">See example</a>.
@@ -1408,10 +1408,10 @@ namespace Koala
 		// dla pary zerowej zwraca ostatni klucz
 		/** \brief Get previous element.
 		 *
-		 *  The method gets the keys of the element prior to the one associated with \t (u,v).
+		 *  The method gets the keys of the element prior to the one associated with \p (u,v).
 		 *  \param u the reference element first key.
 		 *  \param v the reference element second key.
-		 *  \return the standard pair representing the keys of element prior to \t (u,v), or (0,0) it matrix is empty.
+		 *  \return the standard pair representing the keys of element prior to \p (u,v), or (0,0) it matrix is empty.
 		 *    If \a u == 0 and \a v == 0 the last element key is returned.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_prevKey.html">See example</a>.
@@ -1419,9 +1419,9 @@ namespace Koala
 		std::pair< Klucz,Klucz > prevKey( Klucz, Klucz ) const ;
 		/** \brief Get previous element.
 		 *
-		 *  The method gets the keys of element prior to the one associated with \t k.
+		 *  The method gets the keys of element prior to the one associated with \p k.
 		 *  \param k the reference element key.
-		 *  \return the standard pair representing the keys of element prior to \t k, or (0,0) it matrix is empty.
+		 *  \return the standard pair representing the keys of element prior to \p k, or (0,0) it matrix is empty.
 		 *    If \a k == (0,0) the last element key is returned.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_prevKey2.html">See example</a>.

@@ -243,7 +243,7 @@ namespace Koala
 			 *  The method gets the maximal independent (stable) set of the graph \a g.
 			 *  \param g the considered graph.
 			 *  \param out the iterator of the container keeping the output set (partition).
-			 *  \return the number of vertices in the maximal stable set kept in the container \a out.*/ //??? -1 dla bledu?
+			 *  \return the number of vertices in the maximal stable set kept in the container \a out.*/ 
 			template< class GraphType, class Iter > static int maxStable( const GraphType &g, Iter out );
 
 			// znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
@@ -252,7 +252,7 @@ namespace Koala
 			 *  The method gets the minimal vertex set such that each edge of the graph is incident to at least one vertex in the set.
 			 *  \param g the considered graph.
 			 *  \param out the iterator of the container keeping the output minimal vertex cover.
-			 *  \return the number of vertices in the output set.*/ //??? -1 dla bledu?
+			 *  \return the number of vertices in the output set.*/ 
 			template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
 
 		};
@@ -583,7 +583,7 @@ namespace Koala
 			 *
 			 *  The method tests if the graph \a g is a comparability graph. If positive, converts all the edges to arcs that represent an exemplary partial order.
 			 *  \param g the considered graph.
-			 *  \return true if \a g is a comparability graph, false otherwise and graph remains unchanged. ???*/
+			 *  \return true if \a g is a comparability graph, false otherwise and the graph remains unchanged. */
 			template< class Graph > static bool getDirs( Graph &g );
 
 			// zwraca liczbe chromatyczna lub -1 jesli graf nie byl comparability

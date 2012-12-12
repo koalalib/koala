@@ -484,14 +484,12 @@ namespace Koala
 		 *  The function generates a random graph on \a n vertices according to ErdosRenyi model G(\a n,\a p).
 		 *  Each edge is included in the graph with probability \a p independent from every other edge.
 		 *  If the type of the graph is set to directed, then each of the two possible (opposite directed) edges
-		 *  between two particular vertices is drawn independently.
+		 *  between two particular vertices is drawn independently. (to initialize pseudo-random number generator use srand() from stdlib.h).
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param p - probability of edge's creation,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
-		 *  \param randSeed - seed for pseudorandom generator, (uwaga: nieaktualne, seed jesli mozna ustawic przed wywolaniem ???
-		 *      funkcja srand, tu korzystamy jedynie z rand)
 		 *  \param type - the type of edges in the graph, i.e., directed or undirected.
 		 *  \retrun the pointer to the first added vertex.*/
 		template< class GraphType, class VInfoGen, class EInfoGen >
@@ -867,9 +865,10 @@ namespace Koala
 	 */
 	class LineGraph: public LineGraphPar< AlgsDefaultSettings > { };
 
-	/* ComplexCaster ???
+	/* ComplexCaster 
 	 * Caster zlozony z jednego castera 3-argumentowego i dwoch 2-argumentowych
 	 */
+	/* \brief Complex caster for linegraph.*/
 	template< class TwoArg, class FirstArg, class SecondArg > struct ComplexCaster
 	{
 		mutable TwoArg twoarg;
@@ -957,7 +956,7 @@ namespace Koala
 				return cart( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 		// j.w. ale tylko tworzy iloczyn
-	/** \brief Generate Cartesian ??? product.
+		/** \brief Generate Cartesian product.
 		 *
 		 *  The Cartesian product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
 		 *  \param g1 the first reference graph.
@@ -972,7 +971,7 @@ namespace Koala
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
-		//    Dopisuje iloczyn    leksykograficzny ???
+		//    Dopisuje iloczyn    leksykograficzny 
 		//    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
 		/** \brief Generate lexicographic product.
 		 *
