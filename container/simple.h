@@ -99,7 +99,7 @@ namespace Koala
 		template< class InputIterator > void assign( InputIterator first, InputIterator last );
 	};
 
-	/* QueueInterface DOCUMENT
+	/* QueueInterface
 	 *
 	 */
 	template< class Container > class QueueInterface;
@@ -173,7 +173,7 @@ namespace Koala
 		template< class InputIterator > void assign( InputIterator first, InputIterator last );
 	};
 
-	/* VectorInterface DOCUMENT
+	/* VectorInterface
 	 *
 	 */
 	template< class Container > class VectorInterface;
@@ -305,7 +305,7 @@ namespace Koala
 		void clearBuf( T val = T() ) { for( T *i = start; i < limit; i++ ) *i = val; }
 	};
 
-	/* PriQueueInterface DOCUMENT
+	/* PriQueueInterface 
 	 *
 	 */
 	template< class Container, class Comp > class PriQueueInterface;

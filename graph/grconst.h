@@ -75,11 +75,11 @@ public:
 	ConstGraphMethods( const ConstGraphMethods & ): self( (const GraphType &)*this )
 		{ }
 
-	/* \brief Copy content operator. ???Aby nie zacze�o pracowa� na innym grafie
+	//Aby nie zaczelo pracowac na innym grafie
+	/* \brief Copy content operator. 
 	 *
-	 *  Overloaded operator = assigns new graph stored in gr.
-	 *  \param gr graph assigned to the base graph.
-	 *  \return reference to assigned graph.
+	 *  Does nothing to prevent change of graphs.
+	 *  \return *this.
 	 */
 	ConstGraphMethods &operator=( const ConstGraphMethods & )
 		{ return *this; }
@@ -117,7 +117,7 @@ public:
 
 
 	// Lista wierzcholkow grafu
-	// Liczba wierzcho³ków (rz¹d grafu).
+	// Liczba wierzcholkow (rzad grafu).
 	/** \brief Get number of vertices.
 	 *
 	 *  The method gets the order of the graph i.e. the number of vertices in the graph.
@@ -476,7 +476,7 @@ public:
 	template<class VChooser2,class EChooser2 >
 		std::pair< Set< PVertex >,Set< PEdge > > getChosenSets( std::pair< VChooser2,EChooser2 > chs, bool chosenends = true) const;
 
-	// Wierzcho�ek/krawedz o podanym numerze w grafie.
+	// Wierzcholek/krawedz o podanym numerze w grafie.
 	/** \brief Get vertex by number
 	 *
 	 *  The list of vertices in the graph is searched through and the pointer to the \a idx-th vertex is returned.
@@ -510,8 +510,9 @@ public:
 	 */int edgePos( PEdge edge ) const;
 
 	// czy graf zawiera dany element
-	//DOCUMENT
+	/** \brief Test the existence of vertex.*/
 	bool has( PVertex ) const;
+	/** \brief Test the existence of edge.*/
 	bool has( PEdge ) const;
 
 	// typ krawedzi
@@ -768,7 +769,7 @@ public:
 	 */
 	template< class Cont > void getAdj( Cont &cont, EdgeType mask = EdAll ) const;
 
-	// Informacja o tym, czy krawêdzie s¹ równoleg³e.
+	// Informacja o tym, czy krawedzie sa rownolegle.
 	// rownoleglosc: 3 typy relacji rownowaznosci, okreslane maska bitowa
 	// zawsze krawedz jest rownolegla do tak samo skierowanej krawedzi tego samego typu
 	//reltype - dopuszczalne tylko jednobitowe: EdDirIn, EdDirOut lub EdUndir (taki jest sens parametru maski we wszystkich metodach dot. rownoleglosci)

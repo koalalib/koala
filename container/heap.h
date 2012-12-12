@@ -58,7 +58,7 @@ namespace Koala
 	 *
 	 *  Standard binominal heap structure.
 	 *  \tparam Key the class of stored objects.
-	 *  \tparam Compre the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>.
+	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>.
 	 *  \tparam Allocator the class allows to use own memory allocator.
 	 *  \ingroup cont
 	 *
@@ -86,7 +86,7 @@ namespace Koala
 		// podajemy komparator, kolejka powiazana z alokatorem zewnetrznym
 		/** \brief Constructor.
 		*
-		*   The costructor allows to use external memory.
+		*   The constructor allows to use external memory.
 		*   \param all memory buffer.
 		*   \param function the comparison functor should define strict weak ordering on set of keys. */
 		inline BinomHeap( Allocator *all, const Compare &function = Compare() ):
@@ -118,7 +118,7 @@ namespace Koala
 		// wstawienie klucza, zwracany wskaznik to jego reprezentant wewnatrz kolejki
 		/**\brief Insert key.
 		 *
-		 * The method insertes \a key on heap.
+		 * The method inserts \a key on heap.
 		 * \return the reference to the new-created node for a key.*/
 		Node* push( const Key &key );
 		// usun najmniejszy
@@ -130,7 +130,7 @@ namespace Koala
 		 // zmniejszenie klucza danego wezla, podanie wiekszej wartosci rzuca blad
 		/** \brief Decrease top element.
 		 *
-		 *  The method decreses the key of the node \a A to \a key. The new key needs to be smaller than the previous one, if not an exception is thrown.
+		 *  The method decreases the key of the node \a A to \a key. The new key needs to be smaller than the previous one, if not an exception is thrown.
 		 *  \param A the modified node
 		 *  \param key the new key.*/
 		void decrease( Node *A, const Key &key );
@@ -186,9 +186,9 @@ namespace Koala
 		template< class InputIterator > void assign2( InputIterator &first, int len );
 	};
 
-	/** FibonHeapNode DOCUMENT
-	 *  Kopiec Fibonacziego, komentarze te same co w 2-mianowym
-	 */
+	/** \brief Fibonacci heap node. 
+	 *  
+	 *  An auxiliary object representing single key (node) of Fibonacci heap. */
 	template< class Key > class FibonHeapNode
 	{
 		template< class K, class Comp, class Alloc > friend class FibonHeap;
@@ -203,13 +203,20 @@ namespace Koala
 		void init( const Key & =Key() );
 
 	public:
+		/**\brief Get key.*/
 		Key get() { return key; }
+		/**\brief Constructor*/
 		FibonHeapNode( const Key &_key = Key() )
 			{ init( _key ); }
 	};
 
-	/** FibonHeap
+	/**  \brief Fibonacci heap.
 	 *
+	 *  Standard Fibonacci heap structure.
+	 *  \tparam Key the class of stored objects.
+	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>.
+	 *  \tparam Allocator the class allows to use own memory allocator.
+	 *  \ingroup cont
 	 *
 	 *  [See example](examples/heap/example_FibonHeap.html).
 	 */
@@ -217,8 +224,8 @@ namespace Koala
 		class FibonHeap
 	{
 	public:
-		typedef FibonHeapNode< Key > Node;
-		typedef FibonHeapNode< Key > *Repr;
+		typedef FibonHeapNode< Key > Node;/**\brief Node of heap. */
+		typedef FibonHeapNode< Key > *Repr;/**\brief Pointer to heap node. */
 
 	private:
 		Node *root;
@@ -231,32 +238,79 @@ namespace Koala
 		void clear( Node * );
 
 	public:
+		/** \brief Empty constructor.*/
 		inline FibonHeap( const Compare &function = Compare() ):
 			root( 0 ), nodes( 0 ), function( function ), allocator( 0 )
 				{ }
+		/** \brief Constructor.
+		*
+		*   The constructor allows to use external memory.
+		*   \param all memory buffer.
+		*   \param function the comparison functor should define strict weak ordering on set of keys. */
 		inline FibonHeap( Allocator *all, const Compare &function = Compare() ):
 			root( 0 ), nodes( 0 ), function( function ), allocator( all )
 				{ }
+		/** \brief Copy constructor.*/
 		inline FibonHeap( const FibonHeap< Key,Compare,Allocator > & );
+		/** \brief Copy content operator.*/
 		FibonHeap& operator=( const FibonHeap< Key,Compare,Allocator > &X );
 		~FibonHeap()
 			{ clear(); }
 
+		/** \brief Get top key.
+		 *
+		 *  The method gets the top key of the heap. If default std::less functor is used the method gets the minimum key.
+		 *  \return the top key.*/
 		Key top() const;
-		Node *topRepr() const
+		/** \brief Get top node.
+		 *
+		 *  The method gets the top heap node. If default std::less functor is used the method gets one with the minimum key.
+		 *  \return the top key.*/
+		 Node *topRepr() const
 			{ return root; }
+		/**\brief Insert key.
+		 *
+		 * The method inserts \a key on heap.
+		 * \return the reference to the new-created node for a key.*/
 		Node *push( const Key & );
+		/** \brief Remove top element.
+		 *
+		 *  The method removes the top element from the heap.*/
 		void pop();
 
+		/** \brief Decrease top element.
+		 *
+		 *  The method decreases the key of the node \a A to \a key. The new key needs to be smaller than the previous one, if not an exception is thrown.
+		 *  \param A the modified node
+		 *  \param key the new key.*/
 		void decrease( Node *, const Key & );
+		/** \brief Delete node.
+		 *
+		 *  The node A is deleted from heap.
+		 *  \param the deleted node.*/
 		void del( Node * );
 
+		/** \brief Merge heaps.
+		 *
+		 *  The keys from \a heap are moved to the current heap. All the keys from \a heap are deleted.
+		 *  \param A the moved heap.*/
 		void merge( FibonHeap & );
+		/** \brief Clear heap.*/
 		void clear();
 
+		/** \brief Assign heap content.
+		 *
+		 *  The method clears the container and assigns new content from container defined by the iterators \a beg and \a end.
+		 *  \param beg the iterator to the first element of the container with new content.
+		 *  \param end the iterator to the past-the-end element of the container with new content. */
 		template< class InputIterator > void assign( InputIterator first, InputIterator last );
 
+		/** \brief Number of nodes.*/
 		unsigned size() const { return nodes; }
+		/** \brief Test if empty.
+		 *
+		 *  The method only checks if there is no elements in the heap. The content remains intact.
+		 *  \return true if heap is empty, false if there is as least one element in heap. */
 		bool empty() const { return !root; }
 
 	protected:
@@ -267,9 +321,9 @@ namespace Koala
 
 
 
-	/** PairHeapNode DOCUMENT
-	 *  Kopiec paruj¹cy, komentarze te same co w 2-mianowym
-	 */
+	/** \brief Pairing heal node.
+	 *
+	 *  An auxiliary object representing single key (node) of pairing heap.*/
 	template <class Key>
 	class PairHeapNode
 	{
@@ -285,13 +339,21 @@ namespace Koala
 		void init( const Key & =Key() );
 
 	public:
+		/**\brief Get key.*/
 		Key get()
 			{ return key; }
+		/**\brief Constructor*/
 		PairHeapNode( const Key &_key = Key() )
 			{ init( _key ); }
 	};
 
-	/** PairHeap
+	/** \brief Pairing heap.
+	 *
+	 *  Standard pairing heap structure.
+	 *  \tparam Key the class of stored objects.
+	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>.
+	 *  \tparam Allocator the class allows to use own memory allocator.
+	 *  \ingroup cont
 	 *
 	 *  [See example](examples/heap/example_FibonHeap.html).
 	 */
@@ -299,8 +361,8 @@ namespace Koala
 	class PairHeap
 	{
 	public:
-		typedef PairHeapNode<Key> Node;
-		typedef PairHeapNode<Key> * Repr;
+		typedef PairHeapNode<Key> Node;/**\brief Node of heap. */
+		typedef PairHeapNode<Key> * Repr;/**\brief Pointer to heap node. */
 
 	protected:
 		Node *root;
@@ -312,33 +374,80 @@ namespace Koala
 		void delNode( Node *node );
 		void clear( Node * );
 	public:
+		/** \brief Constructor.*/
 		inline PairHeap( const Compare &function = Compare() ):
 			root( 0 ), nodes( 0 ), function( function ), allocator( 0 )
 				{ }
+		/** \brief Constructor.
+		*
+		*   The constructor allows to use external memory.
+		*   \param all memory buffer.
+		*   \param function the comparison functor should define strict weak ordering on set of keys. */
 		inline PairHeap( Allocator *all, const Compare &function = Compare() ):
 			root( 0 ), nodes( 0 ), function( function ), allocator( all )
 				{ }
+		/** \brief Copy constructor.*/
 		inline PairHeap( const PairHeap< Key,Compare,Allocator > & );
+		/** \brief Copy content operator.*/
 		PairHeap& operator=( const PairHeap< Key,Compare,Allocator > &X );
 		~PairHeap()
 			{ clear(); }
 
+		/** \brief Get top key.
+		 *
+		 *  The method gets the top key of the heap. If default std::less functor is used the method gets the minimum key.
+		 *  \return the top key.*/
 		Key top() const;
+		/** \brief Get top node.
+		 *
+		 *  The method gets the top heap node. If default std::less functor is used the method gets one with the minimum key.
+		 *  \return the top key.*/
 		Node *topRepr() const
 			{ return root; }
+		/**\brief Insert key.
+		 *
+		 * The method inserts \a key on heap.
+		 * \return the reference to the new-created node for a key.*/
 		Node *push( const Key & );
+		/** \brief Remove top element.
+		 *
+		 *  The method removes the top element from the heap.*/
 		void pop();
 
+		/** \brief Decrease top element.
+		 *
+		 *  The method decreases the key of the node \a A to \a key. The new key needs to be smaller than the previous one, if not an exception is thrown.
+		 *  \param A the modified node
+		 *  \param key the new key.*/
 		void decrease( Node *, const Key & );
+		/** \brief Delete node.
+		 *
+		 *  The node A is deleted from heap.
+		 *  \param the deleted node.*/
 		void del( Node * );
 
+		/** \brief Merge heaps.
+		 *
+		 *  The keys from \a heap are moved to the current heap. All the keys from \a heap are deleted.
+		 *  \param A the moved heap.*/
 		void merge( PairHeap & );
+		/** \brief Clear heap.*/
 		void clear();
 
+		/** \brief Assign heap content.
+		 *
+		 *  The method clears the container and assigns new content from container defined by the iterators \a beg and \a end.
+		 *  \param beg the iterator to the first element of the container with new content.
+		 *  \param end the iterator to the past-the-end element of the container with new content. */
 		template< class InputIterator > void assign( InputIterator first, InputIterator last );
 
+		/** \brief Number of nodes.*/
 		unsigned size() const
 			{ return nodes; }
+		/** \brief Test if empty.
+		 *
+		 *  The method only checks if there is no elements in the heap. The content remains intact.
+		 *  \return true if heap is empty, false if there is as least one element in heap. */
 		bool empty() const
 			{ return !root; }
 

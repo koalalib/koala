@@ -5,7 +5,7 @@ namespace Koala
 {
 	/** \brief Edge constants
 	 *
-	 * ??? */
+	 * Constants for edge. */
 	class EdgeConst
 	{
 	public:
