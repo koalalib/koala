@@ -118,7 +118,7 @@ namespace Koala
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param centerDir - direction mask for edges connected to center vertex.
 		 *  \param borderDir - direction mask for edges between border vertices.
-		 *  \return the pointer that indicates the first (and also center) vertex.	*/
+		 *  \return the pointer that indicates the first (and also center) vertex.*/
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex fan( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeDirection centerDir, EdgeDirection borderDir );
@@ -164,7 +164,7 @@ namespace Koala
 		 *  \param  centerDir - direction mask for edges connected to center vertex,
 		 *  \param  borderDir - direction mask for edges between border vertices.
 		 *  \return the pointer that indicates the first (and also center) vertex.
-		*/
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex wheel( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeDirection centerDir, EdgeDirection borderDir );
@@ -180,7 +180,7 @@ namespace Koala
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
 		 *  \return the pointer that indicates the first (and also center) vertex.
-		*/
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex wheel( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeDirection dir = EdUndir);
@@ -209,7 +209,7 @@ namespace Koala
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
 		 *  \return a pair of pointers. The pointers indicate the first vertices in the partitions.
-		*/
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 			compBipartite( GraphType &g, int n1, int n2, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection dir = EdUndir );
@@ -332,7 +332,7 @@ namespace Koala
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
 		 *  \return a pointer that indicates the root.
-		*/
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen>
 			static typename GraphType::PVertex regTree( GraphType &g, int deg, int height, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection dir = EdUndir);
@@ -367,7 +367,7 @@ namespace Koala
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
 		 *  \return the pointer that indicates the root.
-		*/
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen, class Iter >
 			static typename GraphType::PVertex regTree( GraphType &g, Iter begin, Iter end, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection dir = EdUndir);
@@ -412,7 +412,7 @@ namespace Koala
 		 *  \param  pathDir - direction mask for edges that form the central path,
 		 *  \param  legDir - direction mask for edges that correspond to legs (leaves) of the caterpillar.
 		 *  \returns the pointer that indicates the first vertex on the central path.
-		*/
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen, class Iter >
 			static typename GraphType::PVertex caterpillar( GraphType &g, Iter begin, Iter end, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection pathDir, EdgeDirection legDir);
@@ -434,7 +434,7 @@ namespace Koala
 		 *  \param  pathDir - direction mask for edges that form the central path,
 		 *  \param  legDir - direction mask for edges that correspond to legs (leaves) of the caterpillar.
 		 *  \returns the pointer that indicates the first vertex on the central path.
-		*/
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen > static typename GraphType::PVertex
 			caterpillar( GraphType &g, int pathVertNum, int legNnm, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeDirection pathDir, EdgeDirection legDir);
@@ -455,7 +455,7 @@ namespace Koala
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
 		 *  \returns the pointer that indicates the first vertex on the central path.
-		*/
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex caterpillar( GraphType &g, int pathVertNum, int legNnm, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection dir = EdUndir);
@@ -558,7 +558,7 @@ namespace Koala
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \returns a pair of pointers. The pointers indicate the first and the last vertex.
-		*/
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 				addVertices( GraphType &g, int n, int num, EdgeDirection dir, VInfoGen vInfoGen, EInfoGen eInfoGen );
@@ -578,7 +578,7 @@ namespace Koala
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param type - the type of edges in the graph, i.e., directed or undirected.
 		 *  \returns a pair of pointers. The pointers indicate the first and the last vertex.
-		*/
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 			addVertices2Tab( GraphType &g, typename GraphType::PVertex *vTab, int n, int num, EdgeDirection dir,
@@ -600,7 +600,7 @@ namespace Koala
 		 *  \param dir - edges direction mask,
 		 *  \param eInfoGen - generator for info objects for edges.
 		 *  \returns a pointer that indicates the created edge.
-		*/
+		 */
 		template< class GraphType, class EInfoGen > static typename GraphType::PEdge
 			addEdges( GraphType &g, typename GraphType::PVertex v1, typename GraphType::PVertex v2, int num1, int num2,
 				EdgeDirection dir, EInfoGen eInfoGen );
@@ -865,36 +865,45 @@ namespace Koala
 	 */
 	class LineGraph: public LineGraphPar< AlgsDefaultSettings > { };
 
-	/* ComplexCaster 
+	/* ComplexCaster
 	 * Caster zlozony z jednego castera 3-argumentowego i dwoch 2-argumentowych
 	 */
-	/* \brief Complex caster for linegraph.*/
+	/* \brief Complex caster for products.
+	 *
+	 * Useful if some entities are generated from one source and other need two sources. Which is the case is some products  of graphs for edges.
+	 * \ingroup detect*/
 	template< class TwoArg, class FirstArg, class SecondArg > struct ComplexCaster
 	{
-		mutable TwoArg twoarg;
-		mutable FirstArg firstarg;
-		mutable SecondArg secondarg;
+		mutable TwoArg twoarg;/**\brief Two argument caster function object.*/
+		mutable FirstArg firstarg;/**\brief First argument caster function object.*/
+		mutable SecondArg secondarg;/**\brief Second argument caster function object.*/
+		/**\brief Constructor*/
 		ComplexCaster( TwoArg t = TwoArg(), FirstArg f = FirstArg(), SecondArg s = SecondArg() ):
 			twoarg( t ), firstarg( f ), secondarg( s )
 			{ }
 
 		// jesli podano oba argumenty, zastosuj twoarg
+		/**\brief Cast two sources to one destination.*/
 		template< class InfoDest, class InfoSour1, class InfoSour2 >
 			void operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 )
 			{ twoarg( dest,sour1,sour2 ); }
 
 		// jesli podano pierwszy argument, zastosuj firstarg
+		/**\brief Cast first source (second BlackHole) to destination.*/
 		template< class InfoDest, class InfoSour1 >
 			void operator()( InfoDest &dest, InfoSour1 sour1, Koala::BlackHole b )
 			{ firstarg( dest,sour1 ); }
 
 		// jesli podano drugi argument, zastosuj secondarg
+		/**\brief Cast second source (first BlackHole) to destination.*/
 		template< class InfoDest, class InfoSour1 >
 			void operator()( InfoDest &dest, Koala::BlackHole b, InfoSour1 sour2 )
 			{ secondarg( dest,sour2 ); }
 	};
 
 	// funkcja tworzaca - podajemy castery skladowe
+	/**\brief Generating function for ComplexCaster
+	 * \ingroup detect*/
 	template< class TwoArg, class FirstArg, class SecondArg > ComplexCaster< TwoArg, FirstArg,SecondArg >
 		complexCast( TwoArg t, FirstArg f, SecondArg s )
 		{ return ComplexCaster< TwoArg,FirstArg,SecondArg >( t,f,s ); }
@@ -971,7 +980,7 @@ namespace Koala
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
-		//    Dopisuje iloczyn    leksykograficzny 
+		//    Dopisuje iloczyn    leksykograficzny
 		//    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
 		/** \brief Generate lexicographic product.
 		 *

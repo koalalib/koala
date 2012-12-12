@@ -468,8 +468,10 @@ template<>  inline std::string PSCast<std::string, double>(const double &val)
 			{ char t[64]; std::sprintf(t, "%lf", val); return t; };
 
 
-/* DOCUMENT
- * ParSet
+/** \brief Parameter set. 
+ *
+ * The class designed to keep properties of graph entities. May be used for communication with zgred.
+ * \ingroup iotxt
  */
 class ParSet {
 private:
@@ -484,15 +486,18 @@ private:
 		};
 
 public:
+	/**\brief Constructor*/
 	ParSet(): m_params()			{};
+	/**\brief Copy constructor*/
 	ParSet(const ParSet &p):m_params()	{ *this = p; };
 
+	/**\brief Copy content operator.*/
 	ParSet &operator =(const ParSet &p) {
 		if(&p == this) return *this;
 		m_params = p.m_params;
 		return *this;
 		};
-
+	/**\brief Test if key named \a k is of type T.*/
 	template<class T>
 	bool is(const std::string &k) const {
 		const_iterator it;
@@ -500,15 +505,20 @@ public:
 		if(it == m_params.end()) return false;
 		return PSIsType<T>(it->second.first);
 		};
+	/**\brief Test if key named \a k is of type boolean.*/
 	bool isBool(const std::string &k)	const
 			{ return is<bool>(k); };
+	/**\brief Test if key named \a k is of type integer.*/
 	bool isInt(const std::string &k)	const
 			{ return is<int>(k); };
+	/**\brief Test if key named \a k is of type double.*/
 	bool isDouble(const std::string &k)	const
 			{ return is<double>(k); };
+	/**\brief Test if key named \a k is of type string.*/
 	bool isString(const std::string &k)	const
 			{ return is<std::string>(k); };
 
+	/**\brief Get type of key named \a k.*/
 	PSType getType(const std::string &k) const {
 		const_iterator it;
 		it = m_params.find(k);
@@ -516,36 +526,44 @@ public:
 		return it->second.first;
 	};
 
+	/**\brief Set value under the key named \a k to v.*/
 	ParSet &set(const std::string &k, bool v) {
 		m_params[k].first = PST_Bool;
 		m_params[k].second.bval = v;
 		return *this;
 	};
 
+	/**\brief Set value under the key named \a k to v.*/
 	ParSet &set(const std::string &k, int v) {
 		m_params[k].first = PST_Int;
 		m_params[k].second.ival = v;
 		return *this;
 	};
 
+	/**\brief Set value under the key named \a k to v.*/
 	ParSet &set(const std::string &k, double v) {
 		m_params[k].first = PST_Double;
 		m_params[k].second.dval = v;
 		return *this;
 	};
 
+	/**\brief Set value under the key named \a k to v.*/
 	ParSet &set(const std::string &k, const std::string &v) {
 		m_params[k].first = PST_String;
 		m_params[k].second.sval = v;
 		return *this;
 	};
 
+	/**\brief Set value under the key named \a k to v.*/
 	ParSet &set(const std::string &k, const char *v) {
 		m_params[k].first = PST_String;
 		m_params[k].second.sval = v;
 		return *this;
 	};
 
+	/** \brief Get mapped value of key.
+	 *
+	 * Get mapped value of key named \a k. In case of lack of the key def is returned. */
 	template<class T>
 	T get(const std::string &k, const T &def = T()) const {
 		const_iterator it;
@@ -561,37 +579,57 @@ public:
 		return def;
 	};
 
+	/** \brief Get mapped value of key.
+	 *
+	 * Get mapped value of key named \a k. In case of lack of the key def is returned. */
 	bool getBool(const std::string &k, bool def = false) const
 			{ return get<bool>(k, def); };
+	/** \brief Get mapped value of key.
+	 *
+	 * Get mapped value of key named \a k. In case of lack of the key def is returned. */
 	int getInt(const std::string &k, int def = 0) const
 			{ return get<int>(k, def); };
+	/** \brief Get mapped value of key.
+	 *
+	 * Get mapped value of key named \a k. In case of lack of the key def is returned. */
 	double getDouble(const std::string &k, double def = 0) const
 			{ return get<double>(k, def); };
+	/** \brief Get mapped value of key.
+	 *
+	 * Get mapped value of key named \a k. In case of lack of the key def is returned. */
 	std::string getString(const std::string &k, const std::string &def = "") const
 			{ return get<std::string>(k, def); };
 
+	/** \brief Delete element with key \a p. */
 	void del(const std::string &p)
 			{ m_params.erase(p); };
 
+	/** \brief Save all keys to vector \a keys.*/
 	void getKeys(std::vector<std::string> &keys) const {
 		const_iterator it;
 		for(it = m_params.begin(); it != m_params.end(); ++it)
 			keys.push_back(it->first);
 	};
 
+	/**\brief Clear - delete all elements*/
 	void clear()
 	{   m_params.clear();   }
 
+	/** \brief The number of keys. */
 	int size() const
 	{   return m_params.size(); }
 
+	/**\brief Test if empty.*/
 	bool empty() const
 	{   return this->size()==0; }
 
+	/**\brief Test if empty.*/
 	bool operator!() const
 	{   return this->size()==0; }
 
+	/**\brief Overloaded stream operator*/
 	friend std::istream &operator >>(std::istream &sin, ParSet &p);
+	/**\brief Overloaded stream operator*/
 	friend std::ostream &operator <<(std::ostream &sout, const ParSet &p);
 
 private:

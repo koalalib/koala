@@ -116,36 +116,36 @@ namespace Koala
 			{ SubgraphBase::link( &g ); }
 		// sprawia, ze podgraf staje sie niepodlaczony do zadnego rodzica
 		/** \brief Unplug graph.
-		*
-		*  The method unplug the current subgraph from the parent.
-		*  \return true if the parent existed, false otherwise.  */
+		 *
+		 *  The method unplug the current subgraph from the parent.
+		 *  \return true if the parent existed, false otherwise.  */
 		bool unplug()
 			{ return SubgraphBase::unlink(); }
 		// adres najwyzszej struktury hierarchii lub NULL w razie braku
 		/** \brief Get root graph.
-		*
-		*  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
-		*  \return the pointer to the root if the parent existed, NULL otherwise. */
+		 *
+		 *  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
+		 *  \return the pointer to the root if the parent existed, NULL otherwise. */
 		const RootGrType *getRootPtr() const
 			{ return parent ? ((const ParentGrType*)parent)->getRootPtr() : NULL; }
 		// adres grafu, do ktorego obiekt jest bezposrednio podlaczony, lub NULL w razie braku
 		/** \brief Get parent graph.
-		*
-		*  The method tests if the graph has any superior graph if true gets the parent graph .
-		*  \return the pointer to the parent if it existed, NULL otherwise. */
+		 *
+		 *  The method tests if the graph has any superior graph if true gets the parent graph .
+		 *  \return the pointer to the parent if it existed, NULL otherwise. */
 		const ParentGrType *getParentPtr() const
 			{ return (const ParentGrType*)parent; }
 		// j.w. ale referencje
 		/** \brief Get root graph.
-		*
-		*  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
-		*  \return the reference to the root if the parent existed, NULL otherwise. */
+		 *
+		 *  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
+		 *  \return the reference to the root if the parent existed, NULL otherwise. */
 		const RootGrType &root() const;
 
 		/** \brief Get parent graph.
-		*
-		*  The method tests if the graph has any superior graph if true gets the parent graph .
-		*  \return the reference to the parent if it existed, NULL otherwise. */
+		 *
+		 *  The method tests if the graph has any superior graph if true gets the parent graph .
+		 *  \return the reference to the parent if it existed, NULL otherwise. */
 		const ParentGrType &up() const;
 
 		// Test przynaleznosci wierzcholka z rodzica do podgrafu. Dla NULL zawsze prawda.
@@ -337,9 +337,9 @@ namespace Koala
 	// zwraca podgraf danego grafu
 	/** \brief Subgraph generating function.
 	 *
-	 *  For a given graph \a g and a pair of choosers (vertex chooser and edge chooser) view on graph is returned.
+	 *  For a given graph \a g and a pair of choosers (vertex chooser and edge chooser) a view on graph is generated and returned.
 	 *  \param g the considered graph.
-	 *  \param chs the standard pair of choosers, the first one chooses vertices to view, the second one chooses edges (both ends of edge need to satisfy  vertex chooser) \ref DMchooser.
+	 *  \param chs the standard pair of choosers, the first one chooses vertices to view, the second one chooses edges (both ends of edge need to satisfy  vertex chooser) See \ref DMchooser.
 	 *  \return the new-created view (subgraph) on graph (view).
 	 *  \ingroup DMview */
 	template< class Graph, class VChooser, class EChooser > Subgraph< Graph,VChooser,EChooser >
@@ -402,26 +402,26 @@ namespace Koala
 			| ((EdLoop&ParentGrType::allowedEdgeTypes()) ? EdLoop : 0 ); }
 
 		/** \brief Get root graph.
-		*
-		*  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
-		*  \return the pointer to the root if the parent existed, NULL otherwise. */
+		 *
+		 *  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
+		 *  \return the pointer to the root if the parent existed, NULL otherwise. */
 		const RootGrType* getRootPtr() const
 			{ return parent ? ((const ParentGrType *)parent)->getRootPtr() : NULL; }
 		/** \brief Get parent graph.
-		*
-		*  The method tests if the graph has any superior graph if true gets the parent graph .
-		*  \return the pointer to the parent if it existed, NULL otherwise. */
+		 *
+		 *  The method tests if the graph has any superior graph if true gets the parent graph .
+		 *  \return the pointer to the parent if it existed, NULL otherwise. */
 		const ParentGrType* getParentPtr() const
 			{ return (const ParentGrType*)parent; }
 		/** \brief Get parent graph.
-		*
-		*  The method tests if the graph has any superior graph if true gets the parent graph .
-		*  \return the reference to the parent if it existed, NULL otherwise. */
+		 *
+		 *  The method tests if the graph has any superior graph if true gets the parent graph .
+		 *  \return the reference to the parent if it existed, NULL otherwise. */
 		const ParentGrType &up() const;
 		 /** \brief Get root graph.
-		*
-		*  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
-		*  \return the reference to the root if the parent existed, NULL otherwise. */
+		 *
+		 *  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
+		 *  \return the reference to the root if the parent existed, NULL otherwise. */
 		const RootGrType &root() const;
 		// rozlacza obiekt od jego rodzica (jesli taki istnial) i podlacza do podanego grafu
 		/** \brief Plug to \a g
@@ -432,9 +432,9 @@ namespace Koala
 			{ SubgraphBase::link( &g ); }
 		// sprawia, ze podgraf staje sie niepodlaczony do zadnego rodzica
 		/** \brief Unplug graph.
-		*
-		*  The method unplug the current subgraph from the parent.
-		*  \return true if the parent existed, false otherwise.  */
+		 *
+		 *  The method unplug the current subgraph from the parent.
+		 *  \return true if the parent existed, false otherwise.  */
 		bool unplug()
 			{ return SubgraphBase::unlink(); }
 
@@ -615,9 +615,9 @@ namespace Koala
 	};
 
 	// Tworzy widok dla podanego grafu
-	/** \brief Undirected view generating function.
+	/** \brief Undirected view (UndirView) generating function.
 	 *
-	 *  For a given graph \a g view in which all the edges are undirected is generated.
+	 *  For a given graph \a g a view in which all the edges are undirected is generated.
 	 *  \param g the considered graph.
 	 *  \return the new-created undirected view on the graph (view).
 	 *  \ingroup DMview */
@@ -709,9 +709,9 @@ namespace Koala
 			{ SubgraphBase::link( &g ); }
 		// sprawia, ze podgraf staje sie niepodlaczony do zadnego rodzica
 		/** \brief Unplug graph.
-		*
-		*  The method unplug the current view from the parent.
-		*  \return true if the parent existed, false otherwise.  */
+		 *
+		 *  The method unplug the current view from the parent.
+		 *  \return true if the parent existed, false otherwise.  */
 		bool unplug()
 			{ return SubgraphBase::unlink(); }
 
@@ -906,9 +906,9 @@ namespace Koala
 	};
 
 	// tworzy widok do podanego grafu
-	/** \brief Reversed view generating function.
+	/** \brief Reversed view (RevView) generating function.
 	 *
-	 *  For a given graph \a g view in which all the arcs have opposite direction.
+	 *  For a given graph \a g a view in which all the arcs have opposite direction, is generated and returned.
 	 *  \param g the considered graph (view).
 	 *  \return the new-created reversed view on the graph.
 	 *  \ingroup DMview */
