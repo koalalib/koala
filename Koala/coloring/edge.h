@@ -49,7 +49,10 @@ public:
 	 *  \param graph the tested graph.
 	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
 	 *   If <tt>colors[e] < 0</tt> we should assume that the edge \a e is not colored.
-	 *  \return true it the coloring is proper, false otherwise.	 */
+	 *  \return true it the coloring is proper, false otherwise.
+	 *
+	 *  [See example](examples/coloring/edgeColorGreedy.html).
+	 */
 	template <typename Graph, typename ColorMap>
 	static bool test(const Graph &graph, const ColorMap &colors);
 };
@@ -112,7 +115,10 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
 	 *   If <tt>colors[e] < 0</tt> we should assume that the edge \a e is not colored.
-	 *  \return the number of the highest used color.	 */
+	 *  \return the number of the highest used color.
+	 *
+	 *  [See example](examples/coloring/edgeColorVizing.html).
+	 */
 	template<typename Graph, typename ColorMap>
 	static int vizingSimple(const Graph &graph, ColorMap &colors);
 
@@ -124,7 +130,10 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param colors the associative table (PEdge->int) that associates colors (integer numbers) to edges.
 	 *   If colors[e] < 0 we should assume that \a e is not colored.
-	 *  \return the number of the highest used color.	 */
+	 *  \return the number of the highest used color.
+	 *
+	 *  [See example](examples/coloring/edgeColorVizing.html).
+	 */
 	template<typename Graph, typename ColorMap>
 	static int vizing(const Graph &graph, ColorMap &colors);
 
@@ -158,7 +167,10 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
 	 *  \param edge the colored edge.
-	 *  \return the color of colored edge or -1 if \a edge was colored.*/
+	 *  \return the color of colored edge or -1 if \a edge was colored.
+	 *
+	 *  [See example](examples/coloring/edgeColorGreedy.html).
+	 */
 	template< typename Graph, typename ColorMap >
 	static int greedy(const Graph &graph, ColorMap &colors,
 		typename Graph::PEdge edge);
@@ -193,7 +205,10 @@ public:
 	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
 	 *  \param beg the iterator of the first element in the container with edges to be colored.
 	 *  \param end the iterator of the past-the-end element in the container with edges to be colored.
-	 *  \return the maximal used color or -1 if all edges from container were colored.  */
+	 *  \return the maximal used color or -1 if all edges from container were colored.
+	 *
+	 *  [See example](examples/coloring/edgeColorGreedy.html).
+	 */
 	template< typename Graph, typename ColorMap, typename EInIter >
 	static int greedy(const Graph &graph, ColorMap &colors,
 		EInIter beg, EInIter end);
@@ -228,7 +243,10 @@ public:
 	 *  The method assigns the minimal (concerning already colored edges) colors to the edges.
 	 *  \param graph the considered graph.
 	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	 *  \return the maximal used color or -1 if all edges from container were colored. */
+	 *  \return the maximal used color or -1 if all edges from container were colored.
+	 *
+	 *  [See example](examples/coloring/edgeColorGreedy.html).
+	 */
 	template< typename Graph, typename ColorMap >
 	static int greedy(const Graph &graph, ColorMap &colors);
 

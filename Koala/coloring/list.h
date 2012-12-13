@@ -304,7 +304,10 @@ public:
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
-	 *  \return the number of properly colored edges or -1 if none was possible.	 */
+	 *  \return the number of properly colored edges or -1 if none was possible.
+	 *
+	 *  [See example](examples/coloring/edgeListColor.html).
+	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int color(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
