@@ -164,7 +164,10 @@ namespace Koala
 
 		// funkcja tworzaca, analogia make_pair
 		// Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
-		/**\brief Generating function for the OutCut object.*/
+		/**\brief Generating function for the OutCut object.
+		 *
+		 *  [See example](examples/flow/example_Flow.html).
+		 */
 		template< class VIter, class EIter > static OutCut< VIter,EIter > outCut( VIter av, EIter ei )
 			{ return OutCut< VIter,EIter >( av,ei ); }
 
@@ -440,7 +443,10 @@ namespace Koala
 		 *  \param[out] edgeTab  the associative table (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge. Array provides both input (capacity) and output (flow) data.
 		 *  \param[in] start the starting vertex.
 		 *  \param[in] end the terminal vertex.
-		 *  \return the size of the achieved flow.         */
+		 *  \return the size of the achieved flow.
+		 *
+		 *  [See example](examples/flow/example_Flow.html).
+		 */
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
 				typename GraphType::PVertex end)
@@ -473,7 +479,10 @@ namespace Koala
 		 *  \param[out] edgeTab the the associative table (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge. Array provides both input (capacity) and output (flow) data.
 		 *  \param[in] start the starting vertex.
 		 *  \param[in] end the terminal vertex.
-		 *  \return the standard pair (cost, size) of the achieved flow.         */
+		 *  \return the standard pair (cost, size) of the achieved flow.
+		 *
+		 *  [See example](examples/flow/example_Flow.html).
+		 */
 		template< class GraphType, class EdgeContainer > static
 			std::pair< typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType >
 			minCostFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
@@ -505,7 +514,10 @@ namespace Koala
 		 *  \param[in] start the starting vertex.
 		 *  \param[in] end the terminal vertex.
 		 *  \param[out] iters the pair of iterators to the containers with the reachable vertices (after subtraction of cut) and the edges of output  cut-set.
-		 *  \return the EdgeCut structure, which keeps the size of cut set and the number of reachable vertices.       */
+		 *  \return the EdgeCut structure, which keeps the size of cut set and the number of reachable vertices.
+		 *
+		 *  [See example](examples/flow/example_Flow.html).
+		 */
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
 			EdgeCut< typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g, EdgeContainer &edgeTab,
 				typename GraphType::PVertex start, typename GraphType::PVertex end, OutCut< VIter,EIter > iters )

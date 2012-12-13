@@ -66,7 +66,10 @@ public:
 	* The method converts a coloring given by \a colors to equitable coloring (new colors are not used).
 	* \param graph the colored graph.
 	* \param colors the associative container PEdge -> int, which assigns color (nonnegative integer) to edges.
-	* \return the difference between the number of edges in most and the least commonly used color.*/
+	* \return the difference between the number of edges in most and the least commonly used color.
+	*
+	*  [See example](examples/coloring/edgeEquitableColor.html).
+	*/
 	template<typename Graph, typename ColorMap>
 	static int repair(const Graph &graph, ColorMap &colors);
 
