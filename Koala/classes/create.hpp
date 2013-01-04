@@ -882,7 +882,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 		{
 			typename Graph::VertInfoType vinfo;
 			cast.first( vinfo,g1.getVertInfo( v1 ),g2.getVertInfo( v2 ) );
-			typename Graph::PVertex v = tabv[n1 * l1 + l2] = g.addVert( vinfo );
+			typename Graph::PVertex v = tabv[n2 * l1 + l2] = g.addVert( vinfo );
 			link.first.first()( v,v1 );
 			link.first.second()( v,v2 );
 		}
@@ -894,8 +894,8 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 			EdgeDirection dir = g2.getEdgeType( e );
 			typename Graph::EdgeInfoType einfo;
 			cast.second( einfo,blackHole,g2.getEdgeInfo( e ) );
-			typename Graph::PEdge eres = g.addEdge( tabv[n1 * indv1[v1] + indv2[ends.first]],
-				tabv[n1 * indv1[v1] + indv2[ends.second]],einfo,dir );
+			typename Graph::PEdge eres = g.addEdge( tabv[n2 * indv1[v1] + indv2[ends.first]],
+				tabv[n2 * indv1[v1] + indv2[ends.second]],einfo,dir );
 			link.second.first()( eres,(typename Graph1::PEdge)0 );
 			link.second.second()( eres,e );
 		}
@@ -907,8 +907,8 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 			EdgeDirection dir = g1.getEdgeType( e );
 			typename Graph::EdgeInfoType einfo;
 			cast.second( einfo,g1.getEdgeInfo( e ),blackHole );
-			typename Graph::PEdge eres= g.addEdge( tabv[n1 * indv1[ends.first] + indv2[v2]],
-				tabv[n1 * indv1[ends.second] + indv2[v2]],einfo,dir );
+			typename Graph::PEdge eres= g.addEdge( tabv[n2 * indv1[ends.first] + indv2[v2]],
+				tabv[n2 * indv1[ends.second] + indv2[v2]],einfo,dir );
 			link.second.first()( eres,e );
 			link.second.second()( eres,(typename Graph2::PEdge)0 );
 		}
@@ -948,7 +948,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 		{
 			typename Graph::VertInfoType vinfo;
 			cast.first( vinfo,g1.getVertInfo( v1 ),g2.getVertInfo( v2 ) );
-			typename Graph::PVertex v = tabv[n1 * l1 + l2] = g.addVert( vinfo );
+			typename Graph::PVertex v = tabv[n2 * l1 + l2] = g.addVert( vinfo );
 			link.first.first()( v,v1 );
 			link.first.second()( v,v2 );
 		}
@@ -960,8 +960,8 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 			EdgeDirection dir = g2.getEdgeType( e );
 			typename Graph::EdgeInfoType einfo;
 			cast.second( einfo,blackHole,g2.getEdgeInfo( e ) );
-			typename Graph::PEdge eres = g.addEdge( tabv[n1 * indv1[v1] + indv2[ends.first]],
-				tabv[n1 * indv1[v1] + indv2[ends.second]],einfo,dir );
+			typename Graph::PEdge eres = g.addEdge( tabv[n2 * indv1[v1] + indv2[ends.first]],
+				tabv[n2 * indv1[v1] + indv2[ends.second]],einfo,dir );
 			link.second.first()( eres,(typename Graph1::PEdge)0 );
 			link.second.second()( eres,e );
 		}
@@ -975,8 +975,8 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 			if (dir == Loop) dir = (v1 == v2) ? EdLoop : EdUndir;
 			typename Graph::EdgeInfoType einfo;
 			cast.second( einfo,g1.getEdgeInfo( e ),blackHole );
-			typename Graph::PEdge eres = g.addEdge( tabv[n1 * indv1[ends.first] + indv2[v1]],
-				tabv[n1 * indv1[ends.second] + indv2[v2]],einfo,dir );
+			typename Graph::PEdge eres = g.addEdge( tabv[n2 * indv1[ends.first] + indv2[v1]],
+				tabv[n2 * indv1[ends.second] + indv2[v2]],einfo,dir );
 			link.second.first()( eres,e );
 			link.second.second()( eres,(typename Graph2::PEdge)0 );
 		}
@@ -1016,7 +1016,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 		{
 			typename Graph::VertInfoType vinfo;
 			cast.first( vinfo,g1.getVertInfo( v1 ),g2.getVertInfo( v2 ) );
-			typename Graph::PVertex v = tabv[n1 * l1 + l2] = g.addVert( vinfo );
+			typename Graph::PVertex v = tabv[n2 * l1 + l2] = g.addVert( vinfo );
 			link.first.first()( v,v1 );
 			link.first.second()( v,v2 );
 		}
@@ -1032,52 +1032,52 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 			typename Graph::PEdge eres1 = 0, eres2 = 0;
 			if (dir1 == Undirected && dir2 == Undirected)
 			{
-				eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo,EdUndir );
-				eres2 = g.addEdge( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
+				eres1 = g.addEdge( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.second]],einfo,EdUndir );
+				eres2 = g.addEdge( tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
 			}
 			if (dir1 == Undirected && dir2 == Directed)
 			{
-				eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
-				eres2 = g.addArc( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
+				eres1 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.second]],einfo );
+				eres2 = g.addArc( tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],einfo );
 			}
 			if (dir1 == Directed && dir2 == Undirected)
 			{
-				eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
-				eres2 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo );
+				eres1 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.second]],einfo );
+				eres2 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],einfo );
 			}
 			if (dir1 == Directed && dir2 == Directed)
 			{
-				eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
+				eres1 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.second]],einfo );
 			}
 			if (dir1 == Undirected && dir2 == Loop)
 			{
-				eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
-				eres2 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
+				eres1 = g.addEdge( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
+				eres2 = g.addEdge( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
 			}
 			if (dir1 == Loop && dir2 == Undirected)
 			{
-				eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
-				eres2 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
+				eres1 = g.addEdge( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
+				eres2 = g.addEdge( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
 			}
 			if (dir1 == Loop && dir2 == Loop)
-				eres1 = g.addLoop( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],einfo );
+				eres1 = g.addLoop( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],einfo );
 			if (dir1 == Directed && dir2 == Loop)
-				eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo );
+				eres1 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],einfo );
 			if (dir1 == Loop && dir2 == Directed)
-				eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
+				eres1 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],einfo );
 			if (eres1)
 			{
 				link.second.first()( eres1,e1 );
@@ -1124,7 +1124,7 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 		{
 			typename Graph::VertInfoType vinfo;
 			cast.first( vinfo,g1.getVertInfo( v1 ),g2.getVertInfo( v2 ) );
-			typename Graph::PVertex v = tabv[n1 * l1 + l2] = g.addVert( vinfo );
+			typename Graph::PVertex v = tabv[n2 * l1 + l2] = g.addVert( vinfo );
 			link.first.first()( v,v1 );
 			link.first.second()( v,v2 );
 		}
@@ -1136,8 +1136,8 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 			EdgeDirection dir = g2.getEdgeType( e );
 			typename Graph::EdgeInfoType einfo;
 			cast.second( einfo,blackHole,g2.getEdgeInfo( e ) );
-			typename Graph::PEdge eres = g.addEdge( tabv[n1 * indv1[v1] + indv2[ends.first]],
-				tabv[n1 * indv1[v1] + indv2[ends.second]],einfo,dir );
+			typename Graph::PEdge eres = g.addEdge( tabv[n2 * indv1[v1] + indv2[ends.first]],
+				tabv[n2 * indv1[v1] + indv2[ends.second]],einfo,dir );
 			link.second.first()( eres,(typename Graph1::PEdge)0 );
 			link.second.second()( eres,e );
 		}
@@ -1149,8 +1149,8 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 			EdgeDirection dir = g1.getEdgeType( e );
 			typename Graph::EdgeInfoType einfo;
 			cast.second( einfo,g1.getEdgeInfo( e ),blackHole );
-			typename Graph::PEdge eres = g.addEdge( tabv[n1 * indv1[ends.first] + indv2[v2]],
-				tabv[n1 * indv1[ends.second] + indv2[v2]],einfo,dir );
+			typename Graph::PEdge eres = g.addEdge( tabv[n2 * indv1[ends.first] + indv2[v2]],
+				tabv[n2 * indv1[ends.second] + indv2[v2]],einfo,dir );
 			link.second.first()( eres,e );
 			link.second.second()( eres,(typename Graph2::PEdge)0 );
 		}
@@ -1166,50 +1166,50 @@ template< class DefaultStructs > template< class Graph1, class Graph2, class Gra
 			typename Graph::PEdge eres1 = 0, eres2 = 0;
 			if (dir1 == Undirected && dir2 == Undirected)
 			{
-				eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo,EdUndir );
-				eres2 = g.addEdge( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
+				eres1 = g.addEdge( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.second]],einfo,EdUndir );
+				eres2 = g.addEdge( tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
 			}
 			if (dir1 == Undirected && dir2 == Directed)
 			{
-				eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
-				eres2 = g.addArc( tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
+				eres1 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.second]],einfo );
+				eres2 = g.addArc( tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],einfo );
 			}
 			if (dir1 == Directed && dir2 == Undirected)
 			{
-				eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
-				eres2 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo );
+				eres1 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.second]],einfo );
+				eres2 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],einfo );
 			}
 			if (dir1 == Directed && dir2 == Directed)
-				eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.second]],einfo );
+				eres1 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.second]],einfo );
 			if (dir1 == Undirected && dir2 == Loop)
 			{
-				eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
-				eres2 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
+				eres1 = g.addEdge( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
+				eres2 = g.addEdge( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],einfo,EdUndir );
 			}
 			if (dir1 == Loop && dir2 == Undirected)
 			{
-				eres1 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
-				eres2 = g.addEdge( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
+				eres1 = g.addEdge( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
+				eres2 = g.addEdge( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],einfo,EdUndir );
 			}
 			if (dir1 == Loop && dir2 == Loop)
-				eres1 = g.addLoop( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],einfo );
+				eres1 = g.addLoop( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],einfo );
 			if (dir1 == Directed && dir2 == Loop)
-				eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.second] + indv2[ends2.first]],einfo );
+				eres1 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.second] + indv2[ends2.first]],einfo );
 			if (dir1 == Loop && dir2 == Directed)
-				eres1 = g.addArc( tabv[n1 * indv1[ends1.first] + indv2[ends2.first]],
-					tabv[n1 * indv1[ends1.first] + indv2[ends2.second]],einfo );
+				eres1 = g.addArc( tabv[n2 * indv1[ends1.first] + indv2[ends2.first]],
+					tabv[n2 * indv1[ends1.first] + indv2[ends2.second]],einfo );
 
 			if (eres1)
 			{
