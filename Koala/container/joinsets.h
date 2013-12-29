@@ -27,7 +27,6 @@ namespace Koala
 		Klucz key;
 	};
 
-	template< class Container > class VectorInterface;
 
 	/* JoinableSetsInternalTypes
 	 *
@@ -37,6 +36,8 @@ namespace Koala
 		typedef Privates::BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc< ITEM > * > > AssocBlockType;
 		typedef JSPartDesrc< ITEM > BufElementType;
 	} ;
+
+
 
 	/* JoinableSets.
 	 * Klasa zbioru rozlacznych zbiorow zlaczalnych o elementach typu wskaznikowego ITEM
@@ -72,27 +73,14 @@ namespace Koala
 		 *  \param n the size of the set of all elements.
 		 *  \param p ignored
 		 *  \param q ignored	*/
-		JoinableSets( unsigned int n = 0, void* p = 0, void *q = 0 );
+		JoinableSets( unsigned int n = 0 );
 		/** \brief Copy constructor.*/
 		JoinableSets( const JoinableSets< ITEM,AssocContainer > & );
 		/** \brief Content copy operator.*/
 		JoinableSets &operator=( const JoinableSets< ITEM,AssocContainer > & );
 		~JoinableSets() { resize( 0 ); }
 
-		// Mozliwosc tworzenia kontenera operujacego na dostarczonych zewnetrznych tablicach
-		// Wowczas AssocContainer powinien opierac sie na VectorInterface
-		// TODO: sprawdzic niekopiowalnosc obiektu w tym przypadku
-		// TODO: rozwazyc usuniecie z finalnej wersji biblioteki
-		/** \brief Constructor.
-		 *
-		 *  The constructor allows to use a buffer of external memory.
-		 *  In such cases AssocContainer should be compatible with VectorInterface.
-		 *  \param n the size of the set of all elements.
-		 *  \param buf  buffer for all elements
-		 *  \param mapbuf buffer for associative table. */
-		JoinableSets( unsigned int n, JSPartDesrc< ITEM > * buf,
-			typename JoinableSetsInternalTypes< ITEM >::AssocBlockType * mapbuf ): mapa( n,mapbuf ), bufor( buf ),
-			siz( 0 ), part_no( 0 ), maxsize( n ) { }
+        //NEW: rezygnacja z tworzenia kontenera zewnetrzna tablica pamieci (podobnie jak w mapach)
 
 		// czysci kontener i zmienia maks. liczbe elementow wszystkich zbiorow
 		/** \brief Resize.
@@ -214,27 +202,6 @@ namespace Koala
 	template< typename Element, typename Cont >
 		std::ostream &operator<<( std::ostream &,const JoinableSets< Element,Cont > & );
 
-namespace Privates {
-	/* JoinableSetsVectIntSwitch
-	 * test, czy kontener dziala na tablicach zewnetrznych
-	 */
-
-	template< class T > struct JoinableSetsVectIntSwitch
-	{
-		typedef void* BufType;
-		typedef void* MapBufType;
-		static bool isJSVI() { return false; }
-	};
-
-	template< class ITEM > struct JoinableSetsVectIntSwitch< JoinableSets<ITEM, AssocArray<ITEM, JSPartDesrc<ITEM> *,
-		VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc<ITEM> * > > * > > > >
-	{
-		typedef JSPartDesrc< ITEM > * BufType;
-		typedef Privates::BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc< ITEM > * > > *MapBufType;
-		static bool isJSVI() { return true; }
-	};
-
-}
 
 #include "joinsets.hpp"
 }

@@ -70,6 +70,7 @@ int& f(int i,int j)
 
     IO::writeGraphText(g1,cout,IO::RG_EdgeList);
 
+    return 0;
 
     vec.clear(); vec.resize(2); vec[0].resize(2);vec[1].resize(2);
     vec[0][1]=1;

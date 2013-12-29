@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "Koala/graph/graph.h"
+#include"./Koala/io/text.h"
 
 using namespace std;
 using namespace Koala;
@@ -20,6 +21,16 @@ struct InfoV2 {
     InfoV2(int n, string aname) : b(n), napis(aname) {}
     InfoV2(){}
 };
+
+int inc(char a)
+{
+    return a+3;
+}
+
+bool chtest( Vertex<char,char> *elem, const Graph<char,char> &graph )
+{
+    return elem!=graph.getVert();
+}
 
 InfoV2 vtrans(InfoV1);
 InfoV2 vtrans(InfoV1 arg) { return InfoV2(0,arg.name); }
@@ -50,6 +61,164 @@ struct InfoE2 {
     InfoE2(int n, string aname) : b(n), napis(aname) {}
     InfoE2(){}
 } ein2;
+
+
+namespace Privates {
+
+    namespace KonwTestSpace {
+
+
+        template <class Dest,class Source> struct Przec {
+
+            struct Lapacz {
+                int a;
+//                template <class T>
+//                Lapacz(T) : a(1) {}
+                    Lapacz(Source) : a(1) {}
+            };
+
+
+            static char przec(Dest,int)
+            {
+                cout << "\nkonwersja";
+                return 'A';
+            }
+
+            static double przec(Lapacz,...)
+            {
+                cout << "\nniekonwersja";
+                return 12.3;
+            }
+
+        };
+
+        template <class Dest,class Sour> struct Przec<Dest*,Sour*> {
+
+            template <class T>
+            static char przec(T,int)
+            {
+                cout << "\nkonwersja";
+                return 'A';
+            }
+
+        };
+
+
+        template <int arg> struct Cast {
+
+            template <class Sour,class Dest>
+            static void make(Dest& d,const Sour& s)
+            {
+                cout << "\nBrak konwersji\n";
+                d=Dest();
+            }
+        };
+
+        template <> struct Cast<1> {
+
+            template <class Sour,class Dest>
+            static void make(Dest& d,const Sour& s)
+            {
+                cout << "\nKonwersja\n";
+                d=(Dest)s;
+            }
+        };
+
+    }
+}
+
+struct KonwTest {
+
+    template <class Sour,class Dest>
+    void operator()(Dest& d,const Sour& s)
+    {
+        ::Privates::KonwTestSpace::Cast<sizeof(::Privates::KonwTestSpace::Przec<Dest,Sour>::przec(s,12))>::make(d,s);
+    }
+} konwtest;
+
+void przec(int,int)
+{
+    cout << "\nkonwersja";
+}
+
+struct Lapacz {
+    int a;
+    template <class T>
+    Lapacz(T) : a(1) {}
+
+};
+
+
+struct AA {
+    int a;
+
+    AA(int arg=13) : a(arg) {}
+    operator int() const
+    {
+        return a;
+    }
+};
+
+struct CCC {
+    int a;
+
+    CCC(int arg=3): a(arg) {}
+
+//    operator BBB() const
+//    {
+//        return BBB(a);
+//    }
+};
+
+
+struct DDD {
+    int a;
+
+    DDD(): a(15) {}
+
+    operator double() const
+    {
+        return 12;
+    }
+} ddd;
+
+
+std::ostream &operator <<(std::ostream &sout, const CCC &p)
+{
+    sout << p.a;
+    return sout;
+}
+
+
+struct BBB {
+    int a;
+
+    BBB(int arg=2): a(arg) {}
+    BBB(CCC c) : a(c.a) {}
+
+};
+
+
+std::ostream &operator <<(std::ostream &sout, const BBB &p)
+{
+    sout << p.a;
+    return sout;
+}
+
+
+
+
+void przec(Lapacz,...)
+{
+    cout << "\nniekonwersja";
+}
+
+//template <class T>
+//void przec(T)
+//{
+//    cout << "\nniekonwersja";
+//}
+
 
 
 #include "main.hpp"
@@ -138,6 +307,61 @@ struct InfoE2 {
 //    cout << endl <<g1.getEdgeNo() << endl;
 //    cout << g1.ch2Archs(g1.getEdgeSet());
 //    cout << endl <<g1.getEdgeNo() << endl;
+    {
+
+
+        cout << "\n\n------------------\n";
+
+        string s="ala";
+        AA aa(15);
+        int b=aa;
+        przec(s,12);
+
+        cout << "\n\n------------------\n";
+        char* ss="Ala";
+        string dd;
+        konwtest(dd,ss);
+
+
+        cout << "\n" << dd << ' ' << ss;
+
+        cout << "\n\n------------------\n";
+#define SourType int
+#define SourVal1 12
+#define SourVal2 12
+#define SourVal3 12
+#define DestType void*
+
+
+        Graph<SourType,SourType> g,gg;
+        Graph<SourType,SourType>::PVertex A,B;
+        A=g.addVert(SourVal1);B=g.addVert(SourVal2);
+        g.addEdge(A,B,SourVal3);
+        Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
+
+        cout << "\n\n--\n\n";
+        Graph<DestType,DestType> h;
+        h.copy(g,stdChoose(true) & stdChoose(true));
+        gg.copy(g);
+//            h.copy(g);
+        Koala::IO::writeGraphText(h, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
+
+    }
+
+    {
+        cout << "\n\n!!!!!!!!!!!!!!\n\n";
+//        Graph<DDD,DDD> g;
+//        g.addVert(ddd);g.addVert(ddd);
+//        Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
+
+//        Graph<char,char> g;
+//        g.addEdge(g.addVert('A'),g.addVert('B'),'C');
+//
+//        Graph<int,int> h;
+//
+//        h.copy(g,stdFChoose(&chtest)& stdChoose(true),stdCast(&inc) & hardCast());
+//        Koala::IO::writeGraphText(h, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
+    }
 
     return 0;
 }

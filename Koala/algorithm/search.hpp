@@ -213,8 +213,8 @@ template< class T > SearchStructs::CompStore< std::back_insert_iterator< std::ve
 
 // Visitors
 
-template< class VertIter > template< class GraphType > bool Visitors::StoreTargetToVertIter< VertIter >::operator()(
-	const GraphType &g, typename GraphType::PVertex u, VisitVertLabs< GraphType > &r )
+template< class VertIter > template< class GraphType, class VisitVertLabsGraphType > bool Visitors::StoreTargetToVertIter< VertIter >::operator()(
+	const GraphType &g, typename GraphType::PVertex u, VisitVertLabsGraphType &r )
 {
 	(void)(g); (void)(r);
 	*m_iter = u;
@@ -229,9 +229,9 @@ template< class CompIter, class VertIter > Visitors::StoreCompVisitor< CompIter,
 	++(iters.compIter);
 }
 
-template< class CompIter, class VertIter > template< class GraphType > bool
+template< class CompIter, class VertIter > template< class GraphType, class VisitVertLabsGraphType > bool
 	Visitors::StoreCompVisitor< CompIter,VertIter >::operator()( const GraphType &g, typename GraphType::PVertex u,
-	VisitVertLabs< GraphType > &r )
+	VisitVertLabsGraphType &r )
 {
 	(void)(g); (void)(r);
 	*(m_st.iters.vertIter) = u;
@@ -277,7 +277,7 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer, class Iter >
 	int GraphSearchBase< SearchImpl, DefaultStructs >::scanAttainable( const GraphType &g,
-		typename GraphType::PVertex root, Iter comp, EdgeDirection mask, VertContainer &cont )
+		typename GraphType::PVertex root, VertContainer &cont,Iter comp, EdgeDirection mask  )
 {
 	int rv;
 	koalaAssert( root,AlgExcNullVert );
@@ -288,15 +288,15 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertIter >
 	int GraphSearchBase< SearchImpl, DefaultStructs >::scanAttainable( const GraphType &g,
-		typename GraphType::PVertex root, VertIter comp, EdgeDirection mask )
+		typename GraphType::PVertex root, BlackHole,VertIter comp, EdgeDirection mask )
 {
 	VisitedMap< GraphType > cont( g.getVertNo() );
-	return scanAttainable( g,root,comp,mask,cont );
+	return scanAttainable( g,root,cont,comp,mask );
 }
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer, class VertIter >
-	int GraphSearchBase< SearchImpl, DefaultStructs >::scan( const GraphType &g, VertIter iter, EdgeDirection mask,
-		VertContainer &tree, bool sym )
+	int GraphSearchBase< SearchImpl, DefaultStructs >::scan( const GraphType &g, VertContainer &tree,VertIter iter,
+        EdgeDirection mask, bool sym )
 {
 	mask &= ~EdLoop;
 	if (sym) mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
@@ -304,10 +304,10 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 }
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertIter >
-	int GraphSearchBase< SearchImpl, DefaultStructs >::scan( const GraphType &g, VertIter iter, EdgeDirection mask )
+	int GraphSearchBase< SearchImpl, DefaultStructs >::scan( const GraphType &g, BlackHole,VertIter iter, EdgeDirection mask, bool sym )
 {
 	VisitedMap< GraphType > cont( g.getVertNo() );
-	return scan( g,iter,mask,cont );
+	return scan( g,cont,iter,mask,sym );
 }
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType >
@@ -316,7 +316,7 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType >
 {
 	assert( root );
 	Set< typename GraphType::PVertex > res;
-	scanAttainable( g,root,setInserter( res ),mask );
+	scanAttainable( g,root,blackHole,setInserter( res ),mask );
 	return res;
 }
 
@@ -337,7 +337,7 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer, class CompIter,
 	class VertIter > int GraphSearchBase< SearchImpl, DefaultStructs >::split( const GraphType &g,
-		CompStore< CompIter,VertIter > iters, EdgeDirection mask, VertContainer &cont )
+		VertContainer &cont,CompStore< CompIter,VertIter > iters, EdgeDirection mask  )
 {
 	mask |= (mask & (EdDirIn | EdDirOut)) ? EdDirIn | EdDirOut : 0;
 	mask &= ~EdLoop;
@@ -346,11 +346,11 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 }
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class CompIter, class VertIter >
-	int GraphSearchBase< SearchImpl, DefaultStructs >::split( const GraphType &g,
+	int GraphSearchBase< SearchImpl, DefaultStructs >::split( const GraphType &g,BlackHole,
 		CompStore< CompIter,VertIter > iters, EdgeDirection mask )
 {
 	VisitedMap< GraphType > cont( g.getVertNo() );
-	return split( g,iters,mask,cont );
+	return split( g,cont,iters,mask );
 }
 
 // DFSBase
@@ -375,7 +375,7 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 		v = params.g.getEdgeEnd( e,u );
 		if(params.visited.hasKey( v )) continue;
 
-		params.visited[v] = SearchStructs::VisitVertLabs< GraphType >( u,e,depth + 1,params.component );
+		SearchStructs::VisitVertLabs< GraphType >( u,e,depth + 1,params.component ).copy(params.visited[v]);
 		t = dfsDoVisit< GraphType,VertContainer,Visitor >( params,v,depth + 1 );
 		if (t < 0)
 		{
@@ -398,7 +398,7 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 	DFSParamBlock< GraphType,VertContainer,Visitor > params( g,visited,visit,mask,component );
 	if (g.getVertNo() == 0) return 0;
 	if (first == NULL) first = g.getVert();
-	visited[first] = SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,component );
+	SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,component ).copy(visited[first]);
 	return DFSBase< SearchImpl,DefaultStructs >:: template dfsDoVisit< GraphType,VertContainer,Visitor>( params,first,0 );
 }
 
@@ -472,7 +472,7 @@ template <class DefaultStructs > template< class GraphType, class VertContainer,
 	if (n == 0) return 0;
 	if (first == NULL) first = g.getVert();
 
-	visited[first] = SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,component );
+	SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,component ).copy(visited[first]);
 	cont.push( first );
 	retVal = 0;
 
@@ -493,7 +493,7 @@ template <class DefaultStructs > template< class GraphType, class VertContainer,
 			v = g.getEdgeEnd( e,u );
 			if (!Visitors::visitEdgePre( g,visit,e,u,visit )) continue;
 			if (visited.hasKey( v )) continue;
-			visited[v] = SearchStructs::VisitVertLabs< GraphType >( u,e,depth + 1,component );
+			SearchStructs::VisitVertLabs< GraphType >( u,e,depth + 1,component ).copy(visited[v]);
 			cont.push( v );
 			if (!Visitors::visitEdgePost( g,visit,e,u,visit )) return -retVal;
 		}
@@ -665,16 +665,17 @@ template< class DefaultStructs > template< class GraphType, class OutVertIter >
 	n = g.getVertNo();
 	typename DefaultStructs::template AssocCont< typename GraphType::PVertex,std::pair< int,int > >::Type
 		orderData( n );
-	Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< LVCNode< GraphType > > > >
+	SimplArrPool<Privates::ListNode< Privates::List_iterator< LVCNode< GraphType> > > >
 		allocat(  n + 3 );
 	//TODO: size? - spr, j.w. 2n+1 -> n + 1 - oj! raczej nie!
-	Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 2 );
-	LexVisitContainer< GraphType,Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator<
-		LVCNode< GraphType > > > >,Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > >
+	SimplArrPool< Privates::ListNode< LVCNode< GraphType > > >
+        allocat2( 2 * n + 2 );
+	LexVisitContainer< GraphType,SimplArrPool< Privates::ListNode< Privates::List_iterator<
+		LVCNode< GraphType > > > >,SimplArrPool< Privates::ListNode< LVCNode< GraphType > > > >
+
 		cont( allocat,allocat2,n );
 
 	bmask &= ~EdLoop;
-		//TODO: watpliwe: if(bmask & EdDirOut) bmask &= ~EdDirIn;
 	koalaAssert( ((bmask & Directed) == 0) || ((bmask & Directed) == Directed),AlgExcWrongMask );
 
 	assert( in == n );
@@ -778,12 +779,12 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
 	if (DefaultStructs::ReserveOutAssocCont) visited.reserve( n );
 	koalaAssert( ((mask & Directed) == 0) || ((mask & Directed) == Directed),AlgExcWrongMask );
-	Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator< LVCNode< GraphType > > > >
+    SimplArrPool< Privates::ListNode< Privates::List_iterator< LVCNode< GraphType > > > >
 		allocat( n + 3 );
 		//TODO: size? - spr:2n+1 -> n+1 - oj! raczej nie!
-	Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 2 );
-	LexVisitContainer< GraphType,Privates::BlockListAllocator< Privates::ListNode< Privates::List_iterator<
-		LVCNode<GraphType > > > >,Privates::BlockListAllocator< Privates::ListNode< LVCNode< GraphType > > > >
+    	SimplArrPool< Privates::ListNode< LVCNode< GraphType > > > allocat2( 2 * n + 2 );
+	LexVisitContainer< GraphType,SimplArrPool< Privates::ListNode< Privates::List_iterator<
+		LVCNode<GraphType > > > >,SimplArrPool< Privates::ListNode< LVCNode< GraphType > > > >
 		cont( allocat,allocat2,n );
 
 	if (n == 0) return 0;
@@ -791,7 +792,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
 	cont.initialize( g );
 
-	visited[start] = SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,component );
+	SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,component ).copy(visited[start]);
 	cont.push( start );
 	retVal = 0;
 
@@ -816,7 +817,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 				if (visited[v].component == -1) cont.move( v );
 				continue;
 			}
-			visited[v] = SearchStructs::VisitVertLabs< GraphType >( u,e,depth + 1,-1 );
+			SearchStructs::VisitVertLabs< GraphType >( u,e,depth + 1,-1 ).copy(visited[v]);
 			cont.move( v );
 			if (!Visitors::visitEdgePost( g,visit,e,u,visit )) return -retVal;
 		}
@@ -979,7 +980,7 @@ template< class DefaultStructs > template< class GraphType, class Iter >
 	for( typename GraphType::PEdge e = g.getEdge( EdDirIn | EdDirOut ); e; e = g.getEdgeNext( e,EdDirIn | EdDirOut ) )
 	{
 		std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends = g.getEdgeEnds( e );
-		if (BFSPar<DefaultStructs>::getPath( makeSubgraph( g,std::make_pair( stdChoose( true ),!stdValChoose( e ) ) ),
+		if (BFSPar<DefaultStructs>::getPath( makeSubgraph( g,std::make_pair( stdChoose( true ),!stdValChoose( e ) ),std::make_pair(true,true) ),
 			ends.first,ends.second,PathStructs::outPath( blackHole,blackHole ),EdDirOut ) != -1)
 		{
 			*out = e;
@@ -1178,11 +1179,10 @@ template< class DefaultStructs > template< class GraphType, class VertDataMap, c
 
 	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,VisitVertLabs< GraphType > >::Type
 		visited( n );
-	if (DefaultStructs::ReserveOutAssocCont)
-	{
+
 		vertMap.reserve( n + 1 );
 		edgeMap.reserve( m + 1 );
-	}
+
 	typename GraphType::PEdge LOCALARRAY( stbuf,m + n + 1 );
 	// TODO: size?
 	VertBlockList LOCALARRAY( vertBlockList,m * 2 + n + 1 );
@@ -1230,40 +1230,40 @@ template< class DefaultStructs > template< class GraphType, class VertDataMap, c
 	return 0;
 }
 
-//TODO: przejsc na kopiec
+
 template< class DefaultStructs > template< class GraphType, class Iterator >
 	int BlocksPar< DefaultStructs >::getCore( const GraphType &g, Iterator out )
 {
 	const EdgeType mask = EdAll;
-	int n;
-	typename DefaultStructs::template AssocCont< typename GraphType::PVertex,int >::Type degs( n = g.getVertNo() );
-	std::pair< int,typename GraphType::PVertex > LOCALARRAY( buf,2 * n );
-	PriQueueInterface< std::pair< int,typename GraphType::PVertex > *,
-		std::greater< std::pair< int,typename GraphType::PVertex > > > q( buf,2 * n );
-	if (!n) return 0;
-	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-		q.push( std::make_pair( degs[v] = g.deg( v,mask ),v ) );
+	int n=g.getVertNo();
+
+	SimplArrPool< typename DefaultStructs:: template
+		HeapCont< std::pair<int,typename GraphType::PVertex> >::NodeType> alloc(n);
+	typename DefaultStructs::template
+		HeapCont< std::pair<int,typename GraphType::PVertex> >::Type q(&alloc);
+	typename DefaultStructs::template
+		AssocCont<typename GraphType::PVertex, typename DefaultStructs:: template
+		HeapCont< std::pair<int,typename GraphType::PVertex> >::NodeType*>::Type vertToQueue(n);
+
+    for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+        vertToQueue[v]=q.push(std::make_pair(g.deg(v,mask),v));
+
 	while (!q.empty() && q.top().first <= 1)
 	{
-		if (!degs.hasKey( q.top().second ))
-		{
-			q.pop();
-			continue;
-		}
 		typename GraphType::PVertex v = q.top().second, u;
 		typename GraphType::PEdge e = g.getEdge( v,mask );
-		degs.delKey( v );
-		q.pop();
-		if (e && degs.hasKey( u = g.getEdgeEnd( e,v ) )) q.push( std::make_pair( --degs[u],u ) );
+		vertToQueue.delKey( v );q.pop();
+		if (e && vertToQueue.hasKey( u = g.getEdgeEnd( e,v ) ))
+        {
+            std::pair<int,typename GraphType::PVertex> uval=vertToQueue[u]->get();
+            uval.first--;
+            q.decrease( vertToQueue[u],uval );
+        }
 	}
-	if (!isBlackHole( out ))
-		for( typename GraphType::PVertex v = degs.firstKey(); v; v = degs.nextKey( v ) )
-		{
-			*out = v;
-			++out;
-		}
-	return degs.size();
+	if (!isBlackHole( out )) vertToQueue.getKeys(out);
+	return vertToQueue.size();
 }
+
 
 // EulerPar
 
@@ -1322,7 +1322,7 @@ template< class DefaultStructs > template< class GraphType >
 	resa = (typename GraphType::PVertex)NULL;
 	resb = (typename GraphType::PVertex)NULL;
 	if (licz == 0) { return; };
-	if (licz != BFSPar< DefaultStructs >::scanAttainable( g,x,blackHole,symmask & ~EdLoop )) return;
+	if (licz != BFSPar< DefaultStructs >::scanAttainable( g,x,blackHole,blackHole,symmask & ~EdLoop )) return;
 	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
 		if (!dir)
 		{
@@ -1548,7 +1548,7 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
 	typename BlackHoleSwitch< CompMap,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
 		int >::Type >::Type &vmap = BlackHoleSwitch< CompMap,typename DefaultStructs:: template AssocCont<
 			typename GraphType::PVertex,int >::Type >::get( avmap,localvtab );
-	if (isBlackHole( avmap ) || DefaultStructs::ReserveOutAssocCont) vmap.reserve( n );
+	vmap.reserve( n );
 	if (n == 1)
 	{
 		vmap[g.getVert()] = 0;
@@ -1562,7 +1562,7 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
 	}
 	typename GraphType::PVertex LOCALARRAY( tabv,n );
 	int LOCALARRAY( tabc,n + 1 );
-	int compno = BFSPar< DefaultStructs >::split( g,compStore( tabc,tabv ),EdUndir );
+	int compno = BFSPar< DefaultStructs >::split( g,blackHole,compStore( tabc,tabv ),EdUndir );
 	if (compno > 1)
 	{
 		for( int i = 0; i <= compno; i++ )
@@ -1580,15 +1580,18 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
 		return Partition( compno,mpDisconnected );
 	}
 
-	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected >::Type
+	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
 		ImageGraph;
-	ImageGraph neg;
+
+    SimplArrPool<typename ImageGraph::Vertex> valloc(n);
+    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1)/2-m);
+	ImageGraph neg(&valloc,&ealloc);
 	typename ImageGraph::PVertex LOCALARRAY( tabvneg,n );
 	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) neg.addVert( v );
 	for( typename ImageGraph::PVertex v = neg.getVert(); v != neg.getVertLast(); v = neg.getVertNext( v ) )
 		for( typename ImageGraph::PVertex u = neg.getVertNext( v ); u; u = neg.getVertNext( u ) )
 			if (!g.getEdge( v->info,u->info,EdUndir )) neg.addEdge( v,u );
-	compno = BFSPar< DefaultStructs >::split( neg,compStore( tabc,tabvneg ),EdUndir );
+	compno = BFSPar< DefaultStructs >::split( neg,blackHole,compStore( tabc,tabvneg ),EdUndir );
 	if (compno > 1)
 	{
 		for( int i = 0; i <= compno; i++ )
@@ -1673,7 +1676,8 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
 	assert( ccomp > 0 && ccomp <= comp );
 
 	adjmatr.clear();
-	makeSubgraph( g,std::make_pair( stdChoose( true ),extAssocChoose( &visited,ccomp ) ) ).getAdj( adjmatr,EdUndir );
+	makeSubgraph( g,std::make_pair( stdChoose( true ),extAssocChoose( &visited,ccomp ) ),
+                                    std::make_pair(true,true)).getAdj( adjmatr,EdUndir );
 
 	l = compno = 0;
 	*out.compIter = 0;

@@ -210,7 +210,7 @@ namespace Koala
 		{
 			// typ liczbowy przepustowosci luku i objetosci przeplywu
 			typedef DType CapacType;/**<\brief Capacity type.*/
-			// maksymalny i minimalny dopuszczalny przy danym wierzcholku laczny wplyw
+			// maksymalny i minimalny dopuszczalny przy danym wierzcholku laczny wplyw (tj. bilans wierzcholka na plus)
 			CapacType hi/**\brief Possible exes in vertex*/,lo/**\brief possible deficit in vertex*/;
 
 			//(dopuszczalne dodatnie i ujemne np. przeplyw to trans. z hi=lo=0 wszedzie poza zrodlem i ujsciem)
@@ -375,7 +375,6 @@ namespace Koala
 
 		// Bellman-Ford w sieci tymczasowej z kosztami lukow skorygowanymi przez potencjaly wierzcholkow
 		// Zwraca: czy istnieje przejscie start->end
-		// TODO: rozwazyc przejscie na kopce
 		template< class GraphType, class VertContainer, class EdgeContainer > static bool
 			BellmanFordFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
 				typename GraphType::PVertex start, typename GraphType::PVertex end );
@@ -660,7 +659,6 @@ namespace Koala
 				const VertContainer &vertTab );
 
 		// znajduje drzewo Gomory-Hu grafu
-		// TODO: niezbyt efektywne, moze zrezygnowac z Setow
 		/** \brief Get Gomory-Hu tree.
 		 *
 		 *  The method calculates the Gomory-Hu tree of undirected graph \a g.

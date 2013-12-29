@@ -29,13 +29,37 @@ struct OpisE {
     int dlugosc;
 };
 
+template< class GraphType > struct VisitLabs
+{
+    // rodzic danego wierzcholka w drzewie (lesie), NULL dla korzenia
+    /** \brief Parent of vertex.*/
+    typename GraphType::PVertex vPrev;
+    // krawedz prowadzaca do rodzica
+    /** \brief Edge leading to parent of vertex.*/
+    typename GraphType::PEdge ePrev;
+
+    // odleglosc od korzenia (liczba krawedzi) i numer skladowej spojnosci (od 0)
+    int distance;/**< \brief Distance (number of edges) from root.*/
+    int component;/**< \brief Index of connected component.*/
+
+    bool dummy;
+
+    /**\brief Constructor*/
+    VisitLabs( typename GraphType::PVertex vp = 0, typename GraphType::PEdge ep = 0,
+        int dist = std::numeric_limits< int >::max(), int comp = -1 ):
+            vPrev( vp ), ePrev( ep ), distance( dist ), component( comp ), dummy(true)
+        { }
+};
+
+
 Koala::Graph<OpisV,OpisE> g;
 Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,G,H,I,V,U,W,tabV[10];
 Koala::Graph<OpisV,OpisE>::PEdge tabE[10];
 
 
 Koala::AssocArray<Koala::Graph<OpisV,OpisE>::PVertex,
-            Koala::SearchStructs::VisitVertLabs<Koala::Graph<OpisV,OpisE> > > vertCont;
+            VisitLabs<Koala::Graph<OpisV,OpisE> > > vertCont;
+//            Koala::SearchStructs::VisitVertLabs<Koala::Graph<OpisV,OpisE> > > vertCont;
 
 void searchTest()
 {   vertCont.clear();g.clear();
@@ -98,38 +122,38 @@ void searchTest2()
 #undef STRATEGY
 #define STRATEGY BFS
     Koala::STRATEGY::visitAllBase(g,vertCont,Visitors::EndVertVisitor(G),EdAll);
-    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll,vertCont);
-    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll);
-    Koala::STRATEGY::scan(g,blackHole,EdAll,vertCont,true);
-    Koala::STRATEGY::scan(g,blackHole,EdAll);
+    Koala::STRATEGY::scanAttainable(g,A,vertCont,blackHole,EdAll);
+    Koala::STRATEGY::scanAttainable(g,A,blackHole,blackHole,EdAll);
+    Koala::STRATEGY::scan(g,vertCont,blackHole,EdAll,true);
+    Koala::STRATEGY::scan(g,blackHole,blackHole,EdAll);
     Koala::STRATEGY::cyclNo(g,EdAll);
     Koala::STRATEGY::getAttainableSet(g,A,EdAll);
-    Koala::STRATEGY::split(g,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll,vertCont);
+    Koala::STRATEGY::split(g,vertCont,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll);
 
 #undef STRATEGY
 #define STRATEGY DFSPreorder
     Koala::STRATEGY::visitAllBase(g,vertCont,Visitors::EndVertVisitor(G),EdAll);
-    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll,vertCont);
-    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll);
-    Koala::STRATEGY::scan(g,blackHole,EdAll,vertCont);
-    Koala::STRATEGY::scan(g,blackHole,EdAll);
+    Koala::STRATEGY::scanAttainable(g,A,vertCont,blackHole,EdAll);
+    Koala::STRATEGY::scanAttainable(g,A,blackHole,blackHole,EdAll);
+    Koala::STRATEGY::scan(g,vertCont,blackHole,EdAll,true);
+    Koala::STRATEGY::scan(g,blackHole,blackHole,EdAll);
     Koala::STRATEGY::cyclNo(g,EdAll);
     Koala::STRATEGY::getAttainableSet(g,A,EdAll);
-    Koala::STRATEGY::split(g,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll,vertCont);
+    Koala::STRATEGY::split(g,vertCont,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll);
 
 #undef STRATEGY
 #define STRATEGY LexBFS
     Koala::STRATEGY::visitAllBase(g,vertCont,Visitors::EndVertVisitor(G),EdAll);
-    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll,vertCont);
-    Koala::STRATEGY::scanAttainable(g,A,blackHole,EdAll);
-    Koala::STRATEGY::scan(g,blackHole,EdAll,vertCont);
-    Koala::STRATEGY::scan(g,blackHole,EdAll);
+    Koala::STRATEGY::scanAttainable(g,A,vertCont,blackHole,EdAll);
+    Koala::STRATEGY::scanAttainable(g,A,blackHole,blackHole,EdAll);
+    Koala::STRATEGY::scan(g,vertCont,blackHole,EdAll,true);
+    Koala::STRATEGY::scan(g,blackHole,blackHole,EdAll);
     Koala::STRATEGY::cyclNo(g,EdAll);
     Koala::STRATEGY::getAttainableSet(g,A,EdAll);
-    Koala::STRATEGY::split(g,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll,vertCont);
+    Koala::STRATEGY::split(g,vertCont,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll);
 
     searchTest();
-    std::cout << (licz=Koala::STRATEGY::scanAttainable(g,A,tabV,EdAll,vertCont)) << std::endl;
+    std::cout << (licz=Koala::STRATEGY::scanAttainable(g,A,vertCont,tabV,EdAll)) << std::endl;
     licz=g.getVertNo();
     for(W=g.getVert();W;W=g.getVertNext(W))
         std::cout << W->info.name << ":: dist:" << vertCont[W].distance << " pred:"
@@ -153,7 +177,7 @@ void searchTest2()
 //    g.del(I); g.del(G); g.del(H);
 
     std::cout<<std::endl;
-    int compno=Koala::STRATEGY::split(g,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll);
+    int compno=Koala::STRATEGY::split(g,blackHole,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll);
     std::cout << compno<<endl;
     for(int i=0;i<=compno;i++) cout << comptab[0][i] << ' '; cout << endl;
     cout << endl;

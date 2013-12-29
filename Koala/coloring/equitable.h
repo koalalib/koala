@@ -5,6 +5,10 @@
 #include "./vertex.h"
 #include "./edge.h"
 
+//TODO: niestety equitable powinno rozkladac sprawiedliwie kolory w podanym przedziale 1,2,...,l a nie
+//w zbiorze wykorzystanych barw.
+//TODO: laczenie sprawiedliwych pokolorowan skladowych spojnych w jedno pokolorowanie sprawiedliwe
+
 namespace Koala {
 /** \brief Equitable vertex coloring.
 * \ingroup color */
@@ -21,15 +25,15 @@ protected:
 	};
 
 public:
-	/**\brief Repair coloring. 
+	/**\brief Repair coloring.
 	*
-	*  The method modifies the coloring given by the map \a colors. It takes the color that is most commonly used, and tries to recolor it with lower color. If not possible new color is used. The procedure is repeated until graph is equitably colored. 
+	*  The method modifies the coloring given by the map \a colors. It takes the color that is most commonly used, and tries to recolor it with lower color. If not possible new color is used. The procedure is repeated until graph is equitably colored.
 	* \param graph the colored graph.
 	* \param colors the associative container PVertex -> int, which assigns color (nonnegative integer) to vertices.
 	* \return the highest color used (nonnegative integer).*/
 	template<typename Graph, typename ColorMap>
 	static int repair1(const Graph &graph, ColorMap &colors);
-	
+
 	/**\brief Repair coloring.
 	*
 	* The method modifies the coloring given by the map \a colors. It takes vertexes colored in most commonly used color and the set colored in the least commonly used one and try to interchange colors between them. If not possible new color is used. The procedure is repeated until graph is equitably colored.

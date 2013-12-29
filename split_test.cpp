@@ -70,6 +70,7 @@ const char* print(ModPartType x)
 	Modules::Partition res=Modules::split(_g,tool.input(),vertTab);
 
 
+
     cout << "size: "<< res.size << " type: " << print(res.type) << endl;
     for(Graph<char>::PVertex v=_g.getVert();v;v=_g.getVertNext(v)) cout << v->info << ":" << vertTab[v] <<"\t";
     cout << "\nsize: " << tool.size() << "\tlen:" <<tool.length();
@@ -88,15 +89,21 @@ const char* print(ModPartType x)
 //    gk3.del(gk3.getVert());
 //    g.substitute(g.getVert(),gk3,stdChoose(true) & stdChoose(true),stdCast() & stdCast());
 
+
     cout << "\n\n" << boolalpha << IsIt::cograph(g);
     int q=IsIt::Cograph::maxStable(g,tabV);
     cout << endl << q << endl;
-    for(int i=0;i<q;i++) cout << tabV[i]->info << ' ';
+    for(int i=0;i<q;i++) cout << tabV[i]->info << '\n';
+    Koala::IO::writeGraphText(g, cout, RG_VertexLists);
 
-    g.neg();
+    g.neg(EdUndir);
+    Koala::IO::writeGraphText(g, cout, RG_VertexLists);
+        cout << "\n\n";
+    q=IsIt::Cograph::maxStable(g,tabV);
 
     q=IsIt::Cograph::maxClique(g,tabV);
     cout << endl << q << endl;
+
     for(int i=0;i<q;i++) cout << tabV[i]->info << ' ';
 
 

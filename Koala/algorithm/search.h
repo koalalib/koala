@@ -136,6 +136,17 @@ namespace Koala
 			int distance;/**< \brief Distance (number of edges) from root.*/
 			int component;/**< \brief Index of connected component.*/
 
+			template <class T> void copy(T& arg) const
+			{
+				arg.vPrev=vPrev;
+				arg.ePrev=ePrev;
+				arg.distance=distance;
+				arg.component=component;
+			}
+			/** \brief Copy.*/
+			void copy(BlackHole&) const
+				{ }
+
 			/**\brief Constructor*/
 			VisitVertLabs( typename GraphType::PVertex vp = 0, typename GraphType::PEdge ep = 0,
 				int dist = std::numeric_limits< int >::max(), int comp = -1 ):
@@ -298,8 +309,6 @@ namespace Koala
 	 *  return values are ignored.
 	 *
 	 */
-	//TODO: vizytory nie powinny zakladac, ze dostaja rekord VisitVertLabs< GraphType > tylko cokolwiek o takiej
-	//strukturze tzn. dodac parametr szablonu. To samo dotyczy implementacji konkretnych przeszukiwan
 	class Visitors: public SearchStructs
 	{
 	public:
@@ -310,36 +319,42 @@ namespace Koala
 		class simple_postorder_visitor_tag: public simple_visitor_tag { } ;
 		class complex_visitor_tag { } ;
 
-		template< class GraphType, class Visitor > static bool visitVertexPre( const GraphType &g, Visitor &v,
-			typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, simple_preorder_visitor_tag &s )
+		template< class GraphType, class Visitor, class VisitVertLabsGraphType>
+            static bool visitVertexPre( const GraphType &g, Visitor &v,
+			typename GraphType::PVertex u, VisitVertLabsGraphType &r, simple_preorder_visitor_tag &s )
 			{ (void)(s); return v( g,u,r ); }
 
-		template< class GraphType, class Visitor > static bool visitVertexPre( const GraphType &g, Visitor &v,
-			typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, simple_postorder_visitor_tag &s )
+		template< class GraphType, class Visitor, class VisitVertLabsGraphType >
+            static bool visitVertexPre( const GraphType &g, Visitor &v,
+			typename GraphType::PVertex u, VisitVertLabsGraphType &r, simple_postorder_visitor_tag &s )
 			{ (void)(g); (void)(v); (void)(u); (void)(r); (void)(s); return true; }
 
-		template< class GraphType, class Visitor > static bool visitVertexPre( const GraphType &g, Visitor &v,
-			typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, complex_visitor_tag &c )
+		template< class GraphType, class Visitor, class VisitVertLabsGraphType >
+            static bool visitVertexPre( const GraphType &g, Visitor &v,
+			typename GraphType::PVertex u, VisitVertLabsGraphType &r, complex_visitor_tag &c )
 			{ (void)(c); return v.visitVertexPre( g,u,r ); }
 
-		template< class GraphType, class Visitor > static bool visitVertexPre( const GraphType &g, Visitor &v,
-			typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, ... )
+		template< class GraphType, class Visitor, class VisitVertLabsGraphType >
+            static bool visitVertexPre( const GraphType &g, Visitor &v,
+			typename GraphType::PVertex u, VisitVertLabsGraphType &r, ... )
 			{ return v.operator()( g,u,r ); }
 
-		template< class GraphType, class Visitor > static bool visitVertexPost( const GraphType &g, Visitor &v,
-			typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, simple_preorder_visitor_tag &s )
+		template< class GraphType, class Visitor, class VisitVertLabsGraphType >
+            static bool visitVertexPost( const GraphType &g, Visitor &v,
+			typename GraphType::PVertex u, VisitVertLabsGraphType &r, simple_preorder_visitor_tag &s )
 			{ (void)(g); (void)(v); (void)(u); (void)(r); (void)(s); return true; }
 
-		template< class GraphType, class Visitor > static bool visitVertexPost( const GraphType &g, Visitor &v,
-			typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, simple_postorder_visitor_tag &s )
+		template< class GraphType, class Visitor, class VisitVertLabsGraphType >
+            static bool visitVertexPost( const GraphType &g, Visitor &v,
+			typename GraphType::PVertex u, VisitVertLabsGraphType &r, simple_postorder_visitor_tag &s )
 			{ (void)(s); return v( g,u,r ); }
 
-		template< class GraphType, class Visitor > static bool visitVertexPost( const GraphType &g, Visitor &v,
-			typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, complex_visitor_tag &c )
+		template< class GraphType, class Visitor, class VisitVertLabsGraphType > static bool visitVertexPost( const GraphType &g, Visitor &v,
+			typename GraphType::PVertex u, VisitVertLabsGraphType &r, complex_visitor_tag &c )
 			{ (void)(c); return v.visitVertexPost( g,u,r); }
 
-		template< class GraphType, class Visitor > static bool visitVertexPost( const GraphType &g, Visitor &v,
-			typename GraphType::PVertex u, VisitVertLabs< GraphType > &r, ... )
+		template< class GraphType, class Visitor, class VisitVertLabsGraphType > static bool visitVertexPost( const GraphType &g, Visitor &v,
+			typename GraphType::PVertex u, VisitVertLabsGraphType &r, ... )
 			{ return v.operator()( g,u,r ); }
 
 		template< class GraphType, class Visitor > static bool visitEdgePre( const GraphType &g, Visitor &v,
@@ -403,8 +418,8 @@ namespace Koala
 			EmptyVisitor()
 				{ }
 
-			template< class GraphType >  bool operator()( const GraphType &g, typename GraphType::PVertex u,
-				VisitVertLabs< GraphType > &r )
+			template< class GraphType, class VisitVertLabsGraphType >  bool operator()( const GraphType &g, typename GraphType::PVertex u,
+				VisitVertLabsGraphType &r )
 				{ return true; }
 		 };
 
@@ -415,12 +430,12 @@ namespace Koala
 			EndVertVisitor( void *arg ): ptr( arg )
 				{ }
 
-			template< class GraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
-				VisitVertLabs< GraphType > &data )
+			template< class GraphType, class VisitVertLabsGraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
+				VisitVertLabsGraphType &data )
 				{ return true; }
 
-			template< class GraphType > bool visitVertexPost( const GraphType &g, typename GraphType::PVertex u,
-				VisitVertLabs< GraphType > &v )
+			template< class GraphType, class VisitVertLabsGraphType > bool visitVertexPost( const GraphType &g, typename GraphType::PVertex u,
+				VisitVertLabsGraphType &v )
 				{ return true; }
 
 			template< class GraphType > bool visitEdgePre( const GraphType &g, typename GraphType::PEdge e,
@@ -443,8 +458,8 @@ namespace Koala
 			StoreTargetToVertIter( VertIter &i ): m_iter( i )
 			{ }
 
-			template< class GraphType > bool operator()( const GraphType &, typename GraphType::PVertex,
-				VisitVertLabs< GraphType > & );
+			template< class GraphType, class VisitVertLabsGraphType > bool operator()( const GraphType &, typename GraphType::PVertex,
+				VisitVertLabsGraphType & );
 
 		private:
 			VertIter &m_iter;
@@ -467,8 +482,8 @@ namespace Koala
 			StoreCompVisitor( State &st ): m_st( st )
 			{ }
 
-			template< class GraphType > bool operator()( const GraphType &, typename GraphType::PVertex,
-				VisitVertLabs< GraphType > & );
+			template< class GraphType, class VisitVertLabsGraphType > bool operator()( const GraphType &, typename GraphType::PVertex,
+				VisitVertLabsGraphType & );
 
 			template< class GraphType > bool beginComponent( const GraphType &g, unsigned u )
 				{ (void)(g); (void)(u); return true; }
@@ -488,12 +503,12 @@ namespace Koala
 			ComplexPreorderVisitor( Visitor &v ): visit( v )
 			{ }
 
-			template< class GraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
-				VisitVertLabs< GraphType > &data )
+			template< class GraphType, class VisitVertLabsGraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
+				VisitVertLabsGraphType &data )
 				{ return visit.operator()( g,u,data ); }
 
-			template< class GraphType > bool visitVertexPost( const GraphType &g, typename GraphType::PVertex u,
-				VisitVertLabs< GraphType > &data )
+			template< class GraphType, class VisitVertLabsGraphType > bool visitVertexPost( const GraphType &g, typename GraphType::PVertex u,
+				VisitVertLabsGraphType &data )
 				{ return true; }
 
 			template< class GraphType > bool visitEdgePre( const GraphType &g, typename GraphType::PEdge e,
@@ -518,12 +533,12 @@ namespace Koala
 			ComplexPostorderVisitor( Visitor &v ): visit( v )
 				{ }
 
-			template< class GraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
-				VisitVertLabs<GraphType> &data )
+			template< class GraphType, class VisitVertLabsGraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
+				VisitVertLabsGraphType &data )
 				{ return true; }
 
-			template< class GraphType > bool visitVertexPost( const GraphType &g, typename GraphType::PVertex u,
-				VisitVertLabs< GraphType > &data )
+			template< class GraphType, class VisitVertLabsGraphType > bool visitVertexPost( const GraphType &g, typename GraphType::PVertex u,
+				VisitVertLabsGraphType &data )
 				{ return visit.operator()( g,u,data ); }
 
 			template< class GraphType > bool visitEdgePre( const GraphType &g, typename GraphType::PEdge e,
@@ -567,7 +582,6 @@ namespace Koala
 
 	public:
 		typedef SearchImpl SearchStrategy;
-		//TODO: przeszukiwania powinny dzialac na lokalnej mapie i pozwalac na blackHole - mniej przeciazen
 		/** \brief Visit all vertices.
 		 *
 		 *  Visit all vertices in a graph in order given by the strategy SearchImpl
@@ -602,7 +616,12 @@ namespace Koala
 		 * [See example](examples/search/search/search.html).
 		 */
 		template< class GraphType, class VertContainer, class Iter > static int scanAttainable( const GraphType &,
-			typename GraphType::PVertex, Iter, EdgeDirection, VertContainer & );
+			typename GraphType::PVertex, VertContainer &, Iter, EdgeDirection dir = EdUndir | EdDirOut );
+
+		template< class GraphType, class Iter > static int scanAttainable( const GraphType &,
+			typename GraphType::PVertex, BlackHole, Iter, EdgeDirection dir = EdUndir | EdDirOut );
+        //NEW: zmiana naglowkow metod tej klasy (kolejnosc parametrow!) - teraz kontener asocjacyjny
+        //dla wierzcholkow moze byc blackholizowany
 
 		/** \brief Visit attainable.
 		 *
@@ -612,8 +631,8 @@ namespace Koala
 		 *  @param[out] out the iterator to write vertices to, in order given by the strategy SearchImpl
 		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
 		 *  @return the number of visited vertices. */
-		template< class GraphType, class VertIter > static int scanAttainable( const GraphType &g,
-			typename GraphType::PVertex src, VertIter out, EdgeDirection dir = EdUndir | EdDirOut );
+//		template< class GraphType, class VertIter > static int scanAttainable( const GraphType &g,
+//			typename GraphType::PVertex src, VertIter out, EdgeDirection dir = EdUndir | EdDirOut );
 
 		/** \brief Visit all vertices.
 		 *
@@ -629,7 +648,11 @@ namespace Koala
 		 *  @return the number of components.
 		 *  \sa SearchStructs::VisitVertLabs */
 		template< class GraphType, class VertContainer, class VertIter > static int scan( const GraphType &g,
-			VertIter out, EdgeDirection dir, VertContainer &visited, bool sym = true );
+			VertContainer &visited,VertIter out, EdgeDirection dir= EdDirOut | EdUndir | EdDirIn, bool sym = true );
+
+		template< class GraphType, class VertIter > static int scan( const GraphType &g,
+			BlackHole,VertIter out, EdgeDirection dir= EdDirOut | EdUndir | EdDirIn, bool sym = true );
+
 
 		/** \brief Visit all vertices.
 		 *
@@ -638,8 +661,8 @@ namespace Koala
 		 *  @param[out] out iterator to write vertices to, in order given by the strategy SearchImpl
 		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
 		 *  @return the number of components.*/
-		template< class GraphType, class VertIter > static int scan( const GraphType &g, VertIter out,
-			EdgeDirection dir = EdDirOut | EdUndir | EdDirIn );
+//		template< class GraphType, class VertIter > static int scan( const GraphType &g, VertIter out,
+//			EdgeDirection dir = EdDirOut | EdUndir | EdDirIn );
 
 		/* Liczba cyklomatyczna podgrafu zlozonego z krawedzi zgodnych z maska */
 		/** \brief Cyclomatic number of graph.
@@ -649,7 +672,7 @@ namespace Koala
 		 *  \param mask determines the types and direction of edges to be considered.
 		 *  \return the cyclomatic number of graph.  */
 		template< class GraphType > static int cyclNo( const GraphType &g, EdgeDirection mask = EdAll )
-			{ return g.getEdgeNo( mask ) - g.getVertNo() + scan( g,blackHole,mask ); }
+			{ return g.getEdgeNo( mask ) - g.getVertNo() + scan( g,blackHole,blackHole,mask ); }
 
 		/** \brief Get contected component.
 		 *
@@ -694,7 +717,10 @@ namespace Koala
 		 * [See example](examples/search/search/search.html).
 		 */
 		template< class GraphType, class VertContainer, class CompIter, class VertIter > static int split(
-			const GraphType &g, CompStore< CompIter,VertIter > out, EdgeDirection dir, VertContainer &visited );
+			const GraphType &g, VertContainer &visited, CompStore< CompIter,VertIter > out, EdgeDirection dir= EdUndir | EdDirOut | EdDirIn );
+
+		template< class GraphType, class CompIter, class VertIter > static int split(
+			const GraphType &g, BlackHole, CompStore< CompIter,VertIter > out, EdgeDirection dir= EdUndir | EdDirOut | EdDirIn );
 
 		/** \brief Split graph.
 		 *
@@ -704,8 +730,8 @@ namespace Koala
 		 *  @param[in] dir direction of edges to consider, loops are ignored.
 		 *  @return the number of components.
 		 *  \sa CompStore */
-		template< class GraphType, class CompIter, class VertIter > static int split( const GraphType &g,
-			CompStore< CompIter,VertIter > out, EdgeDirection dir = EdUndir | EdDirOut | EdDirIn );
+//		template< class GraphType, class CompIter, class VertIter > static int split( const GraphType &g,
+//			CompStore< CompIter,VertIter > out, EdgeDirection dir = EdUndir | EdDirOut | EdDirIn );
 	};
 
 	/*
@@ -724,6 +750,8 @@ namespace Koala
 			{ }
 	};
 
+
+    //TODO: czy mozna usunac klase DFSBase, zostawiajac tylko wersjie DFSPre/PosorderPar?
 	/*
 	* DFSBase
 	* DefaultStructs - wytyczne dla wewnetrznych procedur
@@ -744,7 +772,7 @@ namespace Koala
 		 *  @param[in] visitor visitor called for each vertex
 		 *  @param[in] dir direction of edges to consider.
 		 * - EdDirOut arcs are traversed according to their direction,
-		 * - EdDirIn arcs are traversed upstream, 
+		 * - EdDirIn arcs are traversed upstream,
 		 * - Directed arcs may be traversed in both directions.
 		 *  @param[in] compid component identifier (give 0 if don't know)
 		 *  @return number of visited vertices or -number if  visitor interrupted the search.
@@ -772,7 +800,7 @@ namespace Koala
 
 	public:
 		/** \brief Visit all vertexes from component.
-		* 
+		*
 		*  The method visits all the vertices in the same component as a given vertex.
 		* @param[in] g the graph containing vertices to visit
 		* @param[in] src the given vertex
@@ -780,7 +808,7 @@ namespace Koala
 		* @param[in] visitor visitor called for each vertex
 		* @param[in] dir direction of edges to consider
 		 * - EdDirOut arcs are traversed according to their direction,
-		 * - EdDirIn arcs are traversed upstream, 
+		 * - EdDirIn arcs are traversed upstream,
 		 * - Directed arcs may be traversed in both directions.
 		* @param[in] compid component identifier (give 0 if don't know)
 		* @return number of visited vertices or -number if the visitor interrupted the search.
@@ -813,7 +841,7 @@ namespace Koala
 			typename GraphType::PVertex, VertContainer &, Visitor, EdgeDirection, int, Visitors::simple_visitor_tag & );
 
 	public:
-		/** \brief Visit all vertexes of component. 
+		/** \brief Visit all vertexes of component.
 		*
 		* Visit all vertices in the same component as a given vertex.
 		* @param[in] g graph containing vertices to visit
@@ -822,7 +850,7 @@ namespace Koala
 		* @param[in] visitor visitor called for each vertex
 		* @param[in] dir direction of edges to consider.
 		 * - EdDirOut arcs are traversed according to their direction,
-		 * - EdDirIn arcs are traversed upstream, 
+		 * - EdDirIn arcs are traversed upstream,
 		 * - Directed arcs may be traversed in both directions.
 		* @param[in] compid component identifier (give 0 if don't know)
 		* @return number of visited vertices of -number if the visitor interrupted the search.
@@ -860,7 +888,7 @@ namespace Koala
 		* @param[in] visitor visitor called for each vertex
 		* @param[in] dir direction of edges to consider.
 		 * - EdDirOut arcs are traversed according to their direction,
-		 * - EdDirIn arcs are traversed upstream, 
+		 * - EdDirIn arcs are traversed upstream,
 		 * - Directed arcs may be traversed in both directions.
 		* @param[in] compid component identifier (give 0 if don't know)
 		* @return number of visited vertices of -number if the visitor interrupted the search.
@@ -902,21 +930,21 @@ namespace Koala
 		public:
 			typedef LVCNode< Graph > Node;
 
-			class Container: public Privates::List< Node,ContAllocator >
+			class Container: public Privates::List< Node >
 			{
 			public:
-				Container( ContAllocator &a): Privates::List< Node,ContAllocator >( a )
+				Container( ContAllocator &a): Privates::List< Node >( &a )
 				{ }
 			};
 
 			Container m_data;
 			Privates::List_iterator< Node > m_openBlock;
-			Privates::List< Privates::List_iterator< Node >,Allocator > m_splits;
+			Privates::List< Privates::List_iterator< Node > > m_splits;
 			typename DefaultStructs::template
 				AssocCont< typename Graph::PVertex,Privates::List_iterator< Node > >::Type m_vertexToPos;
 
 			LexVisitContainer( Allocator& a, ContAllocator& ca, int n):
-				m_data( ca ), m_openBlock(), m_splits( a ),  m_vertexToPos( n )
+				m_data( ca ), m_openBlock(), m_splits( &a ),  m_vertexToPos( n )
 				{ }
 
 			~LexVisitContainer()
@@ -1291,7 +1319,6 @@ namespace Koala
 
 		// wyrzuca na iterator ciag wierzcholkow tworzacych rdzen grafu tj. podgraf pozostajacy po sukcesywnym
 		// usuwaniu wierzcholkow stopnia < 2. Zwraca dlugosc sekwencji
-		// TODO: przejsc na kopiec
 		/** \brief Get core.
 		 *
 		 *  The method writes to \a out a sequence of vertex that make a core of graph i.e. remains after recursive deletions of vertices of deg < 2.
@@ -1439,7 +1466,7 @@ namespace Koala
 
 		/** \brief Test if Eulerian cycle containing \a u.
 		 *
-		 *  The method tests if the graph \a g has an undirected Eulerian cycle containing the vertex \a u. 
+		 *  The method tests if the graph \a g has an undirected Eulerian cycle containing the vertex \a u.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] u the given vertex.
 		 *  @return true if it has an undirected Eulerian cycle containing the vertex \a u, false otherwise */

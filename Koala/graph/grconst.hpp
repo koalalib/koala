@@ -187,6 +187,7 @@ template< class GraphType> template< class EChooser2 >
 	this->getEdges( setInserter( s ),ch );
 	return s;
 }
+
 template< class GraphType > Set< typename ConstGraphMethods< GraphType>::PEdge >
 	ConstGraphMethods< GraphType >::getEdgeSet( EdgeType mask ) const
 {
@@ -263,7 +264,8 @@ template< class GraphType> template< class VChooser2, class EChooser2 >
 template< class GraphType > template< class Cont >
 void ConstGraphMethods< GraphType >::getAdj( Cont &cont, EdgeType mask ) const
 {
-	if (GraphSettings::ReserveOutAssocCont) cont.reserve( self.getVertNo() );
+	//if (GraphSettings::ReserveOutAssocCont)
+	cont.reserve( self.getVertNo() );
 	std::pair< PVertex,PVertex > ends;
 	for( PEdge e = this->getEdge( mask ); e; e = self.getEdgeNext( e,mask ) )
 	{
@@ -372,37 +374,48 @@ template< class GraphType > template< class OutputIterator >
 	return res;
 }
 
+template< class GraphType> EdgeDirection ConstGraphMethods< GraphType>::
+    paralDirs(EdgeDirection dir, EdgeDirection reltype ) const
+{
+    switch (dir) {
+        case EdLoop: return EdLoop;
+        case EdDirIn:
+        case EdDirOut:
+                       {   switch (reltype)  {
+                                case EdDirOut : return dir;
+                                case EdDirIn : return EdDirIn | EdDirOut;
+                                default: return EdDirIn | EdDirOut | EdUndir;
+                            }
+                        }
+        case EdUndir: return (reltype == EdUndir) ? (EdDirIn | EdDirOut | EdUndir) : EdUndir ;
+    }
+    assert(0);
+}
+
+
 template< class GraphType> bool ConstGraphMethods< GraphType>::areParallel(
 	typename ConstGraphMethods< GraphType >::PEdge e1,
 	typename ConstGraphMethods< GraphType >::PEdge e2, EdgeDirection reltype ) const
 {
-	//TODO: uproscic kod - switch po reltype
 	koalaAssert( e1 && e2,GraphExcNullEdge );
-	koalaAssert( reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir,GraphExcWrongMask );
-	std::pair< PVertex,PVertex > ends1 = self.getEdgeEnds( e1 ),ends2 = self.getEdgeEnds( e2 );
-	if (e1 == e2) return true;
-	else if (self.getEdgeType( e1 ) == Loop) return self.getEdgeType( e2 ) == Loop && ends1.first == ends2.first;
-	else if (self.getEdgeType( e2 ) == Loop) return false;
-	else if ((self.getEdgeType( e1 ) == Undirected && self.getEdgeType( e2 ) == Undirected)
-		|| (self.getEdgeType( e1 ) != self.getEdgeType( e2 ) && reltype == EdUndir)
-		|| (self.getEdgeType( e1 ) == Directed && self.getEdgeType( e2 ) == Directed
-			&& (reltype == EdUndir || reltype == EdDirIn)))
-		return (ends1.first == ends2.first && ends1.second == ends2.second)
-				|| (ends1.second == ends2.first && ends1.first == ends2.second);
-	else return self.getEdgeType( e1 ) == self.getEdgeType( e2 ) && ends1.first == ends2.first &&
-		ends1.second == ends2.second;
+    koalaAssert( reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir,GraphExcWrongMask );
+	if (e1==e2) return true;
+	std::pair< PVertex,PVertex > ends1 = pairMinMax(self.getEdgeEnds( e1 )),ends2 = pairMinMax(self.getEdgeEnds( e2 ));
+	if (ends1!=ends2) return false;
+	return this->paralDirs(self.getEdgeDir(e1,ends1.first),reltype) & self.getEdgeDir(e2,ends2.first);
 }
 
 template< class GraphType > template< class OutputIterator >
 int ConstGraphMethods< GraphType >::getParals( OutputIterator iter, PEdge edge, EdgeDirection reltype ) const
-// TODO: nieefektywne, mozna bezposrednio
 {
 	koalaAssert( edge,GraphExcNullEdge );
-	koalaAssert(reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir,GraphExcWrongMask );
+    koalaAssert( reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir,GraphExcWrongMask );
 	int licz = 0;
 	std::pair< PVertex,PVertex > ends = self.getEdgeEnds( edge );
-	for( PEdge e = this->getEdge( ends.first,ends.second,EdAll ); e; e = self.getEdgeNext( ends.first,ends.second,e,EdAll ) )
-		if (e != edge && this->areParallel( e,edge,reltype ))
+	EdgeDirection dir = this->getEdgeDir(edge,ends.first);
+	dir = this->paralDirs(dir,reltype);
+	for( PEdge e = this->getEdge( ends.first,ends.second,dir ); e; e = self.getEdgeNext( ends.first,ends.second,e,dir ) )
+		if (e != edge)
 		{
 			*iter = e;
 			++iter;
@@ -454,8 +467,8 @@ template< class GraphType > template< class Iterator, class OutIter > int
 		EdgeDirection type, EdgeType kind ) const
 {
 	int licze = 0;
-	typename GraphSettings:: template VertAssocCont< PVertex,bool >::Type vset( self.getVertNo() );
-	for( Iterator i = beg; i != end; ++i ) vset[*i] = true;
+	typename GraphSettings:: template VertEdgeAssocCont< PVertex,EmptyVertInfo >::Type vset( self.getVertNo() );
+	for( Iterator i = beg; i != end; ++i ) vset[*i] = EmptyVertInfo();
 	for( PVertex v = vset.firstKey(); v; v = vset.nextKey( v ) )
 		for( PEdge e = this->getEdge( v,type ); e; e = self.getEdgeNext( v,e,type ) )
 			if (((kind & Loop) && (((self.getEdgeDir( e,this->getEdgeEnd( e,v )) & type) == 0) ||
@@ -486,27 +499,21 @@ template< class GraphType > Set< typename ConstGraphMethods< GraphType >::PEdge 
 	return res;
 }
 
+
 template< class GraphType > template< class Iterator, class OutIter >
 	int ConstGraphMethods< GraphType >::getIncVerts( OutIter out, Iterator beg, Iterator end, EdgeDirection type,
 		EdgeType kind) const
 {
-	int liczv = 0;
-	typename GraphSettings:: template VertAssocCont< PVertex,bool >::Type vset( self.getVertNo() );
-	for( Iterator i = beg; i != end; ++i ) vset[*i] = true;
-	PVertex LOCALARRAY( tabv,2 * self.getEdgeNo( type ) );
+	int n;
+	typename GraphSettings:: template VertEdgeAssocCont< PVertex,EmptyVertInfo >::Type vset( n=self.getVertNo() );
+	typename GraphSettings:: template VertEdgeAssocCont< PVertex,EmptyVertInfo >::Type resset( n );
+	for( Iterator i = beg; i != end; ++i ) vset[*i] = EmptyVertInfo();
 	for( PVertex v = vset.firstKey(); v; v = vset.nextKey( v ) )
 		for( PEdge e = this->getEdge( v,type ); e; e = self.getEdgeNext( v,e,type ) )
 			if (((kind & Loop) && vset.hasKey( this->getEdgeEnd( e,v ) ) ) ||
 				((kind & (Directed | Undirected)) && !vset.hasKey( this->getEdgeEnd( e,v ) ) ))
-				tabv[liczv++] = this->getEdgeEnd( e,v );
-	GraphSettings::sort( tabv,tabv + liczv );
-	liczv = std::unique( tabv,tabv + liczv ) - tabv;
-	for( int i=0; i < liczv; i++ )
-	{
-		*out = tabv[i];
-		++out;
-	}
-	return liczv;
+				resset[this->getEdgeEnd( e,v )]=EmptyVertInfo();
+	return resset.getKeys(out);
 }
 
 template< class GraphType > template< class Iterator > Set< typename ConstGraphMethods< GraphType >::PVertex >
@@ -530,14 +537,8 @@ template< class GraphType > template< class IterOut1, class IterOut2, class Iter
 	std::pair< int,int > ConstGraphMethods< GraphType>::findParals2( std::pair< IterOut1,IterOut2 > out,
 		Iterator begin, Iterator end, EdgeType relType ) const
 {
-	int size = 0;
-	for( Iterator iter = begin; iter != end; iter++ ) size++;
-	PEdge LOCALARRAY( buf,size );
-	size = 0;
-	for( Iterator iter = begin; iter != end; iter++ ) if (*iter) buf[size++] = *iter;
-	GraphSettings::sort( buf,buf + size );
-	size = std::unique( buf,buf + size ) - buf;
-	return this->findParals(out, buf,buf + size,relType );
+    typename GraphSettings:: template RepsDeleter< PEdge> reps(begin,end);
+	return this->findParals(out, reps.buf,reps.buf + reps.len,relType );
 }
 
 template< class GraphType > template< class IterOut1, class IterOut2, class Iterator >
@@ -588,11 +589,25 @@ template< class GraphType > template< class IterOut1, class IterOut2 > std::pair
 template< class GraphType > template< class IterOut1, class IterOut2 >
 	std::pair<int,int> ConstGraphMethods< GraphType >::findParals(
 		std::pair< IterOut1,IterOut2 > out, PVertex vert1, PVertex vert2, EdgeType relType ) const
-// TODO: nieefektywne, mozna bezposrednio
 {
-	PEdge LOCALARRAY( buf,std::min( self.getEdgeNo( vert1,EdAll ),self.getEdgeNo( vert2,EdAll ) ) );
-	int size = this->getEdges( buf,vert1,vert2,EdAll );
-	return this->findParals( out,buf,buf + size,relType );
+	koalaAssert( (relType == EdDirIn || relType == EdDirOut || relType == EdUndir),GraphExcWrongMask );
+	std::pair< int,int > res( 0,0 );
+	PEdge ee=0;
+	for(EdgeDirection dir=EdLoop; dir<=EdDirOut;dir<<=1)
+        for(PEdge e=this->getEdge(vert1,vert2,dir);e;
+        e=self.getEdgeNext(vert1,vert2,e,dir))
+            if (ee==0 || !this->areParallel(e,ee,relType))
+            {
+                *out.first = ee = e;
+                ++out.first;
+                res.first++;
+            } else
+            {
+                *out.second = e;
+                ++out.second;
+                res.second++;
+            }
+	return res;
 }
 
 template< class GraphType > template< class IterOut1, class IterOut2 > std::pair< int,int >

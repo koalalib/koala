@@ -1,3 +1,4 @@
+#include <cstdio>
 #ifndef KOALA_LOCALTABLE_H
 #define KOALA_LOCALTABLE_H
 
@@ -28,11 +29,16 @@
  *   this value should not exceed the stack size (usually 1MB on Windows
  *   system, about 10MB on Linux system)
  *
- * KOALA_DONT_USE_ALLOCA
- *   define this symbol to prevent Koala from using alloca function
+ * KOALA_USES_ALLOCA
+ *   define this symbol to force Koala to use alloca function
  */
 
-//#define KOALA_DONT_USE_ALLOCA
+//#define KOALA_USES_ALLOCA
+
+//NEW: teraz alloca powinna wlaczac stala KOALA_USES_ALLOCA
+
+//TODO: w ogole nie odpalila sie wersja z alloca, a tylko z new. Czemu nie wprowadzic makra z "typ tabl[dlugosc]"
+// - na uzytek kompilatorow, ktore to rozumieja?
 
 #ifndef KOALA_STACK_THRESHOLD
 #define KOALA_STACK_THRESHOLD       8192
@@ -97,7 +103,7 @@ namespace Koala
 #endif
 
 // Intel Compiler, GCC-likes, Visual Studio and Borland have alloca
-#if !defined(KOALA_DONT_USE_ALLOCA) && \
+#if defined(KOALA_USES_ALLOCA) && \
 	(defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__) || \
 	 defined(__INTEL_COMPILER) || defined(__GCC__))
 

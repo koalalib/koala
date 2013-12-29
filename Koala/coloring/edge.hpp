@@ -606,6 +606,7 @@ int SeqEdgeColoringPar<DefaultStructs>::vizingSimple(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 
 	int degree = graph.Delta(Mask);
 	VizingState<Graph, ColorMap> vState(graph, colors, degree+1);
@@ -693,6 +694,7 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int degree = graph.Delta(Mask);
 	int mu = graph.mu();
 	VizingState<Graph, ColorMap> vState(graph, colors, degree+mu);
@@ -798,7 +800,7 @@ template<typename Graph, typename ColorMap>
 int SeqEdgeColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors,
 	typename Graph::PEdge edge)
 {
-	int maxCol = maxColor(graph, colors);
+	int maxCol = SeqEdgeColoringPar<DefaultStructs>::maxColor(graph, colors);
 	return greedyInter(graph, colors, edge, maxCol);
 }
 
@@ -816,6 +818,7 @@ template< typename Graph, typename ColorMap, typename EInIter >
 int SeqEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph, ColorMap &colors,
 	EInIter beg, EInIter end)
 {
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int locMax = -1;
 	while (beg != end) {
 		int col = greedy(graph, colors, *beg++);
@@ -830,7 +833,8 @@ template< typename Graph, typename ColorMap, typename EInIter >
 int SeqEdgeColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors,
 	EInIter beg, EInIter end)
 {
-	int locMax = -1, maxCol = maxColor(graph, colors);
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
+	int locMax = -1, maxCol = SeqEdgeColoringPar<DefaultStructs>::maxColor(graph, colors);
 	while(beg != end) {
 		int col = greedyInter(graph , colors, *beg++, maxCol);
 		if (col > maxCol) maxCol = col;
@@ -844,6 +848,7 @@ template< typename Graph, typename ColorMap, typename EInIter >
 int SeqEdgeColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors,
 	EInIter beg, EInIter end, int maxCol)
 {
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int locMax = -1;
 	while(beg != end) {
 		int col = greedyInter(graph, colors, *beg++, maxCol);
@@ -857,6 +862,7 @@ template<class DefaultStructs>
 template< typename Graph, typename ColorMap >
 int SeqEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph, ColorMap &colors)
 {
+    colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int locMax = -1;
 	for(typename Graph::PEdge ee = graph.getEdge(Mask); ee;
@@ -872,8 +878,9 @@ template<class DefaultStructs>
 template< typename Graph, typename ColorMap >
 int SeqEdgeColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors)
 {
+    colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	int locMax = -1, maxCol = maxColor(graph, colors);
+	int locMax = -1, maxCol = SeqEdgeColoringPar<DefaultStructs>::maxColor(graph, colors);
 	for(typename Graph::PEdge ee = graph.getEdge(Mask); ee;
 		ee = graph.getEdgeNext(ee, Mask))
 	{
@@ -889,6 +896,7 @@ template< typename Graph, typename ColorMap >
 int SeqEdgeColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors,
 	int maxCol)
 {
+	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int locMax = -1;
 	for(typename Graph::PEdge ee = graph.getEdge(Mask); ee;

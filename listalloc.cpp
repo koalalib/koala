@@ -35,7 +35,7 @@ template <class T>
 class AllocTest {
     public:
 
-    typedef typename Privates::List<T,AllocTest<T> >::Node NodeType;
+    typedef typename Privates::List<T >::Node NodeType;
 
     NodeType x;
 
@@ -56,10 +56,10 @@ class AllocTest {
 //    all1.deallocate(p1);all2.deallocate(p3);
 //    cout << *p3;
 
-    Privates::DefaultCPPAllocator all;
+//    Privates::DefaultCPPAllocator all;
 
 
-    Privates::BlockListAllocator<Privates::ListNode<int> > ball(40);
+    SimplArrPool<Privates::ListNode<int> > ball(40);
 
 //    ListBlockListAllocator<int> ball2(100);
 //    ball2=ball;
@@ -68,10 +68,10 @@ class AllocTest {
 	int i, j;
 //	List<int> l(all);
 
-    ball.allocate<Privates::ListNode<int> >();
-    Privates::List<int,Privates::BlockListAllocator<Privates::ListNode<int> > > l,l2;
-    l.init(ball);
-	Privates::List<int,Privates::BlockListAllocator<Privates::ListNode<int> > >::iterator it;
+//    ball.alloc();
+    Privates::List<int > l,l2;
+    l.init(&ball);
+	Privates::List<int >::iterator it;
 	for(j = 0; j < 19; j++) {
 		l.clear();
 		for(i = 0; i < j; i++) l.push_back(17 - i);
@@ -80,11 +80,11 @@ class AllocTest {
 			printf("%d ", *it);
 			};
 		printf("\n");
-		Privates::List<int,Privates::BlockListAllocator<Privates::ListNode<int> > > l2;
+		Privates::List<int > l2;
 		l2=l;
         cout << l2;
 
-		Privates::List<int> l3(all);
+		Privates::List<int> l3;
 		l3.copy(l2);
 		};
 

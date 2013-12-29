@@ -162,11 +162,11 @@ typedef Graph<int,int,GrSettings<EdDirIn|EdDirOut|EdLoop,AdjAllow> > MyDigraph;
 class FibonHeapSettings : public Settings {
 
         public:
-        template< class Key, class Compare = std::less< Key >, class Allocator = Privates::DefaultCPPAllocator >
+        template< class Key, class Compare = std::less< Key > >
             class HeapCont
         {
           public:
-            typedef FibonHeap< Key,Compare,Allocator > Type;
+            typedef FibonHeap< Key,Compare > Type;
             typedef FibonHeapNode< Key > NodeType;
         };
 };
@@ -175,11 +175,11 @@ class FibonHeapSettings : public Settings {
 class BinomHeapSettings : public Settings {
 
         public:
-        template< class Key, class Compare = std::less< Key >, class Allocator = Privates::DefaultCPPAllocator >
+        template< class Key, class Compare = std::less< Key > >
             class HeapCont
         {
           public:
-            typedef BinomHeap< Key,Compare,Allocator > Type;
+            typedef BinomHeap< Key,Compare > Type;
             typedef BinomHeapNode< Key > NodeType;
         };
 };
@@ -188,11 +188,11 @@ class BinomHeapSettings : public Settings {
 class PairHeapSettings : public Settings {
 
         public:
-        template< class Key, class Compare = std::less< Key >, class Allocator = Privates::DefaultCPPAllocator >
+        template< class Key, class Compare = std::less< Key > >
             class HeapCont
         {
           public:
-            typedef PairHeap< Key,Compare,Allocator > Type;
+            typedef PairHeap< Key,Compare> Type;
             typedef PairHeapNode< Key > NodeType;
         };
 };

@@ -127,7 +127,7 @@ using namespace Koala;
 // za tablice przechowujaca wynikowy ciag wierzcholkow posluzy tabV
 // Jesli chcemy tylko numeracje, przy skanowaniu poczawszy od A to np.
 
-    int licz=DFSPreorder::scanAttainable(g,A,tabV,EdUndir);
+    int licz=DFSPreorder::scanAttainable(g,A,blackHole,tabV,EdUndir);
     for(int i=0;i<licz;i++) std::cout << tabV[i]->info << ' ';
     std::cout <<  std::endl;
 
@@ -137,7 +137,7 @@ using namespace Koala;
     AssocArray<Graph<char,std::string>::PVertex,
             SearchStructs::VisitVertLabs<Graph<char,std::string> > > vertCont(g.getVertNo()); // podajemy rozmiar
 
-    licz=DFSPostorder::scanAttainable(g,A,tabV,EdUndir,vertCont); // jesli chcemy przebiec caly graf, a nie tylko
+    licz=DFSPostorder::scanAttainable(g,A,vertCont,tabV,EdUndir); // jesli chcemy przebiec caly graf, a nie tylko
     // skladowa zawierajaca A, mozna uzyc analogicznej funkcji scan
     std::cout << "Sekwencja: ";
     for(int i=0;i<licz;i++) std::cout << tabV[i]->info << ' ';

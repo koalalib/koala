@@ -10,6 +10,9 @@
 #include "../base/defs.h"
 #include "../graph/view.h"
 
+//TODO: kolorowanie przy listach rozmiarow <=2 (wierzcholkowe, krawedziowe)
+//TODO: kolorowanie krawedziowe dwudzielnych przy listach rozmiarow >=Delta (tj. listowy Konig)
+
 namespace Koala {
 /** \brief Methods for list coloring of graphs (parametrized).
  *  \ingroup color */

@@ -37,20 +37,24 @@ namespace Koala
 		enum { EdAllow = edAllow };
 		// czy jest dopuszczalne tworzenie macierzy sasiedztwa
 		enum { AdjMatrixAllowed = adjMatrixAllowed };
+        //NEW: ustawiona flaga wprowadza do wierzcholka i krawedzi metode getGraph() - wskaznik staly na macierzysty graf
+		enum { VertEdgeGraphPtr = false };
 
 		// typ klasy tablicy asocjacyjnej uzywanej w metodach grafu przypisujacej wierzcholkom wartosci typu B
+		//NEW: zmiana nazwy
 		/** \brief Association table for vertices
 		 *
 		 *  The type of association table for vertices is definded.
 		 *  \tparam A pointer to vertex (PVert).
 		 *  \tparam B type of values associated to vertices.
 		 */
-		template< class A, class B > class VertAssocCont
+		template< class A, class B > class VertEdgeAssocCont
 		{
 		public:
 			typedef AssocArray< A,B > Type;
 			// typedef AssocTable<std::map<A,B> > Type; // - przyklad uzycia, nie usuwac
 		};
+
 
 		// typ klasy tablicy asocjacyjnej uzywanej w metodach grafu przypisujacej wierzcholkom innego grafu (np.
 		// innego typu) wartosci typu B
@@ -100,12 +104,61 @@ namespace Koala
 		};
 
 		// czy dostosowywac rozmiar pamieci wyjsciowych tablic asocjacyjnych
-		enum { ReserveOutAssocCont = true };
+		//enum { ReserveOutAssocCont = true };
 
 		// wybrany do uzytku wewnetrznego algorytm sortowania tablic
 		template< class Iterator > static void sort( Iterator first, Iterator last );
 		// ... i to samo z dostarczonym porownywaczem
 		template< class Iterator, class Comp > static void sort ( Iterator first, Iterator last, Comp comp );
+
+
+        //NEW: klasa usuwajaca ew. powtorzenia z ciagow wejsciowych podanych miedzy iteratorami - filtruje
+        // wejscie w roznych metodach
+        template <class T> class RepsDeleter {
+
+                RepsDeleter(const RepsDeleter&) {}
+                RepsDeleter& operator=(const RepsDeleter&) {}
+
+                template <class Iter>
+                void init(Iter beg, Iter end, int n)
+                {
+                    typename VertEdgeAssocCont< T,EmptyVertInfo >::Type res(n);
+                    for(Iter i=beg;i!=end;++i) if (*i) res[*i]=Koala::EmptyVertInfo();
+                    buf = new T[res.size()];
+                    len=res.getKeys(buf);
+                }
+
+            public:
+
+                T* buf;
+                int len;
+
+                template <class Iter>
+                RepsDeleter(Iter beg, Iter end)
+                {
+                    int size=0;
+                    for(Iter i=beg;i!=end;++i) size++;
+                    init(beg,end,size);
+                }
+
+                RepsDeleter(T* beg,T* end)
+                {
+                    init(beg,end,end-beg);
+                }
+
+                RepsDeleter(const T* beg,const T* end)
+                {
+                    init(beg,end,end-beg);
+                }
+
+
+                ~RepsDeleter()
+                {
+                    delete [] buf;
+                }
+
+        };
+
 	};
 
 	namespace Privates
@@ -176,6 +229,7 @@ namespace Koala
 
 	namespace Privates
 	{
+
 		/* EdgeCounterLoop
 		 *
 		 */
@@ -249,30 +303,32 @@ namespace Koala
 				{ return DummyVar< int >(); }
 		};
 
-	}
 
+    //NEW: sprywatyzowano
 	/* Graph
 	 * Graf wraz z wszystkimi podstawowymi operacjami wykonywanymi na grafach. Parametry grafu to klasy, których
 	 * instancje będą etykietami wierzchołków i krawędzi. Settings - wytyczne parametryzujace strukture i dzialanie
 	 * metod klasy grafu.
 	 */
-	template< class GraphType > struct GraphInternalTypes;
-	template< class VertInfo, class EdgeInfo, class Settings >
-		struct GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >
-	{
-		typedef Koala::Vertex< VertInfo,EdgeInfo,Settings > Vertex;
-		typedef Vertex* PVertex;
-		typedef Koala::Edge< VertInfo,EdgeInfo,Settings > Edge;
-		typedef Edge* PEdge;
-		typedef VertInfo VertInfoType;
-		typedef EdgeInfo EdgeInfoType;
-		typedef Settings GraphSettings;
-	};
+        template< class GraphType > struct GraphInternalTypes;
+        template< class VertInfo, class EdgeInfo, class Settings >
+            struct GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >
+        {
+            typedef Koala::Vertex< VertInfo,EdgeInfo,Settings > Vertex;
+            typedef Vertex* PVertex;
+            typedef Koala::Edge< VertInfo,EdgeInfo,Settings > Edge;
+            typedef Edge* PEdge;
+            typedef VertInfo VertInfoType;
+            typedef EdgeInfo EdgeInfoType;
+            typedef Settings GraphSettings;
+        };
+
+	}
 
 #include "grconst.h"
 	/** \brief Main class.
 	 *
-	 *  Main structure of library representing graph and some the basic operations. 
+	 *  Main structure of library representing graph and some the basic operations.
 	 *  \ingroup DMgraph*/
 	template< class VertInfo = EmptyVertInfo, class EdgeInfo = EmptyVertInfo,
 		class Settings = GrDefaultSettings< EdAll,true > > class Graph:
@@ -284,18 +340,21 @@ namespace Koala
 	public:
 		friend class Koala::Edge< VertInfo,EdgeInfo,Settings >;
 
-		typedef typename GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::Vertex Vertex;/**< \brief Type of vertex*/
-		typedef typename GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::PVertex PVertex;/**< \brief Type of pointer to vertex*/
-		typedef typename GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::Edge Edge;/**< \brief Type of edge*/
-		typedef typename GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::PEdge PEdge;/**< \brief Type of pointer to edge*/
-		typedef typename GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::VertInfoType VertInfoType; /**< \brief Type of vertex info class*/
-		typedef typename GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::EdgeInfoType EdgeInfoType; /**< \brief Type of edge info class*/
-		typedef typename GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::GraphSettings GraphSettings; /**< \brief Type of class with settings.*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::Vertex Vertex;/**< \brief Type of vertex*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::PVertex PVertex;/**< \brief Type of pointer to vertex*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::Edge Edge;/**< \brief Type of edge*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::PEdge PEdge;/**< \brief Type of pointer to edge*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::VertInfoType VertInfoType; /**< \brief Type of vertex info class*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::EdgeInfoType EdgeInfoType; /**< \brief Type of edge info class*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::GraphSettings GraphSettings; /**< \brief Type of class with settings.*/
 		typedef Graph< VertInfo,EdgeInfo,Settings > GraphType; /**< \brief Current graph type */
 
 		// Do wspolpracy z podgrafami
 		typedef Graph< VertInfo,EdgeInfo,Settings > RootGrType; /**< \brief Current graph type */
 
+
+        //NEW: umozliwia oddelegowanie alokowania wierzcholkow/krawedzi do pul SimplArrPool o ograniczonej
+        //pojemnosci - na uzytek grafow lokalnych w procedurach
 		// Konstruktory
 		// Tworzy pusty graf, bez krawędzi i wierzchołków.
 		/** \brief Constructor
@@ -304,7 +363,8 @@ namespace Koala
 		 *
 		 *  [See example](examples/graph/graph_clear.html).
 		 */
-		Graph();
+		Graph(SimplArrPool<Koala::Vertex< VertInfo,EdgeInfo,Settings > > *valloc=0,
+            SimplArrPool<Koala::Edge< VertInfo,EdgeInfo,Settings > > *ealloc=0);
 
 		// Konstruktor kopiujący.
 		/** \brief Copy constructor
@@ -1421,6 +1481,9 @@ namespace Koala
 		 */
 		template< class ExtGraph > typename GraphType::PVertex copy( const ExtGraph &agraph );
 
+        //NEW: wersja z HardCaster zamiast standadowego, podobnie w substitute
+		template< class ExtGraph > typename GraphType::PVertex copy2( const ExtGraph &agraph );
+
 		/** \brief Copy graph.
 		 *
 		 *  The method adds to the current graph a copy of the graph \a agraph.
@@ -1428,8 +1491,13 @@ namespace Koala
 		 *  \param choosers the standard pair of choosers which allow to choose vertices and edges to copy. Additionally both ends of each copied edge need to satisfy the VChooser.
 		 *  \return the pointer to the first new-created vertex.
 		 */
+
 		template< class ExtGraph, class VChooser, class EChooser >
 			typename GraphType::PVertex copy( const ExtGraph &agraph, std::pair< VChooser,EChooser > choosers );
+
+		template< class ExtGraph, class VChooser, class EChooser >
+			typename GraphType::PVertex copy2( const ExtGraph &agraph, std::pair< VChooser,EChooser > choosers );
+
 
 		/** \brief Copy graph.
 		 *
@@ -1466,6 +1534,8 @@ namespace Koala
 		 *  \param graph the copied graph.
 		 *  \return the pointer to the first new-created vertex. */
 		template< class ExtGraph > typename GraphType::PVertex substitute( typename GraphType::PVertex, const ExtGraph & );
+
+		template< class ExtGraph > typename GraphType::PVertex substitute2( typename GraphType::PVertex, const ExtGraph & );
 		/** \brief Substitute graph for vertex.
 		 *
 		 *  The method substitute a copy of the graph \a graph for the vertex \a vert. The vertex \a vert is deleted form graph.
@@ -1475,6 +1545,10 @@ namespace Koala
 		 *  \return the pointer to the first new-created vertex. */
 		template< class ExtGraph, class VChooser, class EChooser >
 			typename GraphType::PVertex substitute( PVertex, const ExtGraph &, std::pair< VChooser,EChooser > );
+
+		template< class ExtGraph, class VChooser, class EChooser >
+			typename GraphType::PVertex substitute2( PVertex, const ExtGraph &, std::pair< VChooser,EChooser > );
+
 
 		/** \brief Substitute graph for vertex.
 		 *
@@ -1572,6 +1646,14 @@ namespace Koala
 		bool good( PEdge, bool = false ) const
 			{ return true; }
 
+        //NEW: adresy uzywanych alokatorow wierzcholkow/krawedzi - 0 przy ich braku
+        std::pair<  SimplArrPool<Koala::Vertex< VertInfo,EdgeInfo,Settings > > *,
+                    SimplArrPool<Koala::Edge< VertInfo,EdgeInfo,Settings > > *>
+        getAllocs() const
+        {
+            return std::make_pair(vallocator,eallocator);
+        }
+
 	private:
 		AdjMatrix< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed > *pAdj;
 
@@ -1585,6 +1667,13 @@ namespace Koala
 		typename Privates::EdgeCounterUndir< Settings::EdAllow & Undirected >::NoType
 			no_undir_edge() const { return this->Privates::EdgeCounterUndir< Settings::EdAllow & Undirected >::no(); }
 		int no_vert;
+
+		SimplArrPool<Koala::Vertex< VertInfo,EdgeInfo,Settings > > *vallocator;
+		SimplArrPool<Koala::Edge< VertInfo,EdgeInfo,Settings > > *eallocator;
+
+		template< class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster, class VLinker,
+			class ELinker > typename GraphType::PVertex copy( ExtGraph &, std::pair< VChooser,EChooser >,
+				std::pair< VCaster,ECaster >, std::pair< VLinker,ELinker > linkers, PVertex );
 
 		inline typename GraphType::PVertex attach( PVertex );/* < Vertex is attached at the beginning of the list of vertex. */
 		inline typename GraphType::PVertex detach( PVertex );/* < If vertex is isolated */

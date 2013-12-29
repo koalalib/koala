@@ -8,6 +8,19 @@
 struct OpisV;  // pewna struktura opisujaca moj wierzcholek
 struct OpisE;  // struktura opisujaca krawedz
 
+Koala::Set<int> rnd;
+
+int random(int scale)
+{
+    int res;
+    do {
+
+        res=1+(rand()% scale);
+    } while (rnd.isElement(res));
+    rnd+=res;
+    return res;
+}
+
 struct OpisV {
     OpisV(std::string aname="") : name(aname) {}
     std::string name;
@@ -343,24 +356,28 @@ void HKTest()
 
     std:: cout << "\n\nStabilne\n\n";
     {   int scope=2;
-        Koala::Graph<char,OpisE2> g;
-        Koala::Graph<char,OpisE2>::PVertex A,B,C,D,E,F,tabV[11];
-        Koala::Graph<char,OpisE2>::PEdge e,tabE[12];
-
-        Koala::AssocTable<std::map<Koala::Graph<char,OpisE2>::PVertex,
-            Koala::StableMatching::VertLabs<Koala::Graph<char,OpisE2> > > > vertCont;
-
-        A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');E=g.addVert('E');
-        Koala::Graph<char,OpisE2>::PEdge
-            eac=g.addEdge(A,C,OpisE2(1,1,"eac")),
-            ebc=g.addEdge(B,C,OpisE2(2,3,"ebc")),
-            ebd=g.addEdge(B,D,OpisE2(1,3,"ebd")),
-            ebd2=g.addEdge(B,D,OpisE2(3,1,"ebd2")),
-            ex;
-
-        Koala::Graph<char,OpisE2>::PVertex vpart[]={A,B,E};
-
-        scope = Koala::StableMatching::bipartFind(g,vpart,vpart+3,Cmp(),vertCont,tabE);
+//        Koala::Graph<char,OpisE2> g;
+//        Koala::Graph<char,OpisE2>::PVertex A,B,C,D,E,F,tabV[11];
+//        Koala::Graph<char,OpisE2>::PEdge e,tabE[12];
+//
+//        Koala::AssocTable<std::map<Koala::Graph<char,OpisE2>::PVertex,
+//            Koala::StableMatching::VertLabs<Koala::Graph<char,OpisE2> > > > vertCont;
+//
+//        A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');E=g.addVert('E');
+//        Koala::Graph<char,OpisE2>::PEdge
+//            eac=g.addEdge(A,C,OpisE2(1,1,"eac")),
+//            ebc=g.addEdge(B,C,OpisE2(2,3,"ebc")),
+//            ebd=g.addEdge(B,D,OpisE2(1,3,"ebd")),
+//            ebd2=g.addEdge(B,D,OpisE2(3,1,"ebd2")),
+//            ex;
+//
+//        Koala::Graph<char,OpisE2>::PVertex vpart[]={A,B,E};
+//
+//        scope = Koala::StableMatching::bipartFind(g,vpart,vpart+3,Cmp(),vertCont,tabE);
+//
+//        for(int i=0;i<scope;i++) std::cout << '{' <<g.getEdgeEnd1(tabE[i])->info <<","<<g.getEdgeEnd2(tabE[i])->info
+//            << ",\"" << tabE[i]->info.name << "\"} ";
+//        std::cout << "\n"<< std::boolalpha << Koala::StableMatching::test(g,Cmp(),tabE,tabE+scope).first;
 
 //        tabE[0]=ebd;
 //        tabE[1]=ebd2;
@@ -369,9 +386,80 @@ void HKTest()
 //            std::endl << ((!Koala::StableMatching::test(g,Cmp(),tabE,tabE+scope).second) ? std::string("NULL") :
 //                         Koala::StableMatching::test(g,Cmp(),tabE,tabE+scope).second->info.name);
 
-        for(int i=0;i<scope;i++) std::cout << '{' <<g.getEdgeEnd1(tabE[i])->info <<","<<g.getEdgeEnd2(tabE[i])->info
-            << ",\"" << tabE[i]->info.name << "\"} ";
-        std::cout << "\n"<< std::boolalpha << Koala::StableMatching::test(g,Cmp(),tabE,tabE+scope).first;
+    }
+    {
+
+        Koala::Graph<char,char> g;
+        Koala::Graph<char,char>::PVertex A,B,C,D,E,F,tabV[11];
+//        Koala::Graph<char,char>::PEdge eab,eac,edc,tabE[12];
+
+        A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');
+
+        Koala::Graph<char,char>::PEdge
+            eab=g.addEdge(A,B),
+            eac=g.addEdge(A,C),
+            edc=g.addEdge(D,C),
+            edc2=g.addEdge(D,C);
+        assert(g.getEdgeEnd1(eab)==A && g.getEdgeEnd1(eac)==A);
+        assert(g.getEdgeEnd2(eac)==C && g.getEdgeEnd2(edc)==C);
+
+        Koala::AssocTable<std::map<Koala::Graph<char,char>::PEdge,std::pair<int,int>  >  > eCont;
+        eCont[eab]=std::make_pair(1,0);
+        eCont[eac]=std::make_pair(2,1);
+        eCont[edc]=std::make_pair(1,2);
+        eCont[edc2]=std::make_pair(4,5);
+            Koala::StableMatching::CompEdgeCont<Koala::Graph<char,char> > c(g,eCont);
+            std::cout << std::boolalpha;
+
+            std::cout << c(A,eac,eab) << ' ' << c(C,eac,edc) << ' ' << c(C,edc2,edc);
+
+        {
+
+            Koala::StableMatching::CompEdgeCont<Koala::Graph<char,char> > c2=c;
+            std::cout << c2(A,eac,eab) << ' ' << c2(C,eac,edc);
+            Koala::StableMatching::CompEdgeCont<Koala::Graph<char,char> > c3(g,eCont);
+            c3=c2;
+            std::cout << c3(A,eac,eab) << ' ' << c3(C,eac,edc);
+        }
+            std::cout << c(A,eac,eab) << ' ' << c(C,eac,edc);
+            std::cout << Koala::StableMatching::compEdgeCont(g,eCont)(A,eac,eab) << ' ' <<
+                Koala::StableMatching::compEdgeCont(g,eCont)(C,eac,edc);
+            c=Koala::StableMatching::compEdgeCont(g,eCont);
+            std::cout << c(A,eac,eab) << ' ' << c(C,eac,edc);
+
+            Koala::Graph<char,char>::PEdge tabA[]={eab,eac}, tabC[]={eac,edc,edc2},tabD[]={edc,edc2};
+            Koala::AssocTable<std::map<Koala::Graph<char,char>::PVertex,std::pair<Koala::Graph<char,char>::PEdge*,Koala::Graph<char,char>::PEdge*>  >  >
+                vCont;
+            vCont[A].first=tabA;vCont[A].second=tabA+(sizeof(tabA)/sizeof(void*));
+            vCont[C].first=tabC;vCont[C].second=tabC+(sizeof(tabC)/sizeof(void*));
+            vCont[D].first=tabD;vCont[D].second=tabD+(sizeof(tabD)/sizeof(void*));
+            c=Koala::StableMatching::compEdgeIters(g,vCont);
+            std::cout << "\n"<< c(A,eac,eab) << ' ' << c(C,edc,eac) <<' ' << c(D,edc2,edc);
+
+            std::cout<< "\n--------\n";
+            Koala::Graph<char,char>::PEdge match[2]={edc2,eab};
+            std::cout<<Koala::StableMatching::test(g,c,match,match+2).first;
+            std::cout<< "\n----!!!----\n";
+            g.clear();eCont.clear();
+            const int n1=8,n2=11;
+            Koala::Graph<char,char>::PVertex V1[n1],V2[n2];
+            Koala::Graph<char,char>::PEdge etab[n1*n2];
+            int ll=0;
+            for(int i=0;i<n1;i++) V1[i]=g.addVert('A'+i);
+            for(int i=0;i<n2;i++) V2[i]=g.addVert('A'+i+n1);
+            for(int i=0;i<n1;i++) for(int j=0;j<n2;j++) if (rand()%100<70)
+                eCont[etab[ll++]=g.addEdge(V1[i],V2[j])]=std::make_pair(random(10000),random(10000));
+            for(int i=0;i<ll;i++) if (rand() & 1)
+            eCont[g.addEdge(g.getEdgeEnd1(etab[i]),g.getEdgeEnd2(etab[i]))]
+                =std::make_pair(random(10000),random(10000));
+            c=Koala::StableMatching::compEdgeCont(g,eCont);
+            Koala::AssocTable<std::map<Koala::Graph<char,char>::PVertex,
+            Koala::Matching::VertLabs<Koala::Graph<char,char> > > > vertCont;
+
+            std::cout << g.getVertNo() << ' ' << g.getEdgeNo() <<'\n';
+            std::cout << (matchSize = Koala::StableMatching::bipartFind (g,V1,V1+n1,c,blackHole,etab)) << "\n";
+            std::cout << Koala::Matching::test(g,etab,etab+matchSize)<< ' ';
+            std::cout << Koala::StableMatching::test(g,c,etab,etab+matchSize).first;
 
 
     }

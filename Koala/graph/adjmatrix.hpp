@@ -7,12 +7,12 @@ template< class VertInfo, class EdgeInfo, class Settings >
 	undirs.clear();
 }
 
-template< class VertInfo, class EdgeInfo, class Settings >
-	void AdjMatrix< VertInfo,EdgeInfo,Settings,true >::defrag()
-{
-	dirs.defrag();
-	undirs.defrag();
-}
+//template< class VertInfo, class EdgeInfo, class Settings >
+//	void AdjMatrix< VertInfo,EdgeInfo,Settings,true >::defrag()
+//{
+//	dirs.defrag();
+//	undirs.defrag();
+//}
 
 template< class VertInfo, class EdgeInfo, class Settings >
 	void AdjMatrix< VertInfo,EdgeInfo,Settings,true >::reserve( int size )

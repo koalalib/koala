@@ -162,11 +162,11 @@ typedef Graph<int,int,GrSettings<EdDirIn|EdDirOut|EdLoop,AdjAllow> > MyDigraph;
 class FibonHeapSettings : public Settings {
 
         public:
-        template< class Key, class Compare = std::less< Key >, class Allocator = Privates::DefaultCPPAllocator >
+        template< class Key, class Compare = std::less< Key > >
             class HeapCont
         {
           public:
-            typedef FibonHeap< Key,Compare,Allocator > Type;
+            typedef FibonHeap< Key,Compare> Type;
             typedef FibonHeapNode< Key > NodeType;
         };
 };
@@ -175,11 +175,11 @@ class FibonHeapSettings : public Settings {
 class BinomHeapSettings : public Settings {
 
         public:
-        template< class Key, class Compare = std::less< Key >, class Allocator = Privates::DefaultCPPAllocator >
+        template< class Key, class Compare = std::less< Key > >
             class HeapCont
         {
           public:
-            typedef BinomHeap< Key,Compare,Allocator > Type;
+            typedef BinomHeap< Key,Compare > Type;
             typedef BinomHeapNode< Key > NodeType;
         };
 };
@@ -188,11 +188,11 @@ class BinomHeapSettings : public Settings {
 class PairHeapSettings : public Settings {
 
         public:
-        template< class Key, class Compare = std::less< Key >, class Allocator = Privates::DefaultCPPAllocator >
+        template< class Key, class Compare = std::less< Key > >
             class HeapCont
         {
           public:
-            typedef PairHeap< Key,Compare,Allocator > Type;
+            typedef PairHeap< Key,Compare> Type;
             typedef PairHeapNode< Key > NodeType;
         };
 };
@@ -687,7 +687,7 @@ int componentsBFS(const char* g6)
     IO::readG6(g,g6);
     MyGraph::PVertex LOCALARRAY(tabv,g.getVertNo());
     int LOCALARRAY(tabpos,g.getVertNo()+1);
-    int res=BFSPar< Settings >::split(g,SearchStructs::compStore(tabpos,tabv));
+    int res=BFSPar< Settings >::split(g,blackHole,SearchStructs::compStore(tabpos,tabv));
     cout << '{';
     for(int i=0;i<res;i++)
     {
@@ -711,7 +711,7 @@ int componentsDFSPre(const char* g6)
     IO::readG6(g,g6);
     MyGraph::PVertex LOCALARRAY(tabv,g.getVertNo());
     int LOCALARRAY(tabpos,g.getVertNo()+1);
-    int res=DFSPreorderPar< Settings >::split(g,SearchStructs::compStore(tabpos,tabv));
+    int res=DFSPreorderPar< Settings >::split(g,blackHole,SearchStructs::compStore(tabpos,tabv));
     cout << '{';
     for(int i=0;i<res;i++)
     {
@@ -735,7 +735,7 @@ int componentsDFSPost(const char* g6)
     IO::readG6(g,g6);
     MyGraph::PVertex LOCALARRAY(tabv,g.getVertNo());
     int LOCALARRAY(tabpos,g.getVertNo()+1);
-    int res=DFSPostorderPar< Settings >::split(g,SearchStructs::compStore(tabpos,tabv));
+    int res=DFSPostorderPar< Settings >::split(g,blackHole,SearchStructs::compStore(tabpos,tabv));
     cout << '{';
     for(int i=0;i<res;i++)
     {
@@ -759,7 +759,7 @@ int componentsLex(const char* g6)
     IO::readG6(g,g6);
     MyGraph::PVertex LOCALARRAY(tabv,g.getVertNo());
     int LOCALARRAY(tabpos,g.getVertNo()+1);
-    int res=LexBFSPar< Settings >::split(g,SearchStructs::compStore(tabpos,tabv));
+    int res=LexBFSPar< Settings >::split(g,blackHole,SearchStructs::compStore(tabpos,tabv));
     cout << '{';
     for(int i=0;i<res;i++)
     {

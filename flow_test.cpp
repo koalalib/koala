@@ -303,6 +303,7 @@ void conTest()
     cout << Koala::Flow::transship(g,tedgeCont,tvertCont) << '\n';
     for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         cout << e->info << ": flow=" << tedgeCont[e].flow << ' ' <<tedgeCont[e].hi<<'\n';
+    cout << "S " << Koala::Flow::vertFlow(g,tedgeCont,S) << "T " << Koala::Flow::vertFlow(g,tedgeCont,T);
 
     cout << "\n\ncon con con con\n\n";
 

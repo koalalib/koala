@@ -6,19 +6,25 @@
  */
 
 template< class GraphType > class ConstGraphMethods;
-template< class GraphType > struct GraphInternalTypes;
 
-template< class GraphType > struct GraphInternalTypes< ConstGraphMethods< GraphType > >
-{
-	typedef typename GraphInternalTypes< GraphType >::Vertex Vertex;
-	typedef typename GraphInternalTypes< GraphType >::PVertex PVertex;
-	typedef typename GraphInternalTypes< GraphType >::Edge Edge;
-	typedef typename GraphInternalTypes< GraphType >::PEdge PEdge;
-	typedef typename GraphInternalTypes< GraphType >::VertInfoType VertInfoType;
-	typedef typename GraphInternalTypes< GraphType >::EdgeInfoType EdgeInfoType;
-	typedef typename GraphInternalTypes< GraphType >::GraphSettings GraphSettings;
-};
 
+namespace Privates {
+
+    //NEW: sprywatyzowano
+    template< class GraphType > struct GraphInternalTypes;
+
+    template< class GraphType > struct GraphInternalTypes< ConstGraphMethods< GraphType > >
+    {
+        typedef typename GraphInternalTypes< GraphType >::Vertex Vertex;
+        typedef typename GraphInternalTypes< GraphType >::PVertex PVertex;
+        typedef typename GraphInternalTypes< GraphType >::Edge Edge;
+        typedef typename GraphInternalTypes< GraphType >::PEdge PEdge;
+        typedef typename GraphInternalTypes< GraphType >::VertInfoType VertInfoType;
+        typedef typename GraphInternalTypes< GraphType >::EdgeInfoType EdgeInfoType;
+        typedef typename GraphInternalTypes< GraphType >::GraphSettings GraphSettings;
+    };
+
+}
 
 /* ConstGraphMethods
  * Klasa wprowadzajaca poprzez mechanizm CRTP metody operujace na strukturze typu const GraphType do tejze struktury
@@ -31,13 +37,13 @@ template< class GraphType > struct GraphInternalTypes< ConstGraphMethods< GraphT
 template< class GraphType > class ConstGraphMethods
 {
 public:
-	typedef typename GraphInternalTypes< ConstGraphMethods< GraphType > >::Vertex Vertex; /**< \brief Vertex of graph.*/
-	typedef typename GraphInternalTypes< ConstGraphMethods< GraphType > >::PVertex PVertex; /**< \brief Pointer to vertex of graph.*/
-	typedef typename GraphInternalTypes< ConstGraphMethods< GraphType > >::Edge Edge; /**< \brief Edge of graph.*/
-	typedef typename GraphInternalTypes< ConstGraphMethods< GraphType > >::PEdge PEdge; /**< \brief Pointer to edge of graph.*/
-	typedef typename GraphInternalTypes< ConstGraphMethods< GraphType > >::VertInfoType VertInfoType; /**< \brief Vertex information.*/
-	typedef typename GraphInternalTypes< ConstGraphMethods< GraphType > >::EdgeInfoType EdgeInfoType; /**< \brief Edge information.*/
-	typedef typename GraphInternalTypes< ConstGraphMethods< GraphType > >::GraphSettings GraphSettings; /**< \brief Graph settings.*/
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::Vertex Vertex; /**< \brief Vertex of graph.*/
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::PVertex PVertex; /**< \brief Pointer to vertex of graph.*/
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::Edge Edge; /**< \brief Edge of graph.*/
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::PEdge PEdge; /**< \brief Pointer to edge of graph.*/
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::VertInfoType VertInfoType; /**< \brief Vertex information.*/
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::EdgeInfoType EdgeInfoType; /**< \brief Edge information.*/
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::GraphSettings GraphSettings; /**< \brief Graph settings.*/
 
 protected:
 	const GraphType &self;
@@ -66,6 +72,8 @@ protected:
 		}
 	};
 
+    EdgeDirection paralDirs(EdgeDirection dir, EdgeDirection reltype ) const;
+
 public:
 	/** \brief Constructor */
 	ConstGraphMethods(): self( (const GraphType &)*this )
@@ -76,7 +84,7 @@ public:
 		{ }
 
 	//Aby nie zaczelo pracowac na innym grafie
-	/* \brief Copy content operator. 
+	/* \brief Copy content operator.
 	 *
 	 *  Does nothing to prevent change of graphs.
 	 *  \return *this.

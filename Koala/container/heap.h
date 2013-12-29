@@ -13,8 +13,11 @@
 
 //Kontenery kolejek priorytetowych szybko zlaczalnych dla porownywalnych typow kluczy: dwumianowej i Fibonacziego.
 //
-//TODO: rozwazyc zamiane we wszystkich algorytmach PriQueueInterface -> dwumianowa (mozliwe usprawnienie algorytmow
-//dzieki brakujacej w STL operacji usuwania klucza)
+//TODO: rozwazyc zamiane we wszystkich algorytmach PriQueueInterface -> HeapCont (mozliwe usprawnienie algorytmow
+//dzieki brakujacej w STL operacji usuwania klucza). Poki co to jedyny modul uzywajacy PriQueueInterface -
+// byc moze mozna ja wywalic?
+
+//NEW: rezygnacja z parametru Allocator szablonow kopcow - kopce lokalne uzywaja puli pamieci typu SimplArrPool (simple.h)
 
 namespace Koala
 {
@@ -30,7 +33,7 @@ namespace Koala
 	 */
 	template< class Key > class BinomHeapNode
 	{
-		template< class K, class Comp, class Alloc > friend class BinomHeap;
+		template< class K, class Comp > friend class BinomHeap;
 		BinomHeapNode< Key > *parent, *child, *next;
 		unsigned degree;
 		Key key;
@@ -64,12 +67,13 @@ namespace Koala
 	 *
 	 *  [See example](examples/heap/example_BinomHeap.html).
 	 */
-	template< class Key, class Compare = std::less< Key >, class Allocator = Privates::DefaultCPPAllocator >
+	template< class Key, class Compare = std::less< Key > >
 		class BinomHeap
 	{
 	public:
 		typedef BinomHeapNode< Key > Node;/**\brief Node of heap. */
 		typedef BinomHeapNode< Key > *Repr;/**\brief Pointer to heap node. */
+		typedef SimplArrPool<BinomHeapNode< Key > > Allocator;
 
 	protected:
 		Node *root,*minimum;
@@ -94,7 +98,7 @@ namespace Koala
 				{ }
 		// konstruktor kopiujacy, obiekt wiaze sie z tym samym alokatorem, co oryginal
 		/** \brief Copy constructor.*/
-		inline BinomHeap( const BinomHeap< Key,Compare,Allocator > & );
+		inline BinomHeap( const BinomHeap< Key,Compare> & );
 		/** \brief Copy content operator.*/
 		BinomHeap &operator=( const BinomHeap &X );
 		~BinomHeap()
@@ -186,12 +190,12 @@ namespace Koala
 		template< class InputIterator > void assign2( InputIterator &first, int len );
 	};
 
-	/** \brief Fibonacci heap node. 
-	 *  
+	/** \brief Fibonacci heap node.
+	 *
 	 *  An auxiliary object representing single key (node) of Fibonacci heap. */
 	template< class Key > class FibonHeapNode
 	{
-		template< class K, class Comp, class Alloc > friend class FibonHeap;
+		template< class K, class Comp > friend class FibonHeap;
 
 		FibonHeapNode< Key > *parent,*child,*previous,*next;
 		unsigned flag;
@@ -220,12 +224,13 @@ namespace Koala
 	 *
 	 *  [See example](examples/heap/example_FibonHeap.html).
 	 */
-	template< class Key, class Compare = std::less< Key >, class Allocator = Privates::DefaultCPPAllocator >
+	template< class Key, class Compare = std::less< Key > >
 		class FibonHeap
 	{
 	public:
 		typedef FibonHeapNode< Key > Node;/**\brief Node of heap. */
 		typedef FibonHeapNode< Key > *Repr;/**\brief Pointer to heap node. */
+		typedef SimplArrPool<FibonHeapNode< Key > > Allocator;
 
 	private:
 		Node *root;
@@ -251,9 +256,9 @@ namespace Koala
 			root( 0 ), nodes( 0 ), function( function ), allocator( all )
 				{ }
 		/** \brief Copy constructor.*/
-		inline FibonHeap( const FibonHeap< Key,Compare,Allocator > & );
+		inline FibonHeap( const FibonHeap< Key,Compare > & );
 		/** \brief Copy content operator.*/
-		FibonHeap& operator=( const FibonHeap< Key,Compare,Allocator > &X );
+		FibonHeap& operator=( const FibonHeap< Key,Compare > &X );
 		~FibonHeap()
 			{ clear(); }
 
@@ -327,7 +332,7 @@ namespace Koala
 	template <class Key>
 	class PairHeapNode
 	{
-		template< class K, class Comp, class Alloc > friend class PairHeap;
+		template< class K, class Comp > friend class PairHeap;
 
 		PairHeapNode< Key > *parent,*child,*previous,*next;
 		unsigned degree;
@@ -357,12 +362,13 @@ namespace Koala
 	 *
 	 *  [See example](examples/heap/example_FibonHeap.html).
 	 */
-	template <class Key, class Compare = std::less<Key>,class Allocator=Privates::DefaultCPPAllocator >
+	template <class Key, class Compare = std::less<Key> >
 	class PairHeap
 	{
 	public:
 		typedef PairHeapNode<Key> Node;/**\brief Node of heap. */
 		typedef PairHeapNode<Key> * Repr;/**\brief Pointer to heap node. */
+		typedef SimplArrPool<PairHeapNode<Key> > Allocator;
 
 	protected:
 		Node *root;
@@ -387,9 +393,9 @@ namespace Koala
 			root( 0 ), nodes( 0 ), function( function ), allocator( all )
 				{ }
 		/** \brief Copy constructor.*/
-		inline PairHeap( const PairHeap< Key,Compare,Allocator > & );
+		inline PairHeap( const PairHeap< Key,Compare > & );
 		/** \brief Copy content operator.*/
-		PairHeap& operator=( const PairHeap< Key,Compare,Allocator > &X );
+		PairHeap& operator=( const PairHeap< Key,Compare > &X );
 		~PairHeap()
 			{ clear(); }
 

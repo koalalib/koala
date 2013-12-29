@@ -16,8 +16,8 @@ using namespace Koala;
 using namespace Koala::IO;
 
 
-#define format RG_VertexLists
-//#define format RG_EdgeList
+//#define format RG_VertexLists
+#define format RG_EdgeList
 
 #include "main.hpp"
 	string buf;
@@ -31,8 +31,17 @@ using namespace Koala::IO;
     xx.set("name","Ala").set("liczba",1).set("float",-3.);
     cout << xx <<"\n";
     ss << xx <<"\n";
-    ss>>yy;
-    cout << yy << "\n\n";
+
+//    char comma;
+//    do {
+//			if(!cin.get(comma)) break;
+//			cout << '*'<< ((comma=='\n')? '@' : comma)<<'-';
+//		} while(comma != ',');
+//    cout << "\n\n*" << ((comma=='\n')? '@' : comma)<<'-';
+//
+    cin>>yy;
+    cout << yy << "|"<< yy.size();
+//    return 0;
     cout << boolalpha;
     cout << (xx.isDouble("float")) << ' '<< (yy.isDouble("float")) << "\n\n\n";
 
@@ -60,7 +69,7 @@ using namespace Koala::IO;
 
 	ifstream pliki("plik.txt");
 	g.clear();
-	readGraphText(g, pliki, format);
+	readGraphText(g, pliki, format|RG_Info);
 	pliki.close();
 	writeGraphText(g, cout, format|RG_Info);
 

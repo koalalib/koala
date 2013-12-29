@@ -16,7 +16,7 @@ using namespace Koala;
 using namespace Koala::IO;
 using namespace std;
 
-#define TEST_3
+#define TEST_2
 // TEST_ 1-3
 
 /*
@@ -79,6 +79,7 @@ using namespace std;
 			printf("%p: %d  ", ci->first, ci->second);
 			};
 		printf("\n");
+		cout << "maxstable: "<< IsIt::Comparability::maxStable(g,clq) << "\n";
 	} else printf("false");
 
 	cout << "\n ----------\n";
@@ -114,35 +115,59 @@ using namespace std;
     g.clear();g.addVert();g.addVert();g.addEdge(g.getVert(),g.getVertLast());
 //    g.addVert();
     SearchStructs::CompStoreTool<Graph<int, int>::PVertex> out;
-    cout << "\n" << boolalpha << IsIt::CompMPartite::split(g,out.input()) << "\n" << IsIt::compMPartite(g);
+    cout << "\n" << boolalpha << IsIt::CompMPartite::split(g,blackHole,out.input()) << "\n" << IsIt::compMPartite(g);
     cout << "\n" << out.size() << ' ' << out.size(0);
     cout  << ' ' << out.size(1);
 
     cout <<"\n---------------------------\n";
     {
-        Graph<char> g;
-        Graph<char>::PVertex A,B,C,D,E,F,G,H,I,J,K,L,tabV[20];
+        Graph<char,int> g;
+        g.delAdjMatrix();
+        Graph<char,int>::PVertex A,B,C,D,E,F,G,H,I,J,K,L,tabV[20];
 
         A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');
         E=g.addVert('E');
         F=g.addVert('F');G=g.addVert('G');H=g.addVert('H');I=g.addVert('I');
+//        g.addArc(A,B);
+//        g.addArc(B,A);
         g.addArc(A,B);
-        g.addArc(B,C);g.addArc(D,F);
-        g.addArc(B,E);
-        g.addArc(G,F);g.addArc(F,I);
+        g.addArc(A,B);g.addArc(A,B);
+        g.addEdge(A,B);
+//        g.addArc(B,A);
+//              g.addLoop(A);
+//                g.addEdge(C,A);
+//        g.addEdge(C,D);
+//        g.addEdge(D,E);
+//        g.addArc(G,F);g.addArc(F,I);
 
 //        g.addArc(E,F);g.addArc(D,F);
 //        g.addArc(H,J);g.addArc(I,J);
 //        g.addArc(F,L);g.addArc(J,K);
 //        g.del(A);g.del(L);g.del(K);g.del(G);g.del(H);g.del(I);g.del(J);
-        RelDiagram::transClousure(g);
-        g.ch2Undir();
+        Graph<char,int> g1;
+        g1.makeAdjMatrix();
+        g1=g;
         writeGraphText(g, cout, RG_VertexLists|RG_VInfo);
-//
-//        g.del(D);
-        int res;
-        cout << (res=IsIt::Comparability::maxStable(g,tabV))<<endl;
-        for(int i=0;i<res ;i++) cout << tabV[i]->info << ' ';
+        cout << "\n*********\n";
+        RelDiagram::symmClousure(g);
+        writeGraphText(g, cout, RG_VertexLists|RG_VInfo);
+//        g.ch2Undir();
+        cout << "\n:::::::::::::::\n";
+       RelDiagram::symmClousure(g1);
+        writeGraphText(g1, cout, RG_VertexLists|RG_VInfo);
+
+        cout << boolalpha << endl << g.hasAdjMatrix() << g1.hasAdjMatrix()<< endl << endl;
+
+        Graph<string,string> g2;
+        g2.copy(g1);
+               writeGraphText(g2, cout, RG_VertexLists|RG_VInfo);
+
+//        cout << boolalpha<< BFS::getAttainableSet(g,A).isElement(A);
+////
+////        g.del(D);
+//        int res;
+//        cout << (res=IsIt::Comparability::maxStable(g,tabV))<<endl;
+//        for(int i=0;i<res ;i++) cout << tabV[i]->info << ' ';
 
     }
 

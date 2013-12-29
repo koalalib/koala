@@ -155,15 +155,8 @@ double kwadrat(int arg) { return arg*arg; }
     cout << cout << "\n\nLocals:\n\n";
     JSPartDesrc< Vert* > buf1[20];
     Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc< Vert* > * > > buf2[20];
-    JoinableSets<Vert*, AssocArray<Vert*, JSPartDesrc<Vert*>*,
-        VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > >
-            locjset(4,(Koala::Privates::JoinableSetsVectIntSwitch<JoinableSets<Vert*,
-                        AssocArray<Vert*, JSPartDesrc<Vert*>*,
-                            VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > > >::BufType)
-                        buf1,(Koala::Privates::JoinableSetsVectIntSwitch<JoinableSets<Vert*,
-                              AssocArray<Vert*, JSPartDesrc<Vert*>*,
-                                VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc<Vert*>* > >*> > > >::MapBufType)
-                        buf2);
+    JoinableSets<Vert*>
+            locjset(4);
 
     locjset.resize(0);
     locjset.resize(3);
@@ -241,6 +234,32 @@ double kwadrat(int arg) { return arg*arg; }
     cout << iset2.min();
     }
 
+    {
+        cout << "\n!!!!\n";
+        const int n=4;
+        int tab[n];
+        QueueInterface<int*> q(tab,3);
+        q.push(0);q.push(0);
+        q.pop();q.pop();
+        q.pushFront(1);q.pushFront(2);q.pushFront(3);
+
+        while(q.size())
+        {
+            cout << q.front() <<' ';
+            q.pop();
+        }
+
+    }
+
+    vector<int> vii(700);
+    cout << endl << vii.size() << ' '<<vii.capacity();
+    //vii.clear();
+    {
+            vector<int> viii=vector<int>(7);
+            vii.swap(viii);
+    }
+
+    cout << endl << vii.size() << ' '<<vii.capacity();
 
     return 0;
 }

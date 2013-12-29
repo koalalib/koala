@@ -186,6 +186,20 @@ namespace Koala
 				{ return "ContExcFull"; }
 		};
 
+
+		//NEW: blad destruktora puli obiektow SimplArrPool (simple.h), gdy nie wszystkie zaalokowane
+		//obiekty zostaly zdealokowane
+		class ContExcPoolNotEmpty: public ContExc
+		{
+		public:
+			inline ContExcPoolNotEmpty( const char *adesc = "", const char *afile = "", int aline = -1):
+				ExcBase( adesc,afile,aline )
+				{ }
+			inline const char *type() const
+				{ return "ContExcPoolNotEmpty"; }
+		};
+
+
 		/* ContExcOutpass
 		 * Wyjątek typu "przekroczenie zakresu kontenera".
 		 */

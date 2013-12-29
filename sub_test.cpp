@@ -138,5 +138,71 @@ Koala::Subgraph<Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koal
                                !Koala::stdChoose(Koala::Set<Koala::Edge<OpisV,OpisE>* >()+=EE)))
                 ,std::cout,Koala::IO::RG_EdgeList);
 
+
+
+    std::cout << "\n****************\n\n";
+    Koala::IO::writeGraphText(g,std::cout,Koala::IO::RG_EdgeList);
+
+    std::cout << "\n"<< g.getVertNo() << " "<< g.getEdgeNo();
+
+    Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koala::Vertex<OpisV,OpisE> >,Koala::SetChooser<Koala::Edge<OpisV,OpisE> > >
+        sgb,sgb2;
+
+
+//    sgb2=sgb;
+    sgb=makeSubgraph(g,std::make_pair(Koala::stdChoose(g.getVertSet()),Koala::stdChoose(g.getEdgeSet())),std::make_pair(true,true));
+    std::cout << std::boolalpha <<sgb.frozenNos().first << ' '<< sgb.frozenNos().second;
+
+    std::cout << "\n****************\n\n";
+    Koala::IO::writeGraphText(sgb,std::cout,Koala::IO::RG_EdgeList);
+    sgb.echoose.set-=g.getEdge();
+    sgb.echoose.set-=g.getEdgeLast();
+    sgb.resetNos(std::make_pair(true,true));
+
+    std::cout << "\n****************\n\n";
+    Koala::IO::writeGraphText(sgb,std::cout,Koala::IO::RG_EdgeList);
+
+    std::cout << "\n****************\n\n";
+
+    g.clear();
+    A=g.addVert(OpisV("A"));
+    B=g.addVert(OpisV("B"));
+    C=g.addVert(OpisV("C"));
+    D=g.addVert(OpisV("D"));
+
+    g.addEdge(A,B,OpisE(1));
+    g.addEdge(A,B,OpisE(1));
+    g.addArc(A,B,OpisE(1));
+    g.addArc(B,A,OpisE(1));
+
+    g.addEdge(A,C,OpisE(1));
+    g.addEdge(A,C,OpisE(1));
+    g.addArc(A,C,OpisE(1));
+    g.addArc(C,A,OpisE(1));
+
+    g.addLoop(C,OpisE(1));
+    g.addLoop(C,OpisE(1));
+
+    Koala::Graph<OpisV,OpisE> gg;
+    gg.addVert(OpisV("A"));
+    gg.addVert(OpisV("B"));
+    gg.addEdge(gg.getVert(),gg.getVertLast(),OpisE(1));
+    gg.addArc(gg.getVert(),gg.getVertLast(),OpisE(1));
+
+
+    Koala::IO::writeGraphText(g,std::cout,Koala::IO::RG_EdgeList);
+
+    Koala::SimpleView<Koala::Graph<OpisV,OpisE> > gsimp(Koala::EdUndir,gg,std::make_pair(true,true));
+
+
+    gsimp.refresh(Koala::EdDirOut);
+
+//    gsimp.plug(g);
+    gsimp=makeSimpleView(Koala::EdUndir,g);
+    gsimp.resetNos();
+    std::cout << "\n\n\n";
+    Koala::IO::writeGraphText(gsimp,std::cout,Koala::IO::RG_EdgeList);
+
+
     return 0;
 }

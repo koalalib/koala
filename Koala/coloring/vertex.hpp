@@ -132,8 +132,8 @@ int SeqVertColoringPar<DefaultStructs>::interchangeComponents(const Graph &graph
 			BFSPar<DefaultStructs>::scanAttainable(
 				makeSubgraph( graph ,
 					std::make_pair(extAssocChoose( &colors,color1 )
-						|| extAssocChoose( &colors,color2 ),stdChoose( true ))),
-				u, assocInserter( compMap,constFun( nComp ) ), Mask );
+						|| extAssocChoose( &colors,color2 ),stdChoose( true )),std::make_pair(true,true)),
+				u, blackHole,assocInserter( compMap,constFun( nComp ) ), Mask );
 			nComp++;
 		}
 	}
@@ -238,10 +238,10 @@ int SeqVertColoringPar<DefaultStructs>::slSort(const Graph &graph,
 
 	if(beg==end) return 0;
 
-	typedef Privates::BlockListAllocator< typename DefaultStructs:: template
-		HeapCont< SlStruct,void,void >::NodeType > Allocator;
+	typedef SimplArrPool< typename DefaultStructs:: template
+		HeapCont< SlStruct,void >::NodeType > Allocator;
 	typedef typename DefaultStructs::template
-		HeapCont< SlStruct, SlCmp<SlStruct>, Allocator >::Type PriQueue;
+		HeapCont< SlStruct, SlCmp<SlStruct> >::Type PriQueue;
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, typename PriQueue::Node*>::Type VertToQueue;
 
@@ -390,6 +390,7 @@ void SeqVertColoringPar<DefaultStructs>::brooksBiconnected(
 		AssocCont<Vert, VertSub>::Type mapVert(bState.graph.getVertNo());
 	std::set< std::pair<Vert, Vert> > simple; // !CHANGE! - don't use std::set
 
+    //TODO: v/e-alokatory, size ???
 	Subgraph subgraph; //subgraph is biconnected
 	while(bState.begVert!=bState.endVert) {
 		//make a subgraph
@@ -753,6 +754,7 @@ template <class DefaultStructs>
 template<typename Graph, typename ColorMap, typename VInIter>
 int SeqVertColoringPar<DefaultStructs>::greedy(const Graph &graph, ColorMap &colors, VInIter beg, VInIter end)
 {
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 	int locMax = -1;
 	while (beg != end) {
 		int col = greedy(graph, colors, *beg++);
@@ -767,6 +769,7 @@ template<typename Graph, typename ColorMap, typename VInIter>
 int SeqVertColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors,
 	VInIter beg, VInIter end)
 {
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 	int locMax = -1, maxCol = maxColor(graph, colors);
 	while(beg != end) {
 		int col = greedyInter(graph , colors, *beg++, maxCol);
@@ -781,6 +784,7 @@ template< typename Graph, typename ColorMap, typename VInIter >
 int SeqVertColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors,
 	VInIter beg, VInIter end, int maxCol)
 {
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 	int locMax = -1;
 	while(beg != end) {
 		int col = greedyInter(graph, colors, *beg++, maxCol);
@@ -794,6 +798,7 @@ template <class DefaultStructs>
 template< typename Graph, typename ColorMap >
 int SeqVertColoringPar<DefaultStructs>::greedy(const Graph &graph, ColorMap &colors)
 {
+	colors.reserve(graph.getVertNo());
 	int locMax = -1;
 	for(typename Graph::PVertex vv = graph.getVert(); vv;
 		vv = graph.getVertNext(vv))
@@ -808,6 +813,7 @@ template <class DefaultStructs>
 template< typename Graph, typename ColorMap >
 int SeqVertColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors)
 {
+	colors.reserve(graph.getVertNo());
 	typedef typename Graph::PVertex Vert;
 	int locMax = -1, maxCol = maxColor(graph, colors);
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv) ) {
@@ -822,6 +828,7 @@ template <class DefaultStructs>
 template< typename Graph, typename ColorMap >
 int SeqVertColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors, int maxCol)
 {
+	colors.reserve(graph.getVertNo());
 	typedef typename Graph::PVertex Vert;
 	int locMax = -1;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
@@ -839,6 +846,7 @@ int SeqVertColoringPar<DefaultStructs>::lf(const Graph &graph, ColorMap &colors)
 	typedef typename Graph::PVertex Vert;
 	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
+    colors.reserve(vertNo);
 
 	if(vertNo==0) return -1;
 	Vert LOCALARRAY(verts, vertNo);
@@ -860,6 +868,7 @@ int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph, ColorMap &co
 	typedef typename Graph::PVertex Vert;
 	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
+	colors.reserve(vertNo);
 
 	if(vertNo==0) return -1;
 	Vert LOCALARRAY(verts, vertNo);
@@ -882,6 +891,7 @@ int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
+	colors.reserve(vertNo);
 
 	if(vertNo==0) return -1;
 	Vert LOCALARRAY(verts, vertNo);
@@ -902,6 +912,7 @@ int SeqVertColoringPar<DefaultStructs>::lf(const Graph &graph, ColorMap &colors,
 	VInIter beg, VInIter end)
 {
 	typedef typename Graph::PVertex Vert;
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -925,6 +936,7 @@ int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph, ColorMap &co
 	VInIter beg, VInIter end)
 {
 	typedef typename Graph::PVertex Vert;
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -948,6 +960,7 @@ int SeqVertColoringPar<DefaultStructs>::lfInter(const Graph &graph, ColorMap &co
 	VInIter beg, VInIter end, int maxCol)
 {
 	typedef typename Graph::PVertex Vert;
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -1002,6 +1015,7 @@ int SeqVertColoringPar<DefaultStructs>::sl(const Graph &graph, ColorMap &colors)
 	typedef typename Graph::PVertex Vert;
 	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
+	colors.reserve(vertNo );
 
 	if(vertNo==0) return -1;
 	Vert LOCALARRAY(verts, vertNo);
@@ -1024,6 +1038,7 @@ int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph, ColorMap &co
 	typedef typename Graph::PVertex Vert;
 	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
+	colors.reserve(vertNo );
 
 	if(vertNo==0) return -1;
 	Vert LOCALARRAY(verts, vertNo);
@@ -1047,6 +1062,7 @@ int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
+	colors.reserve(vertNo );
 
 	if(vertNo==0) return -1;
 	Vert LOCALARRAY(verts, vertNo);
@@ -1068,6 +1084,7 @@ int SeqVertColoringPar<DefaultStructs>::sl(const Graph &graph, ColorMap &colors,
 	VInIter beg, VInIter end)
 {
 	typedef typename Graph::PVertex Vert;
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -1092,6 +1109,7 @@ int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph,
 	ColorMap &colors, VInIter beg, VInIter end)
 {
 	typedef typename Graph::PVertex Vert;
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -1116,6 +1134,7 @@ int SeqVertColoringPar<DefaultStructs>::slInter(const Graph &graph,
 	ColorMap &colors, VInIter beg, VInIter end, int maxCol)
 {
 	typedef typename Graph::PVertex Vert;
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 
 	int n = 0;
 	for(VInIter cur = beg; cur!=end; ++cur, ++n);
@@ -1165,6 +1184,7 @@ int SeqVertColoringPar<DefaultStructs>::slf(const Graph &graph, ColorMap &colors
 	typedef typename Graph::PVertex Vert;
 	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
+	colors.reserve(vertNo );
 
 	if(vertNo==0) return -1;
 	Vert LOCALARRAY(verts, vertNo);
@@ -1186,6 +1206,7 @@ int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph, ColorMap &c
 	typedef typename Graph::PVertex Vert;
 	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
+	colors.reserve(vertNo );
 
 	if(vertNo==0) return -1;
 	Vert LOCALARRAY(verts, vertNo);
@@ -1208,6 +1229,7 @@ int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	int vertNo = graph.getVertNo();
 	int lenVerts = 0;
+	colors.reserve(vertNo );
 
 	if(vertNo==0) return -1;
 	Vert LOCALARRAY(verts, vertNo);
@@ -1234,10 +1256,11 @@ int SeqVertColoringPar<DefaultStructs>::slf(const Graph &graph,
 
 	if(beg==end) return -1;
 
-	typedef Privates::BlockListAllocator< typename DefaultStructs:: template
-		HeapCont< SlfStruct,void,void >::NodeType > Allocator;
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
+	typedef SimplArrPool< typename DefaultStructs:: template
+		HeapCont< SlfStruct,void >::NodeType > Allocator;
 	typedef typename DefaultStructs::template
-		HeapCont< SlfStruct, SlfCmp<SlfStruct>, Allocator >::Type PriQueue;
+		HeapCont< SlfStruct, SlfCmp<SlfStruct> >::Type PriQueue;
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, typename PriQueue::Node*>::Type VertToQueue;
 	typedef typename DefaultStructs::template
@@ -1326,11 +1349,12 @@ int SeqVertColoringPar<DefaultStructs>::slfInter(const Graph &graph,
 	typedef VertDegSat<Vert> SlfStruct;
 
 	if(beg==end) return -1;
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 
-	typedef Privates::BlockListAllocator< typename DefaultStructs:: template
-		HeapCont< SlfStruct,void,void >::NodeType > Allocator;
+	typedef SimplArrPool< typename DefaultStructs:: template
+		HeapCont< SlfStruct,void >::NodeType > Allocator;
 	typedef typename DefaultStructs::template
-		HeapCont< SlfStruct, SlfCmp<SlfStruct>, Allocator >::Type PriQueue;
+		HeapCont< SlfStruct, SlfCmp<SlfStruct> >::Type PriQueue;
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, typename PriQueue::Node*>::Type VertToQueue;
 	typedef typename DefaultStructs::template
@@ -1443,6 +1467,7 @@ int SeqVertColoringPar<DefaultStructs>::brooks(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
+    colors.reserve(graph.getVertNo());
 	BrooksState<Graph, ColorMap> bState(graph, colors);
 
 	for(Vert vert = graph.getVert(); vert;
@@ -1482,12 +1507,14 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	colors.reserve(graph.getVertNo());
 
 	typedef typename DefaultStructs::template
 		LocalGraph<Vert, Koala::EmptyEdgeInfo, Undirected>::Type Subgraph;
 	typedef typename Subgraph::PVertex VertSub;
 	typedef typename Subgraph::PEdge EdgeSub;
 
+    //TODO: v/e-alokatory, size ???
 	Subgraph subgraph;
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, VertSub>::Type Map;
@@ -1547,12 +1574,14 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 
 	typedef typename DefaultStructs::template
 		LocalGraph<Vert, Koala::EmptyEdgeInfo, Undirected>::Type Subgraph;
 	typedef typename Subgraph::PVertex VertSub;
 	typedef typename Subgraph::PEdge EdgeSub;
 
+    //TODO: v/e-alokatory, size ???
 	Subgraph subgraph;
 	typedef typename DefaultStructs::template
 		AssocCont<Vert, VertSub>::Type Map;

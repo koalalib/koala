@@ -14,23 +14,49 @@
 
 namespace Koala
 {
+
+
 	/* SubGraph
 	 *
 	 */
 	template< class Graph, class VChooser, class EChooser > class Subgraph;
 
-	template< class GraphType > struct GraphInternalTypes;
-	template< class Graph, class VChooser, class EChooser >
-		struct GraphInternalTypes< Subgraph < Graph, VChooser, EChooser> >
-	{
-		typedef typename Graph::Vertex Vertex;
-		typedef typename Graph::PVertex PVertex;
-		typedef typename Graph::Edge Edge;
-		typedef typename Graph::PEdge PEdge;
-		typedef typename Graph::VertInfoType VertInfoType;
-		typedef typename Graph::EdgeInfoType EdgeInfoType;
-		typedef typename Graph::GraphSettings GraphSettings;
-	};
+
+	namespace Privates {
+
+        struct SubgraphCount {
+
+            bool freezev, freezee;
+            int vcount, eloopcount, edircount, eundircount;
+
+            SubgraphCount(std::pair< bool,bool > fr= std::make_pair(false,false))
+                :   freezev(fr.first), freezee(fr.second),
+                    vcount(-1), eloopcount(-1), edircount(-1), eundircount(-1)
+            {}
+
+            void reset(bool vf,bool ef)
+            {
+                if (vf) vcount=-1;
+                if (ef) eloopcount= edircount= eundircount=-1;
+            }
+        };
+
+        //NEW: sprywatyzowano, podobnie w dalszych widokach
+        template< class GraphType > struct GraphInternalTypes;
+
+        template< class Graph, class VChooser, class EChooser >
+            struct GraphInternalTypes< Subgraph < Graph, VChooser, EChooser> >
+        {
+            typedef typename Graph::Vertex Vertex;
+            typedef typename Graph::PVertex PVertex;
+            typedef typename Graph::Edge Edge;
+            typedef typename Graph::PEdge PEdge;
+            typedef typename Graph::VertInfoType VertInfoType;
+            typedef typename Graph::EdgeInfoType EdgeInfoType;
+            typedef typename Graph::GraphSettings GraphSettings;
+        };
+
+	}
 
 	// Klasa podgrafu struktury grafowej typu Graph, do podgrafu wybierane sa wierzcholki spelniajace
 	// chooser vchoose i krawedzie spelniajace echoose z obydwoma koncami spelniajacymi vchoose
@@ -38,7 +64,7 @@ namespace Koala
 	 *
 	 *  Class allows to isolate and use only part of the graph without allocating new graph. The original graph is called and there is no need to create a copy.
 	 *  Classes VChooser and EChooser allow to choose vertex and edges for subgraph.
-	 *  \tparam Graph the type of graph
+	 *  \tparam Graph the type of graphPrivates
 	 *  \tparam VChooser the class allowing to choose vertices automatically.
 	 *  \tparam EChooser the class allowing to choose edges automatically.
 	 *  \ingroup DMview */
@@ -57,13 +83,13 @@ namespace Koala
 		mutable EChooser echoose;
 
 		// te typy sa takie same, jak w grafie nadrzednym
-		typedef typename GraphInternalTypes< Subgraph< Graph, VChooser, EChooser> >::Vertex Vertex; /**< \brief Vertex of graph.*/
-		typedef typename GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::PVertex PVertex; /**< \brief Pointer to vertex of graph.*/
-		typedef typename GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::Edge Edge; /**< \brief Edge of graph.*/
-		typedef typename GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::PEdge PEdge; /**< \brief Pointer to edge of graph.*/
-		typedef typename GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::VertInfoType VertInfoType; /**< \brief Vertex information.*/
-		typedef typename GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::EdgeInfoType EdgeInfoType; /**< \brief Edge information.*/
-		typedef typename GraphInternalTypes< Subgraph< Graph, VChooser, EChooser> >::GraphSettings GraphSettings; /**< \brief Graph settings.*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser> >::Vertex Vertex; /**< \brief Vertex of graph.*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::PVertex PVertex; /**< \brief Pointer to vertex of graph.*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::Edge Edge; /**< \brief Edge of graph.*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::PEdge PEdge; /**< \brief Pointer to edge of graph.*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::VertInfoType VertInfoType; /**< \brief Vertex information.*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::EdgeInfoType EdgeInfoType; /**< \brief Edge information.*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser> >::GraphSettings GraphSettings; /**< \brief Graph settings.*/
 
 		// typ tej struktury
 		typedef Subgraph< Graph,VChooser,EChooser > GraphType; /**< \brief The current graph type.*/
@@ -74,10 +100,15 @@ namespace Koala
 
 		// Konstruktory
 		// tworzy podgraf nie podlaczony do zadnego grafu
+		//NEW: metody getVertNo() i getEdgeNo(type) dla podgrafow sa powolne - wymagaja przejzenia calej
+		// listy wierz/kraw. Wprowadzono wewnetrzne liczniki - mozemy zamrozic te wielkosci (first - licznik
+        // wierzcholkow, second - liczniki krawedzi roznych typow). Od zamrozenia po pierwszym wyliczeniu
+        // wartosci te sa zapamietane i uzywane ponownie. Jest to oczywiscie niebezpieczne, stosujemy
+        // gdy mamy pewnosc, ze liczby te nie zmienily sie.
 		/** \brief Constructor
 		 *
 		 *  New subgraph is created without any connection to a graph.	 */
-		Subgraph()
+		Subgraph(std::pair< bool,bool > fr= std::make_pair(false,false)) : counters(fr)
 			{ }
 		// tworzy podgraf danego grafu i ustawia wartosci obu chooserow
 		/** \brief Constructor
@@ -85,14 +116,15 @@ namespace Koala
 		 *  New subgraph of \a g is created. The method assigns the attributes \a vchoose and \a echoose that determine the vertices and edges of subgraph. See \ref DMchooser.
 		 *  \param g the parent graph (or subgraph).
 		 *  \param chs standard pair of choosers, first of which choose vertices second edges.   */
-		Subgraph( const Graph &g, std::pair< VChooser,EChooser > chs = std::make_pair( VChooser(),EChooser() ) );
+		Subgraph( const Graph &g, std::pair< VChooser,EChooser > chs = std::make_pair( VChooser(),EChooser() ),
+                std::pair< bool,bool > fr= std::make_pair(false,false));
 
 		// ustawia wartosci obu chooserow, tworzy podgraf niepodlaczony
 		/** \brief Constructor
 		 *
 		 *  New unconnected subgraph is created. The method assigns the attributes \a vchoose and \a echoose that determine the vertices and edges of subgraph. See \ref DMchooser.
 		 *  \param chs standard pair of choosers, first of which choose vertices second edges. 	 */
-		Subgraph( std::pair< VChooser,EChooser > );
+		Subgraph( std::pair< VChooser,EChooser >, std::pair< bool,bool > fr= std::make_pair(false,false) );
 
 		// ustawienie wartosci chooserow
 		/** \brief Set choose.
@@ -113,7 +145,7 @@ namespace Koala
 		 *
 		 * The method plugs the current graph as a child to \a g.*/
 		void plug( const Graph &g )
-			{ SubgraphBase::link( &g ); }
+			{ counters.reset(true,true); SubgraphBase::link( &g ); }
 		// sprawia, ze podgraf staje sie niepodlaczony do zadnego rodzica
 		/** \brief Unplug graph.
 		 *
@@ -165,7 +197,7 @@ namespace Koala
 		 *  The method tests if the edge form ancestor belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph and both ends satisfy \a vchoose. If the flag \a deep is set to true all the ancestors choosers are tested.
 		 *  \param edge the tested edge.
 		 *  \param deep the flag determining if all choosers of ancestors are checked.
-		 *  \return true if edge belongs to subgraph, false otherwise.*/
+		 *  \return true if edge belongs to subgraph, fagetVertNextlse otherwise.*/
 		bool good( PEdge edge, bool deep = false ) const;
 
 		// metody dla ConstGraphMethods
@@ -324,6 +356,29 @@ namespace Koala
 		EdgeDirection getEdgeDir( PEdge edge, PVertex v) const
 			{ return up().getEdgeDir( edge,v ); }
 
+
+        //NEW: zamroz liczniki wierzcholkow, krawedzi lub oba. Dziala od ich nastepnego wyliczenia
+        void freezeNos(std::pair<bool,bool> tofreeze) const
+        {
+            if (tofreeze.first && !counters.freezev) counters.vcount=-1;
+            counters.freezev=tofreeze.first;
+            if (tofreeze.second && !counters.freezee)
+                    counters.eloopcount= counters.edircount= counters.eundircount=-1;
+            counters.freezee=tofreeze.second;
+        }
+
+        //NEW: ktore liczniki sa zamrozone
+        std::pair<bool,bool> frozenNos() const
+        {
+            return std::pair<bool,bool>(counters.freezev, counters.freezee);
+        }
+
+        //NEW: uniewaznia wybrane liczniki - trzeba je wyliczyc ponownie
+        void resetNos(std::pair<bool,bool> toreset= std::make_pair(true,true)) const
+        {
+            counters.reset(toreset.first,toreset.second);
+        }
+
 	protected:
 		template <class T> static bool isEdgeTypeChooser( const T &x, Koala::EdgeDirection &val )
 			{ return false; }
@@ -332,8 +387,12 @@ namespace Koala
 		template <class T> static bool isBoolChooser( const T &x, bool &val )
 			{ (void)(x); (void)(val); return false; }
 		static bool isBoolChooser( const BoolChooser &x, bool &val );
+
+		mutable Privates::SubgraphCount counters;
+
 	};
 
+	//NEW: parametr zamrazajacy liczniki tworzonego grafu
 	// zwraca podgraf danego grafu
 	/** \brief Subgraph generating function.
 	 *
@@ -343,20 +402,24 @@ namespace Koala
 	 *  \return the new-created view (subgraph) on graph (view).
 	 *  \ingroup DMview */
 	template< class Graph, class VChooser, class EChooser > Subgraph< Graph,VChooser,EChooser >
-		makeSubgraph( const Graph &, const std::pair< VChooser,EChooser > & );
+		makeSubgraph( const Graph &, const std::pair< VChooser,EChooser > &, std::pair< bool,bool > fr= std::make_pair(false,false) );
 
 		template< class Graph > class UndirView;
-		template< class GraphType > struct GraphInternalTypes;
-		template< class Graph  > struct GraphInternalTypes< UndirView<Graph> >
-		{
-			typedef typename Graph::Vertex Vertex;
-			typedef typename Graph::PVertex PVertex;
-			typedef typename Graph::Edge Edge;
-			typedef typename Graph::PEdge PEdge;
-			typedef typename Graph::VertInfoType VertInfoType;
-			typedef typename Graph::EdgeInfoType EdgeInfoType;
-			typedef typename Graph::GraphSettings GraphSettings;
-		};
+
+        namespace Privates {
+
+            template< class Graph  > struct GraphInternalTypes< UndirView<Graph> >
+            {
+                typedef typename Graph::Vertex Vertex;
+                typedef typename Graph::PVertex PVertex;
+                typedef typename Graph::Edge Edge;
+                typedef typename Graph::PEdge PEdge;
+                typedef typename Graph::VertInfoType VertInfoType;
+                typedef typename Graph::EdgeInfoType EdgeInfoType;
+                typedef typename Graph::GraphSettings GraphSettings;
+            };
+
+        }
 
 		/* UndirView
 		 * widok na graf typu Graph, przy czym wszystkie krawedzie rozne od petli sa widziane jako nieskierowane
@@ -369,13 +432,13 @@ namespace Koala
 	{
 	public:
 		// ten sam sens typow, co dla podgrafu
-		typedef typename GraphInternalTypes< UndirView< Graph > >::Vertex Vertex; /**< \brief Vertex of graph.*/
-		typedef typename GraphInternalTypes< UndirView< Graph > >::PVertex PVertex;/**< \brief Pointer to vertex of graph.*/
-		typedef typename GraphInternalTypes< UndirView< Graph > >::Edge Edge;/**< \brief Edge of graph.*/
-		typedef typename GraphInternalTypes< UndirView< Graph > >::PEdge PEdge;/**< \brief Pointer to edge of graph.*/
-		typedef typename GraphInternalTypes< UndirView< Graph > >::VertInfoType VertInfoType; /**< \brief Vertex information.*/
-		typedef typename GraphInternalTypes< UndirView< Graph > >::EdgeInfoType EdgeInfoType;/**< \brief Edge information.*/
-		typedef typename GraphInternalTypes< UndirView< Graph > >::GraphSettings GraphSettings;/**< \brief Graph settings.*/
+		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::Vertex Vertex; /**< \brief Vertex of graph.*/
+		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::PVertex PVertex;/**< \brief Pointer to vertex of graph.*/
+		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::Edge Edge;/**< \brief Edge of graph.*/
+		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::PEdge PEdge;/**< \brief Pointer to edge of graph.*/
+		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::VertInfoType VertInfoType; /**< \brief Vertex information.*/
+		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::EdgeInfoType EdgeInfoType;/**< \brief Edge information.*/
+		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::GraphSettings GraphSettings;/**< \brief Graph settings.*/
 
 		typedef UndirView< Graph > GraphType;/**< \brief The current graph (view) type.*/
 		typedef typename Graph::RootGrType RootGrType;  /**< \brief Root (initial) graph type.*/
@@ -628,17 +691,21 @@ namespace Koala
 	 *
 	 */
 	template< class Graph > class RevView;
-	template< class GraphType > struct GraphInternalTypes;
-	template< class Graph > struct GraphInternalTypes< RevView< Graph> >
-	{
-		typedef typename Graph::Vertex Vertex;
-		typedef typename Graph::PVertex PVertex;
-		typedef typename Graph::Edge Edge;
-		typedef typename Graph::PEdge PEdge;
-		typedef typename Graph::VertInfoType VertInfoType;
-		typedef typename Graph::EdgeInfoType EdgeInfoType;
-		typedef typename Graph::GraphSettings GraphSettings;
-	};
+
+	namespace Privates {
+
+        template< class Graph > struct GraphInternalTypes< RevView< Graph> >
+        {
+            typedef typename Graph::Vertex Vertex;
+            typedef typename Graph::PVertex PVertex;
+            typedef typename Graph::Edge Edge;
+            typedef typename Graph::PEdge PEdge;
+            typedef typename Graph::VertInfoType VertInfoType;
+            typedef typename Graph::EdgeInfoType EdgeInfoType;
+            typedef typename Graph::GraphSettings GraphSettings;
+        };
+
+	}
 
 	// widok grafu typy Graph z odwroconymi wszystkimi krawedziami skierowanymi
 
@@ -649,13 +716,13 @@ namespace Koala
 	template< class Graph > class RevView: public SubgraphBase, public ConstGraphMethods< RevView< Graph> >
 	{
 	public:
-		typedef typename GraphInternalTypes< RevView< Graph > >::Vertex Vertex; /**< \brief Vertex of graph.*/
-		typedef typename GraphInternalTypes< RevView< Graph > >::PVertex PVertex;/**< \brief Pointer to vertex of graph.*/
-		typedef typename GraphInternalTypes< RevView< Graph > >::Edge Edge;/**< \brief Edge of graph.*/
-		typedef typename GraphInternalTypes< RevView< Graph > >::PEdge PEdge;/**< \brief Pointer to edge of graph.*/
-		typedef typename GraphInternalTypes< RevView< Graph > >::VertInfoType VertInfoType;/**< \brief Vertex information.*/
-		typedef typename GraphInternalTypes< RevView< Graph > >::EdgeInfoType EdgeInfoType;/**< \brief Edge information.*/
-		typedef typename GraphInternalTypes< RevView< Graph > >::GraphSettings GraphSettings;/**< \brief Graph settings.*/
+		typedef typename Privates::GraphInternalTypes< RevView< Graph > >::Vertex Vertex; /**< \brief Vertex of graph.*/
+		typedef typename Privates::GraphInternalTypes< RevView< Graph > >::PVertex PVertex;/**< \brief Pointer to vertex of graph.*/
+		typedef typename Privates::GraphInternalTypes< RevView< Graph > >::Edge Edge;/**< \brief Edge of graph.*/
+		typedef typename Privates::GraphInternalTypes< RevView< Graph > >::PEdge PEdge;/**< \brief Pointer to edge of graph.*/
+		typedef typename Privates::GraphInternalTypes< RevView< Graph > >::VertInfoType VertInfoType;/**< \brief Vertex information.*/
+		typedef typename Privates::GraphInternalTypes< RevView< Graph > >::EdgeInfoType EdgeInfoType;/**< \brief Edge information.*/
+		typedef typename Privates::GraphInternalTypes< RevView< Graph > >::GraphSettings GraphSettings;/**< \brief Graph settings.*/
 
 		typedef RevView< Graph > GraphType;/**< \brief The current graph (view) type.*/
 		typedef typename Graph::RootGrType RootGrType; /**< \brief Root (initial) graph type.*/
@@ -914,6 +981,99 @@ namespace Koala
 	 *  \ingroup DMview */
 	template< class Graph > RevView< Graph > makeRevView( const Graph &g )
 		{ return RevView< Graph>( g ); }
+
+
+    //NEW: widok na podgraf bez krawedzi rownoleglych tj. po jednej krawedzi z kazdej klasy rownoleglosci
+    // - analogicznie, jak w metodzie findParals, ale w postaci widoku podgrafu
+    template< class Graph>  class SimpleView:
+        public Subgraph<Graph,BoolChooser,AssocHasChooser<typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type> >
+    {
+        protected:
+            EdgeType relType;
+            using Subgraph<Graph,BoolChooser,AssocHasChooser<typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type> >
+                                    ::vchoose;
+            using Subgraph<Graph,BoolChooser,AssocHasChooser<typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type> >
+                                    ::echoose;
+
+        public:
+
+            typedef SimpleView<Graph> GraphType;
+            typedef Subgraph<Graph,BoolChooser,AssocHasChooser<typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type> >
+                                    BaseSubgraphType;
+
+            SimpleView(EdgeType areltype,std::pair< bool,bool > fr= std::make_pair(false,false)):
+                Subgraph<Graph,BoolChooser,AssocHasChooser<typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type> >
+                                    (std::make_pair(stdChoose(true),assocKeyChoose(typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type ())),
+                                    fr), relType(areltype)
+            {
+                koalaAssert( (areltype == EdDirIn || areltype == EdDirOut || areltype == EdUndir),GraphExcWrongMask );
+            }
+
+            SimpleView(EdgeType areltype,const Graph &g,std::pair< bool,bool > fr= std::make_pair(false,false)):
+                Subgraph<Graph,BoolChooser,AssocHasChooser<typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type> >
+                                    (g,std::make_pair(stdChoose(true),assocKeyChoose(typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type ())),
+                                     fr), relType(areltype)
+            {
+                koalaAssert( (areltype == EdDirIn || areltype == EdDirOut || areltype == EdUndir),GraphExcWrongMask );
+                this->vchoose=stdChoose(true);
+                refresh();
+            }
+
+            //rodzaj wybranej relacji rownoleglosci
+            EdgeType getRelType() const
+            {
+                return relType;
+            }
+            // ponowne wyliczenie krawedzi podgrafu, ew. zmiana typu relacji rownoleglosci
+            void refresh(EdgeType newrelType=0)
+            {
+                if (newrelType) relType=newrelType;
+                koalaAssert( (relType == EdDirIn || relType == EdDirOut || relType == EdUndir),GraphExcWrongMask );
+                this->echoose.cont.clear();
+                if (this->getRootPtr())
+                {
+                    this->echoose.cont.reserve(this->up().getEdgeNo());
+                    typename Graph::GraphSettings
+                             ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type::ValType val;
+                    this->up().findParals(std::make_pair(assocInserter( this->echoose.cont, constFun( val ) ),
+                                                        blackHole), relType);
+                }
+                this->resetNos(std::make_pair(false,true));
+            }
+
+            void plug( const Graph &g )
+                {
+                    Subgraph<Graph,BoolChooser,AssocHasChooser<typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type> >
+                    ::plug(g);
+                    refresh();
+                }
+
+            bool unplug()
+                {
+                    this->echoose.cont.clear();
+                    return Subgraph<Graph,BoolChooser,AssocHasChooser<typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type> >
+                            ::unplug();
+                }
+    };
+
+
+	template< class Graph> SimpleView< Graph>
+		makeSimpleView( EdgeType areltype, const Graph & g, std::pair< bool,bool > fr= std::make_pair(false,false) )
+    {
+        return SimpleView< Graph>(areltype,g,fr);
+    }
+
+
 
 #include "view.hpp"
 }

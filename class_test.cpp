@@ -94,12 +94,22 @@ using namespace std;
         for(int i=0;i<cl-1;i++) cout << tabpar[i].first << tabpar[i].second << ' ';
         int res;
 
+        Graph<int, int>::PVertex u10=g.addVert(10);
+        Graph<int, int>::PVertex u11=g.addVert(11);
+        Graph<int, int>::PVertex u12=g.addVert(12);
+        Graph<int, int>::PVertex u13=g.addVert(13);
+
+        g.addEdge(u10,u11); g.addEdge(u12,u13);
+        g.addEdge(u11,u12);
+      g.addEdge(u10,u12);
+        g.addEdge(u10,u13);
+
         cout << endl << "maxStable: ";
         cout << endl << endl << (res=IsIt::Chordal::maxStable(g,tabV2))<< endl;
         for(int i=0;i<res;i++) cout << tabV2[i]->info << ' ';
 	}
 
-
+    return 0;
 
 //    cout <<IsIt::caterpillar(g) << " " <<
 //        (IsIt::Caterpillar::getSpineEnds(g).first ? IsIt::Caterpillar::getSpineEnds(g).first->info : -1) << ' ' <<
@@ -123,5 +133,34 @@ using namespace std;
 //    cout << endl;
 //    for(Graph<int, int>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) cout << e->info << ":" << edgeCont[e] << ' ';
 
+    {
+        cout << "\n............\n";
+        Graph<char, char> g;
+        Graph<char, char>::PVertex u,v,tabV[20];
+        int tabi[20];
+        Koala::AssocArray<Koala::Graph<char,char>::PVertex,int> mapa;
+
+
+        g.addVert('A');
+        g.addVert('B');
+        g.addVert('C');
+        g.addVert('A');
+        g.addVert('A');
+        g.addVert('B');
+        g.addVert('C');
+
+        for(u=g.getVert();u!=g.getVertLast();u=g.getVertNext(u))
+            for(v=g.getVertNext(u);v;v=g.getVertNext(v)) if (v->info!=u->info) g.addEdge(u,v);
+
+        int k=IsIt::CompMPartite::split(g,mapa, SearchStructs::compStore(tabi,tabV));
+        cout << endl;
+        for(int i=0;i<k;i++)
+        { for(int j=tabi[i];j<tabi[i+1];j++) cout << tabV[j]->info;
+          cout  << ' ';
+        }
+        cout << endl;
+        for(u=g.getVert();u;u=g.getVertNext(u)) cout << u->info << ' '<< mapa[u] << endl;
+
+    }
 	return 0;
 }

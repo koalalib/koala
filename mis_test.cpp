@@ -434,5 +434,25 @@ int main(void) {
     std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
     std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
     std::cout << std::endl; clearOutput();
-    return 0;
+
+    {
+        g.clear();
+        A=g.addVert(OpisV("A",1));
+        B=g.addVert(OpisV("B",1));
+        C=g.addVert(OpisV("C",1));
+        D=g.addVert(OpisV("D",1));
+
+        g.addEdge(A,B,OpisE(1));
+        g.addEdge(C,B,OpisE(1));
+        g.addEdge(C,D,OpisE(1));
+
+        tabV[0]=A;
+        tabV[1]=D;
+        tabV[2]=C;
+
+        std::cout << std::boolalpha << Koala::MISHeuristic::isStable(g, tabV, tabV+1)
+            << ' ' << Koala::MISHeuristic::isMaxStable(g, tabV, tabV+1);
+
+
+    }
 }

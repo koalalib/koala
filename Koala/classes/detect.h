@@ -225,6 +225,7 @@ namespace Koala
 		/** \brief Methods for bipartite graphs. */
 		class Bipartite
 		{
+
 		public:
 			// wypisuje na iterator wierzcholki jednej partycji grafu dwudzielnego. Zwraca licznosc partycji (-1 w razie bledu)
 			/** \brief Get partition.
@@ -243,7 +244,7 @@ namespace Koala
 			 *  The method gets the maximal independent (stable) set of the graph \a g.
 			 *  \param g the considered graph.
 			 *  \param out the iterator of the container keeping the output set (partition).
-			 *  \return the number of vertices in the maximal stable set kept in the container \a out.*/ 
+			 *  \return the number of vertices in the maximal stable set kept in the container \a out.*/
 			template< class GraphType, class Iter > static int maxStable( const GraphType &g, Iter out );
 
 			// znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
@@ -252,7 +253,7 @@ namespace Koala
 			 *  The method gets the minimal vertex set such that each edge of the graph is incident to at least one vertex in the set.
 			 *  \param g the considered graph.
 			 *  \param out the iterator of the container keeping the output minimal vertex cover.
-			 *  \return the number of vertices in the output set.*/ 
+			 *  \return the number of vertices in the output set.*/
 			template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
 
 		};
@@ -301,7 +302,7 @@ namespace Koala
 		{
 		public:
 			// wyrzuca na out ciagi wierzcholkow tworzacych partycje grafu pelnego M-dzielnego. Zwraca liczbe partycji M lub -1 w razie bledu
-			//TODO: argument w postaci kontenera wyjsciowego PVertex->int (tj. numer partycji)
+			//NEW: argument w postaci kontenera wyjsciowego PVertex->int (tj. numer partycji)
 			/** \brief Get partitions.
 			 *
 			 *  The method gets all the partitions of graph and stores it up in the CompStore \a out.
@@ -309,8 +310,8 @@ namespace Koala
 			 *  \param[out] out the CompStore iterator of a container with the partitions.
 			 *  \return the number of partitions or -1 if any error occur.
 			 *  \sa CompStore*/
-			template< class GraphType, class Iter, class VIter >
-				static int split( const GraphType &g, CompStore< Iter,VIter > out );
+			template< class GraphType, class VMap, class Iter, class VIter >
+				static int split( const GraphType &g, VMap& avertCont, CompStore< Iter,VIter > out );
 		};
 
 		// czy pelny M-dzielny dla pewnego M>0
@@ -320,7 +321,7 @@ namespace Koala
 		 *  \param g the considered graph.
 		 *  \return true if the graph \a g is a complete M-partite, false  otherwise. */
 		template< class GraphType > static bool compMPartite( const GraphType &g )
-			{ return CompMPartite::split( g,compStore( blackHole,blackHole )) != -1; }
+			{ return CompMPartite::split( g,blackHole,compStore( blackHole,blackHole )) != -1; }
 
 		protected:
 
@@ -368,12 +369,55 @@ namespace Koala
 
 			static void SemiPostOrderTree( int *parent, int n, int *out );
 
+
+            template <class Elem> struct RekSet {
+                Elem elem;
+                std::vector<std::pair<RekSet<Elem>*,int> > * buf;
+                int prev;
+
+                RekSet(): buf(0), elem(0), prev(-1)
+                {}
+
+                void add(Elem e)
+                {
+                    elem=e;
+                }
+
+                void add(RekSet<Elem>* x, std::vector<std::pair<RekSet<Elem>*,int> > * abuf)
+                {
+                    if (!buf) buf=abuf;
+                    assert(buf==abuf);
+                    std::pair<RekSet<Elem>*,int> pair(x,prev);
+                    buf->push_back(pair);
+                    prev=buf->size()-1;
+                }
+
+                int isElement(Elem e)
+                {
+                    if (elem==e) return true;
+                    if (buf)
+                        for(int i=prev;i!=-1;i=(*buf)[i].second)
+                            if ((*buf)[i].first->isElement(e)) return true;
+                    return false;
+                }
+            };
+
 			template< class Graph > struct QTRes
 			{
 				int size;
-				Set< typename Graph::PVertex > trees;
-				QTRes(): size( 0 ), trees()
+				RekSet< typename Graph::PVertex > rtrees;
+				QTRes(): size( 0 ), rtrees()
 					{ }
+			};
+
+
+			template <class Graph, class Iterator> struct VLab {
+
+                QTRes<Graph> tnull;
+                Iterator beg,end;
+                VLab(Iterator abeg) : beg(abeg), end(abeg)
+                {}
+
 			};
 
 		public:
@@ -710,15 +754,15 @@ namespace Koala
 				struct Elem
 				{
 					int value;
-					Privates::List< Elem,Privates::BlockListAllocator< Privates::ListNode< Elem > > > *cont;
+					Privates::List< Elem > *cont;
 					Privates::List_iterator< Elem > next;
 					Elem( int _v = -1 ): value( _v ), cont( NULL ), next()
 					{ }
 				};
-				typedef Privates::List< Elem,Privates::BlockListAllocator< Privates::ListNode< Elem > > > Entry;
+				typedef Privates::List< Elem > Entry;
 
 				Sets( std::pair< Entry,Privates::List_iterator< Elem> > *data, size_t n,
-					Privates::BlockListAllocator< Privates::ListNode< Elem > > &a );
+					SimplArrPool< Privates::ListNode< Elem > > &a );
 
 				// dodaje trg do zbioru id
 				void add( int id, int trg );
@@ -836,9 +880,6 @@ namespace Koala
 			 *  \param out the iterator of the output container with all the vertices of the vertex cover.
 			 *  \return the number of element in the output set \a out i.e. the cardinality of the vertex cover of \a g.*/
 			template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
-
-	//        TODO: template<class Graph, class AssocTab>
-	//        static int color(const Graph &g,AssocTab out);
 
 		protected:
 			template< class GraphType, class Assoc > static bool cograph( const GraphType &ag, Assoc &subset );

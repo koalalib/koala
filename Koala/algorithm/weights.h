@@ -652,7 +652,7 @@ namespace Koala
 					sets.resize( n = g.getVertNo() );
 					if (n == 0) return res;
 					for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ))
-					sets.makeSinglet( v );
+                        sets.makeSinglet( v );
 
 					edgeNo = (edgeNo >= 0) ? edgeNo : n-1;
 					if (m == 0|| edgeNo == 0) return res;

@@ -196,7 +196,33 @@ void searchTest2()
         cout << endl;
     }
 
+    {
+        std::cout << "\n\n------------\n\n";
+        Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,G,H,I,J,K,L,M,N;
+        g.clear();
+        A=g.addVert(OpisV("A"));
 
+        B=g.addVert(OpisV("B"));C=g.addVert(OpisV("C"));
+        D=g.addVert(OpisV("D"));E=g.addVert(OpisV("E"));F=g.addVert(OpisV("F"));
+        G=g.addVert(OpisV("G"));H=g.addVert(OpisV("H"));I=g.addVert(OpisV("I"));
+        J=g.addVert(OpisV("J"));K=g.addVert(OpisV("K"));L=g.addVert(OpisV("L"));
+        M=g.addVert(OpisV("M"));N=g.addVert(OpisV("N"));
+
+        g.addEdge(A,B,OpisE(1));g.addEdge(A,I,OpisE(1));g.addEdge(I,B,OpisE(1));
+        g.addEdge(C,B,OpisE(1));g.addEdge(C,D,OpisE(1));g.addEdge(C,N,OpisE(1));
+        g.addEdge(N,G,OpisE(1));g.addEdge(G,H,OpisE(1));g.addEdge(H,N,OpisE(1));
+        g.addEdge(J,K,OpisE(1));g.addEdge(K,L,OpisE(1));g.addEdge(L,M,OpisE(1));
+//        g.addLoop(D,OpisE(1));
+//        g.addEdge(C,D,OpisE(1));
+//    g.addEdge(J,M,OpisE(1));
+        std::cout << g.getVertNo() << ' ' << g.getEdgeNo() << '\n';
+
+        int res=Koala::Blocks::getCore(g,tabV);
+
+        for(int i=0;i<res;i++) std::cout << tabV[i]->info.name << ' ';
+
+
+    }
 
     return 0;
 }

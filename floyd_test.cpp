@@ -22,12 +22,12 @@ Koala::Graph<OpisV,OpisE> g;
 Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,V,U,tabV[20];
 Koala::Graph<OpisV,OpisE>::PEdge tabE[20];
 
-Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Floyd::EdgeLabs<int> > > edgeCont;
+Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Dijkstra::EdgeLabs<int> > > edgeCont;
 
 //dwuwymiarowa tablica asocjacyjna - zawiera dlugosci najkrotszych sciezek pomiedzy kazda para wierzcholkow
 //twoDimVertCont(A,B).distance zawierac bedzie najkrotsza sciezke z A do B
 Koala::AssocMatrix<Koala::Graph<OpisV,OpisE>::PVertex,
-        Koala::Floyd::VertLabs<int, Koala::Graph<OpisV,OpisE> >,
+        Koala::Dijkstra::VertLabs<int, Koala::Graph<OpisV,OpisE> >,
             Koala::AMatrFull> twoDimVertCont;
 
 void floydTest()

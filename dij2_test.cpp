@@ -25,6 +25,36 @@ Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,V,U,tabV[10];
 Koala::Graph<OpisV,OpisE>::PEdge tabE[10];
 
 
+		template< class DType > struct ELabs
+		{
+			// typ wagi liczbowej na krawedzi
+			typedef DType DistType;/**<\brief Type of edge weight.*/
+			// dlugosc krawedzi
+			DistType length; /**< \brief Length (weight) of edge.*/
+		};
+
+		// rekord wyjsciowy opisujacy wierzcholek
+		/** \brief The input/output information for vertices.*/
+		template< class DType, class GraphType > struct VLabs
+		{
+			// typ wagi liczbowej na krawedzi`
+			typedef DType DistType;/**<\brief Type of vertex distance*/
+			// znaleziona odleglosc
+			DType distance;/**<\brief Found vertex distance.*/
+			// element sciezki, analogicznie jak VisitVertLabs w search.h
+			typename GraphType::PVertex vPrev;/**<\brief Previous vertex on the path from the source.*/
+			typename GraphType::PEdge  ePrev;/**<\brief Previous edge on the path from the source.*/
+
+			/**\brief Constructor.*/
+			VLabs():
+				distance( std::numeric_limits< DType >::min() ),
+				vPrev( 0 ), ePrev( 0 )
+				{ }
+		};
+
+
+
+
 Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex,
             Koala::DAGCritPath::VertLabs<int, Koala::Graph<OpisV,OpisE> > > > vertCont;
 Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::DAGCritPath::EdgeLabs<int> > > edgeCont;

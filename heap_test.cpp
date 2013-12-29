@@ -14,7 +14,7 @@ struct Cos {
 
 void FibonTest1()
 {
-    Privates::BlockListAllocator<FibonHeapNode<int> > alloc(4);
+    SimplArrPool<FibonHeapNode<int> > alloc(4);
 //    Privates::DefaultCPPAllocator stdAlloc;
 //    FibonHeap<int,std::less<int>,Privates::BlockListAllocator<FibonHeapNode<int> > > heap(&alloc);
 //    FibonHeap<int,std::less<int>,Privates::DefaultCPPAllocator  > heap(&stdAlloc);
@@ -45,9 +45,9 @@ void FibonTest1()
 
 void FibonTest1Loc()
 {
-    Privates::BlockListAllocator<FibonHeapNode<int> > alloc(100);
+    SimplArrPool<FibonHeapNode<int> > alloc(100);
 //    Privates::DefaultCPPAllocator stdAlloc;
-    FibonHeap<int,std::less<int>,Privates::BlockListAllocator<FibonHeapNode<int> > > heap(&alloc),heap2(&alloc);
+    FibonHeap<int,std::less<int> > heap(&alloc),heap2(&alloc);
 //    FibonHeap<int,std::less<int>,Privates::DefaultCPPAllocator  > heap(&stdAlloc);
 
 
@@ -57,7 +57,7 @@ void FibonTest1Loc()
     heap2.push(10), heap2.push(12), heap2.push(20);
 	FibonHeap<int>::Repr test2 = heap2.push(35);
 
-    FibonHeap<int,std::less<int>,Privates::BlockListAllocator<FibonHeapNode<int> > > heap3(heap);
+    FibonHeap<int,std::less<int> > heap3(heap),heap4,heap5;
 //	heap3.check();
 
 	heap.decrease(test, 11);
@@ -69,6 +69,10 @@ void FibonTest1Loc()
     while (!heap.empty())
         cout << heap.top() << " ", heap.pop();
 	cout << endl;
+
+	heap4.push(102);
+	heap5.push(103);
+//	heap2.merge(heap5);
 }
 
 
@@ -94,7 +98,7 @@ void FibonTest2()
 
 void BinomTest1()
 {
-    Privates::BlockListAllocator<BinomHeapNode<int> > alloc(4);
+    SimplArrPool<BinomHeapNode<int> > alloc(4);
 //    Privates::DefaultCPPAllocator stdAlloc;
 //    BinomHeap<int,std::less<int>,Privates::BlockListAllocator<BinomHeapNode<int> > > heap(&alloc);
 //    BinomHeap<int,std::less<int>,Privates::DefaultCPPAllocator  > heap(&stdAlloc);
@@ -128,9 +132,9 @@ void BinomTest1()
 
 void BinomTest1Loc()
 {
-    Privates::BlockListAllocator<BinomHeapNode<int> > alloc(100);
+    SimplArrPool<BinomHeapNode<int> > alloc(100);
 //    Privates::DefaultCPPAllocator stdAlloc;
-    BinomHeap<int,std::less<int>,Privates::BlockListAllocator<BinomHeapNode<int> > > heap(&alloc),heap2(&alloc);
+    BinomHeap<int,std::less<int>  > heap(&alloc),heap2(&alloc);
 //    BinomHeap<int,std::less<int>,Privates::DefaultCPPAllocator  > heap(&stdAlloc);
 
 
@@ -140,8 +144,9 @@ void BinomTest1Loc()
     heap2.push(10), heap2.push(12), heap2.push(20);
 	BinomHeap<int>::Repr test2 = heap2.push(35);
 
-    BinomHeap<int,std::less<int>,Privates::BlockListAllocator<BinomHeapNode<int> > > heap3(heap);
+    BinomHeap<int,std::less<int> > heap3(heap), heap4,heap5;
 //	heap3.check();
+
 
 	heap.decrease(test, 11);
 	heap.del(test);
@@ -152,6 +157,10 @@ void BinomTest1Loc()
     while (!heap.empty())
         cout << heap.top() << " ", heap.pop();
 	cout << endl;
+
+	heap4.push(102);
+	heap5.push(103);
+//	heap2.merge(heap5);
 }
 
 
@@ -178,7 +187,7 @@ void BinomTest2()
 
 void PairTest1()
 {
-    Privates::BlockListAllocator<PairHeapNode<int> > alloc(4);
+    SimplArrPool<PairHeapNode<int> > alloc(4);
 //    Privates::DefaultCPPAllocator stdAlloc;
 //    FibonHeap<int,std::less<int>,Privates::BlockListAllocator<FibonHeapNode<int> > > heap(&alloc);
 //    FibonHeap<int,std::less<int>,Privates::DefaultCPPAllocator  > heap(&stdAlloc);
@@ -209,9 +218,9 @@ void PairTest1()
 
 void PairTest1Loc()
 {
-    Privates::BlockListAllocator<PairHeapNode<int> > alloc(100);
+    SimplArrPool<PairHeapNode<int> > alloc(100);
 //    Privates::DefaultCPPAllocator stdAlloc;
-    PairHeap<int,std::less<int>,Privates::BlockListAllocator<PairHeapNode<int> > > heap(&alloc),heap2(&alloc);
+    PairHeap<int,std::less<int> > heap(&alloc),heap2(&alloc);
 //    PairHeap<int,std::less<int>,Privates::DefaultCPPAllocator  > heap(&stdAlloc);
 
 
@@ -221,7 +230,7 @@ void PairTest1Loc()
     heap2.push(10), heap2.push(12), heap2.push(20);
 	PairHeap<int>::Repr test2 = heap2.push(35);
 
-    PairHeap<int,std::less<int>,Privates::BlockListAllocator<PairHeapNode<int> > > heap3(heap);
+    PairHeap<int,std::less<int> > heap3(heap),heap4,heap5;
 //	heap3.check();
 
 	heap.decrease(test, 11);
@@ -233,6 +242,11 @@ void PairTest1Loc()
     while (!heap.empty())
         cout << heap.top() << " ", heap.pop();
 	cout << endl;
+
+	heap4.push(102);
+	heap5.push(103);
+//	heap2.merge(heap5);
+
 }
 
 void PairTest2()

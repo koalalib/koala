@@ -21,7 +21,10 @@ struct OpisE {
     int dlugosc; // dla Dijkstry niepotrzebne
 };
 
-Koala::Graph<OpisV,OpisE> g;
+Koala::SimplArrPool<Koala::Vertex<OpisV,OpisE> > vpool(10);
+Koala::SimplArrPool<Koala::Edge<OpisV,OpisE> > epool(50);
+
+Koala::Graph<OpisV,OpisE> g(&vpool,&epool);
 Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,V,U,tabV[10];
 Koala::Graph<OpisV,OpisE>::PEdge tabE[10];
 
@@ -56,10 +59,28 @@ void dijTest()
     for(int i=0;i<10;i++) {tabV[i]=0; tabE[i]=0; }
 }
 
+
+
+template< class GraphType, class VertContainer, class Iter > static int scanAttainable( const GraphType & g,
+			typename GraphType::PVertex v, VertContainer & cont, Iter iter, Koala::EdgeDirection dr)
+{
+    std::cout << "\n\n wersja ogolna";
+}
+
+template< class GraphType, class Iter > static int scanAttainable( const GraphType & g,
+			typename GraphType::PVertex v, Koala::BlackHole, Iter iter, Koala::EdgeDirection dr)
+{
+    std::cout << "\n\n wersja szczegolna";
+}
+
+
 #include "main.hpp"
     g.makeAdjMatrix();
-    dijTest();
 
+    dijTest();
+    Koala::Graph<OpisV,OpisE> g2;
+    g2=g;
+    g.getAllocs();
 
     std::cout<< "Odleglosc: "<< Koala::Dijkstra::distances(g,vertCont,edgeCont,U,V)<<":";
 //       - mozna i bez ostatniego arg. - liczymy z U do wszystkich
@@ -250,6 +271,11 @@ void dijTest()
     dijTest();
     std::cout<< "Odleglosc: "<< Koala::DijkstraHeap::distances(makeSubgraph(g,std::make_pair(Koala::stdChoose(true),Koala::stdChoose(true))),blackHole,edgeCont,U,V)<<":";
 
+//    std::cout << "\n" << g.getEdge()->getGraph() << ' ' << (&g);
 
+    Koala::EmptyVertInfo eee;
+    eee=Koala::EmptyVertInfo();
+
+    scanAttainable(g,g.getVert(),blackHole,tabV,Koala::EdUndir);
     return 0;
 }

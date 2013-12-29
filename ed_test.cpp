@@ -7,6 +7,7 @@
 #include "Koala/io/text.h"
 
 
+
 using namespace std;
 using namespace Koala;
 
@@ -51,39 +52,65 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
 //    g1.addLoop(B,"B");
 //    g1.addLoop(C,"C");
 //
-//    g1.addEdge(A,B,"A-B");
+    g1.addEdge(A,B,"A-B");
 //    g1.addEdge(A,C,"A-C");
 //    g1.addEdge(B,C,"B-C");
 //    g1.addArc(A,B,"A>B");
 //    g1.addArc(A,C,"A>C");
 //    g1.addArc(B,C,"B>C");
-//    g1.addArc(B,A,"B>A");
+    e=g1.addArc(B,A,"B>A");
 //    g1.addArc(C,A,"C>A");
 //    g1.addArc(C,B,"C>B");
-//    g1.addLoop(A,"A");g1.addLoop(B,"B");g1.addLoop(C,"C");
-//    g1.addEdge(A,B,"A-B");g1.addEdge(A,C,"A-C");g1.addEdge(B,C,"B-C");
-//    g1.addArc(A,B,"A>B");g1.addArc(A,C,"A>C");g1.addArc(B,C,"B>C");
+    f=g1.addLoop(A,"A");g1.addLoop(B,"B");g1.addLoop(C,"C");
+    g1.addLoop(A,"A");
+    f=g1.addEdge(A,B,"A-B");g1.addEdge(A,C,"A-C");g1.addEdge(B,C,"B-C");
+    f=g1.addArc(A,B,"A>B");
+    g1.addArc(A,C,"A>C");g1.addArc(B,C,"B>C");
+    f=g1.addArc(B,A,"B>A");
 //    g1.addArc(B,A,"B>A");g1.addArc(C,A,"C>A");g1.addArc(C,B,"C>B");
+//    g1.addLoop(A,"A");
 
-
-    cout <<boolalpha;
-//    for(int i=0;i<g1.getConEdges(tabE,tabV3,tabV3+5,tabV,tabV+5,EdAll);i++) cout << tabE[i]->info << '\n';
-//    g1.addLoop(B,"*B");
-    e=g1.addArc(B,A,"B>A");
-//    g1.addLoop(A,"*A");
-    g1.addArc(B,C,"B>C");
-//    g1.addEdge(B,C,"B-C");
-    f=g1.addEdge(B,A,"B-A");
-//    g1.addEdge(A,B,"A-B");
-    //g1.addEdge(C,B,"C-B");
+//    cout <<boolalpha;
+////    for(int i=0;i<g1.getConEdges(tabE,tabV3,tabV3+5,tabV,tabV+5,EdAll);i++) cout << tabE[i]->info << '\n';
+////    g1.addLoop(B,"*B");
+//    e=g1.addArc(B,A,"B>A");
+////    g1.addLoop(A,"*A");
+//    g1.addArc(B,C,"B>C");
+////    g1.addEdge(B,C,"B-C");
+//    f=g1.addEdge(B,A,"B-A");
+////    g1.addEdge(A,B,"A-B");
+//    //g1.addEdge(C,B,"C-B");
+////    g1.addArc(C,B,"C>B");
+//    g1.addLoop(B,"*B");g1.addLoop(B,"*B");g1.addLoop(B,"*B");
 //    g1.addArc(C,B,"C>B");
-    g1.addLoop(B,"*B");g1.addLoop(B,"*B");g1.addLoop(B,"*B");
-    g1.addArc(C,B,"C>B");
-    g1.addArc(C,B,"C>B");
-    g1.addEdge(A,B,"A-B");
+//    g1.addArc(C,B,"C>B");
+//    g1.addEdge(A,B,"A-B");
 //    g1.addArc(B,C,"B>C");
     IO::writeGraphText(g1,cout,IO::RG_EdgeList);
     cout<< endl<<endl;
+
+    int licz;
+    Edge<char,string> *tabvpom[500];
+    g1.getEdges(tabvpom);
+    std::pair<int,int> plicz=g1.findParals(make_pair(tabE,tabE+10),&tabvpom[0],tabvpom+3,EdDirOut);
+    cout << plicz.first << '\t';
+    for(int i=0;i<plicz.first;i++) cout << tabE[i]->info << ' ';
+    cout <<endl;
+    cout << plicz.second << '\t';
+    for(int i=0;i<plicz.second;i++) cout << tabE[i+10]->info << ' ';
+
+
+//    Vertex<char,string> *tabVVV[5]={B,A,C,B,A};
+//    RepsDeleter<Vertex<char,string> *> repd(tabVVV,tabVVV+5);
+//    cout << "\n\n";
+//    for(int i=0;i<repd.len;i++) cout << repd.buf[i]->info;
+    return 0;
+    cout <<endl << boolalpha <<g1.areParallel(f,e,EdDirOut) << endl << endl;
+
+    cout << endl << g1.delAllParals(B,A,EdDirIn) << endl << endl ;
+    IO::writeGraphText(g1,cout,IO::RG_EdgeList);
+
+    return 0;
 
 //    g1.addArc(A,D,"A>D");
     #define mask EdDirIn
@@ -92,6 +119,7 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
 //    cout << res<<endl;
 //    for(int i=0;i<res;i++) cout << tabE[i]->info << endl;
     for(int i=0;i<g1.getIncVerts(tabV,vset,EdDirIn,Directed);i++) cout << tabV[i]->info << ' ';
+    return 0;
 //    g1.getIncVerts(tabV,vset.begin(),vset.end(),mask,mask);
 //    g1.getIncVertSet(vset.begin(),vset.end(),mask,mask);
 //    g1.getIncVertSet(vset,mask,mask);

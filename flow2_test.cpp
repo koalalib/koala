@@ -11,6 +11,194 @@
 using namespace std;
 using namespace Koala;
 
+		template< class DType, class CType = DType > struct EdgeLabs
+		{
+			// typ liczbowy przepustowosci luku i objetosci przeplywu
+			typedef DType CapacType;/**<\brief Type of capacity and flow variables.*/
+			// typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
+			typedef CType CostType;/**<\brief Type of cost variables.*/
+
+			// przepustowosc (dana wejsciowa), wartosc znalezionego przeplywu w kierunku getEdgeEnd1->getEdgeEnd2
+			CapacType capac/**\brief Capacity of edge.*/,flow/** \brief Actual flow through edge*/;
+			// koszt jednostkowy przeplywu przez luk (dana wejsciowa)
+			CostType cost;/**<\brief Cost of unit size flow.*/
+
+			// agrs: przepustowosc i koszt krawedzi
+			/** \brief Empty constructor.*/
+			EdgeLabs():
+					capac(0 ),
+					flow( 0 ),
+					cost( 0 )
+				{ }
+			/** \brief Constructor.*/
+			EdgeLabs( CapacType arg):
+					capac( arg ), flow( 0 ),
+					cost(0)
+				{ }
+			/** \brief Constructor
+			 *
+			 *  By default assigns zero capacity and zero cost of unit flow.
+			 *  \param arg the capacity of edge.
+			 *  \param arg2 the cost of unit flow.*/
+			EdgeLabs( CapacType arg, CostType arg2):
+					capac( arg ), flow( 0 ),
+					cost( arg2 )
+				{ }
+		};
+
+		// j.w. ale nadaje domyslne jednostkowe przepustowosci i koszty
+		/** \brief Edge information for unit capacity  flow problems algorithms.*/
+		template< class DType, class CType = DType > struct UnitEdgeLabs
+		{
+			// typ liczbowy przepustowosci luku i objetosci przeplywu
+			typedef DType CapacType;/**<\brief Type of capacity variables.*/
+			// typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
+			typedef CType CostType;/**<\brief Type of cost variables.*/
+
+			// przepustowosc (dana wejsciowa), wartosc znalezionego przeplywu w kierunku getEdgeEnd1->getEdgeEnd2
+			CapacType capac/**\brief Capacity of edge.*/,flow/** \brief Actual flow through edge*/;
+			// koszt jednostkowy przeplywu przez luk (dana wejsciowa)
+			CostType cost;/**<\brief Cost of unit size flow.*/
+
+			// agrs: przepustowosc i koszt krawedzi
+			/**\brief Constructor.*/
+			UnitEdgeLabs():
+					capac(1 ),
+					flow( 0 ),
+					cost( 1 )
+				{ }
+			UnitEdgeLabs( CapacType arg):
+					capac( arg ), flow( 0) ,
+					cost(1)
+				{ }
+			/** \brief Constructor.
+			 *
+			 *  By default assigns unit capacity and unit cost of unit flow.
+			 *  \param arg the capacity of edge.
+			 *  \param arg2 the cost of unit flow.*/
+			UnitEdgeLabs( CapacType arg, CostType arg2):
+					capac( arg ), flow( 0 ),
+					cost( arg2 )
+				{ }
+		};
+
+		// rekord wynikowy opisujacy rozciecie krawedziowe w grafie miedzy para wierzcholkow
+		/** \brief Output structure for problem of cut-set between two vertices.*/
+		template< class CapacType > struct EdgeCut
+		{
+			// typ liczbowy przepustowosci luku i objetosci przeplywu
+			CapacType capac;/**< \brief Capacity type.*/
+			// liczba wierzcholkow osiagalnych z poczatkowego po usunieciu rozciecia
+			int vertNo;/**< \brief Number of vertices reachable after deletion of the cut-set.*/
+			// liczba krawedzi rozciecia
+			int edgeNo;/**<\brief Number of edges in the cut set.*/
+
+			/** \brief Constructor.*/
+			EdgeCut(): capac( 0 ),
+						vertNo( 0 ), edgeNo( 0 )
+				{ }
+		};
+
+		template< class GraphType, class CType > struct GHTreeEdge
+		{
+			// typ liczbowy przepustowosci luku
+			typedef CType CapacType;/**<\brief Capacity type*/
+			// koncowki krawedzi
+			typename GraphType::PVertex first/**\brief First vertex of GHTree edge*/,second/**\brief Second vertex of GHTree edge*/;
+			// przepustowosc "krawedzi"
+			CapacType capac;/**< \brief Capacity.*/
+
+			// args: oba wierzcholki koncowe i przepustowosc
+			/**\brief Constructor.*/
+			GHTreeEdge( ): first( 0 ), second( 0 ),
+				capac( 0 )
+				{ }
+			/**\brief Constructor.*/
+			GHTreeEdge( typename GraphType::PVertex f ): first( f ), second( 0 ),
+				capac( 0 )
+				{ }
+			/**\brief Constructor.
+			 *
+			 *  Assigns the both ends of edge and capacity.
+			 *  \param f the first vertex of edge.
+			 *  \param s the second vertex of edge.
+			 *  \param c the capacity of edge.*/
+			GHTreeEdge( typename GraphType::PVertex f, typename GraphType::PVertex s, CapacType c  ):
+				first( f ), second( s ), capac( c )
+				{ }
+
+		};
+
+		// Transshipment - uogolnienie przeplywu (por. Schrijver)
+		// rekord wejsciowy opisujacy wierzcholek dla wyszukiwania transhipmentow
+		/** \brief The input structure for vertex in transhipment problem.*/
+		template< class DType > struct TrsVertLoss
+		{
+			// typ liczbowy przepustowosci luku i objetosci przeplywu
+			typedef DType CapacType;/**<\brief Capacity type.*/
+			// maksymalny i minimalny dopuszczalny przy danym wierzcholku laczny wplyw
+			CapacType hi/**\brief Possible exes in vertex*/,lo/**\brief possible deficit in vertex*/;
+
+			//(dopuszczalne dodatnie i ujemne np. przeplyw to trans. z hi=lo=0 wszedzie poza zrodlem i ujsciem)
+			/**\brief Constructor.*/
+			TrsVertLoss():
+				hi(0),
+				lo(0)
+				{ }
+			/**\brief Constructor.*/
+			TrsVertLoss( CapacType alo):
+				hi(0),
+				lo( alo )
+				{ }
+			/**\brief Constructor*/
+			TrsVertLoss( CapacType alo, CapacType ahi): hi( ahi ), lo( alo )
+				 { }
+		};
+
+		// rekord  opisujacy krawedz dla wyszukiwania transhipmentow
+		/**\brief The input structure for edge in transhipment problem.*/
+		template< class DType, class CType = DType > struct TrsEdgeLabs
+		{
+			// typ liczbowy przepustowosci luku i objetosci przeplywu
+			typedef DType CapacType;/**<\brief Type of capacity, balance and flow variables.*/
+			// typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
+			typedef CType CostType;/**<\brief Type of cost variables.*/
+			// wymagane gorne i dolne ograniczenie na wielkosc przeplywu przez ta krawedz.
+			//Dla nieskierowanych wymaga sie lo=0
+			// TODO: sprawdzic, czy moga byc ujemne dla lukow
+			CapacType hi/**\brief Possible exes*/,lo/**\brief possible deficit*/;
+			// wartosc znalezionego przeplywu (transship.) w kierunku getEdgeEnd1->getEdgeEnd2
+			CapacType flow;/**<\brief Actual flow through edge*/
+			// koszt jednostkowy przeplywu dla luku, jesli wymagany to wymagany nieujemny z wyjatkiem petli
+			CostType cost;/**<\brief Cost of unit size flow.*/
+
+			/** \brief Empty constructor.*/
+			TrsEdgeLabs():
+				hi(0),
+				lo(0),
+				cost(0)
+			{ }
+			/** \brief Constructor.*/
+			TrsEdgeLabs( CapacType alo):
+				hi(0),
+				lo( alo ),
+				cost(0)
+			{ }
+			/** \brief Constructor.*/
+			TrsEdgeLabs( CapacType alo, CapacType ahi):
+				hi( ahi ),
+				lo( alo ),
+				cost(0)
+			{ }
+			/** \brief Constructor.*/
+			TrsEdgeLabs( CapacType alo,
+				CapacType ahi,
+				CostType c): hi( ahi ), lo( alo ), cost( c )
+			{ }
+		};
+
+
+
 struct OpisE {
     string name;
     int cap;
@@ -24,11 +212,11 @@ Koala::Graph<char,OpisE> g;
 Koala::Graph<char,OpisE>::PVertex A,B,C,D,E,F,V,U,S,T,G,tabV[20],*tabVit;
 Koala::Graph<char,OpisE>::PEdge tabE[20];
 
-Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeLabs<int> >  edgeCont;
+Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,EdgeLabs<int16_t,int> >  edgeCont;
 //Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::VertLabs<Koala::Graph<char,OpisE>,int> > vertCont;
 
-Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::TrsEdgeLabs<int> > tedgeCont;
-Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsVertLoss<int> > tvertCont;
+Koala::AssocArray<Koala::Graph<char,OpisE>::PEdge,TrsEdgeLabs<int16_t,int> > tedgeCont;
+Koala::AssocArray<Koala::Graph<char,OpisE>::PVertex,TrsVertLoss<int16_t> > tvertCont;
 
 
 void dijTest()
@@ -128,13 +316,13 @@ void costTest()
     S=g.addVert('S');T=g.addVert('T');
     F=g.addVert('F');
 
-    edgeCont[g.addArc(S,A,OpisE(0))]=Koala::Flow::EdgeLabs<int>(18,3);
-    edgeCont[g.addArc(S,C,OpisE(50))]=Koala::Flow::EdgeLabs<int>(20,8);
-    edgeCont[g.addArc(A,C,OpisE(10))]=Koala::Flow::EdgeLabs<int>(15,4);
-    edgeCont[g.addArc(B,A,OpisE(50))]=Koala::Flow::EdgeLabs<int>(20,5);
-    edgeCont[g.addArc(C,B,OpisE(60))]=Koala::Flow::EdgeLabs<int>(12,8);
-    edgeCont[g.addArc(B,T,OpisE(30))]=Koala::Flow::EdgeLabs<int>(14,5);
-    edgeCont[g.addArc(C,T,OpisE(10))]=Koala::Flow::EdgeLabs<int>(17,3);
+    edgeCont[g.addArc(S,A,OpisE(0))]=EdgeLabs<int16_t,int>(18,3);
+    edgeCont[g.addArc(S,C,OpisE(50))]=EdgeLabs<int16_t,int>(20,8);
+    edgeCont[g.addArc(A,C,OpisE(10))]=EdgeLabs<int16_t,int>(15,4);
+    edgeCont[g.addArc(B,A,OpisE(50))]=EdgeLabs<int16_t,int>(20,5);
+    edgeCont[g.addArc(C,B,OpisE(60))]=EdgeLabs<int16_t,int>(12,8);
+    edgeCont[g.addArc(B,T,OpisE(30))]=EdgeLabs<int16_t,int>(14,5);
+    edgeCont[g.addArc(C,T,OpisE(10))]=EdgeLabs<int16_t,int>(17,3);
 //    edgeCont[g.addLoop(C,OpisE(10))]=Koala::Flow::EdgeLabs<int>(1,1);
 //    edgeCont[g.addLoop(B,OpisE(10))]=Koala::Flow::EdgeLabs<int>(1,-10);
 
@@ -163,13 +351,13 @@ void costTest2()
     S=g.addVert('S');T=g.addVert('T');
 //    F=g.addVert('F');
 
-    edgeCont[g.addEdge(A,S,OpisE(0))]=Koala::Flow::EdgeLabs<int>(18,3);
-    edgeCont[g.addEdge(S,C,OpisE(50))]=Koala::Flow::EdgeLabs<int>(20,8);
-    edgeCont[g.addEdge(A,C,OpisE(10))]=Koala::Flow::EdgeLabs<int>(15,4);
-    edgeCont[g.addEdge(B,A,OpisE(50))]=Koala::Flow::EdgeLabs<int>(20,5);
-    edgeCont[g.addEdge(C,B,OpisE(60))]=Koala::Flow::EdgeLabs<int>(12,8);
-    edgeCont[g.addEdge(B,T,OpisE(30))]=Koala::Flow::EdgeLabs<int>(14,5);
-    edgeCont[g.addEdge(C,T,OpisE(10))]=Koala::Flow::EdgeLabs<int>(17,3);
+    edgeCont[g.addEdge(A,S,OpisE(0))]=EdgeLabs<int16_t,int>(18,3);
+    edgeCont[g.addEdge(S,C,OpisE(50))]=EdgeLabs<int16_t,int>(20,8);
+    edgeCont[g.addEdge(A,C,OpisE(10))]=EdgeLabs<int16_t,int>(15,4);
+    edgeCont[g.addEdge(B,A,OpisE(50))]=EdgeLabs<int16_t,int>(20,5);
+    edgeCont[g.addEdge(C,B,OpisE(60))]=EdgeLabs<int16_t,int>(12,8);
+    edgeCont[g.addEdge(B,T,OpisE(30))]=EdgeLabs<int16_t,int>(14,5);
+    edgeCont[g.addEdge(C,T,OpisE(10))]=EdgeLabs<int16_t,int>(17,3);
 //    edgeCont[g.addLoop(B,OpisE(10))]=Koala::Flow::EdgeLabs<int>(1,-10);
 
 //    g.addArc(T,F,OpisE(40));
@@ -197,22 +385,22 @@ void costTest3()
     S=g.addVert('S');T=g.addVert('T');
 //    F=g.addVert('F');
 
-    edgeCont[g.addArc(S,A,OpisE(0))]=Koala::Flow::EdgeLabs<int>(18,3);
-    edgeCont[g.addArc(S,C,OpisE(50))]=Koala::Flow::EdgeLabs<int>(20,8);
-    edgeCont[g.addArc(A,C,OpisE(10))]=Koala::Flow::EdgeLabs<int>(15,4);
-    edgeCont[g.addArc(A,B,OpisE(50))]=Koala::Flow::EdgeLabs<int>(20,5);
-    edgeCont[g.addArc(C,B,OpisE(60))]=Koala::Flow::EdgeLabs<int>(12,8);
-    edgeCont[g.addArc(B,T,OpisE(30))]=Koala::Flow::EdgeLabs<int>(14,5);
-    edgeCont[g.addArc(C,T,OpisE(10))]=Koala::Flow::EdgeLabs<int>(17,3);
+    edgeCont[g.addArc(S,A,OpisE(0))]=EdgeLabs<int16_t,int>(18,3);
+    edgeCont[g.addArc(S,C,OpisE(50))]=EdgeLabs<int16_t,int>(20,8);
+    edgeCont[g.addArc(A,C,OpisE(10))]=EdgeLabs<int16_t,int>(15,4);
+    edgeCont[g.addArc(A,B,OpisE(50))]=EdgeLabs<int16_t,int>(20,5);
+    edgeCont[g.addArc(C,B,OpisE(60))]=EdgeLabs<int16_t,int>(12,8);
+    edgeCont[g.addArc(B,T,OpisE(30))]=EdgeLabs<int16_t,int>(14,5);
+    edgeCont[g.addArc(C,T,OpisE(10))]=EdgeLabs<int16_t,int>(17,3);
 
 
-    edgeCont[g.addArc(A,S,OpisE(0))]=Koala::Flow::EdgeLabs<int>(18,3);
-    edgeCont[g.addArc(C,S,OpisE(50))]=Koala::Flow::EdgeLabs<int>(20,8);
-    edgeCont[g.addArc(C,A,OpisE(10))]=Koala::Flow::EdgeLabs<int>(15,4);
-    edgeCont[g.addArc(B,A,OpisE(50))]=Koala::Flow::EdgeLabs<int>(20,5);
-    edgeCont[g.addArc(B,C,OpisE(60))]=Koala::Flow::EdgeLabs<int>(12,8);
-    edgeCont[g.addArc(T,B,OpisE(30))]=Koala::Flow::EdgeLabs<int>(14,5);
-    edgeCont[g.addArc(T,C,OpisE(10))]=Koala::Flow::EdgeLabs<int>(17,3);
+    edgeCont[g.addArc(A,S,OpisE(0))]=EdgeLabs<int16_t,int>(18,3);
+    edgeCont[g.addArc(C,S,OpisE(50))]=EdgeLabs<int16_t,int>(20,8);
+    edgeCont[g.addArc(C,A,OpisE(10))]=EdgeLabs<int16_t,int>(15,4);
+    edgeCont[g.addArc(B,A,OpisE(50))]=EdgeLabs<int16_t,int>(20,5);
+    edgeCont[g.addArc(B,C,OpisE(60))]=EdgeLabs<int16_t,int>(12,8);
+    edgeCont[g.addArc(T,B,OpisE(30))]=EdgeLabs<int16_t,int>(14,5);
+    edgeCont[g.addArc(T,C,OpisE(10))]=EdgeLabs<int16_t,int>(17,3);
 
 //    edgeCont[g.addLoop(B,OpisE(10))]=Koala::Flow::EdgeLabs<int>(1,-10);
 
@@ -241,15 +429,15 @@ void transTest()
     S=g.addVert('S');T=g.addVert('T');
 //    F=g.addVert('F');
 
-    tedgeCont[g.addArc(S,A,OpisE(0))]=Koala::Flow::TrsEdgeLabs<int>(0,18,3);
-    tedgeCont[g.addArc(S,C,OpisE(50))]=Koala::Flow::TrsEdgeLabs<int>(0,20,8);
-    tedgeCont[g.addArc(A,C,OpisE(10))]=Koala::Flow::TrsEdgeLabs<int>(0,15,4);
-    tedgeCont[g.addEdge(B,A,OpisE(50))]=Koala::Flow::TrsEdgeLabs<int>(0,20,5);
-    tedgeCont[g.addArc(C,B,OpisE(60))]=Koala::Flow::TrsEdgeLabs<int>(0,12,8);
-    tedgeCont[g.addArc(B,T,OpisE(30))]=Koala::Flow::TrsEdgeLabs<int>(0,14,5);
-    tedgeCont[g.addArc(C,T,OpisE(10))]=Koala::Flow::TrsEdgeLabs<int>(0,17,3);
-    tedgeCont[g.addLoop(C,OpisE(10))]=Koala::Flow::TrsEdgeLabs<int>(1,10,-1);
-//    edgeCont[g.addLoop(B,OpisE(10))]=Koala::Flow::EdgeLabs<int>(1,-10);
+    tedgeCont[g.addArc(S,A,OpisE(0))]=TrsEdgeLabs<int16_t,int>(0,18,3);
+    tedgeCont[g.addArc(S,C,OpisE(50))]=TrsEdgeLabs<int16_t,int>(0,20,8);
+    tedgeCont[g.addArc(A,C,OpisE(10))]=TrsEdgeLabs<int16_t,int>(0,15,4);
+    tedgeCont[g.addEdge(B,A,OpisE(50))]=TrsEdgeLabs<int16_t,int>(0,20,5);
+    tedgeCont[g.addArc(C,B,OpisE(60))]=TrsEdgeLabs<int16_t,int>(0,12,8);
+    tedgeCont[g.addArc(B,T,OpisE(30))]=TrsEdgeLabs<int16_t,int>(0,14,5);
+    tedgeCont[g.addArc(C,T,OpisE(10))]=TrsEdgeLabs<int16_t,int>(0,17,3);
+    tedgeCont[g.addLoop(C,OpisE(10))]=TrsEdgeLabs<int16_t,int>(1,10,-1);
+//    edgeCont[g.addLoop(B,OpisE(10))]=EdgeLabs<int>(1,-10);
 
 //    g.addArc(T,F,OpisE(40));
 
@@ -264,7 +452,7 @@ void transTest()
 
 
     for(Koala::Graph<char,OpisE>::PVertex ePt=g.getVert();ePt;ePt=g.getVertNext(ePt))
-        tvertCont[ePt]=Koala::Flow::TrsVertLoss<int>(0,0);
+        tvertCont[ePt]=TrsVertLoss<int16_t>(0,0);
     tvertCont[S].lo=-34;
     tvertCont[S].hi=-31;
     tvertCont[T].lo=31;
@@ -402,7 +590,7 @@ void ghTest2()
 //    for(int i=0;i<b;i++) cout << tabE[i]->info.name << ' ';
         cout << "\n\nHHHHHHHHHHHHHHHH\n\n";
     ghTest();
-    Koala::Flow::GHTreeEdge<Koala::Graph<char,OpisE>,int> pairTab[1000];
+    Koala::Flow::GHTreeEdge<Koala::Graph<char,OpisE>,int16_t> pairTab[1000];
 
     cout << "\n\n";
     Koala::Flow::findGHTree(g,edgeCont,pairTab);
@@ -447,5 +635,6 @@ void ghTest2()
     }
 
     cout << g.getVertNo() << ' ' << g.getEdgeNo();
+
     return 0;
 }

@@ -18,7 +18,6 @@
 
 namespace Koala
 {
-	template< class Container > class VectorInterface;
 
 	namespace Privates
 	{
@@ -34,23 +33,12 @@ namespace Koala
 			BlockOfBlockList() : blob() {}
 		};
 
-		template< class T > class BlockListVectInerfTest { };
-		template< class T > class BlockListVectInerfTest< VectorInterface< T > >
-		{
-		public:
-			//wylaczenie konstruktora domyslnego
-			BlockListVectInerfTest( bool ) { }
-		private:
-			//wylaczenie konstruktora kopiujacego
-			BlockListVectInerfTest( const BlockListVectInerfTest< VectorInterface< T > > & ) { }
-		};
 
 		/* BlockList
 		 * Struktura alokatora wolnych blokow (lista) typu Element zorganizowanych w kontenerze w rodzaju tablicy
 		 * Pomocna w AssocArray i alokatorach
 		 */
-		template< class Element, class Container = std::vector< BlockOfBlockList< Element > > > class BlockList:
-			protected BlockListVectInerfTest< Container >
+		template< class Element, class Container = std::vector< BlockOfBlockList< Element > > > class BlockList
 		{
 		protected:
 			int siz,first,last,ffree;
@@ -64,14 +52,10 @@ namespace Koala
 			BlockList( const BlockList< Element,Container > &X ):
 				siz( X.siz ), first( X.first ), last( X.last ), ffree( X.ffree ), cont( X.cont ) { }
 
+            //NEW: rezygnacja z tworzenia kontenera zewnetrzna tablica pamieci (podobnie jak w mapach)
+
 			BlockList< Element,Container > &operator=( const BlockList< Element,Container > & );
 
-			// tylko dla Container==VectorInterface<BlockOfBlockList< Element > *>
-			// BlockList moze tez dzialac na dostarczonej z zewnatrz tablicy ustalonego rozmiaru, na ktorej operuje wowczas
-			// poprzez VectorInterface, wylapujac bledy ew. przepelnienia
-			BlockList( BlockOfBlockList< Element > *wsk, int asize ):
-				Privates::BlockListVectInerfTest< Container >( true ),
-				siz( 0 ), first( -1 ), last( -1 ), ffree( -1 ), cont( wsk,asize ) { cont.clear(); }
 
 			bool ready( int pos ) { return pos >= 0 && pos < cont.size() && cont[pos].prev != -2; }
 			void clear();
@@ -88,51 +72,9 @@ namespace Koala
 			int newPos( int = -1 );
 			void delPos( int );
 			void defrag();
-			bool test();
 		};
 
-		/* DefaultCPPAllocator
-		 * Domyslny alokator pamieci uzywajacy new
-		 */
-		class DefaultCPPAllocator
-		{
-		public:
-			template< class T > T *allocate() { return new T(); }
-			template< class T > void deallocate( T *p ) { delete p; }
-			template< class T > T *allocate( size_t n ) { return new T[n]; }
-			template< class T > void deallocate( T *p, size_t ) { delete[] p; }
-		};
-
-		/* BlockListAllocator
-		 * ten alokator potrafi dostarczac jedynie zmiennych typu Element, operuje
-		 * na tworzonej na poczatku tablicy o podnym rozmiarze
-		 * Poprzez BlockList kontroluje przepelnienia
-		 */
-		template< class Element > class BlockListAllocator
-		{
-		private:
-			BlockOfBlockList< Element >* wsk;
-			BlockList< Element,VectorInterface< BlockOfBlockList< Element > * > > *manager;
-
-			//Obiekt niekopiowalny
-			BlockListAllocator( const BlockListAllocator & ) { }
-			const BlockListAllocator &operator=( const BlockListAllocator & ) { }
-
-			template< class U, class W > class TestEqTypes;
-			template< class U > class TestEqTypes< U,U > { };
-
-			Element *alloc() { return &(manager->operator[]( manager->newPos() )); }
-
-			void dealloc( Element* ptr );
-
-		public:
-			BlockListAllocator( int n );
-
-			~BlockListAllocator();
-
-			template< class U > U *allocate();
-			template< class U > void deallocate( U *p );
-		};
+        //NEW: wylecialy alokatory, kontenery lokalne (np. ponizsza Lista) uzywaja zawsze SimplArrPool
 
 		template< class T > struct ListNode;
 		template< class T >	struct BaseListNode
@@ -232,7 +174,7 @@ namespace Koala
 		* move_before(iterator, iterator) -- przeniesienie wewnÂ¹trz jednej listy
 		*
 		*/
-		template< class T, class Allocator = DefaultCPPAllocator > class List
+		template< class T > class List
 		{
 		public:
 			typedef T value_type;
@@ -240,10 +182,10 @@ namespace Koala
 			typedef List_const_iterator< T > const_iterator;
 
 			 // niebezpieczny, do tworzenia tablic list, nalezy natychmiast wykonac init
-			List(): allocator()	{ Zero(); }
+			List(): allocator(0)	{ Zero(); }
 
-			void init( Allocator &a ) { allocator = &a; }
-			List( Allocator &a ): allocator( &a ) { Zero(); }
+			void init( SimplArrPool<ListNode< T > > *a ) { allocator = a; }
+			List( SimplArrPool<ListNode< T > > *a ): allocator( a ) { Zero(); }
 			List( const List &lst );
 			~List() { clear(); }
 
@@ -283,9 +225,9 @@ namespace Koala
 
 			void erase( iterator pos ) { _erase( pos.ptr ); }
 
-			template< class Alloc > void copy( const List< T,Alloc > &lst );
+			void copy( const List &lst );
 
-			List &operator=( const List< T,Allocator > &lst );
+			List &operator=( const List &lst );
 
 			void swap( List &o );
 
@@ -298,11 +240,14 @@ namespace Koala
 			friend struct List_const_iterator< T >;
 
 		private:
-			List( ListNode< T > *n, ListNode< T > *p, size_t c, Allocator *a );
+			List( ListNode< T > *n, ListNode< T > *p, size_t c, SimplArrPool<ListNode< T > > *a );
 
 			void Zero();
 
-			ListNode< T > *NewElem() { return allocator->template allocate< ListNode< T > >(); }
+			ListNode< T > *NewElem()
+			{   if (allocator) return new (allocator->alloc()) ListNode< T > ;
+                else return new  ListNode< T >;
+            }
 
 			ListNode< T > *_find( const T &v );
 			void _link_before( ListNode< T > *ptr, ListNode< T > *p );
@@ -317,10 +262,10 @@ namespace Koala
 		private:
 			BaseListNode< T > m_root;
 			size_t m_count;
-			Allocator *allocator;
+			SimplArrPool<ListNode< T > >  *allocator;
 		};
 
-	template< class T, class Allocator > std::ostream &operator<<( std::ostream &strm, const List< T,Allocator > &lst );
+	template< class T> std::ostream &operator<<( std::ostream &strm, const List< T > &lst );
 
 #include "privates.hpp"
 	}

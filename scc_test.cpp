@@ -107,7 +107,7 @@ void searchTest2()
 //
 //    for(int i=0;i<g.getVertNo();i++)  cout << ((tabV[i]) ? tabV[i]->info.name : "NULL") << " ";
 //
-//    int r=DAGAlgs::transEdges(g,tabE);
+    int r=DAGAlgs::transEdges(g,tabE);
 //    std::cout << '\n' << r << '\n';
 //    for(int i=0;i<r;i++) std::cout << tabE[i]->getEnds().first->info.name << ' ' << tabE[i]->getEnds().second->info.name << '\n';
 //

@@ -596,41 +596,97 @@ template< class DefaultStructs > template< class Graph > void
 	RelDiagramPar< DefaultStructs >::symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo )
 {
 	typename DefaultStructs::template TwoDimAssocCont< typename Graph::PVertex,bool,AMatrNoDiag >::Type
-		matr( g.getVertNo() );
-	typename Graph::PEdge e,enext;
-	for( e = g.getEdge( Directed | Undirected ); e; e = g.getEdgeNext( e,Directed | Undirected ) )
-	{
-		matr( g.getEdgeEnd1( e ),g.getEdgeEnd2( e )) = true;
-		if (g.getEdgeType( e ) == Undirected) matr( g.getEdgeEnd2( e ),g.getEdgeEnd1( e ) ) = true;
-	}
+		matr;
+	if (!g.hasAdjMatrix())
+    {
+        matr.reserve(g.getVertNo() );
+        g.getAdj(matr,Directed | Undirected);
+    }
 	int m = g.getEdgeNo( Directed );
 	typename Graph::PEdge LOCALARRAY( tabe,m );
 	g.getEdges( tabe,Directed );
 	for( int i = 0; i < m; i++ )
-		if (!matr( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ) ))
-			g.addArc( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ),einfo );
+    {
+        if (g.hasAdjMatrix() && !g.getEdge( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ) ,EdDirOut|EdUndir))
+                g.addArc( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ),einfo );
+        if (!g.hasAdjMatrix() && !matr( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ) ))
+			{
+                g.addArc( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ),einfo );
+                matr( g.getEdgeEnd2( tabe[i] ),g.getEdgeEnd1( tabe[i] ) )=true;
+			}
+    }
 }
 
 template< class DefaultStructs > template< class Graph > void
 	RelDiagramPar< DefaultStructs >::transClousure( Graph &g, const typename Graph::EdgeInfoType &einfo )
 {
-	typename DefaultStructs::template TwoDimAssocCont< typename Graph::PVertex,typename FloydPar< DefaultStructs >
-		::template VertLabs< int,Graph >,AMatrFull >::Type matr( g.getVertNo() );
-	typename FloydPar< DefaultStructs >::template UnitLengthEdges< int > econt;
+    int n;
+	typename DefaultStructs::template TwoDimAssocCont< typename Graph::PVertex,char,AMatrNoDiag >::Type mat( n=g.getVertNo() );
+    typename DefaultStructs::template AssocCont< typename Graph::PVertex, SearchStructs::VisitVertLabs<Graph > >
+        ::Type vertCont( n );
+    typename Graph::PVertex LOCALARRAY(buf,g.getVertNo());
+    for( typename Graph::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
+    {
+        vertCont.clear();
+        int res=BFSPar<DefaultStructs>::scanAttainable(g,u,vertCont,buf,EdDirOut|EdUndir);
+        for(int i=0;i<res;i++) if (buf[i]!=u) mat(u,buf[i])=1;
+    }
+    for( typename Graph::PEdge e = g.getEdge( Directed | Undirected ); e; e = g.getEdgeNext( e,Directed | Undirected ) )
+    {
+        mat(g.getEdgeEnd1( e ),g.getEdgeEnd2( e ))=2;
+        if (g.getEdgeType( e ) == Undirected) mat(g.getEdgeEnd2( e ),g.getEdgeEnd1( e ))=2;
+    }
 
-	FloydPar< DefaultStructs >::distances( g,matr,econt );
 	for( typename Graph::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
 		for( typename Graph::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-			if (u != v && matr( u,v ).distance > 1 && DefaultStructs::template NumberTypeBounds< int >::plusInfty()
-				> matr( u,v ).distance) g.addArc( u,v,einfo );
+			if (u != v && mat( u,v )==1)
+				g.addArc( u,v,einfo );
 	for( typename Graph::PEdge e = g.getEdge( Directed | Undirected ); e; e = g.getEdgeNext( e,Directed | Undirected ) )
 		if ((g.getEdgeType( e ) == Undirected) || ((g.getEdgeType( e ) == Directed) &&
-			DefaultStructs::template NumberTypeBounds< int >::plusInfty() > matr( g.getEdgeEnd2( e ),g.getEdgeEnd1( e ) ).distance))
+             mat( g.getEdgeEnd2( e ),g.getEdgeEnd1( e ) )))
 		{
 			if (!g.getEdge( g.getEdgeEnd1( e ),EdLoop )) g.addLoop( g.getEdgeEnd1( e ),einfo );
 			if (!g.getEdge( g.getEdgeEnd2( e ),EdLoop)) g.addLoop( g.getEdgeEnd2( e ),einfo );
 		}
 }
+
+template< class DefaultStructs > template< class Graph > void
+	RelDiagramPar< DefaultStructs >::pow( Graph &g, int wyk, const typename Graph::EdgeInfoType &einfo, bool noNewDir)
+{
+    koalaAssert( wyk>=0,AlgExcWrongArg );
+    if (!wyk)
+    {   g.clearEdges(); return; }
+
+    int n;
+    typename DefaultStructs::template TwoDimAssocCont< typename Graph::PVertex,bool,AMatrNoDiag >::Type mat( n=g.getVertNo() );
+    typename DefaultStructs::template AssocCont< typename Graph::PVertex, SearchStructs::VisitVertLabs<Graph > >
+        ::Type vertCont( n );
+    typename Graph::PVertex LOCALARRAY(buf,n);
+    if (wyk>n) wyk=n;
+
+    for( typename Graph::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
+    {
+        vertCont.clear();
+        int res=BFSPar<DefaultStructs>::scanAttainable(g,u,vertCont,buf,EdDirOut | EdUndir);
+        for(int i=0;i<res;i++) if (u!=buf[i] && vertCont[buf[i]].distance<=wyk)
+            mat(u,buf[i])=true;
+    }
+	for( typename Graph::PEdge e = g.getEdge( Directed | Undirected ); e; e = g.getEdgeNext( e,Directed | Undirected ) )
+		{
+			mat( g.getEdgeEnd1( e ),g.getEdgeEnd2( e ))=false;
+			if (g.getEdgeType( e ) == Undirected) mat( g.getEdgeEnd2( e ),g.getEdgeEnd1( e ))=false;
+		}
+	for( typename Graph::PVertex u = g.getVert(); u!=g.getVertLast(); u = g.getVertNext( u ) )
+		for( typename Graph::PVertex v = g.getVertNext(u); v; v = g.getVertNext( v ) )
+        {   bool uv=mat(u,v), vu=mat(v,u);
+            if (uv && !vu) g.addArc( u,v,einfo );
+            else if (vu && !uv) g.addArc( v,u,einfo );
+            else if (uv && vu && noNewDir) g.addEdge( u,v,einfo,EdUndir );
+            else if (uv && vu && !noNewDir)
+            {   g.addArc( v,u,einfo ); g.addArc( u,v,einfo );   }
+        }
+}
+
 
 template< class DefaultStructs > template< class Cont > void
 	RelDiagramPar< DefaultStructs >::MatrixForm::empty( Cont &cont, int size )
@@ -775,7 +831,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
 {
 	typename DefaultStructs::template AssocCont< typename GraphIn::PEdge,typename GraphOut::PVertex >::Type
 		e2vtab( g.getEdgeNo() );
-	typename DefaultStructs::template AssocCont< typename GraphIn::PVertex,char >::Type vset( g.getVertNo() );
+	typename DefaultStructs::template AssocCont< typename GraphIn::PVertex,EmptyVertInfo >::Type vset( g.getVertNo() );
 	typename GraphOut::PVertex res = lg.getVertLast();
 	for( typename GraphOut::PVertex v = lg.getVert(); v; v = lg.getVertNext( v ) )
 		linkers.first( v,(typename GraphIn::PEdge)NULL );
@@ -794,7 +850,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
 					typename GraphOut::EdgeInfoType einfo;
 					casters.second( einfo,g.getVertInfo( v ) );
 					linkers.second( lg.addEdge( e2vtab[e],e2vtab[f],einfo, EdUndir ),v );
-					vset[v];
+					vset[v]=EmptyVertInfo();
 				}
 	for( typename GraphIn::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
 		if (!vset.hasKey( v )) linkers.second( (typename GraphOut::PEdge)NULL,v );
@@ -811,7 +867,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
 template< class DefaultStructs > template< class GraphIn, class GraphOut >
 	typename GraphOut::PVertex LineGraphPar< DefaultStructs >::undir( const GraphIn &g, GraphOut &lg )
 {
-	return undir( g,lg,std::make_pair( stdCast( false ),stdCast( false ) ),
+	return undir( g,lg,std::make_pair( stdCast( ),stdCast( ) ),
 		std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 }
 
@@ -821,7 +877,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
 {
 	typename DefaultStructs::template AssocCont< typename GraphIn::PEdge,typename GraphOut::PVertex >::Type
 		e2vtab( g.getEdgeNo() );
-	typename DefaultStructs::template AssocCont< typename GraphIn::PVertex,char >::Type vset( g.getVertNo() );
+	typename DefaultStructs::template AssocCont< typename GraphIn::PVertex,EmptyVertInfo >::Type vset( g.getVertNo() );
 	typename GraphOut::PVertex res = lg.getVertLast();
 	for( typename GraphOut::PVertex v = lg.getVert(); v; v = lg.getVertNext( v ) )
 		linkers.first( v,(typename GraphIn::PEdge)NULL );
@@ -840,7 +896,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
 					typename GraphOut::EdgeInfoType einfo;
 					casters.second( einfo,g.getVertInfo( v ) );
 					linkers.second( lg.addArc( e2vtab[e],e2vtab[f],einfo ),v );
-					vset[v];
+					vset[v]=EmptyVertInfo();
 				}
 	for( typename GraphIn::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
 		if (!vset.hasKey( v )) linkers.second( (typename GraphOut::PEdge)NULL,v );

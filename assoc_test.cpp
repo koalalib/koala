@@ -80,7 +80,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
 
 
 
-    AssocArray<Vert*,std::string> a(5,(int*)bufor);
+    AssocArray<Vert*,std::string> a(5);
     BlockOfAssocMatrix< std::string > matbuf[100];
     Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > indbuf[100];
 
@@ -104,7 +104,13 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
     a.clear();
     t(a);
     t(b);
+    std::cout << "\nCap=" << b.capacity() <<"\n";
 
+
+//    Delete( B);Delete( A);
+    b.defrag();
+    t(b);
+    std::cout << "\nCap=" << b.capacity() <<"\n";
     AssocArray<Vert*,std::string> a2=a;
     AssocArray<Vert*,std::string> a3;
     a3=a;
@@ -146,11 +152,11 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
 
 
     std::cout << "\nMatrixy:\n";
-    AssocMatrix<Vert*,std::string,AMatrClTriangle> m,m1(0,(Koala::Privates::AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle> >::BufType)matbuf,(Koala::Privates::AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle> >::BufType)indbuf);
+    AssocMatrix<Vert*,std::string,AMatrClTriangle> m,m1;
 
-    m(A,B)="Wpis wspolny";
-    m(A,A)="Wpis pojedynczy";
-    m(C,C)="Wpis";
+    m(A,B)="\nWpis wspolny";
+    m(A,A)="\nWpis pojedynczy";
+    m(C,C)="\nWpis";
     t(m);
     m.delKey(C,C);
     m.defrag();
@@ -165,6 +171,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
 
     const AssocMatrix<Vert*,std::string,AMatrClTriangle> cm=m;
     t(m);
+
 
     std::cout << "\nMatrixy2:\n";
     AssocMatrix<Vert*,std::string,AMatrClTriangle,std::vector< BlockOfAssocMatrix< std::string > >
@@ -187,11 +194,8 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
 
 
     std::cout << "\nMatrixy3:\n";
-    AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
-         ,AssocArray<Vert*,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > >
-        lpm(4,(Koala::Privates::AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
-         ,AssocArray<Vert*,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::BufType)matbuf,(Koala::Privates::AssocMatrixVectIntSwitch<AssocMatrix<Vert*,std::string,AMatrClTriangle,VectorInterface< BlockOfAssocMatrix< std::string > *>
-         ,AssocArray<Vert*,int,VectorInterface< Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > *> > > >::IndBufType)indbuf);
+    AssocMatrix<Vert*,std::string,AMatrClTriangle>
+        lpm(4);
 
 
     lpm(A,B)="Wpis skasowany";
@@ -247,8 +251,8 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
     std::cout << "\n***Locals***\n";
 
 
-    AssocArray<Vert*,std::string,VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >
-        vitab(3,bufor);
+    AssocArray<Vert*,std::string>
+        vitab(3);
 
 
 
@@ -273,7 +277,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
     vitab[D]="Dagmara";
     t(vitab);
 
-    std::cout << "\n\n" << Koala::Privates::AssocArrayVectIntSwitch<AssocArray<Vert*,std::string,VectorInterface<Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > >*> >  >::isAAVI();
+
 
     cout << "\n\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n";
 
@@ -370,7 +374,6 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
         cout << hmp.size() << ' ' << hmp[3] << hmp[6];
 
     }
-
 
     return 0;
 }

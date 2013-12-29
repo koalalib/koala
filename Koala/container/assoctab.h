@@ -524,13 +524,15 @@ namespace Koala
 		 */
 		void reserve( int n ) { inter.reserve( n ); }
 
+        //NEW: generalnie: rezygnacja z tworzenia map z zewnetrzna tablica pamieci (konstruktory z dodatkowymi
+        // parametrami wskaznikowymi. Zarowno tu, jak i w dalszych mapach.
 		/** \brief Constructor
 		 *
 		 *  Runs the empty constructor of \a cont and reserves memory for \a n elements.
 		 *
 		 *  <a href="examples/assoctab/assocTable/assocTable_constructor.html">See example</a>.
 		 */
-		AssocTable( int n, void* p = 0 ): cont(), inter( cont ) { inter.reserve( n ); }
+		AssocTable( int n): cont(), inter( cont ) { inter.reserve( n ); }
 
 	private:
 		// interfejs na pole cont
@@ -656,7 +658,7 @@ namespace Koala
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_constructor.html">See example</a>.
 		 */
-		AssocArray( int asize = 0, void *p = 0 ): tab( asize ) { }
+		AssocArray( int asize = 0): tab( asize ) { }
 		/** \brief Copy constructor.
 		 *
 		 *  Copies the container \a X to the new-created one.
@@ -683,12 +685,6 @@ namespace Koala
 		 *  <a href="examples/assoctab/assocArray/assocArray_operator_assignment.html">See example</a>.
 		 */
 		template< class AssocCont > AssocArray &operator=( const AssocCont &arg );
-
-		// tylko dla Container==VectorInterface<BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > >*>
-		// pozwala zorganizowac AssocArray bez uzywania pamieci dynamicznej, na zewnetrznej, dostarczonej w konstruktorze tablicy
-		// TODO: sprawdzic niekopiowalnosc tablicy w tym przypadku
-		// TODO: rozwazyc usuniecie w finalnej wersji biblioteki
-		AssocArray( int asize, typename AssocArrayInternalTypes< Klucz,Elem >::BlockType *wsk ): tab( wsk,asize ) { }
 
 		/** \brief Test if empty.
 		 *
@@ -862,24 +858,6 @@ namespace Koala
 	};
 
 
-	namespace Privates {
-
-	// Test w kodzie szablonu, czy typ kontenera to AssocArray zorganizowany na zewnwetrznej tablicy.
-	// TODO: rozwazyc usuniecie w finalnej wersji biblioteki
-	template< class T > struct AssocArrayVectIntSwitch
-	{
-		typedef void* BufType;
-		static bool isAAVI() { return false; }
-	};
-
-	template< class K, class E > struct AssocArrayVectIntSwitch< AssocArray< K,E,VectorInterface<
-		typename AssocArrayInternalTypes< K,E >::BlockType * > > >
-	{
-		typedef typename AssocArrayInternalTypes< K,E >::BlockType *BufType;
-		static bool isAAVI() { return true; }
-	};
-
-	}
 
 	namespace Privates {
 
@@ -888,7 +866,6 @@ namespace Koala
 	// wskaznikami na znikajace obiekty. Chyba jedyne sensowne zastosowanie, to wykorzystanie jako IndexContainer
 	// w ponizszejh AssocMatrix w sytuacji, gdy jej klucz nie obsluguje AssocArray
 
-	// TODO: sprawdzic, czy ponizsza AssocMatrix nadal dziala wyposazona w indeks tego typu
 	/** \brief Pseudo associative array.
 	 *
 	 *  The class pretending to be the AssocArray for keys that are not designed to work with AssocArray. The interface remains the same.
@@ -910,7 +887,7 @@ namespace Koala
 			typedef Container ContainerType;
 			typedef AssocCont AssocContainerType;
 
-			PseudoAssocArray( int asize = 0, void *p = 0 ): tab( asize ), assocTab( asize ) { }
+			PseudoAssocArray( int asize = 0): tab( asize ), assocTab( asize ) { }
 
 			template< class AssocCont2 >
 				PseudoAssocArray< Klucz,Elem,AssocCont,Container > &operator=( const AssocCont2 &arg );
@@ -1081,11 +1058,7 @@ namespace Koala
 			// rozmiar poczatkowy
 			AssocIndex( int asize = 0 ): IndexContainer( asize ) { }
 
-			// umozliwia stworzenie indeksu dzialajacego w zewnetrznym buforze tablicowym
-			// Dziala, gdy IndexContainer to AssocArray oparta na VectorInterface
-			// TODO: rozwazyc usuniecie w finalnej wersji biblioteki
-			AssocIndex( int asize, typename AssocMatrixInternalTypes< Klucz,Elem >::IndexBlockType *indbuf ):
-				IndexContainer( asize,indbuf ) { }
+
 			// konwersja klucza na jego numer, -1 w razie braku
 			int klucz2pos( Klucz v)
 			{
@@ -1145,7 +1118,7 @@ namespace Koala
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_constructor_AMatrClTriangle.html">See example with AMatrClTriangle</a>.
 		 */
-		AssocMatrix( int = 0, void *p = 0, void *q = 0 );
+		AssocMatrix( int = 0);
 		/** \brief Copy contructor.*/
 		AssocMatrix( const AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > &X ):
 			index( X.index ), bufor( X.bufor ), siz( X.siz ), first( X.first ), last( X.last ) { index.owner = this; }
@@ -1157,16 +1130,6 @@ namespace Koala
 			&operator=( const AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > & );
 		template< class MatrixContainer > AssocMatrix &operator=( const MatrixContainer &X );
 
-		// Umozliwia dzialanie tablicy w 2 zewnetrznych buforach tablicowych (bufora i indeksu)
-		// Wowczas Container i IndexContainer powinny opierac sie na VectorInterface
-		// TODO: sprawdzic czy nadal dziala i czy kontener jest wtedy nieprzepisywalny.
-		// TODO: rozwazyc usuniecie w finalnej wersji biblioteki
-		/** \brief Constructor.
-		 *
-		 *  Allows to use external buffers, both Container and IndexContainer should be compatible with VectorInterface.
-		 */
-		AssocMatrix( int asize, typename AssocMatrixInternalTypes<Klucz,Elem>::BlockType* contBuf,
-					typename AssocMatrixInternalTypes<Klucz,Elem>::IndexBlockType* indBuf );
 
 		// operowanie na indeksie zawierajacym pojedyncze klucze
 		/** \brief Test whether key appear in the matrix.
@@ -1492,28 +1455,6 @@ namespace Koala
 		 */
 		template< class Iterator > int getKeys( Iterator iter ) const;
 	};
-
-	namespace Privates {
-	// Klasa testujaca, czy typ T jest macierza asocjacyjna zorganizowana na zewnetrznych buforach tablicowych
-	// TODO: rozwazyc usuniecie w finalnej wersji biblioteki
-		template< class T > struct AssocMatrixVectIntSwitch
-		{
-			typedef void *BufType;
-			typedef void *IndBufType;
-			static bool isAMVI() { return false; }
-		};
-
-		template< class K, class E, AssocMatrixType aType > struct
-			AssocMatrixVectIntSwitch< AssocMatrix< K,E,aType,
-			VectorInterface< typename AssocMatrixInternalTypes< K,E >::BlockType * >,AssocArray<K,int,
-			VectorInterface< typename AssocMatrixInternalTypes< K,E >::IndexBlockType * > > > >
-		{
-			typedef typename AssocMatrixInternalTypes< K,E >::BlockType *BufType;
-			typedef typename AssocMatrixInternalTypes< K,E >::IndexBlockType *IndBufType;
-			static bool isAMVI() { return true; }
-		};
-
-	}
 
 	/* AssocInserter ???
 	 * iterator wstawiajacy do podanego przez adres kontenera asocjacyjnego pary (klucz, wartosc)
