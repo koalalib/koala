@@ -9,6 +9,7 @@ repair1(const Graph &graph, ColorMap &colors)
 	const int VertNo = graph.getVertNo();
 	int LOCALARRAY(colCount, VertNo); //number of vertices colored by index of table
 	Vert LOCALARRAY(used, VertNo);
+	colors.reserve(VertNo );
 	int maxCol=0;
 
 	for (int i = 0; i < VertNo; ++i) {
@@ -81,6 +82,7 @@ repair2(const Graph &graph, ColorMap &colors)
 	typedef typename Graph::PVertex Vert;
 	const EdgeDirection Mask = EdDirIn | EdDirOut | EdUndir;
 	const int VertNo = graph.getVertNo();
+	colors.reserve(VertNo );
 
 	int maxCol = 0;
 	int LOCALARRAY(colCount, VertNo);
@@ -132,8 +134,10 @@ repair2(const Graph &graph, ColorMap &colors)
 						assocChoose(colors, minColCntId)
 							|| assocChoose(colors, maxColCntId),
 						stdChoose(true)
-					)
+					),
+                    std::make_pair(true,true)
 				),
+                blackHole,
 				SearchStructs::compStore(compTab, vertTab),
 				Mask
 			);
@@ -229,6 +233,7 @@ int EquitEdgeColoringPar<DefaultStructs>::repair(const Graph &graph, ColorMap &c
 
 	const int VertNo = graph.getVertNo();
 	const int EdgeNo = graph.getEdgeNo( Mask );
+	colors.reserve(EdgeNo);
 
 	typename DefaultStructs::template
 		AssocCont<typename Graph::PVertex, int>::Type vertToTab( VertNo );

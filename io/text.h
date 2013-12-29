@@ -468,7 +468,7 @@ template<>  inline std::string PSCast<std::string, double>(const double &val)
 			{ char t[64]; std::sprintf(t, "%lf", val); return t; };
 
 
-/** \brief Parameter set. 
+/** \brief Parameter set.
  *
  * The class designed to keep properties of graph entities. May be used for communication with zgred.
  * \ingroup iotxt
@@ -665,7 +665,6 @@ inline std::string addDot(double d)
 
 }
 
-//TODO: ale z klawiatury nie wczytuje
 inline std::istream &operator >>(std::istream &sin, ParSet &p) {
 	char comma, colon;
 	bool bv;
@@ -680,14 +679,16 @@ inline std::istream &operator >>(std::istream &sin, ParSet &p) {
 			if(colon != ':') k += colon;
 		} while(colon != ':');
 		v = "";
+		comma=0;
 		do {
 			if(!sin.get(comma)) break;
-			if(comma != ',') v += comma;
-		} while(comma != ',');
+			if(comma != ',' && comma !='\n') v += comma;
+		} while(comma != ',' && comma !='\n');
 		if(Privates::PSTestBool(v, &bv)) p.set(k, bv);
 		else if(Privates::PSTestInt(v, &iv)) p.set(k, iv);
 		else if(Privates::PSTestDouble(v, &dv)) p.set(k, dv);
 		else p.set(k, v);
+		if (comma=='\n') break;
 		};
 	return sin;
 };

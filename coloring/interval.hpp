@@ -16,6 +16,7 @@ template<typename Graph, typename Weights, typename ColorMap, typename VIter>
 int IntervalVertColoringPar<DefaultStructs>::greedy(const Graph &graph,
 	const Weights &weights, ColorMap &colors, VIter beg, VIter end)
 {
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 	int maxCol = -1;
 	while(beg!=end) {
 		Color col = simulColor(graph, weights, colors, *beg);
@@ -32,6 +33,7 @@ template<typename Graph, typename Weights, typename ColorMap>
 int IntervalVertColoringPar<DefaultStructs>::greedy(const Graph &graph,
 	const Weights &weights, ColorMap &colors)
 {
+	colors.reserve(graph.getVertNo());
 	typedef typename Graph::PVertex Vert;
 	int maxCol = -1;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
@@ -60,6 +62,7 @@ int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
 	typename DefaultStructs::template
 		AssocCont<Vert, int>::Type vertId(graph.getVertNo());
 
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 	int lenVertTab = 0;
 	for(VIter cur = beg; cur!=end; ++cur) {
 		if( vertId.hasKey(*cur) ) continue;
@@ -124,6 +127,7 @@ int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
 	typename DefaultStructs::template
 		AssocCont<Vert, int>::Type vertId(graph.getVertNo());
 
+    colors.reserve(graph.getVertNo());
 	int lenVertTab = 0;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv))
 		vertId[vv] = lenVertTab++;
@@ -300,6 +304,7 @@ template<typename Graph, typename Weights, typename ColorMap, typename EIter>
 int IntervalEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph,
 	const Weights &weights, ColorMap &colors, EIter beg, EIter end)
 {
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int maxCol = -1;
 	while(beg!=end) {
 		Color col = simulColor(graph, weights, colors, *beg);
@@ -316,6 +321,7 @@ template<typename Graph, typename Weights, typename ColorMap>
 int IntervalEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph,
 	const Weights &weights, ColorMap &colors)
 {
+	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int maxCol = -1;
@@ -337,6 +343,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::lf(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 
 	int lenEdgeTab = 0;
 	for(EIter cur = beg; cur!=end; ++cur, ++lenEdgeTab);
@@ -365,6 +372,7 @@ template<typename Graph, typename Weights, typename ColorMap>
 int IntervalEdgeColoringPar<DefaultStructs>::lf(const Graph &graph,
 	const Weights &weights, ColorMap &colors)
 {
+	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
@@ -395,6 +403,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	typename DefaultStructs::template
 		AssocCont<Edge, int>::Type edgeId(graph.getEdgeNo(Mask));
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 
 	int lenEdgeTab = 0;
 	for(EIter cur = beg; cur!=end; ++cur) {
@@ -471,12 +480,14 @@ template<typename Graph, typename Weights, typename ColorMap>
 int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 	const Weights &weights, ColorMap &colors)
 {
+	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	typename DefaultStructs::template
 		AssocCont<Edge, int>::Type edgeId(graph.getEdgeNo(Mask));
 	std::pair<Edge,Color> LOCALARRAY(freeColors, graph.getEdgeNo(Mask));
+
 	// freeColors[ edgeId[ee] ].first == ee
 
 	//create minimal colorings for each edge (it's not coloring yet)

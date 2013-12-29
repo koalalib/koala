@@ -46,11 +46,26 @@ template< class T > void QueueInterface< T * >::push( const T &val )
 	koalaAssert( end != beg,ContExcFull );
 }
 
+template< class T > void QueueInterface< T * >::pushFront( const T &val )
+{
+	beg = prev( beg );
+	koalaAssert( end != beg,ContExcFull );
+	buf[beg] = val;
+}
+
+
 template< class T > void QueueInterface< T * >::pop()
 {
 	koalaAssert( beg != end,ContExcOutpass );
 	beg = next( beg );
 }
+
+template< class T > void QueueInterface< T * >::popBack()
+{
+	koalaAssert( beg != end,ContExcOutpass );
+	end = prev( end );
+}
+
 
 template< class T > T &QueueInterface< T * >::front()
 {
@@ -75,83 +90,6 @@ template< class T > template< class InputIterator >
 {
 	clear();
 	for( ; first != last; first++ ) push( *first );
-}
-
-template< class T > void VectorInterface< T * >::resize( int arg )
-{
-	koalaAssert( arg <= max_size(),ContExcFull );
-	while (siz < arg) push_back( T() );
-}
-
-template< class T > T &VectorInterface< T * >::at( int pos )
-{
-	koalaAssert( pos >= 0,ContExcOutpass );
-	koalaAssert( pos < capacity(),ContExcFull );
-	return start[pos];
-}
-
-template< class T > void VectorInterface< T * >::push_back( const T &arg )
-{
-	koalaAssert( siz < capacity(),ContExcFull );
-	start[siz++] = arg;
-}
-
-template< class T > void VectorInterface< T * >::pop_back()
-{
-	koalaAssert( siz,ContExcOutpass );
-	siz--;
-}
-
-template< class T > void VectorInterface< T * >::rev( T* f,T *l )
-{
-	T z;
-	l--;
-	while (f < l)
-	{
-		z = *f;
-		*f = *l;
-		*l = z;
-		f++;
-		l--;
-	}
-}
-
-template< class T > template< class InputIterator >
-	void VectorInterface< T * >::assign( InputIterator first, InputIterator last )
-{
-	clear();
-	for( ; first != last; first++ ) push_back( *first );
-}
-
-template< class T > void VectorInterface< T * >::insert( T *where, int n, const T &x )
-{
-	koalaAssert( siz + n <= max_size(),ContExcFull );
-	for( int i = siz - 1; i >= where - start; i-- ) start[i + n] = start[i];
-	for( int i = 0; i < n; i++ ) where[i] = x;
-	siz += n;
-}
-
-template< class T > template< class InputIterator >
-	void VectorInterface< T * >::insert( T *where, InputIterator first, InputIterator last )
-{
-	int ile = 0;
-	for( ; first != last; first++ )
-	{
-		push_back( *first );
-		ile++;
-	}
-	if (!ile) return;
-//TODO: nieefektywne, usunac odwracanie
-	rev( where,start + siz );
-	rev( where,where + ile );
-	rev( where + ile,start + siz );
-}
-
-template< class T > void VectorInterface< T * >::erase( T* f, T* l )
-{
-	int ile = l - f;
-	for( ; f + ile < start + siz; f++) *f = f[ile];
-	siz -= ile;
 }
 
 

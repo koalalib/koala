@@ -104,7 +104,7 @@ template< class DefaultStructs > template< typename TaskIterator >
 			if (finish[j->task] < j->end) finish[j->task] = j->end;
 
 	i = 0;
-	int ans = AlgsDefaultSettings::NumberTypeBounds< int >::minusInfty();
+	int ans = std::numeric_limits< int >::min();
 	for( TaskIterator iterator = begin; iterator != end; ++iterator, i++ )
 	{
 		int value = finish[i] - iterator->duedate;
@@ -130,7 +130,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 
 	// Wyznaczenie kolejnoci wierzcho³ków
 	typename GraphType::PVertex LOCALARRAY( vertices,n );
-	Koala::DAGAlgs::topOrd( DAG,vertices );
+	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
 	// Wyznaczenie czasow najwczeniejszego startu
 	for( int i = 0; i < n; i++ )
@@ -386,7 +386,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	}
 
 	typename GraphType::PVertex LOCALARRAY( vertices,n );
-	Koala::DAGAlgs::topOrd( DAG,vertices );
+	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
 	Pair LOCALARRAY( candidates,n );
 	Pair LOCALARRAY( actives,n );
@@ -406,7 +406,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 		if (first.degree == 0) candidate.push( Pair( v,first.task.release ) );
 	}
 
-	int time = 0, out = DefaultStructs::template NumberTypeBounds< int >::minusInfty();
+	int time = 0, out = std::numeric_limits< int >::min();
 	while (!candidate.empty())
 	{
 		typename GraphType::PVertex v = candidate.top().first;
@@ -416,7 +416,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 
 		if (time < activated.task.release) time = activated.task.release;
 
-		int stop = candidate.empty() ? DefaultStructs::template NumberTypeBounds< int >::plusInfty() : candidate.top().second;
+		int stop = candidate.empty() ? std::numeric_limits< int >::max() : candidate.top().second;
 
 		while (!active.empty() && time < stop)
 		{
@@ -469,7 +469,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 
 	// Wyznaczenie kolejnoci wierzcho³ków
 	typename GraphType::PVertex LOCALARRAY( vertices,n );
-	Koala::DAGAlgs::topOrd( DAG,vertices );
+	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
 	// Aktualizacja terminów zakoñczenia zadañ, zgodnie z relacj¹ prec, i tworzenie kolejki priorytetowej zadañ dostêpnych
 	Pair LOCALARRAY( actives,n );
@@ -489,7 +489,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 		if (first.degree == 0) active.push( Pair( v,first.priority ) );
 	}
 
-	int used, time = 0, out = DefaultStructs:: template NumberTypeBounds< int >::minusInfty();
+	int used, time = 0, out = std::numeric_limits< int >::min();
 	typename GraphType::PVertex LOCALARRAY( current,schedule.getMachNo() );
 	while (!active.empty())
 	{
@@ -538,7 +538,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 
 	// Wyznaczenie kolejnoci wierzcho³ków
 	typename GraphType::PVertex LOCALARRAY( vertices,n );
-	Koala::DAGAlgs::topOrd( DAG,vertices );
+	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
 	// Odwzorowanie poziomów drzewa i tworzenie kolejki priorytetowej zadañ dostêpnych
 	Pair LOCALARRAY( actives,n );

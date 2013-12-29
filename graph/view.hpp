@@ -1,15 +1,17 @@
 // Subgraph
 
 template< class Graph, class VChooser, class EChooser >
-	Subgraph< Graph,VChooser,EChooser >::Subgraph( const Graph &g, std::pair< VChooser,EChooser > chs ):
-	SubgraphBase(), vchoose( chs.first ), echoose( chs.second )
+	Subgraph< Graph,VChooser,EChooser >::Subgraph( const Graph &g, std::pair< VChooser,EChooser > chs,
+                                               std::pair< bool,bool > fr):
+	SubgraphBase(), vchoose( chs.first ), echoose( chs.second ), counters( fr )
 {
 	SubgraphBase::link( &g );
 }
 
 template< class Graph, class VChooser, class EChooser >
-	Subgraph< Graph,VChooser,EChooser >::Subgraph( std::pair< VChooser,EChooser > chs ):
-	SubgraphBase(), vchoose( chs.first ), echoose( chs.second )
+	Subgraph< Graph,VChooser,EChooser >::Subgraph( std::pair< VChooser,EChooser > chs,
+                                            std::pair< bool,bool > fr):
+	SubgraphBase(), vchoose( chs.first ), echoose( chs.second ), counters( fr )
 {}
 
 template< class Graph, class VChooser, class EChooser >
@@ -17,6 +19,7 @@ template< class Graph, class VChooser, class EChooser >
 {
 	vchoose = chs.first;
 	echoose = chs.second;
+    counters.reset(true,true);
 }
 
 template< class Graph, class VChooser, class EChooser >
@@ -60,6 +63,7 @@ template< class Graph, class VChooser, class EChooser > typename Subgraph< Graph
 		e = up().getEdgeNext( e,mask );
 	while (e && !(vchoose( up().getEdgeEnd1( e ),up() )
 		&& vchoose( up().getEdgeEnd2( e ),up() ) && echoose( e,up() )));
+
 	return e;
 }
 
@@ -88,17 +92,22 @@ template< class Graph, class VChooser, class EChooser > typename Subgraph< Graph
 template< class Graph, class VChooser, class EChooser >
 	int Subgraph< Graph,VChooser,EChooser >::getVertNo( ) const
 {
+	const typename Subgraph< Graph,VChooser,EChooser >::RootGrType *res = getRootPtr();
+	koalaAssert( res,GraphExc );
 	bool b;
 	if (isBoolChooser(vchoose,b))
 		if (b) return up().getVertNo();
 		else return 0;
-	else return this->getVerts( blackHole );
+	else if (counters.freezev && counters.vcount!=-1) return counters.vcount;
+        else return counters.vcount=this->getVerts( blackHole );
 }
 
 
 template< class Graph, class VChooser, class EChooser >
 	int Subgraph< Graph,VChooser,EChooser >::getEdgeNo( EdgeDirection mask ) const
 {
+	const typename Subgraph< Graph,VChooser,EChooser >::RootGrType *res = getRootPtr();
+	koalaAssert( res,GraphExc );
 	bool bv,be;
 	EdgeType amask;
 	if (isBoolChooser(vchoose,bv) && isBoolChooser(echoose,be))
@@ -109,7 +118,25 @@ template< class Graph, class VChooser, class EChooser >
 	{   if (!bv) return 0;
 		return up().getEdgeNo(mask&amask);
 	}
-	return this->getEdges( blackHole,mask );
+	if (!(counters.freezee && counters.eloopcount!=-1))
+    {
+        counters.eloopcount=counters.eundircount=counters.edircount=0;
+        PEdge edge = this->getEdgeNext((PEdge)0,EdAll);
+        while (edge) {
+            switch (this->getEdgeType( edge ))
+            {
+                case Loop: counters.eloopcount++; break;
+                case Undirected: counters.eundircount++; break;
+                case Directed: counters.edircount++; break;
+                default : assert(0);
+            }
+            edge = this->getEdgeNext(edge,EdAll);
+        }
+    }
+
+    return ((mask & EdLoop) ? counters.eloopcount : 0 )
+                    +((mask & EdUndir) ? counters.eundircount : 0)
+                    +((mask & (EdDirIn|EdDirOut)) ? counters.edircount : 0);
 }
 
 template< class Graph, class VChooser, class EChooser > typename Subgraph< Graph,VChooser,EChooser >::PEdge
@@ -176,9 +203,10 @@ template< class Graph, class VChooser, class EChooser >
 
 
 template< class Graph, class VChooser, class EChooser >
-	Subgraph< Graph,VChooser,EChooser > makeSubgraph( const Graph &g, const std::pair< VChooser,EChooser > &chs )
+	Subgraph< Graph,VChooser,EChooser > makeSubgraph( const Graph &g, const std::pair< VChooser,EChooser > &chs,
+                                                  std::pair< bool,bool > fr )
 {
-	return Subgraph< Graph,VChooser,EChooser >( g,chs );
+	return Subgraph< Graph,VChooser,EChooser >( g,chs,fr );
 }
 
 template< class Graph, class VChooser, class EChooser >

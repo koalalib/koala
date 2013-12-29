@@ -66,7 +66,8 @@ private:
 			T elem;
 	};
 
-	template<class T, class Allocator = Privates::DefaultCPPAllocator>
+    //TODO: jest jakis wyciek pamieci zwiazany z ta klasa, por. edmonds2_test.cpp - jedyny wykomentowany test
+	template<class T>
 	class CyclicList {
 	public:
 
@@ -86,10 +87,10 @@ private:
 				Node<T> *m_ptr;
 		};
 
-		CyclicList(Allocator& alloc=0):  allocator(&alloc), m_cur(0)
+		CyclicList(SimplArrPool<Node<T> > * alloc=0):  allocator(alloc), m_cur(0)
 			{};
 		~CyclicList()
-			{ erase(); };
+			{ clear(); };
 		T &curr()
 			{ return m_cur->elem; };
 
@@ -105,7 +106,8 @@ private:
 
 		void add_before(const T &v) {
 			//Node<T> *n = new Node<T>;
-			Node<T> *n = allocator->template allocate<Node<T> >();
+			Node<T> *n;
+			if (allocator) n=new (allocator->alloc()) Node<T>; else n=new Node<T>;
 			n->elem = v;
 			if(m_cur == 0) {
 				n->prev = n;
@@ -125,12 +127,12 @@ private:
 			if(m_cur == 0) return;
 			t = m_cur->next;
 			if(t == m_cur) //{ delete m_cur; t = 0; }
-				{ allocator-> deallocate( m_cur); t = 0; }
+				{ if (allocator) allocator->dealloc(m_cur); else delete m_cur; t = 0; }
 			else {
 				m_cur->prev->next = m_cur->next;
 				m_cur->next->prev = m_cur->prev;
 				//delete m_cur;
-				allocator-> deallocate( m_cur);
+				if (allocator) allocator->dealloc(m_cur); else delete m_cur;
 				};
 			m_cur = t;
 		};
@@ -156,7 +158,7 @@ private:
 		};
 
 
-		Allocator* allocator;
+		SimplArrPool<Node<T> > * allocator;
 
 	private:
 		Node<T> *m_cur;
@@ -421,6 +423,91 @@ private:
 
 		};
 
+        //NEW: pomocniczy funktor porownujacy stykajace sie przy danym wierzcholku krawedzie - ulatwia
+        //podawanie porzadkow (preferencji) krawedzi przy wierzcholkach
+		template <class GraphType>
+		class CompEdgeCont {
+
+                std::pair<typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,
+                    std::pair<int,int > > ::Type,int> *wsk;
+                const GraphType* graph;
+
+		    public:
+                template <class ECont>
+                CompEdgeCont(const GraphType& g,const ECont& cont) : graph(&g)
+                {
+                    wsk= new std::pair<typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,
+                        std::pair<int,int > >::Type,int>();
+                    wsk->first.reserve(graph->getEdgeNo(Directed|Undirected)); wsk->second=1;
+                    for(typename GraphType::PEdge e=graph->getEdge(Directed|Undirected);e;e=graph->getEdgeNext(e,Directed|Undirected))
+                    {
+                        wsk->first[e].first=cont[e].first;
+                        wsk->first[e].second=cont[e].second;
+                    }
+                }
+
+                ~CompEdgeCont()
+                {
+                    if(!(--wsk->second)) delete wsk;
+                }
+
+                CompEdgeCont(const CompEdgeCont& x): graph(x.graph), wsk(x.wsk)
+                {
+                    wsk->second++;
+                }
+
+                CompEdgeCont& operator=(const CompEdgeCont& x)
+                {
+                    if (&x==this) return *this;
+                    this->~CompEdgeCont();
+                    wsk=x.wsk; graph=x.graph;
+                    wsk->second++;
+                    return *this;
+                }
+
+                bool operator()(typename GraphType::PVertex v, typename GraphType::PEdge e1,typename GraphType::PEdge e2)
+                {
+                    koalaAssert(graph->isEdgeEnd(e1,v) && graph->isEdgeEnd(e2,v),ContExcWrongArg);
+                    int p1= (v==graph->getEdgeEnd1(e1)) ? wsk->first[e1].first : wsk->first[e1].second;
+                    int p2= (v==graph->getEdgeEnd1(e2)) ? wsk->first[e2].first : wsk->first[e2].second;
+                    return p1<p2;
+                }
+
+		};
+
+        //NEW: ...i jego funkcja tworzaca - na podstawie podanej tablicy asocjacyjnej PEdge->std::pair<int,int>
+        //tj. priorytety danej krawedzi przy koncowce getEdgeEnd1/2
+        template <class GraphType,class ECont>
+        static CompEdgeCont<GraphType> compEdgeCont(const GraphType& g,const ECont& cont)
+        {
+            return CompEdgeCont<GraphType>(g,cont);
+        }
+
+        //NEW: ...i jego funkcja tworzaca - na podstawie podanej tablicy asocjacyjnej PVertex->std::pair<Iterator,Iterator>
+        //tj. przedzial miedzy iteratorami to krawedzie incydentne do wierzcholka posortowane wg. rosnacego priorytetu
+        template <class GraphType,class VCont>
+        static CompEdgeCont<GraphType> compEdgeIters(const GraphType& g,const VCont& cont)
+        {
+            typename DefaultStructs:: template AssocCont< typename GraphType::PEdge, std::pair<int,int > >
+                    ::Type edgeCont(g.getEdgeNo(Directed|Undirected));
+            typedef typename VCont::ValType::first_type Iterator;
+            for(typename GraphType::PEdge e=g.getEdge(Directed|Undirected);e;e=g.getEdgeNext(e,Directed|Undirected))
+                edgeCont[e]=std::make_pair(0,0);
+            for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+            {
+                int no=0;
+                for(Iterator it=cont[v].first;it!=cont[v].second;it++)
+                {
+                    no++;
+                    typename GraphType::PEdge e=*it;
+                    koalaAssert(g.isEdgeEnd(e,v),ContExcWrongArg);
+                    if (v==g.getEdgeEnd1(e)) edgeCont[e].first=no; else edgeCont[e].second=no;
+                }
+            }
+            return compEdgeCont(g,edgeCont);
+        }
+
+
 		// wlasciwa procedura - testuje czy podane na wejsciu krawedzie tworza skojarzenie stabilne
 		// wynik.first- odpowiedz. Jesli jest to matching ale istnieje krawedz rozbijajaca, zostaje ona zwrocona w .second
 		// compare, funktor podajacy preferencje wierzcholkow odnosnie ich krawedzi, wolanie
@@ -429,21 +516,20 @@ private:
 		 *
 		 *  The method tests if the given set of edges is a stable matching in a graph.
 		 *  \param g the considered graph.
-		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view. <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.  
+		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view. <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.
 		 *  \param edgeIterInBegin the iterator to the first element of the container with the edges of tested set.
 		 *  \param edgeIterInEnd the iterator to the past-the-end element of the container with the edges of tested set.
 		 *  \return the standard pair consisting of the bool value (pair true if the edge set form a stable matching, false otherwise) and the breaking edge.
-		 */	
+		 */
 		template< class GraphType, class EIterIn, class Comp > static std::pair< bool,typename GraphType::PEdge >
 			test( const GraphType &g, Comp compare, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd );
-		//TODO: niepewny, przetestowac poprawnosc na duzych przykladach
 		/** \brief Find stable matching in bipartite graph.
 		 *
 		 *  The method finds the stable matching in bipartite graph.
 		 *  \param g the considered graph.
 		 *  \param begin the iterator to the first element of the container with vertexes.
 		 *  \param end the iterator to the past-the-end element of the container with vertexes.
-		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view. <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.  
+		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view. <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.
 		 *  \param verttab an associative container from PVertex to VertLabs, which keeps matched edges and vertices (BlackHole possible).
 		 *  \param out  the list of edges in found matching.
 		 *  \return the number of edges in found strong matching.

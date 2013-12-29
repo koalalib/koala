@@ -285,16 +285,17 @@ template< class DefaultStructs >
 	// USR: directed graphs and loops are not allowed
 	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
-	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected >::Type
+	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
 		ImageGraph;
-	ImageGraph ig;
-	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) ig.addVert( u );
 
-	for( typename ImageGraph::PVertex u = ig.getVert(); u != ig.getVertLast(); u = ig.getVertNext( u ) )
-	{
-		for( typename ImageGraph::PVertex v = ig.getVertNext( u ); v ; v = ig.getVertNext( v ) )
-			if (g.getEdge( u->info,v->info )) ig.addEdge( u,v );
-	}
+    SimplArrPool<typename ImageGraph::Vertex> valloc(g.getVertNo());
+    SimplArrPool<typename ImageGraph::Edge> ealloc(g.getEdgeNo());
+	ImageGraph ig(&valloc,&ealloc);
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, typename ImageGraph::PVertex>
+        ::Type org2im( g.getVertNo() );
+	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) org2im[u]=ig.addVert( u );
+	for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
+        ig.addEdge(org2im[g.getEdgeEnd1(e)],org2im[g.getEdgeEnd2(e)]);
 	// ALG: copy contains all vertices and edges
 	assert( g.getEdgeNo() == ig.getEdgeNo() && g.getVertNo() == ig.getVertNo() );
 	return TemplateWMIN( ig,out,choose,vertTab);
@@ -307,16 +308,17 @@ template< class DefaultStructs >
 {
 	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
-	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,char,Undirected >::Type
+	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
 		ImageGraph;
-	ImageGraph ig;
-	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u )) ig.addVert( u );
 
-	for( typename ImageGraph::PVertex u = ig.getVert(); u != ig.getVertLast(); u = ig.getVertNext( u ) )
-	{
-		for( typename ImageGraph::PVertex v = ig.getVertNext( u ); v; v = ig.getVertNext( v ) )
-			if (g.getEdge( u->info,v->info )) ig.addEdge( u,v );
-	}
+    SimplArrPool<typename ImageGraph::Vertex> valloc(g.getVertNo());
+    SimplArrPool<typename ImageGraph::Edge> ealloc(g.getEdgeNo());
+	ImageGraph ig(&valloc,&ealloc);
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, typename ImageGraph::PVertex>
+        ::Type org2im( g.getVertNo() );
+	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) org2im[u]=ig.addVert( u );
+	for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
+        ig.addEdge(org2im[g.getEdgeEnd1(e)],org2im[g.getEdgeEnd2(e)]);
 	// ALG: copy contains all vertices and edges
 	assert( g.getEdgeNo() == ig.getEdgeNo() && g.getVertNo() == ig.getVertNo() );
 	return TemplateWMAX( ig,out,choose,vertTab );
@@ -389,13 +391,13 @@ template< class DefaultStructs > template< class GraphType, typename Iterator >
 {
 	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, EmptyVertInfo> ::Type s( g.getVertNo() );
+	for( Iterator pV = first; pV != last; pV++ ) s[*pV]=EmptyVertInfo();
 	for( Iterator pV = first; pV != last; pV++ )
-	{
-		Iterator pU = last;
-		for( --pU; pU != pV; pU-- )
-			if (g.getEdge( *pV,*pU )) return false;
-	}
-	return true;
+        for( typename GraphType::PEdge e=g.getEdge(*pV); e; e=g.getEdgeNext(*pV,e))
+            if (s.hasKey(g.getEdgeEnd(e,*pV))) return false;
+    return true;
+
 }
 
 template< class DefaultStructs > template< class GraphType, typename Iterator >
@@ -404,18 +406,20 @@ template< class DefaultStructs > template< class GraphType, typename Iterator >
 	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
 	if ( stabilitytest && (!isStable( g,first,last ))) return false;
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, EmptyVertInfo> ::Type s( g.getVertNo() );
+	for( Iterator it = first; it != last; it++ ) s[*it]=EmptyVertInfo();
+
 	for( typename GraphType::PVertex pV = g.getVert(); pV; pV = g.getVertNext( pV ) )
-	{
-		bool isVertIndependent = true;
-		for( Iterator ipU = first; ipU != last; ipU++ )
-		{
-			if (pV == *ipU || g.getEdge( pV,*ipU ))
-			{
-				isVertIndependent = false;
-				break;
-			}
-		}
-		if (isVertIndependent) return false;
-	}
-	return true;
+        if (!s.hasKey(pV))
+        {
+            bool flag=false;
+            for( typename GraphType::PEdge e=g.getEdge(pV); e; e=g.getEdgeNext(pV,e))
+                if (s.hasKey(g.getEdgeEnd(e,pV)))
+                {
+                    flag=true;
+                    break;
+                }
+            if (!flag) return false;
+        }
+    return true;
 }

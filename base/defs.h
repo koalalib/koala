@@ -124,16 +124,17 @@ namespace Koala
 		};
 
 		// typ struktury kopca i jego wezla
+		//NEW: zmiana HeapCont w zwiazku z rezygnacja z uzywania trzeciego parametru szablonow kopca (wylecial Allocator)
 		/** \brief Heap container.
 		 *
 		 *  \tparam key the key class.
 		 *  \tparam Compare the comparison object function.
 		 *  \tparam Allocator the memory allocator class.*/
-		template< class Key, class Compare = std::less< Key >, class Allocator = Privates::DefaultCPPAllocator >
+		template< class Key, class Compare = std::less< Key > >
 			class HeapCont
 		{
 		public:
-			typedef FibonHeap< Key,Compare,Allocator > Type;/**<\brief Define own if intend to change.???*/
+			typedef FibonHeap< Key,Compare > Type;/**<\brief Define own if intend to change.???*/
 			typedef FibonHeapNode< Key > NodeType;/**<\brief Define own if intend to change.???*/
 		};
 
@@ -223,7 +224,7 @@ namespace Koala
 		template< class A, class B, class C > T operator()( const A&,const B&,const C& )
 				{ return val; }
 		/** \brief Four arguments functor. */
-		template< class A, class B, class C, class D > T operator()( const A&,const B&,const C&,const D& )
+		template< class A, class B, class C, class D > T operator()(  const A&,const B&,const C&,const D& )
 				{ return val; }
 		/** \brief Five arguments functor. */
 		template< class A, class B, class C,class D, class E > T operator()( const A&,const B&,const C&,const D&,const E& )
@@ -232,6 +233,9 @@ namespace Koala
 		template< class A, class B, class C,class D, class E, class F > T operator()( const A&,const B&,const C&,const D&,const E&,const F& )
 				{ return val; }
 	};
+
+
+
 
 	// Funkcja tworząca powyższy funktor.
 	/** \brief Generating function for constant functor. \ingroup def*/
@@ -493,7 +497,6 @@ namespace Koala
 	 *  \ingroup DMchooser */
 	template< class Obj > struct ObjChooser
 	{
-		// TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
 		mutable Obj funktor; /**< Function object defined in constructor.*/
 
 		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
@@ -676,7 +679,6 @@ namespace Koala
 	/* FielObjChooser
 	 * wlasny obiekt lub funkcja, ktora ma sie wykonywac dla konkretnego pola z info
 	 */
-	// TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
 	/** \brief Info field value chooser with functor.
 	 *
 	 *  Function object that checks if the given \a functor returns value convertible to true for a certain field of info object.
@@ -978,7 +980,6 @@ namespace Koala
 	 *  \ingroup DMchooser */
 	template< class Cont, class Obj > struct AssocObjChooser
 	{
-		// TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
 		mutable Obj funktor;
 		Cont cont;
 
@@ -1211,7 +1212,6 @@ namespace Koala
 	 *  \ingroup DMchooser */
 	template< class Cont, class Obj > struct AssocObjChooser< Cont *,Obj >
 	{
-		// TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
 		mutable Obj funktor;
 		const Cont *cont;
 
@@ -1559,7 +1559,6 @@ namespace Koala
 	/* VertDegFunctorChooser
 	 * decyzja podejmowana na podstawie wartosci obiektu funktora policzonego na stopniu wierzcholka
 	 */
-	// TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
 	/** \brief Vertex degree functor chooser.
 	 *
 	 *  The function object that for a given vertex tests if the vertex degree satisfy the functor defined in the constructor.
@@ -1798,6 +1797,67 @@ namespace Koala
 	//Castery to funktory ustalajace wartosci pol info w nowych wierz/kraw tworzonych podczas np. kopiowania grafow.
 	// Wartosci te powstaja (w rozny sposob) na podstawie inf oryginalnych
 
+    namespace Privates {
+
+        namespace KonwTestSpace {
+
+
+            template <class Dest,class Source> struct Przec {
+
+                struct Lapacz {
+                    int a;
+    //                template <class T>
+    //                Lapacz(T) : a(1) {}
+                        Lapacz(Source) : a(1) {}
+                };
+
+
+                static char przec(Dest,int)
+                {
+                    return 'A';
+                }
+
+                static double przec(Lapacz,...)
+                {
+                    return 12.3;
+                }
+
+            };
+
+            template <class Dest,class Sour> struct Przec<Dest*,Sour*> {
+
+                template <class T>
+                static char przec(T,int)
+                {
+                    return 'A';
+                }
+
+            };
+
+
+            template <int arg> struct Cast {
+
+                template <class Sour,class Dest>
+                static void make(Dest& d,const Sour& s)
+                {
+                    d=Dest();
+                }
+            };
+
+            template <> struct Cast<1> {
+
+                template <class Sour,class Dest>
+                static void make(Dest& d,const Sour& s)
+                {
+                    d=(Dest)s;
+                }
+            };
+
+        }
+    }
+
+
+
 	/* StdCaster
 	 * caster zwyklego rzutowania miedzy dwoma strukturami
 	 */
@@ -1815,13 +1875,43 @@ namespace Koala
 		 *  \param dest the reference to the destination object.
 		 *  \param sour the source object. */
 		template< class InfoDest, class InfoSour >
-			void operator()( InfoDest &dest, InfoSour sour ) { dest = (InfoDest)sour; }
+			void operator()( InfoDest &dest, InfoSour sour )
+			{
+			    //dest = (InfoDest)sour;
+                Koala::Privates::KonwTestSpace::Cast<
+                        sizeof(Koala::Privates::KonwTestSpace::Przec<InfoDest,InfoSour>::przec(sour,12))
+                    >::make(dest,sour);
+			}
 	};
 
 	// i jego funkcja tworzaca
 	/** \brief Generating function for standard caster (StdCaster).
 	 *  \ingroup DMcaster*/
 	StdCaster stdCast() { return StdCaster(); }
+
+    //NEW: stdCaster probuje przekonwertowac InfoSour->InfoDest, a jesli sie nie uda, inicjuje InfoDest wart. domyslna
+    //HardCaster bezposrednio rzutuje (InfoDest)InfoSour, co jesli jest nielegalne - wywola blad kompilacji
+	struct HardCaster
+	{
+		typedef HardCaster CastersSelfType;
+
+		/** \brief Call function operator.
+		 *
+		 *  The overloaded call function operator with two parameters, that uses the inbuilt type conversion of \a sour to \a dest.
+		 *  \param dest the reference to the destination object.
+		 *  \param sour the source object. */
+		template< class InfoDest, class InfoSour >
+			void operator()( InfoDest &dest, InfoSour sour )
+			{
+			    dest = (InfoDest)sour;
+			}
+	};
+
+	// i jego funkcja tworzaca
+	/** \brief Generating function for standard caster (StdCaster).
+	 *  \ingroup DMcaster*/
+	HardCaster hardCast() { return HardCaster(); }
+
 
 	/* NoCastCaster
 	 * caster ustawiajacy wartosc domyslna i ignorujacy oryginalny parametr wspolpracuje z produktami grafow (stad
@@ -1864,7 +1954,6 @@ namespace Koala
 	 * wyliczenie wartosci nowego info poprzez podany funktor wspolpracuje z produktami grafow (stad takze operator
 	 * 3-argumentowy) jesli funktor je obsluguje
 	 */
-	// TODO: sprawdzic, czy nadal dziala ze zwyklymi funkcjami C pobierajacymi argument przez wartosc, referencje lub const ref
 
 	/** \brief Functor caster.
 	 *
@@ -2091,7 +2180,7 @@ namespace Koala
 	/** \brief Generating function of one way linker based on Std2Linker.
 	 *
 	 *  \param a1 boolean parameter take only false,
-	 *  \param awsk pointer to member 
+	 *  \param awsk pointer to member
 	 *  \return the linker with one way connection source to destination, using field pointed by \a awsk in source info object.
 	 *  \ingroup DMlinker     */
 	template< class Info,class T >
@@ -2100,7 +2189,7 @@ namespace Koala
 	/** \brief Generating function of one way linker based on Std2Linker.
 	 *
 	 *  \param a1 boolean parameter take only false,
-	 *  \param tab associative container assigning  destination to source. 
+	 *  \param tab associative container assigning  destination to source.
 	 *  \return the linker with one way connection source to destination, basing on associative container.
 	 *  \ingroup DMlinker     */
 	template< class Map >
@@ -2108,7 +2197,7 @@ namespace Koala
 
 	/** \brief Generating function for one way linker based on Std2Linker.
 	 *
-	 *  \param awsk1 pointer to member 
+	 *  \param awsk1 pointer to member
 	 *  \param a2 boolean parameter take only false,
 	 *  \return the linker with one way connection destination to source, using field pointed by \a awsk1 in destination info object.
 	 *  \ingroup DMlinker     */
@@ -2136,7 +2225,7 @@ namespace Koala
 	/** \brief Generating function of one way linker based on Std2Linker.
 	 *
 	 *  \param a2 boolean parameter take only false,
-	 *  \param tab1 associative container assigning  source to destination. 
+	 *  \param tab1 associative container assigning  source to destination.
 	 *  \return the linker with one way connection destination to source, basing on associative container.
 	 *  \ingroup DMlinker     */
 	template< class Map1 >
@@ -2170,7 +2259,7 @@ namespace Koala
 			return std::pair< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >(a,b);
 		}
 
-	
+
 	/**\brief Make pair of casters.
 	 *
 	 * Overloaded operator& allows to create easily a pair of casters \a a and \a b.*/

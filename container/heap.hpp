@@ -17,8 +17,8 @@ template< class Key > bool BinomHeapNode< Key >::check() const
 	return degree == this->degree;
 }
 
-template< class Key, class Compare, class Allocator > BinomHeap< Key,Compare,Allocator >
-	&BinomHeap< Key,Compare,Allocator >::operator=( const BinomHeap< Key,Compare,Allocator > &X )
+template< class Key, class Compare > BinomHeap< Key,Compare >
+	&BinomHeap< Key,Compare >::operator=( const BinomHeap< Key,Compare > &X )
 {
 	if (this == &X) return *this;
 	clear();
@@ -39,8 +39,8 @@ template< class Key, class Compare, class Allocator > BinomHeap< Key,Compare,All
 	return *this;
 }
 
-template< class Key, class Compare, class Allocator > template <class InputIterator>
-	void BinomHeap< Key,Compare,Allocator >::assign( InputIterator first, InputIterator last )
+template< class Key, class Compare  > template <class InputIterator>
+	void BinomHeap< Key,Compare >::assign( InputIterator first, InputIterator last )
 {
 	int len = 0;
 	clear();
@@ -48,23 +48,24 @@ template< class Key, class Compare, class Allocator > template <class InputItera
 	assign2( first,len );
 }
 
-template< class Key, class Compare, class Allocator > typename BinomHeap< Key,Compare,Allocator >::Node
-	*BinomHeap< Key,Compare,Allocator >::newNode( Key key )
+template< class Key, class Compare  > typename BinomHeap< Key,Compare  >::Node
+	*BinomHeap< Key,Compare  >::newNode( Key key )
 {
 	if (!allocator) return new Node( key );
-	Node *res = allocator->template allocate< BinomHeapNode< Key > >();
-	res->key = key;
-	return res;
+	else return new (allocator->alloc()) Node( key );
+//	Node *res = allocator->template allocate< BinomHeapNode< Key > >();
+//	res->key = key;
+//	return res;
 }
 
-template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compare,Allocator >::delNode( Node *node )
+template< class Key, class Compare  > void BinomHeap< Key,Compare  >::delNode( Node *node )
 {
 	if (!allocator) delete node;
-	else allocator->deallocate( node );
+	else allocator->dealloc( node );
 }
 
-template< class Key, class Compare, class Allocator > template< class InputIterator >
-	void BinomHeap< Key,Compare,Allocator >::assign2( InputIterator &first, int len )
+template< class Key, class Compare  > template< class InputIterator >
+	void BinomHeap< Key,Compare  >::assign2( InputIterator &first, int len )
 {
 	if (len == 1)
 	{
@@ -73,14 +74,14 @@ template< class Key, class Compare, class Allocator > template< class InputItera
 	}
 	if (len <= 1) return;
 	int half = len/2;
-	BinomHeap< Key,Compare,Allocator > heap( *this );
+	BinomHeap< Key,Compare  > heap( *this );
 	assign2( first,half );
 	heap.assign2( first,len - half );
 	merge( heap );
 }
 
-template< class Key, class Compare,class Allocator > inline
-	BinomHeap< Key,Compare,Allocator >::BinomHeap( const BinomHeap< Key,Compare,Allocator > &other ):
+template< class Key, class Compare > inline
+	BinomHeap< Key,Compare  >::BinomHeap( const BinomHeap< Key,Compare  > &other ):
 	root( 0 ), minimum( 0 ), nodes( other.nodes ), function( other.function ), allocator( other.allocator )
 {
 	if (!other.nodes) return;
@@ -94,8 +95,8 @@ template< class Key, class Compare,class Allocator > inline
 	minimum = A;
 }
 
-template< class Key, class Compare, class Allocator >
-	typename BinomHeap< Key,Compare,Allocator >::Node *BinomHeap< Key,Compare,Allocator >::copy( Node *A, Node *parent )
+template< class Key, class Compare  >
+	typename BinomHeap< Key,Compare  >::Node *BinomHeap< Key,Compare  >::copy( Node *A, Node *parent )
 {
 	Node *B = A, *C = newNode( B->key ), *D = C;
 	D->parent = parent;
@@ -112,14 +113,14 @@ template< class Key, class Compare, class Allocator >
 	return C;
 }
 
-template< class Key, class Compare, class Allocator > Key BinomHeap< Key,Compare,Allocator >::top() const
+template< class Key, class Compare  > Key BinomHeap< Key,Compare  >::top() const
 {
 	koalaAssert( minimum,ContExcOutpass );
 	return minimum->key;
 }
 
-template< class Key, class Compare, class Allocator > typename BinomHeap< Key,Compare,Allocator>::Node
-	*BinomHeap< Key,Compare,Allocator >::push( const Key &key )
+template< class Key, class Compare  > typename BinomHeap< Key,Compare >::Node
+	*BinomHeap< Key,Compare  >::push( const Key &key )
 {
 	nodes++;
 	Node *A = newNode( key );
@@ -134,7 +135,7 @@ template< class Key, class Compare, class Allocator > typename BinomHeap< Key,Co
 	return A;
 }
 
-template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compare,Allocator >::pop()
+template< class Key, class Compare  > void BinomHeap< Key,Compare  >::pop()
 {
 	koalaAssert( nodes,ContExcOutpass );
 	nodes--;
@@ -168,8 +169,8 @@ template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compar
 			if (function( A->key,minimum->key )) minimum = A;
 }
 
-template< class Key, class Compare, class Allocator >
-	void BinomHeap< Key,Compare,Allocator >::decrease( Node *A, const Key &key )
+template< class Key, class Compare  >
+	void BinomHeap< Key,Compare  >::decrease( Node *A, const Key &key )
 {
 	koalaAssert( !function( A->key,key ),ContExcWrongArg );
 	if (!function( A->key,key ) && !function( key,A->key )) return;
@@ -229,7 +230,7 @@ template< class Key, class Compare, class Allocator >
 	while (minimum->parent) minimum = minimum->parent;
 }
 
-template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compare,Allocator >::del( Node *A )
+template< class Key, class Compare  > void BinomHeap< Key,Compare  >::del( Node *A )
 {
 	koalaAssert( nodes,ContExcOutpass );
 	nodes--;
@@ -295,8 +296,9 @@ template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compar
 	delNode( A );
 }
 
-template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compare,Allocator >::merge( BinomHeap &heap )
+template< class Key, class Compare  > void BinomHeap< Key,Compare  >::merge( BinomHeap &heap )
 {
+	koalaAssert(this->allocator==heap.allocator,ContExcWrongArg);
 	if(!heap.root || root == heap.root) return;
 	else if (root)
 	{
@@ -316,21 +318,21 @@ template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compar
 	while (minimum->parent) minimum = minimum->parent;
 }
 
-template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compare,Allocator >::clear( Node *n )
+template< class Key, class Compare  > void BinomHeap< Key,Compare  >::clear( Node *n )
 {
 	if (n->next) clear( n->next );
 	if (n->child) clear( n->child );
 	delNode( n );
 }
 
-template< class Key, class Compare, class Allocator > void BinomHeap< Key,Compare,Allocator >::clear()
+template< class Key, class Compare  > void BinomHeap< Key,Compare  >::clear()
 {
 	if (root) clear( root );
 	root = minimum = 0;
 	nodes = 0;
 }
 
-template< class Key, class Compare, class Allocator > bool BinomHeap< Key,Compare,Allocator >::check() const
+template< class Key, class Compare  > bool BinomHeap< Key,Compare  >::check() const
 {
 	Node *A = root;
 	while (A)
@@ -341,8 +343,8 @@ template< class Key, class Compare, class Allocator > bool BinomHeap< Key,Compar
 	return true;
 }
 
-template< class Key, class Compare, class Allocator > inline typename BinomHeap< Key,Compare,Allocator>::Node
-	*BinomHeap< Key,Compare,Allocator >::join( Node *A, Node *B )
+template< class Key, class Compare  > inline typename BinomHeap< Key,Compare >::Node
+	*BinomHeap< Key,Compare  >::join( Node *A, Node *B )
 {
 	Node *start, *C;
 	if (A->degree <= B->degree)
@@ -392,8 +394,8 @@ template< class Key, class Compare, class Allocator > inline typename BinomHeap<
 	return start;
 }
 
-template< class Key, class Compare, class Allocator > inline typename BinomHeap< Key,Compare,Allocator >::Node
-	*BinomHeap< Key,Compare,Allocator >::reverse( Node *A )
+template< class Key, class Compare  > inline typename BinomHeap< Key,Compare  >::Node
+	*BinomHeap< Key,Compare  >::reverse( Node *A )
 {
 	Node *B = A->next, *C;
 	A->next = 0;
@@ -407,8 +409,8 @@ template< class Key, class Compare, class Allocator > inline typename BinomHeap<
 	return A;
 }
 
-template< class Key, class Compare, class Allocator > inline typename BinomHeap< Key,Compare,Allocator>::Node
-	*BinomHeap< Key,Compare,Allocator >::cut( Node *A )
+template< class Key, class Compare  > inline typename BinomHeap< Key,Compare >::Node
+	*BinomHeap< Key,Compare  >::cut( Node *A )
 {
 	Node *B = A->next, *C;
 	A->next = 0;
@@ -463,23 +465,21 @@ template< class Key > bool FibonHeapNode< Key >::check() const
 	return degree == (flag >> 1);
 }
 
-template< class Key, class Compare, class Allocator > typename FibonHeap< Key,Compare,Allocator >::Node
-	*FibonHeap< Key,Compare,Allocator >::newNode( Key key )
+template< class Key, class Compare  > typename FibonHeap< Key,Compare >::Node
+	*FibonHeap< Key,Compare  >::newNode( Key key )
 {
 	if (!allocator) return new Node( key );
-	Node *res = allocator->template allocate< FibonHeapNode< Key > >();
-	res->init( key );
-	return res;
+	else return new (allocator->alloc()) Node( key );
 }
 
-template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compare,Allocator >::delNode( Node *node )
+template< class Key, class Compare  > void FibonHeap< Key,Compare  >::delNode( Node *node )
 {
 	if (!allocator) delete node;
-	else allocator->deallocate( node );
+	else allocator->dealloc( node );
 }
 
-template< class Key, class Compare, class Allocator > FibonHeap< Key,Compare,Allocator >
-	&FibonHeap< Key,Compare,Allocator >::operator=( const FibonHeap< Key,Compare,Allocator > &X )
+template< class Key, class Compare  > FibonHeap< Key,Compare  >
+	&FibonHeap< Key,Compare  >::operator=( const FibonHeap< Key,Compare  > &X )
 {
 	if (this == &X) return *this;
 	clear();
@@ -492,23 +492,23 @@ template< class Key, class Compare, class Allocator > FibonHeap< Key,Compare,All
 	return *this;
 }
 
-template< class Key, class Compare, class Allocator > template< class InputIterator >
-	void FibonHeap< Key,Compare,Allocator >::assign( InputIterator first, InputIterator last )
+template< class Key, class Compare  > template< class InputIterator >
+	void FibonHeap< Key,Compare  >::assign( InputIterator first, InputIterator last )
 {
 	clear();
 	for( ; first != last; first++ ) push( *first );
 }
 
-template< class Key, class Compare,class Allocator > inline
-	FibonHeap< Key,Compare,Allocator >::FibonHeap( const FibonHeap< Key,Compare,Allocator > &other ):
+template< class Key, class Compare > inline
+	FibonHeap< Key,Compare  >::FibonHeap( const FibonHeap< Key,Compare  > &other ):
 		root( 0 ), nodes( other.nodes ), function( other.function ), allocator( other.allocator )
 {
 	if (!other.nodes) return;
 	root = copy( other.root,0 );
 }
 
-template< class Key, class Compare, class Allocator > typename FibonHeap< Key,Compare,Allocator>::Node
-	*FibonHeap< Key,Compare,Allocator >::copy( Node *A, Node *parent )
+template< class Key, class Compare  > typename FibonHeap< Key,Compare >::Node
+	*FibonHeap< Key,Compare  >::copy( Node *A, Node *parent )
 {
 	Node *B = A, *C = newNode( B->key ), *D = C, *E;
 	D->parent = parent;
@@ -528,14 +528,14 @@ template< class Key, class Compare, class Allocator > typename FibonHeap< Key,Co
 	return C;
 }
 
-template< class Key, class Compare, class Allocator > Key FibonHeap< Key,Compare,Allocator >::top() const
+template< class Key, class Compare  > Key FibonHeap< Key,Compare  >::top() const
 {
 	koalaAssert( root,ContExcOutpass );
 	return root->key;
 }
 
-template< class Key, class Compare, class Allocator > typename FibonHeap< Key,Compare,Allocator >::Node
-	*FibonHeap< Key,Compare,Allocator >::push( const Key &key )
+template< class Key, class Compare  > typename FibonHeap< Key,Compare  >::Node
+	*FibonHeap< Key,Compare  >::push( const Key &key )
 {
 	nodes++;
 
@@ -547,7 +547,7 @@ template< class Key, class Compare, class Allocator > typename FibonHeap< Key,Co
 	return A;
 }
 
-template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compare,Allocator >::pop()
+template< class Key, class Compare  > void FibonHeap< Key,Compare  >::pop()
 {
 	koalaAssert( nodes,ContExcOutpass );
 	nodes--;
@@ -622,8 +622,8 @@ template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compar
 		}
 }
 
-template< class Key, class Compare, class Allocator >
-	void FibonHeap< Key,Compare,Allocator >::decrease( Node *A, const Key &key )
+template< class Key, class Compare  >
+	void FibonHeap< Key,Compare  >::decrease( Node *A, const Key &key )
 {
 	koalaAssert( !function( A->key,key ),ContExcWrongArg );
 	if (!function( A->key,key ) && !function( key,A->key )) return;
@@ -662,7 +662,7 @@ template< class Key, class Compare, class Allocator >
 	}
 }
 
-template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compare,Allocator >::del( Node *A )
+template< class Key, class Compare  > void FibonHeap< Key,Compare  >::del( Node *A )
 {
 	koalaAssert( nodes,ContExcOutpass );
 	Node *B = A->parent, *C = A;
@@ -700,8 +700,9 @@ template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compar
 	pop();
 }
 
-template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compare,Allocator >::merge( FibonHeap &heap )
+template< class Key, class Compare  > void FibonHeap< Key,Compare  >::merge( FibonHeap &heap )
 {
+	koalaAssert(this->allocator==heap.allocator,ContExcWrongArg);
 	if(!heap.root || root == heap.root) return;
 	else if (root)
 	{
@@ -718,14 +719,14 @@ template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compar
 	heap.nodes = 0;
 }
 
-template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compare,Allocator >::clear()
+template< class Key, class Compare  > void FibonHeap< Key,Compare  >::clear()
 {
 	if (root) clear( root );
 	root = 0;
 	nodes = 0;
 }
 
-template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compare,Allocator >::clear( Node *n )
+template< class Key, class Compare  > void FibonHeap< Key,Compare  >::clear( Node *n )
 {
 	if (n->child) clear( n->child );
 	if (n->previous != n)
@@ -736,7 +737,7 @@ template< class Key, class Compare, class Allocator > void FibonHeap< Key,Compar
 	delNode( n );
 }
 
-template< class Key, class Compare, class Allocator > bool FibonHeap< Key,Compare,Allocator >::check() const
+template< class Key, class Compare  > bool FibonHeap< Key,Compare  >::check() const
 {
 	if (!root) return true;
 
@@ -797,23 +798,21 @@ bool PairHeapNode<Key>::check() const
 	return true;
 }
 
-template< class Key, class Compare, class Allocator > typename PairHeap< Key,Compare,Allocator >::Node
-	*PairHeap< Key,Compare,Allocator >::newNode( Key key )
+template< class Key, class Compare  > typename PairHeap< Key,Compare  >::Node
+	*PairHeap< Key,Compare  >::newNode( Key key )
 {
 	if (!allocator) return new Node( key );
-	Node *res = allocator->template allocate< PairHeapNode< Key > >();
-	res->init( key );
-	return res;
+	else return new (allocator->alloc()) Node( key );
 }
 
-template< class Key, class Compare, class Allocator > void PairHeap< Key,Compare,Allocator >::delNode( Node *node )
+template< class Key, class Compare  > void PairHeap< Key,Compare  >::delNode( Node *node )
 {
 	if (!allocator) delete node;
-	else allocator->deallocate( node );
+	else allocator->dealloc( node );
 }
 
-template< class Key, class Compare, class Allocator > PairHeap< Key,Compare,Allocator >
-	&PairHeap< Key,Compare,Allocator >::operator=( const PairHeap< Key,Compare,Allocator > &X )
+template< class Key, class Compare  > PairHeap< Key,Compare  >
+	&PairHeap< Key,Compare  >::operator=( const PairHeap< Key,Compare > &X )
 {
 	if (this == &X) return *this;
 	clear();
@@ -826,23 +825,23 @@ template< class Key, class Compare, class Allocator > PairHeap< Key,Compare,Allo
 	return *this;
 }
 
-template< class Key, class Compare, class Allocator > template< class InputIterator >
-	void PairHeap< Key,Compare,Allocator >::assign( InputIterator first, InputIterator last )
+template< class Key, class Compare  > template< class InputIterator >
+	void PairHeap< Key,Compare  >::assign( InputIterator first, InputIterator last )
 {
 	clear();
 	for( ; first != last; first++ ) push( *first );
 }
 
-template< class Key, class Compare,class Allocator > inline
-	PairHeap< Key,Compare,Allocator >::PairHeap( const PairHeap< Key,Compare,Allocator > &other ):
+template< class Key, class Compare  > inline
+	PairHeap< Key,Compare  >::PairHeap( const PairHeap< Key,Compare  > &other ):
 		root( 0 ), nodes( other.nodes ), function( other.function ), allocator( other.allocator )
 {
 	if (!other.nodes) return;
 	root = copy( other.root,0 );
 }
 
-template <class Key, class Compare,class Allocator>
-typename PairHeap<Key, Compare,Allocator>::Node* PairHeap<Key, Compare,Allocator>::copy(Node *A, Node *parent)
+template <class Key, class Compare >
+typename PairHeap<Key, Compare >::Node* PairHeap<Key, Compare >::copy(Node *A, Node *parent)
 {
 	Node *B = A, *C = newNode(B->key), *D = C, *E;
 	D->parent = parent, D->child = B->child ? copy(B->child, B) : 0;
@@ -857,14 +856,14 @@ typename PairHeap<Key, Compare,Allocator>::Node* PairHeap<Key, Compare,Allocator
 	return C;
 }
 
-template <class Key, class Compare,class Allocator>
-Key PairHeap<Key, Compare,Allocator>::top() const
+template <class Key, class Compare >
+Key PairHeap<Key, Compare >::top() const
 {   koalaAssert(root,ContExcOutpass);
 	return root->key;
 }
 
-template <class Key, class Compare,class Allocator>
-typename PairHeap<Key, Compare,Allocator>::Node* PairHeap<Key, Compare,Allocator>::push(const Key &key)
+template <class Key, class Compare >
+typename PairHeap<Key, Compare >::Node* PairHeap<Key, Compare >::push(const Key &key)
 {
 	nodes++;
 	Node *A = newNode(key);
@@ -879,8 +878,8 @@ typename PairHeap<Key, Compare,Allocator>::Node* PairHeap<Key, Compare,Allocator
 	return A;
 }
 
-template <class Key, class Compare,class Allocator>
-void PairHeap<Key, Compare,Allocator>::pop()
+template <class Key, class Compare >
+void PairHeap<Key, Compare >::pop()
 {
 	koalaAssert( nodes,ContExcOutpass );
 	nodes--;
@@ -930,8 +929,8 @@ void PairHeap<Key, Compare,Allocator>::pop()
 	root->parent = 0;
 }
 
-template <class Key, class Compare,class Allocator>
-void PairHeap<Key, Compare,Allocator>::decrease(Node *A, const Key &key)
+template <class Key, class Compare >
+void PairHeap<Key, Compare >::decrease(Node *A, const Key &key)
 {
 	koalaAssert(!function(A->key,key),ContExcWrongArg);
 	if (!function(A->key,key) && !function(key,A->key)) return;
@@ -947,17 +946,18 @@ void PairHeap<Key, Compare,Allocator>::decrease(Node *A, const Key &key)
 		root->insert(A);
 }
 
-template <class Key, class Compare,class Allocator>
-void PairHeap<Key, Compare,Allocator>::del(Node *A)
+template <class Key, class Compare >
+void PairHeap<Key, Compare >::del(Node *A)
 {   koalaAssert(nodes,ContExcOutpass);
 	if(A->parent)
 		A->remove(), A->insert(root), A->parent = 0, root = A;
 	pop();
 }
 
-template <class Key, class Compare,class Allocator>
-void PairHeap<Key, Compare,Allocator>::merge(PairHeap& heap)
+template <class Key, class Compare >
+void PairHeap<Key, Compare >::merge(PairHeap& heap)
 {
+	koalaAssert(this->allocator==heap.allocator,ContExcWrongArg);
 	if(!heap.root || root == heap.root)
 		return;
 	else if(root)
@@ -973,23 +973,23 @@ void PairHeap<Key, Compare,Allocator>::merge(PairHeap& heap)
 	heap.root = 0, heap.nodes = 0;
 }
 
-template <class Key, class Compare,class Allocator>
-void PairHeap<Key, Compare,Allocator>::clear()
+template <class Key, class Compare >
+void PairHeap<Key, Compare >::clear()
 {
 	if(root) clear(root);
 	root=0; nodes=0;
 }
 
-template <class Key, class Compare,class Allocator>
-void PairHeap<Key, Compare,Allocator>::clear(Node* n)
+template <class Key, class Compare >
+void PairHeap<Key, Compare >::clear(Node* n)
 {
 	if(n->next) clear(n->next);
 	if(n->child) clear(n->child);
 	delNode(n);
 }
 
-template <class Key, class Compare,class Allocator>
-bool PairHeap<Key, Compare,Allocator>::check() const
+template <class Key, class Compare >
+bool PairHeap<Key, Compare >::check() const
 {
 	Node *A = root;
 	while(A)

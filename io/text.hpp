@@ -132,7 +132,7 @@ bool readOutputId(std::istream &strm, unsigned int &id) {
  * @return true on success, false otherwise
  */
 template<class Graph, class VMap, class EMap>
-bool readGraphVL(Graph &g, std::istream &strm,
+bool readGraphVL(Graph &g, std::istream &strm, std::pair<bool,bool> printinf,
 		 VMap &vertexMap, EMap &edgeMap) {
 	char c;
 	unsigned int i, m, iu, iv, n,ix;
@@ -151,7 +151,7 @@ bool readGraphVL(Graph &g, std::istream &strm,
 		if(it == idxToPtr.end()) return false;
 		else u = it->second;
 
-		if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::VertInfoType >::res>::read(ostrm,u->info)) return false;
+		if(readObjectInfo(strm, ostrm) && printinf.first && !ReadWriteHlp<HasOperIn<typename Graph::VertInfoType >::res>::read(ostrm,u->info)) return false;
 		if(readOutputId(strm, ix)) vertexMap[ix] = u;
 
 		if(!(bool)(strm >> m)) return false;
@@ -171,7 +171,7 @@ bool readGraphVL(Graph &g, std::istream &strm,
 			if ((u == v) != (dir == EdLoop)) return false;
 			e = g.addEdge(u, v, typename Graph::EdgeInfoType(), dir);
 
-			if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::EdgeInfoType >::res>::read(ostrm,e->info)) return false;
+			if(readObjectInfo(strm, ostrm) && printinf.second && !ReadWriteHlp<HasOperIn<typename Graph::EdgeInfoType >::res>::read(ostrm,e->info)) return false;
 			if(readOutputId(strm, ix)) edgeMap[ix] = e;
 			};
 		};
@@ -188,7 +188,7 @@ bool readGraphVL(Graph &g, std::istream &strm,
  * @return true on success, false otherwise
  */
 template<class Graph, class VMap, class EMap>
-bool readGraphEL(Graph &g, std::istream &strm,
+bool readGraphEL(Graph &g, std::istream &strm, std::pair<bool,bool> printinf,
 		 VMap &vertexMap, EMap &edgeMap) {
 	char c;
 	std::string str;
@@ -224,47 +224,20 @@ bool readGraphEL(Graph &g, std::istream &strm,
 			if ((u == v)!= (dir== EdLoop)) return false;
 			e = g.addEdge(u, v, typename Graph::EdgeInfoType(),dir);
 
-			if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::EdgeInfoType >::res>::read(ostrm,e->info)) return false;
+			if(readObjectInfo(strm, ostrm) && printinf.second && !ReadWriteHlp<HasOperIn<typename Graph::EdgeInfoType >::res>::read(ostrm,e->info)) return false;
 			if(readOutputId(strm, ix)) edgeMap[ix] = e;
 			};
 		for(id=0;id<n;id++) {
 			strm >> iu; if (iu!=id) return false;
 			it = idxToPtr.find(id);
 			u = it->second;
-			if(readObjectInfo(strm, ostrm) && !ReadWriteHlp<HasOperIn<typename Graph::VertInfoType >::res>::read(ostrm,u->info)) return false;
+			if(readObjectInfo(strm, ostrm) && printinf.first && !ReadWriteHlp<HasOperIn<typename Graph::VertInfoType >::res>::read(ostrm,u->info)) return false;
 			if(readOutputId(strm, ix)) vertexMap[ix] = u;
 		};
 	return true;
 	};
 
 }
-
-
-/** append a graph described by a stream
- * requires overloading >> operator for std::istream for VertexInfo and EdgeInfo
- * @param[out] graph to read to (it will NOT be cleared)
- * @param[in] strm stream to read graph from
- * @param[in] format describes format of the stream (RG_* values)
- * @param[out] vertexMap
- * @return true on success, false otherwise
- */
-template<typename Graph, class VMap, class EMap>
-bool readGraphText(Graph &g, std::istream &strm, int format,
-		   VMap &vertexMap, EMap &edgeMap) {
-	Privates::EmptyMap<typename Graph::PVertex> tv;
-	Privates::EmptyMap<typename Graph::PEdge> te;
-	typename  BlackHoleSwitch< VMap, Privates::EmptyMap<typename Graph::PVertex> >::Type &avmap =
-				BlackHoleSwitch< VMap, Privates::EmptyMap<typename Graph::PVertex> >::get(vertexMap ,tv );
-	typename  BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::Type &aemap =
-				BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::get(edgeMap ,te );
-
-	//TODO: flaga RG_Info nie powinna byc ignorowana, tylko ew. dane o infach w wejsciu tekstowym
-	switch(format & (~RG_Info)) {
-		case RG_VertexLists:	return Privates::readGraphVL(g, strm, avmap, aemap);
-		case RG_EdgeList:	return Privates::readGraphEL(g, strm, avmap, aemap);
-		};
-	return false;
-	};
 
 
 namespace Privates {
@@ -402,6 +375,33 @@ bool writeGraphText(const Graph &g, std::ostream &out, int format,
 		};
 	return false;
 	};
+
+
+/** append a graph described by a stream
+ * requires overloading >> operator for std::istream for VertexInfo and EdgeInfo
+ * @param[out] graph to read to (it will NOT be cleared)
+ * @param[in] strm stream to read graph from
+ * @param[in] format describes format of the stream (RG_* values)
+ * @param[out] vertexMap
+ * @return true on success, false otherwise
+ */
+template<typename Graph, class VMap, class EMap>
+bool readGraphText(Graph &g, std::istream &strm, int format,
+		   VMap &vertexMap, EMap &edgeMap) {
+	Privates::EmptyMap<typename Graph::PVertex> tv;
+	Privates::EmptyMap<typename Graph::PEdge> te;
+	typename  BlackHoleSwitch< VMap, Privates::EmptyMap<typename Graph::PVertex> >::Type &avmap =
+				BlackHoleSwitch< VMap, Privates::EmptyMap<typename Graph::PVertex> >::get(vertexMap ,tv );
+	typename  BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::Type &aemap =
+				BlackHoleSwitch< EMap, Privates::EmptyMap<typename Graph::PEdge> >::get(edgeMap ,te );
+
+	switch(format & (~RG_Info)) {
+		case RG_VertexLists:	return Privates::readGraphVL(g, strm, std::make_pair((bool)(format&RG_VInfo),(bool)(format&RG_EInfo)),avmap, aemap);
+		case RG_EdgeList:	return Privates::readGraphEL(g, strm, std::make_pair((bool)(format&RG_VInfo),(bool)(format&RG_EInfo)),avmap, aemap);
+		};
+	return false;
+	};
+
 
 }; // namespace InOut
 }; // namespace Koala

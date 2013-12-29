@@ -41,6 +41,7 @@ template<typename Graph, typename ColLists, typename ColorMap,
 int ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, VIter beg, VIter end, ColorChooser chooser)
 {
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 	int cnt = 0;
 	while(beg!=end) {
 		if(!colorChoose(graph, colLists, colors, *beg, chooser))
@@ -56,6 +57,7 @@ template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
 int ListVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, VIter beg, VIter end)
 {
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 	int cnt = 0;
 	while(beg!=end) {
 		if(!color(graph, colLists, colors, *beg))
@@ -71,6 +73,7 @@ template<typename Graph, typename ColLists, typename ColorMap, typename ColorCho
 int ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, ColorChooser chooser)
 {
+	colors.reserve(graph.getVertNo());
 	typedef typename Graph::PVertex Vert;
 	int cnt=0;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
@@ -86,6 +89,7 @@ template<typename Graph, typename ColLists, typename ColorMap>
 int ListVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors)
 {
+	colors.reserve(graph.getVertNo());
 	typedef typename Graph::PVertex Vert;
 	int cnt=0;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
@@ -277,6 +281,7 @@ template<typename Graph, typename ColLists, typename ColorMap, typename EIter,
 int ListEdgeColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, EIter beg, EIter end, ColorChooser chooser)
 {
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int cnt=0;
 	while(beg!=end) {
 		if(!colorChoose(graph, colLists, colors, *beg, chooser))
@@ -292,6 +297,7 @@ template<typename Graph, typename ColLists, typename ColorMap, typename EIter>
 int ListEdgeColoringPar<DefaultStructs>::color(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, EIter beg, EIter end)
 {
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int cnt=0;
 	while(beg!=end) {
 		if(!color(graph, colLists, colors, *beg))
@@ -307,6 +313,7 @@ template<typename Graph, typename ColLists, typename ColorMap, typename ColorCho
 int ListEdgeColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, ColorChooser chooser)
 {
+	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int cnt=0;
@@ -323,6 +330,7 @@ template<typename Graph, typename ColLists, typename ColorMap>
 int ListEdgeColoringPar<DefaultStructs>::color(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors)
 {
+	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int cnt=0;

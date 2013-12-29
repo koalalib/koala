@@ -151,6 +151,11 @@ public:
 	 *  [See example](examples/text/graphml.html).
 	 */
 	GraphMLGraph* createGraph(const char *name);
+
+//TODO: dodac metode
+//    GraphMLGraph* createGraph();
+//    ktora tworzy graf i sama wymysla mu nieistniejace jeszcze imie i umieszcza na koncu bazy.
+//    Bo imionami troche trudno sie poslugiwac i cos czuje, ze jesli ktos uzyje tej klasy, to tylko posulugujac sie indeksami grafow.
 	/** \brief Get graph named \a name.
 	 *
 	 *  The method gets a [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>")

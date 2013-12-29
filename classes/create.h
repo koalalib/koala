@@ -625,7 +625,6 @@ namespace Koala
 	template< class DefaultStructs > class RelDiagramPar
 	{
 	public:
-		//TODO: rozwazyc pow(Graph& g,int n) i to samo w MatrixForm
 		// doprowadza diagram do zwyklej postaci, bez krawedzi nieskierowanych ani rownoleglych
 		/** \brief Normalize.
 		 *
@@ -680,7 +679,6 @@ namespace Koala
 			symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
 		// przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
-		// TODO: nieefektywne, zamiast Floyda nalezy uzyc BFS z kazdego wierzcholka
 		/** \brief Transitiv clousure.
 		 *
 		 *  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) transitive.
@@ -697,6 +695,15 @@ namespace Koala
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
 		template< class Graph > static void
 			transClousure( Graph &g, const typename Graph::EdgeInfoType &einfo);
+
+        //NEW: potegowanie grafu (wykladnik wyk)
+        template< class Graph > static void
+			pow( Graph &g, int wyk, const typename Graph::EdgeInfoType &einfo, bool noNewDir=true);
+
+        template< class Graph > static void
+			pow( Graph &g, int wyk)
+			{ pow(g,wyk,typename Graph::EdgeInfoType(),true); }
+
 
 		//    Oferuje te same operacje na relacjach reprezentowanych inaczej niz przez graf.
 		//    Wersje 2-argumentowe: kontener obslugiwany jak tablica 2-wymiarowa o wartosciach konwertowalnych z bool
@@ -800,6 +807,8 @@ namespace Koala
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg );
 
+
+
 		//        Dopisuje do lg skierowany graf krawedziowy tworzony na podstawie g.
 		//        Para casterow wyznacza infa nowych wierzcholkow na podstawie inf oryginalnych krawedzi
 		//        i infa nowych lukow na podstawie inf wierzcholkow, w ktorych stykaly sie oryginalne krawedzie
@@ -849,9 +858,11 @@ namespace Koala
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex dir( const GraphIn &g, GraphOut &lg )
 			{
-				return dir( g,lg,std::make_pair( stdCast( false ),stdCast( false ) ),
+				return dir( g,lg,std::make_pair( stdCast(  ),stdCast(  ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
+
+
 	};
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
@@ -874,6 +885,9 @@ namespace Koala
 	 * \ingroup detect*/
 	template< class TwoArg, class FirstArg, class SecondArg > struct ComplexCaster
 	{
+
+	    typedef ComplexCaster< TwoArg, FirstArg, SecondArg > CastersSelfType;
+
 		mutable TwoArg twoarg;/**\brief Two argument caster function object.*/
 		mutable FirstArg firstarg;/**\brief First argument caster function object.*/
 		mutable SecondArg secondarg;/**\brief Second argument caster function object.*/
@@ -976,7 +990,7 @@ namespace Koala
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return cart( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+				return cart( g1,g2,g,std::make_pair( stdCast(  ),stdCast(  ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
@@ -1027,7 +1041,7 @@ namespace Koala
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex lex( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return lex( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+				return lex( g1,g2,g,std::make_pair( stdCast(  ),stdCast(  ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
@@ -1078,7 +1092,7 @@ namespace Koala
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex tensor( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return tensor( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+				return tensor( g1,g2,g,std::make_pair( stdCast( ),stdCast( ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
@@ -1129,7 +1143,7 @@ namespace Koala
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex strong( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return strong( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+				return strong( g1,g2,g,std::make_pair( stdCast( ),stdCast( ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 	};

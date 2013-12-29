@@ -16,6 +16,25 @@ namespace Koala
 
 	namespace Privates
 	{
+
+        template <class T,bool> class MainGraphEPtr
+	    {
+        protected:
+	        const T* wsk;
+	    public:
+            MainGraphEPtr(const T* arg) : wsk(arg) {}
+
+	        const T* getGraph() const
+	        {
+	            return wsk;
+	        }
+	    };
+
+	    template <class T> class MainGraphEPtr<T,false>
+	    {
+	    public:
+            MainGraphEPtr(const T* arg) {}
+	    };
 		/* NormalParalLink
 		 *
 		 */
@@ -76,13 +95,18 @@ namespace Koala
 	template< class VertInfo = EmptyVertInfo, class EdgeInfo = EmptyEdgeInfo,
 		class Settings = GrDefaultSettings< EdAll,true > > class Edge: public EdgeConst,
 		public Settings::template EdgeAdditData< VertInfo,EdgeInfo,Settings >,
-		public Privates::ParalLink< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed >
+		public Privates::ParalLink< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed >,
+        public Privates::MainGraphEPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>
 	{
 		friend class Graph< VertInfo,EdgeInfo,Settings >;
 		friend class Vertex< VertInfo,EdgeInfo,Settings >;
 		friend class AdjMatrix< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed >;
+		friend class SimplArrPool<Koala::Edge< VertInfo,EdgeInfo,Settings > >;
 
 	public:
+        //NEW:
+		typedef Graph< VertInfo,EdgeInfo,Settings > GraphType;
+
 		// Additional user information in the edge.
 		EdgeInfo info; /**< \brief Additional user information in edge.*/
 
@@ -172,10 +196,14 @@ namespace Koala
 
 		// klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
 		/** Standard constructor. */
-		Edge(): info( ), next( NULL ), prev( NULL ), type( Detached )
+		Edge(const Graph< VertInfo,EdgeInfo,Settings >* wsk):
+		    Privates::MainGraphEPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>(wsk),
+		    info( ), next( NULL ), prev( NULL ), type( Detached )
 			{ }
 		/** Constructor sets info variable. */
-		Edge( const EdgeInfo &infoExt ): info( infoExt ), next( NULL ), prev( NULL ), type( Detached )
+		Edge( const EdgeInfo &infoExt,const Graph< VertInfo,EdgeInfo,Settings >* wsk ):
+		    Privates::MainGraphEPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>(wsk),
+		    info( infoExt ), next( NULL ), prev( NULL ), type( Detached )
 			{ }
 
 		// klasa niekopiowalna

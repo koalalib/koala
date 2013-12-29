@@ -36,7 +36,7 @@ namespace Koala
 			{ }
 
 		void clear();
-		void defrag();
+//		void defrag();
 		void reserve( int size );
 		void add( Koala::Edge< VertInfo,EdgeInfo,Settings > * );
 		void delVert( Koala::Vertex< VertInfo,EdgeInfo,Settings > *u );
@@ -71,8 +71,8 @@ namespace Koala
 
 		void clear()
 			{ }
-		void defrag()
-			{ }
+//		void defrag()
+//			{ }
 		void add( void * )
 			{ }
 		void delVert( void * )

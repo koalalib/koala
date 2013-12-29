@@ -14,7 +14,7 @@ void MatchingPar<DefaultStructs>::BackRec(MatchingData<GraphType> &data,
 					CList &path)
 {
 	typename GraphType::PVertex vert1;
-	CList path1(*path.allocator);
+	CList path1(path.allocator);
 	vert1 = data[vert].labT2;
 	st = true;
 	do {
@@ -247,10 +247,12 @@ int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
 	typename GraphType::PEdge e;
 	typename GraphType::PVertex u, v, i, j, ix, jx;
 	EdgeDirection mask = EdUndir | EdDirOut | EdDirIn;
-	Privates::BlockListAllocator< Node<typename GraphType::PVertex> > allocat(3*n+3);
+	//Privates::BlockListAllocator< Node<typename GraphType::PVertex> >
+	SimplArrPool<Node<typename GraphType::PVertex> > allocat(3*n+3);
 	//TODO:size?
 
-	CyclicList<typename GraphType::PVertex,Privates::BlockListAllocator< Node<typename GraphType::PVertex> > > pathl(allocat), pathr(allocat);
+	CyclicList<typename GraphType::PVertex> pathl(&allocat), pathr(&allocat);
+//	CyclicList<typename GraphType::PVertex> pathl, pathr;
 	std::pair<typename GraphType::PVertex, bool> LOCALARRAY(qdata, 2 * n + 4);
 	SimpleQueue<typename GraphType::PVertex> q(qdata, 2 * n + 3);
 	MatchingData<GraphType> data;
@@ -258,7 +260,7 @@ int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
 
 	data.reserve(n);
 	sets.resize(n);
-	if (DefaultStructs::ReserveOutAssocCont) vertTab.reserve(n);
+	vertTab.reserve(n);
 
 	if(matchSize < 0) matchSize = n;
 
@@ -479,7 +481,7 @@ template< class DefaultStructs > template< class GraphType, class EIterIn > bool
 //	int expo = vertNo;
 	typename GraphType::PVertex U,V;
 	 //jezeli true - wierzcholek nalezy do matchingu
-	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,bool >::Type vertTabMatch( vertNo );
+	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,EmptyVertInfo >::Type vertTabMatch( vertNo );
 
 	//przeglasamy podane krawedzie
 	for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )
@@ -488,8 +490,8 @@ template< class DefaultStructs > template< class GraphType, class EIterIn > bool
 		V = g.getEdgeEnd2( *itE );
 		//jezeli ktorykolwiek z wierzcholkow tworzacych krawedz nie jest wolny to nie mamy matchingu
 		if (vertTabMatch.hasKey( U ) || vertTabMatch.hasKey( V )) return false;
-		vertTabMatch[U] = true;
-		vertTabMatch[V] = true;
+		vertTabMatch[U] = EmptyVertInfo();
+		vertTabMatch[V] = EmptyVertInfo();
 	}
 	return true;
 }
@@ -505,6 +507,7 @@ template< class DefaultStructs > template< class GraphType, class EIterIn, class
 	if (!(res.first = MatchingPar< DefaultStructs >::template test( g,edgeIterInBegin,edgeIterInEnd ))) return res;
 	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge >::Type
 		match( g.getVertNo() );
+//    for( typename GraphType::PVertex v=g.getVert() ;v;v=g.getVertNext(v)) match[v]=0;
 	for( ; edgeIterInBegin != edgeIterInEnd; ++edgeIterInBegin )
 		match[g.getEdgeEnd1( *edgeIterInBegin )] = match[g.getEdgeEnd2( *edgeIterInBegin )] = *edgeIterInBegin;
 	for( typename GraphType::PEdge e = g.getEdge( Directed | Undirected ); e; e = g.getEdgeNext( e,Directed | Undirected ) )
@@ -525,7 +528,7 @@ template< class DefaultStructs > template< class GraphType, class VIterIn, class
 	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge* >::Type
 		bufs( n1 );
 	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,int > ::Type love( n1 );
-	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,char > ::Type free( n1 );
+	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,EmptyVertInfo > ::Type free( n1 );
 	typename GraphType::PEdge LOCALARRAY( incids,g.getEdgeNo( Directed | Undirected ) );
 	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename GraphType::PEdge >::Type
 		match( (n=g.getVertNo()) - n1 );
@@ -534,7 +537,7 @@ template< class DefaultStructs > template< class GraphType, class VIterIn, class
 		if (g.deg( *it,Directed | Undirected ))
 		{
 			love[*it] = 0;
-			free[*it];
+			free[*it]=EmptyVertInfo();
 			int deg = g.getEdges( bufs[*it] = incids + licz,*it,Directed | Undirected );
 			DefaultStructs::sort( incids + licz,incids + licz + deg,SortCmp< GraphType,Comp >( *it,compare ) );
 			licz += deg;

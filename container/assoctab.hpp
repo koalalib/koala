@@ -543,7 +543,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
-	AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocMatrix( int asize, void *p, void *q ):
+	AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocMatrix( int asize):
 		index( asize ), siz( 0 ), first( -1 ), last( -1 )
 {
 	bufor.clear();
@@ -743,18 +743,6 @@ template< class MatrixContainer > AssocMatrix< Klucz,Elem,aType,Container,IndexC
 	return *this;
 }
 
-template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
-	AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocMatrix( int asize,
-		typename AssocMatrixInternalTypes< Klucz,Elem >::BlockType *contBuf,
-		typename AssocMatrixInternalTypes<Klucz,Elem>::IndexBlockType *indBuf ):
-			index( asize,indBuf),
-			bufor( contBuf,AssocMatrixAddr< aType >::bufLen( asize ) ),
-			siz( 0 ), first( -1 ), last( -1 )
-{
-	bufor.clear();
-	bufor.reserve( AssocMatrixAddr< aType >::bufLen( asize ) );
-	index.owner = this;
-}
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 	std::pair< Klucz,Klucz > AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::prevKey( Klucz u, Klucz v ) const
@@ -809,6 +797,10 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	bufor.clear();
 	index.clear();
 	index.defrag();
+	{
+	    Container tmp;
+	    bufor.swap(tmp);
+	}
 	siz = 0;
 	first = last = -1;
 	for( int ii = 0; ii < i ; ii++ ) this->operator()( tab[ii].u,tab[ii].v ) = tab[ii].val;
