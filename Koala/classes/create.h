@@ -858,7 +858,7 @@ namespace Koala
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex dir( const GraphIn &g, GraphOut &lg )
 			{
-				return dir( g,lg,std::make_pair( stdCast(  ),stdCast(  ) ),
+				return dir( g,lg,std::make_pair( stdCast(false  ),stdCast( false ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
@@ -990,7 +990,7 @@ namespace Koala
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return cart( g1,g2,g,std::make_pair( stdCast(  ),stdCast(  ) ),
+				return cart( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
@@ -1041,7 +1041,7 @@ namespace Koala
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex lex( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return lex( g1,g2,g,std::make_pair( stdCast(  ),stdCast(  ) ),
+				return lex( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
@@ -1092,7 +1092,7 @@ namespace Koala
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex tensor( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return tensor( g1,g2,g,std::make_pair( stdCast( ),stdCast( ) ),
+				return tensor( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
@@ -1143,7 +1143,7 @@ namespace Koala
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex strong( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return strong( g1,g2,g,std::make_pair( stdCast( ),stdCast( ) ),
+				return strong( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 	};

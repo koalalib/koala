@@ -19,13 +19,15 @@ std::ostream& operator<<(std::ostream& os,OpisE arg) { os << arg.name; return os
 
 Koala::Graph<char,OpisE> g;
 Koala::Graph<char,OpisE>::PVertex A,B,C,D,E,F,V,U,S,T,tabV[20],*tabVit;
-Koala::Graph<char,OpisE>::PEdge tabE[20];
+Koala::Graph<char,OpisE>::PEdge tabE[20],ee;
 
 Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeLabs<int> > >edgeCont;
 Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::UnitEdgeLabs<int> > > unitedgeCont;
 
 Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::TrsEdgeLabs<int> > > tedgeCont;
 Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsVertLoss<int> > > tvertCont;
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsEdgeLabs<int> > > t2vertCont;
+
 
 template <class T>
 void printInfo(const SearchStructs::CompStoreTool<T>& cont)
@@ -218,6 +220,64 @@ void tdijTest2()
 }
 
 
+void tdijTest3()
+{   g.clear();tedgeCont.clear();tvertCont.clear();
+
+//ttt
+    A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
+    D=g.addVert('D');
+
+    tvertCont[A].lo=-100;tvertCont[A].hi=0;
+    tvertCont[B].lo=0;tvertCont[B].hi=100;
+    tvertCont[C].lo=tvertCont[D].lo=0;tvertCont[C].hi=tvertCont[D].hi=1;
+
+    t2vertCont[A].lo=0;t2vertCont[A].hi=1000; t2vertCont[A].cost=1;
+    t2vertCont[B].lo=0;t2vertCont[B].hi=1000; t2vertCont[B].cost=1;
+    t2vertCont[C].lo=39;t2vertCont[C].hi=40;t2vertCont[D].lo=39;t2vertCont[D].hi=40;t2vertCont[C].cost=1;t2vertCont[D].cost=1;
+
+
+    tedgeCont[ee=g.addArc(A,C,OpisE(20))].lo=0;tedgeCont[ee].hi=30;tedgeCont[ee].cost=1;
+    tedgeCont[ee=g.addArc(C,B,OpisE(50))].lo=20;tedgeCont[ee].hi=30;tedgeCont[ee].cost=1;
+    tedgeCont[ee=g.addArc(A,D,OpisE(20))].lo=20;tedgeCont[ee].hi=30;tedgeCont[ee].cost=1;
+    tedgeCont[ee=g.addArc(D,B,OpisE(50))].lo=20;tedgeCont[ee].hi=30;tedgeCont[ee].cost=1;
+    tedgeCont[ee=g.addLoop(C,OpisE(10))].lo=0;tedgeCont[ee].hi=10;tedgeCont[ee].cost=1;
+    tedgeCont[ee=g.addLoop(D,OpisE(10))].lo=0;tedgeCont[ee].hi=20;tedgeCont[ee].cost=1;
+
+    bool flag;
+    cout << "\n\n**********\n\n" << boolalpha << (flag=Koala::Flow::transship(g,tedgeCont,tvertCont, t2vertCont)) ;
+
+    if (flag){
+        for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
+            {   char buf[20];
+                cout << endl << ePt->getEnds().first->info << ePt->getEnds().second->info << ":" <<tedgeCont[ePt].flow;
+                tedgeCont[ePt].flow=0;
+            }
+        for(Koala::Graph<char,OpisE>::PVertex ePt=g.getVert();ePt;ePt=g.getVertNext(ePt))
+            {   char buf[20];
+                cout << endl << ePt->info << ":" <<t2vertCont[ePt].flow;
+                t2vertCont[ePt].flow=0;
+            }
+    } else
+    {
+        for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
+                tedgeCont[ePt].flow=0;
+        for(Koala::Graph<char,OpisE>::PVertex ePt=g.getVert();ePt;ePt=g.getVertNext(ePt))
+                t2vertCont[ePt].flow=0;
+    }
+    cout << "\n\n**********\n\n" << Koala::Flow::minCostTransship(g,tedgeCont,tvertCont, t2vertCont) <<endl;
+       for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
+            {   char buf[20];
+                cout << endl << ePt->getEnds().first->info << ePt->getEnds().second->info << ":" <<tedgeCont[ePt].flow;
+                tedgeCont[ePt].flow=0;
+            }
+        for(Koala::Graph<char,OpisE>::PVertex ePt=g.getVert();ePt;ePt=g.getVertNext(ePt))
+            {   char buf[20];
+                cout << endl << ePt->info << ":" <<t2vertCont[ePt].flow;
+                t2vertCont[ePt].flow=0;
+            }
+}
+
+
 void conTest()
 {   g.clear();edgeCont.clear();
 
@@ -365,6 +425,7 @@ void conTest()
         cout << (p=Koala::Connect::minVertCut(g,tabV)) << endl;
     for(int i=0;i<p;i++) cout << tabV[i]->info << ' ';
 
+    tdijTest3();
 
     return 0;
 }

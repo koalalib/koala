@@ -708,7 +708,7 @@ template< class K, class V > typename AssocTabConstInterface< BiDiHashMap< K,V >
 {
 	typename BiDiHashMap< K,V >::iterator i = _cont().find( arg );
 	if (i == _cont().end()) return NULL;
-	else return _cont().operator[]( arg );
+	else return &_cont().operator[]( arg );
 }
 
 template< class K, class V > bool AssocTabConstInterface< BiDiHashMap< K,V > >::delKey( K arg )
@@ -777,7 +777,7 @@ template< class K, class V > typename AssocTabConstInterface< HashMap< K,V > >::
 {
 	typename HashMap< K,V >::iterator i = _cont().find( arg );
 	if (i == _cont().end()) return NULL;
-	else return _cont().operator[]( arg );
+	else return &_cont().operator[]( arg );
 }
 
 template< class K, class V > bool AssocTabConstInterface< HashMap< K,V > >::delKey( K arg )

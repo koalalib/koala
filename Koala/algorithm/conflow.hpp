@@ -674,6 +674,34 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 	*(out2 + Rnew.size() - 1) = GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType >( s,t,capac );
 }
 
+template< class DefaultStructs > template< class GraphType, class ImageType, class Linker >
+	void FlowPar< DefaultStructs >::makeImage(const GraphType &g, ImageType &ig, Linker &images, EdgeType mask )
+{
+	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+	{
+		images[v].first = ig.addVert( v );
+		images[v].second = ig.addVert( v );
+		ig.addArc( images[v].first,images[v].second,
+			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( v,(typename GraphType::PEdge)0 ) );
+	}
+	if (mask & Directed)
+	for( typename GraphType::PEdge e = g.getEdge( EdDirIn | EdDirOut ); e; e = g.getEdgeNext( e,EdDirIn | EdDirOut ) )
+		ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
+			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
+	if (mask & Undirected)
+	for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
+	{
+		ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
+			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
+		ig.addArc( images[g.getEdgeEnd2( e )].second,images[g.getEdgeEnd1( e )].first,
+			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ));
+	}
+	if (mask & Loop)
+    for( typename GraphType::PEdge e = g.getEdge( EdLoop ); e; e = g.getEdgeNext( e,EdLoop ) )
+		ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd1( e )].first,
+			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
+}
+
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
 	typename EdgeContainer::ValType::CapacType FlowPar< DefaultStructs >::vertFlow( const GraphType &g,
 		const EdgeContainer &edgeTab, typename GraphType::PVertex v, EdgeDirection type )
@@ -851,6 +879,60 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 	return true;
 }
 
+template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2 >
+	bool FlowPar< DefaultStructs >::transship( const GraphType &g, EdgeContainer &edgeTab, const VertContainer &vertTab,
+        VertContainer2 &vertTab2)
+{
+    int n=g.getVertNo(),m=g.getEdgeNo(Directed|Loop);
+	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,
+		std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed >::Type Image;
+
+	typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
+		std::pair< typename Image::PVertex,typename Image::PVertex > >::Type images(n);
+    SimplArrPool<typename Image::Vertex> valloc(2*n+3);
+    SimplArrPool<typename Image::Edge> ealloc(5*n+m+2);
+	Image ig(&valloc,&ealloc);
+	makeImage( g,ig,images, Directed|Loop );
+	images.clear();
+
+	typename DefaultStructs:: template AssocCont< typename Image::PVertex,
+		typename FlowPar< DefaultStructs >:: template TrsVertLoss< typename EdgeContainer::ValType::CapacType > >
+            ::Type imageVLabs(n=ig.getVertNo());
+	typename DefaultStructs:: template AssocCont< typename Image::PEdge,
+		typename FlowPar< DefaultStructs >:: template TrsEdgeLabs< typename EdgeContainer::ValType::CapacType > >
+            ::Type imageELabs(n+ig.getEdgeNo());
+
+	for(typename Image::PEdge e=ig.getEdge();e;e=ig.getEdgeNext(e))
+        if (e->info.second)
+            imageELabs[e]=TrsEdgeLabs< typename EdgeContainer::ValType::CapacType >
+                (edgeTab[e->info.second].lo,edgeTab[e->info.second].hi);
+        else
+        {
+            imageELabs[e]=TrsEdgeLabs< typename EdgeContainer::ValType::CapacType >
+                    (vertTab2[e->info.first].lo,vertTab2[e->info.first].hi);
+            if (vertTab[e->info.first].hi>=vertTab[e->info.first].lo &&
+                vertTab[e->info.first].lo>=DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >
+                    ::zero())
+                imageVLabs[ig.getEdgeEnd1(e)]=TrsVertLoss< typename EdgeContainer::ValType::CapacType >
+                                            (vertTab[e->info.first].lo,vertTab[e->info.first].hi);
+            else if (vertTab[e->info.first].hi>=vertTab[e->info.first].lo &&
+                vertTab[e->info.first].hi<=DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >
+                    ::zero())
+                imageVLabs[ig.getEdgeEnd2(e)]=TrsVertLoss< typename EdgeContainer::ValType::CapacType >
+                                            (vertTab[e->info.first].lo,vertTab[e->info.first].hi);
+            else koalaAssert( false,AlgExcWrongArg );
+        }
+
+        if (!transship(ig,imageELabs,imageVLabs)) return false;
+
+
+        for(typename Image::PEdge e=ig.getEdge();e;e=ig.getEdgeNext(e))
+            if (e->info.second) edgeTab[e->info.second].flow=imageELabs[e].flow;
+            else vertTab2[e->info.first].flow=imageELabs[e].flow;
+
+    return true;
+}
+
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VertContainer >
 	typename EdgeContainer::ValType::CostType FlowPar< DefaultStructs >::minCostTransship( GraphType &g,
 		EdgeContainer &edgeTab, const VertContainer &vertTab )
@@ -927,6 +1009,63 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 	return flowCost( g,edgeTab );
 }
 
+template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2 >
+	typename EdgeContainer::ValType::CostType FlowPar< DefaultStructs >::minCostTransship( const GraphType &g,
+        EdgeContainer &edgeTab, const VertContainer &vertTab,VertContainer2 &vertTab2)
+{
+	int n=g.getVertNo(),m=g.getEdgeNo(Directed|Loop);
+	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,
+		std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed >::Type Image;
+
+	typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
+		std::pair< typename Image::PVertex,typename Image::PVertex > >::Type images(n);
+    SimplArrPool<typename Image::Vertex> valloc(2*n+3);
+    SimplArrPool<typename Image::Edge> ealloc(5*n+m+2);
+	Image ig(&valloc,&ealloc);
+	makeImage( g,ig,images, Directed|Loop );
+	images.clear();
+
+	typename DefaultStructs:: template AssocCont< typename Image::PVertex,
+		typename FlowPar< DefaultStructs >:: template TrsVertLoss< typename EdgeContainer::ValType::CapacType > >
+            ::Type imageVLabs(n=ig.getVertNo());
+	typename DefaultStructs:: template AssocCont< typename Image::PEdge,
+		typename FlowPar< DefaultStructs >:: template TrsEdgeLabs< typename EdgeContainer::ValType::CapacType > >
+            ::Type imageELabs(n+ig.getEdgeNo());
+
+	for(typename Image::PEdge e=ig.getEdge();e;e=ig.getEdgeNext(e))
+        if (e->info.second)
+            imageELabs[e]=TrsEdgeLabs< typename EdgeContainer::ValType::CapacType >
+                (edgeTab[e->info.second].lo,edgeTab[e->info.second].hi,edgeTab[e->info.second].cost);
+        else
+        {
+            imageELabs[e]=TrsEdgeLabs< typename EdgeContainer::ValType::CapacType >
+                    (vertTab2[e->info.first].lo,vertTab2[e->info.first].hi,vertTab2[e->info.first].cost);
+            if (vertTab[e->info.first].hi>=vertTab[e->info.first].lo &&
+                vertTab[e->info.first].lo>=DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >
+                    ::zero())
+                imageVLabs[ig.getEdgeEnd1(e)]=TrsVertLoss< typename EdgeContainer::ValType::CapacType >
+                                            (vertTab[e->info.first].lo,vertTab[e->info.first].hi);
+            else if (vertTab[e->info.first].hi>=vertTab[e->info.first].lo &&
+                vertTab[e->info.first].hi<=DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >
+                    ::zero())
+                imageVLabs[ig.getEdgeEnd2(e)]=TrsVertLoss< typename EdgeContainer::ValType::CapacType >
+                                            (vertTab[e->info.first].lo,vertTab[e->info.first].hi);
+            else koalaAssert( false,AlgExcWrongArg );
+        }
+
+        typename EdgeContainer::ValType::CostType res=minCostTransship(ig,imageELabs,imageVLabs);
+        if (DefaultStructs:: template NumberTypeBounds
+		< typename EdgeContainer::ValType::CostType >::isPlusInfty(res)) return res;
+
+
+        for(typename Image::PEdge e=ig.getEdge();e;e=ig.getEdgeNext(e))
+            if (e->info.second) edgeTab[e->info.second].flow=imageELabs[e].flow;
+            else vertTab2[e->info.first].flow=imageELabs[e].flow;
+
+    return res;
+}
+
+
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class IterOut >
 	void FlowPar< DefaultStructs >::findGHTree( GraphType &g, EdgeContainer &edgeTab, IterOut out )
 {
@@ -941,28 +1080,6 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 	{
 		*out = buf[i];
 		++out;
-	}
-}
-
-template< class DefaultStructs > template< class GraphType, class ImageType, class Linker >
-	void ConnectPar< DefaultStructs >::makeImage(const GraphType &g, ImageType &ig, Linker &images )
-{
-	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-	{
-		images[v].first = ig.addVert( v );
-		images[v].second = ig.addVert( v );
-		ig.addArc( images[v].first,images[v].second,
-			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( v,(typename GraphType::PEdge)0 ) );
-	}
-	for( typename GraphType::PEdge e = g.getEdge( EdDirIn | EdDirOut ); e; e = g.getEdgeNext( e,EdDirIn | EdDirOut ) )
-		ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
-			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
-	for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
-	{
-		ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
-			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
-		ig.addArc( images[g.getEdgeEnd2( e )].second,images[g.getEdgeEnd1( e )].first,
-			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ));
 	}
 }
 
@@ -1073,7 +1190,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     SimplArrPool<typename Image::Vertex> valloc(2*n);
     SimplArrPool<typename Image::Edge> ealloc(im);
 	Image ig(&valloc,&ealloc);
-	makeImage( g,ig,images );
+	FlowPar<void>::makeImage( g,ig,images, Directed|Undirected );
 
 	for( typename Image::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
 		imageFlow[e].capac = (e->info.first) ? 1 : 2;
@@ -1107,7 +1224,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     SimplArrPool<typename Image::Vertex> valloc(2*n);
     SimplArrPool<typename Image::Edge> ealloc(im);
 	Image ig(&valloc,&ealloc);
-    makeImage( g,ig,images );
+    FlowPar<void>::makeImage( g,ig,images, Directed|Undirected );
 
 
 	for( typename Image::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
@@ -1175,7 +1292,7 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
     SimplArrPool<typename Image::Vertex> valloc(2*n);
     SimplArrPool<typename Image::Edge> ealloc(2*(2 * g.getEdgeNo(Undirected) +g.getEdgeNo(Directed)+ n));
 	Image ig(&valloc,&ealloc);
-	makeImage( g,ig,images );
+	FlowPar<void>::makeImage( g,ig,images, Directed|Undirected );
 
 	ig.delEdges( images[start].second,images[end].first );
 	ig.delEdges( images[end].second,images[start].first );
