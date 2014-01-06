@@ -67,8 +67,12 @@ template< class ITEM, class AssocContainer > void JoinableSets< ITEM,AssocContai
 template< class ITEM, class AssocContainer > template< class Iter >
 	int JoinableSets< ITEM,AssocContainer >::getElements( Iter iter ) const
 {
-	mapa.getKeys( iter );
-	return siz;
+    for(int i=0;i<siz;i++)
+    {
+        *iter=bufor[i].key;
+        ++iter;
+    }
+    return siz;
 }
 
 template< class ITEM, class AssocContainer > template< class Iter >

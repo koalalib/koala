@@ -867,7 +867,7 @@ template< class DefaultStructs > template< class GraphIn, class GraphOut, class 
 template< class DefaultStructs > template< class GraphIn, class GraphOut >
 	typename GraphOut::PVertex LineGraphPar< DefaultStructs >::undir( const GraphIn &g, GraphOut &lg )
 {
-	return undir( g,lg,std::make_pair( stdCast( ),stdCast( ) ),
+	return undir( g,lg,std::make_pair( stdCast(false ),stdCast(false ) ),
 		std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 }
 

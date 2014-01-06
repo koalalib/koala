@@ -52,6 +52,8 @@ namespace Koala
 	template< class DefaultStructs > class FlowPar: public PathStructs
 	{
 	public:
+
+	    template <class Defs> friend class ConnectPar;
 		// rekord z danymi (in-out) opisujacy krawedz
 		/** \brief Edge information for flow problems algorithms.*/
 		template< class DType, class CType = DType > struct EdgeLabs
@@ -403,6 +405,10 @@ namespace Koala
 				Set< typename GraphType::PVertex > &V, Set< typename GraphType::PVertex > &R,
 				GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType > *out, AssocSub& vsub );
 
+		// tworzy w ig pomocnicza siec na podstawie g. Mapa images laczy wierzcholki g z parami odpowiednich krawedzi w ig
+		template< class GraphType, class ImageType, class Linker >
+			static void makeImage( const GraphType &g, ImageType &ig, Linker &images, EdgeType mask );
+
 	public:
 		// objetosc przeplywu przy wierzcholku v
 		// type=EdDirOut - objetosc wyplywajaca, type=EdDirIn - objetosc wplywajaca, type=EdUndir - bilans wyplywajacy
@@ -645,6 +651,14 @@ namespace Koala
 		template< class GraphType, class EdgeContainer, class VertContainer > static bool transship( GraphType &g,
 			EdgeContainer &edgeTab, const VertContainer &vertTab );
 
+        //NEW: wersja ogolniejsza, dla wierzcholkow o bilansie 0 mozna definiowac wymagania odnosnie przeplywu przez
+        // ten wierzcholek, analogicznie jak dla krawedzi tj. vertTab2: PVertex ->TrsEdgeLabs
+        //Podobnie jest z minCostTraship
+		template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2  >
+            static bool transship(const GraphType &g,
+			EdgeContainer &edgeTab, const VertContainer &vertTab,  VertContainer2 &vertTab2);
+
+
 		// szuka najtanszego transship. w grafie o podanych warunkach na wierzcholki i krawedzie
 		// zwraca jego koszt lub nieskonczonosc w razie braku
 		/** \brief Solve transshipment problem
@@ -657,6 +671,10 @@ namespace Koala
 		template< class GraphType, class EdgeContainer, class VertContainer > static
 			typename EdgeContainer::ValType::CostType minCostTransship( GraphType &g, EdgeContainer &edgeTab,
 				const VertContainer &vertTab );
+
+        template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2 > static
+			typename EdgeContainer::ValType::CostType minCostTransship(const GraphType &g, EdgeContainer &edgeTab,
+				const VertContainer &vertTab,  VertContainer2 &vertTab2 );
 
 		// znajduje drzewo Gomory-Hu grafu
 		/** \brief Get Gomory-Hu tree.
@@ -722,10 +740,6 @@ namespace Koala
 			EdgeLabs(): capac( 1 ), flow( 0 )
 				{ }
 		};
-
-		// tworzy w ig pomocnicza siec na podstawie g. Mapa images laczy wierzcholki g z parami odpowiednich krawedzi w ig
-		template< class GraphType, class ImageType, class Linker >
-			static void makeImage( const GraphType &g, ImageType &ig, Linker &images );
 
 	public:
 		// znajduje najmniejsze rozciecie krawedziowe miedzy start->end

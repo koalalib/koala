@@ -15,6 +15,7 @@
 namespace Koala
 {
 
+
 	/* JSPartDesrc
 	 * struktura pomocnicza dla zbiorow zlaczalnych o elementach typu Klucz
 	 */
@@ -25,6 +26,9 @@ namespace Koala
 		JSPartDesrc *parent,*next,*first,*last;
 		unsigned int deg,size;
 		Klucz key;
+
+        public:
+		JSPartDesrc() {}
 	};
 
 
@@ -37,6 +41,53 @@ namespace Koala
 		typedef JSPartDesrc< ITEM > BufElementType;
 	} ;
 
+
+    namespace Privates {
+
+        template <class Klucz> struct JoinSetsIntPseudoMap {
+
+            typedef JSPartDesrc< Klucz > * ValType;
+
+            std::vector<std::pair<ValType,bool> > cont;
+
+            JoinSetsIntPseudoMap(int asize=0) : cont(asize) {}
+
+            void clear()
+            {   cont.clear();   }
+
+            void reserve(int asize)
+            {   cont.resize(asize); }
+
+            bool hasKey(int arg) const
+            {
+                koalaAssert( arg>=0 && arg < cont.size(),ContExcOutpass );
+                return cont[arg].second;
+            }
+
+            ValType& operator[](int arg)
+            {
+                koalaAssert( arg>=0 && arg < cont.size(),ContExcOutpass );
+                cont[arg].second=true;
+                return cont[arg].first;
+            }
+
+            ValType operator[](int arg) const
+            {
+                koalaAssert( arg>=0 && arg < cont.size(),ContExcOutpass );
+                if (!cont[arg].second) return ValType();
+                return cont[arg].first;
+            }
+        };
+
+        template <class Klucz> struct JoinSetsAssocContSwitch {
+            typedef JoinSetsIntPseudoMap< Klucz > Type;
+        };
+
+        template <class T> struct JoinSetsAssocContSwitch<T*> {
+            typedef AssocArray< T*,JSPartDesrc< T* > * >  Type;
+        };
+
+    }
 
 
 	/* JoinableSets.
@@ -54,7 +105,9 @@ namespace Koala
 	 *  \tparam ITEM class of stored element.
 	 *  AssocContainer type of internal associative table. <tt>ITEM->JSPartDesrc< ITEM > *</tt>
 	 *  \ingroup cont*/
-	template< class ITEM, class AssocContainer = AssocArray< ITEM,JSPartDesrc< ITEM > * > > class JoinableSets
+//	template< class ITEM, class AssocContainer = AssocArray< ITEM,JSPartDesrc< ITEM > * > >
+    template< class ITEM, class AssocContainer = typename Privates::JoinSetsAssocContSwitch<ITEM>::Type >
+	class JoinableSets
 	{
 	protected:
 		AssocContainer mapa;
