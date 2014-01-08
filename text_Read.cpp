@@ -14,7 +14,7 @@ using namespace std;
 using namespace Koala;
 using namespace Koala::IO;
 
-    std::pair<bool,bool> form =std::make_pair(false,true);
+    std::pair<bool,bool> form =std::make_pair(true,true);
     RG_Format bform=RG_VertexLists;
 
     RG_Format eform = (RG_Format)(((form.first) ? RG_VInfo : 0)+((form.second) ? RG_EInfo : 0));

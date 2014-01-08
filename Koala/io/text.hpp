@@ -19,12 +19,17 @@ class OperTest {
 	OperTest(std::istream& os) { (void)(os); }
 };
 
+struct Lapacz {
+    int a;
+    template <class T>
+    Lapacz (const T&) : a(0) {}
+};
 
-template <class T>
-OperTest operator<<(OperTest arg1,T arg) { return OperTest();}
+//template <class T>
+OperTest operator<<(OperTest arg1,Lapacz) { return OperTest();}
 
-template <class T>
-OperTest operator>>(OperTest arg1,T arg) { return OperTest();}
+//template <class T>
+OperTest operator>>(OperTest arg1,Lapacz) { return OperTest();}
 
 template <class T>
 char makeOper(const T& arg) { return 'a';}

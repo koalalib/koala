@@ -14,23 +14,47 @@ using namespace std;
 using namespace Koala;
 using namespace Koala::IO;
 
-    std::pair<bool,bool> form =std::make_pair(true,false);
+    std::pair<bool,bool> form =std::make_pair(true,true);
     RG_Format bform=RG_VertexLists;
 
     RG_Format eform = (RG_Format)(((form.first) ? RG_VInfo : 0)+((form.second) ? RG_EInfo : 0));
 
+    struct Klasa {
+        int a;
+        string s;
+
+//        Klasa(int arg, string sarg="1"): a(arg), s(sarg) {}
+        Klasa(string sarg="1"): a(0), s(sarg) {}
+        Klasa(const char* sarg="1"): a(0), s(string(sarg)) {}
+        operator int() { return 10; }
+    };
+
+ostream& operator<<(ostream& out, Klasa x)
+{
+    out << x.s;
+    return out;
+}
 
 #include "main.hpp"
 	string buf;
-	Graph<string,string> g;
-	Graph<string,string>::PVertex A,B,C,D;
-    Graph<string,string>::PEdge d,e,f,h,p,q,x,y,z;
+//	Graph<string,string> g;
+//	Graph<string,string>::PVertex A,B,C,D;
+//    Graph<string,string>::PEdge d,e,f,h,p,q,x,y,z;
+//
+//    AssocTable<std::map<Graph<string,string>::PVertex,int> > v2int;
+//    AssocTable<std::map<Graph<string,string>::PEdge,int> > e2int;
+//    std::map<int,Graph<string,string>::PVertex> int2v;
+//    std::map<int,Graph<string,string>::PEdge> int2e;
 
-    AssocTable<std::map<Graph<string,string>::PVertex,int> > v2int;
-    AssocTable<std::map<Graph<string,string>::PEdge,int> > e2int;
-    std::map<int,Graph<string,string>::PVertex> int2v;
-    std::map<int,Graph<string,string>::PEdge> int2e;
 
+	Graph<Klasa,Klasa> g;
+	Graph<Klasa,Klasa>::PVertex A,B,C,D;
+    Graph<Klasa,Klasa>::PEdge d,e,f,h,p,q,x,y,z;
+
+    AssocTable<std::map<Graph<Klasa,Klasa>::PVertex,int> > v2int;
+    AssocTable<std::map<Graph<Klasa,Klasa>::PEdge,int> > e2int;
+    std::map<int,Graph<Klasa,Klasa>::PVertex> int2v;
+    std::map<int,Graph<Klasa,Klasa>::PEdge> int2e;
 
 	A=g.addVert("1");B=g.addVert("2");C=g.addVert("3");D=g.addVert("4");
 
