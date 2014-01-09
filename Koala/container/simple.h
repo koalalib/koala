@@ -30,6 +30,12 @@ namespace Koala
 	template< class T > std::pair< T,T > pairMinMax( std::pair< T,T > arg )
 		{ return pairMinMax( arg.first,arg.second ); }
 
+    //NEW:
+	template< class T > std::pair< T,T > pairMaxMin( T a, T b );
+	/** \brief Make sorted pair.*/
+	template< class T > std::pair< T,T > pairMaxMin( std::pair< T,T > arg )
+		{ return pairMaxMin( arg.first,arg.second ); }
+
 
     //NEW: wylecial VectorInterface
 

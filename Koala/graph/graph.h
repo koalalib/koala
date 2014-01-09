@@ -75,7 +75,7 @@ namespace Koala
 		template< class K, class V > class AdjMatrixDirEdges
 		{
 		public:
-			typedef AssocMatrix< K,V,AMatrNoDiag > Type;
+			typedef SimpleAssocMatrix< K,V,AMatrNoDiag > Type;
 			// - przyklad uzycia, nie usuwac
 			// typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
 		};
@@ -84,7 +84,7 @@ namespace Koala
 		template< class K, class V > class AdjMatrixUndirEdges
 		{
 		public:
-			typedef AssocMatrix< K,V,AMatrTriangle > Type;
+			typedef SimpleAssocMatrix< K,V,AMatrTriangle > Type;
 			// - przyklad uzycia, nie usuwac
 			// typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
 		};

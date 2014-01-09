@@ -118,7 +118,7 @@ namespace Koala
 		template< class A, class B, AssocMatrixType type > class TwoDimAssocCont
 		{
 		public:
-			typedef AssocMatrix< A,B,type > Type;/**<\brief Define own if intend to change.*/
+			typedef SimpleAssocMatrix< A,B,type > Type;/**<\brief Define own if intend to change.*/
 			// Nie usuwac komentarza (przykladowe uzycia)
 			// typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
 		};

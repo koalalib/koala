@@ -31,6 +31,17 @@ namespace Koala
 		// kontrola zgodnosci typow kluczy dla przypisan miedzy roznymi tablicami asocjacyjnymi
 		template< class Key > class AssocTabTag { };
 
+		template< class Key> struct ZeroAssocKey
+		{
+		    static Key zero() { return (Key)0; }
+		    static bool isZero(Key k) { return k==(Key)0; }
+        };
+
+        template< class Key> struct ZeroAssocKey<std::pair<Key,Key> >
+		{
+		    static std::pair<Key,Key> zero() { return std::pair<Key,Key>((Key)0,(Key)0); };
+		    static bool isZero(std::pair<Key,Key> k) { return k==std::pair<Key,Key>((Key)0,(Key)0); }
+        };
 	}
 
 	/* AssocTabInterface
@@ -694,6 +705,10 @@ namespace Koala
 		 */
 		int size() const
 			{ return tab.size(); }
+        //NEW: ilosc obecnie zaalokowanych miejsc na elementy - w tym zakresie moga byc wartosci funkcji keyPos
+        // zaalokowanych elementow
+        int contSize() const
+                { return tab.contSize(); }
 
 		/** \brief Test if empty.
 		 *
@@ -893,6 +908,8 @@ namespace Koala
 				PseudoAssocArray< Klucz,Elem,AssocCont,Container > &operator=( const AssocCont2 &arg );
 			int size() const
 				{ return tab.size(); }
+            int contSize() const
+                { return tab.contSize(); }
 			bool empty() const
 				{ return tab.empty(); }
 			bool operator!() const
@@ -941,24 +958,27 @@ namespace Koala
 
 	// klasa wspomagajaca operowanie na kluczach tablic 2-wymiarowych
 	// Uzywana wewnatrz tego kontenera
-	template< AssocMatrixType > class AssocMatrixAddr;
+	template< AssocMatrixType > class Assoc2DimTabAddr;
 
-	/* AssocMatrixAddr
+	/* Assoc2DimTabAddr
 	 *
 	 */
-	template<> class AssocMatrixAddr< AMatrFull >
+	template<> class Assoc2DimTabAddr< AMatrFull >
 	{
-	public:
+	protected:
 		// dlugosc wewnetrznego bufora dla podanej liczby kluczy
 		static int bufLen( int n ) { return n * n; }
 		// przerabia pare numerow elementow klucza (w indeksie kluczy) na pozycje bufora wewnetrznego
 		inline int wsp2pos( std::pair< int,int > ) const;
 		// ... i odwrotnie
 		inline std::pair< int,int > pos2wsp( int ) const;
+
+		inline int colSize(int i,int n) const { return n; }
+		inline std::pair< int,int > wsp2pos2(std::pair< int,int > arg) const { return arg; }
 		// test, czy klucz danej postaci jest akceptowany przez ten typ tablicy
+    public:
 		template< class T > bool correctPos( T, T ) const
 			{ return true; }
-
 		// przerabia klucz 2-wymiarowy (tj. pare kluczy) na postac standardowa dla danego typu tablicy
 		template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz u, Klucz v ) const
 			{ return std::pair< Klucz,Klucz >( u,v ); }
@@ -966,12 +986,18 @@ namespace Koala
 			{ return k; }
 	};
 
-	template<> class AssocMatrixAddr< AMatrNoDiag >
+	template<> class Assoc2DimTabAddr< AMatrNoDiag >
 	{
-		public:
+		protected:
 			static int bufLen( int n ) { return n * (n - 1); }
 			inline int wsp2pos( std::pair< int,int > ) const ;
 			inline std::pair< int,int > pos2wsp( int ) const ;
+
+		inline int colSize(int i,int n) const { return n-1; }
+		inline std::pair< int,int > wsp2pos2(std::pair< int,int > arg) const
+		{ return std::pair< int,int >(arg.first,arg.second -(arg.second>arg.first)); }
+
+        public:
 			template< class T > bool correctPos( T u, T v )  const  { return u != v; }
 			template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz u, Klucz v ) const
 				{ return std::pair< Klucz,Klucz >( u,v ); }
@@ -979,12 +1005,17 @@ namespace Koala
 				{ return k; }
 	};
 
-	template<> class AssocMatrixAddr< AMatrClTriangle >
+	template<> class Assoc2DimTabAddr< AMatrClTriangle >
 	{
-	public:
+	protected:
 		static int bufLen( int n )  { return n * (n + 1) / 2; }
 		inline int wsp2pos( std::pair< int,int > ) const ;
 		inline std::pair< int,int > pos2wsp( int ) const ;
+
+		inline int colSize(int i,int n) const { return i+1; }
+		inline std::pair< int,int > wsp2pos2(std::pair< int,int > arg) const { return pairMaxMin(arg); }
+
+    public:
 		template< class T > bool correctPos( T, T ) const  { return true; }
 		template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz u, Klucz v ) const
 			{ return pairMinMax( u,v ); }
@@ -992,12 +1023,17 @@ namespace Koala
 			{ return pairMinMax( k.first,k.second ); }
 	};
 
-	template <> class AssocMatrixAddr< AMatrTriangle >
+	template <> class Assoc2DimTabAddr< AMatrTriangle >
 	{
-	public:
+	protected:
 		static int bufLen( int n ) { return n * (n - 1) / 2; }
 		inline int wsp2pos( std::pair< int,int > ) const ;
 		inline std::pair< int,int > pos2wsp( int ) const ;
+
+		inline int colSize(int i,int n) const { return i; }
+		inline std::pair< int,int > wsp2pos2(std::pair< int,int > arg) const { return pairMaxMin(arg); }
+
+    public:
 		template< class T > bool correctPos( T u, T v )  const { return u != v; }
 		template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz u, Klucz v ) const
 			{ return pairMinMax( u,v ); }
@@ -1017,7 +1053,7 @@ namespace Koala
 	namespace Privates
 	{
 		// kontrola zgodnosci typow kluczy dla przypisan miedzy roznymi tablicami asocjacyjnymi
-		template< class Key,AssocMatrixType > class AssocMatrixTag { };
+		template< class Key,AssocMatrixType > class Assoc2DimTabTag { };
 	}
 
 	/* AssocMatrix
@@ -1045,7 +1081,7 @@ namespace Koala
 			AssocArray< Klucz,int,std::vector< typename AssocMatrixInternalTypes< Klucz,Elem >::IndexBlockType > > >
 	// Container - typ wewnetrznego bufora - tablicy przechowujacej opakowany ciag wartosci przypisanych roznym parom kluczy
 	// IndexContainer - typ indeksu tj. tablicy asocjacyjnej przypisujacej pojedynczym kluczom ich liczby wystapien we wpisach oraz (rozne) numery.
-	class AssocMatrix: public AssocMatrixAddr< aType >, public Privates::AssocMatrixTag< Klucz,aType >
+	class AssocMatrix: public Assoc2DimTabAddr< aType >, public Privates::Assoc2DimTabTag< Klucz,aType >
 	{
 		template< class A, class B, AssocMatrixType C, class D, class E > friend class AssocMatrix;
 
@@ -1121,7 +1157,8 @@ namespace Koala
 		AssocMatrix( int = 0);
 		/** \brief Copy contructor.*/
 		AssocMatrix( const AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > &X ):
-			index( X.index ), bufor( X.bufor ), siz( X.siz ), first( X.first ), last( X.last ) { index.owner = this; }
+			index( X.index ), bufor( X.bufor ), siz( X.siz ), first( X.first ), last( X.last )
+			{   index.owner = this; }
 
 		/** \brief Copy content operator.
 		 *
@@ -1196,6 +1233,8 @@ namespace Koala
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_indSize.html">See example</a>.
 		 */
 		int indSize() const { return index.size(); }
+
+		template< class Iterator > int getInds( Iterator iter ) const {   return index.getKeys(iter); }
 
 		// zapis do zewnetrznej mapy (Klucz->ValType) wartosci wszystkich wpisow dla kluczy 2-wymiarowych zawierajacych argument na pierwszej pozycji
 		/** \brief Slice by first key.
@@ -1502,28 +1541,498 @@ namespace Koala
 	template< class T, class F > AssocFunktorInserter< T,F > assocInserter( T &x, F f )
 		{ return AssocFunktorInserter< T,F >( x,f ); }
 
+
+
+    //NEW: Nowe 2-wymiarowe tablice asocjacyjne, lzejsze od AssocMatrix. Zycie pokazalo, ze z tej tablicy
+    // uzywane byly tylko operator(), hasKey i delIndex :-) Te ponizsze oferuja wiec tylko czesc interfejsu
+    // AssocMatrix i sa inaczej zorganizowane.
+    // TODO: przetestowac, upiekszyc kod, sprawdzic czy to cos przyspiesza
+	template< AssocMatrixType aType, class Container> class Assoc2DimTable
+	:   public Assoc2DimTabAddr< aType >,
+        public Privates::Assoc2DimTabTag< typename AssocTabInterface<Container>::KeyType::first_type,aType >
+	{
+	protected:
+        Container acont;
+        AssocTabInterface<Container> interf;
+	public:
+        const Container& cont;
+
+
+        // typ klucza tablicy
+		typedef typename AssocTabInterface<Container>::KeyType::first_type KeyType; /**< \brief Type of key. */
+		// typ przypisywanych wartosci
+		typedef typename AssocTabInterface<Container>::ValType ValType; /**< \brief Type of mapped value.*/
+		typedef Container OriginalType; /**< \brief Type of wrapped container.*/
+
+		enum { shape = aType };
+
+		Assoc2DimTable(int n=0) : cont(acont), interf(acont)
+		{
+		    interf.reserve(n);
+		}
+
+		Assoc2DimTable(const Assoc2DimTable& X) : acont(X.acont), interf(acont), cont(acont)
+		{}
+
+        Assoc2DimTable& operator=(const Assoc2DimTable& X)
+        {
+            if (this==&X) return *this;
+            acont=X.acont;
+            return *this;
+        }
+
+		template< class MatrixContainer > Assoc2DimTable &operator=( const MatrixContainer &X )
+        {
+            Privates::Assoc2DimTabTag< KeyType,aType >::operator=( X );
+            this->clear();
+            int rozm;
+            std::pair<KeyType,KeyType> LOCALARRAY(tab,rozm=X.size());
+            X.getKeys(tab);
+            for( int i=0;i<rozm;i++ )
+                this->operator()( tab[i] )=X( tab[i] );
+            return *this;
+        }
+
+		ValType &operator()( KeyType u, KeyType v )
+        {
+            koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+            return interf[Assoc2DimTabAddr< aType >::key(u,v)];
+
+        }
+		ValType &operator()( std::pair< KeyType,KeyType > k ) { return operator()( k.first,k.second ); }
+		ValType operator()( KeyType u, KeyType v) const
+		{
+		    koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+		    return ((AssocTabConstInterface< Container >&)interf).operator[]( Assoc2DimTabAddr< aType >::key(u,v) );
+		}
+		ValType operator()( std::pair< KeyType,KeyType > k ) const { return operator()( k.first,k.second ); }
+
+		ValType* valPtr( KeyType u, KeyType v)
+		{
+            koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+            return interf.valPtr(Assoc2DimTabAddr< aType >::key(u,v));
+		}
+		ValType* valPtr( std::pair< KeyType,KeyType > k ) { return valPtr(k.first,k.second); }
+
+		bool hasKey( KeyType u, KeyType v ) const
+		{
+            if (!u || !v) return false;
+            if (!Assoc2DimTabAddr< aType >::correctPos( u,v )) return false;
+            return interf.hasKey(Assoc2DimTabAddr< aType >::key(u,v));
+		}
+		bool hasKey( std::pair< KeyType,KeyType > k ) const { return hasKey( k.first,k.second ); }
+
+		bool delKey( KeyType u, KeyType v)
+        {
+            if (!u || !v) return false;
+            if (!Assoc2DimTabAddr< aType >::correctPos( u,v )) return false;
+            return interf.delKey(Assoc2DimTabAddr< aType >::key(u,v));
+        }
+		bool delKey( std::pair< KeyType,KeyType > k ) { return delKey( k.first,k.second ); }
+
+		std::pair< KeyType,KeyType > firstKey() const  {   return interf.firstKey(); }
+		std::pair< KeyType,KeyType > lastKey() const  {   return interf.lastKey(); }
+
+		std::pair< KeyType,KeyType > nextKey( KeyType u, KeyType v) const
+        {
+            if (!u || !v) return firstKey();
+            koalaAssert( Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+            return interf.nextKey(Assoc2DimTabAddr< aType >::key(u,v));
+        }
+		std::pair< KeyType,KeyType> nextKey( std::pair< KeyType,KeyType > k ) const { return nextKey( k.first,k.second ); }
+		std::pair< KeyType,KeyType > prevKey( KeyType u, KeyType v) const
+        {
+            if (!u || !v) return lastKey();
+            koalaAssert( Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+            return interf.prevKey(Assoc2DimTabAddr< aType >::key(u,v));
+        }
+		std::pair< KeyType,KeyType > prevKey( std::pair< KeyType,KeyType > k ) const { return prevKey( k.first,k.second ); }
+
+        bool hasInd( KeyType v ) const
+        {
+            for(std::pair< KeyType,KeyType> key=this->firstKey();
+                !Privates::ZeroAssocKey<std::pair< KeyType,KeyType> >::isZero(key);
+                key=this->nextKey(key)) if (key.first==v || key.second==v) return true;
+            return false;
+        }
+        bool delInd( KeyType v )
+        {
+            bool flag=false;
+            std::pair< KeyType,KeyType> key,key2;
+            for(std::pair< KeyType,KeyType> key=this->firstKey();
+                !Privates::ZeroAssocKey<std::pair< KeyType,KeyType> >::isZero(key);key=key2)
+            {
+                key2=this->nextKey(key);
+                if (key.first==v || key.second==v)
+                {
+                    flag=true;
+                    this->delKey(key);
+                }
+            }
+            return flag;
+        }
+        template<class DefaultStructs, class Iterator > int getInds( Iterator iter ) const
+        {   typename DefaultStructs:: template AssocCont< KeyType, char >::Type inds(2*this->size());
+            for(std::pair< KeyType,KeyType> key=this->firstKey();
+                !Privates::ZeroAssocKey<std::pair< KeyType,KeyType> >::isZero(key);
+                key=this->nextKey(key))
+                    inds[key.first]=inds[key.second]='A';
+            return inds.getKeys(iter);
+        }
+
+		int size()  const { return interf.size(); }
+		bool empty()  const { return interf.size()==0; }
+		bool operator!() const { return empty(); }
+		void clear() { interf.clear(); }
+		void reserve( int arg ) { interf.reserve(arg); }
+		template< class Iterator > int getKeys( Iterator iter ) const { return interf.getKeys(iter); }
+
+	};
+
+
+	template< class Elem > struct BlockOfSimpleAssocMatrix
+	{
+		Elem val;
+		bool present;
+		BlockOfSimpleAssocMatrix(): val(), present( false ) { }
+	};
+
+	template <class Klucz, class Elem>
+	struct SimpleAssocMatrixInternalTypes
+	{
+		typedef BlockOfSimpleAssocMatrix< Elem > BlockType;
+		typedef Privates::BlockOfBlockList< BlockOfAssocArray< Klucz,int > > IndexBlockType;
+	};
+
+
+	template< class Klucz, class Elem, AssocMatrixType aType, class Container =
+		std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<Klucz,Elem>::BlockType> >, class IndexContainer =
+			AssocArray< Klucz,int,std::vector< typename SimpleAssocMatrixInternalTypes< Klucz,Elem >::IndexBlockType > > >
+	class SimpleAssocMatrix: public Assoc2DimTabAddr< aType >, public Privates::Assoc2DimTabTag< Klucz,aType >
+	{
+		template< class A, class B, AssocMatrixType C, class D, class E > friend class SimpleAssocMatrix;
+
+	private:
+		class AssocIndex: public IndexContainer
+		{
+		public:
+			SimpleAssocMatrix< Klucz,Elem,aType,Container,IndexContainer > *owner;
+
+			// rozmiar poczatkowy
+			AssocIndex( int asize = 0 ): IndexContainer( asize ) { }
+
+
+			// konwersja klucza na jego numer, -1 w razie braku
+			int klucz2pos( Klucz v)
+			{
+				if (!v) return -1;
+				return IndexContainer::keyPos( v );
+			}
+			// i odwrotnie
+			Klucz pos2klucz( int );
+			virtual void DelPosCommand( int pos)
+            {
+                int LOCALARRAY( tabpos,size() );
+                int l = 0;
+                int i = IndexContainer::tab.firstPos();
+                for( ; i != -1; i = IndexContainer::tab.nextPos( i ) )
+                    tabpos[l++] = i;
+                for( l--; l >= 0; l-- )
+                {
+                    owner->delPos( std::pair< int,int >( pos,tabpos[l] ) );
+                    if ((aType == AMatrNoDiag || aType == AMatrFull) && (pos != tabpos[l]))
+                        owner->delPos( std::pair< int,int >( tabpos[l],pos ) );
+                }
+                IndexContainer::tab.delPos( pos );
+                Klucz LOCALARRAY(keytab,size() );
+                int res=this->getKeys(keytab);
+                for( int j=0;j<res;j++)
+                    if (!this->operator[]( keytab[j] )) IndexContainer::delKey( keytab[j] );
+            }
+
+			friend class SimpleAssocMatrix< Klucz,Elem,aType,Container,IndexContainer >;
+		};
+
+		// wewnetrzny indeks pojedynczych kluczy (mapa: Klucz->int)
+		mutable AssocIndex index;
+
+		friend class AssocIndex;
+
+		// glowny bufor z wartosciami
+		mutable Container bufor;
+		// wartosci przypisane parom (kluczom) sa w buforze powiazane w liste 2-kierunkowa
+		int siz;
+
+		// usuniecie wpisu dla kluczy o podanych numerach
+        void delPos( std::pair< int,int > wsp )
+        {
+            if (!Assoc2DimTabAddr< aType >::correctPos( wsp.first,wsp.second )) return;
+            std::pair< int,int > x=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
+            if (!bufor.at(x.first).at(x.second).present) return;
+            bufor.at(x.first).at(x.second) = BlockOfSimpleAssocMatrix< Elem >();
+            siz--;
+            --index.tab[wsp.first].val;
+            --index.tab[wsp.second].val;
+        }
+
+	protected:
+
+        void resizeBuf( int asize )
+        {
+            asize=std::max((int)bufor.size(),asize );
+            bufor.resize(asize);
+            for(int i=0;i<asize;i++) bufor.at(i).resize
+//                (asize);
+                ( std::max(Assoc2DimTabAddr< aType >::colSize( i,asize ),(int)bufor.at(i).size()) );
+        }
+
+	public:
+		// typ klucza
+		typedef Klucz KeyType; /**< \brief Type of key.*/
+		// typ wartosci przypisywanej parze (tj. kluczowi 2-wymiarowemu)
+		typedef Elem ValType;/**< \brief Type of mapped value*/
+
+		typedef Container ContainerType;/**<\brief The type of internal container used to store maped values. */
+		typedef IndexContainer IndexContainerType; /**<\brief The type of internal associative.*/
+		enum { shape = aType };/**< \brief Matrix type \sa AssocMatrixType*/
+
+		SimpleAssocMatrix( int asize= 0) :	index( asize ), siz( 0 )
+        {
+            reserve(asize);
+            index.owner = this;
+        }
+		/** \brief Copy contructor.*/
+		SimpleAssocMatrix( const SimpleAssocMatrix< Klucz,Elem,aType,Container,IndexContainer > &X ):
+			index( X.index ), bufor( X.bufor ), siz( X.siz )
+			{
+			    index.owner = this;
+            }
+
+		/** \brief Copy content operator.
+		 *
+		 * \param X the copied matrix.*/
+		SimpleAssocMatrix< Klucz,Elem,aType,Container,IndexContainer >
+			&operator=( const SimpleAssocMatrix< Klucz,Elem,aType,Container,IndexContainer > & X)
+        {
+            if (&X == this) return *this;
+            index = X.index;
+        	bufor = X.bufor;
+            siz = X.siz;
+            index.owner = this;
+            return *this;
+        }
+
+		template< class MatrixContainer > SimpleAssocMatrix &operator=( const MatrixContainer &X )
+        {
+            Privates::Assoc2DimTabTag< Klucz,aType >::operator=( X );
+            this->clear();
+            int rozm;
+            std::pair<Klucz,Klucz> LOCALARRAY(tab,rozm=X.size());
+            X.getKeys(tab);
+            for( int i=0;i<rozm;i++ )
+                this->operator()( tab[i] )=X( tab[i] );
+            return *this;
+        }
+
+        int size()  const { return siz; }
+        bool empty()  const { return !siz; }
+        bool operator!() const { return empty(); }
+        void reserve( int asize )
+        {
+            index.reserve( asize );
+            bufor.resize( asize=std::max((int)bufor.size(),asize ));
+            for(int i=0;i<asize;i++) bufor.at(i).reserve( Assoc2DimTabAddr< aType >::colSize( i,asize ) );
+        }
+
+        void clear()
+        {
+            index.clear();
+            int bufsize=bufor.size();
+            bufor.clear();
+            this->resizeBuf(bufsize);
+            siz = 0;
+        }
+
+        bool hasInd( Klucz v ) const { return index.hasKey( v ); }
+		Klucz firstInd() const { return index.firstKey(); }
+		Klucz lastInd() const { return index.lastKey(); }
+		Klucz nextInd( Klucz v )const  { return index.nextKey( v ); }
+		Klucz prevInd( Klucz v ) const { return index.prevKey( v ); }
+		int indSize() const { return index.size(); }
+        template< class Iterator > int getInds( Iterator iter ) const {   return index.getKeys(iter); }
+		bool delInd( Klucz v )
+        {
+            if (!hasInd( v )) return false;
+            Klucz LOCALARRAY( tab,index.size() );
+            int i = 0;
+            for( Klucz x = index.firstKey(); x; x = index.nextKey( x ) ) tab[i++] = x;
+            for( i--; i >= 0; i-- )
+            {
+                delKey( v,tab[i] );
+                if ((aType == AMatrNoDiag || aType == AMatrFull) && (v != tab[i]))
+                    delKey( tab[i],v );
+            }
+            index.delKey( v );
+            return true;
+        }
+
+		bool hasKey( Klucz u, Klucz v ) const
+        {
+            if (!u || !v) return false;
+            if (!Assoc2DimTabAddr< aType >::correctPos( u,v )) return false;
+            std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
+            if (wsp.first == -1 || wsp.second == -1) return false;
+            wsp=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
+            return bufor.at(wsp.first).at(wsp.second).present;
+        }
+		bool hasKey( std::pair< Klucz,Klucz > k ) const { return hasKey( k.first,k.second ); }
+
+		bool delKey( Klucz u, Klucz v)
+        {
+            if (!u || !v) return false;
+            if (!Assoc2DimTabAddr< aType >::correctPos( u,v )) return false;
+            std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
+            if (wsp.first == -1 || wsp.second == -1) return false;
+            std::pair< int,int > x=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
+            if  (bufor.at(x.first).at(x.second).present)
+            {
+                bufor.at(x.first).at(x.second) = BlockOfSimpleAssocMatrix< Elem >();
+                siz--;
+                if (--index[u] == 0) index.delKey( u );
+                if (--index[v] == 0) index.delKey( v );
+                return true;
+            }
+            return false;
+        }
+		bool delKey( std::pair< Klucz,Klucz > k ) { return delKey( k.first,k.second ); }
+
+		Elem &operator()( Klucz u, Klucz v )
+        {
+            koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+            std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
+            if (wsp.first == -1)
+            {
+                index[u] = 0;
+                wsp.first = index.klucz2pos( u );
+            }
+            if (wsp.second == -1)
+            {
+                index[v] = 0;
+                wsp.second = index.klucz2pos( v );
+            }
+            int q,qq;
+            this->resizeBuf( q=std::max( qq=(int)bufor.size(), index.size() ) );
+            std::pair< int,int > x = Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
+            if (!bufor.at(x.first).at(x.second).present)
+            {
+                bufor.at(x.first).at(x.second).present=true;
+                index[u]++;
+                index[v]++;
+                siz++;
+            }
+            return bufor.at(x.first).at(x.second).val;
+        }
+		Elem &operator()( std::pair< Klucz,Klucz > k ) { return operator()( k.first,k.second ); }
+
+		Elem operator()( Klucz u, Klucz v) const
+        {
+            koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+            std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
+            if (wsp.first == -1 || wsp.second == -1) return Elem();
+            std::pair< int,int > x = Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
+            if (!bufor.at(x.first).at(x.second).present) return Elem();
+            return bufor.at(x.first).at(x.second).val;
+        }
+		Elem operator()( std::pair< Klucz,Klucz > k ) const { return operator()( k.first,k.second ); }
+		Elem* valPtr( Klucz u, Klucz v)
+        {
+            koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+            std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
+            if (wsp.first == -1 || wsp.second == -1) return NULL;
+            std::pair< int,int > pos=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
+            if (!bufor.at(pos.first).at(pos.second).present) return NULL;
+            return &bufor.at(pos.first).at(pos.second).val;
+        }
+		Elem* valPtr( std::pair< Klucz,Klucz > k ) { return valPtr(k.first,k.second); }
+
+		template< class Iterator > int getKeys( Iterator iter ) const
+		{
+		    for(Klucz x=this->firstInd();x;x=this->nextInd(x))
+                for(Klucz y=(aType==AMatrFull || aType==AMatrNoDiag) ? this->firstInd() : x;
+                    y;y=this->nextInd(y))
+                if (this->hasKey(x,y))
+                {
+                    *iter=Assoc2DimTabAddr<aType>::key(std::pair<Klucz,Klucz>(x,y));
+                    ++iter;
+                }
+            return siz;
+		}
+
+		void defrag()
+		{
+		    int n;
+		    std::pair<Klucz,Klucz> LOCALARRAY(keys,n=this->size());
+		    ValType LOCALARRAY(vals,n);
+		    this->getKeys(keys);
+		    for(int i=0;i<n;i++) vals[i]=this->operator()(keys[i].first,keys[i].second);
+		    index.clear();
+		    index.defrag();
+		    siz=0;
+		    	{
+                    Container tmp;
+                    bufor.swap(tmp);
+                }
+            for(int i=0;i<n;i++) this->operator()(keys[i].first,keys[i].second)=vals[i];
+		}
+
+	};
+
 	namespace Privates
 	{
-		template< class Cont > std::ostream &printAssoc( std::ostream &out, const Cont &cont );
+		template< class Cont,class K > std::ostream &printAssoc( std::ostream &out, const Cont &cont, Privates::AssocTabTag< K > );
+		template< class Cont,class K,AssocMatrixType aType > std::ostream &printAssoc( std::ostream &out, const Cont &cont, Privates::Assoc2DimTabTag< K,aType > );
 	};
 
 	// wypisywanie do strumienia wszystkich wpisow w podanych tablicach asocjacyjnych, dziala jesli typ wartosci takze obsluguje <<
 
 	template< typename T > std::ostream &operator<<( std::ostream &out, const AssocTabConstInterface< T > & cont )
-		{ return Privates::printAssoc( out,cont ); }
+		{ return Privates::printAssoc( out,cont,cont ); }
 
 	template< typename T > std::ostream &operator<<( std::ostream &out, const AssocTable< T > & cont )
-		{ return Privates::printAssoc( out,cont ); }
+		{ return Privates::printAssoc( out,cont,cont ); }
 
 	template< class K, class V,class C > std::ostream &operator<<( std::ostream &out, const AssocArray< K,V,C > & cont )
-		{ return Privates::printAssoc( out,cont ); }
+		{ return Privates::printAssoc( out,cont,cont ); }
 
 	template< typename K, typename V, typename A, typename C >
 		std::ostream &operator<<( std::ostream &out, const Privates::PseudoAssocArray< K,V,A,C > & cont )
-		{ return Privates::printAssoc( out,cont ); }
+		{ return Privates::printAssoc( out,cont,cont ); }
 
 	template< class Klucz, class Elem, AssocMatrixType aType, class C, class IC >
-		std::ostream &operator<<( std::ostream &out, const AssocMatrix< Klucz,Elem,aType,C,IC > & cont );
+		std::ostream &operator<<( std::ostream &out, const AssocMatrix< Klucz,Elem,aType,C,IC > & cont )
+		{ return Privates::printAssoc( out,cont,cont ); }
+
+	template<AssocMatrixType aType, class Container>
+		std::ostream &operator<<( std::ostream &out, const Assoc2DimTable< aType,Container > & cont )
+		{ return Privates::printAssoc( out,cont,cont ); }
+
+	template< class Klucz, class Elem, AssocMatrixType aType, class C, class IC >
+		std::ostream &operator<<( std::ostream &out, const SimpleAssocMatrix< Klucz,Elem,aType,C,IC > & cont )
+		{
+            out << '{';
+            int siz = cont.size();
+            std::pair< Klucz,Klucz> LOCALARRAY(keys,siz);
+            cont.getKeys(keys);
+            for(int i=0;i<siz;i++)
+            {
+                out << '(' << keys[i].first << ',' << keys[i].second << ':'<< cont(keys[i]) << ')';
+                if (i!=siz-1) out << ',';
+            }
+            out << '}';
+            return out;
+        }
+
+
 
 #include "assoctab.hpp"
 }

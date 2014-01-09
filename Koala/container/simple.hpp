@@ -14,6 +14,22 @@ template< class T > std::pair< T,T > pairMinMax( T a, T b )
 	return res;
 }
 
+template< class T > std::pair< T,T > pairMaxMin( T a, T b )
+{
+	std::pair< T,T > res;
+	if (a >= b)
+	{
+		res.first = a;
+		res.second = b;
+	}
+	else
+	{
+		res.first = b;
+		res.second = a;
+	}
+	return res;
+}
+
 template< class T > void StackInterface< T * >::push( const T &val )
 {
 	koalaAssert( siz < maxsize,ContExcFull );

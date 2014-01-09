@@ -721,42 +721,42 @@ template< class K, class V > bool AssocTabConstInterface< BiDiHashMap< K,V > >::
 
 template< class K, class V > K AssocTabConstInterface< BiDiHashMap< K,V > >::firstKey() const
 {
-	if (cont.begin() == cont.end()) return (K)0;
+	if (cont.begin() == cont.end()) return Privates::ZeroAssocKey<K>::zero();
 	return cont.begin()->first;
 }
 
 template< class K, class V > K AssocTabConstInterface< BiDiHashMap< K,V > >::lastKey() const
 {
 	typename BiDiHashMap< K,V >::const_iterator pos;
-	if (cont.begin() == (pos = cont.end())) return (K)0;
+	if (cont.begin() == (pos = cont.end())) return Privates::ZeroAssocKey<K>::zero();
 	pos--;
 	return pos->first;
 }
 
 template< class K, class V > K AssocTabConstInterface< BiDiHashMap< K,V > >::prevKey( K arg ) const
 {
-	if (!arg) return lastKey();
+	if (Privates::ZeroAssocKey<K>::isZero(arg)) return lastKey();
 	typename BiDiHashMap< K,V >::const_iterator pos = cont.find( arg );
 	koalaAssert( pos != cont.end(),ContExcOutpass );
-	if (pos == cont.begin()) return (K)0;
+	if (pos == cont.begin()) return Privates::ZeroAssocKey<K>::zero();
 	pos--;
 	return pos->first;
 }
 
 template< class K, class V > K AssocTabConstInterface< BiDiHashMap< K,V > >::nextKey( K arg ) const
 {
-	if (!arg) return firstKey();
+	if (Privates::ZeroAssocKey<K>::isZero(arg)) return firstKey();
 	typename BiDiHashMap< K,V >::const_iterator pos = cont.find( arg );
 	koalaAssert( pos != cont.end() ,ContExcOutpass );
 	pos++;
-	if (pos == cont.end()) return (K)0;
+	if (pos == cont.end()) return Privates::ZeroAssocKey<K>::zero();
 	return pos->first;
 }
 
 template< class K, class V > template< class Iterator >
 	int AssocTabConstInterface< BiDiHashMap< K,V > >::getKeys( Iterator iter ) const
 {
-	for( K key = firstKey(); key; key = nextKey( key ) )
+	for( K key = firstKey(); !Privates::ZeroAssocKey<K>::isZero(key); key = nextKey( key ) )
 	{
 		*iter = key;
 		iter++;
@@ -790,42 +790,42 @@ template< class K, class V > bool AssocTabConstInterface< HashMap< K,V > >::delK
 
 template< class K, class V > K AssocTabConstInterface< HashMap< K,V > >::firstKey() const
 {
-	if (cont.begin() == cont.end()) return (K)0;
+	if (cont.begin() == cont.end()) return Privates::ZeroAssocKey<K>::zero();
 	return cont.begin()->first;
 }
 
 template< class K, class V > K AssocTabConstInterface< HashMap< K,V > >::lastKey() const
 {
 	typename HashMap< K,V >::const_iterator pos;
-	if (cont.begin() == (pos = cont.end())) return (K)0;
+	if (cont.begin() == (pos = cont.end())) return Privates::ZeroAssocKey<K>::zero();
 	pos--;
 	return pos->first;
 }
 
 template< class K, class V > K AssocTabConstInterface< HashMap< K,V > >::prevKey( K arg ) const
 {
-	if (!arg) return lastKey();
+	if (Privates::ZeroAssocKey<K>::isZero(arg)) return lastKey();
 	typename HashMap< K,V >::const_iterator pos = cont.find( arg );
 	koalaAssert( pos != cont.end(),ContExcOutpass  );
-	if (pos == cont.begin()) return (K)0;
+	if (pos == cont.begin()) return Privates::ZeroAssocKey<K>::zero();
 	pos--;
 	return pos->first;
 }
 
 template< class K, class V > K AssocTabConstInterface< HashMap< K,V > >::nextKey( K arg ) const
 {
-	if (!arg) return firstKey();
+	if (Privates::ZeroAssocKey<K>::isZero(arg)) return firstKey();
 	typename HashMap< K,V >::const_iterator pos = cont.find( arg );
 	koalaAssert( pos != cont.end(),ContExcOutpass  );
 	pos++;
-	if (pos == cont.end()) return (K)0;
+	if (pos == cont.end()) return Privates::ZeroAssocKey<K>::zero();
 	return pos->first;
 }
 
 template< class K, class V > template< class Iterator >
 	int AssocTabConstInterface< HashMap< K,V > >::getKeys( Iterator iter ) const
 {
-	for( K key = firstKey(); key; key = nextKey( key ) )
+	for( K key = firstKey(); !Privates::ZeroAssocKey<K>::isZero(key); key = nextKey( key ) )
 	{
 		*iter = key;
 		iter++;
