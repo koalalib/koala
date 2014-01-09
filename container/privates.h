@@ -64,6 +64,8 @@ namespace Koala
 			void reserve( int arg ) { cont.reserve( arg ); }
 			bool full() { return ffree == -1; }
 			int capacity() { return cont.capacity(); }
+			//NEW:
+			int contSize() { return cont.size(); }
 			int firstPos() { return first; }
 			int lastPos() { return last; }
 			int nextPos( int );

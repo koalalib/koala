@@ -388,7 +388,9 @@ void SeqVertColoringPar<DefaultStructs>::brooksBiconnected(
 	typedef typename Subgraph::PEdge EdgeSub;
 	typename DefaultStructs::template
 		AssocCont<Vert, VertSub>::Type mapVert(bState.graph.getVertNo());
-	std::set< std::pair<Vert, Vert> > simple; // !CHANGE! - don't use std::set
+	//std::set< std::pair<Vert, Vert> > simple; // !CHANGE! - don't use std::set
+	//TODO: simple(size???) oraz sprawdz czy na pewno AMatrTriangle
+	typename DefaultStructs::template TwoDimAssocCont< Vert,EmptyVertInfo,AMatrTriangle >::Type simple;
 
     //TODO: v/e-alokatory, size ???
 	Subgraph subgraph; //subgraph is biconnected
@@ -420,8 +422,10 @@ void SeqVertColoringPar<DefaultStructs>::brooksBiconnected(
 			VertPair tmp;
 			if(v1<v2) tmp = std::make_pair(v1,v2);
 			else tmp = std::make_pair(v2,v1);
-			if(simple.find(tmp)!=simple.end()) continue;
-			simple.insert(tmp);
+			//if(simple.find(tmp)!=simple.end()) continue;
+			if (simple.hasKey(tmp)) continue;
+			//simple.insert(tmp);
+			simple(tmp)=EmptyVertInfo();
 
 			subgraph.addEdge(mapVert[v1], mapVert[v2]);
 			++bState.begEdge;

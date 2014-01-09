@@ -679,9 +679,23 @@ public:
 	static int brooks(const Graph &graph, ColorMap &colors);
 };
 
+class SeqVertColDefaultSettings: public AlgsDefaultSettings
+{
+	public:
+		template< class A, class B, AssocMatrixType type > class TwoDimAssocCont
+		{
+		public:
+			typedef Assoc2DimTable< type,std::map<std::pair<A,A>, B> > Type;/**<\brief Define own if intend to change.*/
+			// Nie usuwac komentarza (przykladowe uzycia)
+			// typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
+		};
+
+};
+
+
 /** \brief Sequential graph coloring algorithms (default).
  *  \ingroup color */
-class SeqVertColoring: public SeqVertColoringPar<AlgsDefaultSettings> {};
+class SeqVertColoring: public SeqVertColoringPar<SeqVertColDefaultSettings> {};
 
 /** \brief Coloring methods using maximal independent set (parametrized).
  *

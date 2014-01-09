@@ -662,6 +662,7 @@ namespace Koala
 	namespace Privates
 	{
 		template< class T > class AssocTabTag;
+		template< class Key> struct ZeroAssocKey;
 	}
 
 	template< class K, class V > class AssocTabConstInterface< BiDiHashMap< K,V > >: public Privates::AssocTabTag< K >

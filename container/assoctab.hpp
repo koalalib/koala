@@ -2,7 +2,7 @@
 
 template< class K, class V > V AssocTabConstInterface< std::map< K,V > >::operator[]( K arg ) const
 {
-	koalaAssert( arg,ContExcOutpass );
+	koalaAssert( !Privates::ZeroAssocKey<K>::isZero(arg),ContExcOutpass );
 	typename std::map< K,V >::const_iterator i;
 	i = cont.find( arg );
 	if (i == cont.end()) return V();
@@ -10,14 +10,14 @@ template< class K, class V > V AssocTabConstInterface< std::map< K,V > >::operat
 }
 template< class K, class V > V &AssocTabConstInterface< std::map< K,V > >::get( K arg )
 {
-	koalaAssert( arg,ContExcOutpass );
+	koalaAssert( !Privates::ZeroAssocKey<K>::isZero(arg),ContExcOutpass );
 	return (_cont())[arg];
 }
 
 template< class K, class V > typename AssocTabConstInterface< std::map< K,V > >::ValType
 	*AssocTabConstInterface< std::map< K,V > >::valPtr( K arg )
 {
-	koalaAssert( arg,ContExcOutpass );
+	koalaAssert( !Privates::ZeroAssocKey<K>::isZero(arg),ContExcOutpass );
 	typename std::map< K,V >::iterator i = _cont().find( arg );
 	if (i == _cont().end()) return NULL;
 	else return &(_cont())[arg];
@@ -33,42 +33,42 @@ template< class K, class V > bool AssocTabConstInterface< std::map< K,V > >::del
 
 template< class K, class V > K AssocTabConstInterface<std::map< K,V > >::firstKey() const
 {
-	if (cont.begin() == cont.end()) return (K)0;
+	if (cont.begin() == cont.end()) return Privates::ZeroAssocKey<K>::zero();
 	return cont.begin()->first;
 }
 
 template< class K, class V > K AssocTabConstInterface<std::map< K,V > >::lastKey() const
 {
 	typename std::map< K,V >::const_iterator pos;
-	if (cont.begin() == (pos = cont.end())) return (K)0;
+	if (cont.begin() == (pos = cont.end())) return Privates::ZeroAssocKey<K>::zero();
 	pos--;
 	return pos->first;
 }
 
 template< class K, class V > K AssocTabConstInterface<std::map< K,V > >::prevKey( K arg ) const
 {
-	if (!arg) return lastKey();
+	if (Privates::ZeroAssocKey<K>::isZero(arg)) return lastKey();
 	typename std::map< K,V >::const_iterator pos = cont.find( arg );
 	koalaAssert( pos != cont.end(),ContExcOutpass );
-	if (pos == cont.begin()) return (K)0;
+	if (pos == cont.begin()) return Privates::ZeroAssocKey<K>::zero();
 	pos--;
 	return pos->first;
 }
 
 template< class K, class V > K AssocTabConstInterface<std::map< K,V > >::nextKey( K arg ) const
 {
-	if (!arg) return firstKey();
+	if (Privates::ZeroAssocKey<K>::isZero(arg)) return firstKey();
 	typename std::map< K,V >::const_iterator pos = cont.find( arg );
 	koalaAssert( pos != cont.end(),ContExcOutpass );
 	pos++;
-	if (pos == cont.end()) return (K)0;
+	if (pos == cont.end()) return Privates::ZeroAssocKey<K>::zero();
 	return pos->first;
 }
 
 template< class K, class V > template< class Iterator >
 	int AssocTabConstInterface< std::map< K,V > >::getKeys( Iterator iter ) const
 {
-	for( K key = firstKey(); key; key = nextKey( key ) )
+	for( K key = firstKey(); !Privates::ZeroAssocKey<K>::isZero(key); key = nextKey( key ) )
 	{
 		*iter = key;
 		iter++;
@@ -82,7 +82,7 @@ template< class T > AssocTabInterface< T > &AssocTabInterface< T >::operator=( c
 {
 	if (&arg.cont == &cont) return *this;
 	clear();
-	for( KeyType k = arg.firstKey(); k; k = arg.nextKey( k ) ) operator[]( k ) = arg[k];
+	for( KeyType k = arg.firstKey(); !Privates::ZeroAssocKey<KeyType>::isZero(k); k = arg.nextKey( k ) ) operator[]( k ) = arg[k];
 	return *this;
 }
 
@@ -90,7 +90,7 @@ template< class T > AssocTabInterface< T > &AssocTabInterface< T >::operator=( c
 {
 	if (&arg.cont == &cont) return *this;
 	clear();
-	for( KeyType k = arg.firstKey(); k; k = arg.nextKey( k ) ) operator[]( k )=arg[k];
+	for( KeyType k = arg.firstKey(); !Privates::ZeroAssocKey<KeyType>::isZero(k); k = arg.nextKey( k ) ) operator[]( k )=arg[k];
 	return *this;
 }
 
@@ -99,7 +99,7 @@ template< class T > template< class AssocCont >
 {
 	Privates::AssocTabTag< KeyType >::operator=( arg );
 	clear();
-	for( KeyType k = arg.firstKey(); k; k = arg.nextKey( k ) ) operator[]( k )=arg[k];
+	for( KeyType k = arg.firstKey(); !Privates::ZeroAssocKey<KeyType>::isZero(k); k = arg.nextKey( k ) ) operator[]( k )=arg[k];
 	return *this;
 }
 
@@ -125,7 +125,7 @@ template< class T > template< class AssocCont >
 	Privates::AssocTabTag< typename AssocTabInterface< T >::KeyType >::operator=( arg );
 	if (Privates::asssocTabInterfTest( arg ) == &cont) return *this;
 	clear();
-	for( typename AssocTabInterface< T >::KeyType k = arg.firstKey(); k; k = arg.nextKey( k ) )
+	for( typename AssocTabInterface< T >::KeyType k = arg.firstKey(); !Privates::ZeroAssocKey<KeyType>::isZero(k); k = arg.nextKey( k ) )
 		operator[]( k ) = arg[k];
 	return *this;
 }
@@ -432,35 +432,35 @@ namespace Privates {
 }
 
 
-// AssocMatrixAddr
+// Assoc2DimTabAddr
 
-inline int AssocMatrixAddr< AMatrFull >::wsp2pos( std::pair< int,int > w )  const
+inline int Assoc2DimTabAddr< AMatrFull >::wsp2pos( std::pair< int,int > w )  const
 {
 	int mfs = std::max( w.first,w.second );
 	return mfs * mfs + mfs + w.second - w.first;
 }
 
-inline std::pair< int,int > AssocMatrixAddr< AMatrFull >::pos2wsp( int pos ) const
+inline std::pair< int,int > Assoc2DimTabAddr< AMatrFull >::pos2wsp( int pos ) const
 {
 	int x = (int)sqrt( (double)pos );
 	if (x * x + x - pos > 0) return std::pair< int,int >( x,pos - x * x );
 	else return std::pair< int,int >( x * x + 2 * x - pos,x );
 }
 
-inline int AssocMatrixAddr< AMatrNoDiag >::wsp2pos( std::pair< int,int > w ) const
+inline int Assoc2DimTabAddr< AMatrNoDiag >::wsp2pos( std::pair< int,int > w ) const
 {
 	int mfs = std::max( w.first,w.second );
 	return mfs * mfs + w.second - w.first - ((w.first > w.second) ? 0 : 1);
 }
 
-inline std::pair< int,int > AssocMatrixAddr< AMatrNoDiag >::pos2wsp( int pos ) const
+inline std::pair< int,int > Assoc2DimTabAddr< AMatrNoDiag >::pos2wsp( int pos ) const
 {
 	int x = (int)sqrt( (double)pos );
 	if (pos - x * x - x >= 0) return std::pair< int,int >( x + 1,pos - x * x - x );
 	else return std::pair< int,int >( x * x + x - 1 - pos,x );
 }
 
-inline int AssocMatrixAddr< AMatrClTriangle >::wsp2pos( std::pair< int,int > w ) const
+inline int Assoc2DimTabAddr< AMatrClTriangle >::wsp2pos( std::pair< int,int > w ) const
 {
 	if (w.first < w.second)
 	{
@@ -471,14 +471,14 @@ inline int AssocMatrixAddr< AMatrClTriangle >::wsp2pos( std::pair< int,int > w )
 	return w.first * (w.first + 1) / 2 + w.second;
 }
 
-inline std::pair< int,int > AssocMatrixAddr< AMatrClTriangle >::pos2wsp( int pos ) const
+inline std::pair< int,int > Assoc2DimTabAddr< AMatrClTriangle >::pos2wsp( int pos ) const
 {
 	int x = (int)sqrt( (double)2 * pos ), xx = pos - x * (x + 1) / 2;
 	if (xx >= 0) return std::pair< int,int >( x,xx );
 	else return std::pair< int,int >( x - 1,xx + x );
 }
 
-inline int AssocMatrixAddr< AMatrTriangle >::wsp2pos( std::pair< int,int > w ) const
+inline int Assoc2DimTabAddr< AMatrTriangle >::wsp2pos( std::pair< int,int > w ) const
 {
 	if (w.first < w.second)
 	{
@@ -489,7 +489,7 @@ inline int AssocMatrixAddr< AMatrTriangle >::wsp2pos( std::pair< int,int > w ) c
 	return w.first * (w.first - 1) / 2 + w.second;
 }
 
-inline std::pair< int,int > AssocMatrixAddr< AMatrTriangle >::pos2wsp( int pos ) const
+inline std::pair< int,int > Assoc2DimTabAddr< AMatrTriangle >::pos2wsp( int pos ) const
 {
 	int x = (int)sqrt( (double)2 * pos ), xx = pos - x * (x + 1) / 2;
 	if (xx >= 0) return std::pair< int,int >( x + 1,xx );
@@ -529,9 +529,9 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 	void AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::delPos( std::pair< int,int > wsp )
 {
-	if (!AssocMatrixAddr< aType >::correctPos( wsp.first,wsp.second )) return;
+	if (!Assoc2DimTabAddr< aType >::correctPos( wsp.first,wsp.second )) return;
 	int x;
-	if (!bufor[x = AssocMatrixAddr< aType >::wsp2pos( wsp )].present()) return;
+	if (!bufor[x = Assoc2DimTabAddr< aType >::wsp2pos( wsp )].present()) return;
 	if (bufor[x].next != -1) bufor[bufor[x].next].prev = bufor[x].prev;
 	else last = bufor[x].prev;
 	if (bufor[x].prev != -1) bufor[bufor[x].prev].next = bufor[x].next;
@@ -547,7 +547,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 		index( asize ), siz( 0 ), first( -1 ), last( -1 )
 {
 	bufor.clear();
-	bufor.reserve( AssocMatrixAddr< aType >::bufLen( asize ) );
+	bufor.reserve( Assoc2DimTabAddr< aType >::bufLen( asize ) );
 	index.owner = this;
 }
 
@@ -617,21 +617,21 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	bool AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::hasKey( Klucz u, Klucz v ) const
 {
 	if (!u || !v) return false;
-	if (!AssocMatrixAddr< aType >::correctPos( u,v )) return false;
+	if (!Assoc2DimTabAddr< aType >::correctPos( u,v )) return false;
 	std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
 	if (wsp.first == -1 || wsp.second == -1) return false;
-	return bufor[AssocMatrixAddr< aType >::wsp2pos( wsp )].present();
+	return bufor[Assoc2DimTabAddr< aType >::wsp2pos( wsp )].present();
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 	bool AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::delKey( Klucz u, Klucz v )
 {
 	if (!u || !v) return false;
-	if (!AssocMatrixAddr< aType >::correctPos( u,v )) return false;
+	if (!Assoc2DimTabAddr< aType >::correctPos( u,v )) return false;
 	std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
 	if (wsp.first == -1 || wsp.second == -1) return false;
 	int x;
-	if  (bufor[x = AssocMatrixAddr< aType >::wsp2pos( wsp )].present())
+	if  (bufor[x = Assoc2DimTabAddr< aType >::wsp2pos( wsp )].present())
 	{
 		if (bufor[x].next != -1) bufor[bufor[x].next].prev = bufor[x].prev;
 		else last = bufor[x].prev;
@@ -649,7 +649,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 	Elem &AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::operator()( Klucz u, Klucz v )
 {
-	koalaAssert( u && v && AssocMatrixAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+	koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
 	std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
 	if (wsp.first == -1)
 	{
@@ -661,8 +661,8 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 		index[v] = 0;
 		wsp.second = index.klucz2pos( v );
 	}
-	bufor.resize( std::max( (int)bufor.size(),AssocMatrixAddr< aType >::bufLen( index.size() ) ) );
-	int x = AssocMatrixAddr< aType >::wsp2pos( wsp );
+	bufor.resize( std::max( (int)bufor.size(),Assoc2DimTabAddr< aType >::bufLen( index.size() ) ) );
+	int x = Assoc2DimTabAddr< aType >::wsp2pos( wsp );
 	if (!bufor[x].present())
 	{
 		if ((bufor[x].prev = last) == -1) first = x;
@@ -679,10 +679,10 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 	Elem AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::operator()( Klucz u, Klucz v ) const
 {
-	koalaAssert( u && v && AssocMatrixAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+	koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
 	std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
 	if (wsp.first == -1 || wsp.second == -1) return Elem();
-	int x = AssocMatrixAddr< aType >::wsp2pos( wsp );
+	int x = Assoc2DimTabAddr< aType >::wsp2pos( wsp );
 	if (!bufor[x].present()) return Elem();
 	return bufor[x].val;
 }
@@ -690,11 +690,11 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 	Elem* AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::valPtr( Klucz u, Klucz v )
 {
-	koalaAssert( u && v && AssocMatrixAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+	koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
 	std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
 	if (wsp.first == -1 || wsp.second == -1) return NULL;
 	int pos;
-	if (!bufor[pos = AssocMatrixAddr< aType >::wsp2pos( wsp )].present()) return NULL;
+	if (!bufor[pos = Assoc2DimTabAddr< aType >::wsp2pos( wsp )].present()) return NULL;
 	return &bufor[pos].val;
 }
 
@@ -702,8 +702,8 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	std::pair< Klucz,Klucz > AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::firstKey() const
 {
 	if (!siz) return std::pair< Klucz,Klucz >( (Klucz)0,(Klucz)0 );
-	std::pair< int,int > wsp = AssocMatrixAddr< aType >::pos2wsp( first );
-	return AssocMatrixAddr< aType >::key( std::pair< Klucz,Klucz >( index.pos2klucz( wsp.first ),
+	std::pair< int,int > wsp = Assoc2DimTabAddr< aType >::pos2wsp( first );
+	return Assoc2DimTabAddr< aType >::key( std::pair< Klucz,Klucz >( index.pos2klucz( wsp.first ),
 		index.pos2klucz( wsp.second ) ) );
 }
 
@@ -711,8 +711,8 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	std::pair< Klucz,Klucz > AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::lastKey() const
 {
 	if (!siz) return std::pair< Klucz,Klucz >( (Klucz)0,(Klucz)0 );
-	std::pair< int,int > wsp = AssocMatrixAddr< aType >::pos2wsp( last );
-	return AssocMatrixAddr< aType >::key( std::pair< Klucz,Klucz >( index.pos2klucz( wsp.first ),
+	std::pair< int,int > wsp = Assoc2DimTabAddr< aType >::pos2wsp( last );
+	return Assoc2DimTabAddr< aType >::key( std::pair< Klucz,Klucz >( index.pos2klucz( wsp.first ),
 		index.pos2klucz( wsp.second ) ) );
 }
 
@@ -720,15 +720,15 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	std::pair< Klucz,Klucz > AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::nextKey( Klucz u, Klucz v ) const
 {
 	if (!u || !v) return firstKey();
-	koalaAssert( AssocMatrixAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+	koalaAssert( Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
 	std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
 	koalaAssert( wsp.first != -1 && wsp.second != -1,ContExcOutpass );
-	int x = AssocMatrixAddr< aType >::wsp2pos( wsp );
+	int x = Assoc2DimTabAddr< aType >::wsp2pos( wsp );
 	koalaAssert( bufor[x].present(),ContExcOutpass );
 	x = bufor[x].next;
 	if (x == -1) return std::pair< Klucz,Klucz >( (Klucz)0,(Klucz)0 );
-	wsp = AssocMatrixAddr< aType >::pos2wsp( x );
-	return AssocMatrixAddr< aType >::key( std::pair< Klucz,Klucz >( index.pos2klucz( wsp.first ),
+	wsp = Assoc2DimTabAddr< aType >::pos2wsp( x );
+	return Assoc2DimTabAddr< aType >::key( std::pair< Klucz,Klucz >( index.pos2klucz( wsp.first ),
 		index.pos2klucz( wsp.second ) ) );
 }
 
@@ -736,10 +736,13 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 template< class MatrixContainer > AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >
 	&AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::operator=( const MatrixContainer &X )
 {
-	Privates::AssocMatrixTag< Klucz,aType >::operator=( X );
+	Privates::Assoc2DimTabTag< Klucz,aType >::operator=( X );
 	this->clear();
-	for( std::pair< Klucz,Klucz > k = X.firstKey(); k.first; k = X.nextKey( k ) )
-		this->operator()( k )=X( k );
+	int rozm;
+	std::pair<Klucz,Klucz> LOCALARRAY(tab,rozm=X.size());
+	X.getKeys(tab);
+	for( int i=0;i<rozm;i++ )
+		this->operator()( tab[i] )=X( tab[i] );
 	return *this;
 }
 
@@ -748,15 +751,15 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	std::pair< Klucz,Klucz > AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::prevKey( Klucz u, Klucz v ) const
 {
 	if (!u || !v) return lastKey();
-	koalaAssert( AssocMatrixAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+	koalaAssert( Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
 	std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
 	koalaAssert( wsp.first != -1 && wsp.second != -1,ContExcOutpass );
-	int x = AssocMatrixAddr< aType >::wsp2pos( wsp );
+	int x = Assoc2DimTabAddr< aType >::wsp2pos( wsp );
 	koalaAssert( bufor[x].present(),ContExcOutpass );
 	x = bufor[x].prev;
 	if (x == -1) return std::pair< Klucz,Klucz >( (Klucz)0,(Klucz)0 );
-	wsp = AssocMatrixAddr< aType >::pos2wsp( x );
-	return AssocMatrixAddr< aType >::key( std::pair< Klucz,Klucz >(index.pos2klucz( wsp.first ),
+	wsp = Assoc2DimTabAddr< aType >::pos2wsp( x );
+	return Assoc2DimTabAddr< aType >::key( std::pair< Klucz,Klucz >(index.pos2klucz( wsp.first ),
 		index.pos2klucz( wsp.second ) ) );
 }
 
@@ -778,7 +781,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	void AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::reserve( int arg )
 {
 	index.reserve( arg );
-	bufor.reserve( AssocMatrixAddr< aType >::bufLen( arg ) );
+	bufor.reserve( Assoc2DimTabAddr< aType >::bufLen( arg ) );
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
@@ -789,7 +792,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	for( int pos = first; pos != -1; pos = bufor[pos].next )
 	{
 		tab[i].val = bufor[pos].val;
-		std::pair< int,int > wsp = AssocMatrixAddr< aType >::pos2wsp( pos );
+		std::pair< int,int > wsp = Assoc2DimTabAddr< aType >::pos2wsp( pos );
 		tab[i].u = index.pos2klucz( wsp.first );
 		tab[i].v = index.pos2klucz( wsp.second );
 		i++;
@@ -817,25 +820,25 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	return size();
 }
 
-template<class Klucz, class Elem, AssocMatrixType aType, class C, class IC >
-	std::ostream &operator<<( std::ostream &out, const AssocMatrix< Klucz,Elem,aType,C,IC > &cont )
-{
-	out << '{';
-	int siz = cont.size();
-	std::pair< typename AssocMatrix< Klucz,Elem,aType,C,IC >::KeyType,typename AssocMatrix< Klucz,Elem,aType,C,IC >::KeyType >
-		key = cont.firstKey();
-	for( ; siz; siz-- )
-	{
-		out << '(' << key.first << ',' << key.second << ':'<< cont(key) << ')';
-		if (siz>1)
-		{
-			key = cont.nextKey( key );
-			out << ',';
-		}
-	}
-	out << '}';
-	return out;
-}
+//template<class Klucz, class Elem, AssocMatrixType aType, class C, class IC >
+//	std::ostream &operator<<( std::ostream &out, const AssocMatrix< Klucz,Elem,aType,C,IC > &cont )
+//{
+//	out << '{';
+//	int siz = cont.size();
+//	std::pair< typename AssocMatrix< Klucz,Elem,aType,C,IC >::KeyType,typename AssocMatrix< Klucz,Elem,aType,C,IC >::KeyType >
+//		key = cont.firstKey();
+//	for( ; siz; siz-- )
+//	{
+//		out << '(' << key.first << ',' << key.second << ':'<< cont(key) << ')';
+//		if (siz>1)
+//		{
+//			key = cont.nextKey( key );
+//			out << ',';
+//		}
+//	}
+//	out << '}';
+//	return out;
+//}
 
 // AssocInserter
 
@@ -853,7 +856,7 @@ template< class T, class Fun > template< class K >
 	return *this;
 }
 
-template< class Cont > std::ostream &Privates::printAssoc( std::ostream &out, const Cont &cont )
+template< class Cont,class K > std::ostream &Privates::printAssoc( std::ostream &out, const Cont &cont,Privates::AssocTabTag< K > )
 {
 	out << '{';
 	int siz = cont.size();
@@ -862,6 +865,25 @@ template< class Cont > std::ostream &Privates::printAssoc( std::ostream &out, co
 	{
 		out << '(' << key << ',' << cont[key] << ')';
 		if (key != cont.lastKey())
+		{
+			key = cont.nextKey( key );
+			out << ',';
+		}
+	}
+	out << '}';
+	return out;
+}
+
+template< class Cont,class K,AssocMatrixType aType > std::ostream &Privates::printAssoc( std::ostream &out, const Cont &cont, Privates::Assoc2DimTabTag< K,aType > )
+{
+	out << '{';
+	int siz = cont.size();
+	std::pair< typename Cont::KeyType,typename Cont::KeyType >
+		key = cont.firstKey();
+	for( ; siz; siz-- )
+	{
+		out << '(' << key.first << ',' << key.second << ':'<< cont(key) << ')';
+		if (siz>1)
 		{
 			key = cont.nextKey( key );
 			out << ',';
