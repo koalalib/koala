@@ -45,6 +45,9 @@ int Test() {
 	int i, s, nr, k;
 	TestStruct tree(8192);
 
+	HashMap<std::pair<int*, int *>, int> m;
+	m[make_pair((int *)3, (int *)NULL)] = 4;
+
 	randomize();
 
 	tree.insert(6, 1);

@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <cstdlib>
 #include <cassert>
 #include <functional>
 #include <iostream>
@@ -104,7 +105,7 @@ namespace Koala
 		public:
 			typedef AssocArray< A,B > Type;/**<\brief Define own if intend to change.*/
 			//  Nie usuwac komentarzy (przykladowa uzycia)
-			//   typedef AssocTable < BiDiHashMap<A,B> > Type;
+			 //  typedef AssocTable < BiDiHashMap<A,B> > Type;
 			//   typedef Privates::PseudoAssocArray<A,B,AssocTable<std::map<A,int> > > Type;
 		};
 
@@ -120,7 +121,7 @@ namespace Koala
 		public:
 			typedef SimpleAssocMatrix< A,B,type > Type;/**<\brief Define own if intend to change.*/
 			// Nie usuwac komentarza (przykladowe uzycia)
-			// typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
+			 // typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
 		};
 
 		// typ struktury kopca i jego wezla
@@ -332,6 +333,7 @@ namespace Koala
 		static const Cont2 &get(const BlackHole &a,const Cont2 &b )
 			{  return b; }
 	};
+
 
 	// Choosery są strukturami funkcyjnymi zwracającymi true/false (poprzez operator()) dla wierzchołków/krawędzi
 	// grafu. Służą np. w procedurach wybierania podgrafow, kopiowania podgrafow... W kodzie powinno się je tworzyć

@@ -73,7 +73,7 @@ namespace Koala
 		public:
 			HashSetTableList< KeyType > *next;
 			size_t size;
-			HSNode< KeyType > array[];
+			HSNode< KeyType > array[1];
 		};
 	}
 
@@ -171,6 +171,26 @@ namespace Koala
 		public:
 			size_t operator()( const CTYPE *key, size_t m ) const;
 		};
+
+		/*
+		 * PairHash
+		 *  default hash for floating point types
+		 */
+		template<class U, class V>
+		class PairHash {
+		public:
+			size_t operator ()(const std::pair<U, V> &key, size_t m) const {
+				// explicit pointer truncation in 64bit
+				DefaultHashFunction<U> h1;
+				DefaultHashFunction<V> h2;
+				uint32_t k1 = h1(key.first, m);
+				uint32_t k2 = h2(key.second, m);
+				k2 = ((k2 & 65535) << 16) | (k2 >> 16);
+				uint64_t iv = (k1 ^ k2) * 2654435769u;
+				iv = iv ^ (iv >> 32);
+				return ((uint64_t)((uint32_t)iv) * m) >> 32;
+				};
+			};
 	}
 
 	template<> class DefaultHashFunction< int >: public Privates::Int32Hash< int > { };
@@ -188,6 +208,9 @@ namespace Koala
 	template<> class DefaultHashFunction< wchar_t * >: public Privates::CStringHash< wchar_t > { };
 	template<> class DefaultHashFunction< const wchar_t * >: public Privates::CStringHash< wchar_t > { };
 	template<> class DefaultHashFunction< std::string >: public Privates::StringHash { };
+
+	template<class U, class V>
+	class DefaultHashFunction< std::pair<U, V> >: public Privates::PairHash<U, V> { };
 
 	/** \brief Set on hash table.
 	 *
@@ -310,7 +333,7 @@ namespace Koala
 		 *  \param[in] key to lookup or insert
 		 *  \return pair of iterator to inserted/found element and a boolean
 		 *  that is true if the insertion occurred */
-		std::pair< iterator,bool > find_or_insert( const KeyType &key );
+		inline std::pair< iterator,bool > find_or_insert( const KeyType &key );
 		/** \brief Test if a set contains the given key */
 		bool contains( const KeyType &key ) const;
 		/** \brief Remove given key */
@@ -336,7 +359,7 @@ namespace Koala
 		void initialize( size_t size );
 		void free( bool deleteFirst );
 		void eraseAll();
-		iterator Find( const KeyType &key ) const;
+		inline iterator Find( const KeyType &key ) const;
 
 		Privates::HashSetTableList< KeyType > *CreateTable( size_t size );
 		bool EnlargeIfNeeded();
@@ -407,8 +430,8 @@ namespace Koala
 			~SetToMap() { }
 
 			SetToMap &operator=( const SetToMap &t );
-			ValueType &operator[]( const KeyType &key );
-			const ValueType &operator[]( const KeyType &key ) const;
+			inline ValueType &operator[]( const KeyType &key );
+			inline const ValueType &operator[]( const KeyType &key ) const;
 
 			std::pair< typename SetType::iterator,bool > insert( const KeyType &key, const ValueType &value )
 				{ return SetType::insert( PairType( key,value ) ); }
@@ -600,10 +623,10 @@ namespace Koala
 		const_iterator end() const { return const_iterator( &m_end ); }
 
 		/** \brief Acces value operator*/
-		ValueType &operator[]( const KeyType &key );
+		inline ValueType &operator[]( const KeyType &key );
 
 		/** \brief Get value operator*/
-		const ValueType &operator[]( const KeyType &key ) const;
+		inline const ValueType &operator[]( const KeyType &key ) const;
 
 		/** \brief Insert element.
 		 *
@@ -623,7 +646,7 @@ namespace Koala
 		/** \brief Find key.
 		 *
 		 *  \return an iterator to given key or end() if key is not in the set */
-		const_iterator find( const KeyType &key ) const;
+		inline const_iterator find( const KeyType &key ) const;
 
 		/** \brief Remove all elements from set */
 		void clear();
@@ -683,7 +706,7 @@ namespace Koala
 		K prevKey( K )const ;
 		K nextKey( K )const ;
 
-		V operator[]( K arg );
+		inline V operator[]( K arg );
 		unsigned size() const
 			{ return cont.size(); }
 		bool empty() const
@@ -720,7 +743,7 @@ namespace Koala
 		K prevKey( K ) const;
 		K nextKey( K ) const;
 
-		V operator[]( K arg );
+		inline V operator[]( K arg );
 		unsigned size() const
 			{ return cont.size(); }
 		bool empty() const

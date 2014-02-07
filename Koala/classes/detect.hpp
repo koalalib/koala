@@ -163,8 +163,8 @@ template< class DefaultStructs > template< class GraphType, class Iter >
 		std::pair<bool,bool> >::Type vertCont( n ); //setL - first, setT - second
 
 	typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,EmptyVertInfo >::Type matching( n / 2 );
-
-	koalaAssert(-1 != getPart( g,assocInserter( vertCont, constFun( std::make_pair(true,false) ) ),true ),AlgExcWrongArg );
+    int ares=getPart( g,assocInserter( vertCont, constFun( std::make_pair(true,false) ) ),true );
+	koalaAssert(-1 != ares,AlgExcWrongArg );
 
 	MatchingPar< DefaultStructs >::findMax( g,vertTab,assocInserter( matching,constFun( EmptyVertInfo() ) ) );
 
@@ -949,7 +949,8 @@ template< class DefaultStructs > template< class GraphType, class Iter >
 	int IsItPar< DefaultStructs >::Comparability::minVertCover( const GraphType &g, Iter out )
 {
 	int n;
-	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,char >::Type
+//	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,char >::Type
+	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,EmptyVertInfo >::Type
 														res( n = g.getVertNo() );
 	maxStable( g,assocInserter( res, ConstFunctor<EmptyVertInfo>(EmptyVertInfo()) ) );
 	for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))

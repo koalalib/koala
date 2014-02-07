@@ -371,7 +371,7 @@ template< class KeyType, class HashFunction, class Allocator >
 {
 	Privates::HashSetTableList< KeyType > *p;
 	size_t n;
-	n = sizeof( Privates::HashSetTableList< KeyType > ) + size * sizeof( Privates::HSNode< KeyType > ) / sizeof( char );
+	n = sizeof( Privates::HashSetTableList< KeyType > ) + (size - 1) * sizeof( Privates::HSNode< KeyType > ) / sizeof( char );
 	p = (Privates::HashSetTableList< KeyType > *)allocate.template allocate< char >( n );
 	p->size = size;
 	p->next = NULL;

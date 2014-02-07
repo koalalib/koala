@@ -100,7 +100,8 @@ void searchTest2()
 
 
 
-#define STRATEGY LexBFS
+//#define STRATEGY LexBFS
+#define STRATEGY DFSPreorder
 
 #include "main.hpp"
 

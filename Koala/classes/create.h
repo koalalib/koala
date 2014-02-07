@@ -5,6 +5,7 @@
 #include <ctime>
 
 #include "../base/exception.h"
+#include "../base/rnd.h"
 #include "../graph/graph.h"
 #include "../algorithm/weights.h"
 
@@ -479,6 +480,7 @@ namespace Koala
 		template< class GraphType > static typename GraphType::PVertex
 			caterpillar( GraphType &g, int pathVertNum, int legNnm, EdgeDirection dir = EdUndir );
 
+        //NEW: nowy pierwszy parametr w generatorach grafow losowych - generator losowy
 		/** \brief Create random graph.
 		 *
 		 *  The function generates a random graph on \a n vertices according to ErdosRenyi model G(\a n,\a p).
@@ -492,8 +494,8 @@ namespace Koala
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param type - the type of edges in the graph, i.e., directed or undirected.
 		 *  \retrun the pointer to the first added vertex.*/
-		template< class GraphType, class VInfoGen, class EInfoGen >
-			static typename GraphType::PVertex erdRen1( GraphType &g, int n, double p, VInfoGen vInfoGen,
+		template< class RndGen,class GraphType, class VInfoGen, class EInfoGen >
+			static typename GraphType::PVertex erdRen1( RndGen& rgen,GraphType &g, int n, double p, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeType type = Undirected );
 
 		/* It is a simpler version of the above function*/
@@ -508,8 +510,8 @@ namespace Koala
 		 *  \param p - probability of edge's creation,
 		 *  \param type - the type of edges in the graph, i.e., directed or undirected.
 		 *  \retrun the pointer to the first added vertex. */
-		template< class GraphType >
-			static typename GraphType::PVertex erdRen1( GraphType &g, int n, double p, EdgeType type = Undirected );
+		template< class RndGen, class GraphType >
+			static typename GraphType::PVertex erdRen1( RndGen& rgen, GraphType &g, int n, double p, EdgeType type = Undirected );
 
 		/** \brief Create random graph.
 		 *
@@ -525,8 +527,8 @@ namespace Koala
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param type - the type of edges in the graph, i.e., directed or undirected.
 		 *  \retrun the pointer to the first added vertex.*/
-		template< class GraphType, class VInfoGen, class EInfoGen > static typename GraphType::PVertex
-			erdRen2( GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen,
+		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen > static typename GraphType::PVertex
+			erdRen2( RndGen& rgen,GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeType type = Undirected);
 
 		/* It is a simpler version of the above function*/
@@ -542,8 +544,8 @@ namespace Koala
 		 *  \param m - number of edges to create,
 		 *  \param type - the type of edges in the graph, i.e., directed or undirected.
 		 *  \retrun the pointer to the first added vertex. */
-		template< class GraphType >
-			static typename GraphType::PVertex erdRen2( GraphType &g, int n, int m, EdgeType type = Undirected );
+		template< class RndGen,class GraphType >
+			static typename GraphType::PVertex erdRen2( RndGen& rgen,GraphType &g, int n, int m, EdgeType type = Undirected );
 
 	protected:
 		/** \brief Add vertices.
@@ -609,7 +611,8 @@ namespace Koala
 		 *
 		 *  The function generates a pseudo-random number \a num (from uniform distribution) such that \a begin <= \a num <= \a end.
 		 */
-		static int random( int begin, int end );
+        template< class RndGen >
+		static int random(RndGen& rgen, int begin, int end );
 	};
 
 	// Operacje na grafie traktowanym jak diagram relacji w zbiorze wierzcholkow
@@ -676,7 +679,12 @@ namespace Koala
 		 *  \param g the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge.*/
 		template< class Graph > static void
-			symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
+			symmClousure( Graph &g)
+			{ symmClousure(g, typename Graph::EdgeInfoType()); };
+
+		template< class Graph > static void
+			symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo);
+//			symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
 		// przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Transitiv clousure.

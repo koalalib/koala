@@ -1,4 +1,5 @@
 #include <iostream>
+//#include <cstdint> - no i wlasnie nie kompiluje sie w standardzie ponizej 2011 :-(
 #include <string>
 #include <cstdio>
 

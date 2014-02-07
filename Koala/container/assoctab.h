@@ -600,7 +600,7 @@ namespace Koala
 		~AssocKeyContReg() { deregister(); }
 
 	private:
-		AssocContReg *find( AssocContBase *cont );
+		inline AssocContReg *find( AssocContBase *cont );
 		void deregister();
 	};
 
@@ -774,7 +774,7 @@ namespace Koala
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_keyPos.html">See example</a>.
 		 */
-		int keyPos( Klucz v ) const;
+		inline int keyPos( Klucz v ) const;
 
 		/** \brief Delete element.
 		 *
@@ -828,7 +828,7 @@ namespace Koala
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_operator_brackets.html">See example</a>.
 		 */
-		Elem &operator[]( Klucz v );
+		inline Elem &operator[]( Klucz v );
 
 		/** \brief Get element.
 		 *
@@ -838,7 +838,7 @@ namespace Koala
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_operator_brackets.html">See example</a>.
 		 */
-		Elem operator[]( Klucz v ) const;
+		inline Elem operator[]( Klucz v ) const;
 
 		// porzadkowanie indeksu kontenera, wszystkie klucze uzyskuja kolejne numery poczatkowe
 		/** \brief Reorder the numbers.
@@ -1732,7 +1732,7 @@ namespace Koala
 			Klucz pos2klucz( int );
 			virtual void DelPosCommand( int pos)
             {
-                int LOCALARRAY( tabpos,size() );
+                int LOCALARRAY( tabpos,IndexContainer::size() );
                 int l = 0;
                 int i = IndexContainer::tab.firstPos();
                 for( ; i != -1; i = IndexContainer::tab.nextPos( i ) )
@@ -1744,7 +1744,7 @@ namespace Koala
                         owner->delPos( std::pair< int,int >( tabpos[l],pos ) );
                 }
                 IndexContainer::tab.delPos( pos );
-                Klucz LOCALARRAY(keytab,size() );
+                Klucz LOCALARRAY(keytab,IndexContainer::size() );
                 int res=this->getKeys(keytab);
                 for( int j=0;j<res;j++)
                     if (!this->operator[]( keytab[j] )) IndexContainer::delKey( keytab[j] );

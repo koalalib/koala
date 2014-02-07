@@ -762,7 +762,8 @@ namespace Koala
 		template< class GraphType, class VertContainer, class Visitor > static int dfsDoVisit(
 			DFSParamBlock< GraphType,VertContainer,Visitor > &, typename GraphType::PVertex, unsigned );
 
-	public:
+//	public:
+	protected:
 		/** \brief Visit all vertices in given component.
 		 *
 		 *  Visit all vertices in the same component as a given vertex

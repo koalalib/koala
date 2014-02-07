@@ -3,7 +3,7 @@
 template< class GraphType, class VertContainer > typename GraphType::PVertex
 	MISStrategy::Rand::operator()( const GraphType &g, const VertContainer& vertTab )
 {
-	unsigned int random = rand() % g.getVertNo();
+	unsigned int random = StdRandGen<>().rand(g.getVertNo()-1);//rand() % g.getVertNo();
 	typename GraphType::PVertex v = g.getVert();
 	while (random--) v = g.getVertNext( v );
 	// ALG: no vertex chosen
@@ -44,7 +44,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 	// ALG: no vertex chosen
 	(void)(vertTab);
 	assert( nMaxs > 0 );
-	randomIndex = rand() % nMaxs;
+	randomIndex = StdRandGen<>().rand(nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
@@ -81,7 +81,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	 // ALG: no vertex chosen
 	assert( nMaxs > 0 );
-	randomIndex = rand() % nMaxs;
+	randomIndex = StdRandGen<>().rand(nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
@@ -120,7 +120,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMaxs > 0 );
-	randomIndex = rand() % nMaxs;
+	randomIndex = StdRandGen<>().rand(nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
@@ -161,7 +161,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMaxs > 0 );
-	randomIndex = rand() % nMaxs;
+	randomIndex = StdRandGen<>().rand(nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
@@ -196,7 +196,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMins > 0 );
-	randomIndex = rand() % nMins;
+	randomIndex = StdRandGen<>().rand(nMins-1);//rand() % nMins;
 	(void)vertTab;
 	return vMins[randomIndex];
 }
@@ -232,7 +232,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMins > 0 );
-	randomIndex = rand() % nMins;
+	randomIndex = StdRandGen<>().rand(nMins-1);//rand() % nMins;
 	return vMins[randomIndex];
 }
 
@@ -271,7 +271,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMins > 0 );
-	randomIndex = rand() % nMins;
+	randomIndex = StdRandGen<>().rand(nMins-1);//rand() % nMins;
 	return vMins[randomIndex];
 }
 

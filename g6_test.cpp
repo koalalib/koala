@@ -25,7 +25,8 @@ int main(int argc, char **argv) {
 		ro = atof(argv[2]);
 		if(ro<0||ro>1) ro = 0.1;
 	}
-	Koala::Creator::erdRen1(g1, n, ro, Gene(), Gene(),  Koala::EdUndir);
+	Koala::StdRandGen<> rgen;
+	Koala::Creator::erdRen1(rgen,g1, n, ro, Gene(), Gene(),  Koala::EdUndir);
 
 	int ans = Koala::IO::writeG6(g1, txt, 9999);
 	printf("%d %s\n", ans, txt);

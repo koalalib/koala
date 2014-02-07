@@ -67,7 +67,7 @@ template< class GraphType, class VertContainer, class Iter > static int scanAtta
     std::cout << "\n\n wersja ogolna";
 }
 
-template< class GraphType, class Iter > static int scanAttainable( const GraphType & g,
+template< class GraphType, class Iter > static void scanAttainable( const GraphType & g,
 			typename GraphType::PVertex v, Koala::BlackHole, Iter iter, Koala::EdgeDirection dr)
 {
     std::cout << "\n\n wersja szczegolna";

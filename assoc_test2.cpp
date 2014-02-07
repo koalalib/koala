@@ -1,3 +1,4 @@
+#define NDEBUG
 #include <iostream>
 #include <string>
 
@@ -181,6 +182,7 @@ void t(const SimpleAssocMatrix<A,B,aType,D,E>& m)
     //. getInds< ::AlgsDefaultSettings>(tabsmiec);
     Assoc2DimTable<AType,std::map<std::pair<Vert*,Vert*>,std::string> > mp;
     mp=m;
+
 
     return 0;
 }

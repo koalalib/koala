@@ -31,15 +31,15 @@ Graph<int, int> g;
 //};
 
 
-template <class T>
-class AllocTest {
-    public:
-
-    typedef typename Privates::List<T >::Node NodeType;
-
-    NodeType x;
-
-};
+//template <class T>
+//class AllocTest {
+//    public:
+//
+//    typedef typename Privates::List<T >::Node NodeType;
+//
+//    NodeType x;
+//
+//};
 
 
 

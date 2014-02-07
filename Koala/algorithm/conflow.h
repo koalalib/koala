@@ -19,6 +19,14 @@
 namespace Koala
 {
 
+    namespace Privates {
+
+		// tworzy w ig pomocnicza siec na podstawie g. Mapa images laczy wierzcholki g z parami odpowiednich krawedzi w ig
+		template< class GraphType, class ImageType, class Linker >
+			static void flowsMakeImage( const GraphType &g, ImageType &ig, Linker &images, EdgeType mask );
+
+    }
+
 	/* FlowAlgsDefaultSettings
 	 * Domyslne wytyczne dla procedur przeplywowych:
 	 * czy do wyznaczania maks. przeplywu uzywac FulkersonaForda, czy MKM
@@ -53,7 +61,6 @@ namespace Koala
 	{
 	public:
 
-	    template <class Defs> friend class ConnectPar;
 		// rekord z danymi (in-out) opisujacy krawedz
 		/** \brief Edge information for flow problems algorithms.*/
 		template< class DType, class CType = DType > struct EdgeLabs
@@ -405,9 +412,6 @@ namespace Koala
 				Set< typename GraphType::PVertex > &V, Set< typename GraphType::PVertex > &R,
 				GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType > *out, AssocSub& vsub );
 
-		// tworzy w ig pomocnicza siec na podstawie g. Mapa images laczy wierzcholki g z parami odpowiednich krawedzi w ig
-		template< class GraphType, class ImageType, class Linker >
-			static void makeImage( const GraphType &g, ImageType &ig, Linker &images, EdgeType mask );
 
 	public:
 		// objetosc przeplywu przy wierzcholku v

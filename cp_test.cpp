@@ -318,7 +318,7 @@ void przec(Lapacz,...)
         przec(s,12);
 
         cout << "\n\n------------------\n";
-        char* ss="Ala";
+        const char* ss="Ala";
         string dd;
         konwtest(dd,ss);
 

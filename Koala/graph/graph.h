@@ -52,7 +52,7 @@ namespace Koala
 		{
 		public:
 			typedef AssocArray< A,B > Type;
-			// typedef AssocTable<std::map<A,B> > Type; // - przyklad uzycia, nie usuwac
+			 //typedef AssocTable<BiDiHashMap<A,B> > Type; // - przyklad uzycia, nie usuwac
 		};
 
 
@@ -68,7 +68,7 @@ namespace Koala
 		{
 		public:
 			typedef AssocArray< A,B > Type;
-			// typedef AssocTable<std::map<A,B> > Type; // - przyklad uzycia, nie usuwac
+			 //typedef AssocTable<BiDiHashMap<A,B> > Type; // - przyklad uzycia, nie usuwac
 		};
 
 		// typ macierzy sasiedztwa dla krawedzi skierowanych - zbedne przy edAllow=false
@@ -77,7 +77,7 @@ namespace Koala
 		public:
 			typedef SimpleAssocMatrix< K,V,AMatrNoDiag > Type;
 			// - przyklad uzycia, nie usuwac
-			// typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+			 //typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
 		};
 
 		// typ macierzy sasiedztwa dla krawedzi nieskierowanych - zbedne przy edAllow=false
@@ -86,7 +86,7 @@ namespace Koala
 		public:
 			typedef SimpleAssocMatrix< K,V,AMatrTriangle > Type;
 			// - przyklad uzycia, nie usuwac
-			// typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+			 //typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
 		};
 
 		// Dodatkowe pola (poza info) wprowadzane do obiektu wierzcholka
@@ -503,7 +503,7 @@ namespace Koala
 		 *  \param direct the mask representing the types of edges.
 		 *  \returns the pointer to the next edge or if the edge is the last edge then NULL.
 		 */
-		typename GraphType::PEdge getEdgeNext( PVertex vert, PEdge e, EdgeDirection direct = EdAll ) const;
+		inline typename GraphType::PEdge getEdgeNext( PVertex vert, PEdge e, EdgeDirection direct = EdAll ) const;
 
 		/** \brief Get previous edge
 		 *
@@ -514,7 +514,7 @@ namespace Koala
 		 *  \param direct the mask representing the types of edges.
 		 *  \returns Pointer to the previous edge or if the edge is the first then NULL.
 		 */
-		typename GraphType::PEdge getEdgePrev( PVertex vert, PEdge ed, EdgeDirection direct = EdAll ) const;
+		inline typename GraphType::PEdge getEdgePrev( PVertex vert, PEdge ed, EdgeDirection direct = EdAll ) const;
 
 		/** \brief Get number of parallel edges.
 		 *

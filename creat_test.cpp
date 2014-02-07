@@ -5,6 +5,8 @@
 #include "Koala/classes/create.h"
 #include "Koala/io/g6.h"
 
+
+Koala::StdRandGen<> stdgen;
 //przyklad uzycia, w tej wersji zawartosc obu struktur jest dla Dijkstry nieistotna
 struct OpisV;  // pewna struktura opisujaca moj wierzchlek
 struct OpisE;   // struktura opisujaca krawedz
@@ -146,46 +148,46 @@ void dir2str(Koala::EdgeDirection dir, std::string & dirStr );
 
 	Koala::Graph<OpisV,OpisE> g14;
 
-	Koala::Creator::erdRen1(g14,10, 0.3, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>());
+	Koala::Creator::erdRen1(stdgen,g14,10, 0.3, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>());
 
 	Koala::Graph<OpisV,OpisE> g15;
 
-	Koala::Creator::erdRen1(g15, 12, 0.5, Koala::ConstFunctor<OpisV>(), Koala::ConstFunctor<OpisE>(), Koala::Directed);
+	Koala::Creator::erdRen1(stdgen,g15, 12, 0.5, Koala::ConstFunctor<OpisV>(), Koala::ConstFunctor<OpisE>(), Koala::Directed);
 
 	Koala::Graph<OpisV,OpisE> g16;
 
-	Koala::Creator::erdRen2(g16, 12, 10, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>(), Koala::Directed);
+	Koala::Creator::erdRen2(stdgen,g16, 12, 10, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>(), Koala::Directed);
 
 	Koala::Graph<OpisV,OpisE> g17;
 
-	Koala::Creator::erdRen2(g17, 12, 15, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>());
+	Koala::Creator::erdRen2(stdgen,g17, 12, 15, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>());
 
 	Koala::Graph<OpisV,OpisE> g18;
 
-	Koala::Creator::erdRen1(g18,10, 1, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>());
+	Koala::Creator::erdRen1(stdgen,g18,10, 1, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>());
 
 	Koala::Graph<OpisV,OpisE> g19;
 
-	Koala::Creator::erdRen1(g19,10, 1, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>(), Koala::Directed);
+	Koala::Creator::erdRen1(stdgen,g19,10, 1, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>(), Koala::Directed);
 
 	Koala::Graph<OpisV,OpisE> g20;
 
-	Koala::Creator::erdRen1(g20,10, 0, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>(), Koala::Directed);
+	Koala::Creator::erdRen1(stdgen,g20,10, 0, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>(), Koala::Directed);
 
 	Koala::Graph<OpisV,OpisE> g21;
 
-	Koala::Creator::erdRen2(g21, 12, 0, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>(), Koala::Directed);
+	Koala::Creator::erdRen2(stdgen,g21, 12, 0, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>(), Koala::Directed);
 
 	Koala::Graph<OpisV,OpisE> g22;
 
-	Koala::Creator::erdRen2(g22, 12, 66, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>());
+	Koala::Creator::erdRen2(stdgen,g22, 12, 66, Koala::ConstFunctor<OpisV>(),Koala::ConstFunctor<OpisE>());
 
 	Koala::Graph<OpisV,OpisE> g23;
-	Koala::Creator::erdRen1(g23,10, 0.7);
+	Koala::Creator::erdRen1(stdgen,g23,10, 0.7);
 
 	Koala::Graph<OpisV,OpisE> g24;
 
-	Koala::Creator::erdRen2(g24, 12, 65);
+	Koala::Creator::erdRen2(stdgen,g24, 12, 65);
 
 
 	test2();
@@ -294,55 +296,55 @@ int test2(){
 	printGraph(g10);
 
 	Koala::Graph<OpisV,OpisE> g11;
-	Koala::Creator::erdRen1(g11,10, 0.3, vFunktor, eFunktor);
+	Koala::Creator::erdRen1(stdgen,g11,10, 0.3, vFunktor, eFunktor);
 	std::cout<< "--g11" <<std::endl;
 //	g11.testGraph();
 	printGraph(g11);
 
 	Koala::Graph<OpisV,OpisE> g12;
-	Koala::Creator::erdRen1(g12,10, 1, vFunktor, eFunktor, Koala::Directed);
+	Koala::Creator::erdRen1(stdgen,g12,10, 1, vFunktor, eFunktor, Koala::Directed);
 	std::cout<< "--g12" <<std::endl;
 //	g12.testGraph();
 	printGraph(g12);
 
 	Koala::Graph<OpisV,OpisE> g13;
-	Koala::Creator::erdRen2(g13, 12, 66, vFunktor, eFunktor);
+	Koala::Creator::erdRen2(stdgen,g13, 12, 66, vFunktor, eFunktor);
 	std::cout<< "--g13" <<std::endl;
 //	g13.testGraph();
 	printGraph(g13);
 
 	Koala::Graph<OpisV,OpisE> g14;
-	Koala::Creator::erdRen2(g14, 12, 0, vFunktor, eFunktor, Koala::Directed);
+	Koala::Creator::erdRen2(stdgen,g14, 12, 0, vFunktor, eFunktor, Koala::Directed);
 	std::cout<< "--g14" <<std::endl;
 //	g14.testGraph();
 	printGraph(g14);
 
 	Koala::Graph<OpisV,OpisE> g15;
-	Koala::Creator::erdRen2(g15, 4, 1, vFunktor, eFunktor, Koala::Directed);
+	Koala::Creator::erdRen2(stdgen,g15, 4, 1, vFunktor, eFunktor, Koala::Directed);
 	std::cout<< "--g15" <<std::endl;
 //	g15.testGraph();
 	printGraph(g15);
 
 	Koala::Graph<OpisV,OpisE> g16;
-	Koala::Creator::erdRen2(g16, 4, 1, vFunktor, eFunktor,  Koala::Directed);
+	Koala::Creator::erdRen2(stdgen,g16, 4, 1, vFunktor, eFunktor,  Koala::Directed);
 	std::cout<< "--g16" <<std::endl;
 //	g16.testGraph();
 	printGraph(g16);
 
 	Koala::Graph<OpisV,OpisE> g16a;
-	Koala::Creator::erdRen2(g16a, 4, 1, vFunktor, eFunktor,  Koala::Directed);
+	Koala::Creator::erdRen2(stdgen,g16a, 4, 1, vFunktor, eFunktor,  Koala::Directed);
 	std::cout<< "--g16a" <<std::endl;
 //	g16a.testGraph();
 	printGraph(g16a);
 
 	Koala::Graph<OpisV,OpisE> g17;
-	Koala::Creator::erdRen2(g17, 4, 1, vFunktor, eFunktor, Koala::Directed);
+	Koala::Creator::erdRen2(stdgen,g17, 4, 1, vFunktor, eFunktor, Koala::Directed);
 	std::cout<< "--g17" <<std::endl;
 //	g17.testGraph();
 	printGraph(g17);
 
 	Koala::Graph<OpisV,OpisE> g18;
-	Koala::Creator::erdRen2(g18, 4, 1, vFunktor, eFunktor, Koala::Directed);
+	Koala::Creator::erdRen2(stdgen,g18, 4, 1, vFunktor, eFunktor, Koala::Directed);
 	std::cout<< "--g18" <<std::endl;
 //	g18.testGraph();
 	printGraph(g18);
@@ -459,20 +461,20 @@ int test3(){
 	printGraph(g10);
 
 	Koala::Graph<OpisV,OpisE> g11;
-	Koala::Creator::erdRen1(g11,1, 0.3, vFunktor, eFunktor);
+	Koala::Creator::erdRen1(stdgen,g11,1, 0.3, vFunktor, eFunktor);
 	std::cout<< "--g11" <<std::endl;
 //	g11.testGraph();
 	printGraph(g11);
 
 	Koala::Graph<OpisV,OpisE> g12;
-	Koala::Creator::erdRen1(g12,1, 1, vFunktor, eFunktor, Koala::Directed);
+	Koala::Creator::erdRen1(stdgen,g12,1, 1, vFunktor, eFunktor, Koala::Directed);
 	std::cout<< "--g12" <<std::endl;
 //	g12.testGraph();
 	printGraph(g12);
 
 
 	Koala::Graph<OpisV,OpisE> g16;
-	Koala::Creator::erdRen2(g16, 2, 2, vFunktor, eFunktor,  Koala::Directed);
+	Koala::Creator::erdRen2(stdgen,g16, 2, 2, vFunktor, eFunktor,  Koala::Directed);
 	std::cout<< "--g16" <<std::endl;
 //	g16.testGraph();
 	printGraph(g16);

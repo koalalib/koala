@@ -9,6 +9,7 @@
 #include <vector>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <iostream>
 #include <limits>
 
