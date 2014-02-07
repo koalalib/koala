@@ -35,8 +35,11 @@ void MatchingPar<DefaultStructs>::BackRec(MatchingData<GraphType> &data,
 			vert1 = data[vert1].labT2;
 			};
 	} while(vert1 != vert);
+
+
 	path.Conc(path1);
 	path.add_before(data[vert].labT1);
+	path.prev();
 	vert = data[vert].labT1;
 };
 
@@ -245,7 +248,7 @@ int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
 	int expo, matched;
 	bool st, noaugment;
 	typename GraphType::PEdge e;
-	typename GraphType::PVertex u, v, i, j, ix, jx;
+	typename GraphType::PVertex u, v, i, ix, jx;
 	EdgeDirection mask = EdUndir | EdDirOut | EdDirIn;
 	//Privates::BlockListAllocator< Node<typename GraphType::PVertex> >
 	SimplArrPool<Node<typename GraphType::PVertex> > allocat(3*n+3);
@@ -451,7 +454,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 	int expo = vertNo;
 	typename GraphType::PVertex U,V;
 
-	//przeglasamy podane krawedzie
+	//przegladamy podane krawedzie
 	for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )
 	{
 		//jezeli osiagniemy zadany rozmiar skojarzenia - koniec

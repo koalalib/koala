@@ -390,6 +390,7 @@ template< class GraphType> EdgeDirection ConstGraphMethods< GraphType>::
         case EdUndir: return (reltype == EdUndir) ? (EdDirIn | EdDirOut | EdUndir) : EdUndir ;
     }
     assert(0);
+    return EdLoop;
 }
 
 

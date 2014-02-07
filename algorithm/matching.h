@@ -79,6 +79,8 @@ private:
 				iterator prev()			{ return iterator(m_ptr->prev); };
 				void moveNext()			{ m_ptr = m_ptr->next; };
 				void movePrev()			{ m_ptr = m_ptr->prev; };
+				iterator &operator++()		{ moveNext(); return *this; };
+				iterator &operator--()		{ movePrev(); return *this; };
 				T &operator *()			{ return m_ptr->elem; };
 				T *operator ->()		{ return &(m_ptr->elem); };
 				bool operator ==(const iterator &i)	{ return m_ptr == i.m_ptr; };
@@ -99,6 +101,8 @@ private:
 
 		void clear()
 			{ while(m_cur != 0) erase(); };
+		bool empty()
+			{ return m_cur == 0; };
 		void next()
 			{ m_cur = m_cur->next; };
 		void prev()
@@ -137,8 +141,14 @@ private:
 			m_cur = t;
 		};
 
-		void Conc(CyclicList &l) {
-			Node<T> *e, *ee, *p2, *p3, *p4, *e0;
+		// append reversed(l - first element) to current list at the
+		// begining of current list, move current pointer to the
+		// begining of reversed(l - first element), destroy l
+		// {A->B->C->D}.Conc({A->1->2->3})
+		// results with {3->2->1->A->B->C->D}
+		// czy powinno byc {A->B->C->D->3->2->1} ???
+		void Conc(CyclicList &l) { // TOFIX!!!
+/*			Node<T> *e, *ee, *p2, *p3, *p4, *e0;
 			e = m_cur->prev;
 			ee = l.m_cur->prev;
 			e0 = ee;
@@ -148,12 +158,41 @@ private:
 			p2->next = m_cur;
 			while(p3 != l.m_cur) {
 				p2->prev = p3; p4 = p3->next; p3->next = p2;
-				p2 = p2;
+				p2 = p3;	// KMO: BYLO p2 = p2;
 				p3 = p4;
 				};
 			ee->prev = e;
 			e->next = ee;
 			m_cur = e0;
+			if (allocator) allocator->dealloc(l.m_cur); else delete l.m_cur; // KMO: added
+			l.m_cur = 0;*/
+			Node<T> *s1, *e1, *s2, *sn2, *e2, *n, *p, *c;
+			if(l.empty()) return;
+			if(l.m_cur->next == l.m_cur) {	// l has a single element
+				l.clear();
+				return;
+				};
+			s1 = m_cur;
+			e1 = m_cur->prev;
+			s2 = l.m_cur;
+			sn2 = l.m_cur->next;
+			e2 = l.m_cur->prev;
+			p = s2;
+			c = sn2;
+			while(c != s2) {
+				n = c->next;
+				p->prev = c;
+				c->next = p;
+				p = c;
+				c = n;
+				};
+			sn2->next = s1;
+			s1->prev = sn2;
+			e1->next = e2;
+			e2->prev = e1;
+//			m_cur = e2;
+			m_cur = e2;
+			if (allocator) allocator->dealloc(l.m_cur); else delete l.m_cur; // KMO: added
 			l.m_cur = 0;
 		};
 

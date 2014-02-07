@@ -201,7 +201,7 @@ namespace Koala
 		 *  The method creates new part with new single element. This is the only method of adding new elements to joinable set.
 		 *  \param i the added element.
 		 *  \return the identifier of the new created part or 0 if the element \a i already belongs to any part. */
-		typename JoinableSets< ITEM >::Repr makeSinglet( const ITEM & );
+		inline typename JoinableSets< ITEM >::Repr makeSinglet( const ITEM & );
 
 		// zwraca reprezentanta zbioru zawierajacego dany element, lub 0 w razie jego braku
 		/** \brief Get set identifier.
@@ -209,14 +209,14 @@ namespace Koala
 		 *  The method gets the identifier of part the element \a i belongs to.
 		 *  \param i the considered element.
 		 *  \return the identifier of part the element belongs to or 0 if there is no such element in set like \a i.*/
-		typename JoinableSets<ITEM>::Repr getSetId( const ITEM &i ) const;
+		inline typename JoinableSets<ITEM>::Repr getSetId( const ITEM &i ) const;
 		// zwraca reprezentanta zbioru zawierajacego zbior o danym reprezentancie np. z wczesniejszego etapu scalania
 		/** \brief Get set identifier.
 		 *
 		 *  The method gets the current identifier of part, the subset represented by identifier \a s belongs to.
 		 *  \param s the tested part identifier.
 		 *  \return the identifier of part, the block \a s is subset of.*/
-		typename JoinableSets<ITEM>::Repr getSetId( typename JoinableSets< ITEM >::Repr s ) const;
+		inline typename JoinableSets<ITEM>::Repr getSetId( typename JoinableSets< ITEM >::Repr s ) const;
 
 		// zlacznia dwoch zbiorow podanych przez zadanie reprezentanta lub ktoregos z elementow
 		// zwracaja reprezentanta wynikowego scalonego zbioru lub 0 w razie porazki (np. brak zbioru do scalenia, albo scalamy ze soba ten sam zbior)
@@ -226,7 +226,7 @@ namespace Koala
 		 *  \param a the identifier of the first part.
 		 *  \param b the identifier of the second part.
 		 *  \return the identifier of new joined set. */
-		typename JoinableSets<ITEM>::Repr join( typename JoinableSets< ITEM >::Repr a,
+		inline typename JoinableSets<ITEM>::Repr join( typename JoinableSets< ITEM >::Repr a,
 			typename JoinableSets< ITEM >::Repr b );
 		/** \brief Join parts.
 		 *
@@ -234,21 +234,21 @@ namespace Koala
 		 *  \param a the element from the first part.
 		 *  \param b the element from the second part.
 		 *  \return the identifier of new joined set. */
-		typename JoinableSets< ITEM >::Repr join( const ITEM &a, const ITEM &b );
+		inline typename JoinableSets< ITEM >::Repr join( const ITEM &a, const ITEM &b );
 		/** \brief Join parts.
 		 *
 		 *  The method joins two parts represented by the identifier \a a and element \a b.
 		 *  \param a the identifier of the first part.
 		 *  \param b the element from the second part.
 		 *  \return the identifier of new joined set. */
-		typename JoinableSets< ITEM >::Repr join( typename JoinableSets< ITEM >::Repr a, const ITEM &b );
+		inline typename JoinableSets< ITEM >::Repr join( typename JoinableSets< ITEM >::Repr a, const ITEM &b );
 		/** \brief Join parts.
 		 *
 		 *  The method joins two parts represented by the identifiers \a a and \a b.
 		 *  \param a the element from the first part.
 		 *  \param b the identifier of the second part.
 		 *  \return the identifier of new joined set. */
-		typename JoinableSets< ITEM >::Repr join( const ITEM &a, typename JoinableSets< ITEM >::Repr b );
+		inline typename JoinableSets< ITEM >::Repr join( const ITEM &a, typename JoinableSets< ITEM >::Repr b );
 	};
 
 	// wypisywanie zawartosci zbiorow zlaczalnych do strumienia

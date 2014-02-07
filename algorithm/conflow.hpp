@@ -1,3 +1,35 @@
+namespace Privates {
+
+    template< class GraphType, class ImageType, class Linker >
+	void flowsMakeImage(const GraphType &g, ImageType &ig, Linker &images, EdgeType mask )
+    {
+        for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+        {
+            images[v].first = ig.addVert( v );
+            images[v].second = ig.addVert( v );
+            ig.addArc( images[v].first,images[v].second,
+                std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( v,(typename GraphType::PEdge)0 ) );
+        }
+        if (mask & Directed)
+        for( typename GraphType::PEdge e = g.getEdge( EdDirIn | EdDirOut ); e; e = g.getEdgeNext( e,EdDirIn | EdDirOut ) )
+            ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
+                std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
+        if (mask & Undirected)
+        for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
+        {
+            ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
+                std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
+            ig.addArc( images[g.getEdgeEnd2( e )].second,images[g.getEdgeEnd1( e )].first,
+                std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ));
+        }
+        if (mask & Loop)
+        for( typename GraphType::PEdge e = g.getEdge( EdLoop ); e; e = g.getEdgeNext( e,EdLoop ) )
+            ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd1( e )].first,
+                std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
+    }
+
+}
+
 // FlowPar
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
@@ -674,33 +706,6 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 	*(out2 + Rnew.size() - 1) = GHTreeEdge< GraphType,typename EdgeContainer::ValType::CapacType >( s,t,capac );
 }
 
-template< class DefaultStructs > template< class GraphType, class ImageType, class Linker >
-	void FlowPar< DefaultStructs >::makeImage(const GraphType &g, ImageType &ig, Linker &images, EdgeType mask )
-{
-	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-	{
-		images[v].first = ig.addVert( v );
-		images[v].second = ig.addVert( v );
-		ig.addArc( images[v].first,images[v].second,
-			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( v,(typename GraphType::PEdge)0 ) );
-	}
-	if (mask & Directed)
-	for( typename GraphType::PEdge e = g.getEdge( EdDirIn | EdDirOut ); e; e = g.getEdgeNext( e,EdDirIn | EdDirOut ) )
-		ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
-			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
-	if (mask & Undirected)
-	for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
-	{
-		ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd2( e )].first,
-			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
-		ig.addArc( images[g.getEdgeEnd2( e )].second,images[g.getEdgeEnd1( e )].first,
-			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ));
-	}
-	if (mask & Loop)
-    for( typename GraphType::PEdge e = g.getEdge( EdLoop ); e; e = g.getEdgeNext( e,EdLoop ) )
-		ig.addArc( images[g.getEdgeEnd1( e )].second,images[g.getEdgeEnd1( e )].first,
-			std::pair< typename GraphType::PVertex,typename GraphType::PEdge >( (typename GraphType::PVertex)0,e ) );
-}
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
 	typename EdgeContainer::ValType::CapacType FlowPar< DefaultStructs >::vertFlow( const GraphType &g,
@@ -892,7 +897,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     SimplArrPool<typename Image::Vertex> valloc(2*n+3);
     SimplArrPool<typename Image::Edge> ealloc(5*n+m+2);
 	Image ig(&valloc,&ealloc);
-	makeImage( g,ig,images, Directed|Loop );
+	Privates::flowsMakeImage( g,ig,images, Directed|Loop );
 	images.clear();
 
 	typename DefaultStructs:: template AssocCont< typename Image::PVertex,
@@ -1022,7 +1027,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
     SimplArrPool<typename Image::Vertex> valloc(2*n+3);
     SimplArrPool<typename Image::Edge> ealloc(5*n+m+2);
 	Image ig(&valloc,&ealloc);
-	makeImage( g,ig,images, Directed|Loop );
+	Privates::flowsMakeImage( g,ig,images, Directed|Loop );
 	images.clear();
 
 	typename DefaultStructs:: template AssocCont< typename Image::PVertex,
@@ -1190,7 +1195,8 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     SimplArrPool<typename Image::Vertex> valloc(2*n);
     SimplArrPool<typename Image::Edge> ealloc(im);
 	Image ig(&valloc,&ealloc);
-	FlowPar<void>::makeImage( g,ig,images, Directed|Undirected );
+
+	Privates::flowsMakeImage( g,ig,images, Directed|Undirected );
 
 	for( typename Image::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
 		imageFlow[e].capac = (e->info.first) ? 1 : 2;
@@ -1224,7 +1230,7 @@ template< class DefaultStructs > template< class GraphType, class VIter > int Co
     SimplArrPool<typename Image::Vertex> valloc(2*n);
     SimplArrPool<typename Image::Edge> ealloc(im);
 	Image ig(&valloc,&ealloc);
-    FlowPar<void>::makeImage( g,ig,images, Directed|Undirected );
+    Privates::flowsMakeImage( g,ig,images, Directed|Undirected );
 
 
 	for( typename Image::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
@@ -1292,7 +1298,8 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
     SimplArrPool<typename Image::Vertex> valloc(2*n);
     SimplArrPool<typename Image::Edge> ealloc(2*(2 * g.getEdgeNo(Undirected) +g.getEdgeNo(Directed)+ n));
 	Image ig(&valloc,&ealloc);
-	FlowPar<void>::makeImage( g,ig,images, Directed|Undirected );
+
+	Privates::flowsMakeImage( g,ig,images, Directed|Undirected );
 
 	ig.delEdges( images[start].second,images[end].first );
 	ig.delEdges( images[end].second,images[start].first );

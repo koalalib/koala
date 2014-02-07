@@ -508,7 +508,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
 	void AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::AssocIndex::DelPosCommand( int pos )
 {
-	int LOCALARRAY( tabpos,size() );
+	int LOCALARRAY( tabpos,IndexContainer::size() );
 	int l = 0;
 	int i = IndexContainer::tab.firstPos();
 	for( ; i != -1; i = IndexContainer::tab.nextPos( i ) )
@@ -520,7 +520,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 			owner->delPos( std::pair< int,int >( tabpos[l],pos ) );
 	}
 	IndexContainer::tab.delPos( pos );
-	Klucz LOCALARRAY(keytab,size() );
+	Klucz LOCALARRAY(keytab,IndexContainer::size() );
 	int res=this->getKeys(keytab);
 	for( int j=0;j<res;j++)
 		if (!this->operator[]( keytab[j] )) IndexContainer::delKey( keytab[j] );

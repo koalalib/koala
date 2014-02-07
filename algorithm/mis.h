@@ -2,6 +2,7 @@
 #define DEF_MIS_H
 
 #include "../base/defs.h"
+#include "../base/rnd.h"
 #include "../graph/graph.h"
 #include "search.h"
 
@@ -36,7 +37,7 @@ namespace Koala
 		class First
 		{
 		public:
-			/* \brief Call function operator. 
+			/* \brief Call function operator.
 			 *
 			 *  \param g the copy of considered graph with pointer of original vertices in info field.
 			 *  \param vertTab the associative table that assigns weights to vertices.*/
@@ -246,7 +247,7 @@ namespace Koala
 				const VertContainer &vertTab );
 
 		/** \brief Test if stable
-		 * 
+		 *
 		 * Determinate if a set of vertices is independent.
 		 *  \param g     - graph to process
 		 *  \param first - first vertex from the potentially independent set
@@ -256,7 +257,7 @@ namespace Koala
 			static bool isStable( const GraphType &g, Iterator first, Iterator last );
 
 		/**\brief Test if max stable.
-		 * 
+		 *
 		 *Determinate if a set of vertices is maximal (in the sense of inclusion) independent.
 		 * \param  g     - graph to process
 		 * \param first - first vertex from the potentially independent set

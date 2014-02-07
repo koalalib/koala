@@ -457,14 +457,14 @@ template< class GraphType > typename GraphType::PVertex
 		Koala::ConstFunctor< typename GraphType::EdgeInfoType >(),dir,dir );
 }
 
-template< class GraphType > typename GraphType::PVertex Creator::erdRen1( GraphType &g, int n, double p, EdgeType eType )
+template< class RndGen, class GraphType > typename GraphType::PVertex Creator::erdRen1( RndGen& rgen,GraphType &g, int n, double p, EdgeType eType )
 {
-	return Creator::erdRen1( g,n,p,Koala::ConstFunctor< typename GraphType::VertInfoType >(),
+	return Creator::erdRen1( rgen,g,n,p,Koala::ConstFunctor< typename GraphType::VertInfoType >(),
 		Koala::ConstFunctor< typename GraphType::EdgeInfoType >(),eType );
 }
 
-template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
-	Creator::erdRen1( GraphType &g, int n, double p, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType eType )
+template< class RndGen,class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
+	Creator::erdRen1(  RndGen& rgen,GraphType &g, int n, double p, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType eType )
 {
 	if (eType == EdDirOut) eType = Directed;
 	koalaAssert( eType == Undirected || eType == Directed,AlgExcWrongMask );
@@ -475,7 +475,7 @@ template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::
 	for (int i = 0; i < n; i++ )
 		for(int j = i + 1; j < n; j++ )
 		{
-			rnd = (double)rand() / (double)RAND_MAX;
+			rnd = (double)rgen.rand() / (double)rgen.maxRand;
 			if (rnd <= p)
 			{
 				if (eType == Undirected) g.addEdge( vTab[i],vTab[j],eInfoGen( i,j,EdUndir ),EdUndir );
@@ -483,21 +483,21 @@ template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::
 			}
 			if (eType == Directed)
 			{
-				rnd = (double)rand() / (double)RAND_MAX;
+				rnd = (double)rgen.rand() / (double)rgen.maxRand;
 				if (rnd <= p) g.addEdge( vTab[j],vTab[i],eInfoGen( j,i,EdDirIn ),EdDirIn );
 			}
 		}
 	return vTab[0];
 }
 
-template< class GraphType > typename GraphType::PVertex Creator::erdRen2( GraphType &g, int n, int m, EdgeType eType )
+template< class RndGen, class GraphType > typename GraphType::PVertex Creator::erdRen2(RndGen& rgen, GraphType &g, int n, int m, EdgeType eType )
 {
-	return Creator::erdRen2( g,n,m,Koala::ConstFunctor< typename GraphType::VertInfoType >(),
+	return Creator::erdRen2( rgen,g,n,m,Koala::ConstFunctor< typename GraphType::VertInfoType >(),
 		Koala::ConstFunctor< typename GraphType::EdgeInfoType >(),eType );
 }
 
-template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
-	Creator::erdRen2( GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType eType )
+template< class RndGen, class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
+	Creator::erdRen2(RndGen& rgen, GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType eType )
 {
 	if (eType == EdDirOut) eType = Directed;
 	int maxEgdesNum = 0, j = 0, k = 0, v1num = 0, v2num = 0;
@@ -541,7 +541,7 @@ template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::
 	//choose m edges at random from uniform distriburion
 	for( int i = 0; i < m; i++ )
 	{
-		j = random( i,maxEgdesNum - 1 );
+		j = random(rgen, i,maxEgdesNum - 1 );
 		temp = edges[i];
 		edges[i] = edges[j];
 		edges[j] = temp;
@@ -556,10 +556,11 @@ template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::
 	return vTab[0];
 }
 
-int Creator::random( int begin, int end )
+template< class RndGen >
+int Creator::random(RndGen& rgen, int begin, int end )
 {
 	int range = (end - begin) + 1;
-	return begin + int( range * rand()/(RAND_MAX + 1.0) );
+	return begin + int( range * (rgen.rand()/(rgen.maxRand + 1.0)) );
 }
 
 // RelDiagramPar
