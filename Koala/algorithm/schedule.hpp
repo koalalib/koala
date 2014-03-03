@@ -201,10 +201,14 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	if (nonPmtn && n != parts) return false;
 
 	TaskPart LOCALARRAY( result,n );
-	Pair LOCALARRAY( available,parts );
-	PriQueueInterface< Pair*,compareSecondLast< Pair > > pq( available,parts );
+
+    SimplArrPool< typename DefaultStructs:: template
+		HeapCont< Pair, compareSecondFirst< Pair > >::NodeType> available(parts);
+    typename DefaultStructs::template
+		HeapCont< Pair,compareSecondFirst< Pair > >::Type pq(&available);
 
 	// To samo zadanie nie jest wykonywane jednoczenie na obu maszynach
+	// TODO: można posortować
 	for( typename Schedule::Type::const_iterator i = schedule.machines.begin(); i != schedule.machines.end(); ++i )
 		for( typename Schedule::Machine::const_iterator j = i->begin(); j != i->end(); ++j )
 			pq.push( Pair( *j,j->start ) );
@@ -245,9 +249,11 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	typedef std::pair< int,int > IntPair;
 	typedef std::pair< typename GraphType::PVertex,int > Pair;
 
+	SimplArrPool<typename DefaultStructs::template
+        HeapCont< IntPair,compareSecondFirst< IntPair > >::NodeType  > machines(schedule.getMachNo());
+	typename DefaultStructs::template
+        HeapCont< IntPair,compareSecondFirst< IntPair > >::Type machine(&machines);
 
-	IntPair LOCALARRAY( machines,schedule.getMachNo() );
-	PriQueueInterface< IntPair *,compareSecondLast< IntPair > > machine( machines,schedule.getMachNo() );
 	for( int i = 0; i < schedule.getMachNo(); i++) machine.push( std::make_pair( i,0 ) );
 
 	int n = 0;
@@ -256,9 +262,10 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	typename DefaultStructs::template AssocCont< typename GraphType::PVertex,Element< Task< GraphType > > >::Type
 		tasks( n );
 
-	Pair LOCALARRAY( candidates,n );
-	Pair LOCALARRAY( actives,n );
-	PriQueueInterface< Pair *,compareSecondLast< Pair > > candidate( candidates,n ), active( actives,n );
+	SimplArrPool<typename DefaultStructs::template
+        HeapCont< Pair,compareSecondFirst< Pair > >::NodeType > alloc(n);
+    typename DefaultStructs::template
+        HeapCont< Pair,compareSecondFirst< Pair > >::Type candidate(&alloc), active(&alloc);
 
 	n = 0;
 	for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ )
@@ -388,9 +395,10 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	typename GraphType::PVertex LOCALARRAY( vertices,n );
 	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
-	Pair LOCALARRAY( candidates,n );
-	Pair LOCALARRAY( actives,n );
-	PriQueueInterface< Pair *,compareSecondLast< Pair > > candidate( candidates,n ), active( actives,n );
+	SimplArrPool<typename DefaultStructs::template
+        HeapCont< Pair,compareSecondFirst< Pair > >::NodeType > alloc(n);
+    typename DefaultStructs::template
+        HeapCont< Pair,compareSecondFirst< Pair > >::Type candidate(&alloc), active(&alloc);
 
 	for( int i = n - 1; i >= 0; i-- )
 	{
@@ -472,8 +480,11 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
 	// Aktualizacja terminów zakoñczenia zadañ, zgodnie z relacj¹ prec, i tworzenie kolejki priorytetowej zadañ dostêpnych
-	Pair LOCALARRAY( actives,n );
-	PriQueueInterface< Pair *,compareSecondFirst< Pair > > active( actives,n );
+	SimplArrPool<typename DefaultStructs::template
+        HeapCont< Pair,compareSecondLast< Pair > >::NodeType > alloc(n);
+    typename DefaultStructs::template
+        HeapCont< Pair,compareSecondLast< Pair > >::Type active(&alloc);
+
 	for( int i = n - 1; i >= 0; i-- )
 	{
 		typename GraphType::PVertex v = vertices[i];
@@ -541,8 +552,11 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
 	// Odwzorowanie poziomów drzewa i tworzenie kolejki priorytetowej zadañ dostêpnych
-	Pair LOCALARRAY( actives,n );
-	PriQueueInterface< Pair *,compareSecondFirst< Pair > > active( actives,n );
+	SimplArrPool<typename DefaultStructs::template
+        HeapCont<  Pair,compareSecondLast< Pair > >::NodeType> alloc(n);
+	typename DefaultStructs::template
+        HeapCont<  Pair,compareSecondLast< Pair > >::Type active(&alloc);
+
 	for( int i = n - 1; i >= 0; i-- )
 	{
 		typename GraphType::PVertex v = vertices[i];
@@ -628,8 +642,10 @@ template< class DefaultStructs > template< typename TaskIterator >
 	for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ )
 		info[n] = HodgsonElement( n,iterator->length,iterator->duedate );
 
-	Pair LOCALARRAY( actives,n );
-	PriQueueInterface< Pair *,compareSecondFirst< Pair > > active( actives,n );
+	SimplArrPool<typename DefaultStructs::template
+        HeapCont< Pair,compareSecondLast< Pair > >::NodeType > alloc(n);
+    typename DefaultStructs::template
+        HeapCont< Pair,compareSecondLast< Pair > >::Type active(&alloc);
 
 	int out = 0, sum = 0;
 	for( int i = 0; i < n; i++ )

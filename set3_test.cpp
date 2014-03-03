@@ -45,18 +45,18 @@ double kwadrat(int arg) { return arg*arg; }
     Set<int> sset;
     sset.reserve(5);
 
-    PriQueueInterface<int*,std::less<int> > q(tab,4);
-
-    cout << q.size() << endl;
-    q.push(4);
-    q.push(4);
-    q.push(2);
-    q.push(5);
-    q.pop();q.pop();q.pop();q.pop();
-    q.push(5);
-    cout << q.top() << endl;
-    cout << q.size() << endl;
-    cout << endl << endl;
+//    PriQueueInterface<int*,std::less<int> > q(tab,4);
+//
+//    cout << q.size() << endl;
+//    q.push(4);
+//    q.push(4);
+//    q.push(2);
+//    q.push(5);
+//    q.pop();q.pop();q.pop();q.pop();
+//    q.push(5);
+//    cout << q.top() << endl;
+//    cout << q.size() << endl;
+//    cout << endl << endl;
 
 
 

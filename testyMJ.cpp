@@ -1287,6 +1287,8 @@ int critPath2(const char* napis)
 
     char napis[20],napis2[20];
 
+    cout << boolalpha<<  endl << chordalRepr("I??E@_KI_") << endl;
+
     {   cout <<"Undirected (g6 or matrix format):\n";
         MyGraph g;
 //        MyGraph::PVertex A,B,C,D;
