@@ -73,8 +73,14 @@ int main() {
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << (res=IsIt::Bipartite::maxStable(g, verts)) << '\t';
     cout << boolalpha<< MISHeuristic::isStable(g, verts, &verts[res]) << endl;
+    for(int i=0;i< res; i++ ) cout << g.vertPos(verts[i]);
+    cout << endl;
+
 	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << (res=IsIt::Chordal::maxStable(g, verts)) <<'\t';
     cout << boolalpha<< MISHeuristic::isStable(g, verts, &verts[res]) << endl;
+    for(int i=0;i< res; i++ ) cout << g.vertPos(verts[i]);
+    cout << endl;
+
 	CATCHKOALA
 
 
