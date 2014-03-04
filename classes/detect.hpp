@@ -556,6 +556,7 @@ template< class DefaultStructs > template< class Graph, class VIterOut >
 }
 
 
+//bug: nowa wersja
 template< class DefaultStructs > template < class Graph, class QIter, class VIter, class QTEIter, class IterOut >
 	int IsItPar< DefaultStructs >::Chordal::maxStable( const Graph& g, int qn, QIter begin, VIter vbegin,
 		QTEIter ebegin, IterOut out )
@@ -666,6 +667,102 @@ template< class DefaultStructs > template < class Graph, class QIter, class VIte
 
 }
 
+
+//bug: stara wersja
+template< class DefaultStructs > template < class Graph, class QIter, class VIter, class QTEIter, class IterOut >
+	int IsItPar< DefaultStructs >::Chordal::maxStable_( const Graph& g, int qn, QIter begin, VIter vbegin,
+		QTEIter ebegin, IterOut out )
+{
+	//TODO: paskudne struktury danych
+	int n=g.getVertNo();
+	typename AssocArrSwitch<typename DefaultStructs:: template AssocCont< typename Graph::PVertex,QTRes_< Graph > >
+					::Type>::Type LOCALARRAY( tabtab,qn );
+	QTRes_< Graph > LOCALARRAY( tabnull,qn );
+	typedef typename DefaultStructs::template LocalGraph< std::pair< typename AssocArrSwitch<typename DefaultStructs:: template AssocCont<
+		typename Graph::PVertex,QTRes_< Graph > >::Type>::Type *,QTRes_< Graph > * >,EmptyEdgeInfo,Directed|Undirected >:: Type ImageGraph;
+    SimplArrPool<typename ImageGraph::Vertex> valloc(n);
+    SimplArrPool<typename ImageGraph::Edge> ealloc(n-1);
+	ImageGraph tree(&valloc,&ealloc);
+//	ImageGraph tree;
+	typename ImageGraph::PVertex LOCALARRAY( treeverts,qn );
+	QIter it = begin, it2 = it;
+	it2++;
+	for( int i = 0; i < qn; i++,it++,it2++ )
+	{
+		int size;
+		(treeverts[i] = tree.addVert( std::make_pair( tabtab + i,tabnull + i ) ))->info.first->reserve( size = (*it2 - *it) );
+		for( int j = 0; j < size; j++,vbegin++ ) (*treeverts[i]->info.first)[*vbegin];
+	}
+	for( int i = 0; i <qn - 1; i++,ebegin++) tree.addEdge( treeverts[(*ebegin).first],treeverts[(*ebegin).second] );
+	typename DefaultStructs:: template AssocCont< typename ImageGraph::PVertex,
+		typename SearchStructs::template VisitVertLabs< ImageGraph > >::Type search( qn );
+	DFSPostorderPar< DefaultStructs >::scanAttainable( tree,tree.getVert(),search,treeverts,EdUndir);
+	for( typename ImageGraph::PVertex u = tree.getVert(); u; u = tree.getVertNext( u ) )
+		if (search[u].ePrev) tree.ch2Dir( search[u].ePrev,u,EdDirOut );
+
+	for( int i = 0; i < qn; i++ )
+	{
+		typename ImageGraph::PVertex vert = treeverts[i];
+		vert->info.second->size = 0;
+		vert->info.second->trees.clear();
+		for( typename ImageGraph::PEdge e = tree.getEdge( vert,EdDirIn ); e; e = tree.getEdgeNext( vert,e,EdDirIn ) )
+		{
+			typename ImageGraph::PVertex child = tree.getEdgeEnd( e,vert );
+			int maxs = child->info.second->size, tmpsize;
+			Set< typename Graph::PVertex > *maxset = &child->info.second->trees;
+			for( typename Graph::PVertex key = child->info.first->firstKey(); key; key = child->info.first->nextKey( key ) )
+				if ((!vert->info.first->hasKey( key )) && (tmpsize = (*child->info.first)[key].size) > maxs)
+				{
+					maxs = tmpsize;
+					maxset = &(*child->info.first)[key].trees;
+				}
+			vert->info.second->size += maxs;
+			vert->info.second->trees += *maxset;
+		}
+		typename ImageGraph::PVertex child;
+		for( typename Graph::PVertex key = vert->info.first->firstKey(); key; key = vert->info.first->nextKey( key ) )
+		{
+			vert->info.first->operator[]( key ).size = 1;
+			vert->info.first->operator[]( key ).trees.clear();
+			vert->info.first->operator[]( key ).trees += key;
+			for( typename ImageGraph::PEdge e = tree.getEdge( vert,EdDirIn ); e; e = tree.getEdgeNext( vert,e,EdDirIn ) )
+				if ((child = tree.getEdgeEnd( e,vert ))->info.first->hasKey( key ))
+				{
+					(*vert->info.first)[key].size += (*child->info.first)[key].size - 1;
+					(*vert->info.first)[key].trees += (*child->info.first)[key].trees;
+				}
+				else
+				{
+					int maxs = child->info.second->size, tmpsize;
+					Set< typename Graph::PVertex > *maxset = &child->info.second->trees;
+					for( typename Graph::PVertex childkey = child->info.first->firstKey(); childkey;
+						childkey = child->info.first->nextKey( childkey ) )
+						if ((!vert->info.first->hasKey( childkey )) && (tmpsize = (*child->info.first)[childkey].size) > maxs)
+						{
+							maxs = tmpsize;
+							maxset = &(*child->info.first)[childkey].trees;
+						}
+					vert->info.first->operator[]( key ).size += maxs;
+					vert->info.first->operator[]( key ).trees += *maxset;
+				}
+		}
+	}
+
+	typename ImageGraph::PVertex root = treeverts[qn - 1];
+	int maxs = root->info.second->size, tmpsize;
+	Set< typename Graph::PVertex > *maxset = &root->info.second->trees;
+	for( typename Graph::PVertex key = root->info.first->firstKey(); key; key = root->info.first->nextKey( key ) )
+	if ((tmpsize = (root->info.first->operator[]( key ).size)) > maxs)
+	{
+		maxs = tmpsize;
+		maxset = &root->info.first->operator[]( key ).trees;
+	}
+	maxset->getElements( out );
+//	assert(maxs==maxset->size());
+	return maxset->size();
+}
+
+
 template< class DefaultStructs > template < class Graph, class QIter, class VIter, class QTEIter, class IterOut >
 	int IsItPar< DefaultStructs >::Chordal::minVertCover( const Graph &g, int qn, QIter begin, VIter vbegin,
 		QTEIter ebegin, IterOut out )
@@ -694,6 +791,19 @@ template< class DefaultStructs > template< class Graph, class IterOut >
 	int qn = maxCliques( g,compStore( begin,vbegin ),ebegin );
 	if (qn == -1) return -1;
 	return maxStable( g,qn,begin,vbegin,ebegin,out );
+}
+
+template< class DefaultStructs > template< class Graph, class IterOut >
+	int IsItPar< DefaultStructs >::Chordal::maxStable_( const Graph &g, IterOut out )
+{
+	int n = g.getVertNo();
+	typename Graph::PVertex LOCALARRAY( vbegin,n * n );
+	//TODO: size?
+	int LOCALARRAY( begin,n + 1 );
+	std::pair< int,int > LOCALARRAY( ebegin,n );
+	int qn = maxCliques( g,compStore( begin,vbegin ),ebegin );
+	if (qn == -1) return -1;
+	return maxStable_( g,qn,begin,vbegin,ebegin,out );
 }
 
 template< class DefaultStructs > template< class Graph, class IterOut >

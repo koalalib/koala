@@ -121,7 +121,7 @@ namespace Koala
 		public:
 			typedef SimpleAssocMatrix< A,B,type > Type;/**<\brief Define own if intend to change.*/
 			// Nie usuwac komentarza (przykladowe uzycia)
-			 // typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
+			//  typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
 		};
 
 		// typ struktury kopca i jego wezla
