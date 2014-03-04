@@ -62,20 +62,20 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << IsIt::Bipartite::maxStable(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable(g, verts) << endl;
+	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable_(g, verts) << endl;
 	if(IsIt::cograph(g)) cout << " Cogr. indep. set = " << IsIt::Cograph::maxStable(g, verts) << endl;
 	CATCHKOALA
 
 	// error 3
-	t = "H??E@_m";
-	g.clear();
-	readG6(g, t);
-	cout << "g6 = " << t << endl;
-	TRYKOALA
-	if(IsIt::bipartite(g)) cout << " Bip. vert cover = " << IsIt::Bipartite::minVertCover(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. vert cover = " << IsIt::Chordal::minVertCover(g, verts) << endl;
-	if(IsIt::cograph(g)) cout << " Cogr. vert cover = " << IsIt::Cograph::minVertCover(g, verts) << endl;
-	CATCHKOALA
+//	t = "H??E@_m";
+//	g.clear();
+//	readG6(g, t);
+//	cout << "g6 = " << t << endl;
+//	TRYKOALA
+//	if(IsIt::bipartite(g)) cout << " Bip. vert cover = " << IsIt::Bipartite::minVertCover(g, verts) << endl;
+//	if(IsIt::chordal(g)) cout << " Chord. vert cover = " << IsIt::Chordal::minVertCover(g, verts) << endl;
+//	if(IsIt::cograph(g)) cout << " Cogr. vert cover = " << IsIt::Cograph::minVertCover(g, verts) << endl;
+//	CATCHKOALA
 
 	// error 4
 	t = "I???E?oJO";
@@ -84,20 +84,20 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << IsIt::Bipartite::maxStable(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable(g, verts) << endl;
+	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable_(g, verts) << endl;
 	if(IsIt::cograph(g)) cout << " Cogr. indep. set = " << IsIt::Cograph::maxStable(g, verts) << endl;
 	CATCHKOALA
 
 	// error 5
-	t = "I???E?oJO";
-	g.clear();
-	readG6(g, t);
-	cout << "g6 = " << t << endl;
-	TRYKOALA
-	if(IsIt::bipartite(g)) cout << " Bip. vert cover = " << IsIt::Bipartite::minVertCover(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. vert cover = " << IsIt::Chordal::minVertCover(g, verts) << endl;
-	if(IsIt::cograph(g)) cout << " Cogr. vert cover = " << IsIt::Cograph::minVertCover(g, verts) << endl;
-	CATCHKOALA
+//	t = "I???E?oJO";
+//	g.clear();
+//	readG6(g, t);
+//	cout << "g6 = " << t << endl;
+//	TRYKOALA
+//	if(IsIt::bipartite(g)) cout << " Bip. vert cover = " << IsIt::Bipartite::minVertCover(g, verts) << endl;
+//	if(IsIt::chordal(g)) cout << " Chord. vert cover = " << IsIt::Chordal::minVertCover(g, verts) << endl;
+//	if(IsIt::cograph(g)) cout << " Cogr. vert cover = " << IsIt::Cograph::minVertCover(g, verts) << endl;
+//	CATCHKOALA
 
 	// error 6
 	t = "I???E?wHo";
@@ -106,20 +106,20 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << IsIt::Bipartite::maxStable(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable(g, verts) << endl;
+	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable_(g, verts) << endl;
 	if(IsIt::cograph(g)) cout << " Cogr. indep. set = " << IsIt::Cograph::maxStable(g, verts) << endl;
 	CATCHKOALA
 
 	// error 7
-	t = "I???E?wHo";
-	g.clear();
-	readG6(g, t);
-	cout << "g6 = " << t << endl;
-	TRYKOALA
-	if(IsIt::bipartite(g)) cout << " Bip. vert cover = " << IsIt::Bipartite::minVertCover(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. vert cover = " << IsIt::Chordal::minVertCover(g, verts) << endl;
-	if(IsIt::cograph(g)) cout << " Cogr. vert cover = " << IsIt::Cograph::minVertCover(g, verts) << endl;
-	CATCHKOALA
+//	t = "I???E?wHo";
+//	g.clear();
+//	readG6(g, t);
+//	cout << "g6 = " << t << endl;
+//	TRYKOALA
+//	if(IsIt::bipartite(g)) cout << " Bip. vert cover = " << IsIt::Bipartite::minVertCover(g, verts) << endl;
+//	if(IsIt::chordal(g)) cout << " Chord. vert cover = " << IsIt::Chordal::minVertCover(g, verts) << endl;
+//	if(IsIt::cograph(g)) cout << " Cogr. vert cover = " << IsIt::Cograph::minVertCover(g, verts) << endl;
+//	CATCHKOALA
 
 	// error 8
 	t = "I??CB?WDO";
@@ -128,20 +128,20 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << IsIt::Bipartite::maxStable(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable(g, verts) << endl;
+	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable_(g, verts) << endl;
 	if(IsIt::cograph(g)) cout << " Cogr. indep. set = " << IsIt::Cograph::maxStable(g, verts) << endl;
 	CATCHKOALA
 
 	// error 9
-	t = "I??CB?WDO";
-	g.clear();
-	readG6(g, t);
-	cout << "g6 = " << t << endl;
-	TRYKOALA
-	if(IsIt::bipartite(g)) cout << " Bip. vert cover = " << IsIt::Bipartite::minVertCover(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. vert cover = " << IsIt::Chordal::minVertCover(g, verts) << endl;
-	if(IsIt::cograph(g)) cout << " Cogr. vert cover = " << IsIt::Cograph::minVertCover(g, verts) << endl;
-	CATCHKOALA
+//	t = "I??CB?WDO";
+//	g.clear();
+//	readG6(g, t);
+//	cout << "g6 = " << t << endl;
+//	TRYKOALA
+//	if(IsIt::bipartite(g)) cout << " Bip. vert cover = " << IsIt::Bipartite::minVertCover(g, verts) << endl;
+//	if(IsIt::chordal(g)) cout << " Chord. vert cover = " << IsIt::Chordal::minVertCover(g, verts) << endl;
+//	if(IsIt::cograph(g)) cout << " Cogr. vert cover = " << IsIt::Cograph::minVertCover(g, verts) << endl;
+//	CATCHKOALA
 
 	// error 10
 	t = "I??E@_KI_";
@@ -150,20 +150,20 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << IsIt::Bipartite::maxStable(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable(g, verts) << endl;
+	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable_(g, verts) << endl;
 	if(IsIt::cograph(g)) cout << " Cogr. indep. set = " << IsIt::Cograph::maxStable(g, verts) << endl;
 	CATCHKOALA
 
 	// error 11
-	t = "I??E@_KI_";
-	g.clear();
-	readG6(g, t);
-	cout << "g6 = " << t << endl;
-	TRYKOALA
-	if(IsIt::bipartite(g)) cout << " Bip. vert cover = " << IsIt::Bipartite::minVertCover(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. vert cover = " << IsIt::Chordal::minVertCover(g, verts) << endl;
-	if(IsIt::cograph(g)) cout << " Cogr. vert cover = " << IsIt::Cograph::minVertCover(g, verts) << endl;
-	CATCHKOALA
+//	t = "I??E@_KI_";
+//	g.clear();
+//	readG6(g, t);
+//	cout << "g6 = " << t << endl;
+//	TRYKOALA
+//	if(IsIt::bipartite(g)) cout << " Bip. vert cover = " << IsIt::Bipartite::minVertCover(g, verts) << endl;
+//	if(IsIt::chordal(g)) cout << " Chord. vert cover = " << IsIt::Chordal::minVertCover(g, verts) << endl;
+//	if(IsIt::cograph(g)) cout << " Cogr. vert cover = " << IsIt::Cograph::minVertCover(g, verts) << endl;
+//	CATCHKOALA
 
 	return 0;
 	};

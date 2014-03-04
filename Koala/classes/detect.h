@@ -380,6 +380,7 @@ namespace Koala
 
                 void add(Elem e)
                 {
+                    assert(!elem);
                     elem=e;
                 }
 
@@ -402,11 +403,21 @@ namespace Koala
                 }
             };
 
+//bug: nowa wersja
 			template< class Graph > struct QTRes
 			{
 				int size;
 				RekSet< typename Graph::PVertex > rtrees;
 				QTRes(): size( 0 ), rtrees()
+					{ }
+			};
+
+//bug: stara wersja
+			template< class Graph > struct QTRes_
+			{
+				int size;
+				Set< typename Graph::PVertex > trees;
+				QTRes_(): size( 0 ), trees()
 					{ }
 			};
 
@@ -494,6 +505,9 @@ namespace Koala
 			template< class Graph, class QIter, class VIter, class QTEIter, class IterOut >
 				static int maxStable( const Graph &g, int qn, QIter begin, VIter vbegin, QTEIter ebegin, IterOut out );
 
+			template< class Graph, class QIter, class VIter, class QTEIter, class IterOut >
+				static int maxStable_( const Graph &g, int qn, QIter begin, VIter vbegin, QTEIter ebegin, IterOut out );
+
 			// znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
 			// sens parametrow j.w.
 			/** \brief Get minimal vertex cover.
@@ -519,6 +533,7 @@ namespace Koala
 			 *  \return the number of element in the output set \a out or -1 if any error occur.*/
 			template< class Graph, class IterOut > static int maxStable( const Graph &g, IterOut out );
 
+			template< class Graph, class IterOut > static int maxStable_( const Graph &g, IterOut out );
 			// znajduje najwieksze pokrycie wierzcholkowe (wypuszczane na out), zwraca jego rozmiar lub -1 w razie bledu
 			// samodzielna
 			/** \brief Get minimal vertex cover.
