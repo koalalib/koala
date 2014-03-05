@@ -104,9 +104,14 @@ namespace Koala
 		{
 		public:
 			typedef AssocArray< A,B > Type;/**<\brief Define own if intend to change.*/
-			//  Nie usuwac komentarzy (przykladowa uzycia)
-			 //  typedef AssocTable < BiDiHashMap<A,B> > Type;
-			//   typedef Privates::PseudoAssocArray<A,B,AssocTable<std::map<A,int> > > Type;
+
+			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+
+			//  typedef AssocTable < BiDiHashMap<A,B> > Type;
+
+            //  typedef AssocTable < HashMap<A,B> > Type;
+
+            //  typedef AssocTable < std::map<A,B> > Type;
 		};
 
 		// Typ 2-wymiarowej tablicy assocjacyjnej o kluczu A i wartości B. Kluczami są pary uporzadkowane lub
@@ -120,8 +125,22 @@ namespace Koala
 		{
 		public:
 			typedef SimpleAssocMatrix< A,B,type > Type;/**<\brief Define own if intend to change.*/
-			// Nie usuwac komentarza (przykladowe uzycia)
+
+			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+
+            //  typedef SimpleAssocMatrix<A,B,type,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<A,B>::BlockType> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
+            //  typedef SimpleAssocMatrix<A,B,type,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<A,B>::BlockType> >,Privates::PseudoAssocArray<A,int,AssocTable<HashMap<A,int> > > > Type;
+            //  typedef SimpleAssocMatrix<A,B,type,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<A,B>::BlockType> >,Privates::PseudoAssocArray<A,int,AssocTable<std::map<A,int> > > > Type;
+
+			// typedef AssocMatrix< A,B,type > Type;
+
 			//  typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
+            //  typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<HashMap<A,int> > > > Type;
+            //  typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<std::map<A,int> > > > Type;
+
+            //  typedef  Assoc2DimTable< type, std::map<std::pair<A,A>, B > > Type;
+            //  typedef  Assoc2DimTable< type, BiDiHashMap<std::pair<A,A>, B > > Type;
+            //  typedef  Assoc2DimTable< type, HashMap<std::pair<A,A>, B > > Type;
 		};
 
 		// typ struktury kopca i jego wezla
@@ -136,7 +155,14 @@ namespace Koala
 		{
 		public:
 			typedef FibonHeap< Key,Compare > Type;/**<\brief Define own if intend to change.???*/
-			typedef FibonHeapNode< Key > NodeType;/**<\brief Define own if intend to change.???*/
+                    typedef FibonHeapNode< Key > NodeType;/**<\brief Define own if intend to change.???*/
+
+			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+            //typedef BinomHeap< Key,Compare > Type;/**<\brief Define own if intend to change.???*/
+                    //typedef BinomHeapNode< Key > NodeType;/**<\brief Define own if intend to change.???*/
+
+            //typedef PairHeap< Key,Compare > Type;/**<\brief Define own if intend to change.???*/
+                    //typedef PairHeapNode< Key > NodeType;/**<\brief Define own if intend to change.???*/
 		};
 
 		// Typ grafu pomocniczego stosowanego wewnątrz procedury.

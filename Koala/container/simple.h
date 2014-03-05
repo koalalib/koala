@@ -220,7 +220,6 @@ namespace Koala
 
         ~SimplArrPool()
         {
-//            if (!(used==0 || !throwIfNotEmpty)) std::cout << "\nErr!: " << this->size() << ' ' << this->used << "\n";
             koalaAssert(used==0 || !throwIfNotEmpty,ContExcPoolNotEmpty);
             if (used)
                 for(int i=0;i<siz;i++) if (blocks()[i].next==-2) blocks()[i].elem.~Elem();
@@ -252,9 +251,13 @@ namespace Koala
         void dealloc(Elem* wsk)
         {
             char* chwsk=(char*) wsk;
-            koalaAssert(chwsk>=buf && chwsk<buf+siz*sizeof(Block),ContExcWrongArg);
+            bool good=chwsk>=buf && chwsk<buf+siz*sizeof(Block);
+            koalaAssert(good,ContExcWrongArg);
+            if (!good) return;
             int pos=(chwsk-buf)/sizeof(Block);
-            koalaAssert((chwsk==(char*)(&blocks()[pos].elem) && blocks()[pos].next==-2),ContExcWrongArg);
+            good=(chwsk==(char*)(&blocks()[pos].elem) && blocks()[pos].next==-2);
+            koalaAssert(good,ContExcWrongArg);
+            if (!good) return;
             blocks()[pos].next=first;
             first=pos;
             used--;

@@ -17,7 +17,7 @@ using namespace std;
 #include "main.hpp"
 
 	bool rv;
-	Graph<int, int> g;
+	Graph<int, int> g,g2;
 	Graph<int, int>::PVertex v,u,w,y,u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,tabV[100],tabV2[100];
 	AssocArray<Koala::Graph<int,int>::PEdge,int> edgeCont;
 	Koala::AssocArray<Koala::Graph<int,int>::PVertex,
@@ -98,15 +98,18 @@ using namespace std;
         Graph<int, int>::PVertex u11=g.addVert(11);
         Graph<int, int>::PVertex u12=g.addVert(12);
         Graph<int, int>::PVertex u13=g.addVert(13);
-
-        g.addEdge(u10,u11); g.addEdge(u12,u13);
-        g.addEdge(u11,u12);
+//
+        g.addEdge(u10,u11);
+        g.addEdge(u12,u13);
+        g.addEdge(u11,u12); g.addEdge(u11,u13);
       g.addEdge(u10,u12);
         g.addEdge(u10,u13);
+
 
         cout << endl << "maxStable: ";
         cout << endl << endl << (res=IsIt::Chordal::maxStable(g,tabV2))<< endl;
         for(int i=0;i<res;i++) cout << tabV2[i]->info << ' ';
+
 	}
 
     return 0;

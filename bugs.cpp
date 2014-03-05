@@ -62,7 +62,7 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << IsIt::Bipartite::maxStable(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable_(g, verts) << endl;
+	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable(g, verts) << endl;
 	if(IsIt::cograph(g)) cout << " Cogr. indep. set = " << IsIt::Cograph::maxStable(g, verts) << endl;
 	CATCHKOALA
 
@@ -84,7 +84,7 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << IsIt::Bipartite::maxStable(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable_(g, verts) << endl;
+	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable(g, verts) << endl;
 	if(IsIt::cograph(g)) cout << " Cogr. indep. set = " << IsIt::Cograph::maxStable(g, verts) << endl;
 	CATCHKOALA
 
@@ -106,7 +106,7 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << IsIt::Bipartite::maxStable(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable_(g, verts) << endl;
+	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable(g, verts) << endl;
 	if(IsIt::cograph(g)) cout << " Cogr. indep. set = " << IsIt::Cograph::maxStable(g, verts) << endl;
 	CATCHKOALA
 
@@ -128,7 +128,7 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << IsIt::Bipartite::maxStable(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable_(g, verts) << endl;
+	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable(g, verts) << endl;
 	if(IsIt::cograph(g)) cout << " Cogr. indep. set = " << IsIt::Cograph::maxStable(g, verts) << endl;
 	CATCHKOALA
 
@@ -150,7 +150,7 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << IsIt::Bipartite::maxStable(g, verts) << endl;
-	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable_(g, verts) << endl;
+	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << IsIt::Chordal::maxStable(g, verts) << endl;
 	if(IsIt::cograph(g)) cout << " Cogr. indep. set = " << IsIt::Cograph::maxStable(g, verts) << endl;
 	CATCHKOALA
 

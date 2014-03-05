@@ -323,20 +323,6 @@ namespace Koala
 		template< class GraphType > static bool compMPartite( const GraphType &g )
 			{ return CompMPartite::split( g,blackHole,compStore( blackHole,blackHole )) != -1; }
 
-		protected:
-
-		  template <class Cont>
-			struct AssocArrSwitch {
-
-				typedef Cont Type;
-			};
-
-			template <class K, class E, class Cont>
-			struct AssocArrSwitch<AssocArray<K,E,Cont> > {
-
-				typedef AssocTable<std::map< K, E> > Type;
-			};
-
 		public:
 
 		/* Chordal
@@ -403,31 +389,53 @@ namespace Koala
                 }
             };
 
-//bug: nowa wersja
+
 			template< class Graph > struct QTRes
 			{
 				int size;
-				RekSet< typename Graph::PVertex > rtrees;
-				QTRes(): size( 0 ), rtrees()
+				RekSet< typename Graph::PVertex > trees;
+				QTRes(): size( 0 ), trees()
 					{ }
 			};
 
-//bug: stara wersja
-			template< class Graph > struct QTRes_
+			template <class Graph, class Matrix, class Buf> struct TabInterf
 			{
-				int size;
-				Set< typename Graph::PVertex > trees;
-				QTRes_(): size( 0 ), trees()
-					{ }
-			};
+			    typename Graph::PVertex nr,last;
+			    Buf * bufor;
+			    Matrix* matr;
 
+			    TabInterf() : bufor(0), matr(0), nr(0), last(0) {}
 
-			template <class Graph, class Iterator> struct VLab {
+			    void init(Matrix* amatr, typename Graph::PVertex ind,Buf * abufor)
+			    {
+			        matr=amatr; nr=ind; bufor=abufor;
+			    }
 
-                QTRes<Graph> tnull;
-                Iterator beg,end;
-                VLab(Iterator abeg) : beg(abeg), end(abeg)
-                {}
+			    void reserve(int) {}
+
+			    bool hasKey(typename Graph::PVertex v) { return matr->hasKey(nr,v); }
+
+			    typename Graph::PVertex firstKey() { return last; }
+
+                QTRes<Graph>& operator[](typename Graph::PVertex v)
+                {   assert(v);
+                    std::pair<QTRes<Graph>,typename Graph::PVertex> * res;
+                    if (!matr->hasKey(nr,v))
+                    {
+                        res=&matr->operator()(nr,v);
+                        res->second=last;
+                        last=v;
+                        res->first.trees.buf=bufor;
+                    } else res=&matr->operator()(nr,v);
+                    return res->first;
+                }
+
+                typename Graph::PVertex nextKey(typename Graph::PVertex v)
+                {
+                    if (!v) return this->firstKey();
+                    assert(matr->hasKey(nr,v));
+                    return matr->operator()(nr,v).second;
+                }
 
 			};
 
@@ -505,9 +513,6 @@ namespace Koala
 			template< class Graph, class QIter, class VIter, class QTEIter, class IterOut >
 				static int maxStable( const Graph &g, int qn, QIter begin, VIter vbegin, QTEIter ebegin, IterOut out );
 
-			template< class Graph, class QIter, class VIter, class QTEIter, class IterOut >
-				static int maxStable_( const Graph &g, int qn, QIter begin, VIter vbegin, QTEIter ebegin, IterOut out );
-
 			// znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
 			// sens parametrow j.w.
 			/** \brief Get minimal vertex cover.
@@ -533,7 +538,6 @@ namespace Koala
 			 *  \return the number of element in the output set \a out or -1 if any error occur.*/
 			template< class Graph, class IterOut > static int maxStable( const Graph &g, IterOut out );
 
-			template< class Graph, class IterOut > static int maxStable_( const Graph &g, IterOut out );
 			// znajduje najwieksze pokrycie wierzcholkowe (wypuszczane na out), zwraca jego rozmiar lub -1 w razie bledu
 			// samodzielna
 			/** \brief Get minimal vertex cover.

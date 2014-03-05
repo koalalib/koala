@@ -1768,8 +1768,8 @@ namespace Koala
         {
             if (!Assoc2DimTabAddr< aType >::correctPos( wsp.first,wsp.second )) return;
             std::pair< int,int > x=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
-            if (!bufor.at(x.first).at(x.second).present) return;
-            bufor.at(x.first).at(x.second) = BlockOfSimpleAssocMatrix< Elem >();
+            if (!bufor.operator[](x.first).operator[](x.second).present) return;
+            bufor.operator[](x.first).operator[](x.second) = BlockOfSimpleAssocMatrix< Elem >();
             siz--;
             --index.tab[wsp.first].val;
             --index.tab[wsp.second].val;
@@ -1781,9 +1781,9 @@ namespace Koala
         {
             asize=std::max((int)bufor.size(),asize );
             bufor.resize(asize);
-            for(int i=0;i<asize;i++) bufor.at(i).resize
+            for(int i=0;i<asize;i++) bufor.operator[](i).resize
 //                (asize);
-                ( std::max(Assoc2DimTabAddr< aType >::colSize( i,asize ),(int)bufor.at(i).size()) );
+                ( std::max(Assoc2DimTabAddr< aType >::colSize( i,asize ),(int)bufor.operator[](i).size()) );
         }
 
 	public:
@@ -1841,7 +1841,7 @@ namespace Koala
         {
             index.reserve( asize );
             bufor.resize( asize=std::max((int)bufor.size(),asize ));
-            for(int i=0;i<asize;i++) bufor.at(i).reserve( Assoc2DimTabAddr< aType >::colSize( i,asize ) );
+            for(int i=0;i<asize;i++) bufor.operator[](i).reserve( Assoc2DimTabAddr< aType >::colSize( i,asize ) );
         }
 
         void clear()
@@ -1883,7 +1883,7 @@ namespace Koala
             std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
             if (wsp.first == -1 || wsp.second == -1) return false;
             wsp=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
-            return bufor.at(wsp.first).at(wsp.second).present;
+            return bufor.operator[](wsp.first).operator[](wsp.second).present;
         }
 		bool hasKey( std::pair< Klucz,Klucz > k ) const { return hasKey( k.first,k.second ); }
 
@@ -1894,9 +1894,9 @@ namespace Koala
             std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
             if (wsp.first == -1 || wsp.second == -1) return false;
             std::pair< int,int > x=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
-            if  (bufor.at(x.first).at(x.second).present)
+            if  (bufor.operator[](x.first).operator[](x.second).present)
             {
-                bufor.at(x.first).at(x.second) = BlockOfSimpleAssocMatrix< Elem >();
+                bufor.operator[](x.first).operator[](x.second) = BlockOfSimpleAssocMatrix< Elem >();
                 siz--;
                 if (--index[u] == 0) index.delKey( u );
                 if (--index[v] == 0) index.delKey( v );
@@ -1923,14 +1923,14 @@ namespace Koala
             int q,qq;
             this->resizeBuf( q=std::max( qq=(int)bufor.size(), index.size() ) );
             std::pair< int,int > x = Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
-            if (!bufor.at(x.first).at(x.second).present)
+            if (!bufor.operator[](x.first).operator[](x.second).present)
             {
-                bufor.at(x.first).at(x.second).present=true;
+                bufor.operator[](x.first).operator[](x.second).present=true;
                 index[u]++;
                 index[v]++;
                 siz++;
             }
-            return bufor.at(x.first).at(x.second).val;
+            return bufor.operator[](x.first).operator[](x.second).val;
         }
 		Elem &operator()( std::pair< Klucz,Klucz > k ) { return operator()( k.first,k.second ); }
 
@@ -1940,8 +1940,8 @@ namespace Koala
             std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
             if (wsp.first == -1 || wsp.second == -1) return Elem();
             std::pair< int,int > x = Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
-            if (!bufor.at(x.first).at(x.second).present) return Elem();
-            return bufor.at(x.first).at(x.second).val;
+            if (!bufor.operator[](x.first).operator[](x.second).present) return Elem();
+            return bufor.operator[](x.first).operator[](x.second).val;
         }
 		Elem operator()( std::pair< Klucz,Klucz > k ) const { return operator()( k.first,k.second ); }
 		Elem* valPtr( Klucz u, Klucz v)
@@ -1950,8 +1950,8 @@ namespace Koala
             std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
             if (wsp.first == -1 || wsp.second == -1) return NULL;
             std::pair< int,int > pos=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
-            if (!bufor.at(pos.first).at(pos.second).present) return NULL;
-            return &bufor.at(pos.first).at(pos.second).val;
+            if (!bufor.operator[](pos.first).operator[](pos.second).present) return NULL;
+            return &bufor.operator[](pos.first).operator[](pos.second).val;
         }
 		Elem* valPtr( std::pair< Klucz,Klucz > k ) { return valPtr(k.first,k.second); }
 
