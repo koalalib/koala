@@ -52,7 +52,14 @@ namespace Koala
 		{
 		public:
 			typedef AssocArray< A,B > Type;
-			 //typedef AssocTable<BiDiHashMap<A,B> > Type; // - przyklad uzycia, nie usuwac
+
+			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+
+			//  typedef AssocTable < BiDiHashMap<A,B> > Type;
+
+            //  typedef AssocTable < HashMap<A,B> > Type;
+
+            //  typedef AssocTable < std::map<A,B> > Type;
 		};
 
 
@@ -68,7 +75,13 @@ namespace Koala
 		{
 		public:
 			typedef AssocArray< A,B > Type;
-			 //typedef AssocTable<BiDiHashMap<A,B> > Type; // - przyklad uzycia, nie usuwac
+			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+
+			//  typedef AssocTable < BiDiHashMap<A,B> > Type;
+
+            //  typedef AssocTable < HashMap<A,B> > Type;
+
+            //  typedef AssocTable < std::map<A,B> > Type;
 		};
 
 		// typ macierzy sasiedztwa dla krawedzi skierowanych - zbedne przy edAllow=false
@@ -76,8 +89,21 @@ namespace Koala
 		{
 		public:
 			typedef SimpleAssocMatrix< K,V,AMatrNoDiag > Type;
-			// - przyklad uzycia, nie usuwac
-			 //typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+
+            //  typedef SimpleAssocMatrix<K,V,AMatrNoDiag,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+            //  typedef SimpleAssocMatrix<K,V,AMatrNoDiag,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<HashMap<K,int> > > > Type;
+            //  typedef SimpleAssocMatrix<K,V,AMatrNoDiag,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<std::map<K,int> > > > Type;
+
+			// typedef AssocMatrix< K,V,AMatrNoDiag > Type;
+
+			//  typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+            //  typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<HashMap<K,int> > > > Type;
+            //  typedef AssocMatrix<K,V,AMatrNoDiag,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<std::map<K,int> > > > Type;
+
+            //  typedef  Assoc2DimTable< AMatrNoDiag, std::map<std::pair<K,K>, V > > Type;
+            //  typedef  Assoc2DimTable< AMatrNoDiag, BiDiHashMap<std::pair<K,K>, V > > Type;
+            //  typedef  Assoc2DimTable< AMatrNoDiag, HashMap<std::pair<K,K>, V > > Type;
 		};
 
 		// typ macierzy sasiedztwa dla krawedzi nieskierowanych - zbedne przy edAllow=false
@@ -86,7 +112,21 @@ namespace Koala
 		public:
 			typedef SimpleAssocMatrix< K,V,AMatrTriangle > Type;
 			// - przyklad uzycia, nie usuwac
-			 //typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+
+            //  typedef SimpleAssocMatrix<K,V,AMatrTriangle,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+            //  typedef SimpleAssocMatrix<K,V,AMatrTriangle,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<HashMap<K,int> > > > Type;
+            //  typedef SimpleAssocMatrix<K,V,AMatrTriangle,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<std::map<K,int> > > > Type;
+
+			// typedef AssocMatrix< K,V,AMatrTriangle > Type;
+
+			//  typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
+            //  typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<HashMap<K,int> > > > Type;
+            //  typedef AssocMatrix<K,V,AMatrTriangle,std::vector< BlockOfAssocMatrix<V> >,Privates::PseudoAssocArray<K,int,AssocTable<std::map<K,int> > > > Type;
+
+            //  typedef  Assoc2DimTable< AMatrTriangle, std::map<std::pair<K,K>, V > > Type;
+            //  typedef  Assoc2DimTable< AMatrTriangle, BiDiHashMap<std::pair<K,K>, V > > Type;
+            //  typedef  Assoc2DimTable< AMatrTriangle, HashMap<std::pair<K,K>, V > > Type;
 		};
 
 		// Dodatkowe pola (poza info) wprowadzane do obiektu wierzcholka

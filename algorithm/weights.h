@@ -87,6 +87,12 @@ namespace Koala
 
 	protected:
 
+        template< typename T > static T posTest(T arg)
+        {
+            koalaAssert( arg>= DefaultStructs:: template NumberTypeBounds<T>::zero(),AlgExcWrongArg );
+            return arg;
+        }
+
 		// Dijkstra na kopcu
 		template< typename Container > struct Cmp
 		{

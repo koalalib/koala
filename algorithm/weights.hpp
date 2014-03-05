@@ -46,7 +46,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 		for( typename GraphType::PEdge E = g.getEdge( U,Koala::EdDirOut | Koala::EdUndir ); E;
 			E = g.getEdgeNext( U,E,Koala::EdDirOut | Koala::EdUndir ) )
 			if (!vertTab.hasKey( V = g.getEdgeEnd( E,U ) ))
-				if ((nd = vertTab[U].distance + edgeTab[E].length) < Q[V].distance)
+				if ((nd = vertTab[U].distance + posTest(edgeTab[E].length)) < Q[V].distance)
 				{
 					Q[V].distance = nd;
 					Q[V].ePrev = E;
@@ -118,7 +118,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 		for( typename GraphType::PEdge E = g.getEdge( U,Koala::EdDirOut | Koala::EdUndir ); E;
 			E = g.getEdgeNext( U,E,Koala::EdDirOut | Koala::EdUndir ) )
 			if (!vertTab.hasKey( V = g.getEdgeEnd( E,U ) ))
-				if ((nd = vertTab[U].distance + edgeTab[E].length) < Q[V].distance)
+				if ((nd = vertTab[U].distance + posTest(edgeTab[E].length)) < Q[V].distance)
 				{
 					if (Q[V].repr)
 						heap.del( (typename DefaultStructs::template HeapCont<
