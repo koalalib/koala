@@ -101,7 +101,7 @@ namespace Koala
 				{ }
 
 			template< class T > bool operator()( T a, T b ) const
-				{ return cont->operator[]( a ).distance < cont->operator[]( b ).distance; }
+				{ return (cont->operator[]( a ).distance) < cont->operator[]( b ).distance; }
 		};
 
 		template< typename Container > static Cmp< Container > makeCmp( Container &acont )

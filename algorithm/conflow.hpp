@@ -442,7 +442,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 		{
 			if (usedCapCost( g,edgeTab,E,U = g.getEdgeEnds( E ).first ) >
 				DefaultStructs::template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::zero()
-				&& vertTab[U].distance < inf &&
+				&& (vertTab[U].distance) < inf &&
 				(nd = vertTab[U].distance + costFlow( g,edgeTab,E,U )) < vertTab[V = g.getEdgeEnds( E ).second].distance)
 				{
 					vertTab[V].distance = nd;
@@ -451,7 +451,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 				}
 			if (usedCapCost( g,edgeTab,E,U = g.getEdgeEnds( E ).second)>
 				DefaultStructs::template NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::zero()
-				&& vertTab[U].distance < inf &&
+				&& (vertTab[U].distance) < inf &&
 				(nd = vertTab[U].distance + costFlow( g,edgeTab,E,U )) < vertTab[V = g.getEdgeEnds( E ).first].distance)
 				{
 					vertTab[V].distance = nd;
@@ -461,7 +461,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 		}
 	}
 
-	return vertTab[end].distance < inf;
+	return (vertTab[end].distance) < inf;
 }
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class EIter, class VIter >
@@ -498,7 +498,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 			(vTab[v].first+k)->distance = PlusInfty;
 			for( typename GraphType::PEdge E = g.getEdge( v,EdUndir | EdDirIn | EdDirOut ); E;
 				E = g.getEdgeNext( v,E,EdUndir | EdDirIn | EdDirOut ) )
-				if ((vTab[U = g.getEdgeEnd( E,v )].first + k - 1)->distance < PlusInfty &&
+				if (((vTab[U = g.getEdgeEnd( E,v )].first + k - 1)->distance) < PlusInfty &&
 					usedCapCost( g,edgeTab,E,U ) > DefaultStructs:: template NumberTypeBounds
 						< typename EdgeContainer::ValType::CapacType >::zero() &&
 					(nd = (vTab[U].first + k - 1)->distance + costFlow( g,edgeTab,E,U )) < (vTab[v].first + k)->distance)
@@ -510,7 +510,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 		}
 
 	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-		if ((vTab[v].first + n)->distance < PlusInfty)
+		if (((vTab[v].first + n)->distance) < PlusInfty)
 			for( int k = 1; k <= n - 1; k++ )
 				if (((vTab[v].first + n)->distance - (vTab[v].first + k)->distance) * (n - vTab[v].second) >
 					((vTab[v].first + n)->distance - (vTab[v].first + vTab[v].second)->distance) * (n - k))
@@ -519,7 +519,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 	std::pair< typename EdgeContainer::ValType::CostType,int > minval,tmpval;
 	typename GraphType::PVertex minv = 0;
 	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
-		if ((vTab[v].first + n)->distance < PlusInfty)
+		if (((vTab[v].first + n)->distance) < PlusInfty)
 		{
 			if (!minv)
 			{

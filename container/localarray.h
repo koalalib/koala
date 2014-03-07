@@ -34,6 +34,7 @@
  */
 
 //#define KOALA_USES_ALLOCA
+//#define KOALA_FORCE_VLARRAY
 
 //NEW: teraz alloca powinna wlaczac stala KOALA_USES_ALLOCA
 
@@ -45,10 +46,21 @@
 #endif
 
 #include <new>
+#include <stdlib.h>
+#ifdef _MSC_VER
 #include <malloc.h>
+#endif
 
 #ifdef __INTEL_COMPILER
 #include <alloca.h>
+#endif
+
+#ifdef __GNUC__
+#ifdef _WIN32
+#include<malloc.h>
+#else
+#include <alloca.h>
+#endif
 #endif
 
 namespace Koala
@@ -102,10 +114,13 @@ namespace Koala
 #define LA_SETTONULL    = NULL
 #endif
 
-// Intel Compiler, GCC-likes, Visual Studio and Borland have alloca
-#if defined(KOALA_USES_ALLOCA) && \
-	(defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__) || \
-	 defined(__INTEL_COMPILER) || defined(__GCC__))
+#if defined(KOALA_FORCE_VLARRAY)
+#define LOCALARRAY(name, size)                          \
+	name[size];
+
+// Intel Compiler, GCC-likes, Visual Studio have alloca
+#elif defined(KOALA_USES_ALLOCA) && \
+	(defined(_MSC_VER) || defined(__INTEL_COMPILER) || defined(__GNUC__))
 
 // name = NULL a dopiero potem name = cast ... 縠by unikn规 warningu
 // od VS o wykorzystaniu niezainicjowanej zmiennej
