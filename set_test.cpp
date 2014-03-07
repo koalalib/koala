@@ -142,7 +142,7 @@ double kwadrat(int arg) { return arg*arg; }
     jset.makeSinglet(4);
     cout << jset.getSet(5,setInserter(sint));
 
-    cout << cout << endl;
+    cout << jset << endl;
 
     int tab3[]={1,3,5,7}, tab4[4];
     Set<int> iiset;
@@ -152,7 +152,8 @@ double kwadrat(int arg) { return arg*arg; }
     cout << iiset;
 
 
-    cout << cout << "\n\nLocals:\n\n";
+//    cout << cout << "\n\nLocals:\n\n";
+    cout << "\n\nLocals:\n\n";
     JSPartDesrc< Vert* > buf1[20];
     Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc< Vert* > * > > buf2[20];
     JoinableSets<Vert*>

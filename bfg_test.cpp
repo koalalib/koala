@@ -5,7 +5,8 @@
 //#define NOALGS			// no algorithms
 //#define NOSLOW			// no slow algs at all
 #define MAXSLOW			30	// max number of verts for slow algs
-#define NOMISMATCHWARNING	true
+//#define NOMISMATCHWARNING	true
+#define NOMISMATCHWARNING	false
 
 #define INP_GRAPH_TXT		-1
 #define INP_FILE_SMALL		0
@@ -382,7 +383,7 @@ int main() {
 		TEST(1, Bipartite, bipartite, 1, 1, 0);
 		TEST(2, Chordal, chordal, 1, 1, 1);
 		TEST(3, Cograph, cograph, 1, 1, 1);
-// BUGS		TEST(4, Comparability, comparability, 1, 1, 1);
+/* BUGS */	TEST(4, Comparability, comparability, 1, 1, 1);
 		TEST(5, XXX, connected, 0, 0, 0);
 		TEST(6, XXX, tree, 0, 0, 0);
 		TEST(7, XXX, forest, 0, 0, 0);

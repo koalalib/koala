@@ -38,7 +38,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 	{
 		typename EdgeContainer::ValType::DistType d = PlusInfty, nd;
 		for( V = Q.firstKey(); V; V = Q.nextKey( V ) )
-			if (Q[V].distance < d) d = Q[U = V].distance;
+			if ((Q[V].distance) < d) d = Q[U = V].distance;
 		Q[U].copy( vertTab[U] );
 		Q.delKey( U );
 		if (U == end) return vertTab[end].distance;
@@ -285,14 +285,14 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 		for( typename GraphType::PEdge E = tabE[iE=0]; iE<m;E = tabE[++iE] ) if (g.getEdgeType(E)==Undirected)
 //		for( typename GraphType::PEdge E = g.getEdge( Koala::EdUndir ); E; E = g.getEdgeNext( E,Koala::EdUndir ) )
 		{
-			if (vertTab[U = g.getEdgeEnd1( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
+			if ((vertTab[U = g.getEdgeEnd1( E )].distance) < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
 				vertTab[V = g.getEdgeEnd2( E )].distance)
 			{
 				vertTab[V].distance = nd;
 				vertTab[V].ePrev = E;
 				vertTab[V].vPrev = U;
 			}
-			else if (vertTab[U = g.getEdgeEnd2( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
+			else if ((vertTab[U = g.getEdgeEnd2( E )].distance) < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
 				vertTab[V = g.getEdgeEnd1( E )].distance)
 			{
 				vertTab[V].distance = nd;
@@ -303,7 +303,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 		//relaksacja krawedzi (u,v) skierowanych u->v
 		for( typename GraphType::PEdge E = tabE[iE=0]; iE<m;E = tabE[++iE] ) if (g.getEdgeType(E)==Directed)
 //		for( typename GraphType::PEdge E = g.getEdge( Koala::EdDirOut ); E; E = g.getEdgeNext( E,Koala::EdDirOut ) )
-			if (vertTab[U = g.getEdgeEnd1( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
+			if ((vertTab[U = g.getEdgeEnd1( E )].distance) < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
 				vertTab[V = g.getEdgeEnd2( E )].distance)
 			{
 				vertTab[V].distance = nd;
@@ -315,13 +315,13 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 	//sprawdzenie czy nie ma cykli ujemnych
     for( typename GraphType::PEdge E = tabE[iE=0]; iE<m;E = tabE[++iE] ) if (g.getEdgeType(E)==Undirected)
 //	for( typename GraphType::PEdge E = g.getEdge( Koala::EdUndir ); E; E = g.getEdgeNext( E,Koala::EdUndir ) )
-		if (vertTab[U = g.getEdgeEnd1( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
+		if ((vertTab[U = g.getEdgeEnd1( E )].distance) < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
 			vertTab[V = g.getEdgeEnd2( E )].distance)
 		{
 			existNegCycle = true;
 			break;
 		}
-		else if (vertTab[U = g.getEdgeEnd2( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
+		else if ((vertTab[U = g.getEdgeEnd2( E )].distance) < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
 			vertTab[V = g.getEdgeEnd1( E )].distance)
 		{
 			existNegCycle = true;
@@ -331,7 +331,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 	if (!existNegCycle)
         for( typename GraphType::PEdge E = tabE[iE=0]; iE<m;E = tabE[++iE] ) if (g.getEdgeType(E)==Directed)
 //		for( typename GraphType::PEdge E = g.getEdge( Koala::EdDirOut ); E; E = g.getEdgeNext( E,Koala::EdDirOut ) )
-			if (vertTab[U = g.getEdgeEnd1( E )].distance < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
+			if ((vertTab[U = g.getEdgeEnd1( E )].distance) < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
 				vertTab[V = g.getEdgeEnd2(E)].distance)
 			{
 				existNegCycle = true;

@@ -115,7 +115,7 @@ template< class T, class InputIter, class VertInputIter, class CIter, class IntI
 		if (i == 0 || tab[i - 1].first != tab[i].first)
 		{
 			*eout = tab[i].first;
-			*eout++;
+			++eout;
 			*out.compIter = i;
 			++out.compIter;
 			licz++;

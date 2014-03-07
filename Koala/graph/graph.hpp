@@ -1020,7 +1020,7 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class Itera
 		if (type & EdLoop)
 		{
 			if (this->getEdge( u,EdLoop ))
-				while (e = this->getEdge( u,EdLoop )) delEdge( e );
+				while ((e = this->getEdge( u,EdLoop ))) delEdge( e );
 			else addLoop(u,infoGen(*this,u,u,EdLoop));
 		}
 	}
@@ -1032,8 +1032,8 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class Itera
 			if (type & Directed)
 			{
 				bool uvflag = this->getEdge( u,v,EdDirOut ), vuflag = this->getEdge( v,u,EdDirOut );
-				while (e = this->getEdge( u,v,EdDirOut )) delEdge( e );
-				while (e = this->getEdge( v,u,EdDirOut )) delEdge( e );
+				while ((e = this->getEdge( u,v,EdDirOut ))) delEdge( e );
+				while ((e = this->getEdge( v,u,EdDirOut ))) delEdge( e );
 
 				if (!uvflag) addArc( u,v,infoGen( (const Graph< VertInfo,EdgeInfo,Settings > &)(*this),u,v,EdDirOut ) );
 				if (!vuflag) addArc( v,u,infoGen( (const Graph< VertInfo,EdgeInfo,Settings > &)(*this),v,u,EdDirOut ) );
@@ -1041,7 +1041,7 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class Itera
 			if (type & Undirected)
 			{
 				bool undflag = this->getEdge( u,v,EdUndir );
-				while (e = this->getEdge( v,u,EdUndir )) delEdge( e );
+				while ((e = this->getEdge( v,u,EdUndir ))) delEdge( e );
 				if (!undflag) addEdge( u,v,infoGen((const Graph< VertInfo,EdgeInfo,Settings > &)(*this),u,v,EdUndir ),EdUndir );
 			}
 		}
@@ -1055,7 +1055,7 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class EdInf
 		{
 			typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e;
 			if (this->getEdge( v,EdLoop ))
-				while (e = this->getEdge( v,EdLoop )) delEdge( e );
+				while ((e = this->getEdge( v,EdLoop ))) delEdge( e );
 			else addLoop( v,infoGen( *this,v,v,EdLoop ) );
 		}
 	for( typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u = this->getVert(); u; u = getVertNext( u ) )
@@ -1066,8 +1066,8 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class EdInf
 				if (type & Directed)
 				{
 					bool uvflag = this->getEdge( u,v,EdDirOut ), vuflag = this->getEdge( v,u,EdDirOut );
-					while (e = this->getEdge( u,v,EdDirOut )) delEdge( e );
-					while (e = this->getEdge( v,u,EdDirOut )) delEdge( e );
+					while ((e = this->getEdge( u,v,EdDirOut ))) delEdge( e );
+					while ((e = this->getEdge( v,u,EdDirOut ))) delEdge( e );
 
 					if (!uvflag) addArc( u,v,infoGen( *this,u,v,EdDirOut ) );
 					if (!vuflag) addArc( v,u,infoGen( *this,v,u,EdDirOut ) );
@@ -1075,7 +1075,7 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class EdInf
 				if (type & Undirected)
 				{
 					bool undflag = this->getEdge( u,v,EdUndir );
-					while (e = this->getEdge( v,u,EdUndir )) delEdge( e );
+					while ((e = this->getEdge( v,u,EdUndir ))) delEdge( e );
 					if (!undflag) addEdge( u,v,infoGen( *this,u,v,EdUndir ), EdUndir );
 				}
 			}

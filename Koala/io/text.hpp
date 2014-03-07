@@ -321,13 +321,12 @@ bool writeGraphVL(const Graph &g, std::ostream &out, std::pair<bool,bool> printi
 template<class Graph, class VMap, class EMap>
 bool writeGraphEL(const Graph &g, std::ostream &out, std::pair<bool,bool> printinf,
 				  const VMap& vmap,const EMap& emap) {
-	unsigned int idx,i=0;
+	unsigned int i=0;
 	typename Graph::PEdge e;
 	typename Graph::PVertex u;
 	std::pair<typename Graph::PVertex , typename Graph::PVertex > vs;
 	std::map<typename Graph::PVertex , unsigned int> ptrToIdx;
 
-	idx = 0;
 	out << g.getVertNo() << ' ' << g.getEdgeNo() << '\n';
 	for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) ptrToIdx[u]=i++;
 	for(e = g.getEdge(); e != NULL; e = g.getEdgeNext(e)) {

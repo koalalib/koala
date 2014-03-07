@@ -9,6 +9,8 @@
 #include "Koala/algorithm/conflow.h"
 #include "Koala/io/text.h"
 
+#define int16_t		short int
+
 using namespace std;
 using namespace Koala;
 

@@ -31,14 +31,14 @@ class StdRandGen {
         {
             initwykl();
             Int& maks=const_cast<Int&>(maxRand);
-            for(int i=0;i<digNo;i++) maks=maks*(RAND_MAX+1)+RAND_MAX;
+            for(int i=0;i<digNo;i++) maks=maks*((Int)RAND_MAX+1)+(Int)RAND_MAX;
             for(int i=0;i<digNo2;i++) maks=2*maks+1;
         }
 
         Int rand()
         {
             Int res=0;
-            for(int i=0;i<digNo;i++) res=res*(RAND_MAX+1)+std::rand();
+            for(int i=0;i<digNo;i++) res=res*((Int)RAND_MAX+1)+std::rand();
             for(int i=0;i<digNo2;i++) res=2*res+(std::rand() & 1);
             return res;
         }
