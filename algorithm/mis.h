@@ -48,6 +48,9 @@ namespace Koala
 				}
 		};
 
+//NEW: w ponizszych stragegiach Rand GMin GWMin GGWMin GWMin2 GMax GWMax GGWMax nowy parametr
+//szablonu klasy - typ wybranego generatora liczb losowych. Zewnetrzny obiekt uzywanego generatora
+// podaje sie w konstruktorze strategii
 		/* ----------------------------------------------------------------------
 		*
 		* Template:        N/A
@@ -58,9 +61,13 @@ namespace Koala
 		/** \brief Get random vertex functor.
 		 *
 		 *  The for a graph functor returns random vertex.  Functor can be used in both approaches.*/
+		template <class RndGen=Koala::StdRandGen<> >
 		class Rand
 		{
 		public:
+		    RndGen* rgen;
+		    Rand(RndGen& rg) : rgen(&rg) {}
+
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
 		};
@@ -77,9 +84,13 @@ namespace Koala
 		/** \brief Get minimum degree vertex functor.
 		 *
 		 *  The for a graph (weights are ignored) functor returns vertex with minimal degree. It is advised to use with method \a getWMin.*/
+		template <class RndGen=Koala::StdRandGen<> >
 		class GMin
 		{
 		public:
+		    RndGen* rgen;
+		    GMin(RndGen& rg) : rgen(&rg) {}
+
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
 		};
@@ -94,9 +105,13 @@ namespace Koala
 		/** \brief Get minimum degree and maximum weight vertex functor.
 		*
 		*  The for a graph and weights functor returns vertex for which W(v)/( deg(v) +1) is maximal. It is advised to use with method \a getWMin.*/
+		template <class RndGen=Koala::StdRandGen<> >
 		class GWMin
 		{
 		public:
+		    RndGen* rgen;
+		    GWMin(RndGen& rg) : rgen(&rg) {}
+
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
 		};
@@ -112,9 +127,13 @@ namespace Koala
 		/** \brief Get minimum degree vertex with weight functor.
 		 *
 		 *  The for a graph and weights functor returns vertices \a v for which Σ<sub>u ∈ N[v]</sub>W(u)/( deg(u) +1) ≤ W(v) . It is advised to use with method \a getWMin.*/
+		template <class RndGen=Koala::StdRandGen<> >
 		class GGWMin
 		{
 		public:
+		    RndGen* rgen;
+		    GGWMin(RndGen& rg) : rgen(&rg) {}
+
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
 		};
@@ -129,9 +148,13 @@ namespace Koala
 		/** \brief Get maximum weight and minimum sum of neighbors weights vertex functor.
 		 *
 		 *  The for a graph and weights functor returns vertex for which W(v)/Σ<sub>u ∈ N[v]</sub>W(u) is maximal. It is advised to use with method \a getWMin.*/
+		template <class RndGen=Koala::StdRandGen<> >
 		class GWMin2
 		{
 		public:
+		    RndGen* rgen;
+		    GWMin2(RndGen& rg) : rgen(&rg) {}
+
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
 		};
@@ -148,9 +171,13 @@ namespace Koala
 		/** \brief Get maximum degree vertex functor.
 		 *
 		 *  The for a graph gets the vertex with maximum degree. It is advised to use this functor with function \a getWMax.*/
+		template <class RndGen=Koala::StdRandGen<> >
 		class GMax
 		{
 		public:
+		    RndGen* rgen;
+		    GMax(RndGen& rg) : rgen(&rg) {}
+
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
 		};
@@ -165,9 +192,13 @@ namespace Koala
 		/** \brief Get maximum degree and minimal weight vertex functor.
 		 *
 		 *  The for a graph gets the vertex for which the function W(v) / (deg(v)*(deg(v)-1)) is minimal. It is advised to use this functor with function \a getWMax.*/
+		template <class RndGen=Koala::StdRandGen<> >
 		class GWMax
 		{
 		public:
+		    RndGen* rgen;
+		    GWMax(RndGen& rg) : rgen(&rg) {}
+
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
 		};
@@ -183,9 +214,13 @@ namespace Koala
 		/** \brief Get maximum degree and minimal weight vertex functor.
 		 *
 		 *  The for a graph and weights gets the vertices v that satisfy  Σ<sub>u ∈ N[v]</sub> W(u) / (deg(u)*(deg(u)-1)) ≥ W(v) /( deg(v) + 1 ). It is advised to use this functor with function \a getWMax.*/
+		template <class RndGen=Koala::StdRandGen<> >
 		class GGWMax
 		{
 		public:
+		    RndGen* rgen;
+		    GGWMax(RndGen& rg) : rgen(&rg) {}
+
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
 		};

@@ -1,9 +1,10 @@
 // MISStrategy::Rand
 
+template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::Rand::operator()( const GraphType &g, const VertContainer& vertTab )
+	MISStrategy::Rand<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
-	unsigned int random = StdRandGen<>().rand(g.getVertNo()-1);//rand() % g.getVertNo();
+	unsigned int random = rgen->rand(g.getVertNo()-1);//rand() % g.getVertNo();
 	typename GraphType::PVertex v = g.getVert();
 	while (random--) v = g.getVertNext( v );
 	// ALG: no vertex chosen
@@ -14,8 +15,9 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 // MISStrategy::GMin
 
+template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GMin::operator()( const GraphType &g, const VertContainer& vertTab )
+	MISStrategy::GMin<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMaxs = 0, randomIndex = 0, deg = 0;
 	double max = std::numeric_limits< double >::min(), value = 0.0;
@@ -44,14 +46,15 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 	// ALG: no vertex chosen
 	(void)(vertTab);
 	assert( nMaxs > 0 );
-	randomIndex = StdRandGen<>().rand(nMaxs-1);//rand() % nMaxs;
+	randomIndex = rgen->rand(nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
 // MISStrategy::GWMin
 
+template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GWMin::operator()( const GraphType &g, const VertContainer& vertTab )
+	MISStrategy::GWMin<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMaxs = 0, randomIndex = 0, deg = 0;
 	double max = std::numeric_limits< double >::min(), value = 0.0;
@@ -81,14 +84,15 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	 // ALG: no vertex chosen
 	assert( nMaxs > 0 );
-	randomIndex = StdRandGen<>().rand(nMaxs-1);//rand() % nMaxs;
+	randomIndex = rgen->rand(nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
 // MISStrategy::GGWMin
 
+template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GGWMin::operator()( const GraphType &g, const VertContainer& vertTab )
+	MISStrategy::GGWMin<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMaxs = 0;
 	unsigned int randomIndex = 0;
@@ -120,14 +124,15 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMaxs > 0 );
-	randomIndex = StdRandGen<>().rand(nMaxs-1);//rand() % nMaxs;
+	randomIndex = rgen->rand(nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
 // MISStrategy::GWMin2
 
+template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GWMin2::operator()( const GraphType &g, const VertContainer& vertTab )
+	MISStrategy::GWMin2<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMaxs = 0;
 	unsigned int randomIndex = 0;
@@ -161,14 +166,15 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMaxs > 0 );
-	randomIndex = StdRandGen<>().rand(nMaxs-1);//rand() % nMaxs;
+	randomIndex = rgen->rand(nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
 // MISStrategy::GMax
 
+template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GMax::operator()( const GraphType &g, const VertContainer& vertTab )
+	MISStrategy::GMax<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMins = 0, randomIndex = 0, deg = 0;
 	double min = std::numeric_limits< double >::max(), value = 0.0;
@@ -196,15 +202,16 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMins > 0 );
-	randomIndex = StdRandGen<>().rand(nMins-1);//rand() % nMins;
+	randomIndex = rgen->rand(nMins-1);//rand() % nMins;
 	(void)vertTab;
 	return vMins[randomIndex];
 }
 
 // MISStrategy::GWMax
 
+template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GWMax::operator()( const GraphType &g, const VertContainer& vertTab )
+	MISStrategy::GWMax<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMins = 0, randomIndex = 0, deg = 0;
 	double min = std::numeric_limits< double >::max(), value = 0.0;
@@ -232,14 +239,15 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMins > 0 );
-	randomIndex = StdRandGen<>().rand(nMins-1);//rand() % nMins;
+	randomIndex = rgen->rand(nMins-1);//rand() % nMins;
 	return vMins[randomIndex];
 }
 
 // MISStrategy::GGWMax
 
+template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GGWMax::operator()( const GraphType &g, const VertContainer& vertTab )
+	MISStrategy::GGWMax<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMins = 0;
 	unsigned int randomIndex = 0;
@@ -271,7 +279,7 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMins > 0 );
-	randomIndex = StdRandGen<>().rand(nMins-1);//rand() % nMins;
+	randomIndex = rgen->rand(nMins-1);//rand() % nMins;
 	return vMins[randomIndex];
 }
 
