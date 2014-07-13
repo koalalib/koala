@@ -24,6 +24,31 @@ using namespace Koala;
 
 #include "main.hpp"
 
+{
+    using namespace std;
+
+
+    Graph<string,int> g;
+
+    Vertex<string,int>* u;
+    // albo tak:
+    Graph<string,int>::PVertex v;
+
+    Edge<string,int>* e;
+
+    u=g.addVert("Gdansk");
+    v=g.addVert("Olsztyn");
+    e=g.addArc(u,v,179);
+    // albo tak:
+    // e=g.addEdge(u,v,179,EdDirOut);
+
+    cout << e->info;
+
+
+//    return 0;
+
+}
+
 //1) W mainie utworzenie grafu i przekazanie go
 //Zalozmy, ze tworzysz graf o wierzcholkach z etykieta char i krawedziach z etykieta string
 
@@ -178,6 +203,7 @@ using namespace Koala;
     for(v=subgr.getVert();v!=NULL;v=subgr.getVertNext(v)) std::cout << v-> info << ' ';
     std::cout << std::endl;
     for(e=subgr.getEdge(EdUndir);e!=NULL;e=subgr.getEdgeNext(e,EdUndir)) std::cout << e-> info << ' ';
+
 
     return 0;
 }

@@ -263,7 +263,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 		tasks( n );
 
 	SimplArrPool<typename DefaultStructs::template
-        HeapCont< Pair,compareSecondFirst< Pair > >::NodeType > alloc(n);
+        HeapCont< Pair,compareSecondFirst< Pair > >::NodeType > alloc(n+1);
     typename DefaultStructs::template
         HeapCont< Pair,compareSecondFirst< Pair > >::Type candidate(&alloc), active(&alloc);
 
@@ -396,7 +396,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
 	SimplArrPool<typename DefaultStructs::template
-        HeapCont< Pair,compareSecondFirst< Pair > >::NodeType > alloc(n);
+        HeapCont< Pair,compareSecondFirst< Pair > >::NodeType > alloc(n+1);
     typename DefaultStructs::template
         HeapCont< Pair,compareSecondFirst< Pair > >::Type candidate(&alloc), active(&alloc);
 

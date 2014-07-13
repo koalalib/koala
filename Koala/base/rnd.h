@@ -7,20 +7,31 @@
 namespace Koala
 {
 
+//Int powinien byc typem calkowitoliczbowym nie wezszym niz int
 template <class Int = int>
 class StdRandGen {
 
         int digNo,digNo2;
 
         void initwykl()
-        {   long double base=RAND_MAX,maks=std::numeric_limits< Int >::max(),res=base,res1=1;
-            base++;
-            for(;res<maks;res=res*base+base-1)
+        {   Int base=RAND_MAX,res=RAND_MAX;
+            if (RAND_MAX==std::numeric_limits< Int >::max())
             {
-                 digNo++; res1=res;
+                digNo=1; digNo2=0; return;
             }
-            res=res1;
-            for(;res<maks;res=2*res+1) digNo2++;
+            base++;
+            for(;;res=res*base+(base-1))
+            {
+                 digNo++;
+                 if (res>std::numeric_limits< Int >::max()/base ||
+                    std::numeric_limits< Int >::max()-(base-1)<res*base) break;
+            }
+            for(;;res=2*res+1)
+            {
+                if (res>std::numeric_limits< Int >::max()/2
+                    || 2*res==std::numeric_limits< Int >::max()) break;
+                digNo2++;
+            }
         }
 
     public:
@@ -29,7 +40,7 @@ class StdRandGen {
 
         StdRandGen() : maxRand(0), digNo(0), digNo2(0)
         {
-            initwykl();
+            this->initwykl();
             Int& maks=const_cast<Int&>(maxRand);
             for(int i=0;i<digNo;i++) maks=maks*((Int)RAND_MAX+1)+(Int)RAND_MAX;
             for(int i=0;i<digNo2;i++) maks=2*maks+1;
@@ -39,14 +50,14 @@ class StdRandGen {
         {
             Int res=0;
             for(int i=0;i<digNo;i++) res=res*((Int)RAND_MAX+1)+std::rand();
-            for(int i=0;i<digNo2;i++) res=2*res+(std::rand() & 1);
+            for(int i=0;i<digNo2;i++) res=2*res+(bool)(std::rand()<=(RAND_MAX/2));
             return res;
         }
 
         Int rand(Int maks)
         {
             if (maks<0) maks=-maks;
-            return Int( (maks+1) * (long double)(rand())/((long double)(maxRand) + 1.0) );
+            return Int( (maks+1) * (long double)(this->rand())/((long double)(maxRand) + 1.0) );
         }
 
 };

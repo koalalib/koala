@@ -15,7 +15,7 @@ using namespace Koala;
 using namespace Koala::IO;
 
     std::pair<bool,bool> form =std::make_pair(true,true);
-    RG_Format bform=RG_VertexLists;
+    RG_Format bform=RG_EdgeList;
 
     RG_Format eform = (RG_Format)(((form.first) ? RG_VInfo : 0)+((form.second) ? RG_EInfo : 0));
 
@@ -46,7 +46,30 @@ ostream& operator<<(ostream& out, Klasa x)
 //    std::map<int,Graph<string,string>::PVertex> int2v;
 //    std::map<int,Graph<string,string>::PEdge> int2e;
 
+{
+    using namespace std;
 
+
+    Graph<string,int> g;
+
+    Vertex<string,int>* u;
+    // albo tak:
+    Graph<string,int>::PVertex v;
+
+    Edge<string,int>* e;
+
+    u=g.addVert("Gdansk");
+    v=g.addVert("Olsztyn");
+    e=g.addArc(u,v,179);
+    // albo tak:
+    // e=g.addEdge(u,v,179,EdDirOut);
+
+    writeGraphText(g, cout, bform+eform);
+
+
+    return 0;
+
+}
 	Graph<Klasa,Klasa> g;
 	Graph<Klasa,Klasa>::PVertex A,B,C,D;
     Graph<Klasa,Klasa>::PEdge d,e,f,h,p,q,x,y,z;
