@@ -5,6 +5,7 @@
 #include "Koala/container/assoctab.h"
 
 #include "Koala/base/defs.h"
+// komentarz
 using namespace std;
 using namespace Koala;
 
