@@ -84,12 +84,12 @@ namespace Koala
 
 		// te typy sa takie same, jak w grafie nadrzednym
 		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser> >::Vertex Vertex; /**< \brief Vertex of graph.*/
-		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::PVertex PVertex; /**< \brief Pointer to vertex of graph.*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::PVertex PVertex; /**< \brief Pointer to vertex of graph.WEN: tj. uzywany identyfikator*/
 		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::Edge Edge; /**< \brief Edge of graph.*/
-		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::PEdge PEdge; /**< \brief Pointer to edge of graph.*/
-		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::VertInfoType VertInfoType; /**< \brief Vertex information.*/
-		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::EdgeInfoType EdgeInfoType; /**< \brief Edge information.*/
-		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser> >::GraphSettings GraphSettings; /**< \brief Graph settings.*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::PEdge PEdge; /**< \brief Pointer to edge of graph.WEN: tj. uzywany identyfikator*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::VertInfoType VertInfoType; /**< \brief Vertex information. WEN: tj. typ pola info*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::EdgeInfoType EdgeInfoType; /**< \brief Edge information. WEN: tj. typ pola info*/
+		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser> >::GraphSettings GraphSettings; /**< \brief Graph settings. WEN: przenosi sie z typu gr. nadrzednego*/
 
 		// typ tej struktury
 		typedef Subgraph< Graph,VChooser,EChooser > GraphType; /**< \brief The current graph type.*/
@@ -128,7 +128,7 @@ namespace Koala
 
 		// ustawienie wartosci chooserow
 		/** \brief Set choose.
-		 *
+		 * WEN: ew. polaczenie do grafu nadrzednego nie zmienia sie
 		 *  The method assigns the attributes \a vchoose and \a echoose which determine the vertices and edges of subgraph. See \ref DMchooser.
 		 *  \param chs reference to standard pair of choosers, first of which choose vertices second edges.  */
 		void setChoose( const std::pair< VChooser,EChooser > &chs );
@@ -136,14 +136,14 @@ namespace Koala
 		// dopuszczalne typy krawedzi
 		/** \brief Check allowed edge types.
 		 *
-		 *  \returns allowed types (EdgeType) of edges in the root graph. */
+		 *  \returns allowed types (EdgeType) of edges in the root graph WEN: typ grafu!. */
 		 static EdgeType allowedEdgeTypes()
 			{ return ParentGrType::allowedEdgeTypes(); }
 
 		// rozlacza sie od rodzica (jesli taki istnial) i podlacza do podanego grafu
 		/** \brief Plug to \a g
-		 *
-		 * The method plugs the current graph as a child to \a g.*/
+		 * WEN: ew. choosery nie zmieniaja sie
+		 * The method plugs the current graph as a child to \a g. WEN: a jesli byl juz podlaczony, to najpierw odlacza */
 		void plug( const Graph &g )
 			{ counters.reset(true,true); SubgraphBase::link( &g ); }
 		// sprawia, ze podgraf staje sie niepodlaczony do zadnego rodzica
@@ -171,13 +171,13 @@ namespace Koala
 		/** \brief Get root graph.
 		 *
 		 *  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
-		 *  \return the reference to the root if the parent existed, NULL otherwise. */
+		 *  \return the reference to the root if the parent existed, NULL otherwise. WEN: tu akurat NULL sie nie da, leci wyjatek */
 		const RootGrType &root() const;
 
 		/** \brief Get parent graph.
 		 *
 		 *  The method tests if the graph has any superior graph if true gets the parent graph .
-		 *  \return the reference to the parent if it existed, NULL otherwise. */
+		 *  \return the reference to the parent if it existed, NULL otherwise. WEN: tu akurat NULL sie nie da, leci wyjatek  */
 		const ParentGrType &up() const;
 
 		// Test przynaleznosci wierzcholka z rodzica do podgrafu. Dla NULL zawsze prawda.
@@ -185,7 +185,7 @@ namespace Koala
 		// wszystkich strukturach az do korzenia
 		/** \brief Check vertex presence.
 		 *
-		 *  The method tests if the vertex form ancestor belongs to the current subgraph i.e. if it satisfy the \a vchoose of current subgraph. If the flag \a deep is set to true all the ancestors choosers are tested.
+		 *  The method tests if the vertex form parent belongs to the current subgraph i.e. if it satisfy the \a vchoose of current subgraph. If the flag \a deep is set to true all the ancestors choosers are tested.
 		 *  \param vert the tested vertex.
 		 *  \param deep the flag determining if all choosers of ancestors are checked.
 		 *  \return true if vertex belongs to subgraph, false otherwise.*/
@@ -194,7 +194,7 @@ namespace Koala
 		// j.w. ale dla krawedzi - sprawdzany jest predykat echoose i vchoose dla obu koncow
 		/** \brief Check edge presence.
 		 *
-		 *  The method tests if the edge form ancestor belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph and both ends satisfy \a vchoose. If the flag \a deep is set to true all the ancestors choosers are tested.
+		 *  The method tests if the edge form parent belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph and both ends satisfy \a vchoose. If the flag \a deep is set to true all the ancestors choosers are tested.
 		 *  \param edge the tested edge.
 		 *  \param deep the flag determining if all choosers of ancestors are checked.
 		 *  \return true if edge belongs to subgraph, fagetVertNextlse otherwise.*/
@@ -202,7 +202,7 @@ namespace Koala
 
 		// metody dla ConstGraphMethods
 		//------------- Methods sent to ConstGraphMethods --------------------------------------
-
+        //WEN: do konca tej klasy - ew. te same komentarze, co w grconst.h przy tych samych metodach
 		/** \brief Get number of vertices.
 		 *
 		 *  Gets the order of the graph.
@@ -432,6 +432,7 @@ namespace Koala
 	{
 	public:
 		// ten sam sens typow, co dla podgrafu
+		//WEN: komentarze co do typow: te same, co w Subgraph
 		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::Vertex Vertex; /**< \brief Vertex of graph.*/
 		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::PVertex PVertex;/**< \brief Pointer to vertex of graph.*/
 		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::Edge Edge;/**< \brief Edge of graph.*/
@@ -459,7 +460,7 @@ namespace Koala
 
 		/** \brief Check allowed edge types.
 		 *
-		 *  \returns allowed types (EdgeType) of edges in the root graph. */
+		 *  \returns allowed types (EdgeType) of edges in the root graph. WEN: bzdura, po pierwsze parent nie root, po drugie tu moga byc oczywiscie tylko Undirected i Loop (jesli byly dozwolone w parent)*/
 		static EdgeType allowedEdgeTypes()
 			{ return (((~EdLoop)&ParentGrType::allowedEdgeTypes()) ? Undirected :0 )
 			| ((EdLoop&ParentGrType::allowedEdgeTypes()) ? EdLoop : 0 ); }
@@ -479,12 +480,12 @@ namespace Koala
 		/** \brief Get parent graph.
 		 *
 		 *  The method tests if the graph has any superior graph if true gets the parent graph .
-		 *  \return the reference to the parent if it existed, NULL otherwise. */
+		 *  \return the reference to the parent if it existed, NULL otherwise. WEN: tu akurat NULL sie nie da, leci wyjatek*/
 		const ParentGrType &up() const;
 		 /** \brief Get root graph.
 		 *
 		 *  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
-		 *  \return the reference to the root if the parent existed, NULL otherwise. */
+		 *  \return the reference to the root if the parent existed, NULL otherwise. WEN: tu akurat NULL sie nie da, leci wyjatek */
 		const RootGrType &root() const;
 		// rozlacza obiekt od jego rodzica (jesli taki istnial) i podlacza do podanego grafu
 		/** \brief Plug to \a g
@@ -504,24 +505,24 @@ namespace Koala
 		// do wspolpracy z podgrafami
 		/** \brief Check vertex presence.
 		 *
-		 *  The method tests if the vertex form ancestor belongs to the current subgraph i.e. if it satisfy the \a vchoose of current subgraph. If the flag \a deep is set to true all the ancestors choosers are tested.
+		 *  The method tests if the vertex form parent belongs to the current subgraph i.e. if it satisfy the \a vchoose of current subgraph. WEN: przeciez nie jestesmy w klasie subgrafu! If the flag \a deep is set to true all the ancestors choosers are tested.
 		 *  \param vert the tested vertex.
 		 *  \param deep the flag determining if all choosers of ancestors are checked.
 		 *  \return true if vertex belongs to subgraph, false otherwise.*/
 		bool good( PVertex, bool = false ) const
-			{ return true; }
+			{ return true; } //TODO: chyba blad, czy ten view moze byc zrobiony do subgraphu?
 		/** \brief Check edge presence.
 		 *
-		 *  The method tests if the edge form ancestor belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph and both ends satisfy \a vchoose. If the flag \a deep is set to true all the ancestors choosers are tested.
+		 *  The method tests if the edge form parent belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph and both ends satisfy \a vchoose. WEN: przeciez nie jestesmy w klasie subgrafu!If the flag \a deep is set to true all the ancestors choosers are tested.
 		 *  \param edge the tested edge.
 		 *  \param deep the flag determining if all choosers of ancestors are checked.
 		 *  \return true if edge belongs to subgraph, false otherwise.*/
 		bool good( PEdge, bool = false ) const
-			{ return true; }
+			{ return true; } //TODO: chyba blad, czy ten view moze byc zrobiony do subgraphu?
 
 		// na uzytek ConstGraphMethods
 		//------------- Methods sent to ConstGraphMethods --------------------------------------
-
+        //WEN: ew. poprawki do dalszych metod tej klasy te same co w grconst.h
 		/** \brief Get number of vertices.
 		 *
 		 *  Gets the order of the graph.
@@ -711,11 +712,12 @@ namespace Koala
 
 	/** \brief Reversed view.
 	 *
-	 *  The class allows to create the view on graph in which all the arc are reversed. Hence it lets us use the reversed graph, but without allocation of new graph. The interface (except the process of creation) is the same as in Koala::Subgraph.
+	 *  The class allows to create the view on graph in which all the arc are reversed WEN: a pozostale krawedzie bez zmian. Hence it lets us use the reversed graph, but without allocation of new graph. The interface (except the process of creation) is the same as in Koala::Subgraph.
 	 *  \ingroup DMview */
 	template< class Graph > class RevView: public SubgraphBase, public ConstGraphMethods< RevView< Graph> >
 	{
 	public:
+	    //WEN: co do typow zagniezdzonych - jak w subgraph por. wyzej
 		typedef typename Privates::GraphInternalTypes< RevView< Graph > >::Vertex Vertex; /**< \brief Vertex of graph.*/
 		typedef typename Privates::GraphInternalTypes< RevView< Graph > >::PVertex PVertex;/**< \brief Pointer to vertex of graph.*/
 		typedef typename Privates::GraphInternalTypes< RevView< Graph > >::Edge Edge;/**< \brief Edge of graph.*/
@@ -742,7 +744,7 @@ namespace Koala
 
 		/** \brief Check allowed edge types.
 		 *
-		 *  \returns allowed types (EdgeType) of edges in the root graph. */
+		 *  \returns allowed types (EdgeType) of edges in the parent graph. */
 		static EdgeType allowedEdgeTypes()
 			{ return ParentGrType::allowedEdgeTypes(); }
 		/** \brief Get root graph.
@@ -760,12 +762,12 @@ namespace Koala
 		/** \brief Get parent graph.
 		 *
 		 *  The method tests if the graph has any superior graph if true gets the parent graph .
-		 *  \return the reference to the parent if it existed, NULL otherwise. */
+		 *  \return the reference to the parent if it existed, NULL otherwise. WEN: nie - wyjatek */
 		const ParentGrType &up() const;
 		/** \brief Get root graph.
 		 *
 		 *  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
-		 *  \return the reference to the root if the parent existed, NULL otherwise. */
+		 *  \return the reference to the root if the parent existed, NULL otherwise. WEN: nie - wyjatek  */
 		const RootGrType &root() const;
 		// rozlacza obiekt od jego rodzica (jesli taki istnial) i podlacza do podanego grafu
 		/** \brief Plug to \a g
@@ -785,24 +787,24 @@ namespace Koala
 		// do wspolpracy z podgrafami
 		/** \brief Check vertex presence.
 		 *
-		 *  The method tests if the vertex form ancestor belongs to the current subgraph i.e. if it satisfy the \a vchoose of current subgraph. If the flag \a deep is set to true all the ancestors choosers are tested.
+		 *  The method tests if the vertex form ancestor belongs to the current subgraph i.e. if it satisfy the \a vchoose of current subgraph. WEN: nie jestesmy w subgrafie, jaki chooser? If the flag \a deep is set to true all the ancestors choosers are tested.
 		 * \param vert the tested vertex.
 		 * \param deep the flag determining if all choosers of ancestors are checked.
 		 *  \return true if vertex belongs to subgraph, false otherwise.*/
 		bool good( PVertex, bool = false ) const
-			{ return true; }
+			{ return true; } //TODO: chyba blad, czy ten view moze byc zrobiony do subgraphu?
 		/** \brief Check edge presence.
 		 *
-		 *  The method tests if the edge form ancestor belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph and both ends satisfy \a vchoose. If the flag \a deep is set to true all the ancestors choosers are tested.
+		 *  The method tests if the edge form ancestor belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph WEN: nie jestesmy w subgrafie, jaki chooser? and both ends satisfy \a vchoose. If the flag \a deep is set to true all the ancestors choosers are tested.
 		 * \param edge the tested edge.
 		 * \param deep the flag determining if all choosers of ancestors are checked.
 		 *  \return true if edge belongs to subgraph, false otherwise.*/
 		bool good( PEdge, bool = false ) const
-			{ return true; }
+			{ return true; } //TODO: chyba blad, czy ten view moze byc zrobiony do subgraphu?
 
 		// na uzytek ConstGraphMethods
 		//------------- Methods sent to ConstGraphMethods --------------------------------------
-
+        //WEN: co do reszty metod klasy - to samo, co w grconst.h
 		/** \brief Get number of vertices.
 		 *
 		 *  Gets the order of the graph.

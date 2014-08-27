@@ -104,6 +104,7 @@ namespace Koala
 	 *  The structure is used for example in the implementation of Kruskal algorithm for minimal weight spanning tree.
 	 *  \tparam ITEM class of stored element.
 	 *  AssocContainer type of internal associative table. <tt>ITEM->JSPartDesrc< ITEM > *</tt>
+	 WEN: jesli jest to AssocArray, klucze powinny wskazywac obiekty zawierajace pole AssocKeyContReg assocReg
 	 *  \ingroup cont*/
 //	template< class ITEM, class AssocContainer = AssocArray< ITEM,JSPartDesrc< ITEM > * > >
     template< class ITEM, class AssocContainer = typename Privates::JoinSetsAssocContSwitch<ITEM>::Type >
@@ -123,8 +124,8 @@ namespace Koala
 		// pierwszy argument - maks. liczba elementow wszystkich zbiorow, pozostale arg. ignorowane
 		/** \brief Constructor.
 		 *
-		 *  \param n the size of the set of all elements.
-		 *  \param p ignored
+		 *  \param n the size of the set of all elements. WEN: lub wiecej - nie musimy zuzyc calej zawartosci
+		 *  \param p ignored WEN: juz ich nie ma
 		 *  \param q ignored	*/
 		JoinableSets( unsigned int n = 0 );
 		/** \brief Copy constructor.*/
@@ -149,7 +150,7 @@ namespace Koala
 		/** \brief Get number of elements in set identified by \a s*/
 		int size( typename JoinableSets< ITEM >::Repr s) const;
 		// liczba elementow zbioru zawierajacego argument, 0 jesli argument nie byl jeszcze wprowadzony
-		/** \brief Get number of elements in set element \a i is in.*/
+		/** \brief Get number of elements in set element \a i is in. WEN: lub 0 jesli i nie byl wprowadzony do dziedziny */
 		int size( const ITEM &i ) const;
 
 		// sprawdzenie, czy kontener jest pusty
@@ -158,7 +159,7 @@ namespace Koala
 		/** \brief Test if empty.*/
 		bool operator!() const { return empty(); }
 
-		/** \brief Delete all elements*/
+		/** \brief Delete all elements WEN: a pojemnosc staje sie 0 */
 		void clear() { resize( 0 ); }
 		// liczba zbiorow
 		/** \brief Get the number of parts.*/
@@ -167,7 +168,7 @@ namespace Koala
 		/** \brief Get elements.
 		 *
 		 *  The method gets all the elements from and writes them down in \a iter.
-		 *  \param[out] iter the iterator to the container with all elements.
+		 *  \param[out] iter the iterator to the container with all elements WEN: czyli na elementy typu ITEM.
 		 *  \return the number of elements.*/
 		template< class Iter > int getElements( Iter iter ) const;
 
@@ -175,7 +176,7 @@ namespace Koala
 		/** \brief Get identifiers.
 		 *
 		 *  The method puts the identifiers of sets to \a iter.
-		 *  \param[out] iter the iterator to the container with identifiers.
+		 *  \param[out] iter the iterator to the container with identifiers WEN: czyli na elementy typu JSPartDesrc< ITEM > *.
 		 *  \return the number of parts.*/
 		template< class Iter > int getSetIds( Iter iter) const;
 		// wypisuje na podany iterator elementy zbioru o podanym reprezencie
@@ -214,13 +215,14 @@ namespace Koala
 		/** \brief Get set identifier.
 		 *
 		 *  The method gets the current identifier of part, the subset represented by identifier \a s belongs to.
-		 *  \param s the tested part identifier.
+		 *  \param s the tested part identifier. WEN: tu jest wazne, ze s musi byc wczesniej powstalym identyfikatorem partycji
 		 *  \return the identifier of part, the block \a s is subset of.*/
 		inline typename JoinableSets<ITEM>::Repr getSetId( typename JoinableSets< ITEM >::Repr s ) const;
 
 		// zlacznia dwoch zbiorow podanych przez zadanie reprezentanta lub ktoregos z elementow
 		// zwracaja reprezentanta wynikowego scalonego zbioru lub 0 w razie porazki (np. brak zbioru do scalenia, albo scalamy ze soba ten sam zbior)
 		/** \brief Join parts.
+		WEN: do wszystkich joinow: jesli laczymy partycje z sama soba, metoda nic nie robi i zwraca 0
 		 *
 		 *  The method joins two parts represented by the identifiers \a a and \a b.
 		 *  \param a the identifier of the first part.
@@ -233,25 +235,26 @@ namespace Koala
 		 *  The method joins two parts represented by the identifiers \a a and \a b.
 		 *  \param a the element from the first part.
 		 *  \param b the element from the second part.
-		 *  \return the identifier of new joined set. */
+		 *  \return the identifier of new joined set. WEN: lub 0 jesli a lub b spoza dziedziny */
 		inline typename JoinableSets< ITEM >::Repr join( const ITEM &a, const ITEM &b );
 		/** \brief Join parts.
 		 *
 		 *  The method joins two parts represented by the identifier \a a and element \a b.
 		 *  \param a the identifier of the first part.
 		 *  \param b the element from the second part.
-		 *  \return the identifier of new joined set. */
+		 *  \return the identifier of new joined set. WEN: lub 0 jesli b spoza dziedziny*/
 		inline typename JoinableSets< ITEM >::Repr join( typename JoinableSets< ITEM >::Repr a, const ITEM &b );
 		/** \brief Join parts.
 		 *
 		 *  The method joins two parts represented by the identifiers \a a and \a b.
 		 *  \param a the element from the first part.
 		 *  \param b the identifier of the second part.
-		 *  \return the identifier of new joined set. */
+		 *  \return the identifier of new joined set. WEN: lub 0 jesli a spoza dziedziny*/
 		inline typename JoinableSets< ITEM >::Repr join( const ITEM &a, typename JoinableSets< ITEM >::Repr b );
 	};
 
 	// wypisywanie zawartosci zbiorow zlaczalnych do strumienia
+	//WEN: opis?
 	template< typename Element, typename Cont >
 		std::ostream &operator<<( std::ostream &,const JoinableSets< Element,Cont > & );
 

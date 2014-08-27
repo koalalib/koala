@@ -681,6 +681,7 @@ namespace Koala
 		size_t m_resizeFactor;
 	};
 
+    //WEN: opis? por. AssocTabConstInterface < std::map<..> > z assoctab.h
 	template< class T > class AssocTabConstInterface;
 	namespace Privates
 	{
@@ -726,6 +727,7 @@ namespace Koala
 		V &get( K arg ) { return (_cont())[arg]; }
 	};
 
+    //WEN: opis? por. AssocTabConstInterface < std::map<..> > z assoctab.h
 	template< class K, class V > class AssocTabConstInterface< HashMap< K,V > >: public Privates::AssocTabTag< K >
 	{
 	public:

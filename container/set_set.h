@@ -30,7 +30,9 @@ namespace Koala
 	 *  - The one working on the STL vector. This option is turned on if constant KOALA_SET_ON_VECTOR is defined.
 	 *  - The one working on hash sets is turned on if constant KOALA_SET_ON_HASHSET is defined.
 	 *
-	 *  In all those cases the interface remains the same and sets are expected to behave in the same way. The difference may occur if the order of the elements. That is why the methods searching through the elements returns elements in a different order. Also the complexity of some operations may vary. \n
+	 *  In all those cases the interface remains the same WEN: no wlasnie nie bardzo, chocby dlatego, ze
+	    jeden z nich dziedziczy caly std::set, a inne nie
+	    and sets are expected to behave in the same way. The difference may occur if the order of the elements. That is why the methods searching through the elements returns elements in a different order. Also the complexity of some operations may vary. \n
 	 *
 	 *  The operator<< of output stream is overloaded, hence the sets can be easily printed.
 	 *  \ingroup cont
@@ -81,7 +83,7 @@ namespace Koala
 		 *
 		 *  Creates a new set and inserts the elements between the iterators \a b and \a e
 		 *  \param b the iterator pointing to the first element of the copied container.
-		 *  \param e the iterator pointing to the last element of the copied container.
+		 *  \param e the iterator pointing to the WEN: nie last (za-last) last element of the copied container.
 		 *
 		 *  [See example](examples/set/setConstructors.html).
 		 */
@@ -109,7 +111,7 @@ namespace Koala
 		 *
 		 *  The method assigns new content (from the container) to the set.
 		 *  \param b the iterator pointing to the first copied element .
-		 *  \param e the iterator pointing to the last copied element.
+		 *  \param e the iterator pointing to the WEN: nie last (za-last) last copied element.
 		 *
 		 *  [See example](examples/set/setAssign.html).
 		 */
@@ -320,7 +322,7 @@ namespace Koala
 
 		// zwracaja 0 gdy nie ma kolejnego elementu. Mozna podac 0, wowczas zwracaja element pierwszy/ostatni
 		/** \brief Get next.
-		 *
+		 *  WEN: no wlasnie nie koniecznie 0 (np. zbiory liczbowe), tylko SetElemForbidValue::badValue(). Nizej to samo
 		 *  The method gets the next after \a a element of the set. If there is no element after \a a, 0 is returned.
 		 *  \param a the reference element. Also 0 is possible then the first element is returned.
 		 *  \return the next element of the set.  If there is no element after \a a, 0 is returned.
@@ -344,7 +346,7 @@ namespace Koala
 		Element prev( const Element &a ) const;
 
 		/** \brief Get minimum.
-		 *
+		 *  WEN: zbior ma byc niepusty, inaczej leci wyjatek ContExcOutpass, to samo nizej
 		 *  The method returns the minimum value element of the set.
 		 *  \return the minimum element of the set.		 */
 		Element min() const

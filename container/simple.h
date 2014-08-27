@@ -89,7 +89,7 @@ namespace Koala
 		 *  The method takes of the top element from the stack.*/
 		void pop();
 		/** \brief Access top.
-		 *
+		 * WEN: kontener musi byc niepusty
 		 *  \returns the reference to the top element on the stack. */
 		T &top();
 
@@ -152,18 +152,18 @@ namespace Koala
 		 *  \param val the inserted value.*/
 		void push( const T& val );
 		/** \brief Pop
-		 *
+		 * WEN: kontener musi byc niepusty
 		 *  The method takes of the top (first) element from the queue.*/
 		void pop();
-		/**\brief Access first element.
+		/**\brief Access first element. WEN: kontener musi byc niepusty
 		 *
 		 *  \return the reference to the first element in the queue.*/
 		T &front();
 		/**\brief Access first element.
-		 *
+		 * WEN: kontener musi byc niepusty
 		 *  \return the reference to the first element in the queue.*/
 		T &top();
-		/**\brief Access last element.
+		/**\brief Access last element. WEN: kontener musi byc niepusty
 		 *
 		 *  \return the reference to the last element in the queue.*/
 		T &back();

@@ -81,7 +81,7 @@ namespace Koala
 	 */
 	/**\brief Edge of graph.
 	 *
-	 *  The main structure of a graph representing an edge i.e. a pair of vertices.
+	 *  The main structure of a graph representing an edge WEN: wskazniki na nia
 	 *  The class is uncopyable, and an object can be created only from friend classes.
 	 *  Each edge keeps information about its type (EdgeType).
 	 *  If the edge type is Loop, there is only one vertex incident with the edge.
@@ -113,25 +113,28 @@ namespace Koala
 		// zwracaja wierzcholki koncowe krawedzi
 		/** \brief Get edge ends.
 		 *
-		 *  \returns the standard pair of pointers that point to the ends (vertices) of the edge.
+		 *  \returns the standard pair of pointers that point to the ends (vertices) of the edge. WEN: zachowanie numeracji z metody addEdge i pokrewnych
+		  WEN: nie zaleca sie bezposredniego uzycia w algorytmie, tylko metod opakowujacych uzywanego obiektu grafu: rozne widoki (view.h) moga zmieniac znaczenie
 		 */
 		std::pair< Vertex< VertInfo,EdgeInfo,Settings > *,Vertex< VertInfo,EdgeInfo,Settings > * > getEnds()
 			{ return std::make_pair( vert[0].vert,vert[1].vert ); }
 		/** \brief Access the first vertex of edge
-		 *
+		 * WEN: zachowanie numeracji z metody addEdge i pokrewnych
+		 WEN: nie zaleca sie bezposredniego uzycia w algorytmie, tylko metod opakowujacych uzywanego obiektu grafu: rozne widoki (view.h) moga zmieniac znaczenie
 		 *  \returns the pointer to the first vertex of the edge.
 		 */
 		Vertex< VertInfo,EdgeInfo,Settings > *getEnd1()
 			{ return vert[0].vert; }
 		/** \brief Access the second vertex of edge
-		 *
+		WEN: zachowanie numeracji z metody addEdge i pokrewnych
+		 * WEN: nie zaleca sie bezposredniego uzycia w algorytmie, tylko metod opakowujacych uzywanego obiektu grafu: rozne widoki (view.h) moga zmieniac znaczenie
 		 *  \returns the pointers to the second end of the edge.
 		 */
 		Vertex< VertInfo,EdgeInfo,Settings > *getEnd2()
 			{ return vert[1].vert; }
 		// czy podany wierzcholek jest koncem krawedzi
 		/** \brief Test if edge end.
-		 *
+		 * WEN: zachowanie numeracji z metody addEdge i pokrewnych
 		 *  \param v the tested vertex.
 		 *  \returns true if the vertex \a v is an end of the edge, false otherwise.
 		 */
@@ -142,7 +145,7 @@ namespace Koala
 		 *
 		 *  For a given vertex \a v in the edge, the method returns the other vertex that is also an end of the edge.
 		 *  \param v the reference vertex.
-		 *  \returns the other vertex of the edge or NULL if unsuccessful.
+		 *  \returns the other vertex of the edge or NULL if unsuccessful. WEN: w szczegolnosci przy petli zwraca to samo
 		 */
 		Vertex< VertInfo,EdgeInfo,Settings > *getEnd( Vertex< VertInfo,EdgeInfo,Settings > *v );
 
@@ -150,7 +153,8 @@ namespace Koala
 		/** \brief Get edge direction.
 		 *
 		 *  The method gets the direction of the edge with respect to the vertex \a v.
-		 *  \param v the vertex of reference.
+		 WEN: nie zaleca sie bezposredniego uzycia w algorytmie, tylko metod opakowujacych uzywanego obiektu grafu: rozne widoki (view.h) moga zmieniac znaczenie
+		 *  \param v the vertex of reference. WEN: zachowanie numeracji z metody addEdge i pokrewnych
 		 *  \returns
 		 *  - EdNone - if \a v does not belong to the edge
 		 *  - EdLoop - if the edge is a loop
@@ -160,9 +164,9 @@ namespace Koala
 		 */
 		EdgeDirection getDir( Vertex< VertInfo,EdgeInfo,Settings > *v );
 		/** \brief Get type of edge.
-		 *
+		 *  WEN: nie zaleca sie bezposredniego uzycia w algorytmie, tylko metod opakowujacych uzywanego obiektu grafu: rozne widoki (view.h) moga zmieniac znaczenie
 		 *  \returns the edge type (EdgeType)
-		 *  - Detached   = 0x0
+		 *  - Detached   = 0x0 WEN: w programie Detached sie nie powinno pojawic
 		 *  - Loop       = 0x1
 		 *  - Undirected = 0x2
 		 *  - Directed   = 0xC
