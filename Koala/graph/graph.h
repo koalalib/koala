@@ -34,10 +34,13 @@ namespace Koala
 	{
 	public:
 		// maska okreslajaca dopuszczalne typy krawedzi
+		//WEN: opis
 		enum { EdAllow = edAllow };
 		// czy jest dopuszczalne tworzenie macierzy sasiedztwa
+		//WEN: opis
 		enum { AdjMatrixAllowed = adjMatrixAllowed };
         //NEW: ustawiona flaga wprowadza do wierzcholka i krawedzi metode getGraph() - wskaznik staly na macierzysty graf
+        //WEN: opis
 		enum { VertEdgeGraphPtr = false };
 
 		// typ klasy tablicy asocjacyjnej uzywanej w metodach grafu przypisujacej wierzcholkom wartosci typu B
@@ -68,7 +71,7 @@ namespace Koala
 		/** \brief Association table for vertices of other graphs
 		 *
 		 *  The type of association table for vertices is definded.
-		 *  \tparam A pointer to vertex (PVert).
+		 *  \tparam A pointer to vertex (PVertex).
 		 *  \tparam B type of values associated to vertices.
 		 */
 		template< class A, class B > class ExtVertAssocCont
@@ -85,6 +88,7 @@ namespace Koala
 		};
 
 		// typ macierzy sasiedztwa dla krawedzi skierowanych - zbedne przy edAllow=false
+		//WEN: opis
 		template< class K, class V > class AdjMatrixDirEdges
 		{
 		public:
@@ -107,6 +111,7 @@ namespace Koala
 		};
 
 		// typ macierzy sasiedztwa dla krawedzi nieskierowanych - zbedne przy edAllow=false
+		//WEN: opis
 		template< class K, class V > class AdjMatrixUndirEdges
 		{
 		public:
@@ -130,6 +135,7 @@ namespace Koala
 		};
 
 		// Dodatkowe pola (poza info) wprowadzane do obiektu wierzcholka
+		//WEN: opis
 		template< class VertInfo, class EdgeInfo, class Settings > struct VertAdditData
 		{
 			// - w tej wersji umozliwia korzystanie z AssocArray
@@ -137,6 +143,7 @@ namespace Koala
 		};
 
 		// Dodatkowe pola (poza info) wprowadzane do obiektu krawedzi
+		//WEN: opis
 		template< class VertInfo, class EdgeInfo, class Settings > struct EdgeAdditData
 		{
 			// - w tej wersji umozliwia korzystanie z AssocArray
@@ -147,8 +154,10 @@ namespace Koala
 		//enum { ReserveOutAssocCont = true };
 
 		// wybrany do uzytku wewnetrznego algorytm sortowania tablic
+		//WEN: opis
 		template< class Iterator > static void sort( Iterator first, Iterator last );
 		// ... i to samo z dostarczonym porownywaczem
+		//WEN: opis
 		template< class Iterator, class Comp > static void sort ( Iterator first, Iterator last, Comp comp );
 
 
@@ -253,6 +262,7 @@ namespace Koala
 		/** \brief Connect.
 		 *
 		 *  Connect the subgraph to the parent \a x.	 */
+		 //WEN: jakie x?
 		SubgraphBase &operator=( const SubgraphBase & );
 
 		// odlacza sie od rodzica (jesli istnial) i odlacza od siebie wszystkie swoje dzieci
@@ -381,11 +391,11 @@ namespace Koala
 		friend class Koala::Edge< VertInfo,EdgeInfo,Settings >;
 
 		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::Vertex Vertex;/**< \brief Type of vertex*/
-		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::PVertex PVertex;/**< \brief Type of pointer to vertex*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::PVertex PVertex;/**< \brief Type of pointer to vertex WEN: tj. używany w procedurach identyfikator wierzchołka.*/
 		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::Edge Edge;/**< \brief Type of edge*/
-		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::PEdge PEdge;/**< \brief Type of pointer to edge*/
-		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::VertInfoType VertInfoType; /**< \brief Type of vertex info class*/
-		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::EdgeInfoType EdgeInfoType; /**< \brief Type of edge info class*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::PEdge PEdge;/**< \brief Type of pointer to edge WEN: tj. używany w procedurach identyfikator krawedzi.*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::VertInfoType VertInfoType; /**< \brief Type of vertex info class WEN: tj. typ pola info*/
+		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::EdgeInfoType EdgeInfoType; /**< \brief Type of edge info class WEN: tj. typ pola info*/
 		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::GraphSettings GraphSettings; /**< \brief Type of class with settings.*/
 		typedef Graph< VertInfo,EdgeInfo,Settings > GraphType; /**< \brief Current graph type */
 
@@ -398,7 +408,7 @@ namespace Koala
 		// Konstruktory
 		// Tworzy pusty graf, bez krawędzi i wierzchołków.
 		/** \brief Constructor
-		 *
+		 * WEN: bez ew. macierzy sasiedztwa
 		 *  Creates a new graph without any edges or vertices.
 		 *
 		 *  [See example](examples/graph/graph_clear.html).
@@ -408,7 +418,7 @@ namespace Koala
 
 		// Konstruktor kopiujący.
 		/** \brief Copy constructor
-		 *
+		 * WEN: powstaje bez ew. macierzy sasiedztwa
 		 *  Creates a new graph which is a copy of \a graph.
 		 *  \param graph reference to the copied graph.  */
 		Graph( const Graph &graph );
@@ -444,8 +454,8 @@ namespace Koala
 
 		// Dodanie kopii grafu do naszego grafu
 		/** \brief Add graph.
-		 *
-		 *  Operator += allows to add a copy of the graph \a gr to the considered one.
+		 *  WEN: nie zmienia ew. posiadania macierzy sasiedztwa
+		 *  Operator += allows to add a copy of the graph \a gr to the considered one. WEN: jako osobna skladowa, nowe wierzcholki wprowadzane sa na koncu listy
 		 *  \param gr the added graph.
 		 *  \returns the sum of graphs.
 		 */
@@ -453,7 +463,8 @@ namespace Koala
 
 		// Przenosimy wszystkie wierzchołki i krawędzie do naszego grafu. Zwraca pierwszy wprowadzony wierzcholek
 		/** \brief Move vertices and edges.
-		 *
+		 *  WEN: jako osobna skladowa, nowe wierzcholki wprowadzane sa na koncu listy
+		 WEN: nie zmienia ew. posiadania macierzy sasiedztwa
 		 *  Edges and vertices from the graph \a gr are moved to the considered graph. (without reallocation)
 		 *  \param gr the moved graph.
 		 *  \returns Pointer to the first inserted vertex.
@@ -462,7 +473,7 @@ namespace Koala
 
 		// dopuszczalne typy krawedzi grafu
 		/** \brief Check Edge types
-		 *
+		 *  WEN: tu jest wazne, ze mowimy o rodzajach dopuszczalnych przez typ grafu, a nie to co w nim jest w danej chwili
 		 *  \return the mask representing allowed types of edges (EdgeType).
 		 */
 		static EdgeType allowedEdgeTypes()
@@ -485,7 +496,7 @@ namespace Koala
 		 *  Since the vertex set is organized as a list, it is necessary to include a method returning the next vertex on the list.
 		 *  If parameter \a vert is set to NULL then the first vertex on the list will be taken.
 		 *  \param vert the reference vertex.
-		 *  \returns avpointer to the next vertex on the vertex list or NULL if the vertex was last.	 */
+		 *  \returns a pointer to the next vertex on the vertex list or NULL if the vertex was last.	 */
 		inline typename GraphType::PVertex getVertNext( PVertex vert ) const;
 
 		/** \brief Get previous vertex.
@@ -500,7 +511,7 @@ namespace Koala
 		 *
 		 *  The method gets the number of edges of type determined by the parameter \a direct.
 		 *  \param direct the mask representing all types of the considered edges.
-		 *  \returns the number of edges of certain type.
+		 *  \returns the number of edges of certain type. WEN: tzn. krawedzie ktorych typ & mask!= sa taken into account
 		 *
 		 *  [See example](examples/graph/graph_clear.html).
 		 */
@@ -511,7 +522,7 @@ namespace Koala
 		 *  The method allows to see through all the edges of the type congruent with the mask \a direct. The method gets the pointer to the edge next to \a e.
 		 *  If parameter e is set to NULL then the first edge on the list is taken.
 		 *  \param e the reference edge.
-		 *  \param direct the mask representing all the types of considered edges.
+		 *  \param direct the mask representing all the types of considered edges. WEN: tzn. krawedzie ktorych typ & mask!= sa taken into account
 		 *  \returns pointer to the next edge or if \a e is the last edge then NULL. */
 		inline typename GraphType::PEdge getEdgeNext( PEdge e, EdgeType direct = EdAll ) const;
 
@@ -520,12 +531,12 @@ namespace Koala
 		 *  The method allows to see through all the edges of the type congruent with the mask direct. The method gets the pointer to the edge previous to \a edge.
 		 *  If parameter \a edge is set to NULL then the last edge on the list will be taken.
 		 *  \param edge the reference edge.
-		 *  \param direct the mask representing all the types of considered edges.
+		 *  \param direct the mask representing all the types of considered edges. WEN: tzn. krawedzie ktorych typ & mask!= sa taken into account
 		 *  \returns pointer to the previous edge or if edge is the first edge then NULL. */
 		inline typename GraphType::PEdge getEdgePrev( PEdge edge, EdgeType direct = EdAll ) const;
 
 		/** \brief Get vertex degree.
-		 *
+		 *  WEN: por. koment. w grconst.h
 		 *  Gets the number of edges incident to the vertex of direction (with respect to the vertex \a vert) prespecified by the mask direct.
 		 *  \param vert the pointer to the reference vertex.
 		 *  \param direct the mask representing the direction of considered edges.
@@ -540,7 +551,7 @@ namespace Koala
 		 *  If the parameter \a e is set to NULL then the first edge on the list is taken.
 		 *  \param vert only the edges incident to \a vert are considered.
 		 *  \param e the reference edge.
-		 *  \param direct the mask representing the types of edges.
+		 *  \param direct the mask representing the types of edges. WEN: no wlasnie nie bardzo type od edge tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
 		 *  \returns the pointer to the next edge or if the edge is the last edge then NULL.
 		 */
 		inline typename GraphType::PEdge getEdgeNext( PVertex vert, PEdge e, EdgeDirection direct = EdAll ) const;
@@ -551,7 +562,7 @@ namespace Koala
 		 *  If the parameter \a ed is set to NULL then the last edge on the list will be returned.
 		 *  \param vert the reference vertex.
 		 *  \param ed the reference edge.
-		 *  \param direct the mask representing the types of edges.
+		 *  \param direct the mask representing the types of edges. WEN: no wlasnie nie bardzo type od edge tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
 		 *  \returns Pointer to the previous edge or if the edge is the first then NULL.
 		 */
 		inline typename GraphType::PEdge getEdgePrev( PVertex vert, PEdge ed, EdgeDirection direct = EdAll ) const;
@@ -561,7 +572,7 @@ namespace Koala
 		 *  The method counts the number of edges between two vertices. Only edges directed in the way consistent with the mask \a direct are considered.
 		 *  \param vert1 the first vertex
 		 *  \param vert2 the second vertex
-		 *  \param direct the mask representing the direction of considered edges.
+		 *  \param direct the mask representing the direction of considered edges. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
 		 *  \returns the number of edges between \a vert1 and \a vert2. */
 		int getEdgeNo( PVertex vert1, PVertex vert2, EdgeDirection direct = EdAll ) const;
 
@@ -572,7 +583,7 @@ namespace Koala
 		 *  \param vert1 the first vertex.
 		 *  \param vert2 the second vertex.
 		 *  \param ed the reference edge
-		 *  \param direct the mask representing the direction of considered edges.
+		 *  \param direct the mask representing the direction of considered edges. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
 		 *  \returns the pointer to the next parallel edge or NULL if \a ed is the last. */
 		typename GraphType::PEdge getEdgeNext( PVertex vert1, PVertex vert2, PEdge ed, EdgeDirection diretction = EdAll ) const;
 
@@ -583,7 +594,7 @@ namespace Koala
 		 *  \param vert1 the first vertex.
 		 *  \param vert2 the second vertex.
 		 *  \param ed the reference edge.
-		 *  \param direct the mask representing direction of the considered edges.
+		 *  \param direct the mask representing direction of the considered edges. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
 		 *  \returns the pointer to the previous parallel edge or NULL if \a ed is the first edge. */
 		typename GraphType::PEdge getEdgePrev( PVertex vert1, PVertex vert2, PEdge ed, EdgeDirection direct = EdAll ) const;
 
@@ -591,7 +602,7 @@ namespace Koala
 		 *
 		 *  \param e the pointer to considered edge.
 		 *  \return the EdgeType value which is a mask representing the type of edge.
-		 *  - Detached   = 0x0
+		 *  - Detached   = 0x0 WEN: wywal, bo ta wartosc nie moze sie pojawic
 		 *  - Loop       = 0x1
 		 *  - Undirected = 0x2
 		 *  - Directed   = 0xC
@@ -599,7 +610,7 @@ namespace Koala
 		inline EdgeType getEdgeType( PEdge e ) const;
 
 		/** \brief Get edge ends
-		 *
+		 *  WEN: tj. pierwsza koncowa w .first, druga w .second - krawedz ma ponumerowane konce
 		 *  The method gets the pair of vertices on which the edge \a ed is spanned.
 		 *  \param ed the considered edge.
 		 *  \returns the pair of the vertices that are the ends of the edge \a ed.	 */
@@ -622,8 +633,8 @@ namespace Koala
 		/** \brief Get arc direction
 		 *
 		 *  The method gets the edge direction. Possible values of EdgeDirection are:
-		 *  - EdNone   = 0x00 if ed is NULL,
-		 *  - EdLoop   = 0x01 if ed is a loop,
+		 *  - EdNone   = 0x00 if ed is NULL WEN: to v,
+		 *  - EdLoop   = 0x01 if ed is a loop, WEN: connected to v,
 		 *  - EdUndir  = 0x02 if ed is undirected,
 		 *  - EdDirIn  = 0x04 if ed is directed and vert is the second vertex of ed,
 		 *  - EdDirOut = 0x08 if ed is directed and vert is the first vertex of ed.
@@ -636,7 +647,7 @@ namespace Koala
 		// ustawianie pol info
 		/** \brief Set vertex Information.
 		 *
-		 *  The method sets the new VertexInfo object as the information about \a vert.
+		 *  The method sets the new VertInfoType object as the information about \a vert. WEN: tj. pole info
 		 *  \param vert the vertex whose info is going to be changed.
 		 *  \param info the object representing new information.
 		 */
@@ -644,7 +655,7 @@ namespace Koala
 
 		/** \brief Set edge information.
 		 *
-		 *  The method sets the new EdgeInfo object as the information about the edge \a ed.
+		 *  The method sets the new EdgeInfoType object as the information about the edge \a ed. WEN: tj. pole info
 		 *  \param ed the edge whose info is going to be changed.
 		 *  \param info the object representing new information.
 		 */
@@ -656,7 +667,7 @@ namespace Koala
 		 *
 		 *  Vertex \a vert is deleted form the graph. If the parameter \a force is set to false, \a vert is deleted only if there are no edges incident to it.
 		 *  \param vert the deleted vertex.
-		 *  \param force the boolean flag saying that deletion should be forced, even if there are some edges incident to \a vert.
+		 *  \param force the boolean flag saying that deletion should be forced, even if there are some edges incident to \a vert. WEN: wtedy te krawedzie sa usuwane razem z nim
 		 *  \returns none
 		 */
 		inline void del( PVertex vert, bool force = true )
@@ -666,16 +677,16 @@ namespace Koala
 		 *
 		 *  Vertex \a vert is deleted form the graph. If the parameter \a force is set to false, \a vert is deleted only if there are no edges incident to it.
 		 *  \param vert the deleted vertex.
-		 *  \param force the boolean flag saying that deletion should be forced, even if there are some edges incident to \a vert.
+		 *  \param force the boolean flag saying that deletion should be forced, even if there are some edges incident to \a vert. WEN: wtedy te krawedzie sa usuwane razem z nim
 		 *  \returns none */
 		void delVert( PVertex vert , bool force = true );
 		// usuwanie zbioru wierzcholkow, zwraca ich liczbe
 		/** \brief Delete vertices.
 		 *
 		 *  Iterators \a begin and \a end define a set of vertices. All vertices from this set are to be deleted (no matter if the are incident with some edges).
-		 *  Notice that method is a template function and iterators can be of any type used by the user, for example a simple table, but also some STL container.
+		 *  Notice that method is a template function and iterators can be of any type used by the user, for example a simple table, but also some STL container. WEN: byle na typ PVertex
 		 *  \param begin the iterator pointing to the first element of the deleted set of vertices.
-		 *  \param end the iterator pointing to the next element after the last deleted vertex.
+		 *  \param end the iterator pointing to the next element after the  last deleted vertex.
 		 *  \returns the number of deleted vertices. */
 		template< class Iterator > int delVerts( Iterator begin, Iterator end );
 
@@ -683,7 +694,7 @@ namespace Koala
 		/** \brief Delete vertices
 		 *
 		 *  Iterators \a begin and \a end define a set of vertices. All vertices from this set are to be deleted (no matter if they are incident with some edges ).
-		 *  Notice that method is a template function and iterators can be of any type used by the user, for example a simple table, but also some STL container. The repetition-proof version of delVerts.
+		 *  Notice that method is a template function and iterators can be of any type used by the user, for example a simple table, but also some STL container. WEN: byle na typ PVertex The repetition-proof version of delVerts. WEN: ktore sa ignorowane
 		 *  \param begin the iterator pointing to the first element of the deleted set of vertices.
 		 *  \param end the iterator pointing to the next element after the last deleted vertex.
 		 *  \returns the number of unique and deleted vertices. */
@@ -726,7 +737,7 @@ namespace Koala
 		 *
 		 *  For a vertex \a vert, each edge incident to it is deleted as long as its direction is consistent with the mask \a direct.
 		 *  \param vert all the edges incident to this vertex and of direction (relative to \a vert) consistent with \a direct are to be deleted.
-		 *  \param direct the mask representing the relative direction of edges which should be deleted. Default value EdAll.
+		 *  \param direct the mask representing the relative direction of edges which should be deleted. Default value EdAll. WEN: no wlasnie relative direction trzeba wyjasnic
 		 *  \return the number of deleted edges.
 		 */
 		int delEdges( PVertex vert, EdgeDirection direct = EdAll );
@@ -734,7 +745,7 @@ namespace Koala
 		// krawedzie miedzy danymi wierzcholkami o podanej orientacji
 		/** \brief Delete edges
 		 *
-		 *  Deletes all the edges between \a vert1 and \a vert2 of direction consistent with the mask direct.
+		 *  Deletes all the edges between \a vert1 and \a vert2 of direction consistent with the mask direct. WEN: consistent direction make zrozumialym
 		 *  \param vert1 the first reference vertex.
 		 *  \param vert2 the second reference vertex.
 		 *  \param direct the mask determining the direction of the deleted edges. By default all edges are deleted.
@@ -745,22 +756,22 @@ namespace Koala
 		// podajemy zbior do usuniecia, uwzglednia tylko krawedzie o typie zawartym w masce
 		/** \brief Delete set of edges.
 		 *
-		 *  Let us consider the container of edges defined by iterators begin and end. An edge from this container is deleted as long as its direction is consistent with the mask \a direct. Any container with a defined iterator can be used as set.
+		 *  Let us consider the container of edges defined by iterators begin and end. An edge from this container is deleted as long as its WEN: tu akurat rodzaj krawedzi direction is consistent with the mask \a direct. Any container with a defined iterator can be used as set. WEN: byle na typ PEdge
 		 *  \param begin the iterator of the first element of the set.
-		 *  \param end the iterator of last element of the set.
-		 *  \param direct the mask determining the direction of the deleted edges.
+		 *  \param end the iterator of WEN: za-last last element of the set.
+		 *  \param direct the mask determining the direction WEN: rodzaj krawedzi of the deleted edges.
 		 *  \return the number of deleted edges.
 		 */
 		template< class Iterator > int delEdges( Iterator begin, Iterator end, EdgeType direct = EdAll );
 
 		// wersja odporna na powtorzenia, ktore sa pmijane
 		/** \brief Delete set of edges.
-		 *
+		 * WEN: j.w.
 		 *  Let us consider the container of edges defined by iterators \a begin and \a end.
 		 *  An edge from this container is deleted as long as its direction is consistent with the mask \a direct. Any container with the defined iterator can be used as theset.
 		 *  Works similarly to delEdges, but here repeated elements are omitted
 		 *  \param begin the iterator of the first element of the set.
-		 *  \param end the iterator of last element of the set.
+		 *  \param end the iterator of WEN: za-last element of the set.
 		 *  \param direct the mask determining the direction of the deleted edges.
 		 *  \return the number of deleted edges.
 		 */
@@ -768,9 +779,9 @@ namespace Koala
 
 		/** \brief Delete set of edges
 		 *
-		 *  Let us consider a set of edges. An edge from this set is deleted as long as its direction is consistent with the mask \a direct.
+		 *  Let us consider a set of edges. An edge from this set is deleted as long as its direction WEN: rodzaj krawedzi is consistent with the mask \a direct.
 		 *  \param s the set of deleted edges.
-		 *  \param direct the mask determining the direction of deleted edges.
+		 *  \param direct the mask determining the direction WEN: rodzaj krawedzi of deleted edges.
 		 *  \return number of deleted edges.
 		 */
 		inline int delEdges( const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> &s,
@@ -779,8 +790,8 @@ namespace Koala
 		// Usuwamy krawędzie z grafu o typie zawartym w masce
 		/** \brief Delete all edges
 		 *
-		 *  Ale the edges of prespecified direction are deleted from the graph.
-		 *  \param direct the mask determining the direction of the deleted edges.
+		 *  Ale the edges of prespecified direction WEN: rodzaj krawedzi are deleted from the graph.
+		 *  \param direct the mask determining the direction WEN: rodzaj krawedzi of the deleted edges.
 		 *  \return the number of deleted edges.
 		 */
 		int delEdges( EdgeType direct = EdAll );
@@ -789,7 +800,7 @@ namespace Koala
 		/** \brief Add vertex.
 		 *
 		 *  A new vertex is created and added to the graph.
-		 *  \param info the information stored in the new-created vertex.
+		 *  \param info the information stored in the new-created vertex. WEN: po prostu pole info
 		 *  \return the pointer to the created vertex.
 		 *
 		 *  [See example](examples/graph/graph_clear.html).
@@ -805,18 +816,18 @@ namespace Koala
 		 *  \param vert2 the second vertex of the new-created edge.
 		 *  \param direct determines the edge direction. Default value EdUndir. If the edge is directed, the parameter is obligatory regardless of the type of graph.
 		 *  \return pointer the new-created edge.
-		 *
+		 *  WEN: nie do konca: dla EdLoop musi byc vert1=vert1, w innych przypadkach vert1!=vert2. Przy EdDirOut, EdUndir i Directed vert1 staje sie pierwsza koncowka, a vert2 druga. Przy EdDirIn odwrotnie. tj. krawedz skierowana wychodzi z pierwszej koncowki
 		 *  [See example](examples/graph/graph_clear.html).
 		 */
 		inline typename GraphType::PEdge addEdge( PVertex vert1, PVertex vert2, EdgeDirection direct = EdUndir );
 
 		// Dodajemy nową krawędź do grafu (z etykietą).
 		/** \brief Add edge.
-		 *
+		 * WEN: j.w. odnosnie maski
 		 *  A new edge (directed or not depending on direct) spanned on two vertices is added to the graph.
 		 *  \param vert1 the first vertex of the new-created edge.
 		 *  \param vert2 the second vertex of the new-created edge.
-		 *  \param info additional information stored in the edge.
+		 *  \param info additional information stored in the edge. WEN: tj. w polu info
 		 *  \param direct determines the edge direction. Default value EdUndir. If the edge is directed, the parameter is obligatory regardless of the type of graph.
 		 *  \return pointer the new-created edge.
 		 *
@@ -828,17 +839,17 @@ namespace Koala
 		 *  A new undirected edge spanned on two vertices is added to the graph.
 		 *  \param u the first vertex of the new-created edge.
 		 *  \param v the second vertex of the new-created edge.
-		 *  \param info additional information stored in the edge.
+		 *  \param info additional information stored in the edge. WEN: tj. w polu info
 		 *  \return pointer the new-created edge.
 		 */
 		inline typename GraphType::PEdge addLink( PVertex u,PVertex v,EdgeInfo info= EdgeInfo() )
 			{   return addEdge(u,v,info,EdUndir); }
 		// Dodajemy nowy łuk do grafu (z etykietą).
-		/** \brief Add arc.
+		/** \brief Add arc. WEN: a czy wiadomo, co to arc?
 		 *
 		 *  \param vert1 the first vertex (tail) of the new-created arc.
 		 *  \param vert2 the second vertex (head) of the new-created arc.
-		 *  \param info the additional information stored in the edge.
+		 *  \param info the additional information stored in the edge. WEN: tj. w polu info
 		 *  \return the pointer the new-created arc.
 		 *
 		 *  [See example](examples/graph/graph_clear.html).
@@ -851,7 +862,7 @@ namespace Koala
 		 *  Add a new loop that is the edge that connects the vertex to itself.
 		 *  \param vert the reference vertex.
 		 *  \param info the additional information stored in the loop.
-		 *  \return the pointer to the new-created edge.
+		 *  \return the pointer to the new-created edge. WEN: tj. w polu info
 		 *
 		 *  [See example](examples/graph/graph_clear.html).
 		 */
@@ -859,7 +870,7 @@ namespace Koala
 
 		// Przenosimy krawędź w inne miejsce z ew. zmiana typu
 		/** \brief Move edge
-		 *
+		 * WEN: ten sam komentarz, co przy addedge
 		 *  Edge is reconnected to new vertices.
 		 *  \param ed the reference edge.
 		 *  \param vert1 the pointer to the first vertex to which the edge will be connected.
@@ -871,7 +882,7 @@ namespace Koala
 
 		// zmiana krawedzi skierowanej na nieskierowana, wynik false gdy krawedz nie byla nieskierowana
 		/** \brief Change to undirected.
-		 *
+		 *  WEN: numeracja koncowek pozostaje bez zmian
 		 *  The type of the edge \a ed is changed to EdUndir i.e. The arc is changed to the undirected edge.
 		 *  \param ed the pointer to the reference edge.
 		 *  \return true if change is accomplished, false if it was not possible or necessary.
@@ -883,21 +894,21 @@ namespace Koala
 		// zamiana na nieskierowane krawedzi z podanego zbioru, wynik - liczba udanych zmian
 		// podany jest zbior krawedzi
 		/** \brief Change to undirected.
-		 *
+		 *  WEN: numeracja koncowek pozostaje bez zmian
 		 *  The type of all the edges in the set is changed to undirected. Any container with edges, which has the implemented iterator, can be used.
 		 *  \param begin the first element of the set.
-		 *  \param end the last element of the set.
-		 *  \return the number of successfully changed directions.
+		 *  \param end the last WEN: za last element of the set.
+		 *  \return the number of successfully changed directions. WEN: tj. undirected i loop moga wystepowac, ale sa ignorowane i nie sa zliczane
 		 *
 		 *  [See example](examples/graph/graph_ch2undir.html).
 		 */
 		template< class Iterator > int ch2Undir( Iterator begin, Iterator end );
 
 		/** \brief Change to undirected
-		 *
+		 *  WEN: numeracja koncowek pozostaje bez zmian
 		 *  The type of all edges in the set is changed to undirected. Any container with edges that has implemented iterator can be used.
 		 *  \param s the set of edges whose direction is going to be changed to undirected.
-		 *  \return the number of successfully changed directions.
+		 *  \return the number of successfully changed directions. WEN: tj. undirected i loop moga wystepowac, ale sa ignorowane i nie sa zliczane
 		 *
 		 *  [See example](examples/graph/graph_ch2undir.html).
 		 */
@@ -907,10 +918,10 @@ namespace Koala
 		/** \brief Change to undirected
 		 *
 		 *  The direction of the edges incident to the vertex \a vert is changed to undirected as long as their direction (with respect to \a vert) is consistent with the mask \a direct
-		 *
+		 *  WEN: numeracja koncowek pozostaje bez zmian
 		 *  \param vert the reference vertex.
 		 *  \param direct the mask determining the direction (related to vert) of edges which are to be changed to undirected.
-		 *  \return the number of successfully changed directions.
+		 *  \return the number of successfully changed directions. WEN: tj. undirected i loop moga wystepowac, ale sa ignorowane i nie sa zliczane
 		 *
 		 *  [See example](examples/graph/graph_ch2undir.html).
 		 */
@@ -918,12 +929,12 @@ namespace Koala
 
 		// wszystkie krawedzie miedzy danymi wierzcholkami o podanej orientacji
 		/** \brief Change to undirected.
-		 *
+		 *  WEN: numeracja koncowek pozostaje bez zmian
 		 *  Direction of all edges spanned on two vertices is changed to undirected.
 		 *  \param vert1 the pointer to the first vertex.
 		 *  \param vert2 the pointer to the second vertex.
-		 *  \param direct the mask determining the initial direction of the changed edges.
-		 *  \return the number of successfully changed directions.
+		 *  \param direct the mask determining the initial direction of the changed edges. WEN: jak zwykle koment. o zgodnosci typu/kierunku z maska
+		 *  \return the number of successfully changed directions. WEN: tj. undirected i loop moga wystepowac, ale sa ignorowane i nie sa zliczane
 		 *
 		 *  [See example](examples/graph/graph_ch2undir.html).
 		 */
@@ -931,9 +942,9 @@ namespace Koala
 
 		// wszystkie w grafie
 		/** \brief Change to undirected.
-		 *
+		 *  WEN: numeracja koncowek pozostaje bez zmian
 		 *  The direction of all edges (arcs) in graph is changed to undirected.
-		 *  \return the number of successfully changed directions.
+		 *  \return the number of successfully changed directions. WEN: tj. undirected i loop moga wystepowac, ale sa ignorowane i nie sa zliczane
 		 *
 		 *  [See example](examples/graph/graph_ch2undir.html).
 		 */
@@ -942,7 +953,7 @@ namespace Koala
 		// Zmieniamy kierunek krawędzi skierowanej, wynik - czy z sukcesem
 		/** \brief Reverse arc.
 		 *
-		 *  The direction of the edge (arcs) is changed to the opposite.
+		 *  The direction of the edge (arcs) is changed to the opposite. WEN: tj. zmiana numeracji koncowek
 		 *  \param ed the considered edge.
 		 *  \return true if successful, false otherwise.
 		 *
@@ -953,10 +964,10 @@ namespace Koala
 		// podany zbior krawedzi
 		/** \brief Reverse arcs.
 		 *
-		 *  The direction of all the arcs form the set defined by iterators \a begin and \a end is changed to opposite.
+		 *  The direction of all the arcs form the set defined by iterators \a begin and \a end is changed to opposite. WEN: tj. zmiana numeracji koncowek
 		 *  Any container of edges, which has a defined iterator, can be used.
 		 *  \param begin the iterator of the first element of the set of arcs.
-		 *  \param end the iterator of the last element of the set of arcs.
+		 *  \param end the iterator of the WEN: za-last last element of the set of arcs. WEN: powtorzenia w ciagu wejsciowym zakazane
 		 *  \return the number of successfully reversed arcs.
 		 *
 		 *  [See example](examples/graph/graph_rev.html).
@@ -965,7 +976,7 @@ namespace Koala
 
 		/** \brief Reverse arcs.
 		 *
-		 *  The direction of all the arcs from the set \a s is changed to the opposite.
+		 *  The direction of all the arcs from the set \a s is changed to the opposite. WEN: tj. zmiana numeracji koncowek
 		 *  \param s the set of arcs.
 		 *  \return the number of successfully reversed arcs.
 		 *
@@ -977,11 +988,11 @@ namespace Koala
 		// wersja odporna na powtorzenia (ignorowane)
 		/** \brief Reverse arcs
 		 *
-		 *  The direction of all the arcs from the set defined by iterators begin and end is changed to the opposite.
+		 *  The direction of all the arcs from the set defined by iterators begin and end is changed to the opposite. WEN: tj. zmiana numeracji koncowek
 		 *  Any container of edges, which has a defined iterator, can be used.
 		 *  In this version repetitions are ignored.
 		 *  \param begin the iterator of the first element of the set of arcs.
-		 *  \param end the iterator of the last element of the set of arcs.
+		 *  \param end the iterator of the WEN: za-last element of the set of arcs.
 		 *  \return the number of successfully reversed arcs.
 		 */
 		 template< class Iterator > int rev2( Iterator begin, Iterator end );
@@ -990,7 +1001,7 @@ namespace Koala
 		 *
 		 *  The direction of all arcs incident to \a vert and of direction (with respect to \a vert) defined by \a direct is changed to the opposite.
 		 *  \param vert the reference vertex.
-		 *  \param direct the mask defining the relative direction of arcs which are to be reversed.
+		 *  \param direct the mask defining the WEN: wyjasnic relative direction of arcs which are to be reversed.
 		 *  \return the number of successfully reversed arcs.
 		 *
 		 *  [See example](examples/graph/graph_rev.html).
@@ -1003,7 +1014,7 @@ namespace Koala
 		 *  All the arcs between two distinct vertices are reversed.
 		 *  \param vert1 the first reference vertex.
 		 *  \param vert2 the second reference vertex.
-		 *  \param direct the mask determining the type of edges that are to be reversed.
+		 *  \param direct the mask determining the type WEN: nie type, tylko rodzaj i ew. kierunek of edges that are to be reversed.
 		 *  \return the number of successfully reversed arcs.
 		 *
 		 *  [See example](examples/graph/graph_rev.html).
@@ -1027,8 +1038,8 @@ namespace Koala
 		 *  The undirected edge is changed to directed. Direction (with respect to \a vert) is determined by \a direct.
 		 *
 		 *  \param ed the edge changed to arc.
-		 *  \param vert the reference vertex.
-		 *  \param direct determines the direction of the arc.
+		 *  \param vert the reference vertex. WEN: musi byc sasiedni z ed
+		 *  \param direct determines the direction of the arc. WEN: dopuszczalne tylko EdDirIn lub EdDirOut
 		 *  \return true if change is successful, false otherwise.
 		 *
 		 *  [See example](examples/graph/graph_ch2dir.html).
@@ -1040,7 +1051,7 @@ namespace Koala
 		 *
 		 *  All undirected and incident to vertex \vert edges are changed to directed.
 		 *  \param vert reference vertex.
-		 *  \param direct determines the direction (with respect to \a vert) of edges converted to arcs.
+		 *  \param direct determines the direction (with respect to \a vert) of edges converted to arcs. WEN: dopuszczalne tylko EdDirIn lub EdDirOut
 		 *  \return the number of changes.
 		 *
 		 *  [See example](examples/graph/graph_ch2dir.html).
@@ -1053,7 +1064,7 @@ namespace Koala
 		 *  The type of all undirected and spanned on two prespecified vertices edges is changed to directed.
 		 *  \param vert1 the first reference vertex.
 		 *  \param vert2 the second reference vertex
-		 *  \param direct determines the direction (with respect to \a vert1 and vert2) of edges converted to arcs.
+		 *  \param direct determines the direction (with respect to \a vert1 and vert2) of edges converted to arcs. WEN: dopuszczalne tylko EdDirIn lub EdDirOut
 		 *  \return the number of changes.
 		 *
 		 *  [See example](examples/graph/graph_ch2dir.html).
@@ -1064,9 +1075,9 @@ namespace Koala
 		// w razie porazki
 		/** \brief Change to arcs.
 		 *
-		 *  The undirected edge is converted into two arcs. More precisely, the edge is changed to directed and a new additional arc with opposite direction is created and added to the graph.
+		 *  The undirected edge is converted into two arcs. More precisely, the edge is changed to directed WEN: zachowujac numeracje koncowek and a new additional arc with opposite direction is created and added to the graph. WEN: jego info jest kopiowane z ed
 		 *  \param ed the changed edge.
-		 *  \return the pointer to the new arc.
+		 *  \return the pointer to the new arc. WEN: lub 0 gdy ed nie byla nieskierowana
 		 *
 		 *  [See example](examples/graph/graph_ch2Arcs.html).
 		 */
@@ -1074,10 +1085,10 @@ namespace Koala
 
 		// j.w.  dla wszystkich krawedzi z danego zbioru, zwraca liczbe sukcesow
 		/** \brief Change to arcs.
-		 *
-		 *  All the undirected edges in the set are converted into two arcs. More precisely, each edge is changed to directed and a new arc with the opposite direction is added to the graph.
+		 *  WEN: powtorzenia dozwolone i ignorowane
+		 *  All the undirected edges in the set are converted into two arcs. More precisely, each WEN: undirected edge is changed to directed and a new arc with the opposite direction WEN: i tym samym info (kopiowanie) is added to the graph.
 		 *  \param begin the first element of set.
-		 *  \param end the last edge in the set.
+		 *  \param end the WEN: za-last last edge in the set.
 		 *  \return the number of changed edges.
 		 *
 		 *  [See example](examples/graph/graph_ch2Arcs.html).
@@ -1086,7 +1097,7 @@ namespace Koala
 
 		/** \brief Change to arcs.
 		 *
-		 *  All the undirected edges in the set \a s are converted into two arcs. More precisely, each edge is changed to directed and a new arc with the opposite direction is created and added to the graph.
+		 *  All the undirected edges in the set \a s are converted into two arcs. More precisely, each WEN: undirected edge is changed to directed and a new arc with the opposite direction WEN: i tym samym info (kopiowanie) is created and added to the graph.
 		 *  \param s the reference to the set of edges.
 		 *  \return the number of changed edges.
 		 *
@@ -1098,7 +1109,7 @@ namespace Koala
 		// j.w. dla wszystkich w grafie
 		/** \brief Change to arcs.
 		 *
-		 *  All the undirected edges in the graph are converted into two arcs. More precisely, each edge is changed to directed and a new arc with opposite direction is added to the graph.
+		 *  All the undirected edges in the graph are converted into two arcs. More precisely, each edge is changed to directed and a new arc with opposite direction WEN: i tym samym info (kopiowanie) is added to the graph.
 		 *  \return the number of changed edges.
 		 *
 		 *  [See example](examples/graph/graph_ch2Arcs.html).
@@ -1108,7 +1119,7 @@ namespace Koala
 		// j.w. dla wszystkich nieskierowanych przy wierzcholku
 		/** \brief Change to arcs.
 		 *
-		 *  All the undirected edges incident to a certain vertex are converted into two arcs. More precisely, each edge is changed to directed and a new arc with opposite direction is added to the graph.
+		 *  All the undirected edges incident to a certain vertex are converted into two arcs. More precisely, each edge is changed to directed and a new arc with opposite direction WEN: i tym samym info (kopiowanie) is added to the graph.
 		 *  \param vert the reference vertex.
 		 *  \return the number of changed edges.
 		 *
@@ -1120,7 +1131,7 @@ namespace Koala
 		/** \brief Change to arcs.
 		 *
 		 *  All the undirected edges spanned on two prespecified vertices are converted into two arcs.
-		 *  More precisely, each edge is changed to directed and a new arc with opposite direction is added to the graph.
+		 *  More precisely, each edge is changed to directed and a new arc with opposite direction WEN: i tym samym info (kopiowanie) is added to the graph.
 		 *  \param vert1 the first reference vertex.
 		 *  \param vert2 the second reference vertex.
 		 *  \return the number of changed edges.
@@ -1133,7 +1144,7 @@ namespace Koala
 		// nowego wierzcholka, ktory jest zwracany
 		/** \brief Put vertex in edge.
 		 *
-		 *  Edge is divided into two edges by one additional vertex.
+		 *  Edge is divided into two edges by one additional vertex. WEN: ed jest kasowana, a dwie nowe otrzymuja jego info. Rodzaje krawedzi: petla->undirected, undir->undir, dir->dir z zachowaniem kierunku
 		 *  \param ed the split edge.
 		 *  \param info vertex information stored in the new-created vertex.
 		 *  \return the pointer to the new-created vertex
@@ -1146,10 +1157,10 @@ namespace Koala
 		// krawedz laczaca tych sasiadow
 		/** \brief Pick vertex.
 		 *
-		 *  If a vertex has at most two neighbors, it is deleted together with all the incident edges. One edge linking two neighbors is created.
+		 *  If a vertex has at most two neighbors, it is deleted together with all the incident edges. One edge linking two neighbors is created. WEN: przy jednym sasiedzie powstaje petla, przy 2 wybierana jest undirected lub skierowanie odpowiednio do skierowania usuwanych krawedzi
 		 *  \param vert the eliminated vertex.
 		 *  \param info the information for the new-created edge.
-		 *  \return the pointer to the new-created edge.
+		 *  \return the pointer to the new-created edge. WEN: lub NULL w razie bledu
 		 *
 		 *  [See example](examples/graph/graph_pick.html).
 		 */
@@ -1158,13 +1169,13 @@ namespace Koala
 		// sklejanie grupy wierzcholkow w jeden wierzcholek docelowy (zwracany).
 		// Mozna wybrac ten wierzcholek sposrod sklejanej grupy. makeloops decyduje, czy krawedzie wewnatrz grupy
 		// maja byc usuwane, czy zamieniane w petle
-		/** \brief Merge vertices
-		 *
+		/** \brief Merge vertices WEN: fachowo to sie nazywa szrinkink :-)
+		 *  WEN: oprocz ew. petli nie sa usuwane powstajace przy sciagnieciu kraw. rownolegle
 		 *  The set of vertices is merged into one. The target vertices in the set can be chosen.
 		 *  \param begin the iterator of the first element of the merged group of vertices.
-		 *  \param end   the iterator of the last element of the merged group of vertices.
-		 *  \param makeloops decides if the edges inside the set are to be converted to loops or not.
-		 *  \param vert the vertex with which all the others will be unified. If NULL any vertex is chosen.
+		 *  \param end   the iterator of the WEN: za-last last element of the merged group of vertices. WEN: powtorzenia niedozwolone
+		 *  \param makeloops decides if the edges inside the set are to be converted to loops or WEN: deleted not.
+		 *  \param vert the vertex with which all the others will be unified. If NULL any vertex is chosen. WEN: Zawsze zachowywane jest jego info
 		 *  \return the pointer to the target vertex.
 		 *
 		 *  [See example](examples/graph/graph_glue.html).
@@ -1173,7 +1184,7 @@ namespace Koala
 			glue( Iterator begin, Iterator end, bool makeloops = false, PVertex vert = NULL );
 
 		/** \brief Merge vertices
-		 *
+		 * WEN: j.w. oprocz powtorzen
 		 *  The set of vertices is merged into one. The target vertex in the set can be chosen.
 		 *  \param s the reference to the set of vertices which are to be merged.
 		 *  \param makeloops decides if the edges inside the set are to be converted to loops or not.
@@ -1188,11 +1199,11 @@ namespace Koala
 				{ glue( s.begin(),s.end(),makeloops,res ); }
 		// wersja odporna na powtorzenia (ignorowane)
 		/** \brief Merge vertices
-		 *
+		 * WEN: j.w. + powtorzenia
 		 *  Repetition-proof version of the glue method.
 		 *  The set of vertices is merged into one. The target vertex in the set can be chosen.
 		 *  \param begin the iterator of the first element of the merged group of vertices.
-		 *  \param end the iterator of the last element of the merged group of vertices.
+		 *  \param end the iterator of the WEN: za-last element of the merged group of vertices.
 		 *  \param makeloops the decides if the edges inside the set are to be converted to loops or not.
 		 *  \param vert the vertex with which all the others will be unified. If NULL any vertex is chosen.
 		 *  \return the pointer to the target vertex.
@@ -1204,7 +1215,7 @@ namespace Koala
 
 		// jw. dla 2 wierzcholkow
 		/** \brief Merge vertices
-		 *
+		 * WEN: jw. bez powtorzen
 		 *  Two vertices are merged into one. Depending on makeloops edges between them can be converted into loops or deleted.
 		 *  \param vert1 the first vertex.
 		 *  \param vert2 the last vertex.
@@ -1219,7 +1230,7 @@ namespace Koala
 		// Wynik - liczba usuniec
 		/** \brief Delete paralel edges.
 		 *
-		 *  All the edges from certain set and parallel to predefined edge are deleted from graph.
+		 *  All the edges from certain set and parallel to predefined edge WEN: procz niej samej are deleted from graph.
 		 *  Set can be given in any form of container that has an iterator defined.
 		 *  Three types of parallelism are possible. Depending on \a reltype:
 		 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
@@ -1227,7 +1238,7 @@ namespace Koala
 		 *  - EdUndir - edges are considered to be parallel if the are spanned on the same vertices.
 		 *
 		 *  \param begin the fist element of the set of edges.
-		 *  \param end the lest element of the set of edges.
+		 *  \param end the WEN: za-last lest element of the set of edges. WEN: powtorzenia zabronione
 		 *  \param ed the edge to which all the others are reduced.
 		 *  \param reltype detrmines the type of parallelism.
 		 *  \return the number of deleted edges.
@@ -1238,7 +1249,7 @@ namespace Koala
 
 		/** \brief Delete parallel edges.
 		 *
-		 *  All the edges from a certain set and parallel to the predefined edge, are deleted from the graph.
+		 *  All the edges from a certain set and parallel to the predefined edge WEN: procz niej samej, are deleted from the graph.
 		 *  Three types of parallelism are possible. Depending on \a reltype:
 		 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
 		 *  - EdDirIn - edges are considered to be parallel if the are spanned on the same vertices and are of the same type.
@@ -1257,7 +1268,7 @@ namespace Koala
 		// wersja odporna na powtorzenia (ignorowane)
 		/** \brief Delete parallel edges.
 		 *
-		 *  All the edges a from certain set and parallel to the predefined edge are deleted from the graph.
+		 *  All the edges a from certain set and parallel to the predefined edge WEN: procz niej samej are deleted from the graph.
 		 *  The set can be given in any form of the container that has an iterator defined.
 		 *  This version is repetition-proof.
 		 *  Three types of parallelism are possible. Depending on \a reltype:
@@ -1266,7 +1277,7 @@ namespace Koala
 		 *  - EdUndir - edges are considered to be parallel if the are spanned on the same vertices.
 		 *
 		 *  \param begin the first element of the set of edges.
-		 *  \param end the lest element of the set of edges.
+		 *  \param end the WEN: za-last lest element of the set of edges.
 		 *  \param ed the edge to which all the others are reduced.
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
@@ -1278,7 +1289,7 @@ namespace Koala
 		// wszystkie krawedzie rownolegle
 		/** \brief Delete parallel edges.
 		 *
-		 *  All the edges parallel to the predefined edge are deleted from the graph.
+		 *  All the edges parallel to the predefined edge WEN: procz niej samej are deleted from the graph.
 		 *  Three types of parallelism are possible. Depending on \a reltype:
 		 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
 		 *  - EdDirIn - edges are considered to be parallel if the are spanned on the same vertices and are of the same type.
@@ -1295,7 +1306,7 @@ namespace Koala
 		// z grupy krawedzi zostawia jedynie nierownoleglych wzgledem siebie reprezentantow. Znaczenie parametrow
 		// analogiczne jak w metodach findParals. Zwraca liczbe usuniec.
 		/** \brief Delete parallel edges.
-		 *
+		 * WEN: gdzie tu jest podany zwiazek representatives z paralelizmem???
 		 *  From the set of edges only unique representatives are left, all the repetitions are deleted. The set of edges can be defined as any container with an iterator.
 		 *  Three types of parallelism are possible. Depending on \a reltype:
 		 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
@@ -1303,7 +1314,7 @@ namespace Koala
 		 *  - EdUndir - edges are considered to be parallel if the are spanned on the same vertices.
 		 *
 		 *  \param begin the first element of the set of edges.
-		 *  \param end the lest element of the set of edges.
+		 *  \param end the WEN: za-lest element of the set of edges. WEN: powtorzenia zabronione
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
@@ -1321,7 +1332,7 @@ namespace Koala
 		 *  - EdUndir - edges are considered to be parallel if the are spanned on the same vertices.
 		 *
 		 *  \param begin the iterator of the fist element of the set of edges.
-		 *  \param end the iterator of the lest element of the set of edges.
+		 *  \param end the iterator of the WEN: za-lest element of the set of edges.
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
@@ -1332,6 +1343,7 @@ namespace Koala
 		/** \brief Delete parallel edges.
 		 *
 		 *  From the set of edges only unique representatives are left, all the repetitions are deleted.
+		 WEN: gdzie tu jest podany zwiazek representatives z paralelizmem???
 		 *  Three types of parallelism are possible. Depending on \a reltype:
 		 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
 		 *  - EdDirIn - edges are considered to be parallel if the are spanned on the same vertices and are of the same type.
@@ -1397,7 +1409,7 @@ namespace Koala
 		// usuwa krawedzie, ktore przy tym samym ustawieniu parametrow zwracalyby metody getIncEdges. Zwraca liczbe
 		// usuniec
 		/** \brief Delete incident edges.
-		 *
+		 * WEN: por. komentarz przy findParals
 		 *  Deletes edges incident to the vertices from the set defined by the iterators \a beg and \a end.
 		 *  Three modes are possible. Depending on the \a kind:
 		 *  - if \a kind is congruent with Directed or Undirected, edges with one vertex outside the vertex set are taken.
@@ -1405,7 +1417,7 @@ namespace Koala
 		 *  - the option in which mask \a kind is congruent with both the above-mentioned is also available.
 		 *
 		 *  \param beg the iterator to the first element of the set of vertices.
-		 *  \param end the iterator to the last element of the set of vertices.
+		 *  \param end the iterator to the WEN: za-last element of the set of vertices.
 		 *  \param type the mask determining the direction (relative to vertices in set) of edges which are to be deleted.
 		 *  \param kind the mask determining the mode.
 		 *  \return the number of deleted edges.
@@ -1413,7 +1425,7 @@ namespace Koala
 		template< class Iterator > int delIncEdges( Iterator beg, Iterator end, EdgeDirection type = EdAll, EdgeType kind = Loop );
 
 		/** \brief Delete incident edges.
-		 *
+		 *  WEN: por. komentarz przy findParals
 		 *  Deletes edges incident to the vertices from the set \a s.
 		 *  Three modes are possible. Depending on the \a kind:
 		 *  - if \a kind is congruent with Directed or Undirected, edges with one vertex outside the vertex set are taken.
@@ -1433,25 +1445,25 @@ namespace Koala
 		// podana wartosc
 		/** \brief Complement of graph.
 		 *
-		 *  Subgraph induced by the set of vertices is converted to its complement. Only edges with direction consistent with mask \a direct are taken.
+		 *  Subgraph induced by the set of vertices is converted to its complement. Only edges with WEN: raczej typ i co to znaczy consistent direction consistent with mask \a direct are taken.
 		 *  Any container that has implemented iterator can be used.
 		 *  \tparam Iterator the class of iterator for the container storing the set of vertices.
-		 *  \tparam EdInfoGen the class generating automatically information for edges.
+		 *  \tparam EdInfoGen the class generating automatically information for edges. WEN: jak? obiekt funkc. ma miec EdgeInfo operator()(const Graph&,PVertexPVertex,EdDirection)
 		 *  \param begin the iterator of the thirst element of the set of vertices.
-		 *  \param end the iterator of the last element of the set of vertices.
-		 *  \param direct the mask determining the types of the considered edges.
+		 *  \param end the iterator of the WEN: za-last element of the set of vertices. WEN: powtorzenia dozwolone lecz ingnorowane
+		 *  \param direct the mask determining the types of the considered edges. WEN: tu raczej trzeba wyjasnic, ze brana jest negacja osobno po Loop, Directed i Undirected
 		 *  \param inforGen the automatic EdgeInfo generator for new edges.
 		 *  \return none.
 		 */
 		template< class Iterator, class EdInfoGen > void neg( Iterator begin, Iterator end, EdgeType direct, EdInfoGen infoGen);
 
 		/** \brief Complement of graph.
-		 *
+		 * WEN: jw. tylko bez funktora generujacego infa
 		 *  Subgraph induced by the set of vertices is converted to its complement. Only edges with direction consistent with the mask \a direct are taken.
 		 *  Any container that has implemented iterator can be used.
 		 *  \tparam Iterator the class of the iterator for the container storing the set of vertices.
 		 *  \param begin the iterator of the thirst element of the set of vertices.
-		 *  \param end the iterator of the last element of the set of vertices.
+		 *  \param end the iterator of the WEN: za-last element of the set of vertices.
 		 *  \param direct the mask determining the types of considered edges.
 		 *  \param info the additional information assigned to the new-created edges.
 		 *  \return none.
@@ -1461,7 +1473,7 @@ namespace Koala
 			{ neg( beg,end,type,ConstFunctor< EdgeInfo >( info ) ); }
 
 		/** \brief Complement of graph.
-		 *
+		 * WEN: jak 2 metody wyzej, tylko bez powtorzen
 		 *  Subgraph induced by the set of vertices is converted to its complement. Only edges with direction consistent with the mask \a direct are taken.
 		 *  The set of vertices is given by \a vset.
 		 *  \tparam EdInfoGen the class generating automatically information for edges.
@@ -1474,7 +1486,7 @@ namespace Koala
 			{ neg( vset.begin(),vset.end(),type,infoGen ); }
 
 		/** \brief Complement of graph.
-		 *
+		 * WEN: jak 2 metody wyzej, tylko bez powtorzen
 		 *  Subgraph induced by the set of vertices is converted to its complement. Only edges with direction consistent with the mask \a direct are taken.
 		 *  \param vset the set of vertices which induce the subgraph that is going to be converted into its complement.
 		 *  \param direct the mask determining the types of considered edges.
@@ -1485,7 +1497,7 @@ namespace Koala
 
 		// ... i dopelnienie calego grafu
 		/** \brief Complement of graph.
-		 *
+		 * WEN: jw.
 		 *  Graph is converted to its complement. Only edges with direction consistent with mask \a type are considered.
 		 *  \tparam EdInfoGen class generating automatically information for edges.
 		 *  \param type mask determining the types of edges that are considered.
@@ -1495,7 +1507,7 @@ namespace Koala
 		template< class EdInfoGen > void neg( EdgeType type, EdInfoGen infoGen );
 
 		/** \brief Complement of graph.
-		 *
+		 * WEN:jw.
 		 *  Graph is converted to its complement. Only edges with type consistent with the mask \a type are considered.
 		 *  \param type the mask determining the types of edges that are considered.
 		 *  \param info the information assigned to new edges.
@@ -1514,8 +1526,8 @@ namespace Koala
 		// Zwraca pierwszy wprowadzony wierzcholek
 
 		/** \brief Copy graph.
-		 *
-		 *  The method adds to the current graph a copy of the graph \a agraph.
+		 * WEN: nie zmienia ew. posiadania macierzy sasiedztwa
+		 *  The method adds to the current graph a copy of the graph \a agraph. WEN: wierzcholki nowe dodawane na koncu jako nowa czesc
 		 *  \param agraph the copied graph.
 		 *  \return the pointer to the first new-created vertex.
 		 */
@@ -1525,10 +1537,10 @@ namespace Koala
 		template< class ExtGraph > typename GraphType::PVertex copy2( const ExtGraph &agraph );
 
 		/** \brief Copy graph.
-		 *
-		 *  The method adds to the current graph a copy of the graph \a agraph.
+		 * WEN: nie zmienia ew. posiadania macierzy sasiedztwa
+		 *  The method adds to the current graph a copy of the graph \a agraph. WEN: wierzcholki nowe dodawane na koncu jako nowa czesc
 		 *  \param agraph the copied graph.
-		 *  \param choosers the standard pair of choosers which allow to choose vertices and edges to copy. Additionally both ends of each copied edge need to satisfy the VChooser.
+		 *  \param choosers the standard pair of choosers which allow to choose vertices and edges to copy. Additionally both ends of each copied edge need to satisfy the VChooser. WEN: jakis link do ogolnego opisu chooserow
 		 *  \return the pointer to the first new-created vertex.
 		 */
 
@@ -1540,10 +1552,10 @@ namespace Koala
 
 
 		/** \brief Copy graph.
-		 *
+		 * WEN: nie zmienia ew. posiadania macierzy sasiedztwa
 		 *  The method adds to the current graph a copy of the graph \a agraph.
-		 *  \param agraph the copied graph.
-		 *  \param choosers the standard pair of choosers which allow to choose vertices and edges to copy. Additionally both ends of each copied edge need to satisfy the VChooser. See \ref DMchooser.
+		 *  \param agraph the copied graph. WEN: wierzcholki nowe dodawane na koncu jako nowa czesc
+		 *  \param choosers the standard pair of choosers which allow to choose vertices and edges to copy. Additionally both ends of each copied edge need to satisfy the VChooser. See \ref DMchooser. WEN: jakis link do ogolnego opisu chooserow
 		 *  \param casters the standard pair of methods allowing to generate a vertex info and an edge info automatically basing on the infos in the added graph \a agraph. See \ref DMcaster.
 		 *  \return the pointer to the first new-created vertex.
 		 */
@@ -1554,9 +1566,9 @@ namespace Koala
 		/** \brief Copy graph.
 		 *
 		 *  The method adds to the current graph a copy of the graph \a agraph.
-		 *  \param agraph the copied graph.
+		 *  \param agraph the copied graph. WEN: wierzcholki nowe dodawane na koncu jako nowa czesc
 		 *  \param choosers the standard pair of choosers which allow to choose vertices and edges to copy. Additionally both ends of each copied edge need to satisfy the VChooser. See \ref DMchooser.
-		 *  \param casters the standard pair of methods allowing to generate a vertex info and an edge info automatically basing on the infos in the added graph \a agraph.
+		 *  \param casters the standard pair of methods allowing to generate a vertex info and an edge info automatically basing on the infos in the added graph \a agraph. WEN: jakis link do ogolnego opisu casterow
 		 *  \param linkers the standard pair of linkers, which are the objects that define the way of joining the initial entities with the copied ones. For more details see \ref DMlinker.
 		 *  \return the pointer to the first new-created vertex.
 		 */
@@ -1568,7 +1580,7 @@ namespace Koala
 		// parametry podobne jak w copy
 		// Zwraca pierwszy wprowadzony wierzcholek
 		/** \brief Substitute graph for vertex.
-		 *
+		 * WEN: we wszystkich substitute te same uwagi, co w copy oraz: graf w argumencie nie moze byc naszym. Typ/orientacja i info krawedzi z czesci nowej do starej sa dziedziczone po wzorcowej krawedzi z vert do czesci starej, ale ew. petle przy wierzcholku podstawianym znikaja
 		 *  The method substitute a copy of the graph \a graph for the vertex \a vert. The vertex \a vert is deleted form graph.
 		 *  \param vert the substituted vertex
 		 *  \param graph the copied graph.
@@ -1619,14 +1631,14 @@ namespace Koala
 		// Tworzymy macierz sąsiedztwa.
 		/** \brief Make adjacency matrix.
 		 *
-		 *  The adjacency matrix is created. For some algorithmic purposes it is better to use the adjacency matrix.
+		 *  The adjacency matrix is created. For some algorithmic purposes it is better to use the adjacency matrix. WEN: mozna podac dokladnie w ktorych, jest jedna taka lista
 		 *  \return true if successful, false otherwise (if adjacency matrix is not allowed or already exists).
 		 */
 		bool makeAdjMatrix();
 
 		// Usuwamy macierz sąsiedztwa.
 		/** \brief Delete adjacency matrix.
-		 *
+		 * WEN: tylko ta i nastepna metoda moze zmiec stan posiadania macierzy sasiedztwa
 		 *  The adjacency matrix is deleted.
 		 *  \return true if successful, false otherwise (if adjacency matrix does not exist).
 		 */
@@ -1645,7 +1657,7 @@ namespace Koala
 		// czy ten typ grafu obsluguje macierz sasiedztwa
 		/** \brief Check if adjacency matrix is allowed.
 		 *
-		 *  Test whether the adjacency matrix is allowed.
+		 *  Test whether the adjacency matrix is allowed. WEN: by Settings tj. typ grafu
 		 *  \return true if an adjacency matrix is allowed, false otherwise.
 		 *
 		 *  [See example](examples/graph/graph_adjmatrix.html).
@@ -1654,7 +1666,7 @@ namespace Koala
 			{ return Settings::AdjMatrixAllowed; }
 		// alokacja pamieci na podana liczbe wierzcholkow
 		/** \brief Reserve memory for adjacency matrix.
-		 *
+		 * WEN: w razie braku macierzy nic nie robi
 		 *  The method allows to allocate sufficient memory area for adjacency matrix, thanks to which excessive reallocations may be avoided.
 		 *  \param size possible dimension of matrix which fits into reserved area.
 		 *

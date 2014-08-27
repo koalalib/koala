@@ -6,6 +6,8 @@
 #include "../Koala/classes/create.h"
 #include"../Koala/io/text.h"
 
+Koala::StdRandGen<> stdgen;
+
 typedef Koala::Graph<int,int> GraphII;
 struct Gene {
 	int operator()(int i) {return i;}
@@ -172,7 +174,7 @@ int main() {
 //	gml.newKey("dgml", "graphML", Koala::IO::GraphMLKeyTypes::Int,
 //		Koala::IO::GraphMLKeyTypes::GraphML);
 
-	Koala::Creator::erdRen1(g1, 10, 0.1, Gene(), Gene(), Koala::EdUndir);
+	Koala::Creator::erdRen1(stdgen,g1, 10, 0.1, Gene(), Gene(), Koala::EdUndir);
 	for(Vert vv = g1.getVert(); vv; vv = g1.getVertNext(vv)) {
 		printf("%d : ", vv->info);
 		for(Edge ee = g1.getEdge(vv); ee; ee = g1.getEdgeNext(vv, ee)) {

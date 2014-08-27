@@ -108,7 +108,7 @@ namespace Koala
 
 	/** \brief Vertex of graph
 	 *
-	 *  The class used as a basic structure of graph representing a vertex (node). Objects of this uncopyable class can be created only from the friend classes.
+	 *  The class used as a basic structure of graph representing a vertex (node) WEN: tak na prawde to wskazniki na nia. Objects of this uncopyable class can be created only from the friend classes.
 	 *  \tparam VertInfo the type of objects that store any information connected with vertex.
 	 *  \tparam EdgeInfo the type of objects that store any information connected with edge.
 	 *  \tparam Settings the type of objects which store parameters of graph.

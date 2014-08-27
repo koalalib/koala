@@ -24,6 +24,8 @@
  *   - will work for anonymous structures (UNDER GCC WILL NOT CALL IT'S CONSTRUCTOR):
  *     eg. struct {int a, b;} LOCALARRAY(table, 10);
  *
+ WEN: trzeba jawnie napisac o stalych czasu kompilacji, ktorych def przed wlaczeniem naglowka zmienia dzialanie
+ WEN: brakuje opisu stalej KOALA_FORCE_VLARRAY, por. tez TODO: nizej
  * KOALA_STACK_THRESHOLD
  *   the maximum size of a single table allocated on stack
  *   this value should not exceed the stack size (usually 1MB on Windows
@@ -31,15 +33,14 @@
  *
  * KOALA_USES_ALLOCA
  *   define this symbol to force Koala to use alloca function
- */
+ WEN: jawnie napisac, przy jakich pojemnosicach LOCALARRAY uzyje stosu, a kiedy pamieci dynamiczej w kontekscie wystepowania lub braku KOALA_USES_ALLOCA i wartosci KOALA_STACK_THRESHOLD
+  */
 
 //#define KOALA_USES_ALLOCA
 //#define KOALA_FORCE_VLARRAY
 
 //NEW: teraz alloca powinna wlaczac stala KOALA_USES_ALLOCA
 
-//TODO: w ogole nie odpalila sie wersja z alloca, a tylko z new. Czemu nie wprowadzic makra z "typ tabl[dlugosc]"
-// - na uzytek kompilatorow, ktore to rozumieja?
 
 #ifndef KOALA_STACK_THRESHOLD
 #define KOALA_STACK_THRESHOLD       8192
@@ -117,11 +118,12 @@ namespace Koala
 #if defined(KOALA_FORCE_VLARRAY)
 #define LOCALARRAY(name, size)                          \
 	name[size];
+	//TODO: jesli uzycie alloca jest warunkowane pojemnoscia KOALA_STACK_THRESHOLD, to VLArraye chyba tez tak poinny funkcjonowac
 
 // Intel Compiler, GCC-likes, Visual Studio have alloca
 #elif defined(KOALA_USES_ALLOCA) && \
 	(defined(_MSC_VER) || defined(__INTEL_COMPILER) || defined(__GNUC__))
-
+//TODO: chyba drugi warunek jest zbednyu, nie wiemy jakie komp. dostarczaja alloca, a jesli gdzies jej nie ma to po prostu kod sie nie skompluje z usawionym KOALA_USES_ALLOCA
 // name = NULL a dopiero potem name = cast ... 縠by unikn规 warningu
 // od VS o wykorzystaniu niezainicjowanej zmiennej
 #define LOCALARRAY(name, size)                          \

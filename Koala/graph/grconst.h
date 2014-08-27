@@ -38,11 +38,11 @@ template< class GraphType > class ConstGraphMethods
 {
 public:
 	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::Vertex Vertex; /**< \brief Vertex of graph.*/
-	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::PVertex PVertex; /**< \brief Pointer to vertex of graph.*/
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::PVertex PVertex; /**< \brief Pointer to vertex of graph WEN: tj. używany w procedurach identyfikator wierzchołka.*/
 	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::Edge Edge; /**< \brief Edge of graph.*/
-	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::PEdge PEdge; /**< \brief Pointer to edge of graph.*/
-	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::VertInfoType VertInfoType; /**< \brief Vertex information.*/
-	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::EdgeInfoType EdgeInfoType; /**< \brief Edge information.*/
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::PEdge PEdge; /**< \brief Pointer to edge of graph. WEN: tj. używany w procedurach identyfikator krawedzi.*/
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::VertInfoType VertInfoType; /**< \brief Vertex information. WEN: tj. typ pola info */
+	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::EdgeInfoType EdgeInfoType; /**< \brief Edge information. WEN: tj. typ pola info */
 	typedef typename Privates::GraphInternalTypes< ConstGraphMethods< GraphType > >::GraphSettings GraphSettings; /**< \brief Graph settings.*/
 
 protected:
@@ -91,7 +91,8 @@ public:
 	 */
 	ConstGraphMethods &operator=( const ConstGraphMethods & )
 		{ return *this; }
-
+//WEN:  gdzies trzeba podac ponizszy koment, tj. ze szablon ConstGraphMethods korzystajac w wzorca CRTP wprowadza staly pakiet metod const grafu korzystajac tylko z ponizszych
+//WEN: jest to wykorzystane w glownej klasie grafu i wszystkich widokach wiew.h
 //    Uwaga: metody, ktore musza byc dostarczane przez GraphType:
 //         int getVertNo() const;
 //         PVertex getVertNext( PVertex ) const;
@@ -110,6 +111,7 @@ public:
 //         PVertex getEdgeEnd1( PEdge ) const;
 //         PVertex getEdgeEnd2( PEdge  ) const;
 //         EdgeDirection getEdgeDir( PEdge , PVertex);
+
 
 //    Uwaga: zasady ogolne obslugi zbiorow wierz/krawedzi struktury grafowej. Zestaw metod postaci:
 //    int get...No(... arg ...) - dlugosc listy
@@ -155,7 +157,7 @@ public:
 	/** \brief Get first vertex
 	 *
 	 *  The graph is organized on list structures. Also the list of vertices is available. The method allows to get the first vertices in the graph.
-	 *  \return Pointer to the the first vertex on the list of vertices.
+	 *  \return Pointer to the the first vertex on the list of vertices WEN: lub NULL przy grafie pustym.
 	 */
 	PVertex getVert() const
 		{ return self.getVertNext( (PVertex)0 ); }
@@ -163,7 +165,7 @@ public:
 	/** \brief Get last vertex
 	 *
 	 *  The graph is organized on list structures. Also the list of vertices is available. The method allows to get to the last vertices in the graph on the list of vertices.
-	 *  \return the pointer to the the last vertex on the list of vertices.
+	 *  \return the pointer to the the last vertex on the list of vertices. WEN: lub NULL przy grafie pustym
 	 */
 	PVertex getVertLast() const
 		{ return self.getVertPrev( (PVertex)0 ); }
@@ -172,7 +174,7 @@ public:
 	 *
 	 *  Pointers to all the vertices in graph are written to the container defined by \a iter. Any container with a defined iterator (ex. table) can be used.
 	 *  \tparam OutputIterator Iterator class of container in which the method stores up vertices.
-	 *  \param[out] iter the iterator of the container to which all the vertices form the graph are written.
+	 *  \param[out] iter the iterator of the container to which all the vertices form the graph are written. WEN: kontener na typ PVertex
 	 *  \return the number of vertices.
 	 */
 	template< class OutputIterator > int getVerts( OutputIterator iter) const;
@@ -188,7 +190,7 @@ public:
 	/** \brief Get edge number.
 	 *
 	 *  The method gets the number of edges of the type determined by the parameter \a mask.
-	 *  \param mask representing all types of considered edges.
+	 *  \param mask representing all types of considered edges. WEN: tzn. krawedzie ktorych typ & mask!= sa taken into account
 	 *  \returns the number of edges of certain type.
 	 */
 	inline int getEdgeNo( EdgeType mask = EdAll ) const
@@ -199,7 +201,7 @@ public:
 	 *  Method allows to see through all the edges of type congruent with \a mask. The method returns the pointer to the edge next to \a e.
 	 *  If the parameter \a e is set to NULL, then the first edge on the list will be taken.
 	 *  \param e reference edge.
-	 *  \param mask represents the types of edges concerned.
+	 *  \param mask represents the types of edges concerned. WEN: tzn. krawedzie ktorych typ & mask!= sa taken into account
 	 *  \returns the pointer to the next edge or NULL if \a e is the last edge on the list of edges.
 	 */
 	inline PEdge getEdgeNext( PEdge e, EdgeType mask = EdAll ) const
@@ -210,7 +212,7 @@ public:
 	 *  The method allows to see through all the edges of type congruent with \a mask. The method returns the pointer to the edge previous to edge \a e.
 	 *  If parameter \a e is set to NULL then the last edge on the list will be taken.
 	 *  \param e next edge will be returned.
-	 *  \param mask represents all the types of edges concerned.
+	 *  \param mask represents all the types of edges concerned. WEN: tzn. krawedzie ktorych typ & mask!= sa taken into account
 	 *  \returns the pointer to the next edge or if the edge is the last one then NULL.
 	 */
 	inline PEdge getEdgePrev( PEdge e, EdgeType mask = EdAll ) const
@@ -218,17 +220,17 @@ public:
 
 	/** \brief Get edges.
 	 *
-	 *  The method puts pointers to all the edges consistent with mask to the container defined by the iterator. Any container with a defined iterator can be taken.
+	 *  The method puts pointers to all the edges consistent with mask to the container defined by the iterator. Any container with a defined iterator can be taken. WEN: ale na typ PEdge
 	 *  \tparam OutputIterator The iterator class of for the container in which the output edges are to be stored up.
 	 *  \param[out] iter the iterator of the container in which edges are to be stored.
-	 *  \param mask the type of edges which are to be taken.
+	 *  \param mask the type of edges which are to be taken. WEN: tzn. krawedzie ktorych typ & mask!= sa taken into account
 	 *  \return the number of stored edges. */
 	template< class OutputIterator > int getEdges( OutputIterator iter, EdgeType mask = EdAll ) const;
 
 	/** \brief Get set of edges.
 	 *
 	 *  All the edges in graph, which are consistent  with \a mask, are stored in the set.
-	 *  \param mask determines the types of edges that are concerned.
+	 *  \param mask determines the types of edges that are concerned. WEN: tzn. krawedzie ktorych typ & mask!= sa taken into account
 	 *  \return the set of edges.
 	 */
 	Set< PEdge > getEdgeSet( EdgeType mask = EdAll ) const;
@@ -237,8 +239,8 @@ public:
 	 *
 	 *  Edges in the graph are organized as lists. There is a separate list for each type of edges. If \a mask is congruent with many types of edges, lists are virtually connected.
 	 *  The method allows to get the pointer to the first edge on the list.
-	 *	\param mask determines the types of edges concerned.
-	 *  \return the pointer to the first edge on the list.
+	 *	\param mask determines the types of edges concerned. WEN: tzn. krawedzie ktorych typ & mask!= sa taken into account
+	 *  \return the pointer to the first edge on the list. WEN: lub NULL przy braku
 	 */
 	PEdge getEdge( EdgeType mask = EdAll ) const
 		{ return self.getEdgeNext( (PEdge)0,mask ); }
@@ -247,18 +249,18 @@ public:
 	 *
 	 *  The edges in a graph are organized as lists, there is a separate list for each type of edges. If \a mask is congruent with many types of edges, lists are virtually connected.
 	 *  The method allows to get the pointer to the last edge on the list.
-	 *	\param mask determines the types of edges concerned.
-	 *  \return the pointer to the last edge on the list.
+	 *	\param mask determines the types of edges concerned. WEN: tzn. krawedzie ktorych typ & mask!= sa taken into account
+	 *  \return the pointer to the last edge on the list. WENL lub NULL przy pustej
 	 */
 	PEdge getEdgeLast( EdgeType mask = EdAll ) const
 		{ return self.getEdgePrev( (PEdge)0,mask ); }
 
 	// lista krawedzi sasiednich do v o orientacji wzgledem v zawartej w masce
 	/** Get degree of vertex
-	 *
+	 *  WEN: to nie jest stopien (przypadek petli), na stopien jest inna metoda
 	 *  The method gets the number of edges incident to the vertex \a v (degree of \a v).
 	 *  \param v the considered vertex.
-	 *  \param mask determines the direction of edges concerned.
+	 *  \param mask determines the direction of edges concerned. WEN: tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
 	 *  \return the number of edges incident the vertex \a v with prespecified direction.
 	 */
 	inline int getEdgeNo( PVertex v, EdgeDirection mask = EdAll) const
@@ -271,7 +273,7 @@ public:
 	 *  If parameter \a e is set to NULL then the first edge on the list will be taken.
 	 *  \param v only edges incident to \a v.
 	 *  \param e next edge will be returned.
-	 *  \param mask representing the types of edges.
+	 *  \param mask representing the types of edges. WEN: no wlasnie nie bardzo type od edge tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
 	 *  \returns the pointer to the next edge or NULL if the edge is the last one.
 	 */
 	inline PEdge getEdgeNext( PVertex v, PEdge e, EdgeDirection mask = EdAll ) const
@@ -283,7 +285,7 @@ public:
 	 *  If parameter \a e is set to NULL, then the last edge on the list will be returned.
 	 *  \param v reference vertex.
 	 *  \param e reference edge.
-	 *  \param mask representing the types of edges.
+	 *  \param mask representing the types of edges. WEN: no wlasnie nie bardzo type od edge tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
 	 *  \returns pointer to the previous edge incident to \a v or if edge is the first then NULL.
 	 */
 	inline PEdge getEdgePrev( PVertex v, PEdge e, EdgeDirection mask = EdAll ) const
@@ -293,8 +295,8 @@ public:
 	 *
 	 *  The method gets the pointer to the first edge on the list of edges incident to vertex \a vert. Only edges with direction consistent with \a mask are considered.
 	 *  \param vert reference vertex. The first edge on the list of edges incident to \a vert is returned.
-	 *  \param mask represents the types of edges.
-	 *  \returns the pointer to the first edge incident to \a vert.
+	 *  \param mask represents the types of edges. WEN: no wlasnie nie bardzo type od edge tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
+	 *  \returns the pointer to the first edge incident to \a vert. WEN: lub NULL przy pustej
 	 */
 	PEdge getEdge( PVertex vert, EdgeDirection mask= EdAll ) const
 		{ return self.getEdgeNext( vert,(PEdge)0,mask ); }
@@ -303,8 +305,8 @@ public:
 	 *
 	 *  The method gets the pointer to the last edge on the list of edges incident to vertex \a vert. Only edges with direction consistent with \a mask are considered.
 	 *  \param vert reference vertex. The last edge on the list of edges incident to \a vert is return.
-	 *  \param mask represents the types of edges.
-	 *  \returns pointer to the last edge incident to \a vert.
+	 *  \param mask represents the types of edges. WEN: no wlasnie nie bardzo type od edge tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
+	 *  \returns pointer to the last edge incident to \a vert. WEN: lub NULL przy pustej
 	 */
 	PEdge getEdgeLast( PVertex vert, EdgeDirection mask = EdAll ) const
 		{ return self.getEdgePrev( vert,(PEdge)0,mask );}
@@ -312,10 +314,10 @@ public:
 	/** \brief Get incident edges.
 	 *
 	 *  The method returns the set of all edges incident to \a v with direction congruent with mask \a direct.
-	 *  \tparam OutpoutIterator the type of iterator for the container of the output set of edges.
+	 *  \tparam OutpoutIterator the type of iterator for the container of the output set of edges. WEN: tj. na typ PEdge
 	 *  \param[out] iter the iterator of the container of output edges.
 	 *  \param v the reference vertex.
-	 *  \param direct the mask defining the returned edges direction (with respect to \a v).
+	 *  \param direct the mask defining the returned edges direction (with respect to \a v). WEN: tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
 	 *  \return the number of edges in the set given by \a iter.
 	 */
 	template< class OutputIterator > int getEdges( OutputIterator, PVertex, EdgeDirection = EdAll ) const;
@@ -324,7 +326,7 @@ public:
 	 *
 	 *  The method returns the set of all edges incident to \a v with direction consistent with mask \a direct.
 	 *  \param v the reference vertex.
-	 *  \param direct the mask defining the returned edges direction (with respect to \a v).
+	 *  \param direct the mask defining the returned edges direction (with respect to \a v). WEN: tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
 	 *  \return the set of edges incident to \a v.
 	 */
 	Set< PEdge > getEdgeSet( PVertex v, EdgeDirection direct = EdAll ) const;
@@ -335,7 +337,7 @@ public:
 	 *  The method counts the number of edges between two vertices.
 	 *  \param u the first vertex
 	 *  \param v the second vertex
-	 *  \param mask represents the edge direction.
+	 *  \param mask represents the edge direction. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
 	 *  \returns the number of edges between \a u and \a v.
 	 */
 	inline int getEdgeNo( PVertex u, PVertex v, EdgeDirection mask = EdAll ) const
@@ -348,7 +350,7 @@ public:
 	 *  \param u the first vertex.
 	 *  \param v the second vertex.
 	 *  \param e the reference edge. The next edge is returned.
-	 *  \param mask represents the considered edge direction.
+	 *  \param mask represents the considered edge direction. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
 	 *  \returns the pointer to the next parallel edge or NULL if \a e is the last.
 	 */
 	inline PEdge getEdgeNext( PVertex u, PVertex v, PEdge e, EdgeDirection mask = EdAll ) const
@@ -361,7 +363,7 @@ public:
 	 *  \param u the first vertex.
 	 *  \param v the second vertex.
 	 *  \param e the reference edge. The previous edge is returned.
-	 *  \param mask representing the edge direction.
+	 *  \param mask representing the edge direction. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
 	 *  \returns the pointer to the next parallel edge or NULL if \a e is the first edge.
 	 */
 	inline PEdge getEdgePrev( PVertex u, PVertex v, PEdge e, EdgeDirection mask = EdAll ) const
@@ -373,8 +375,8 @@ public:
 	 *  If the adjacency matrix is allowed the method will use it, otherwise only lists are checked.
 	 *  \param vert1 the first vertex.
 	 *  \param vert2 the second vertex.
-	 *  \param mask represents the direction of considered edge.
-	 *  \returns the pointer to the first edge spanned on vertices \a vert1 and \a vert2.
+	 *  \param mask represents the direction of considered edge. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
+	 *  \returns the pointer to the first edge spanned on vertices \a vert1 and \a vert2. WEN: lub NULL dla pustej
 	 */
 	PEdge getEdge( PVertex vert1, PVertex vert2, EdgeDirection mask = EdAll ) const
 		{ return self.getEdgeNext( vert1,vert2,(PEdge)0,mask ); }
@@ -385,8 +387,8 @@ public:
 	 *  If adjacency matrix is allowed method will use it, otherwise only lists are checked.
 	 *  \param vert1 the first vertex.
 	 *  \param vert2 the second vertex.
-	 *  \param mask represents the considered edge direction.
-	 *  \returns the  pointer to the last edge spanned on vertices \a vert1 and \a vert2.
+	 *  \param mask represents the considered edge direction. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
+	 *  \returns the  pointer to the last edge spanned on vertices \a vert1 and \a vert2. WEN: lub NULL dla pustej
 	 */
 	PEdge getEdgeLast( PVertex vert1, PVertex vert2, EdgeDirection mask = EdAll ) const
 		{ return self.getEdgePrev( vert1,vert2,(PEdge)0,mask ); }
@@ -396,7 +398,7 @@ public:
 	 *  The method returns the set of edges spanned on vertices \a vert1 and \a vert2 with direction congruent with mask \a direct.
 	 *  \param vert1 the first reference vertex.
 	 *  \param vert2 the second reference vertex.
-	 *  \param direct mask representing the considered edges direction.
+	 *  \param direct mask representing the considered edges direction. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
 	 *  \return the set of edges spanned on vert1 and vert2.
 	 */
 	Set< PEdge > getEdgeSet( PVertex vert1, PVertex vert2, EdgeDirection direct = EdAll ) const;
@@ -406,10 +408,10 @@ public:
 	 *  The method gets a set of edges spanned on the vertices \a vert1 and \a vert2. Only edges with direction congruent with \a direct are considered.
 	 *  Any container with a defined iterator may by used.
 	 *  \tparam OutputIterator Type of iterator for the container of the output set of edges.
-	 *  \param[out] iter the iterator of the container with edges.
+	 *  \param[out] iter the iterator of the container with edges. WEN: tj na typ PEdge
 	 *  \param vert1 the first reference vertex.
 	 *  \param vert2 the second reference vertex.
-	 *  \param direct the mask defining the considered edges direction.
+	 *  \param direct the mask defining the considered edges direction. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
 	 *  \return the number of parallel edges stored in return via container represented by \a iter.
 	 */
 	template< class OutputIterator > int getEdges( OutputIterator iter, PVertex vert1, PVertex vert2, EdgeDirection direct = EdAll ) const;
@@ -418,10 +420,10 @@ public:
 	/** \brief Get set of vertices.
 	 *
 	 *  The method gets the set of vertices defined by the chooser \a ch.
-	 *  \tparam OutputIterator iterator class of a container used to store the set of vertices returned via reference.
+	 *  \tparam OutputIterator iterator class of a container used to store the set of vertices returned via WEN: reference??? chyba nie, po prostu na PVertex
 	 *  \tparam VChooser2 Class allowing to choose vertices automatically.
 	 *  \param out the iterator of the container used to store up the vertices chosen by the chooser \a ch.
-	 *  \param ch the chooser object allowing to choose vertices automatically.
+	 *  \param ch the chooser object allowing to choose vertices automatically. WEN: czyli jak? musi miec bool operator()( Elem *elem, const Graph &gr ) - jak wszystkie choosery
 	 *  \return the number of vertices in the output container.
 	 */
 	template< class OutputIterator, class VChooser2 > int getVerts( OutputIterator out, VChooser2 ch ) const;
@@ -430,7 +432,7 @@ public:
 	 *
 	 *  The method returns the set of vertices defined by the chooser class.
 	 *  \tparam VChooser2 the class allowing to choose vertices automatically.
-	 *  \param ch the chooser object allowing to choose vertices automatically.
+	 *  \param ch the chooser object allowing to choose vertices automatically. WEN: czyli jak? musi miec bool operator()( Elem *elem, const Graph &gr ) - jak wszystkie choosery
 	 *  \return the set of vertices.
 	 */
 	template< class VChooser2 > Set< PVertex > getVertSet( VChooser2 ch ) const;
@@ -440,8 +442,8 @@ public:
 	 *  The method gets the set of edges defined by the chooser object \a ch.
 	 *  \tparam OutputIterator the iterator class of the container used to store the set of edges returned via reference (iterator).
 	 *  \tparam EChooser2 the class allowing to choose edges automatically.
-	 *  \param[out] out the iterator of the container used to store up the vertices chosen by the chooser \a ch.
-	 *  \param ch the chooser object allowing to choose edges automatically.
+	 *  \param[out] out the iterator of the container used to store up the WEN: edges! vertices chosen by the chooser \a ch.
+	 *  \param ch the chooser object allowing to choose edges automatically. WEN: czyli jak? musi miec bool operator()( Elem *elem, const Graph &gr ) - jak wszystkie choosery
 	 *  \return the number of edges in out container.
 	 */
 	template< class OutputIterator, class EChooser2 > int getEdges( OutputIterator out, EChooser2 ch ) const;
@@ -450,7 +452,7 @@ public:
 	 *
 	 *  The method gets the set of edges defined by the chooser object \a ch.
 	 *  \tparam EChooser2 the class allowing to choose edges automatically.
-	 *  \param ch the chooser object allowing to choose edges automatically.
+	 *  \param ch the chooser object allowing to choose edges automatically. WEN: czyli jak? musi miec bool operator()( Elem *elem, const Graph &gr ) - jak wszystkie choosery
 	 *  \return the set of pointers to edges congruent with the chooser object \a ch.
 	 */
 	template< class EChooser2 > Set< PEdge > getEdgeSet( EChooser2 ch ) const;
@@ -465,7 +467,7 @@ public:
 	 *  \tparam EChooser2 the class allowing to choose edges automatically.
 	 *  \tparam VChooser2 the class allowing to choose vertices automatically.
 	 *  \param out the standard pair of iterators used to return the containers of vertices and edges.
-	 *  \param chs the pair of chooser objects allowing to choose vertices and edges automatically.
+	 *  \param chs the pair of chooser objects allowing to choose vertices and edges automatically. WEN: czyli jak? musi miec bool operator()( Elem *elem, const Graph &gr ) - jak wszystkie choosery
 	 *  \param chooseends if true for each edge not only the edge chooser must be satisfied but also both ends need to satisfy the vertex chooser.
 	 *  \return the standard pair of integers that are respectively the number of chosen vertices and the number of edges.
 	 */
@@ -477,7 +479,7 @@ public:
 	 *  The method gets the pair of sets. The set of vertices and the set of edges. The pair of choosers defines which edges and vertices should be passed to function as a value.
 	 *  \tparam EChooser2 the class allowing to choose edges automatically.
 	 *  \tparam VChooser2 the class allowing to choose vertices automatically.
-	 *  \param chs the pair of chooser objects allowing to choose vertices and edges automatically.
+	 *  \param chs the pair of chooser objects allowing to choose vertices and edges automatically. WEN: czyli jak? musi miec bool operator()( Elem *elem, const Graph &gr ) - jak wszystkie choosery
 	 *  \param chosenends if true for each edge, not only edge chooser must be satisfied but also both ends need to satisfy vertex chooser.
 	 *  \return the standard pair of sets in which the first element is the set of vertices and the second the set of edges.
 	 */
@@ -488,7 +490,7 @@ public:
 	/** \brief Get vertex by number
 	 *
 	 *  The list of vertices in the graph is searched through and the pointer to the \a idx-th vertex is returned.
-	 *  \param idx the index of the returned vertex.
+	 *  \param idx the index of the returned vertex. WEN: numeracja od 0
 	 *  \return the pointer to the \a idx-th vertex.
 	 */
 	PVertex vertByNo( int idx ) const;
@@ -496,7 +498,7 @@ public:
 	/** \brief Get edge by number
 	 *
 	 *  The list of edges in the graph is searched through. The pointer to the \a idx-th edge is returned.
-	 *  \param idx the index of the returned edge.
+	 *  \param idx the index of the returned edge. WEN: numeracja od 0
 	 *  \return the pointer to the \a idx-th edge.
 	 */
 	PEdge edgeByNo( int idx ) const;
@@ -506,7 +508,7 @@ public:
 	 *
 	 *  The list of vertices in the graph is searched through. The position of \a vert is returned.
 	 *  \param vert the index of the vertex \a vert is returned.
-	 *  \return the position of \a vert on the list of vertices in the graph.
+	 *  \return the position of \a vert on the list of vertices in the graph. WEN: numeracja od 0, zwraca -1 w razie bledu
 	 */
 	int vertPos( PVertex vert ) const;
 
@@ -514,7 +516,7 @@ public:
 	 *
 	 *  The list of edges in the graph is searched through. The position of \a edge is returned.
 	 *  \param edge the index of this edge is returned.
-	 *  \return the position of edge on the list of edges in the graph.
+	 *  \return the position of edge on the list of edges in the graph. WEN: numeracja od 0, zwraca -1 w razie bledu
 	 */int edgePos( PEdge edge ) const;
 
 	// czy graf zawiera dany element
@@ -528,7 +530,7 @@ public:
 	 *
 	 *  \param e the pointer to the considered edge.
 	 *  \returns EdgeType value which represents the type of edge.
-	 *  - Detached   = 0x0
+	 *  - Detached   = 0x0 WEN: wywal, bo ta wartosc nie moze sie pojawic
 	 *  - Loop       = 0x1
 	 *  - Undirected = 0x2
 	 *  - Directed   = 0xC
@@ -540,7 +542,7 @@ public:
 	 *
 	 *  \param e the pointer to the considered edge.
 	 *  \returns EdgeType value which represents the type of edge.
-	 *  - Detached   = 0x0
+	 *  - Detached   = 0x0 WEN: wywal, bo ta wartosc nie moze sie pojawic
 	 *  - Loop       = 0x1
 	 *  - Undirected = 0x2
 	 *  - Directed   = 0xC
@@ -553,7 +555,7 @@ public:
 	 *
 	 *  The method gets the pair of vertices on which \a edge is spanned.
 	 *  \param edge the considered edge
-	 *  \returns the pair of vertices that are the ends of \a edge. */
+	 *  \returns the pair of vertices that are the ends of \a edge. WEN: tj. pierwsza koncowa w .first, druga w .second - krawedz ma ponumerowane konce */
 	inline std::pair< PVertex,PVertex > getEdgeEnds( PEdge edge ) const
 		{ return self.getEdgeEnds( edge ); }
 	// synonim poprzedniej
@@ -561,7 +563,7 @@ public:
 	 *
 	 *  The method gets the pair of vertices on which \a edge is spanned.
 	 *  \param edge the considered edge
-	 *  \returns the pair of vertices that are the ends of \a edge.	 */
+	 *  \returns the pair of vertices that are the ends of \a edge.	WEN: tj. pierwsza koncowa w .first, druga w .second - krawedz ma ponumerowane konce  */
 	std::pair< PVertex,PVertex > getEnds( PEdge edge ) const
 		{ return self.getEdgeEnds( edge ); }
 
@@ -583,8 +585,8 @@ public:
 	/** \brief Get edge direction
 	 *
 	 *  The method gets direction of edge (with resprect to \a v). Possible values of EdgeDirection are:
-	 *  - EdNone   = 0x00 if edge is NULL or not connected,
-	 *  - EdLoop   = 0x01 if \a edge is a loop,
+	 *  - EdNone   = 0x00 if edge is NULL or not connected WEN: to v,
+	 *  - EdLoop   = 0x01 if \a edge is a loop  WEN: connected to v,
 	 *  - EdUndir  = 0x02 if \a edge is undirected,
 	 *  - EdDirIn  = 0x04 if \a edge is directed and \a v is the second vertex of edge,
 	 *  - EdDirOut = 0x08 if \a edge is directed and \a v is the first vertex of edge.
@@ -596,7 +598,7 @@ public:
 	// czy wierzcholek jest koncem krawedzi
 	/** \brief Test if edge consist of vertex.
 	 *
-	 *  \param edge the reference edge (pointer).
+	 *  \param edge the reference edge (pointer). WEN: kurde, reference to nie jest pointer
 	 *  \param vert the considered vertex.
 	 *  \return true if the vertex \a vert is one of the \a edge ends and false if \a vert is not \a edge end or \a edge is not a proper edge.
 	 */
@@ -617,7 +619,7 @@ public:
 	 *  For \a edge, the method returns the other (than \a vert) vertex.
 	 *  \param edge the considered edge.
 	 *  \param vert the reference vertex.
-	 *  \return the pointer to other vertex in \a edge.
+	 *  \return the pointer to other vertex in \a edge WEN: tylko ten other moze byc nim samym w przypadku petli, co wiecej zwraca NULL dla niesasiedniej edge.
 	 */
 	PVertex getEdgeEnd( PEdge edge, PVertex vert) const;
 	// synonim
@@ -626,7 +628,7 @@ public:
 	 *  For \a edge, the method returns the other (than \a vert) vertex.
 	 *  \param edge the considered edge.
 	 *  \param vert the reference vertex.
-	 *  \return the pointer to the other vertex in \a edge.
+	 *  \return the pointer to the other vertex in \a edge. WEN: tylko ten other moze byc nim samym w przypadku petli, co wiecej zwraca NULL dla niesasiedniej edge.
 	 */
 	PVertex getEnd( PEdge edge, PVertex vert) const;
 
@@ -658,7 +660,7 @@ public:
 	// sasiedztwo "otwarte" tj. wierzcholki widoczne z danego v poprzez krawedzie o orientacji wzgledem v zgodnej z maska
 	/** \brief Get vertex neighborhood.
 	 *
-	 *  The set of all adjacent vertices is returned in a container via iterator \a out. The vertex itself is not included. Only edges with direction consistent with the mask \a direct make adjacency.
+	 *  The set of all adjacent vertices is returned in a container via iterator \a out. The vertex itself is not included. WEN: owszem icluded jezeli direct zawiera EdLoop i przy vert jest petla Only edges with direction consistent with the mask \a direct make adjacency.
 	 *  \tparam OutputIterator the iterator class of container in which the target set of vertices is stored.
 	 *  \param out the iterator of the output container.
 	 *  \param vert the reference vertex.
@@ -669,7 +671,7 @@ public:
 
 	/** \brief Get vertex neighborhood.
 	 *
-	 *  The set of all adjacent vertices is returned. The vertex itself is not included. Only edges with direction consistent with the mask \a direct make adjacency.
+	 *  The set of all adjacent vertices is returned. The vertex itself is not included. WEN: owszem icluded jezeli direct zawiera EdLoop i przy vert jest petla Only edges with direction consistent with the mask \a direct make adjacency.
 	 *  \param vert the reference vertex.
 	 *  \param direct the mask defining the direction of edges that make adjacency.
 	 *  \return the set of vertices that form neighborhood of \a vert.
@@ -678,7 +680,7 @@ public:
 
 	/** \brief Get size of neighborhood.
 	 *
-	 *  The method gets the number of adjacent vertices. The vertex itself is not included. Only edges with direction consistent with the mask \a direct make adjacency.
+	 *  The method gets the number of adjacent vertices. The vertex itself is not included. WEN: owszem icluded jezeli direct zawiera EdLoop i przy vert jest petla Only edges with direction consistent with the mask \a direct make adjacency.
 	 *  \param vert the reference vertex.
 	 *  \param mask the mask defining the direction of edges that make adjacency.
 	 *  \return the number of adjacent vertices.
@@ -697,7 +699,7 @@ public:
 
 	/** \brief Get closed neighborhood of vertex.
 	 *
-	 *  The method gets the set of vertices adjacent to \a vert and \a vert itself. To store vertices any container with an iterator is used.
+	 *  The method gets the set of vertices adjacent to \a vert and \a vert itself. To store vertices any container WEN: ale na elementy typu PVertex with an iterator is used.
 	 *  Only edges with direction consistent with the mask \a direct make adjacency.
 	 *  \tparam OutputIterator the iterator class of container in which the target set of vertices is stored.
 	 *  \param out the iterator of the output container.
@@ -712,7 +714,7 @@ public:
 	 *  The method gets the size of closed neighborhood set.
 	 *  \param vert the reference vertex.
 	 *  \param direct the mask defining the direction of edges that make adjacency.
-	 *  \return the number of adjacent vertices plus one.
+	 *  \return the number of adjacent vertices plus one. WEN: znow pytanie, czy przypadek petli to jest +1 czy nie
 	 */
 	int getClNeighNo( PVertex vert, EdgeDirection direct = EdAll ) const
 		{ return this->getClNeighs( blackHole,vert,direct ); }
@@ -721,7 +723,7 @@ public:
 	// getEdgeNo(vert,direct) - petle jesli zliczane, to podwojnie
 	/** \brief Get degree of vertex.
 	 *
-	 *  The method calculates the vertex degree. It works similarly to getEdgeNo(vert,direct), but each loop is counted twice.
+	 *  The method calculates the vertex degree. It works similarly to getEdgeNo(vert,direct), but each loop WEN: "if included in mask direct" is counted twice.
 	 *  \param vert the pointer to the considered vertex.
 	 *  \param direct the mask determines the type of direction (with respect to \a vert) of edges that are counted.
 	 *  \return the degree of \a vert.
@@ -733,7 +735,7 @@ public:
 	/** \brief Get maximum degree.
 	 *
 	 *  The method calculates the maximum degree over all vertices in the graph.
-	 *  \param direct the mask determining the types of edges.
+	 *  \param direct the mask determining the types of edges. WEN: nie bardzo types np. przy EdDirOut nie zlicza krawedzi wchodzacej
 	 *  \return the maximum degree of graph.
 	 */
 	inline int Delta( EdgeDirection direct = EdAll ) const
@@ -742,7 +744,7 @@ public:
 	/** \brief Get minimum degree
 	 *
 	 *  The minimum degree over all vertices in the graph is returned.
-	 *  \param direct the mask determining the types of edges.
+	 *  \param direct the mask determining the types of edges. WEN: nie bardzo types np. przy EdDirOut nie zlicza krawedzi wchodzacej
 	 *  \return the minimum degree of graph.
 	 */
 	inline int delta( EdgeDirection direct = EdAll ) const
@@ -751,7 +753,7 @@ public:
 	/** \brief Get minimum degree.
 	 *
 	 *  Method gets the minimum degree over all vertices in the graph and one vertex of such degree.
-	 *  \param direct the mask determining the types of edges.
+	 *  \param direct the mask determining the types of edges. WEN: nie bardzo types np. przy EdDirOut nie zlicza krawedzi wchodzacej
 	 *  \return The standard pair: minimum vertex and the minimum degree of graph.
 	 */
 	std::pair< PVertex,int > minDeg( EdgeDirection direct = EdAll ) const;
@@ -759,7 +761,7 @@ public:
 	/** \brief Get maximum degree.
 	 *
 	 *  The method gets the maximum degree over all vertices in the graph and one vertex of such degree.
-	 *  \param direct the mask determining the types of edges.
+	 *  \param direct the mask determining the types of edges. WEN: nie bardzo types np. przy EdDirOut nie zlicza krawedzi wchodzacej
 	 *  \return the standard pair: maximum vertex and the maximum degree of graph.
 	 */
 	std::pair< PVertex,int > maxDeg( EdgeDirection direct = EdAll ) const;
@@ -770,7 +772,7 @@ public:
 	 *
 	 *  The method gets adjacency matrix that is kept in associative container \a cont.
 	 *  A key of \a cont is a pair of vertices, and mapped value is of any type convertible to bool type.
-	 *  A mapped value is true if there is an edge between the vertices in the pair.
+	 *  A mapped value is true if there is an edge WEN: raczej connection? between the vertices in the pair.
 	 *  \param cont the reference to an associative container in which keys are pairs of vertices and mapped values are convertible to bool type.
 	 *  \param mask determines the types of edges to be stored in cont.
 	 *  \return none.
@@ -801,7 +803,7 @@ public:
 	// zbior krawedzi rownoleglych do zadanej z wykluczeniem jej samej
 	/** \brief Get parallel edges.
 	 *
-	 *  The method gets edges parallel to \a ed. The edges are stored in a container defined by \a iter. Three types of parallelism are possible. Depending on \a reltype:
+	 *  The method gets edges parallel to \a ed. WEN: ale bez ed The edges are stored in a container defined by \a iter. Three types of parallelism are possible. Depending on \a reltype:
 	 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
 	 *  - EdDirIn - edges are considered to be parallel if they are spanned on the same vertices and are of the same type.
 	 *  - EdUndir - edges are considered to be parallel if they are spanned on the same vertices.
@@ -815,7 +817,7 @@ public:
 
 	/** \brief Get set of parallel edges.
 	 *
-	 *  The method gets and returns the set of edges parallel to \a ed. Three types of parallelism are possible. Depending on \a reltype:
+	 *  The method gets and returns the set of edges parallel to \a ed. WEN: ale bez ed  Three types of parallelism are possible. Depending on \a reltype:
 	 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
 	 *  - EdDirIn - edges are considered to be parallel if they are spanned on the same vertices and are of the same type.
 	 *  - EdUndir - edges are considered to be parallel if they are spanned on the same vertices.
@@ -871,7 +873,8 @@ public:
 	/** \brief Find parallel edges.
 	 *
 	 *  The method splits the given set of edges into two sets and keeps them in two containers. The first set consists of unique representatives of edges.
-	 *  The second set contains all the other edges. Three types of parallelism are possible. Depending on \a reltype:
+	 *  The second set contains all the other edges. Three types of parallelism are possible.
+	 WEN: gdzie tu jest podany zwiazek representatives z paralelizmem??? Depending on \a reltype:
 	 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
 	 *  - EdDirIn - edges are considered to be parallel if the are spanned on the same vertices and are of the same type.
 	 *  - EdUndir - edges are considered to be parallel if the are spanned on the same vertices.
@@ -883,7 +886,7 @@ public:
 	 *      The first is bound with the container consisting of unique edges representatives.\n
 	 *      The second is bound with the container holding the residue.
 	 *  \param begin iterator to the first element of the input container.
-	 *  \param end iterator to the last element of the input container.
+	 *  \param end iterator to the WEN: za-last element of the input container.
 	 *  \param reltype determines the type of parallelism.
 	 *  \return the standard pair of integers, which corresponds with the size of the first and second output container.
 	 */
@@ -892,8 +895,8 @@ public:
 
 	// wersja odporna na ew. powtorzenia - ignorowane w ciagu wejsciowym
 	/** \brief Find parallel edges.
-	 *
-	 *  The ethod splits the given set of edges into two sets and keeps them in two containers. The first set consists of unique representatives of edges.
+	 * WEN: j.w.
+	 *  The method splits the given set of edges into two sets and keeps them in two containers. The first set consists of unique representatives of edges.
 	 *  The second set contains all the other edges. Repetition-proof version of \a  findParals. Three types of parallelism are possible. Depending on \a reltype:
 	 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
 	 *  - EdDirIn - edges are considered to be parallel if they are spanned on the same vertices and are of the same type.
@@ -906,7 +909,7 @@ public:
 	 *      The first is bound with the container consisting of unique edges representatives.\n
 	 *      The second is bound with the container holding the residue.
 	 *  \param begin the iterator to the first element of the input container.
-	 *  \param end the iterator to the last element of the input container.
+	 *  \param end the iterator to the WEN: za-last element of the input container.
 	 *  \param reltype determines the type of parallelism.
 	 *  \return the standard pair of integers which corresponds with the size of the first and second output container.
 	 */
@@ -914,7 +917,7 @@ public:
 		std::pair< int,int > findParals2( std::pair< IterOut1,IterOut2 > out, Iterator begin, Iterator end, EdgeType reltype = EdUndir ) const;
 
 	/** \brief Find parallel edges.
-	 *
+	 *  WEN: j.w.
 	 *  The method splits the given set of edges into two sets and keeps them in two containers. The first set consists of unique representatives of edges.
 	 *  The second set contains all the other edges. Three types of parallelism are possible. Depending on\a reltype:
 	 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
@@ -935,7 +938,7 @@ public:
 			{ return this->findParals( out, eset.begin(),eset.end(),relType ); }
 	// zbiorem wejsciowym sa wszystkie krawedzie przy wierzcholku
 	/** \brief Find parallel edges.
-	 *
+	 *  WEN: j.w.
 	 *  The method splits the edges incident to vertex into two sets and keeps them in two containers. The first set consists of unique representatives of edges.
 	 *  The second set contains all the other edges. Three types of parallelism are possible. Depending on reltype:
 	 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
@@ -956,7 +959,7 @@ public:
 
 	// zbiorem wejsciowym sa wszystkie krawedzie miedzy para wierzcholkow
 	/** \brief Find parallel edges.
-	 *
+	 * WEJ:j.w.
 	 *  The method splits the set of edges spanned on two vertices into two sets and keeps them in two containers. The first set consists of unique representatives of edges.
 	 *  The second set contains all the other edges. Three types of parallelism are possible. Depending on \a reltype:
 	 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
@@ -978,7 +981,7 @@ public:
 
 	// zbiorem wejsciowym sa wszystkie krawedzie
 	/** \brief Find parallel edges.
-	 *
+	 * WEN:j.w.
 	 *  The method splits the set of all edges into two sets and keeps them in two containers. The first set consists of unique representatives of edges.
 	 *  The second set contains all the other edges.Three types of parallelism are possible. Depending on \a reltype:
 	 *  - EdDirOut - two edges are considered to be parallel if they are spanned on the same vertices, are of the same type and direction.
@@ -1002,17 +1005,18 @@ public:
 	/** \brief Get incident edges
 	 *
 	 *  The method gets the edges incident to the set of vertices defined by iterators \a beg and \a end.
+        WEN: powtorzenia w ciagu wejsciowym sa dozwolone ale ignorowane
 	 *  Three modes are possible, depending on the \a kind:
 	 *  - if \a kind is congruent with Directed or Undirected, the edges with one vertex outside the vertex set are taken.
-	 *  - if \a kind is congruent with Loop, the edges with both vertices inside the vertex set are taken.
+	 *  - if \a kind is WEN: raczej equal congruent with Loop, the edges with both vertices inside the vertex set are taken.
 	 *  - the option in which the mask \a kind is congruent with both the above-mentioned is also available.
 	 *
 	 *  \tparam Iterator the iterator class of the container for input vertices.
 	 *  \tparam OutIter class of iterator of the set of returned edges.
 	 *  \param[out] out the iterator of the container storing edges
 	 *  \param beg the iterator of the first vertex of the vertex set.
-	 *  \param end the iterator of the last vertex of the vertex set.
-	 *  \param type the mask determining the type of direction of considered edges.
+	 *  \param end the iterator of the WEN: za-last last vertex of the vertex set.
+	 *  \param type the mask determining the type of direction WEN: przy wierzcholku ze zbioru wejsciowego of considered edges.
 	 *  \param kind determines the mode.
 	 *  \return the number of incident edges returned via the parameter \a out.
 	 */
@@ -1020,7 +1024,7 @@ public:
 		int getIncEdges( OutIter out, Iterator beg, Iterator end, EdgeDirection type = EdAll, EdgeType kind = Loop ) const;
 
 	/** \brief Get incident edges
-	 *
+	 *  WEN:j.w.
 	 *  The method gets the edges incident to the set of vertices defined by iterators \a beg and \a end.
 	 *  Three modes are possible, depending on the \a kind:
 	 *  - if \a kind is congruent with Directed or Undirected, the edges with one vertex outside the vertex set are taken.
@@ -1029,7 +1033,7 @@ public:
 	 *
 	 *  \tparam Iterator the iterator class of the container for input vertices.
 	 *  \param beg the iterator of the first vertex of the vertex set.
-	 *  \param end the iterator of the last vertex of the vertex set.
+	 *  \param end the iterator of the WEN: za-last vertex of the vertex set.
 	 *  \param type the mask determining the type of direction of considered edges.
 	 *  \param kind determines the mode.
 	 *  \return the set of incident edges.
@@ -1056,7 +1060,7 @@ public:
 		{ return this->getIncEdges( out,vset.begin(),vset.end(),type,kind ); }
 
 	/** \brief Get incident edges.
-	 *
+	 * WEN:j.w. oprocz powtorzen
 	 *  The method gets the edges incident to the set of vertices defined by \a vset.
 	 *  Three modes are possible, depending on the \a kind:
 	 *  - if \a kind is congruent with Directed or Undirected, the edges with one vertex outside the vertex set are taken.
@@ -1072,7 +1076,7 @@ public:
 
 	// Podobnie j.w. ale tym razem pobieramy drugie konce (tj. wierzcholki) od takich krawedzi.
 	/** \brief Get adjacent vertices.
-	 *
+	 *  WEN: j.w.
 	 *  The method gets vertices adjacent to vertices in the set defined by the iterators \a beg and \a end.
 	 *  Three modes are possible depending on the \a kind:
 	 *  - if \a kind is congruent with Directed or Undirected, edges with one vertex outside the vertex set are taken.
@@ -1083,7 +1087,7 @@ public:
 	 *  \tparam OutIter the iterator class of the set of output vertices.
 	 *  \param out the iterator of the container storing output vertices.
 	 *  \param beg the iterator of the first vertex of the vertex set.
-	 *  \param end the iterator of the last vertex of the vertex set.
+	 *  \param end the iterator of the WEN: za-last vertex of the vertex set.
 	 *  \param type mask determining the type of direction of considered edges.
 	 *  \param kind determines the mode.
 	 *  \return the number of adjecent vertices returned in the parameter \a out.
@@ -1092,7 +1096,7 @@ public:
 		int getIncVerts( OutIter out, Iterator beg, Iterator end, EdgeDirection type = EdAll,EdgeType kind = Loop ) const;
 
 	/** \brief Get adjacent vertices.
-	 *
+	 * WEN:j.w. oraz powtorzenia w ciagu wejsciowym sa dozwolone ale ignorowane
 	 *  The method gets vertices adjacent to vertices in the set defined by the iterators \a beg and \a end.
 	 *  Three modes are possible depending on the \a kind:
 	 *  - if \a kind is congruent with Directed or Undirected, edges with one vertex outside the vertex set are taken.
@@ -1101,7 +1105,7 @@ public:
 	 *
 	 *  \tparam Iterator the iterator class for the container for input vertices.
 	 *  \param beg the iterator of the first vertex of the vertex set.
-	 *  \param end the iterator of the last vertex of the vertex set.
+	 *  \param end the iterator of the WEN:za-last vertex of the vertex set.
 	 *  \param type the mask determining the type of direction of considered edges.
 	 *  \param kind determines the mode.
 	 *  \return the set of adjecent vertices.
@@ -1110,7 +1114,7 @@ public:
 		Set< PVertex > getIncVertSet( Iterator beg, Iterator end, EdgeDirection type = EdAll, EdgeType kind = Loop ) const;
 
 	/** \brief Get adjacent vertices.
-	 *
+	 *  WEN:j.w.
 	 *  The method gets vertices adjacent to vertices in the set \a vset.
 	 *  Three modes are possible depending on the \a kind:
 	 *  - if \a kind is congruent with Directed or Undirected, edges with one vertex outside the vertex set are taken.
@@ -1128,7 +1132,7 @@ public:
 		{ return this->getIncVerts( out,vset.begin(),vset.end(),type,kind ); }
 
 	/** \brief Get adjacent vertices.
-	 *
+	 *  WEN:j.w.
 	 *  The method gets vertices adjacent to the vertices in the set \a vset.
 	 *  Three modes are possible depending on the \a kind:
 	 *  - if \a kind is congruent with Directed or Undirected, edges with one vertex outside the vertex set are taken.

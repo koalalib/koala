@@ -12,10 +12,7 @@
 #include "privates.h"
 
 //Kontenery kolejek priorytetowych szybko zlaczalnych dla porownywalnych typow kluczy: dwumianowej i Fibonacziego.
-//
-//TODO: rozwazyc zamiane we wszystkich algorytmach PriQueueInterface -> HeapCont (mozliwe usprawnienie algorytmow
-//dzieki brakujacej w STL operacji usuwania klucza). Poki co to jedyny modul uzywajacy PriQueueInterface -
-// byc moze mozna ja wywalic?
+
 
 //NEW: rezygnacja z parametru Allocator szablonow kopcow - kopce lokalne uzywaja puli pamieci typu SimplArrPool (simple.h)
 
@@ -61,8 +58,8 @@ namespace Koala
 	 *
 	 *  Standard binominal heap structure.
 	 *  \tparam Key the class of stored objects.
-	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>.
-	 *  \tparam Allocator the class allows to use own memory allocator.
+	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>. WEN: to powinien byc strict weak ordering
+	 *  \tparam Allocator the class allows to use own memory allocator. WEN: juz nie ma, zastapiono ew. pula podawana w konstruktorze
 	 *  \ingroup cont
 	 *
 	 *  [See example](examples/heap/example_BinomHeap.html).
@@ -73,7 +70,7 @@ namespace Koala
 	public:
 		typedef BinomHeapNode< Key > Node;/**\brief Node of heap. */
 		typedef BinomHeapNode< Key > *Repr;/**\brief Pointer to heap node. */
-		typedef SimplArrPool<BinomHeapNode< Key > > Allocator;
+		typedef SimplArrPool<BinomHeapNode< Key > > Allocator; //WEN: zewnetrzna pula na wezly
 
 	protected:
 		Node *root,*minimum;
@@ -82,7 +79,7 @@ namespace Koala
 		Allocator* allocator;
 
 	public:
-		// podajemy komparator, alokacja new/delete???
+		// podajemy komparator,
 		/** \brief Constructor.*/
 		inline BinomHeap( const Compare &function = Compare() ):
 			root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( 0 )
@@ -96,10 +93,10 @@ namespace Koala
 		inline BinomHeap( Allocator *all, const Compare &function = Compare() ):
 			root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( all )
 				{ }
-		// konstruktor kopiujacy, obiekt wiaze sie z tym samym alokatorem, co oryginal
+		// WEN: konstruktor kopiujacy, obiekt wiaze sie z ta sama pula, co oryginal
 		/** \brief Copy constructor.*/
 		inline BinomHeap( const BinomHeap< Key,Compare> & );
-		/** \brief Copy content operator.*/
+		/** \brief Copy content operator.*/ //WEN: nie zmienia swojej puli
 		BinomHeap &operator=( const BinomHeap &X );
 		~BinomHeap()
 			{ clear(); }
@@ -123,7 +120,7 @@ namespace Koala
 		/**\brief Insert key.
 		 *
 		 * The method inserts \a key on heap.
-		 * \return the reference to the new-created node for a key.*/
+		 * \return the reference WEN: raczej pointer to the new-created node for a key.*/
 		Node* push( const Key &key );
 		// usun najmniejszy
 		/** \brief Remove top element.
@@ -134,7 +131,7 @@ namespace Koala
 		 // zmniejszenie klucza danego wezla, podanie wiekszej wartosci rzuca blad
 		/** \brief Decrease top element.
 		 *
-		 *  The method decreases the key of the node \a A to \a key. The new key needs to be smaller than the previous one, if not an exception is thrown.
+		 *  The method decreases the key of the node \a A to \a key. The new key needs to be smaller WEN: nie! not greater than the previous one, if not an exception is thrown.
 		 *  \param A the modified node
 		 *  \param key the new key.*/
 		void decrease( Node *A, const Key &key );
@@ -149,6 +146,7 @@ namespace Koala
 		/** \brief Merge heaps.
 		 *
 		 *  The keys from \a heap are moved to the current heap. All the keys from \a heap are deleted.
+		    WEN: jesli ktorys z kopcow uzywa puli na wezly, oba kopce musza uzywac tej samej
 		 *  \param A the moved heap.*/
 		void merge( BinomHeap & );
 		/** \brief Clear heap.*/
@@ -189,6 +187,8 @@ namespace Koala
 
 		template< class InputIterator > void assign2( InputIterator &first, int len );
 	};
+
+	//WEN: do pozostalych 2 kopcow zasadniczo te same poprawki
 
 	/** \brief Fibonacci heap node.
 	 *

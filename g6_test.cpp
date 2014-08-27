@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
     std::cout << "\n" << std::numeric_limits< Type >::max() << ' ' << rg.maxRand <<"\n" ;
 
     for(int i=0;i<1000;i++)
-        std::cout << std::setprecision(1) <<(double)rg.rand()/std::numeric_limits< Type >::max() << ' ';
+        std::cout << std::setprecision(4) <<(double)rg.rand()/std::numeric_limits< Type >::max() << ' ';
      std::cout << "\n\n";
      for(int i=0;i<1000;i++) std::cout<<rg.rand(1) << " ";
 

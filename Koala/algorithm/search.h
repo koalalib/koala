@@ -1400,7 +1400,7 @@ namespace Koala
 			dirEnds( const GraphType &g )
 			{
 				std::pair< typename GraphType::PVertex, typename GraphType::PVertex > res;
-				_ends( g,EdUndir | EdLoop, res.first,res.second );
+				_ends( g,EdDirOut | EdLoop, res.first,res.second );
 				return res;
 			}
 

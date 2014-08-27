@@ -32,10 +32,10 @@ namespace Koala
 	/** \brief Edge types.
 	 *
 	 *  Type used for variables storing basic information about edge type. Applied to masks with bit meaning as follows:
-	 *  - Detached   = 0x0  - Not connected
+	 *  - Detached   = 0x0  - Not connected WEN: tego user nie powinien nigdy zobaczyc
 	 *  - Loop       = 0x1  - edges with only one vertex.
-	 *  - Undirected = 0x2  - simple undirected edges (undirected pair of vertices).
-	 *  - Directed   = 0xC  - arcs (directed pair of vertices).
+	 *  - Undirected = 0x2  - simple undirected edges .
+	 *  - Directed   = 0xC  - arcs (directed pair of vertices) WEN: arc nie jest para wierzcholkow.
 	 *  \ingroup DMgraph
 	 */
 	typedef unsigned char EdgeType;
@@ -48,7 +48,7 @@ namespace Koala
 	 *  Bits meaning:
 	 *  -  EdNone   = 0x00  - edge not defined.
 	 *  -  EdLoop   = 0x01  - edge with only one vertex.
-	 *  -  EdUndir  = 0x02  - simple undirected edge (undirected pair of vertices)
+	 *  -  EdUndir  = 0x02  - simple undirected edge (undirected pair of vertices) WEN: link nie jest para wierzcholkow.
 	 *  -  EdDirIn  = 0x04  - for directed edge in direction
 	 *  -  EdDirOut = 0x08  - for directed edge out direction
 	 *  -  EdAll    = 0x0F  - for all above options
@@ -167,7 +167,7 @@ namespace Koala
 
 		// Typ grafu pomocniczego stosowanego wewnątrz procedury.
 		/** \brief Auxiliary graph.
-		 *
+		 *  WEN: opis parametrow szablonu (podobnie jak w grafie glownym)
 		 *  The structure is used for internal purposes in various procedures.*/
 		template< class A, class B, EdgeType mask> class LocalGraph
 		{
@@ -182,11 +182,12 @@ namespace Koala
 		// Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych w
 		// algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda.
 		/** \brief Numeric types specialization.
-		 *
+		 *  WEN: to jest taka wersja std::numeric_limits ograniczona do potrzeb algorytmow Koali
 		 *  Class allows to choose own numeric types for data in algorithms.*/
 		template< class T > class NumberTypeBounds
 		{
 		public:
+		    //WEN: opisy
 			static T plusInfty()
 				{ return std::numeric_limits< T >::max(); }
 			static bool isPlusInfty( T arg )
@@ -209,8 +210,8 @@ namespace Koala
 		// ... i to samo z funkcją porównującą.
 		/** \brief Table sorting algorithm
 		 *
-		 *  \tparam Iterator the iterator class.
-		 *  \tparam Comp the comparison object function.
+		 *  \tparam Iterator the iterator class. WEN: a opis przedzialu poczatkowo-zakoncowego?
+		 *  \tparam Comp the comparison object function. WEN: powinien byc strict weak order, jak w std::sort
 		 */
 		template< class Iterator, class Comp > static void sort( Iterator first, Iterator last, Comp comp );
 	};
@@ -225,7 +226,7 @@ namespace Koala
 	 *
 	 *  The default function object can be used if method requires the object function, generating for example
 	 *   edge info, but the user does not need to specify it. The functor works with 0 to 6 arguments and always
-	 *   returns the value prespecified in constructor.
+	 *   returns the value prespecified in constructor. WEN: typ T powinien spelniac tradycyjne zalozenia STLowe
 	 *  \ingroup DMdef*/
 	template< class T > class ConstFunctor
 	{
@@ -276,7 +277,7 @@ namespace Koala
 	 */
 	/** \brief Black hole.
 	 *
-	 *  Sometimes method does more than the user wans. Than the class succor. It can supersede  iterators of containers or associative tables as long as the result is never used by the user.
+	 *  Sometimes method does more than the user wans. Than the class succor. It can supersede WEN: chodzi o iterator-wstawiacz iterators of containers or associative tables as long as the result is never used by the user.
 	 *  \ingroup DMdef */
 	struct BlackHole: public std::iterator< std::output_iterator_tag,void,void,void,void >
 	{
@@ -324,6 +325,7 @@ namespace Koala
 
 
 	// Makra blackHole można używać jak zmiennej globalnej typu BlackHole.
+	//WEN: opis?
 	#define blackHole ((*((Koala::BlackHole*)( &std::cout ))))
 
 	// Test na to, czy argument jest typu BlackHole.
@@ -339,6 +341,7 @@ namespace Koala
 	 * tego kontenera - tworzy go sobie sama lokalnie. Ta klasa pozwala sprawdzić, czy taki przypadek zaszedł i
 	 * przełączyć kontener na odpowiednio: dostarczony lub lokalny (nie będący BlackHolem).
 	 */
+	 //WEN: tez opis by sie przydal
 	template< class Cont1, class Cont2 > struct BlackHoleSwitch
 	{
 		// Typ kontenera, na którym będziemy działać.
@@ -375,12 +378,12 @@ namespace Koala
 	 *  Function object class that always returns value true or false, depending on the value set in constructor.
 	 *  This chooser should be used whenever each (or none) object is to be chosen.
 	 *  \ingroup DMchooser*/
-	struct BoolChooser
+	struct BoolChooser //WEN: dla kazdego
 	{
 		bool val;/**<\brief Logic value fixed in constructor returned by each call of function object. */
 
 		// Każdy chooser ma swój wlasny typ zdefiniowany jako ChoosersSelfType.
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef BoolChooser ChoosersSelfType;
 
 		/** \brief Constructor
@@ -402,6 +405,7 @@ namespace Koala
 	// Funkcja tworząca chooser typu BoolChooser.
 	// TODO: sprawdzic, czy rozne przeciazenia funkcji tworzacych nie wywoluja niejednoznacznosci w rozstrzyganiu przeciazen
 	/** \brief Generating  function of fixed chooser (BoolChooser).
+	//WEN: opis arg?
 	 *  \ingroup DMchooser*/
 	BoolChooser stdChoose( bool arg ) { return BoolChooser( arg ); }
 
@@ -415,11 +419,11 @@ namespace Koala
 	 *   for example only one object is to be chosen.
 	 *  \tparam Elem class of compared value.
 	 *  \ingroup DMchooser */
-	template< class Elem > struct ValChooser
+	template< class Elem > struct ValChooser //WEN: dla kazdego
 	{
 		Elem val; /**< \brief value fixed in constructor */
 
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef ValChooser< Elem > ChoosersSelfType;
 
 		/** \brief Constructor
@@ -437,6 +441,7 @@ namespace Koala
 	};
 	/** \brief Generating function of value chooser (ValCooser).
 	 *  \ingroup DMchooser*/
+	 //WEN: opis arg
 	template< class Elem > ValChooser< Elem > stdValChoose( Elem arg ) { return ValChooser< Elem >( arg ); }
 
 	/* SetChooser
@@ -448,11 +453,11 @@ namespace Koala
 	 *  Chooser should be used whenever elements from given set are to be chosen.
 	 *  \tparam Elem the class of compared value.
 	 *  \ingroup DMchooser*/
-	template< class Elem > struct SetChooser
+	template< class Elem > struct SetChooser //WEN: dla kazdego
 	{
 		Koala::Set< Elem * > set;/**< \brief the set of Elem. Value fixed in constructor. */
 
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef SetChooser< Elem > ChoosersSelfType;
 
 		/** \brief Constructor
@@ -470,6 +475,7 @@ namespace Koala
 		template< class Graph > bool operator()( Elem *elem, const Graph &gr ) const { return set.isElement( elem ); }
 	};
 	/** \brief Generating function of set chooser (SetChooser).
+	//WEN: opis arg
 	 *  \ingroup DMchooser*/
 	template< class Elem >
 		SetChooser< Elem > stdChoose( Koala::Set< Elem * > arg ) { return SetChooser< Elem >( arg ); }
@@ -479,16 +485,17 @@ namespace Koala
 	 */
 	/** \brief Container element chooser
 	 *
-	 *  Function object that checks if parameter elem in call of overloaded operator() belongs to the container defined in constructor.
+	 *  Function object that checks if parameter elem in call of overloaded operator() belongs to the container WEN: chodzi o STL-like containers tj. obslugujace algorytm std::find defined in constructor.
 	 *  Chooser should be used whenever elements from given container should be considered.
+	 WEN: jest odpowiedzialnoscia uzytkownika, by przedzial iteratorow byl wazny podczas uzywania choosera (kontener nie jest kopiowany)
 	 *  \tparam Iter the iterator class used to access a container.
 	 *  \ingroup DMchooser*/
-	template< class Iter > struct ContainerChooser
+	template< class Iter > struct ContainerChooser //WEN: dla kazdego
 	{
 		Iter begin; /**< \brief iterator to the first element of container */
 		Iter end; /**< \brief iterator to the past-the-end element of container */
 
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef ContainerChooser< Iter > ChoosersSelfType;
 
 		/** \brief Constructor
@@ -509,6 +516,7 @@ namespace Koala
 	};
 
 	/** \brief Generating function of container element chooser (ContainerChooser).
+	WEN: opis param.
 	 * \ingroup DMchooser*/
 	template< class Iter >
 		ContainerChooser< Iter > stdChoose( Iter begin, Iter end ) { return ContainerChooser< Iter >( begin,end ); }
@@ -519,15 +527,15 @@ namespace Koala
 	/** \brief Function object chooser.
 	 *
 	 *  Wraps self-made function object.
-	 *  Redundant if logic operators (&&, ||, !) are not use.
+	 *  Redundant if logic operators (&&, ||, !) are not use. WEN: nie rozumiem
 	 *  Function object should take two parameters chosen element and considered graph. It should return value convertible to bool type.
 	 *  \tparam Obj the function object class used to choose entities.
 	 *  \ingroup DMchooser */
-	template< class Obj > struct ObjChooser
+	template< class Obj > struct ObjChooser //WEN: dla kazdego
 	{
 		mutable Obj funktor; /**< Function object defined in constructor.*/
 
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef ObjChooser< Obj > ChoosersSelfType;
 
 		/** \brief Constructor
@@ -548,6 +556,7 @@ namespace Koala
 
 	// liera F w nazwie - dla chooserow dzialajaych z funktorami
 	/** \brief Generating function of function object chooser (ObjChooser).
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Obj > ObjChooser< Obj > stdFChoose( Obj arg ) { return ObjChooser< Obj >( arg ); }
 
@@ -558,16 +567,16 @@ namespace Koala
 	 */
 	/** \brief Info field value chooser
 	 *
-	 *  Function object that checks if the attribute \a val matches an element (parameter of call function operator) info object field pointed by \a wsk.
+	 *  Function object that checks if the attribute \a val matches an element (WEN: nie rozumiem nawiasu parameter of call function operator) info object field pointed by \a wsk.
 	 *  \tparam Info the class of object info.
 	 *  \tparam T the type of compared field.
 	 *  \ingroup DMchooser */
 	template< class Info, class T > struct FieldValChooser
-	{
+	{ //WEN: dla kazdego
 		T Info:: *wsk; /**<\brief Pointer to member.*/
 		T val; /**< \brief value fixed in constructor */
 
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef FieldValChooser< Info,T > ChoosersSelfType;
 
 		/** \brief Constructor
@@ -586,6 +595,7 @@ namespace Koala
 	};
 
 	/** \brief Generating function of field value chooser (FieldChooser).
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Info, class T >
 		FieldValChooser< Info,T > fieldChoose( T Info:: *wsk, T arg ) { return FieldValChooser< Info,T >( wsk,arg ); }
@@ -595,16 +605,16 @@ namespace Koala
 	 */
 	/** \brief Less info field value chooser
 	 *
-	 *  Function object that checks if the attribute \a val greater than an element (parameter of call function operator) info object field pointed by \a wsk.
+	 *  Function object that checks if the attribute \a val greater (WEN: uzywa operatora < na typie T) than an element (WEN: nie rozumiem nawiasu parameter of call function operator) info object field pointed by \a wsk.
 	 *  \tparam Info the class of object info.
 	 *  \tparam T the type of compared field.
 	 *  \ingroup DMchooser */
-	template< class Info, class T > struct FieldValChooserL
+	template< class Info, class T > struct FieldValChooserL //WEN: dla kazdego
 	{
 		T Info:: *wsk; /**< \brief Pointer to member.*/
 		T val; /**< \brief Value to compare to fixed in constructor */
 
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef FieldValChooserL< Info,T > ChoosersSelfType;
 
 		/** \brief Constructor
@@ -623,6 +633,7 @@ namespace Koala
 	};
 
 	/** \brief Generating function of less field value chooser (FieldChooser).
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Info, class T > FieldValChooserL< Info,T >
 		fieldChooseL( T Info:: *wsk, T arg ) { return FieldValChooserL< Info,T >( wsk,arg ); }
@@ -632,16 +643,16 @@ namespace Koala
 	 */
 	/** \brief Greater info field value chooser
 	 *
-	 *  Function object that checks if attribute \a val is smaller then an element (parameter of call function operator) info object field pointed by \a wsk.
+	 *  Function object that checks if attribute \a val is smaller then (WEN: uzywa operatora > na typie T) an element (WEN: nie rozumiem nawiasu parameter of call function operator) info object field pointed by \a wsk.
 	 *  \tparam Info the class of object info.
 	 *  \tparam T the type of compared field.
 	 *  \ingroup DMchooser */
-	template< class Info, class T > struct FieldValChooserG
+	template< class Info, class T > struct FieldValChooserG //WEN: dla kazdego
 	{
 		T Info:: *wsk;/**< \brief Pointer to member.*/
 		T val;/**< \brief value to compare to fixed in constructor */
 
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef FieldValChooserG< Info,T > ChoosersSelfType;
 
 		/** \brief Constructor
@@ -664,6 +675,7 @@ namespace Koala
 	/** \brief Generating function of greater field value chooser (FieldChooser).
 	 * \ingroup DMchooser*/
 	template< class Info, class T > FieldValChooserG< Info,T >
+	//WEN: opis param.
 		fieldChooseG( T Info:: *wsk, T arg ) { return FieldValChooserG< Info,T >( wsk,arg ); }
 
 	/* FielBoolChooser
@@ -676,11 +688,11 @@ namespace Koala
 	 *  \tparam Info class of object info.
 	 *  \tparam T type of compared field.
 	 *  \ingroup DMchooser */
-	template< class Info, class T > struct FielBoolChooser
+	template< class Info, class T > struct FielBoolChooser //WEN: dla kazdego
 	{
 		T Info:: *wsk;/**<  \brief Pointer to tested member.*/
 
-		/** \brief  Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** \brief  Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef FielBoolChooser< Info,T > ChoosersSelfType;
 
 		/** \brief Constructor
@@ -690,7 +702,7 @@ namespace Koala
 
 		/** \brief Overloaded operator()
 		 *
-		 *  Function call operator returning true as long as pointed by \a wsk field of \a elem is convertible to true.
+		 *  Function call operator returning true as long as pointed by \a wsk field of \a elem WEN: nie - pole infa z elem is convertible to true.
 		 *  \param elem the checked object.
 		 *  \param graph the considered graph.
 		 *  \return true if pointed by \a wsk member of info in object \a elem is true.
@@ -700,6 +712,7 @@ namespace Koala
 	};
 
 	/** \brief Generating function of bool field chooser (FielBoolChooser).
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Info, class T >
 		FielBoolChooser< Info,T > fieldChoose( T Info:: *wsk ) { return FielBoolChooser< Info,T >(wsk); }
@@ -714,21 +727,22 @@ namespace Koala
 	 *  \tparam T the type of compared field.
 	 *  \tparam Obj the function object class that provides function testing the field.
 	 *  \ingroup DMchooser */
-	template< class Info, class T, class Obj > struct FieldObjChooser
+	template< class Info, class T, class Obj > struct FieldObjChooser //WEN: dla kazdego
 	{
 		T Info:: *wsk; /**< \brief the pointer to tested member.*/
 		mutable Obj funktor; /**< \brief functor testing the member. */
 
-		/** \brief  Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** \brief  Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef FieldObjChooser< Info,T,Obj > ChoosersSelfType;
 
 		FieldObjChooser( T Info:: *awsk = 0, Obj afun = Obj() ): wsk( awsk ), funktor( afun ) { }
-
+        //WEN: chyba czegos brakuje
 		template< class Elem, class Graph >
 			bool operator()( Elem *elem, const Graph &graph ) const { return (bool)funktor( elem->info.*wsk ); }
 	};
 
 	/** \brief Generating  function of FieldObjChooser.
+		WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Info, class T, class Obj > FieldObjChooser< Info,T,Obj >
 		fieldFChoose( T Info::*wsk, Obj obj ) { return FieldObjChooser< Info,T,Obj >( wsk,obj ); }
@@ -743,22 +757,23 @@ namespace Koala
 	 *  \tparam T the type of compared field.
 	 *  \tparam Z the type of object in set.
 	 *  \ingroup DMchooser */
-	template< class Info, class T, class Z > struct FieldSetChooser
+	template< class Info, class T, class Z > struct FieldSetChooser //WEN: dla kazdego
 	{
 		T Info:: *wsk;
 		Koala::Set< Z > set;
 
-		/** \brief Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** \brief Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef FieldSetChooser< Info,T,Z > ChoosersSelfType;
 
 		FieldSetChooser( T Info:: *awsk = 0, const Koala::Set< Z > &aset = Koala::Set< Z >() ):
 			wsk( awsk ), set( aset ) { }
-
+                //WEN: chyba czegos brakuje
 		template< class Elem, class Graph >
 			bool operator()( Elem *elem, const Graph &graph ) const { return set.isElement( elem->info.*wsk ); }
 	};
 
 	/** \brief Generating  function of FieldSetChooser.
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Info, class T, class Z > FieldSetChooser< Info,T,Z >
 		fieldChoose( T Info::*wsk, Koala::Set< Z > set ) { return FieldSetChooser< Info,T,Z >( wsk,set ); }
@@ -768,27 +783,29 @@ namespace Koala
 	 */
 	/** \brief Info field value belong to container chooser.
 	 *
-	 *  Function object that checks if the given \a certain field of info object belongs to the container defined in constructor and given by iterators.
+	 *  Function object that checks if the given \a certain field of info object belongs to the container WEN: chodzi o STL-like containers tj. obslugujace algorytm std::find defined in constructor and given by iterators.
 	 *  \tparam Info the class of object info.
 	 *  \tparam T the type of compared field.
 	 *  \tparam Iter the type of iterator for container with tested elements.
+	 WEN: jest odpowiedzialnoscia uzytkownika, by przedzial iteratorow byl wazny podczas uzywania choosera (kontener nie jest kopiowany)
 	 *  \ingroup DMchooser */
-	template< class Info, class T, class Iter > struct FieldContainerChooser
+	template< class Info, class T, class Iter > struct FieldContainerChooser //WEN: dla kazdego
 	{
 		T Info:: *wsk;
 		Iter begin, end;
 
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef FieldContainerChooser< Info,T,Iter > ChoosersSelfType;
 
 		FieldContainerChooser( T Info:: *awsk = 0, Iter a = Iter(), Iter b = Iter() ):
 			wsk( awsk ), begin( a ), end( b ) {}
-
+        //WEN: chyba czegos brakuje
 		template< class Elem, class Graph > bool
 			operator()( Elem *elem, const Graph &graph ) const { return std::find( begin,end,elem->info.*wsk ) != end; }
 	};
 
 	/** \brief Generating  function of FielContainerChooser.
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Info, class T, class Iter > FieldContainerChooser< Info,T,Iter >
 		fieldChoose( T Info::*wsk, Iter b, Iter e ) { return FieldContainerChooser< Info,T,Iter >( wsk,b,e ); }
@@ -798,18 +815,20 @@ namespace Koala
 	/* AssocHasChooser
 	 * test, czy element jest kluczem znajdujacym sie w tablicy
 	 */
-	/** \brief Is key in hashmap chooser.
+	/** \brief Is key in hashmap chooser. WEN: ja pier ... assoc w sesie koalowym, a nie hash
 	 *
-	 *  Function object that checks if the element is  a key in hashmap defined in constructor.
+	 *  Function object that checks if the element is  a key in WEN: ...! cenzura hashmap defined in constructor.
 	 *  \tparam Cont the type of hashmap
 	 *  \ingroup DMchooser */
-	template< class Cont > struct AssocHasChooser
+	template< class Cont > struct AssocHasChooser //WEN: dla kazdego
+	//WEN: kontener asocjacyjny jest kopiowany do choosera: zaleta - nie zalezy od dalszego stanu kontenera, wada - oczywiscie czas i pamiec. Istniejaca dalej specjalizacja posluguje sie natomiast wskaznikiem do zewnetrzengo kont.
 	{
 		Cont cont;
 
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef AssocHasChooser< Cont > ChoosersSelfType;
 
+        //WEN: chyba czegos brakuje
 		AssocHasChooser( const Cont &arg = Cont() ): cont( arg ) { }
 
 		template< class Elem, class Graph >
@@ -817,6 +836,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of AssocHasChooser.
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Cont >
 		AssocHasChooser< Cont > assocKeyChoose( Cont arg ) { return AssocHasChooser< Cont >( arg ); }
@@ -827,16 +847,17 @@ namespace Koala
 	 */
 	/** \brief Has true mapped value chooser.
 	 *
-	 *  Function object that checks if the element has a mapped value convertible to true in the associative container defined in constructor. Obviously the element needs to be a key in the associative container.
+	 *  Function object that checks if the element has a mapped value convertible to true in the associative container defined in constructor.
 	 *  \tparam Cont the type of associative container.
 	 *  \ingroup DMchooser */
-	template< class Cont > struct AssocBoolChooser
+	template< class Cont > struct AssocBoolChooser //WEN: dla kazdego
 	{
 		Cont cont;
 
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef AssocBoolChooser< Cont > ChoosersSelfType;
 
+    //WEN: chyba czegos brakuje
 		AssocBoolChooser( const Cont &arg = Cont() ): cont( arg ) { }
 
 		template< class Elem, class Graph >
@@ -844,6 +865,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of AssocBoolChooser.
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Cont >
 		AssocBoolChooser< Cont > assocChoose( Cont arg ) { return AssocBoolChooser< Cont >( arg ); }
@@ -856,15 +878,16 @@ namespace Koala
 	 *  Function object that checks if the element mapped value equals the prespecified value. Furthermore, the element needs to be a key in the container. Both, the associative container and the value to compare are set up in constructor.
 	 *  \tparam Cont the type of associative container.
 	 *  \ingroup DMchooser */
-	template< class Cont > struct AssocValChooser
-	{
+	template< class Cont > struct AssocValChooser //WEN: dla kazdego
+	{ //WEN: kontener asocjacyjny jest kopiowany do choosera: zaleta - nie zalezy od dalszego stanu kontenera, wada - oczywiscie czas i pamiec. Istniejaca dalej specjalizacja posluguje sie natomiast wskaznikiem do zewnetrzengo kont.
 		Cont cont;
 
 		typename Cont::ValType val;
 		typedef typename Cont::ValType SelfValType;
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef AssocValChooser< Cont > ChoosersSelfType;
 
+        //WEN: chyba czegos brakuje
 		AssocValChooser( const Cont &arg = Cont(), typename Cont::ValType aval = SelfValType() ):
 			cont( arg ),val( aval ) { }
 
@@ -873,10 +896,12 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of AssocValChooser.
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Cont > AssocValChooser< Cont >
 		assocChoose( Cont arg, typename Cont::ValType val ) { return AssocValChooser< Cont >( arg,val ); }
 
+    //WEN: wszystko jak wyzej + Cont::ValType musi obsluzyc <
 	/* AssocValChooserL
 	 * test, czy element jest kluczem znajdujacym sie w tablicy, a przypisana w niej wartosc jest mniejsza od zadanej
 	 */
@@ -907,6 +932,7 @@ namespace Koala
 	template< class Cont > AssocValChooserL< Cont >
 		assocChooseL( Cont arg, typename Cont::ValType val ) { return AssocValChooserL< Cont >( arg,val ); }
 
+    //WEN: wszystko jak wyzej + Cont::ValType musi obsluzyc >
 	/* AssocValChooserG
 	 * test, czy element jest kluczem znajdujacym sie w tablicy, a przypisana w niej wartosc jest wieksza od zadanej
 	 */
@@ -937,6 +963,7 @@ namespace Koala
 	template< class Cont > AssocValChooserG< Cont >
 		assocChooseG( Cont arg, typename Cont::ValType val ) { return AssocValChooserG< Cont >( arg,val ); }
 
+    //WEN: wszystko jak wyzej
 	/* AssocSetChooser
 	 * test, czy element jest kluczem znajdujacym sie w tablicy, a przypisana w niej wartosc jest elementem podanego
 	 * zbioru (Koala::Set)
@@ -967,6 +994,9 @@ namespace Koala
 	template< class Cont > AssocSetChooser< Cont > assocChoose( Cont arg,
 		const Koala::Set< typename Cont::ValType > &set ) { return AssocSetChooser< Cont >( arg,set ); }
 
+    //WEN: j.w oraz
+    //WEN: chodzi o STL-like containers tj. obslugujace algorytm std::find
+    // WEN: jest odpowiedzialnoscia uzytkownika, by przedzial iteratorow byl wazny podczas uzywania choosera (kontener nie jest kopiowany)
 	/* AssocContainerChooser
 	 * test, czy element jest kluczem znajdujacym sie w tablicy, a przypisana w niej wartosc lezy w przedziale miedzy
 	 * podanymi iteratorami - uzywa STLowego find
@@ -996,12 +1026,13 @@ namespace Koala
 	template< class Cont, class Iter > AssocContainerChooser< Cont,Iter >
 		assocChoose( Cont cont, Iter begin, Iter end ) { return AssocContainerChooser< Cont,Iter >( cont,begin,end ); }
 
+    //WEN: jw. oraz ...
 	/* AssocObjChooser
 	 * sprawdza wartosc podanemgo obiektu funkcyjnego przypisana w tablicy asocjacyjnej testowanemu elementowi
 	 */
 	/** \brief Test mapped value with another functor chooser.
 	 *
-	 *  The function object that passes the mapped value of element to the functor, and returns the same result.
+	 *  The function object that passes the mapped value of element to the functor, and returns the same result. WEN:... funktor zawolany na tej zamapowanej wartosci ma zwrocic true (lub cos don konwertowalnego)
 	 *  Both, the associative container and the functor are defined in the constructor.
 	 *  \tparam Cont the type of associative container.
 	 *  \tparma Obj the functor class.
@@ -1024,6 +1055,7 @@ namespace Koala
 	template< class Cont, class Obj > AssocObjChooser< Cont,Obj >
 		assocFChoose( Cont cont, Obj arg ) { return AssocObjChooser< Cont,Obj >( cont,arg ); }
 
+    //WEN: wiec i poprawki beda jak wyzej - por. ponizszy koment.
 	// Wszystkie choosery operujace na tablicach asocjacyjnych maja wersje dzialajace z zewnetrzna tablica
 	// podawana przez wskaznik. Unikamy kopiowania tablic, uzywajac trzeba uwazac, by tablica wciaz zyla przez
 	// caly czas zycia choosera. Funkcje tworzace maja przedrostek ext i pobieraja adres tablicy
@@ -1268,14 +1300,14 @@ namespace Koala
 	 *  \tparam Ch1 the first chooser class.
 	 *  \tparma Ch2 the second chooser class.
 	 *  \ingroup DMchooser */
-	template< class Ch1, class Ch2 > struct OrChooser
+	template< class Ch1, class Ch2 > struct OrChooser //WEN: dla kazdego
 	{
 		Ch1 ch1;
 		Ch2 ch2;
 
-		/** \brief Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** \brief Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef OrChooser< Ch1,Ch2 > ChoosersSelfType;
-
+        //WEN: chyba czegos brakuje
 		OrChooser( Ch1 a = Ch1(), Ch2 b = Ch2() ): ch1( a ), ch2( b ) { }
 
 		template< class Elem, class Graph > bool operator()( Elem *elem, const Graph &graph ) const
@@ -1283,6 +1315,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of OrChooser.
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class  Ch1, class Ch2 > OrChooser< Ch1,Ch2 >
 		orChoose( Ch1 a, Ch2 b ) { return OrChooser< Ch1,Ch2 >( a,b ); }
@@ -1295,7 +1328,7 @@ namespace Koala
 		operator||( Ch1 a, Ch2 b ) { return OrChooser< Ch1,Ch2 >( a,b ); }
 
 	/* AndChooser
-	 *
+	 * WEN: jw.
 	 */
 	/** \brief And chooser.
 	 *
@@ -1327,7 +1360,7 @@ namespace Koala
 		operator&&( Ch1 a, Ch2 b ) { return AndChooser< Ch1,Ch2 >( a,b ); }
 
 	/* XorChooser
-	 *
+	 * WEN: jw.
 	 */
 	/** \brief Xor chooser.
 	 *
@@ -1359,7 +1392,7 @@ namespace Koala
 	template< class Ch1, class Ch2 > XorChooser< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >
 		operator^( Ch1 a, Ch2 b ) { return XorChooser< Ch1,Ch2 >( a,b ); }
 
-	/* NotChooser
+	/* NotChooser WEN:jw.
 	 *
 	 */
 	/** \brief Not chooser.
@@ -1397,14 +1430,14 @@ namespace Koala
 	 */
 	/** \brief Vertex degree value chooser.
 	 *
-	 *  The function object that checks if the vertex degree concerning the edge direction type is equal to the prespecified value.
+	 *  The function object that checks if the vertex degree concerning the edge direction WEN: por. metode deg is equal to the prespecified value.
 	 *  \ingroup DMchooser */
-	struct VertDegValChooser
+	struct VertDegValChooser //WEN: dla wierzcholkow
 	{
 		int deg; /**< \brief the desired degree*/
 		Koala::EdgeDirection type; /**< \brief the considered edge direction.*/
 
-		/** \brief Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** \brief Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef VertDegValChooser ChoosersSelfType;
 
 		/** \brief Constructor
@@ -1425,6 +1458,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of VertDegChoose.
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	VertDegValChooser vertDegChoose( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
 		{ return VertDegValChooser( adeg,atype ); }
@@ -1433,6 +1467,7 @@ namespace Koala
 	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc
 	 * mniejsza od zadanej
 	 */
+	 //WEN: j.w
 	/** \brief Vertex degree less chooser.
 	 *
 	 *  The function object that checks if the vertex degree concerning the edge direction type is less then the prespecified value.
@@ -1467,6 +1502,7 @@ namespace Koala
 	VertDegValChooserL vertDegChooseL( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
 		{ return VertDegValChooserL( adeg,atype ); }
 
+    //WEN: jw.
 	/* VertDegValChooserG
 	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc
 	 * wieksza od zadanej
@@ -1505,6 +1541,7 @@ namespace Koala
 	VertDegValChooserG vertDegChooseG( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
 		{ return VertDegValChooserG( adeg,atype ); }
 
+    //WEN: jw.
 	/* VertDegSetChooser
 	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc z
 	 * podanego zbioru
@@ -1544,6 +1581,9 @@ namespace Koala
 	template< class Int > VertDegSetChooser< Int > vertDegChoose( Koala::Set< Int > aset,
 		Koala::EdgeDirection atype = Koala::EdAll ) { return VertDegSetChooser< Int >( aset,atype ); }
 
+    // WEN: jw oraz
+    //WEN: chodzi o STL-like containers tj. obslugujace algorytm std::find
+    //WEN: jest odpowiedzialnoscia uzytkownika, by przedzial iteratorow byl wazny podczas uzywania choosera (kontener nie jest kopiowany)
 	/* VertDegContainerChooser
 	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc
 	 * z zakresu miedzy podanymi iteratorami - uzywa STLowego find
@@ -1584,6 +1624,7 @@ namespace Koala
 	template< class Iter > VertDegContainerChooser< Iter > vertDegChoose( Iter begin, Iter end,
 		Koala::EdgeDirection atype = Koala::EdAll ) { return VertDegContainerChooser< Iter >( begin,end,atype ); }
 
+    //WEN: jw. oraz powinno sie podac sygnature tj. jak dziala funktor
 	/* VertDegFunctorChooser
 	 * decyzja podejmowana na podstawie wartosci obiektu funktora policzonego na stopniu wierzcholka
 	 */
@@ -1627,21 +1668,21 @@ namespace Koala
 	/* EdgeTypeChooser
 	 * testuje, czy typ krawedzi spelnia podana maske
 	 */
-	/** \brief Edge direction chooser.
+	/** \brief Edge direction chooser. WEN: chyba rodzaj nie direction, dot. calej dokumentacji choosera
 	 *
-	 *  The function object chooses the edges with direction congruent with the mask prespecified in constructor.
+	 *  The function object chooses the edges with WEN: chyba rodzaj nie direction direction congruent with the mask prespecified in constructor.
 	 *  \ingroup DMchooser */
-	struct EdgeTypeChooser
+	struct EdgeTypeChooser //WEN: dla krawedzi
 	{
 		Koala::EdgeDirection mask;/**< \brief the considered edge direction.*/
 
-		/** \brief Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** \brief Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef EdgeTypeChooser ChoosersSelfType;
 
 		/** \brief Constructor
 		 *
 		 *  The direction of edge to choose is defined here.
-		 *  \param amask the mask of considered edge directions.*/
+		 *  \param amask the mask of considered edge directions. WEN: ustawienie ktoregos z bitow Directed dziala jak ustawienie calego Directed */
 		EdgeTypeChooser( Koala::EdgeDirection amask = Koala::EdAll ): mask( amask )
 			{ mask |= (mask & Directed) ? Directed : 0; }
 
@@ -1656,6 +1697,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of EdgeTypeChooser.
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	EdgeTypeChooser edgeTypeChoose( Koala::EdgeDirection mask ) { return EdgeTypeChooser( mask ); }
 
@@ -1668,16 +1710,16 @@ namespace Koala
 	 *
 	 *  The function object chooses the edges with first end satisfy a functor (ex. some vertex chooser)  defined in constructor.
 	 *  \ingroup DMchooser */
-	template< class Ch > struct EdgeFirstEndChooser
+	template< class Ch > struct EdgeFirstEndChooser //WEN: dla krawedzi
 	{
 		Ch ch;/**< \brief the function object that checks the first end of edge.*/
 
-		/** \brief Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !)  work properly. */
+		/** \brief Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
 		typedef EdgeFirstEndChooser< Ch > ChoosersSelfType;
 
 		/** \brief Constructor
 		 *
-		 *  The \a ch functor is defined here.
+		 *  The \a ch functor is defined here. WEN: po prostu chooser dla wierzcholka
 		 *  \param funktor the functor assigned to attribute \a ch.*/
 		EdgeFirstEndChooser( Ch funktor = Ch() ): ch( funktor ) { }
 
@@ -1691,6 +1733,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of EdgeFirstEndChooser.
+	//WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Ch > EdgeFirstEndChooser< Ch >
 		edgeFirstEndChoose( Ch ch ) { return EdgeFirstEndChooser< Ch >( ch ); }
@@ -1702,7 +1745,7 @@ namespace Koala
 	 *
 	 *  The function object chooses the edges with second end satisfy a functor (ex. some vertex chooser)  defined in constructor.
 	 *  \ingroup DMchooser */
-	template <class Ch> struct EdgeSecondEndChooser
+	template <class Ch> struct EdgeSecondEndChooser //WEN: dla krawedzi
 	{
 		Ch ch;/**< \brief the function object that checks the second end of edge.*/
 
@@ -1711,7 +1754,7 @@ namespace Koala
 
 		/** \brief Constructor
 		 *
-		 *  The \a ch functor is defined here.
+		 *  The \a ch functor is defined here. WEN: po prostu chooser dla wierzcholka
 		 *  \param funktor the functor assigned to attribute \a ch.*/
 		EdgeSecondEndChooser( Ch funktor = Ch() ): ch( funktor ) { }
 
@@ -1725,6 +1768,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of EdgeSecondEndChooser.
+	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Ch > EdgeSecondEndChooser< Ch >
 		edgeSecondEndChoose( Ch ch ) { return EdgeSecondEndChooser< Ch >( ch ); }
@@ -1736,7 +1780,7 @@ namespace Koala
 	 *
 	 *  The function object chooses the edges in with none of its ends satisfies a functor (ex. some vertex chooser)  defined in constructor.
 	 *  \ingroup DMchooser */
-	template< class Ch > struct Edge0EndChooser
+	template< class Ch > struct Edge0EndChooser // dla krawedzi
 	{
 		Ch ch;/**< \brief the function object that tests vertices (defined in constructor).*/
 
@@ -1745,7 +1789,7 @@ namespace Koala
 
 		/** \brief Constructor
 		 *
-		 *  The \a ch functor is defined here.
+		 *  The \a ch functor is defined here. WEN: po prostu chooser dla wierzcholka
 		 *  \param funktor the functor assigned to attribute \a ch.*/
 		Edge0EndChooser( Ch funktor = Ch() ): ch( funktor ) { }
 
@@ -1758,8 +1802,10 @@ namespace Koala
 			{ return !ch( g.getEdgeEnd1( e ),g ) && !ch( g.getEdgeEnd2( e ),g ); }
 	};
 
+    //WEN: chyba czegos brakuje
 	template< class Ch > Edge0EndChooser< Ch > edge0EndChoose( Ch ch ) { return Edge0EndChooser< Ch >( ch ); }
 
+    //WEN: jw.
 	/* Edge1EndChooser
 	 * test, czy jeden koniec spelnia warunkek
 	 */
@@ -1791,6 +1837,7 @@ namespace Koala
 
 	template< class Ch > Edge1EndChooser< Ch > edge1EndChoose( Ch ch ) { return Edge1EndChooser< Ch >( ch ); }
 
+    //WEN: jw.
 	/* Edge2EndChooser
 	 * test, czy oba konice spelniaja warunkek
 	 */
@@ -1890,10 +1937,10 @@ namespace Koala
 	 * caster zwyklego rzutowania miedzy dwoma strukturami
 	 */
 	/** \brief Standard caster.
-	 *
+	 *  WEN: wykorzystywane w metodach copy, substitute z grafu oraz linegrafach i produktach (create.h) do tworzenia inf nowych elementow na podstawie oryginalow - to dot. wszystkich casterow
 	 *  The structure overload call function operator for two parameters. The value of source is simply casted on the destination. The inbuilt type conversion is used.
 	 *  \ingroup DMcaster*/
-	struct StdCaster
+	struct StdCaster // NEW: tu opis nie bedzie sie zgadzal, tera to robi HardCaster
 	{
 		typedef StdCaster CastersSelfType;
 
@@ -1924,7 +1971,7 @@ namespace Koala
 		typedef HardCaster CastersSelfType;
 
 		/** \brief Call function operator.
-		 *
+		 * WEN: wykorzystywane w metodach copy, substitute z grafu oraz linegrafach i produktach (create.h) do tworzenia inf nowych elementow na podstawie oryginalow - to dot. wszystkich casterow
 		 *  The overloaded call function operator with two parameters, that uses the inbuilt type conversion of \a sour to \a dest.
 		 *  \param dest the reference to the destination object.
 		 *  \param sour the source object. */
@@ -1946,7 +1993,7 @@ namespace Koala
 	 * takze operator 3-argumentowy)
 	 */
 	/** \brief No cast caster.
-	 *
+	 * WEN: wykorzystywane w metodach copy, substitute z grafu oraz linegrafach i produktach (create.h) do tworzenia inf nowych elementow na podstawie oryginalow - to dot. wszystkich casterow
 	 *  The caster ignores the sources and simply calls the default values. Also three parameter call function is overloaded here.
 	 *  \ingroup DMcaster*/
 	struct NoCastCaster
@@ -1984,8 +2031,8 @@ namespace Koala
 	 */
 
 	/** \brief Functor caster.
-	 *
-	 *  The caster calls the functor defined in constructor to produce the info object.
+	 * WEN: wykorzystywane w metodach copy, substitute z grafu oraz linegrafach i produktach (create.h) do tworzenia inf nowych elementow na podstawie oryginalow - to dot. wszystkich casterow
+	 *  The caster calls the functor defined in constructor to produce the info object. WEN: ale jaki funktor? 1-argumentowy, bierzemy jego wynik ...
 	 *  \ingroup DMcaster*/
 	template< class Fun > struct ObjCaster
 	{
@@ -2026,8 +2073,8 @@ namespace Koala
 	 * Caster wpisujacy ustalona wartosc wspolpracuje z produktami grafow (stad takze operator 3-argumentowy)
 	 */
 	/** \brief Fixed value caster.
-	 *
-	 * The caster assigns the same value to info. The value is set up in constructor.
+	 * WEN: wykorzystywane w metodach copy, substitute z grafu oraz linegrafach i produktach (create.h) do tworzenia inf nowych elementow na podstawie oryginalow - to dot. wszystkich casterow
+	 * The caster assigns the same value to info WEN: ignorujac argument. The value is set up in constructor.
 	 *  \ingroup DMcaster*/
 	template< class T > struct ValueCaster
 	{
@@ -2073,7 +2120,7 @@ namespace Koala
 	 * tylko false jest dopuszczalne - brak polaczenia
 	 */
 	/** \brief No link.
-	 *
+	 * WEN: rowniez jakis opis do czego sa uzywane - wszystkie linkery
 	 *  This linker should be used in in cases when user doesn't need a link and doesn't want to create one but function in Koala require some.
 	 *
 	 *  \ingroup DMlinker */
@@ -2119,8 +2166,8 @@ namespace Koala
 	 * nie byl NULLem)
 	 */
 	/** \brief Associative array one direction linker.
-	 *
-	 *  This linker uses the associative array which is a map that associate pointer of destination element with the pointer of source.
+	 * WEN: uzywa mapy zewnetrznej, a wiec user jest odpowiedzialny za stan obiektu mapy podczas dzialania linkera
+	 *  This linker uses the associative array which is a map that associate pointer of destination element with the pointer of source. WEN: tj. te asocjacje dopiero zostana wpisane
 	 *  \ingroup DMlinker
 	 */
 	template< class Map > struct Std1AssocLinker
@@ -2280,7 +2327,7 @@ namespace Koala
 	// wygodne laczenie chooserow, casterow i linkerow w pary za pomoca &
 	/**\brief Make pair of choosers.
 	 *
-	 * Overloaded operator& allows to create easily a pair of choosers \a a and \a b.*/
+	 * Overloaded operator& allows to create easily a std::pair of choosers \a a and \a b.*/
 	template <class  Ch1, class Ch2> std::pair< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >
 		operator&( Ch1 a, Ch2 b )
 		{
@@ -2290,7 +2337,7 @@ namespace Koala
 
 	/**\brief Make pair of casters.
 	 *
-	 * Overloaded operator& allows to create easily a pair of casters \a a and \a b.*/
+	 * Overloaded operator& allows to create easily a std::pair of casters \a a and \a b.*/
 		template <class  Ch1, class Ch2> std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >
 		operator&( Ch1 a, Ch2 b )
 		{
@@ -2299,7 +2346,7 @@ namespace Koala
 
 	/**\brief Make pair of linkers.
 	 *
-	 * Overloaded operator& allows to create easily a pair of linkers \a a and \a b.*/
+	 * Overloaded operator& allows to create easily a pair of std::linkers \a a and \a b.*/
 	template <class  Ch1, class Ch2> std::pair< typename Ch1::LinkersSelfType,typename Ch2::LinkersSelfType >
 		operator&( Ch1 a, Ch2 b )
 		{

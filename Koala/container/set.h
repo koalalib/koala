@@ -42,6 +42,7 @@ namespace Koala
     };
 
     template< typename Element > class Set;
+    //WEN: a opisy?
     template< typename Element > bool operator==( const Set< Element > &, const Set< Element > & );
     template< typename Element > bool operator!=( const Set< Element > &s1, const Set< Element > &s2 )
         { return !(s1 == s2); }
@@ -66,7 +67,7 @@ namespace Koala
 	//Iterator wstawiajacy elementy do podanego przez adres zewnetrznego zbioru
 	/** \briefn Set inserter.
 	 *
-	 * The iterator with ability to insert elements to set  given by pointer.
+	 * The iterator with ability to insert elements to set  given by pointer WEN: chyba referencje.
 	 * \ingroup cont
 	 *
 	 *  [See example](examples/set/setInserter.html)
@@ -91,6 +92,7 @@ namespace Koala
 	};
 
 	// funkcja tworzaca interator wstawiajacy do podanego zbioru
+	// WEN: a gdzie opis?
 	template< class Element > SetInserter< Set< Element > > setInserter( Set< Element > &x )
 		{ return SetInserter< Set< Element > >( x ); }
 
@@ -100,7 +102,7 @@ namespace Koala
 	 *
 	 * The method generate the image given by functor \a f of the set \a arg. The function is unable to guess the type of returned value so calls like <tt>imageSet<double>(iset,kwadrat);</tt> are obligatory.
 	 * \ingroup cont
-	 *   
+	 *
 	 *  [See example](examples/set/setFunction.html)
 	 */
 	template< class ValType, class ArgType, class Funktor >
@@ -108,7 +110,9 @@ namespace Koala
 	// wylicza przeciwobraz zbioru w podanym przeksztalceniu i danej dziedzinie
 	/** \brief Preimage
 	 *
-	 * The method gets the preimage of the given set \a domain and the functor \a f. The function is unable to guess the type of returned value so calls like <tt>imageSet<double>(iset,kwadrat);</tt> are obligatory.
+	 * The method gets the preimage of the given set \a domain and the functor \a f.
+	 * WEN: reszta komentarza jest bez sensu, bo funkcja owszem zgaduje zwracany typ i jest 3-argumentowa, por. set_test.cpp
+	 * The function is unable to guess the type of returned value so calls like <tt>imageSet<double>(iset,kwadrat);</tt> are obligatory.
 	 * \ingroup cont
 	 *
 	 *  [See example](examples/set/setFunction.html)

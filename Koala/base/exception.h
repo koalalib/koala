@@ -9,16 +9,20 @@
 #include <cstdlib>
 #include <cstring>
 
+//WEN: czy makra tez mozna zdokumentowac?
+// dlugosc bufora wewnatrz wyjatku przeznaczonego na jego tekstowy opis
 #ifndef KOALA_EXCEPTION_BUF_SIZE
 	#define KOALA_EXCEPTION_BUF_SIZE 200
 #endif
 
 // Stała KOALA_DONT_CHECK_ERRORS wyłącza sprawdzanie błędów i rzucanie wyjątków przez Koalę.
+// Wylaczenie standardowego assert przez NDEBUG automatycznie wylacza koalowa kontrole
 #if defined(NDEBUG)
 	#define KOALA_DONT_CHECK_ERRORS
 #endif
 
-// Makro koalaAssert() - pierwszy argument sprawdzany warunek, drugi typ rzucanego wyjątku.
+// Makro koalaAssert() - pierwszy argument sprawdzany warunek, drugi typ rzucanego wyjątku. Automatycznie rzuca wyjatek z podanym w konstr. opisem zwracajacym jego typ i polozenie
+//To wlasnie to makro jest ew. wylaczane stala czasu kompilacji KOALA_DONT_CHECK_ERRORS
 #if defined(KOALA_DONT_CHECK_ERRORS)
 	#define koalaAssert( descr,type ) {}
 #else
@@ -30,6 +34,8 @@ namespace Koala
 	/** \brief Exceptions */
 	namespace Error
 	{
+	    //WEN: wszedzie brak opisu metod i konstruktora
+	    //WEN: w opisie warto zwrocic uwage na 2-wymiarowa hierarchie klas wyjatkow Koali: sam typ wyjatku pokazuje, czy polecialo z metody kontenera, metody grafu, czy algorytmu
 		// Klasa bazowa dla wyjątków Koali.
 		/** \brief Exception base.
 		 *

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<key id="nx_0" for="node" attr.name="x" attr.type="double"></key>
+<key id="ny_0" for="node" attr.name="y" attr.type="double"></key>
+<key id="nliczint_0" for="node" attr.name="liczint" attr.type="int"></key>
+<key id="nvlitera_0" for="node" attr.name="vlitera" attr.type="int"></key>
+<key id="eelitera_0" for="edge" attr.name="elitera" attr.type="int"></key>
+<key id="eliczdouble_0" for="edge" attr.name="liczdouble" attr.type="double"></key>
+<graph id="first" edgedefault="undirected">
+<node id="v0"><data key="nx_0">401</data><data key="ny_0">258</data><data key="nliczint_0">1</data><data key="nvlitera_0">65</data></node>
+<node id="v1"><data key="nx_0">245</data><data key="ny_0">97.25</data><data key="nliczint_0">2</data></node>
+<edge id="e0" source="v0" target="v1"><data key="eelitera_0">101</data><data key="eliczdouble_0">0</data></edge>
+<edge id="e1" source="v1" target="v0" directed="true"><data key="eliczdouble_0">0.5</data></edge>
+<edge id="e2" source="v1" target="v1"><data key="eelitera_0">102</data><data key="eliczdouble_0">1.5</data></edge>
+</graph>
+</graphml>
