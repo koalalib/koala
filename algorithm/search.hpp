@@ -915,7 +915,6 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
 	SCCVisitor< GraphType,CompIter,VertIter,CompMap > visit( state );
 	rv = DFSPostorderPar< DefaultStructs >::visitAllBase( g,vertCont,visit,EdDirOut | EdUndir );
 	if (rv < 0) return rv;
-	// TODO: a co to za ...???
 	return state.count;
 }
 
@@ -1321,7 +1320,10 @@ template< class DefaultStructs > template< class GraphType >
 		}
 	resa = (typename GraphType::PVertex)NULL;
 	resb = (typename GraphType::PVertex)NULL;
-	if (licz == 0) { return; };
+	if (licz == 0)
+    {   if (g.getVertNo()) resa=resb=g.getVert();
+        return;
+    };
 	if (licz != BFSPar< DefaultStructs >::scanAttainable( g,x,blackHole,blackHole,symmask & ~EdLoop )) return;
 	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
 		if (!dir)
@@ -1376,7 +1378,7 @@ template< class DefaultStructs > template< class GraphType >
 {
 	std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
 	_ends( g,EdUndir | EdLoop,res.first,res.second );
-	return res.first != 0 && res.first != res.second;
+	return /*res.first != 0 &&*/ res.first != res.second;
 }
 
 template< class DefaultStructs > template< class GraphType >
@@ -1384,7 +1386,7 @@ template< class DefaultStructs > template< class GraphType >
 {
 	std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
 	_ends( g,EdDirOut | EdLoop,res.first,res.second );
-	return res.first != 0 && res.first != res.second;
+	return /*res.first != 0 &&*/ res.first != res.second;
 }
 
 template< class DefaultStructs > template< class GraphType >
@@ -1393,7 +1395,8 @@ template< class DefaultStructs > template< class GraphType >
 	koalaAssert( u,AlgExcNullVert );
 	std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
 	_ends( g,EdUndir | EdLoop,res.first,res.second );
-	return (res.first == u || res.second == u);
+//	return (res.first == u || res.second == u); //zmiana
+    return res.first != res.second && (res.first == u || res.second == u);
 }
 
 template< class DefaultStructs > template< class GraphType >
@@ -1402,21 +1405,24 @@ template< class DefaultStructs > template< class GraphType >
 	koalaAssert( u,AlgExcNullVert );
 	std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
 	_ends( g,EdDirOut | EdLoop,res.first,res.second );
-	return res.first == u;
+//	return res.first == u; //zmiana
+    return res.first != res.second && res.first == u;
 }
 
 template< class DefaultStructs > template< class GraphType >
 	bool EulerPar< DefaultStructs >::hasCycle( const GraphType &g, typename GraphType::PVertex u )
 {
 	koalaAssert( u,AlgExcNullVert );
-	return hasCycle( g ) && g.deg( u,EdUndir | EdLoop );
+//	return hasCycle( g ) && g.deg( u,EdUndir | EdLoop ); //zmiana
+    return hasCycle( g ) && (g.deg( u,EdUndir | EdLoop )>0 || g.getEdgeNo(EdUndir | EdLoop)==0);
 }
 
 template< class DefaultStructs > template< class GraphType >
 	bool EulerPar< DefaultStructs >::hasDirCycle( const GraphType &g, typename GraphType::PVertex u )
 {
 	koalaAssert( u,AlgExcNullVert );
-	return hasDirCycle( g ) && g.deg( u,EdDirOut | EdLoop );
+//	return hasDirCycle( g ) && g.deg( u,EdDirOut | EdLoop ); //zmiana
+	return hasDirCycle( g ) && (g.deg( u,EdDirOut | EdLoop )>0 || g.getEdgeNo(Directed | EdLoop)==0); //zmiana
 }
 
 template< class DefaultStructs > template< class GraphType, class VertIter, class EdgeIter >
@@ -1463,7 +1469,9 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
 		LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
 		//TODO: size? - spr
 	EulerState< GraphType > state( g,_vstk,n + m + 1,EdUndir | EdLoop );
-	eulerEngine< GraphType >( g.getEdge( prefstart,EdUndir | EdLoop) ? prefstart : res.first,NULL,state );
+//	eulerEngine< GraphType >( g.getEdge( prefstart,EdUndir | EdLoop) ? prefstart : res.first,NULL,state );
+	eulerEngine< GraphType >( (g.getEdgeNo( prefstart,EdUndir | EdLoop)>0 || g.getEdgeNo( EdUndir | EdLoop)==0) ?
+                          prefstart : res.first,NULL,state );
 	eulerResult( state,out );
 	return true;
 }
@@ -1480,7 +1488,9 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
 		LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) );
 		//TODO: size? - spr
 	EulerState< GraphType > state( g,_vstk,n + m + 1,EdDirOut | EdLoop );
-	eulerEngine< GraphType >( g.getEdge( prefstart,EdDirOut | EdLoop ) ? prefstart : res.first,NULL,state );
+//	eulerEngine< GraphType >( g.getEdge( prefstart,EdDirOut | EdLoop ) ? prefstart : res.first,NULL,state );
+	eulerEngine< GraphType >( (g.getEdgeNo( prefstart,EdDirOut | EdLoop )>0 ||  g.getEdgeNo( Directed | EdLoop)==0) ?
+                          prefstart : res.first,NULL,state );
 	eulerResult( state,out );
 	return true;
 }

@@ -17,12 +17,17 @@ namespace Koala
 	namespace Privates
 	{
 
-        template <class T,bool> class MainGraphEPtr
+        template <class T,bool> class MainGraphPtr
 	    {
         protected:
 	        const T* wsk;
+
+	        void moveGrPtr(const T* arg)
+	        {
+	            wsk=arg;
+	        }
 	    public:
-            MainGraphEPtr(const T* arg) : wsk(arg) {}
+            MainGraphPtr(const T* arg) : wsk(arg) {}
 
 	        const T* getGraph() const
 	        {
@@ -30,10 +35,13 @@ namespace Koala
 	        }
 	    };
 
-	    template <class T> class MainGraphEPtr<T,false>
+	    template <class T> class MainGraphPtr<T,false>
 	    {
 	    public:
-            MainGraphEPtr(const T* arg) {}
+            MainGraphPtr(const T* arg) {}
+        protected:
+            void moveGrPtr(const T* arg)
+            { }
 	    };
 		/* NormalParalLink
 		 *
@@ -96,7 +104,7 @@ namespace Koala
 		class Settings = GrDefaultSettings< EdAll,true > > class Edge: public EdgeConst,
 		public Settings::template EdgeAdditData< VertInfo,EdgeInfo,Settings >,
 		public Privates::ParalLink< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed >,
-        public Privates::MainGraphEPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>
+        public Privates::MainGraphPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>
 	{
 		friend class Graph< VertInfo,EdgeInfo,Settings >;
 		friend class Vertex< VertInfo,EdgeInfo,Settings >;
@@ -201,12 +209,12 @@ namespace Koala
 		// klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
 		/** Standard constructor. */
 		Edge(const Graph< VertInfo,EdgeInfo,Settings >* wsk):
-		    Privates::MainGraphEPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>(wsk),
+		    Privates::MainGraphPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>(wsk),
 		    info( ), next( NULL ), prev( NULL ), type( Detached )
 			{ }
 		/** Constructor sets info variable. */
 		Edge( const EdgeInfo &infoExt,const Graph< VertInfo,EdgeInfo,Settings >* wsk ):
-		    Privates::MainGraphEPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>(wsk),
+		    Privates::MainGraphPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>(wsk),
 		    info( infoExt ), next( NULL ), prev( NULL ), type( Detached )
 			{ }
 

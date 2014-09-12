@@ -152,6 +152,20 @@ int ConstGraphMethods< GraphType >::getEdges( OutputIterator out, PVertex vert, 
 	return ans;
 }
 
+template< class GraphType > template< class OutputIterator >
+int ConstGraphMethods< GraphType >::getEdgeVerts( OutputIterator out, PVertex vert, EdgeDirection direct ) const
+{
+	int ans = 0;
+	PEdge edge = this->getEdge( vert,direct );
+	while (edge) {
+		*out = std::pair<PEdge,PVertex>(edge,this->getEdgeEnd(edge,vert));
+		++out;
+		++ans;
+		edge = self.getEdgeNext( vert,edge,direct );
+	}
+	return ans;
+}
+
 template< class GraphType > template< class OutputIterator > int
 	ConstGraphMethods< GraphType >::getEdges( OutputIterator out, PVertex vert1, PVertex vert2, EdgeDirection direct ) const
 {
@@ -167,7 +181,7 @@ template< class GraphType > template< class OutputIterator > int
 }
 
 template< class GraphType > template< class OutputIterator,class EChooser2 >
-	int ConstGraphMethods< GraphType >::getEdges( OutputIterator out, EChooser2 ch ) const
+	typename Privates::SecondTypeTest<typename EChooser2::ChoosersSelfType, int>::Type ConstGraphMethods< GraphType >::getEdges( OutputIterator out, EChooser2 ch ) const
 {
 	int licz = 0;
 	for( PEdge e = this->getEdge(); e; e = self.getEdgeNext( e ) )
@@ -181,7 +195,8 @@ template< class GraphType > template< class OutputIterator,class EChooser2 >
 }
 
 template< class GraphType> template< class EChooser2 >
-	Set< typename ConstGraphMethods< GraphType >::PEdge > ConstGraphMethods< GraphType >::getEdgeSet( EChooser2 ch ) const
+    typename Privates::SecondTypeTest<typename EChooser2::ChoosersSelfType, Set< typename ConstGraphMethods< GraphType >::PEdge > >::Type
+	 ConstGraphMethods< GraphType >::getEdgeSet( EChooser2 ch ) const
 {
 	Set< PEdge > s;
 	this->getEdges( setInserter( s ),ch );

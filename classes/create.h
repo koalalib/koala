@@ -28,6 +28,14 @@ namespace Koala
 	 */
 	class Creator{
 	public:
+//TODO:
+//          - chocby szczatkowy opis numeracji wprowadzanych wierzcholkow np. zakres+kolejnosc (trzeba ja znac, by napisac funktor generujacy)
+//	      - przydalo by sie, zeby cycle dzialal takze dla n=1 generujac wierzcholek z petlami (o liczbie zaleznej od maski, podobnie
+//          jak przy n>1, tyle ze tym razem ta/te krawedzie sila rzeczy musza byc petlami, bo nie mamy petli Directed/Undiected)                                                                                              )
+//          - jeszcze poprosze o
+//            typename GraphType::PVertex empty( GraphType &g, int n,  VInfoGen vInfoGen)
+//            typename GraphType::PVertex empty( GraphType &g, int n)
+//            bo zauwazylem, ze nigdzie nie mamy konstruktora hurtowo wprowadzajacego serie wierzcholkow izolowanych
 		/** \brief Create clique.
 		 *
 		 *  The function generates a clique, i.e. for every two vertices, there is created a connection

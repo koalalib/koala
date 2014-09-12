@@ -475,7 +475,8 @@ template< class RndGen,class GraphType, class VInfoGen, class EInfoGen > typenam
 	for (int i = 0; i < n; i++ )
 		for(int j = i + 1; j < n; j++ )
 		{
-			rnd = (double)rgen.rand() / (double)rgen.maxRand;
+			//rnd = (double)rgen.rand() / (double)rgen.maxRand;
+			rnd = (double)Privates::getRandom(rgen) / (double)Privates::getMaxRandom(rgen);
 			if (rnd <= p)
 			{
 				if (eType == Undirected) g.addEdge( vTab[i],vTab[j],eInfoGen( i,j,EdUndir ),EdUndir );
@@ -483,7 +484,8 @@ template< class RndGen,class GraphType, class VInfoGen, class EInfoGen > typenam
 			}
 			if (eType == Directed)
 			{
-				rnd = (double)rgen.rand() / (double)rgen.maxRand;
+				//rnd = (double)rgen.rand() / (double)rgen.maxRand;
+				rnd = (double)Privates::getRandom(rgen) / (double)Privates::getMaxRandom(rgen);
 				if (rnd <= p) g.addEdge( vTab[j],vTab[i],eInfoGen( j,i,EdDirIn ),EdDirIn );
 			}
 		}
@@ -560,7 +562,8 @@ template< class RndGen >
 int Creator::random(RndGen& rgen, int begin, int end )
 {
 	int range = (end - begin) + 1;
-	return begin + int( range * (rgen.rand()/(rgen.maxRand + 1.0)) );
+//	return begin + int( range * (rgen.rand()/(rgen.maxRand + 1.0)) );
+	return begin + int( range * (Privates::getRandom(rgen)/(Privates::getMaxRandom(rgen) + 1.0)) );
 }
 
 // RelDiagramPar

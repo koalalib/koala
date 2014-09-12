@@ -24,6 +24,10 @@ namespace Privates {
         typedef typename GraphInternalTypes< GraphType >::GraphSettings GraphSettings;
     };
 
+    template <class A, class B> struct SecondTypeTest {
+        typedef B Type;
+    };
+
 }
 
 /* ConstGraphMethods
@@ -111,6 +115,9 @@ public:
 //         PVertex getEdgeEnd1( PEdge ) const;
 //         PVertex getEdgeEnd2( PEdge  ) const;
 //         EdgeDirection getEdgeDir( PEdge , PVertex);
+//NEW: a takze
+//          bool hasAdjMatrix() const;
+//          static bool allowedAdjMatrix()
 
 
 //    Uwaga: zasady ogolne obslugi zbiorow wierz/krawedzi struktury grafowej. Zestaw metod postaci:
@@ -134,7 +141,7 @@ public:
 	 *  \return number of vertices in the graph.
 	 */
 	inline int getVertNo() const
-		{ return self.getVertNo(); }
+		{  return self.getVertNo(); }
 
 	/** \brief Get next vertex.
 	 *
@@ -331,6 +338,31 @@ public:
 	 */
 	Set< PEdge > getEdgeSet( PVertex v, EdgeDirection direct = EdAll ) const;
 
+    //NEW: Poniewaz nie da sie latwo bez iteratorow przegladac listy kolejnych sasiadow wierzcholka w multigrafie
+    // (bo moga sie powtarzac via rozne krawedzie), wprowadzono liste rozszerzen powyzszych getEdge...(PVertex...), ktora wraz z krawedzia
+    //zwraca takze drugi (procz v) wierzcholek koncowy tejze krawedzi (lub (NULL,NULL) na koncu listy).
+   	inline std::pair<PEdge,PVertex> getEdgeVertNext( PVertex v, PEdge e, EdgeDirection mask = EdAll ) const
+		{
+		    e=self.getEdgeNext( v,e,mask );
+		    PVertex u= (e) ? this->getEnd(e,v) : 0;
+		    return std::pair<PEdge,PVertex> (e,u);
+        }
+   	inline std::pair<PEdge,PVertex> getEdgeVertPrev( PVertex v, PEdge e, EdgeDirection mask = EdAll ) const
+		{
+		    e=self.getEdgePrev( v,e,mask );
+		    PVertex u= (e) ? this->getEnd(e,v) : 0;
+		    return std::pair<PEdge,PVertex> (e,u);
+        }
+   	inline std::pair<PEdge,PVertex> getEdgeVert( PVertex v,  EdgeDirection mask = EdAll ) const
+		{   return this->getEdgeVertNext(v,(PEdge)0,mask);   }
+   	inline std::pair<PEdge,PVertex> getEdgeVertLast( PVertex v,  EdgeDirection mask = EdAll ) const
+		{   return this->getEdgeVertPrev(v,(PEdge)0,mask);   }
+    inline int getEdgeVertNo( PVertex v, EdgeDirection mask = EdAll) const
+		{ return self.getEdgeNo( v,mask ); }
+		// tu OutputIterator przyjmuje pary std::pair<PEdge,PVertex>
+	template< class OutputIterator > int getEdgeVerts( OutputIterator, PVertex, EdgeDirection = EdAll ) const;
+
+
 	// lista krawedzi laczacych podane wierzcholki w sposob zawarty w masce
 	/** \brief Get number of parallel edges.
 	 *
@@ -446,7 +478,8 @@ public:
 	 *  \param ch the chooser object allowing to choose edges automatically. WEN: czyli jak? musi miec bool operator()( Elem *elem, const Graph &gr ) - jak wszystkie choosery
 	 *  \return the number of edges in out container.
 	 */
-	template< class OutputIterator, class EChooser2 > int getEdges( OutputIterator out, EChooser2 ch ) const;
+	template< class OutputIterator, class EChooser2 >
+        typename Privates::SecondTypeTest<typename EChooser2::ChoosersSelfType, int>::Type getEdges( OutputIterator out, EChooser2 ch ) const;
 
 	/** \brief Get set of edges.
 	 *
@@ -455,7 +488,8 @@ public:
 	 *  \param ch the chooser object allowing to choose edges automatically. WEN: czyli jak? musi miec bool operator()( Elem *elem, const Graph &gr ) - jak wszystkie choosery
 	 *  \return the set of pointers to edges congruent with the chooser object \a ch.
 	 */
-	template< class EChooser2 > Set< PEdge > getEdgeSet( EChooser2 ch ) const;
+	template< class EChooser2 >
+	typename Privates::SecondTypeTest<typename EChooser2::ChoosersSelfType, Set< PEdge > >::Type getEdgeSet( EChooser2 ch ) const;
 
 	// podobnie, ale podajemy pare chooserow (dla wierzcholka i krawedzi). Parametr bool=true - krawedz ma spelniac
 	// nie tylko swoj chooser, ale takze oba konce chooser dla wierzcholkow
@@ -1144,6 +1178,13 @@ public:
 	 *  \param kind determines mode.
 	 *  \return the number of adjecent vertices returned in the parameter \a out.  */
 	Set< PVertex > getIncVertSet( const Set< PVertex > &vset, EdgeDirection type = EdAll, EdgeType kind = Loop ) const;
+
+    //NEW:
+	inline bool hasAdjMatrix() const
+	{   return self.hasAdjMatrix();  }
+
+	static bool allowedAdjMatrix()
+	{   return GraphType::allowedAdjMatrix();  }
 };
 
 #include "grconst.hpp"

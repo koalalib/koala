@@ -94,6 +94,7 @@ namespace Koala
 		public:
 			typedef SimpleAssocMatrix< K,V,AMatrNoDiag > Type;
 			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+			// por.  komentarze w defs.h klasa domyslnych wytycznych algorytmow AlgsDefaultSettings
 
             //  typedef SimpleAssocMatrix<K,V,AMatrNoDiag,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
             //  typedef SimpleAssocMatrix<K,V,AMatrNoDiag,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<HashMap<K,int> > > > Type;
@@ -470,6 +471,19 @@ namespace Koala
 		 *  \returns Pointer to the first inserted vertex.
 		 */
 		typename GraphType::PVertex move( Graph< VertInfo,EdgeInfo,Settings > &gr );
+
+        //NEW: przenosi vert z innego grafu do naszego (bez zmiany identyfikatora). Drugi graf musi byc rozny od naszego, wszystkie styczne z nim
+        //krawedzie (nawet petle) sa usuwane.
+		bool move( Graph< VertInfo,EdgeInfo,Settings > &gr, PVertex vert );
+		//NEW: przenosi do naszego grafu wierzcholki z grafu gr podane w przedziale iteratorw. Wraz z nimi przenoszone
+		//sa krawedzie podgrafu indukowanego w gr przez te wierzcholki o typie zgodnym z mask. Inne krawedzie
+		//styczne z tymi wierzcholkami w gr sa kasowane. gr musi byc rozny od naszego grafu. Zwraca liczby
+		//wierz/kraw. ktore ulegly przeniesieniu.
+		template< class Iterator > std::pair<int,int>
+            move( Graph< VertInfo,EdgeInfo,Settings > &gr, Iterator beg, Iterator end, EdgeType mask=EdAll );
+        template< class Iterator > std::pair<int,int>
+        //NEW: j.w. ale wersja odporna na powtorzenia wierzcholkow w sekwencji
+            move2( Graph< VertInfo,EdgeInfo,Settings > &gr, Iterator beg, Iterator end, EdgeType mask=EdAll );
 
 		// dopuszczalne typy krawedzi grafu
 		/** \brief Check Edge types

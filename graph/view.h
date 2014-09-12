@@ -56,6 +56,16 @@ namespace Koala
             typedef typename Graph::GraphSettings GraphSettings;
         };
 
+        //NEW: widok nie moze tworzyc/usuwac macierzy sasiedztwa grafu podstawowego, ale musi miec metody, by kompilowaly sie kody algorytmow grafowych dla wejsciowego widoku
+        struct ViewAdjMatrixTool {
+
+            bool makeAdjMatrix()
+            {    return false;    }
+            bool delAdjMatrix()
+            {    return false;    }
+            void reserveAdjMatrix( int ) {}
+        };
+
 	}
 
 	// Klasa podgrafu struktury grafowej typu Graph, do podgrafu wybierane sa wierzcholki spelniajace
@@ -69,7 +79,7 @@ namespace Koala
 	 *  \tparam EChooser the class allowing to choose edges automatically.
 	 *  \ingroup DMview */
 	template< class Graph, class VChooser, class EChooser > class Subgraph:
-		public SubgraphBase, public ConstGraphMethods< Subgraph< Graph, VChooser, EChooser> >
+		public SubgraphBase, public ConstGraphMethods< Subgraph< Graph, VChooser, EChooser> >, public Privates::ViewAdjMatrixTool
 	{
 	public:
 		// choosery predykatow definiujacych podgraf
@@ -184,7 +194,7 @@ namespace Koala
 		// w przeciwnym razie sprawdzany jest predykat vchoose. Flaga true wymusza tez analogiczne sprawdzanie we
 		// wszystkich strukturach az do korzenia
 		/** \brief Check vertex presence.
-		 *
+		 *  WEN: zalozenie wejsciowe przy deep=true to vert nalezy do grafu-korzenia, przy false - nalezy do rodzica
 		 *  The method tests if the vertex form parent belongs to the current subgraph i.e. if it satisfy the \a vchoose of current subgraph. If the flag \a deep is set to true all the ancestors choosers are tested.
 		 *  \param vert the tested vertex.
 		 *  \param deep the flag determining if all choosers of ancestors are checked.
@@ -193,7 +203,7 @@ namespace Koala
 
 		// j.w. ale dla krawedzi - sprawdzany jest predykat echoose i vchoose dla obu koncow
 		/** \brief Check edge presence.
-		 *
+		 *  WEN: zalozenie wejsciowe przy deep=true to edge nalezy do grafu-korzenia, przy false - nalezy do rodzica
 		 *  The method tests if the edge form parent belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph and both ends satisfy \a vchoose. If the flag \a deep is set to true all the ancestors choosers are tested.
 		 *  \param edge the tested edge.
 		 *  \param deep the flag determining if all choosers of ancestors are checked.
@@ -379,6 +389,14 @@ namespace Koala
             counters.reset(toreset.first,toreset.second);
         }
 
+        //NEW: widok przenosi pytanie o macierz sasiedztwa do korzenia, w razie niepodlaczenia: false
+        inline bool hasAdjMatrix() const
+        {
+            return (getRootPtr()) ? getRootPtr()->hasAdjMatrix() : false;
+        }
+        static bool allowedAdjMatrix()
+			{ return Graph::allowedAdjMatrix(); }
+
 	protected:
 		template <class T> static bool isEdgeTypeChooser( const T &x, Koala::EdgeDirection &val )
 			{ return false; }
@@ -428,7 +446,7 @@ namespace Koala
 	 *
 	 *  The class allows to create the view on graph in which all the edges (except loops) are undirected. The class let us use the graph as undirected, but without allocation of new graph. The interface (except the process of creation) is the same as in Koala::Subgraph.
 	 *  \ingroup DMview */
-	template< class Graph > class UndirView: public SubgraphBase, public ConstGraphMethods< UndirView< Graph> >
+	template< class Graph > class UndirView: public SubgraphBase, public ConstGraphMethods< UndirView< Graph> >, public Privates::ViewAdjMatrixTool
 	{
 	public:
 		// ten sam sens typow, co dla podgrafu
@@ -673,6 +691,14 @@ namespace Koala
 		 *  \returns direction of edge \a edge. */
 		EdgeDirection getEdgeDir( PEdge edge, PVertex v ) const;
 
+       //NEW: widok przenosi pytanie o macierz sasiedztwa do korzenia, w razie niepodlaczenia: false
+        inline bool hasAdjMatrix() const
+        {
+            return (getRootPtr()) ? getRootPtr()->hasAdjMatrix() : false;
+        }
+        static bool allowedAdjMatrix()
+			{ return Graph::allowedAdjMatrix(); }
+
 	protected:
 		static EdgeDirection transl( EdgeDirection mask )
 			{ return ((mask & EdLoop) ? EdLoop : 0) | ((mask & EdUndir) ? (Directed | Undirected) : 0); }
@@ -714,7 +740,7 @@ namespace Koala
 	 *
 	 *  The class allows to create the view on graph in which all the arc are reversed WEN: a pozostale krawedzie bez zmian. Hence it lets us use the reversed graph, but without allocation of new graph. The interface (except the process of creation) is the same as in Koala::Subgraph.
 	 *  \ingroup DMview */
-	template< class Graph > class RevView: public SubgraphBase, public ConstGraphMethods< RevView< Graph> >
+	template< class Graph > class RevView: public SubgraphBase, public ConstGraphMethods< RevView< Graph> >, public Privates::ViewAdjMatrixTool
 	{
 	public:
 	    //WEN: co do typow zagniezdzonych - jak w subgraph por. wyzej
@@ -963,6 +989,14 @@ namespace Koala
 		 *  \returns direction of edge \a edge. */
 		EdgeDirection getEdgeDir( PEdge edge, PVertex v ) const;
 
+       //NEW: widok przenosi pytanie o macierz sasiedztwa do korzenia, w razie niepodlaczenia: false
+        inline bool hasAdjMatrix() const
+        {
+            return (getRootPtr()) ? getRootPtr()->hasAdjMatrix() : false;
+        }
+        static bool allowedAdjMatrix()
+			{ return Graph::allowedAdjMatrix(); }
+
 	protected:
 		static EdgeDirection transl( EdgeDirection mask );
 		static EdgeDirection nextDir( EdgeDirection dir );
@@ -999,6 +1033,10 @@ namespace Koala
             using Subgraph<Graph,BoolChooser,AssocHasChooser<typename Graph::GraphSettings
                                     ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type> >
                                     ::echoose;
+
+            using Subgraph<Graph,BoolChooser,AssocHasChooser<typename Graph::GraphSettings
+                                    ::template VertEdgeAssocCont<typename Graph::PEdge,EmptyVertInfo>::Type> >
+                                    ::setChoose;
 
         public:
 
