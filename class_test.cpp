@@ -112,7 +112,7 @@ using namespace std;
 
 	}
 
-    return 0;
+//    return 0;
 
 //    cout <<IsIt::caterpillar(g) << " " <<
 //        (IsIt::Caterpillar::getSpineEnds(g).first ? IsIt::Caterpillar::getSpineEnds(g).first->info : -1) << ' ' <<
@@ -165,5 +165,21 @@ using namespace std;
         for(u=g.getVert();u;u=g.getVertNext(u)) cout << u->info << ' '<< mapa[u] << endl;
 
     }
+     {
+        cout << "\n............\n";
+        Graph<char, char> g;
+        Graph<char, char>::PVertex u,v,w;
+
+
+        u=g.addVert('A');
+        v=g.addVert('B');
+        w=g.addVert('C');
+        g.addEdge(u,v);
+        g.addEdge(u,w);
+        cout << u << ' '<< v<<'\n';
+        cout << IsIt::Caterpillar::spineEnds(g).first << ' ' <<IsIt::Caterpillar::spineEnds(g).second;
+        g.clear();
+        cout << '\n' << IsIt::tree(g);
+     }
 	return 0;
 }

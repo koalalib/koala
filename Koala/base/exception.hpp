@@ -6,9 +6,10 @@ namespace Koala
 	{
 		inline ExcBase::ExcBase( const char *adesc, const char *afile, int aline ): _line(aline)
 		{
-			assert( std::strlen( adesc ) + std::strlen( afile ) + 2 <= KOALA_EXCEPTION_BUF_SIZE );
-			std::strcpy( buf,adesc );
-			std::strcpy( buf + std::strlen( adesc ) + 1,afile );
+			std::strncpy( buf,adesc,KOALA_EXCEPTION_BUF_SIZE-2 );
+			buf[KOALA_EXCEPTION_BUF_SIZE-2]=0;
+			std::strncpy( buf + std::strlen( buf ) + 1,afile,KOALA_EXCEPTION_BUF_SIZE-2-std::strlen( buf ));
+			buf[KOALA_EXCEPTION_BUF_SIZE-1]=0;
 		}
 	}
 }

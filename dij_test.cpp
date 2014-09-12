@@ -277,5 +277,10 @@ template< class GraphType, class Iter > static void scanAttainable( const GraphT
     eee=Koala::EmptyVertInfo();
 
     scanAttainable(g,g.getVert(),blackHole,tabV,Koala::EdUndir);
+    g.getEdgeSet(
+               //Koala::stdChoose(true)
+               Koala::Undirected|Koala::Directed
+               );
+
     return 0;
 }

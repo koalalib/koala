@@ -6,25 +6,6 @@ namespace Koala
 	namespace Privates
 	{
 
-	    template <class T,bool> class MainGraphVPtr
-	    {
-        protected:
-	        const T* wsk;
-	    public:
-            MainGraphVPtr(const T* arg) : wsk(arg) {}
-
-	        const T* getGraph() const
-	        {
-	            return wsk;
-	        }
-	    };
-
-	    template <class T> class MainGraphVPtr<T,false>
-	    {
-	    public:
-            MainGraphVPtr(const T* arg) {}
-	    };
-
 		/* NormalVertLink
 		 *
 		 */
@@ -120,7 +101,7 @@ namespace Koala
 		private Privates::VertLinkEdUndir< VertInfo,EdgeInfo,Settings,EdUndir & Settings::EdAllow >,
 		private Privates::VertLinkEdLoop< VertInfo,EdgeInfo,Settings,EdLoop & Settings::EdAllow >,
 		public Settings::template VertAdditData< VertInfo,EdgeInfo,Settings >,
-		public Privates::MainGraphVPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>
+		public Privates::MainGraphPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>
 	{
 		friend class Graph< VertInfo,EdgeInfo,Settings >;
 		friend class Edge< VertInfo,EdgeInfo,Settings >;
@@ -160,7 +141,7 @@ namespace Koala
 			{ }
 		/** Constructor sets info variable */
 		Vertex( const VertInfo &infoExt, const Graph< VertInfo,EdgeInfo,Settings >* wsk ):
-		    Privates::MainGraphVPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>(wsk),
+		    Privates::MainGraphPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>(wsk),
             info( infoExt ), next( NULL ), prev( NULL )
 			{ }
 

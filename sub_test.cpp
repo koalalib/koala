@@ -147,6 +147,17 @@ Koala::Subgraph<Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koal
 
     Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koala::Vertex<OpisV,OpisE> >,Koala::SetChooser<Koala::Edge<OpisV,OpisE> > >
         sgb,sgb2;
+    Koala::Graph<int,int,Koala::GrDefaultSettings< Koala::EdAll,false > > g_bez;
+
+    makeSubgraph(g_bez,Koala::stdChoose(true)&Koala::stdChoose(true));
+    g.makeAdjMatrix();g_bez.makeAdjMatrix();
+#define gr2test makeSubgraph(g_bez,Koala::stdChoose(true)&Koala::stdChoose(true))
+    std::cout << "\n make:" << gr2test.makeAdjMatrix();
+    std::cout << "\n has:" << gr2test.hasAdjMatrix();
+    std::cout << "\n del:" << gr2test.delAdjMatrix();
+    gr2test.reserveAdjMatrix(100);
+    std::cout << "\n allow:" << gr2test.allowedAdjMatrix();
+    std::cout << "\n has:" << gr2test.hasAdjMatrix() << "\n";
 
 
 //    sgb2=sgb;
@@ -193,6 +204,7 @@ Koala::Subgraph<Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koal
     Koala::IO::writeGraphText(g,std::cout,Koala::IO::RG_EdgeList);
 
     Koala::SimpleView<Koala::Graph<OpisV,OpisE> > gsimp(Koala::EdUndir,gg,std::make_pair(true,true));
+
 
 
     gsimp.refresh(Koala::EdDirOut);

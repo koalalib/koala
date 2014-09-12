@@ -76,6 +76,7 @@ template< class DefaultStructs > template< class GraphType >
 	std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 		null = std::make_pair( typename GraphType::PVertex( 0 ),typename GraphType::PVertex( 0 ) );
 	if (!connected( g,false )) return null;
+	if (g.getVertNo()<3) return std::make_pair( g.getVert(),g.getVert() );
 	return Path::ends( makeSubgraph( g,std::make_pair( notChoose( orChoose( vertDegChoose( 0,EdUndir ),
 		vertDegChoose( 1,EdUndir ) ) ),stdChoose( true ) ) , std::make_pair(true,true)) );
 }

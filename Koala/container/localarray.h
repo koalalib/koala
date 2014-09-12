@@ -118,7 +118,7 @@ namespace Koala
 #if defined(KOALA_FORCE_VLARRAY)
 #define LOCALARRAY(name, size)                          \
 	name[size];
-	//TODO: jesli uzycie alloca jest warunkowane pojemnoscia KOALA_STACK_THRESHOLD, to VLArraye chyba tez tak poinny funkcjonowac
+	//TODO: jesli uzycie alloca jest warunkowane pojemnoscia KOALA_STACK_THRESHOLD, to VLArraye chyba tez tak poinny funkcjonowac, tj. po przekroczeniu KOALA_STACK_THRESHOLD przechodzic na operator new
 
 // Intel Compiler, GCC-likes, Visual Studio have alloca
 #elif defined(KOALA_USES_ALLOCA) && \

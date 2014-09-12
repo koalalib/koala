@@ -1706,7 +1706,7 @@ namespace Koala
 		bool empty()  const { return interf.size()==0; }
 		bool operator!() const { return empty(); }
 		void clear() { interf.clear(); }
-		void reserve( int arg ) { interf.reserve(arg); }
+		void reserve( int arg ) { interf.reserve(Assoc2DimTabAddr< aType >::bufLen( arg )); }
 		template< class Iterator > int getKeys( Iterator iter ) const { return interf.getKeys(iter); }
 
 	};

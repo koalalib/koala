@@ -22,8 +22,8 @@ struct OpisE {
 };
 
 Koala::Graph<OpisV,OpisE> g;
-Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,V,U,tabV[10];
-Koala::Graph<OpisV,OpisE>::PEdge tabE[10];
+Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,G,H,I,V,U,tabV[20];
+Koala::Graph<OpisV,OpisE>::PEdge tabE[20];
 
 
 Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex,
@@ -45,11 +45,15 @@ void bfTest()
     //po dodaniu tej krawedzi tez mamy cykl ujemny
     //g.addEdge(C,A,OpisE(-4),Koala::EdDirOut);
 
+    G=g.addVert(OpisV("G"));H=g.addVert(OpisV("H"));I=g.addVert(OpisV("I"));
+    g.addEdge(G,H,OpisE(2),Koala::EdDirOut);g.addEdge(H,I,OpisE(2),Koala::EdDirOut);g.addEdge(I,G,OpisE(-5),Koala::EdDirOut);
+    //g.addEdge(A,G,OpisE(2));
+
     for(Koala::Graph<OpisV,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
         edgeCont[ePt].length=ePt->info.dlugosc;
 
     U=A; V=E;
-    for(int i=0;i<10;i++) {tabV[i]=0; tabE[i]=0; }
+    for(int i=0;i<20;i++) {tabV[i]=0; tabE[i]=0; }
 }
 
 #include "main.hpp"

@@ -66,7 +66,6 @@ private:
 			T elem;
 	};
 
-    //TODO: jest jakis wyciek pamieci zwiazany z ta klasa, por. edmonds2_test.cpp - jedyny wykomentowany test
 	template<class T>
 	class CyclicList {
 	public:

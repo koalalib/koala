@@ -21,7 +21,7 @@ struct OpisE {
 };
 
 Koala::Graph<OpisV,OpisE> g;
-Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,V,U,tabV[20];
+Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,G,V,U,tabV[20];
 Koala::Graph<OpisV,OpisE>::PEdge tabE[20];
 std::pair<Koala::Graph<OpisV,OpisE>::PVertex,Koala::Graph<OpisV,OpisE>::PVertex> para;
 
@@ -31,7 +31,7 @@ void dijTest()
     A=g.addVert(OpisV("A"));B=g.addVert(OpisV("B"));C=g.addVert(OpisV("C"));
     D=g.addVert(OpisV("D"));E=g.addVert(OpisV("E"));
 
-    F=g.addVert(OpisV("F"));
+    F=g.addVert(OpisV("F"));G=g.addVert(OpisV("G"));
 
 //    g.addEdge(A,B,OpisE(1));g.addEdge(B,D,OpisE(5));g.addEdge(A,C,OpisE(4));g.addEdge(D,C,OpisE(2));
 //    g.addEdge(C,E,OpisE(1));g.addEdge(B,C,OpisE(2));g.addEdge(D,E,OpisE(1));
@@ -52,33 +52,72 @@ void dijTest()
     for(int i=0;i<20;i++) {tabV[i]=0; tabE[i]=0; }
 }
 
+void dijTest2()
+{   g.clear();
+    A=g.addVert(OpisV("A"));
+//    g.addLoop(A);
+    E=g.addVert(OpisV("E"));
+
+    for(int i=0;i<20;i++) {tabV[i]=0; tabE[i]=0; }
+}
+
+void dijTest3()
+{   g.clear();
+    A=g.addVert(OpisV("A"));B=g.addVert(OpisV("B"));C=g.addVert(OpisV("C"));
+    D=g.addVert(OpisV("D"));E=g.addVert(OpisV("E"));F=g.addVert(OpisV("F"));
+    G=g.addVert(OpisV("G"));
+
+    g.addArc(A,B,OpisE(1));g.addArc(B,C,OpisE(1));g.addArc(D,E,OpisE(1));g.addArc(E,F,OpisE(1));
+    g.addLink(A,B,OpisE(1));g.addLink(B,C,OpisE(1));g.addLink(D,E,OpisE(1));g.addLink(E,F,OpisE(1));
+
+    g.addLoop(E);g.addLoop(B);
+
+    g.addArc(C,D,OpisE(1));g.addLink(C,D,OpisE(1));
+    g.addArc(F,A,OpisE(1));g.addLink(F,A,OpisE(1));
+
+    for(int i=0;i<20;i++) {tabV[i]=0; tabE[i]=0; }
+}
+
+
 Koala::EdgeDirection mask=Koala::EdUndir|Koala::EdLoop;
 
 #include "main.hpp"
 
-    dijTest();
+//#define HASP hasPath
+//#define HASC hasCycle
+//#define GETP getPath
+//#define GETC getCycle
+//#define ENDS ends
 
-    para=Koala::Euler::ends(g);
-    std::cout << "\n[";
+#define HASP hasDirPath
+#define HASC hasDirCycle
+#define GETP getDirPath
+#define GETC getDirCycle
+#define ENDS dirEnds
+
+    dijTest3();
+
+    para=Koala::Euler:: ENDS (g);
+    std::cout << "\n[" << std::boolalpha;
     if (para.first) std::cout << para.first->info.name; else std::cout << "NULL";
     if (para.second) std::cout << para.second->info.name; else std::cout << "NULL";
     std::cout << "]\n";
 
-    std::cout <<"C:"<< Koala::Euler::hasCycle(g)<<std::endl;
-    std::cout<<"P:"<< Koala::Euler::hasPath(g)<<std::endl;
+    std::cout <<"Cycle:"<< Koala::Euler:: HASC (g,G)<<std::endl;
+    std::cout<<"Path:"<< Koala::Euler:: HASP (g,G)<<std::endl;
 
     std::cout << "\n\n\n";
 
 
-        std::cout<< "C:" << Koala::Euler::getDirCycle(g,Koala::Euler::outPath(tabV,tabE))<<std::endl;
+        std::cout<< "Cycle:" << Koala::Euler:: GETC (g,G,Koala::Euler::outPath(tabV,tabE))<<std::endl;
         for(int i=0;tabV[i];i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;tabE[i];i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";
 
-        dijTest();
+        dijTest3();
 
 
-        std::cout<< "\n\nP:" <<Koala::Euler::getDirPath(g,Koala::Euler::outPath(tabV,tabE))<<std::endl;
+        std::cout<< "\n\nPath:" <<Koala::Euler:: GETP (g,Koala::Euler::outPath(tabV,tabE))<<std::endl;
         for(int i=0;tabV[i];i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;tabE[i];i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";
@@ -88,7 +127,7 @@ Koala::EdgeDirection mask=Koala::EdUndir|Koala::EdLoop;
         A=g.addVert(); B=g.addVert(); C=g.addVert();
         g.addArc(A,B); g.addEdge(B,A); //g.addLoop(C);
 
-        std::cout << g.mu(g.getEdge(),Koala::EdUndir);
+//        std::cout << g.mu(g.getEdge(),Koala::EdUndir);
 
     return 0;
 }

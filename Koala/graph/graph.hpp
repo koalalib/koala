@@ -1177,6 +1177,7 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class Itera
 	return res;
 }
 
+
 template< class VertInfo, class EdgeInfo, class Settings > typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
 	Graph< VertInfo,EdgeInfo,Settings >::move( Graph< VertInfo,EdgeInfo,Settings > &graph )
 {
@@ -1189,6 +1190,13 @@ template< class VertInfo, class EdgeInfo, class Settings > typename Graph< VertI
 		typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = graph.first_edge;
 		for( ; e; e = e->next) pAdj->add( e );
 	}
+	if (Settings::VertEdgeGraphPtr)
+    {
+        typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v = graph.first_vert;
+		for( ; v; v = v->next) v->moveGrPtr(this);
+		typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = graph.first_edge;
+		for( ; e; e = e->next) e->moveGrPtr(this);
+    }
 	if (this->last_vert)
 	{
 		if (graph.first_vert)
@@ -1226,6 +1234,61 @@ template< class VertInfo, class EdgeInfo, class Settings > typename Graph< VertI
 	graph.no_vert = graph.no_dir_edge() = graph.no_loop_edge() = graph.no_undir_edge() = 0;
 	return this->getVertNext( res );
 }
+
+template< class VertInfo, class EdgeInfo, class Settings > bool
+	Graph< VertInfo,EdgeInfo,Settings >::move( Graph< VertInfo,EdgeInfo,Settings > &graph, PVertex vert )
+{
+	koalaAssert(this->vallocator==graph.vallocator && this->eallocator==graph.eallocator,GraphExcWrongArg);
+	if (&graph == this) return false;
+	graph.delEdges(vert);
+	graph.detach(vert);
+	attach(vert);
+	vert->moveGrPtr(this);
+	return true;
+}
+
+template< class VertInfo, class EdgeInfo, class Settings >
+    template< class Iterator >
+    std::pair<int,int> Graph< VertInfo,EdgeInfo,Settings >::move( Graph< VertInfo,EdgeInfo,Settings > &graph,
+    Iterator beg, Iterator end, EdgeType mask)
+{
+    koalaAssert(this->vallocator==graph.vallocator && this->eallocator==graph.eallocator,GraphExcWrongArg);
+	if (&graph == this) return std::make_pair(0,0);
+	if (mask & (EdDirIn | EdDirOut)) mask|=(EdDirIn | EdDirOut);
+	std::pair<int,int> res(0,0);
+	graph.delIncEdges(beg,end,EdAll,Undirected);
+	graph.delIncEdges(beg,end,EdAll&(~mask),Loop);
+	typename ConstGraphMethods< Graph< VertInfo,EdgeInfo,Settings > >::Parals3 LOCALARRAY(edges,graph.getEdgeNo(mask));
+	for(Iterator it=beg;it!=end;++it,res.first++)
+        for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e=graph.getEdge(*it);e;e=graph.getEdgeNext(*it,e))
+            if (*it==graph.getEdgeEnd1(e))
+            edges[res.second++]=
+                typename ConstGraphMethods< Graph< VertInfo,EdgeInfo,Settings > >::
+                    Parals3(*it,graph.getEdgeEnd(e,*it),graph.getEdgeDir(e,*it),0,e);
+    for(int i=0;i<res.second;i++) graph.detach(edges[i].edge);
+    for(Iterator it=beg;it!=end;++it)
+    {
+        graph.detach(*it);
+        attach(*it);
+        (*it)->moveGrPtr(this);
+    }
+    for(int i=0;i<res.second;i++)
+    {
+        attach(edges[i].edge,edges[i].v1,edges[i].v2,edges[i].direct);
+        edges[i].edge->moveGrPtr(this);
+    }
+    return res;
+}
+
+template< class VertInfo, class EdgeInfo, class Settings >
+    template< class Iterator >
+    std::pair<int,int> Graph< VertInfo,EdgeInfo,Settings >::move2( Graph< VertInfo,EdgeInfo,Settings > &graph,
+    Iterator beg, Iterator end, EdgeType mask)
+{
+    typename Settings:: template RepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> reps(beg,end);
+	return move(  graph,beg, end, mask );
+}
+
 
 template< class VertInfo, class EdgeInfo, class Settings > template< class ExtGraph >
 	typename Graph< VertInfo,EdgeInfo,Settings >::PVertex

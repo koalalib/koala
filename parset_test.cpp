@@ -31,6 +31,11 @@ using namespace Koala::IO;
     xx.set("name","Ala").set("liczba",1).set("float",-3.);
     cout << xx <<"\n";
     ss << xx <<"\n";
+    deque<string> keytable;
+    std::string keytable2[10];
+
+    xx.getKeys(keytable2);
+    cout << '\n' << keytable2[0] << endl;
 
 //    char comma;
 //    do {

@@ -48,5 +48,6 @@ void TT(GraphType &g, int n) {
 
 	Graph<int, int> g;
 	TT(g, 12);
+#warning kom
 	return 0;
 	};

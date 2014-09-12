@@ -26,7 +26,9 @@ template< class Graph, class VChooser, class EChooser >
 	bool Subgraph< Graph,VChooser,EChooser >::good( PVertex vert, bool deep ) const
 {
 	if (!vert) return true;
-	return vchoose( vert,up() ) && (!deep || up().good( vert,true ));
+	if (deep) return up().good( vert,true ) && vchoose( vert,up() );
+	else return vchoose( vert,up() );
+//	return vchoose( vert,up() ) && (!deep || up().good( vert,true ));
 }
 
 template< class Graph, class VChooser, class EChooser >
@@ -34,8 +36,10 @@ template< class Graph, class VChooser, class EChooser >
 {
 	if (!edge) return true;
 	std::pair< PVertex,PVertex > ends = edge->getEnds();
-	return vchoose( ends.first,up() ) && vchoose( ends.second,up() )
-		&& echoose( edge,up() ) && (!deep || up().good( edge,true ));
+	if (deep) return up().good( edge,true ) && vchoose( ends.first,up() ) && vchoose( ends.second,up() ) && echoose( edge,up() );
+	else return vchoose( ends.first,up() ) && vchoose( ends.second,up() ) && echoose( edge,up() );
+//	return vchoose( ends.first,up() ) && vchoose( ends.second,up() )
+//		&& echoose( edge,up() ) && (!deep || up().good( edge,true ));
 }
 
 template< class Graph, class VChooser, class EChooser > typename Subgraph< Graph,VChooser,EChooser >::PVertex

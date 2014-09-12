@@ -432,7 +432,7 @@ namespace Koala
 		 *  \return the distance from \a start to \a end or infinity if such path doesn't exist. If <tt>end == NULL</tt>, the method returns 0. If  the negative cycle was discovered -infinity is returned. */
 		template< class GraphType, class VertContainer, class EdgeContainer > static
 			typename EdgeContainer::ValType::DistType distances( const GraphType &g, VertContainer &avertTab,
-			const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end = 0 );
+			const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end = 0);
 
 		// wlasciwa procedura: zapisuje najkrotsza sciezke (wierzcholki i krawedzie) pod pare podanych iteratorow,
 		// zwraca liczbe krawedzi najkrotszej sciezki. Korzysta z kontenera vertTab z danymi z poprzedniej funkcji
@@ -490,7 +490,7 @@ namespace Koala
 					VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
 
 					if (DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::DistType >
-						::isPlusInfty(dist = distances( g,vertTab,edgeTab,start,end )))
+						::isPlusInfty(dist = distances( g,vertTab,edgeTab,start,end)))
 							return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
 					else if (DefaultStructs:: template NumberTypeBounds< typename EdgeContainer::ValType::DistType >
 						::isMinusInfty( dist ))

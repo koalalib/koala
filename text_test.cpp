@@ -15,6 +15,7 @@ using namespace Koala;
 using namespace Koala::IO;
 
 Graph<char,string>::PEdge tabE[10];
+std::pair<Graph<char,string>::PEdge,Graph<char,string>::PVertex> tabPair[10];
 
 struct Dummy {
     int a;
@@ -24,13 +25,19 @@ struct bezop {
     int a,b;
 };
 
+template <class T>
+void printInfo(T* w)
+{
+    if (w ) cout << w->info; else cout << "NULL";
+}
+
 //template <class A, class B>
 //void operator << (const A&,const B&) {}
 
 #include "main.hpp"
 	string buf;
-	Graph<char,string> g;
-	Graph<char,string>::PVertex A,B,C,D;
+	Graph<char,string> g,g2;
+	Graph<char,string>::PVertex A,B,C,D,E,F,tabV[10];
     Graph<char,string>::PEdge d,e,f,h,p,q,x,y,z;
     char text[10000];
 
@@ -177,16 +184,76 @@ struct bezop {
 
         bezop bz1,bz2;
         {   char tab[100];
-            g.clear();
+            g.clear();g2.clear();
             cout << "\n\n*******\n";
-            A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');
-            g.addEdge(A,B);g.addEdge(B,C);
+            A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');
+            g.addEdge(B,A,"ab");g.addArc(B,C,"bc");g.addArc(B,A,"b>a");g.addArc(C,D,"cd");
+            g.addEdge(D,A,"ad");
+            g.addLoop(B,"bb");
+            g.getVerts(tabV);
+            g2.addVert('E');
             writeGraphText(g, cout, RG_VertexLists|RG_Info);
-            cout << "\n" << g.getVertNo() << "\n*******\n";
-            g.pickVert(B);
-            writeGraphText(g, cout, RG_VertexLists|RG_Info);
+            cout << "\n"<< A<<"\n\n";
+            writeGraphText(g2, cout, RG_VertexLists|RG_Info);
+            cout  << "\n*******\n";
+            cout << "movev:" << g2.move2(g,tabV,tabV+2,EdDirOut).second;
 
-            cout << "\n" << g.getVertNo() << "\n*******\n";
+           writeGraphText(g, cout, RG_VertexLists|RG_Info);
+            cout << "\n\n";
+            writeGraphText(g2, cout, RG_VertexLists|RG_Info);
+            cout << "\n"<< A << "\n";
+//             << sizeof(Directed) << ' '<<sizeof(EdDirIn|EdDirOut)
+//            << "\n" << int(EdAll&(~Undirected)) << ' '<<int(EdAll^Undirected);
+
+//            g.pickVert(B);
+//            writeGraphText(g, cout, RG_VertexLists|RG_Info);
+
+//            cout << "\n" << g.getVertNo() << "\n*******\n";
+            return 0;
+
+        }
+        {
+            std::pair<Graph<char,string>::PEdge,Graph<char,string>::PVertex> para;
+            g.clear();
+            cout << "!!!!!!!!!!\n";
+            A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D');
+           	d=g.addEdge(A,B,"ab");
+            e=g.addEdge(A,C,"ac");
+            f=g.addArc(A,D,"ad");
+            h=g.addLoop(A,"AA");
+            x=0;
+            do
+            {
+                y=g.getEdgePrev(A,x);
+//                if (!x) break;
+                printInfo(x); cout << "  e: ";
+                printInfo(g.getEdgeVertPrev(A,x).first);
+                cout <<"  v:";
+                printInfo(g.getEdgeVertPrev(A,x).second);
+                cout <<"\n"; x=y;
+
+            } while(y);
+            cout <<"\n" << g.getEdgeVertNo(A) << "\n";
+            printInfo(g.getEdgeVert(A,EdUndir).first); cout << ' '; printInfo(g.getEdgeVert(A,EdUndir).second);
+            cout <<"\n";
+            printInfo(g.getEdgeVertLast(A,EdUndir).first); cout << ' '; printInfo(g.getEdgeVertLast(A,EdUndir).second);
+
+            cout <<"\n\n";
+            int res=g.getEdgeVerts(tabPair,A);
+            for(int i=0;i<res;i++)
+            {
+                printInfo(tabPair[i].first); cout << ' '; printInfo(tabPair[i].second);cout <<"\n";
+            }
+            g2.move(g);
+
+            cout << "\n" <<
+            //A->getGraph() << d->getGraph() <<
+                &g2 << " " << g2.getEdgeNo() <<"\n";
+            g2.makeAdjMatrix();
+            g2.delAdjMatrix();
+            cout << g2.hasAdjMatrix() << g2.allowedAdjMatrix() ;
+
+            g2.getVertNo();
 
         }
 

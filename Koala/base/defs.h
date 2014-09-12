@@ -130,14 +130,17 @@ namespace Koala
 
             //  typedef SimpleAssocMatrix<A,B,type,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<A,B>::BlockType> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
             //  typedef SimpleAssocMatrix<A,B,type,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<A,B>::BlockType> >,Privates::PseudoAssocArray<A,int,AssocTable<HashMap<A,int> > > > Type;
+            // mozliwy ale nie zalecany - dostep logarytmiczny:
             //  typedef SimpleAssocMatrix<A,B,type,std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<A,B>::BlockType> >,Privates::PseudoAssocArray<A,int,AssocTable<std::map<A,int> > > > Type;
 
 			// typedef AssocMatrix< A,B,type > Type;
 
 			//  typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
             //  typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<HashMap<A,int> > > > Type;
+            // mozliwy ale nie zalecany - dostep logarytmiczny:
             //  typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<std::map<A,int> > > > Type;
 
+            // to sa tak na prawde opakowania do map 2-wymiarowych zorganizowanych tak, jak pokazuje drugi param. szablonu:
             //  typedef  Assoc2DimTable< type, std::map<std::pair<A,A>, B > > Type;
             //  typedef  Assoc2DimTable< type, BiDiHashMap<std::pair<A,A>, B > > Type;
             //  typedef  Assoc2DimTable< type, HashMap<std::pair<A,A>, B > > Type;
@@ -333,7 +336,7 @@ namespace Koala
 	template< class T > bool isBlackHole( const T & )
 		{ return false; }
 	/** \brief Test if black hole.*/
-	bool isBlackHole( const BlackHole & )
+	inline bool isBlackHole( const BlackHole & )
 		{ return true; }
 
 	/* BlackHoleSwitch

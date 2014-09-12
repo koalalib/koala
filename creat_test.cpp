@@ -1,12 +1,15 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+//#include <random>
 #include "Koala/graph/graph.h"
 #include "Koala/classes/create.h"
 #include "Koala/io/g6.h"
 
 
 Koala::StdRandGen<> stdgen;
+//std::mt19937 stdgen;
+
 //przyklad uzycia, w tej wersji zawartosc obu struktur jest dla Dijkstry nieistotna
 struct OpisV;  // pewna struktura opisujaca moj wierzchlek
 struct OpisE;   // struktura opisujaca krawedz
@@ -193,6 +196,13 @@ void dir2str(Koala::EdgeDirection dir, std::string & dirStr );
 	test2();
 	test3();
 
+    std::cout << '\n'<< Koala::Privates::getMaxRandom(stdgen) << ' ' << Koala::Privates::getRandom(stdgen) <<' ' << Koala::Privates::getRandom(stdgen)
+            << ' ' << Koala::Privates::getRandom(stdgen,3)<< ' ' << Koala::Privates::getRandom(stdgen,3)<< ' ' << Koala::Privates::getRandom(stdgen,3);
+//    std::default_random_engine newgen;
+//    std::cout << '\n'<< Koala::Privates::getMaxRandom(newgen) << ' ' << Koala::Privates::getRandom(newgen) <<' ' << Koala::Privates::getRandom(newgen)
+//            << ' ' << Koala::Privates::getRandom(newgen,3)<< ' ' << Koala::Privates::getRandom(newgen,3)<< ' ' << Koala::Privates::getRandom(newgen,3);
+
+//xxx
 	return 0;
 }
 
@@ -496,6 +506,8 @@ int test3(){
 //	g19.testGraph();
 	std::cout<< "--g19" <<std::endl;
 	printGraph(g19);
+
+
 
 	return 0;
 }

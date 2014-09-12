@@ -12,7 +12,7 @@
 //WEN: czy makra tez mozna zdokumentowac?
 // dlugosc bufora wewnatrz wyjatku przeznaczonego na jego tekstowy opis
 #ifndef KOALA_EXCEPTION_BUF_SIZE
-	#define KOALA_EXCEPTION_BUF_SIZE 200
+	#define KOALA_EXCEPTION_BUF_SIZE 150
 #endif
 
 // Stała KOALA_DONT_CHECK_ERRORS wyłącza sprawdzanie błędów i rzucanie wyjątków przez Koalę.

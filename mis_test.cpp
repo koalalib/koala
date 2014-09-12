@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+//#include <random>
 #include "Koala/graph/graph.h"
 #include "Koala/algorithm/mis.h"
 
@@ -7,7 +8,11 @@
 
 using namespace std;
 
+#define RandGenType
+//std::default_random_engine
+
 Koala::StdRandGen<> stdgen;
+//std::default_random_engine stdgen;
 
 struct OpisV;  // pewna struktura opisujaca moj wierzchlek
 struct OpisE;  // struktura opisujaca krawedz
@@ -197,7 +202,7 @@ int main(void) {
     result = Koala::MISHeuristic::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::GMin<>(stdgen),
+        Koala::MISStrategy::GMin< RandGenType >(stdgen),
         vertCont/*NULL*/);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
@@ -207,7 +212,7 @@ int main(void) {
     result = Koala::MISHeuristic::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::GWMin<>(stdgen),
+        Koala::MISStrategy::GWMin<RandGenType>(stdgen),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
@@ -217,7 +222,7 @@ int main(void) {
     result = Koala::MISHeuristic::getWMin(
             g,
             tabV,
-            Koala::MISStrategy::GWMin2<>(stdgen),
+            Koala::MISStrategy::GWMin2<RandGenType>(stdgen),
             vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
@@ -227,7 +232,7 @@ int main(void) {
     result = Koala::MISHeuristic::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::GGWMin<>(stdgen),
+        Koala::MISStrategy::GGWMin<RandGenType>(stdgen),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
@@ -247,7 +252,7 @@ int main(void) {
     result = Koala::MISHeuristic::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::Rand< >(stdgen),
+        Koala::MISStrategy::Rand<RandGenType >(stdgen),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
@@ -263,7 +268,7 @@ int main(void) {
     result = Koala::MISHeuristic::getWMax(
         g,
         tabV,
-        Koala::MISStrategy::GMax<>(stdgen),
+        Koala::MISStrategy::GMax<RandGenType>(stdgen),
         vertCont/*NULL*/);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
@@ -273,7 +278,7 @@ int main(void) {
     result = Koala::MISHeuristic::getWMax(
         g,
         tabV,
-        Koala::MISStrategy::GWMax<>(stdgen),
+        Koala::MISStrategy::GWMax<RandGenType>(stdgen),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
@@ -283,7 +288,7 @@ int main(void) {
     result = Koala::MISHeuristic::getWMax(
         g,
         tabV,
-        Koala::MISStrategy::GGWMax<>(stdgen),
+        Koala::MISStrategy::GGWMax<RandGenType>(stdgen),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
@@ -425,7 +430,7 @@ int main(void) {
     result = Koala::MISHeuristic::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::GMin<>(stdgen),
+        Koala::MISStrategy::GMin<RandGenType>(stdgen),
         vertCont/*NULL*/);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {

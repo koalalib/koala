@@ -71,6 +71,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
     typedef AssocTable<std::map< K, E> > Type;
 };
 
+int xxx=0;
 
 #include "main.hpp"
 
@@ -80,6 +81,7 @@ struct AssocArrSwitch<AssocArray<K,E,Cont> > {
 //    AssocTabInterface<std::map<int,std::string> > aaa=assocTabInterf(mapa);
 
 
+    int xxxtab[xxx];
 
     AssocArray<Vert*,std::string> a(5);
     BlockOfAssocMatrix< std::string > matbuf[100];

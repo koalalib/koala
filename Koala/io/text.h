@@ -605,10 +605,19 @@ public:
 			{ m_params.erase(p); };
 
 	/** \brief Save all keys to vector \a keys.*/
-	void getKeys(std::vector<std::string> &keys) const {
+	//NEW: nie koniecznie vector, kontener na std::string-i obslugujacy push_back
+	template <class Container>
+	void getKeys(Container &keys) const {
 		const_iterator it;
 		for(it = m_params.begin(); it != m_params.end(); ++it)
 			keys.push_back(it->first);
+	};
+
+    //NEW: lub tablica std::string-ow
+	void getKeys(std::string* keys) const {
+		const_iterator it;
+		for(it = m_params.begin(); it != m_params.end(); ++it)
+			*keys++=it->first;
 	};
 
 	/**\brief Clear - delete all elements*/
