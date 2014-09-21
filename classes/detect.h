@@ -211,13 +211,14 @@ namespace Koala
 		 *  \return true if the graph \a g is a block graph, false  otherwise. */
 		template< class GraphType > static bool block( const GraphType &g );
 
+        //NEW: teraz jest z allowmulti
 		// maks. liczba cyklomatyczna skladowej 2-spojnej grafu prostego. -1 w razie bledu.
 		/** \brief Test if almost K-tree.
 		 *
 		 *  The method checks for which smallest  \a K a graph is an almost K-tree.
 		 *  \param g the considered graph.
 		 *  \return the smallest \a K for which  the graph \a g is an almost K-tree.  If any error occurs -1 is returned.*/
-		template< class GraphType > static int almostTree( const GraphType &g );
+		template< class GraphType > static int almostTree( const GraphType &g, bool allowmulti=false );
 
 		/* Bipartite
 		 *

@@ -601,12 +601,12 @@ namespace Koala
 	public:
 		AssocKeyContReg() { next = 0; }
 		AssocKeyContReg( const AssocKeyContReg & ) { next = 0; }
-		AssocKeyContReg &operator=( const AssocKeyContReg & );
+		inline AssocKeyContReg &operator=( const AssocKeyContReg & );
 		~AssocKeyContReg() { deregister(); }
 
 	private:
 		inline AssocContReg *find( AssocContBase *cont );
-		void deregister();
+		inline void deregister();
 	};
 
 	/* BlockOfAssocArray

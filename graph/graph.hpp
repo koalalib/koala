@@ -1,18 +1,3 @@
-// GrDefaultSettings
-
-template< EdgeType edAllow, bool adjMatrixAllowed > template< class Iterator >
-	void GrDefaultSettings< edAllow,adjMatrixAllowed >::sort( Iterator first, Iterator last )
-{
-	std::make_heap( first,last );
-	std::sort_heap( first,last );
-}
-
-template< EdgeType edAllow, bool adjMatrixAllowed > template< class Iterator, class Comp >
-	void GrDefaultSettings< edAllow,adjMatrixAllowed >::sort( Iterator first, Iterator last, Comp comp )
-{
-	std::make_heap( first,last,comp );
-	std::sort_heap( first,last,comp );
-}
 
 // DummyVar
 

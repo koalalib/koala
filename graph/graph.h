@@ -13,6 +13,7 @@
 
 namespace Koala
 {
+
 	// Domyslne wytyczne parametryzujace strukture i dzialanie metod klasy grafu
 	// TODO: przetestowac dzialanie grafu przy roznych ustawieniach
 
@@ -155,12 +156,34 @@ namespace Koala
 		//enum { ReserveOutAssocCont = true };
 
 		// wybrany do uzytku wewnetrznego algorytm sortowania tablic
-		//WEN: opis
-		template< class Iterator > static void sort( Iterator first, Iterator last );
-		// ... i to samo z dostarczonym porownywaczem
-		//WEN: opis
-		template< class Iterator, class Comp > static void sort ( Iterator first, Iterator last, Comp comp );
+		// Wybrany do użytku wewnętrznego algorytm sortowania tablic. Domsyslnie sort. kopcowe
+		/**  \brief Table sorting algorithm*/
+		template< class Iterator > static void sort( Iterator first, Iterator last )
+		{
+            std::make_heap( first,last );
+            std::sort_heap( first,last );
+        }
+		// ... i to samo z funkcją porównującą.
+		/** \brief Table sorting algorithm
+		 *
+		 *  \tparam Iterator the iterator class. WEN: a opis przedzialu poczatkowo-zakoncowego?
+		 *  \tparam Comp the comparison object function. WEN: powinien byc strict weak order, jak w std::sort
+		 */
+		template< class Iterator, class Comp > static void sort( Iterator first, Iterator last, Comp comp )
+		{
+            std::make_heap( first,last,comp );
+            std::sort_heap( first,last,comp );
+        }
 
+        //inna mozliwosc: z std::sort
+//		template< class Iterator > static void sort( Iterator first, Iterator last )
+//		{
+//            std::sort( first,last );
+//        }
+//		template< class Iterator, class Comp > static void sort( Iterator first, Iterator last, Comp comp )
+//		{
+//            std::sort( first,last,comp );
+//       }
 
         //NEW: klasa usuwajaca ew. powtorzenia z ciagow wejsciowych podanych miedzy iteratorami - filtruje
         // wejscie w roznych metodach
@@ -177,6 +200,22 @@ namespace Koala
                     buf = new T[res.size()];
                     len=res.getKeys(buf);
                 }
+
+                //NEW: druga mozliwosc:
+//                template <class Iter>
+//                void init(Iter beg, Iter end, int n)
+//                {
+//                    len=0;
+//                    for(Iter i=beg;i!=end;++i) if (*i) len++;
+//                    buf = new T[len];
+//                    len=0;
+//                    for(Iter i=beg;i!=end;++i) if (*i)
+//                    {
+//                        buf[len++]=*i;
+//                    }
+//                    sort( buf,buf + len );
+//                    len =std::unique( buf,buf + len ) - buf;
+//                }
 
             public:
 
@@ -264,18 +303,18 @@ namespace Koala
 		 *
 		 *  Connect the subgraph to the parent \a x.	 */
 		 //WEN: jakie x?
-		SubgraphBase &operator=( const SubgraphBase & );
+		inline SubgraphBase &operator=( const SubgraphBase & );
 
 		// odlacza sie od rodzica (jesli istnial) i odlacza od siebie wszystkie swoje dzieci
-		~SubgraphBase();
+		inline ~SubgraphBase();
 
 	protected:
 		mutable const SubgraphBase *parent,*next,*child;
 
 		// wypisuje sie z listy potomkow obiektu nadrzednego, jednak nie usuwa powiazan ze swoimi obiektami podrzednymi
-		bool unlink();
+		inline bool unlink();
 		// dolacza sie jako obiekt podrzedny podanego obiektu
-		bool link(const SubgraphBase * = NULL );
+		inline bool link(const SubgraphBase * = NULL );
 	};
 
 	namespace Privates

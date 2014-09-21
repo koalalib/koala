@@ -823,6 +823,10 @@ namespace Koala
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg );
 
+		//NEW: to samo z hardCast
+		template< class GraphIn, class GraphOut >
+			static typename GraphOut::PVertex undir2( const GraphIn &g, GraphOut &lg );
+
 
 
 		//        Dopisuje do lg skierowany graf krawedziowy tworzony na podstawie g.
@@ -874,10 +878,17 @@ namespace Koala
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex dir( const GraphIn &g, GraphOut &lg )
 			{
-				return dir( g,lg,std::make_pair( stdCast(false  ),stdCast( false ) ),
+				return dir( g,lg,std::make_pair( stdCast(  ),stdCast( ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
+        //NEW: to samo z hardCast
+		template< class GraphIn, class GraphOut >
+			static typename GraphOut::PVertex dir2( const GraphIn &g, GraphOut &lg )
+			{
+				return dir( g,lg,std::make_pair( hardCast(  ),hardCast( ) ),
+				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
+			}
 
 	};
 
@@ -899,10 +910,41 @@ namespace Koala
 	 *
 	 * Useful if some entities are generated from one source and other need two sources. Which is the case is some products  of graphs for edges.
 	 * \ingroup detect*/
-	template< class TwoArg, class FirstArg, class SecondArg > struct ComplexCaster
+
+	 namespace Privates {
+
+        template <class Caster, int> struct ComplexCastTwoArgCaster;
+
+        template <class Caster> struct ComplexCastTwoArgCaster<Caster,0>
+        {
+            template< class InfoDest, class InfoSour1, class InfoSour2 >
+            inline void cast(Caster& cast,InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) const
+            { cast( dest,sour1,sour2 ); }
+        };
+
+        template <class Caster> struct ComplexCastTwoArgCaster<Caster,1>
+        {
+            template< class InfoDest, class InfoSour1, class InfoSour2 >
+            inline void cast(Caster& cast,InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) const
+            { cast( dest,sour1 ); }
+        };
+
+        template <class Caster> struct ComplexCastTwoArgCaster<Caster,2>
+        {
+            template< class InfoDest, class InfoSour1, class InfoSour2 >
+            inline void cast(Caster& cast,InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) const
+            { cast( dest,sour2 ); }
+        };
+
+	 }
+
+    //NEW: 4-ty argument szablonu. int=0 - jak bylo, int =1 to twoarg jest 3-argumentowy, a w wywolaniu
+    // operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) rzutuje z sour1, int =2 tj. ale z sour2
+    //Dzieki temu mozna tworzyc ComplexCaster poslugujac sie tylko casterami 2-argumentowymi
+    template< class TwoArg, class FirstArg, class SecondArg,int ver> struct ComplexCaster
 	{
 
-	    typedef ComplexCaster< TwoArg, FirstArg, SecondArg > CastersSelfType;
+	    typedef ComplexCaster< TwoArg, FirstArg, SecondArg, ver > CastersSelfType;
 
 		mutable TwoArg twoarg;/**\brief Two argument caster function object.*/
 		mutable FirstArg firstarg;/**\brief First argument caster function object.*/
@@ -916,7 +958,7 @@ namespace Koala
 		/**\brief Cast two sources to one destination.*/
 		template< class InfoDest, class InfoSour1, class InfoSour2 >
 			void operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 )
-			{ twoarg( dest,sour1,sour2 ); }
+			{ Privates::ComplexCastTwoArgCaster<TwoArg,ver>().cast(twoarg, dest,sour1,sour2 ); }
 
 		// jesli podano pierwszy argument, zastosuj firstarg
 		/**\brief Cast first source (second BlackHole) to destination.*/
@@ -931,12 +973,32 @@ namespace Koala
 			{ secondarg( dest,sour2 ); }
 	};
 
+
 	// funkcja tworzaca - podajemy castery skladowe
 	/**\brief Generating function for ComplexCaster
 	 * \ingroup detect*/
-	template< class TwoArg, class FirstArg, class SecondArg > ComplexCaster< TwoArg, FirstArg,SecondArg >
+	template< class TwoArg, class FirstArg, class SecondArg > ComplexCaster< TwoArg, FirstArg,SecondArg,0 >
 		complexCast( TwoArg t, FirstArg f, SecondArg s )
-		{ return ComplexCaster< TwoArg,FirstArg,SecondArg >( t,f,s ); }
+		{ return ComplexCaster< TwoArg,FirstArg,SecondArg,0 >( t,f,s ); }
+
+
+    //NEW: ale dla int=1
+	// funkcja tworzaca - podajemy castery skladowe
+	/**\brief Generating function for ComplexCaster
+	 * \ingroup detect*/
+	template< class TwoArg, class FirstArg, class SecondArg > ComplexCaster< TwoArg, FirstArg,SecondArg,1 >
+		complexCast1( TwoArg t, FirstArg f, SecondArg s )
+		{ return ComplexCaster< TwoArg,FirstArg,SecondArg,1 >( t,f,s ); }
+
+
+    //NEW: ale dla int=2
+	// funkcja tworzaca - podajemy castery skladowe
+	/**\brief Generating function for ComplexCaster
+	 * \ingroup detect*/
+	template< class TwoArg, class FirstArg, class SecondArg > ComplexCaster< TwoArg, FirstArg,SecondArg,2 >
+		complexCast2( TwoArg t, FirstArg f, SecondArg s )
+		{ return ComplexCaster< TwoArg,FirstArg,SecondArg,2 >( t,f,s ); }
+
 
 	/* ProductPar
 	 * Kreator iloczynow grafow

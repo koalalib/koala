@@ -83,7 +83,7 @@ namespace Koala
 
 		// fallback Bind for types not matched by the template
 		// (e.g. anonymous structs in GCC)
-		void *Bind( void *ptr, size_t size, bool local );
+		inline void *Bind( void *ptr, size_t size, bool local );
 
 #ifdef __BORLANDC__
 #pragma argsused
@@ -102,8 +102,8 @@ namespace Koala
 		void (*m_killer)( void *, size_t );
 	};
 
-	template<> void LocalTableMgr::StackKiller< void >( void *, size_t ) { }
-	template<> void LocalTableMgr::HeapKiller< void >( void *ptr, size_t ) { free( ptr ); }
+	template<> void inline LocalTableMgr::StackKiller< void >( void *, size_t ) { }
+	template<> void inline LocalTableMgr::HeapKiller< void >( void *ptr, size_t ) { free( ptr ); }
 
 	template< class T > inline T *k__cast( T *, void *p2 ) { return (T *)p2; }
 	inline void *k__cast( void *, void *p2 ) { return (void *)p2; }

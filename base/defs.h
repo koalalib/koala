@@ -207,16 +207,35 @@ namespace Koala
 				{ return arg == zero(); }
 		};
 
-		// Wybrany do użytku wewnętrznego algorytm sortowania tablic.
+		// Wybrany do użytku wewnętrznego algorytm sortowania tablic. Domsyslnie sort. kopcowe
 		/**  \brief Table sorting algorithm*/
-		template< class Iterator > static void sort( Iterator first, Iterator last );
+		template< class Iterator > static void sort( Iterator first, Iterator last )
+		{
+            std::make_heap( first,last );
+            std::sort_heap( first,last );
+        }
 		// ... i to samo z funkcją porównującą.
 		/** \brief Table sorting algorithm
 		 *
 		 *  \tparam Iterator the iterator class. WEN: a opis przedzialu poczatkowo-zakoncowego?
 		 *  \tparam Comp the comparison object function. WEN: powinien byc strict weak order, jak w std::sort
 		 */
-		template< class Iterator, class Comp > static void sort( Iterator first, Iterator last, Comp comp );
+		template< class Iterator, class Comp > static void sort( Iterator first, Iterator last, Comp comp )
+		{
+            std::make_heap( first,last,comp );
+            std::sort_heap( first,last,comp );
+        }
+
+        //inna mozliwosc: z std::sort
+//		template< class Iterator > static void sort( Iterator first, Iterator last )
+//		{
+//            std::sort( first,last );
+//        }
+//		template< class Iterator, class Comp > static void sort( Iterator first, Iterator last, Comp comp )
+//		{
+//            std::sort( first,last,comp );
+//        }
+
 	};
 
 
@@ -242,7 +261,7 @@ namespace Koala
 		ConstFunctor( const T &aval = T() ): val( aval ) { }
 
 		/** \brief No arguments functor. */
-		T operator()()
+		inline T operator()()
 			{ return val; }
 
 		/** \brief Single argument functor. */
@@ -299,26 +318,26 @@ namespace Koala
 
 		// BlackHole również może służyć jako zaślepka dla nie interesujacego nas kontenera asocjacyjnego wymaganego
 		// w procedurze; te metody nigdy nie powinny być wykonane, są potrzebne jedynie by kod się kompilował.
-		template< class T > BlackHole &operator[]( T );
-		template< class T, class R > BlackHole &operator()( T,R );
+		template< class T > inline BlackHole &operator[]( T );
+		template< class T, class R > inline BlackHole &operator()( T,R );
 
 		// BlackHole potrafi przekonwertować się na dowolny typ - uwaga j.w.
-		template< class T > operator T();
+		template< class T > inline operator T();
 
-		template< class T > bool hasKey(T) const;
-		BlackHole firstKey() const;
-		BlackHole lastKey() const;
-		template< class T > BlackHole nextKey(T) const;
-		template< class T > BlackHole prevKey(T) const;
-		template< class T > int getKeys(T) const;
+		template< class T > inline bool hasKey(T) const;
+		inline BlackHole  firstKey() const;
+		inline BlackHole  lastKey() const;
+		template< class T > inline BlackHole nextKey(T) const;
+		template< class T > inline BlackHole prevKey(T) const;
+		template< class T > inline int getKeys(T) const;
 		void reserve( int )
 			{ }
 		bool empty() const
 			{ return true; }
 		bool operator!() const
 			{ return true; }
-		unsigned size() const;
-		int capacity() const;
+		inline unsigned size() const;
+		inline int capacity() const;
 		template< class T > bool delKey(T)
 			{ return false; };
 		void clear()
@@ -410,7 +429,7 @@ namespace Koala
 	/** \brief Generating  function of fixed chooser (BoolChooser).
 	//WEN: opis arg?
 	 *  \ingroup DMchooser*/
-	BoolChooser stdChoose( bool arg ) { return BoolChooser( arg ); }
+	inline BoolChooser stdChoose( bool arg ) { return BoolChooser( arg ); }
 
 	/* ValChooser
 	 * sprawdza, czy testowany element to podana (ustalona) wartosc
@@ -1463,7 +1482,7 @@ namespace Koala
 	/** \brief Generating  function of VertDegChoose.
 	WEN: opis param.
 	 *  \ingroup DMchooser*/
-	VertDegValChooser vertDegChoose( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
+	inline VertDegValChooser vertDegChoose( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
 		{ return VertDegValChooser( adeg,atype ); }
 
 	/* VertDegValChooserL
@@ -1502,7 +1521,7 @@ namespace Koala
 
 	/** \brief Generating  function of vertDegChooseL.
 	 *  \ingroup DMchooser*/
-	VertDegValChooserL vertDegChooseL( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
+	inline VertDegValChooserL vertDegChooseL( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
 		{ return VertDegValChooserL( adeg,atype ); }
 
     //WEN: jw.
@@ -1541,7 +1560,7 @@ namespace Koala
 
 	/** \brief Generating  function of vertDegChooseG.
 	 *  \ingroup DMchooser*/
-	VertDegValChooserG vertDegChooseG( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
+	inline VertDegValChooserG vertDegChooseG( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
 		{ return VertDegValChooserG( adeg,atype ); }
 
     //WEN: jw.
@@ -1702,7 +1721,7 @@ namespace Koala
 	/** \brief Generating  function of EdgeTypeChooser.
 	WEN: opis param.
 	 *  \ingroup DMchooser*/
-	EdgeTypeChooser edgeTypeChoose( Koala::EdgeDirection mask ) { return EdgeTypeChooser( mask ); }
+	inline EdgeTypeChooser edgeTypeChoose( Koala::EdgeDirection mask ) { return EdgeTypeChooser( mask ); }
 
 	// choosery zlozone dla krawedzi, sprawdzajace warunkek definiowany dla wierzcholka sa prawda dla jej koncow
 
@@ -1965,7 +1984,7 @@ namespace Koala
 	// i jego funkcja tworzaca
 	/** \brief Generating function for standard caster (StdCaster).
 	 *  \ingroup DMcaster*/
-	StdCaster stdCast() { return StdCaster(); }
+	inline StdCaster stdCast() { return StdCaster(); }
 
     //NEW: stdCaster probuje przekonwertowac InfoSour->InfoDest, a jesli sie nie uda, inicjuje InfoDest wart. domyslna
     //HardCaster bezposrednio rzutuje (InfoDest)InfoSour, co jesli jest nielegalne - wywola blad kompilacji
@@ -1988,7 +2007,7 @@ namespace Koala
 	// i jego funkcja tworzaca
 	/** \brief Generating function for standard caster (StdCaster).
 	 *  \ingroup DMcaster*/
-	HardCaster hardCast() { return HardCaster(); }
+	inline HardCaster hardCast() { return HardCaster(); }
 
 
 	/* NoCastCaster
@@ -2026,7 +2045,7 @@ namespace Koala
 	 *
 	 *  \param arg only false values are allowed.
 	 *  \ingroup DMcaster*/
-	NoCastCaster stdCast( bool arg );
+	inline NoCastCaster stdCast( bool arg );
 
 	/* ObjCaster
 	 * wyliczenie wartosci nowego info poprzez podany funktor wspolpracuje z produktami grafow (stad takze operator
@@ -2225,7 +2244,7 @@ namespace Koala
 	 *  \param a1 always false
 	 *  \return the linker that does not make a connection.
 	 *  \ingroup DMlinker */
-	Std1NoLinker stdLink( bool a1 ) { return Std1NoLinker( a1 ); }
+	inline Std1NoLinker stdLink( bool a1 ) { return Std1NoLinker( a1 ); }
 
 	/** \brief Generating function of one direction info linker (Std1FieldLinker).
 	 *
@@ -2253,7 +2272,7 @@ namespace Koala
 	 *
 	 *   Both boolean parameters take only false value, then the link is not created.
 	 *  \ingroup DMlinker     */
-	Std2Linker< Std1NoLinker,Std1NoLinker > stdLink( bool a1, bool a2 );
+	inline Std2Linker< Std1NoLinker,Std1NoLinker > stdLink( bool a1, bool a2 );
 
 	/** \brief Generating function of one way linker based on Std2Linker.
 	 *
