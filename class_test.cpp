@@ -179,7 +179,29 @@ using namespace std;
         cout << u << ' '<< v<<'\n';
         cout << IsIt::Caterpillar::spineEnds(g).first << ' ' <<IsIt::Caterpillar::spineEnds(g).second;
         g.clear();
-        cout << '\n' << IsIt::tree(g);
+        cout << '\n' << IsIt::tree(g) << "\n\n";
+        u=g.addVert('A');
+        v=g.addVert('B');
+        w=g.addVert('C');
+        g.addEdge(u,v);
+        g.addEdge(u,w);
+//        g.addEdge(v,w);
+//        g.addEdge(v,w);
+        g.addLoop(v);
+        g.addLoop(v);
+        cout << '\n' << IsIt::almostTree(g,false) << "\n\n";
+
+        int tab[]={1,3,-1,3,1};
+
+        GrDefaultSettings<EdAll,true>::sort(tab,tab+5,std::less<int>());
+        for(int i=0;i<5;i++) cout << tab[i]<<' ';
+
+        Graph<char, char>::PVertex tabvv[]={u,v,w,v,u};
+        for (int i=0;i<5;i++) cout << tabvv[i] <<' ';
+        cout << "\n";
+        GrDefaultSettings<EdAll,true >::RepsDeleter<Graph<char, char>::PVertex> reps(tabvv,tabvv+5);
+        for (int i=0;i<reps.len;i++) cout << reps.buf[i] <<' ';
+
      }
 	return 0;
 }

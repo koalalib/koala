@@ -108,6 +108,7 @@ Graph<OpV,OpE>::PEdge e=g.addEdge(u,v,std::string("u>v"));
                           make_pair(tripcast,complexCast(tripcast,singlecast,singlecast)),
                           make_pair(stdLink(vtov1map,vtov2map),stdLink(etoe1map,etoe2map))
                                                  )->info.name << endl;
+
     std::cout << g.getVertNo() << endl;
     for(Graph<OpV,OpE>::PVertex u=g.getVert();u;u=g.getVertNext(u))
         cout << u->info.name << " : " << vtov1map[u]->info.name << ' '<< vtov2map[u]->info.name<< endl;

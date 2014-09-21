@@ -83,6 +83,7 @@ int& f(int i,int j)
         Graph<char,string> g;
 
         Graph<string,char> lg;
+        Graph<std::pair<int,int>,std::pair<int,int> > lg2;
 
         AssocTable<std::map<Edge<char,string> *,Vertex<string,char>*> > e2vmap;
         AssocTable<std::map<Vertex<string,char>*,Edge<char,string> *> > v2emap;
@@ -106,7 +107,7 @@ int& f(int i,int j)
         cout<<endl<<endl;
 
     //    LineGraph::undir(g,lg,make_pair(stdCast(),stdCast()),stdLink(v2emap ,e2vmap));
-        LineGraph::undir(g,lg,make_pair(stdCast(),stdCast()));
+        LineGraph::dir2(g,lg);
         IO::writeGraphText(lg,cout,IO::RG_EdgeList);
 
 
@@ -150,7 +151,7 @@ int& f(int i,int j)
         IO::writeGraphText(g,cout,IO::RG_EdgeList);
         cout<<endl<<endl;
 
-        LineGraph::dir(g,lg,make_pair(stdCast(),stdCast()),make_pair(stdLink(v2emap ,e2vmap),stdLink(le2vmap ,lv2emap)));
+        LineGraph::dir(g,lg,stdCast()&stdCast(),stdLink(v2emap ,e2vmap)&stdLink(le2vmap ,lv2emap));
         LineGraph::dir(g,lg2);
     //    LineGraph::undir(g,lg,make_pair(stdCast(),stdCast()));
         IO::writeGraphText(lg,cout,IO::RG_EdgeList);

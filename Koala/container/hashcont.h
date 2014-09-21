@@ -133,7 +133,7 @@ namespace Koala
 		{
 		public:
 			// explicit pointer truncation in 64bit
-			size_t operator()( KeyType key, size_t m ) const
+			 size_t operator()( KeyType key, size_t m ) const
 				{ return ((uint64_t)(uint32_t)(((uint32_t)(size_t)key) * 2654435769u) * m) >> 32; }
 		};
 
@@ -144,7 +144,7 @@ namespace Koala
 		template<class KeyType>
 		class FloatHash {
 		public:
-			size_t operator ()(KeyType key, size_t m) const {
+			 size_t operator ()(KeyType key, size_t m) const {
 				// explicit pointer truncation in 64bit
 				uint64_t iv = key * 2654435769u;
 				iv = iv ^ (iv >> 32);
@@ -159,7 +159,7 @@ namespace Koala
 		class StringHash
 		{
 		public:
-			size_t operator()( const std::string &key, size_t m ) const;
+			inline size_t operator()( const std::string &key, size_t m ) const;
 		};
 
 		/*

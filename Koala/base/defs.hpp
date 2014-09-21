@@ -1,16 +1,5 @@
 // AlgsDefaultSettings
 
-template< class Iterator > void AlgsDefaultSettings::sort( Iterator first, Iterator last )
-{
-	std::make_heap( first,last );
-	std::sort_heap( first,last );
-}
-
-template< class Iterator, class Comp > void AlgsDefaultSettings::sort( Iterator first, Iterator last, Comp comp )
-{
-	std::make_heap( first,last,comp );
-	std::sort_heap( first,last,comp );
-}
 
 // BlackHole
 

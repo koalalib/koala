@@ -94,9 +94,9 @@ template< class DefaultStructs > template< class GraphType >
 }
 
 template< class DefaultStructs > template< class GraphType >
-	int IsItPar< DefaultStructs >::almostTree( const GraphType &g )
+	int IsItPar< DefaultStructs >::almostTree( const GraphType &g, bool allowmulti )
 {
-	if (!undir( g,false )) return -1;
+	if (!undir( g,allowmulti )) return -1;
 	int n,m;
 	int LOCALARRAY( comptab,(n = g.getVertNo()) + (m = g.getEdgeNo()) + 1 );
 	int LOCALARRAY( compE,n + m + 1 );
@@ -212,7 +212,7 @@ template< class DefaultStructs > template< class GraphType, class Iter >
 	int n = g.getVertNo();
 	typename GraphType::PVertex LOCALARRAY( tabE,n );
 	int licz = Bipartite::getPart( g,tabE,false );
-	if (licz == -1) return -1;
+	if (licz == -1 || licz == 0 || licz == n) return -1;
 	if (licz * (n - licz) != g.getEdgeNo( EdUndir )) return -1;
 	if (!isBlackHole( out ))
 		for( int i = 0; i < licz; i++ )
@@ -710,7 +710,7 @@ template< class DefaultStructs > template< class Graph, class IterOut >
 	int n;
 	typename DefaultStructs:: template AssocCont< typename Graph::PVertex,EmptyVertInfo >::Type
 															res( n = g.getVertNo() );
-	maxStable( g,assocInserter( res, ConstFunctor<EmptyVertInfo>(EmptyVertInfo()) ) );
+	if (maxStable( g,assocInserter( res, ConstFunctor<EmptyVertInfo>(EmptyVertInfo()) ) )==-1) return -1;
 	for(typename Graph::PVertex v=g.getVert();v;v=g.getVertNext(v))
 			if (! res.hasKey(v))
 			{
