@@ -690,7 +690,8 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class Itera
 template< class VertInfo, class EdgeInfo, class Settings > template< class Iterator >
 	int Graph< VertInfo,EdgeInfo,Settings >::rev2( Iterator begin, Iterator end )
 {
-    typename Settings:: template RepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> reps(begin,end);
+    typename Privates::GraphRepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge, Settings>
+        reps(begin,end);
 	return rev( reps.buf,reps.buf + reps.len);
 }
 
@@ -753,7 +754,8 @@ template< class VertInfo, class EdgeInfo, class Settings > inline int Graph< Ver
 template< class VertInfo, class EdgeInfo, class Settings > template < class Iterator >
 	int Graph< VertInfo,EdgeInfo,Settings >::delVerts2( Iterator begin, Iterator end )
 {
-    typename Settings:: template RepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> reps(begin,end);
+    typename Privates::GraphRepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex, Settings>
+        reps(begin,end);
 	return delVerts( reps.buf,reps.buf + reps.len );
 }
 
@@ -820,7 +822,8 @@ int Graph<VertInfo,EdgeInfo,Settings>::delEdges( PVertex vert1, PVertex vert2, E
 template< class VertInfo, class EdgeInfo, class Settings > template< class Iterator >
 	int Graph< VertInfo,EdgeInfo,Settings >::delEdges2( Iterator begin, Iterator end, EdgeType direct )
 {
-    typename Settings:: template RepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> reps(begin,end);
+    typename Privates::GraphRepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge, Settings>
+        reps(begin,end);
 	return delEdges( reps.buf,reps.buf + reps.len,direct );
 }
 
@@ -889,7 +892,8 @@ template< class VertInfo, class EdgeInfo, class Settings >
 template< class VertInfo, class EdgeInfo, class Settings > template< class Iterator >
 	int Graph< VertInfo,EdgeInfo,Settings >::delParals2( Iterator begin, Iterator end, PEdge edge, EdgeDirection reltype )
 {
-    typename Settings:: template RepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> reps(begin,end);
+    typename Privates::GraphRepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge, Settings>
+        reps(begin,end);
 	return delParals( reps.buf,reps.buf + reps.len,edge,reltype );
 }
 
@@ -1117,7 +1121,8 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class Itera
 	typename Graph< VertInfo,EdgeInfo,Settings >::PVertex
 	Graph< VertInfo,EdgeInfo,Settings >::glue2( Iterator begin, Iterator end, bool makeloops, PVertex res )
 {
-    typename Settings:: template RepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> reps(begin,end);
+    typename Privates::GraphRepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex, Settings>
+        reps(begin,end);
 	return glue( reps.buf,reps.buf + reps.len,makeloops,res );
 }
 
@@ -1270,7 +1275,8 @@ template< class VertInfo, class EdgeInfo, class Settings >
     std::pair<int,int> Graph< VertInfo,EdgeInfo,Settings >::move2( Graph< VertInfo,EdgeInfo,Settings > &graph,
     Iterator beg, Iterator end, EdgeType mask)
 {
-    typename Settings:: template RepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex> reps(beg,end);
+    typename Privates::GraphRepsDeleter< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex, Settings>
+        reps(beg,end);
 	return move(  graph,beg, end, mask );
 }
 

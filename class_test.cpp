@@ -171,6 +171,7 @@ using namespace std;
         Graph<char, char>::PVertex u,v,w;
 
 
+
         u=g.addVert('A');
         v=g.addVert('B');
         w=g.addVert('C');
@@ -197,10 +198,40 @@ using namespace std;
         for(int i=0;i<5;i++) cout << tab[i]<<' ';
 
         Graph<char, char>::PVertex tabvv[]={u,v,w,v,u};
+        Graph<char, char>::PEdge tabee[]={g.getEdge(),g.getEdgeLast(),g.getEdge()};
         for (int i=0;i<5;i++) cout << tabvv[i] <<' ';
         cout << "\n";
-        GrDefaultSettings<EdAll,true >::RepsDeleter<Graph<char, char>::PVertex> reps(tabvv,tabvv+5);
+        Koala::Privates::GraphRepsDeleter<Graph<char, char>::PVertex, GrDefaultSettings<EdAll,true > > reps(tabvv,tabvv+5);
         for (int i=0;i<reps.len;i++) cout << reps.buf[i] <<' ';
+        g.rev2(tabee,tabee+3);
+       g.findParals2(std::make_pair(blackHole,blackHole),tabee,tabee+3);
+        g.delEdges2(tabee,tabee+2);
+        g.delVerts2(tabvv,tabvv+2);
+
+     }
+
+{
+        cout << "\n............\n";
+        Graph<char, char> g;
+        Graph<char, char>::PVertex u,v,w,x,tabv[10];
+
+
+
+        u=g.addVert('A');
+        v=g.addVert('B');
+        w=g.addVert('C');
+        x=g.addVert('D');
+        g.addEdge(u,v);
+        g.addEdge(u,w);
+        g.addEdge(u,x);
+        g.addEdge(u,v);
+        g.addEdge(u,w);
+        g.addLoop(u);
+
+        int res=g.getClNeighs(tabv,u);
+        cout  << res;
+        for(int i=0;i<res;i++) cout << tabv[i]->info << ' ';
+
 
      }
 	return 0;
