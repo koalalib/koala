@@ -329,24 +329,22 @@ template< class GraphType > std::pair< typename ConstGraphMethods< GraphType >::
 template< class GraphType > template< class OutputIterator >
 	int ConstGraphMethods< GraphType>::getNeighs( OutputIterator out, PVertex vert, EdgeDirection direct ) const
 {
-	koalaAssert( vert,GraphExcNullVert );
+    koalaAssert( vert,GraphExcNullVert );
 	PVertex LOCALARRAY( ans,self.root().getEdgeNo( vert,direct ) );
-	int size = 0, res = 0;
+	int size = 0;
 	PEdge edge = this->getEdge( vert,direct );
 	while (edge)
 	{
 		ans[size++] = this->getEdgeEnd( edge,vert );
 		edge = self.getEdgeNext( vert,edge,direct );
 	}
-	GraphSettings::sort( ans,ans + size );
+	size = Privates::GraphRepsDeleter< PVertex, GraphSettings>::template clear( ans,ans + size );
 	for( int i = 0; i < size; i++ )
-		if (i == 0 || ans[i - 1] != ans[i])
 		{
 			*out = ans[i];
 			++out;
-			++res;
 		}
-	return res;
+	return size;
 }
 
 template< class GraphType > Set< typename ConstGraphMethods< GraphType >::PVertex >
@@ -371,22 +369,20 @@ template< class GraphType > template< class OutputIterator >
 	koalaAssert( vert,GraphExcNullVert );
 	PVertex LOCALARRAY( ans,self.root().getEdgeNo( vert,direct ) + 1 );
 	ans[0] = vert;
-	int size = 1, res = 0;
+	int size = 1;
 	PEdge edge = this->getEdge( vert,direct );
 	while (edge)
 	{
 		ans[size++] = this->getEdgeEnd( edge,vert );
 		edge = self.getEdgeNext( vert,edge,direct );
 	}
-	GraphSettings::sort( ans,ans + size );
+	size = Privates::GraphRepsDeleter< PVertex, GraphSettings>::template clear( ans,ans + size );
 	for( int i = 0; i < size; i++ )
-		if (i == 0 || ans[i - 1] != ans[i])
 		{
 			*out = ans[i];
 			++out;
-			++res;
 		}
-	return res;
+	return size;
 }
 
 template< class GraphType> EdgeDirection ConstGraphMethods< GraphType>::
@@ -553,7 +549,7 @@ template< class GraphType > template< class IterOut1, class IterOut2, class Iter
 	std::pair< int,int > ConstGraphMethods< GraphType>::findParals2( std::pair< IterOut1,IterOut2 > out,
 		Iterator begin, Iterator end, EdgeType relType ) const
 {
-    typename GraphSettings:: template RepsDeleter< PEdge> reps(begin,end);
+    typename Privates::GraphRepsDeleter< PEdge, GraphSettings> reps(begin,end);
 	return this->findParals(out, reps.buf,reps.buf + reps.len,relType );
 }
 

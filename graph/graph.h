@@ -14,6 +14,75 @@
 namespace Koala
 {
 
+    namespace Privates {
+
+        template <class T> class RepsDeleterBase {
+
+                RepsDeleterBase(const RepsDeleterBase&) {}
+                RepsDeleterBase& operator=(const RepsDeleterBase&) {}
+
+            public:
+
+                T* buf;
+                int len;
+
+                 RepsDeleterBase() : buf(0), len(0) {}
+                ~RepsDeleterBase()
+                {   if (buf) delete [] buf;  }
+        };
+
+    }
+
+    template <class T,class Settings> class AssocRepsDeleterBase : public Privates::RepsDeleterBase<T>
+    {
+        public:
+
+        template <class Iter>
+        void init(Iter beg, Iter end, int n)
+        {
+            typename Settings::template VertEdgeAssocCont< T,EmptyVertInfo >::Type res(n);
+            for(Iter i=beg;i!=end;++i) if (*i) res[*i]=Koala::EmptyVertInfo();
+            this->buf = new T[res.size()];
+            this->len=res.getKeys(this->buf);
+        }
+
+        template <class Iter>
+        static int clear(Iter beg, Iter end)
+        {
+            typename Settings::template VertEdgeAssocCont< T,EmptyVertInfo >::Type res(end-beg);
+            for(Iter i=beg;i!=end;++i) if (*i) res[*i]=Koala::EmptyVertInfo();
+            return res.getKeys(beg);
+        }
+    };
+
+    template <class T,class Settings> class SortRepsDeleterBase : public Privates::RepsDeleterBase<T>
+    {
+        public:
+
+            template <class Iter>
+            void init(Iter beg, Iter end, int n)
+            {
+                this->len=0;
+                for(Iter i=beg;i!=end;++i) if (*i) this->len++;
+                this->buf = new T[this->len];
+                this->len=0;
+                for(Iter i=beg;i!=end;++i) if (*i)
+                {
+                    this->buf[this->len++]=*i;
+                }
+                Settings::template sort( this->buf,this->buf + this->len );
+                this->len =std::unique( this->buf,this->buf + this->len ) - this->buf;
+            }
+
+            template <class Iter>
+            static int clear(Iter beg, Iter end)
+            {
+                Settings::template sort( beg,end);
+                return std::unique( beg,end ) - beg;
+            }
+    };
+
+
 	// Domyslne wytyczne parametryzujace strukture i dzialanie metod klasy grafu
 	// TODO: przetestowac dzialanie grafu przy roznych ustawieniach
 
@@ -34,6 +103,7 @@ namespace Koala
 	template< EdgeType edAllow, bool adjMatrixAllowed > class GrDefaultSettings
 	{
 	public:
+
 		// maska okreslajaca dopuszczalne typy krawedzi
 		//WEN: opis
 		enum { EdAllow = edAllow };
@@ -185,73 +255,44 @@ namespace Koala
 //            std::sort( first,last,comp );
 //       }
 
-        //NEW: klasa usuwajaca ew. powtorzenia z ciagow wejsciowych podanych miedzy iteratorami - filtruje
+        //NEW: klasa usuwajaca ew. powtorzenia i wartosci zerowe z ciagow wejsciowych podanych miedzy iteratorami - filtruje
         // wejscie w roznych metodach
-        template <class T> class RepsDeleter {
 
-                RepsDeleter(const RepsDeleter&) {}
-                RepsDeleter& operator=(const RepsDeleter&) {}
-
-                template <class Iter>
-                void init(Iter beg, Iter end, int n)
-                {
-                    typename VertEdgeAssocCont< T,EmptyVertInfo >::Type res(n);
-                    for(Iter i=beg;i!=end;++i) if (*i) res[*i]=Koala::EmptyVertInfo();
-                    buf = new T[res.size()];
-                    len=res.getKeys(buf);
-                }
-
-                //NEW: druga mozliwosc:
-//                template <class Iter>
-//                void init(Iter beg, Iter end, int n)
-//                {
-//                    len=0;
-//                    for(Iter i=beg;i!=end;++i) if (*i) len++;
-//                    buf = new T[len];
-//                    len=0;
-//                    for(Iter i=beg;i!=end;++i) if (*i)
-//                    {
-//                        buf[len++]=*i;
-//                    }
-//                    sort( buf,buf + len );
-//                    len =std::unique( buf,buf + len ) - buf;
-//                }
-
-            public:
-
-                T* buf;
-                int len;
-
-                template <class Iter>
-                RepsDeleter(Iter beg, Iter end)
-                {
-                    int size=0;
-                    for(Iter i=beg;i!=end;++i) size++;
-                    init(beg,end,size);
-                }
-
-                RepsDeleter(T* beg,T* end)
-                {
-                    init(beg,end,end-beg);
-                }
-
-                RepsDeleter(const T* beg,const T* end)
-                {
-                    init(beg,end,end-beg);
-                }
-
-
-                ~RepsDeleter()
-                {
-                    delete [] buf;
-                }
-
-        };
+        template <class T,class Settings> class RepsDeleter
+            : public AssocRepsDeleterBase<T, Settings>
+        //Inna mozliwosc
+        //  : public SortRepsDeleterBase<T, Settings>
+        {};
 
 	};
 
 	namespace Privates
 	{
+
+        template <class T,class Settings> class GraphRepsDeleter : public Settings:: template RepsDeleter<T, Settings>
+        {
+            public:
+
+                template <class Iter>
+                GraphRepsDeleter(Iter beg, Iter end)
+                {
+                    int size=0;
+                    for(Iter i=beg;i!=end;++i) size++;
+                    this->init(beg,end,size);
+                }
+
+                GraphRepsDeleter(T* beg,T* end)
+                {
+                    this->init(beg,end,end-beg);
+                }
+
+                GraphRepsDeleter(const T* beg,const T* end)
+                {
+                    this->init(beg,end,end-beg);
+                }
+
+        };
+
 		/* DummyVar
 		 * Do uzytku wewnetrznego, typ zmiennej udajacej int lub wskaznik, przypisywalny z i konwertowalny do takiego
 		 * typu
