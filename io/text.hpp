@@ -26,15 +26,15 @@ struct Lapacz {
 };
 
 //template <class T>
-OperTest operator<<(OperTest arg1,Lapacz) { return OperTest();}
+inline OperTest operator<<(OperTest arg1,Lapacz) { return OperTest();}
 
 //template <class T>
-OperTest operator>>(OperTest arg1,Lapacz) { return OperTest();}
+inline OperTest operator>>(OperTest arg1,Lapacz) { return OperTest();}
 
 template <class T>
-char makeOper(const T& arg) { return 'a';}
+inline char makeOper(const T& arg) { return 'a';}
 
-OperTest makeOper(const OperTest&) { return OperTest(); }
+inline OperTest makeOper(const OperTest&) { return OperTest(); }
 
 template <class T>
 struct PrivHasOperOut {
@@ -81,7 +81,7 @@ struct ReadWriteHlp<true> {
  * @param[out] out string stream to put info to
  * @return true on success, false otherwise
  */
-static bool readObjectInfo(std::istream &strm, std::istringstream &out) {
+inline bool readObjectInfo(std::istream &strm, std::istringstream &out) {
 	int parCount = 0;
 	char c;
 	bool escape;
@@ -118,7 +118,7 @@ static bool readObjectInfo(std::istream &strm, std::istringstream &out) {
  * @param[out] id place to put the read id to
  * @return true when id was read, false if there is no id to read or on error
  */
-bool readOutputId(std::istream &strm, unsigned int &id) {
+inline bool readOutputId(std::istream &strm, unsigned int &id) {
 	char at;
 	if(!(bool)(strm >> at)) return false;
 	if(at != '@') { strm.unget(); return false; };
