@@ -657,8 +657,8 @@ namespace Koala
 	protected:
 		mutable Privates::BlockList< BlockOfAssocArray< Klucz,Elem >,Container > tab;
 
-		virtual void DelPosCommand( int pos ) { tab.delPos( pos ); }
-		virtual AssocContReg &getReg( int pos ) { return tab[pos].assocReg; }
+		inline virtual void DelPosCommand( int pos ) { tab.delPos( pos ); }
+		inline virtual AssocContReg &getReg( int pos ) { return tab[pos].assocReg; }
 
 	public:
 		typedef Klucz KeyType; /**< \brief Type of key. */
@@ -1112,7 +1112,7 @@ namespace Koala
 			}
 			// i odwrotnie
 			Klucz pos2klucz( int );
-			virtual void DelPosCommand( int );
+			inline virtual void DelPosCommand( int );
 
 			friend class AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >;
 		};
@@ -1752,7 +1752,7 @@ namespace Koala
 			}
 			// i odwrotnie
 			Klucz pos2klucz( int );
-			virtual void DelPosCommand( int pos)
+			inline virtual void DelPosCommand( int pos)
             {
                 int LOCALARRAY( tabpos,IndexContainer::size() );
                 int l = 0;
