@@ -63,6 +63,11 @@ void printGraph(Koala::Graph<OpisV,OpisE>& g);
 void dir2str(Koala::EdgeDirection dir, std::string & dirStr );
 
 #include "main.hpp"
+	Koala::Graph<OpisV, OpisE> g0;
+
+	Koala::Creator::empty(g0, 7);
+
+	Koala::Creator::empty(g0, 7, Koala::ConstFunctor <OpisV>());
 
 	Koala::Graph<OpisV,OpisE> g1;
 

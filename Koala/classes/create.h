@@ -30,12 +30,32 @@ namespace Koala
 	public:
 //TODO:
 //          - chocby szczatkowy opis numeracji wprowadzanych wierzcholkow np. zakres+kolejnosc (trzeba ja znac, by napisac funktor generujacy)
-//	      - przydalo by sie, zeby cycle dzialal takze dla n=1 generujac wierzcholek z petlami (o liczbie zaleznej od maski, podobnie
-//          jak przy n>1, tyle ze tym razem ta/te krawedzie sila rzeczy musza byc petlami, bo nie mamy petli Directed/Undiected)                                                                                              )
-//          - jeszcze poprosze o
-//            typename GraphType::PVertex empty( GraphType &g, int n,  VInfoGen vInfoGen)
-//            typename GraphType::PVertex empty( GraphType &g, int n)
-//            bo zauwazylem, ze nigdzie nie mamy konstruktora hurtowo wprowadzajacego serie wierzcholkow izolowanych
+		
+		//NEW
+		/** \brief Create empty graph.
+		*
+		*  The function generates an empty graph.
+		*
+		*  \param g  the input/output graph,
+		*  \param n  number of vertices to create,
+		*  \param vInfoGen  generator for info objects for vertices used in form: vInfoGen(num),
+		*   \retrun the pointer to the first added vertex.*/
+		template< class GraphType, class VInfoGen >
+		static typename GraphType::PVertex empty(GraphType &g, int n, VInfoGen vInfoGen);
+
+
+		//NEW
+		/** \brief Create empty graph.
+		*
+		*  The function generates an empty graph.
+		*
+		*  \param g  the input/output graph,
+		*  \param n  number of vertices to create,
+		*  \param vInfoGen  generator for info objects for vertices used in form: vInfoGen(num),
+		*   \retrun the pointer to the first added vertex.*/
+		template< class GraphType >
+		static typename GraphType::PVertex empty(GraphType &g, int n);
+	
 		/** \brief Create clique.
 		 *
 		 *  The function generates a clique, i.e. for every two vertices, there is created a connection
