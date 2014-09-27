@@ -60,6 +60,23 @@ template< class GraphType, class EInfoGen > typename GraphType::PEdge
 	return pEdge;
 }
 
+template< class GraphType, class VInfoGen >
+typename GraphType::PVertex Creator::empty(GraphType &g, int n, VInfoGen vInfoGen)
+{
+	if (n <= 0) return NULL;
+
+	typename GraphType::PVertex LOCALARRAY(vTab, n);
+
+	addVertices2Tab(g, vTab, n, 0, EdNone, vInfoGen, Koala::ConstFunctor< typename GraphType::EdgeInfoType >());
+	return vTab[0];
+}
+
+template< class GraphType>
+typename GraphType::PVertex Creator::empty(GraphType &g, int n)
+{
+	return empty(g, n, Koala::ConstFunctor< typename GraphType::VertInfoType >());
+}
+
 template< class GraphType, class VInfoGen, class EInfoGen >
 	typename GraphType::PVertex Creator::clique( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection dir )
 {
@@ -109,10 +126,16 @@ template< class GraphType >
 template< class GraphType, class VInfoGen, class EInfoGen > typename GraphType::PVertex
 	Creator::cycle( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection dir )
 {
+	if (n <= 0) return NULL;
 	typename GraphType::PVertex firstVertex = NULL, pathVertex = NULL, tempVertex = NULL;
 
 	firstVertex = addVertices( g,1,0,dir,vInfoGen,eInfoGen ).first;
-	if (n < 2) return firstVertex;
+	if (n < 2) {
+		if (dir & EdUndir) g.addEdge( firstVertex,firstVertex,eInfoGen( 0,0,EdUndir ),EdLoop );
+		if (dir & EdDirIn) g.addEdge( firstVertex,firstVertex,eInfoGen( 0,0,EdDirIn ),EdLoop );
+		if (dir & EdDirOut) g.addEdge( firstVertex,firstVertex,eInfoGen( 0,0,EdDirOut ),EdLoop );
+		return firstVertex;
+	}
 	pathVertex = firstVertex;
 	for( int i = 1; i < n; i++ )
 	{
