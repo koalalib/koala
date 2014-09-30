@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "Koala/tools/drawcreator.h"
+//Ponizsze oczywiscie pozostaje zakomentowane w razie uzycia porzadnym projekcie wielomodulowym :-)
 //#include "Koala/tools/drawcreator.cpp"
 #include "Koala/io/text.h"
 #include "Koala/graph/graph.h"
