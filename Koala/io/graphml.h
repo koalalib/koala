@@ -18,6 +18,8 @@ typedef __int64 int64_t;
 namespace Koala {
 namespace IO {
 
+//TODO: generalnie brakuje inlineow (a jakby chciec porzadnie, to i constow) przy metodach nieszablonowych - beda klopoty z linkerem
+
 class GraphMLGraph;
 class GraphMLKeysRead;
 class GraphMLKeysWrite;
@@ -396,6 +398,7 @@ public:
 	 *  \param name the considered key.
 	 *  \param attrName the name for attr.name.
 	 *  \return true if the name was successfully set, false otherwise.*/
+    //WEN: czy ustawinie attrName ponowne dla danego name nadpisuje stary attr.name, czy tez jest bledem?
 	bool setKeyAttrName(const char *name, const char *attrName);
 
 	/** \brief Get attr.name associated with key.
@@ -405,6 +408,8 @@ public:
 	 *  \param name the checked key.
 	 *  \return the string with the attr.name of the key \a name.*/
 	std::string getKeyAttrName(const char *name);
+
+//TODO: do kompletu brakuje bool delKeyAttrName(const char *name); tzn. usuwanie attr.name keya bez usuwania samego keya
 private:
 	template<GraphMLKeyTypes::Type, typename InType>
 	bool set(const char *name, InType val);
