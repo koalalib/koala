@@ -710,17 +710,17 @@ namespace Koala
 	 *  \tparam Info class of object info.
 	 *  \tparam T type of compared field.
 	 *  \ingroup DMchooser */
-	template< class Info, class T > struct FielBoolChooser //WEN: dla kazdego
+	template< class Info, class T > struct FieldBoolChooser //WEN: dla kazdego
 	{
 		T Info:: *wsk;/**<  \brief Pointer to tested member.*/
 
 		/** \brief  Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
-		typedef FielBoolChooser< Info,T > ChoosersSelfType;
+		typedef FieldBoolChooser< Info,T > ChoosersSelfType;
 
 		/** \brief Constructor
 		 *
 		 *  Decides which members of info are to be checked. */
-		FielBoolChooser( T Info::*arg = 0): wsk( arg ) { }
+		FieldBoolChooser( T Info::*arg = 0): wsk( arg ) { }
 
 		/** \brief Overloaded operator()
 		 *
@@ -737,7 +737,7 @@ namespace Koala
 	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Info, class T >
-		FielBoolChooser< Info,T > fieldChoose( T Info:: *wsk ) { return FielBoolChooser< Info,T >(wsk); }
+		FieldBoolChooser< Info,T > fieldChoose( T Info:: *wsk ) { return FieldBoolChooser< Info,T >(wsk); }
 
 	/* FielObjChooser
 	 * wlasny obiekt lub funkcja, ktora ma sie wykonywac dla konkretnego pola z info
@@ -826,7 +826,7 @@ namespace Koala
 			operator()( Elem *elem, const Graph &graph ) const { return std::find( begin,end,elem->info.*wsk ) != end; }
 	};
 
-	/** \brief Generating  function of FielContainerChooser.
+	/** \brief Generating  function of FieldContainerChooser.
 	WEN: opis param.
 	 *  \ingroup DMchooser*/
 	template< class Info, class T, class Iter > FieldContainerChooser< Info,T,Iter >
