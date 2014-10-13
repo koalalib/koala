@@ -1639,3 +1639,129 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	return col;
 }
 
+template <class DefaultStructs>
+template< typename Graph, typename ColorMap >
+int VertColoringPar<DefaultStructs>::color(const Graph &graph, ColorMap &colors)
+{
+	return colorIterative(graph, colors, -1, graph.getVertNo() + 1);
+}
+
+template <class DefaultStructs>
+template< typename Graph, typename ColorMap >
+int VertColoringPar<DefaultStructs>::color(const Graph &graph, ColorMap &colors, int maxColor)
+{
+	int colorNo = colorIterative(graph, colors, maxColor, maxColor + 1);
+	return colorNo > maxColor ? -1 : colorNo;
+}
+
+template <class DefaultStructs>
+template< typename Graph, typename ColorMap >
+int VertColoringPar<DefaultStructs>::colorIterative(const Graph &graph, ColorMap &colors, int maxColor, int upperBound)
+{
+	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	typedef typename Graph::PVertex Vert;
+	typedef typename Graph::PEdge Edge;
+	typedef std::vector<bool> ColorSet;
+	typedef std::vector<bool> IndexSet;
+	typedef typename DefaultStructs::template AssocCont<Vert, EmptyVertInfo>::Type VertSet;
+
+	int n = graph.getVertNo(), r = 0, max_used = 0, index = -1, color;
+	typename DefaultStructs::template AssocCont<Vert, int>::Type colors_temp(n);
+	for(Vert v=graph.getVert();v;v=graph.getVertNext(v)) if (colors.hasKey(v)) colors_temp[v]=colors[v];
+	Vert LOCALARRAY(vertices, n);
+	graph.getVerts(vertices);
+    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
+
+	ColorSet LOCALARRAY(FC, n);
+	IndexSet CP, LOCALARRAY(P, n);
+	Vert u, v;
+	for(int i = 0; i < n; i++)
+	{
+		VertSet neighbours(graph.getEdgeNo(vertices[i], Mask));
+		for(Edge e = graph.getEdge(v = vertices[i], Mask); e; e = graph.getEdgeNext(v, e, Mask))
+			if(!colors.hasKey(u = graph.getEdgeEnd(e, v)))
+				neighbours[u];
+
+		P[i].assign(n, false);
+		for(int j = 0; j < i; j++)
+			if(neighbours.hasKey(vertices[j]))
+			{
+				P[i].at(j) = true;
+				for(int k = 0; k < n; k++)
+					if(P[j].at(k))
+						P[i].at(k) = true;
+			}
+	}
+
+	bool found = true;
+	CP.assign(n, false);
+	while(found)
+	{
+		for(int i = r; i < n; i++)
+		{
+			if(r == 0 || r < i)
+			{
+				FC[i].assign(n + 1, false);
+				for(int j = ((max_used + 1 < upperBound - 1) ? max_used + 1 : upperBound - 1); j > 0; j--)
+					FC[i].at(j) = true;
+
+				for(Edge e = graph.getEdge(v = vertices[i], Mask); e; e = graph.getEdgeNext(v, e, Mask))
+					if(colors_temp.hasKey(u = graph.getEdgeEnd(e, v)))
+						FC[i].at(colors_temp[u]) = false;
+			}
+
+			for(color = 1; color <= n; color++)
+				if(FC[i].at(color))
+					break;
+
+			if(color >= upperBound)
+			{
+				r = i, found = false;
+				break;
+			}
+			colors_temp[vertices[i]] = color;
+			if(color > max_used)
+				max_used = color, index = i;
+		}
+
+		if(found)
+		{
+			colors = colors_temp, upperBound = max_used, r = index;
+			if(upperBound <= maxColor)
+				return upperBound;
+		}
+
+		found = false;
+		for(int i = 0; i < n; i++)
+			if(P[r].at(i))
+				CP.at(i) = true;
+		while(!CP.empty())
+		{
+			int i = *(CP.begin());
+			for(i = n - 1; i >= 0; i--)
+				if(CP.at(i))
+					break;
+
+			if(i < 0)
+				break;
+			CP.at(i) = false, FC[i].at(colors_temp[vertices[i]]) = false;
+
+			for(color = 1; color <= n; color++)
+				if(FC[i].at(color))
+					break;
+
+			if(color <= n)
+			{
+				r = i, found = true, max_used = 0, index = 0;
+				for(int j = r + 1; j < n; j++)
+					colors_temp.delKey(vertices[j]);
+				for (typename Graph::PVertex k = colors_temp.firstKey(); k; k = colors_temp.nextKey(k))
+					if(colors[k] > max_used)
+						max_used = colors[k];
+				break;
+			}
+		}
+	}
+
+	return upperBound;
+}

@@ -436,8 +436,8 @@ int main(void) {
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
     } std::cout << std::endl;
-    isIndependentStr = (Koala::MISHeuristic::isStable(g, tabV, &tabV[result])) ? "YES" : "NO";
-    isMaxIndependentStr = (Koala::MISHeuristic::isMaxStable(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[result])) ? "YES" : "NO";
     std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
     std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
     std::cout << std::endl; clearOutput();

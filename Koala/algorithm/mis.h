@@ -6,7 +6,6 @@
 #include "../graph/graph.h"
 #include "search.h"
 
-
 namespace Koala
 {
 
@@ -343,6 +342,77 @@ namespace Koala
 	 *
 	 *  \ingroup DMmis */
 	class MISHeuristic: public MISHeuristicPar< Koala::AlgsDefaultSettings > {};
+
+    /*
+    * Class for maximum independent set - exact algorithm.
+    *
+    * Based on:
+    * F. V. Fomin, F. Grandoni i D. Kratsch.
+    * Measure & conquer: A simple O(2^0.288n) independent set algorithm.
+    * ACM-SIAM Symposium on Discrete Algorithms (SODA), 18–25, 2006.
+    *
+    */
+
+    class LocalGrAdjMatrSettings : public AlgsDefaultSettings
+	{
+	public:
+
+		template< class A, class B, EdgeType mask> class LocalGraph
+		{
+		public:
+			typedef Graph< A,B,GrDefaultSettings< mask,true > > Type;
+		};
+
+	};
+
+    //NEW:
+    template< class DefaultStructs > class MISPar : private MISHeuristicPar<DefaultStructs>
+    {
+      public:
+        /*
+        * Calculate maximum independent set.
+        *
+        * Input:
+        *   g    - graph to process
+        *   out  - iterator to the output independent set
+        *
+        * Output:
+        *   number of vertices in the maximum independent set
+        *
+        */
+        //NEW: znajduje najliczniejszy zbior niezalezny (procedura niewielomianowa). Jesli w trakcie szukania
+        //wykryje, ze rozmiar minSize jest nieosioagalny, przerywa zwracajac -1
+        template< class GraphType, class OutputIterator > static int
+            get( GraphType & g, OutputIterator out, int minSize = 0);
+
+        //NEW: znajduje zbior niezalezny mocy >= minSize (procedura niewielomianowa). Jesli w trakcie szukania
+        //wykryje, ze rozmiar minSize jest nieosioagalny, przerywa zwracajac -1
+        template< class GraphType, class OutputIterator > static int
+            getSome( GraphType & g, OutputIterator out, int minSize);
+
+            using MISHeuristicPar<DefaultStructs>::isStable;
+            using MISHeuristicPar<DefaultStructs>::isMaxStable;
+
+      private:
+        /*
+        * Maximum independent set - inner, recursive.
+        */
+        template< class GraphType, class OutputIterator > static int
+            get( GraphType & g, OutputIterator out, int minSize, bool skipsearchiffound);
+        template< class GraphType, class OutputIterator > static int
+            getRecursive( GraphType &g, OutputIterator out, bool isConnectedComponent, bool outblackhole, int minSize, bool skipsearchiffound );
+		template< class GraphType, class OutputIterator > static int
+			getMirrors( const GraphType & g, typename GraphType::PVertex v, OutputIterator out);
+        template< class GraphType, class InputIterator > static bool
+			isClique( const GraphType &g, InputIterator beg, InputIterator end );
+        template< class GraphType > static bool
+			isDominated( const GraphType &g, typename GraphType::PVertex u, typename GraphType::PVertex v );
+        template< class GraphType > static bool
+			isFoldable( const GraphType &g, typename GraphType::PVertex v );
+    };
+
+    class MIS: public MISPar< Koala::LocalGrAdjMatrSettings > {};
+    //class MIS: public MISPar< Koala::AlgsDefaultSettings > {};
 
 
 #include "mis.hpp"
