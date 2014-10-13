@@ -11,6 +11,8 @@
 #include "../graph/view.h"
 #include "../algorithm/search.h"
 
+#include <set>
+
 namespace Koala {
 
 /* ------------------------------------------------------------------------- *
@@ -741,6 +743,23 @@ public:
  */
 class GisVertColoring: public GisVertColoringPar<AlgsDefaultSettings> {};
 
+//NEW: kolorowanie wierzcholkowe klasyczne - procedury niewielomianowe
+template<class DefaultStructs>
+class VertColoringPar: public VertColoringTest {
+	public:
+	    //NEW: znajduje optymalne pokolorowanie
+		template<typename Graph, typename ColorMap>
+		static int color(const Graph &graph, ColorMap &colors);
+		//NEW: znajduje pokolorowanie o najwiekszym kolorze <=maxColor. Jesli w trakcie pracy
+		//wykryje, ze jest to niemozliwe, zwraca -1
+		template<typename Graph, typename ColorMap>
+		static int color(const Graph &graph, ColorMap &colors, int maxColor);
+	private:
+		template<typename Graph, typename ColorMap>
+		static int colorIterative(const Graph &graph, ColorMap &colors, int maxColor, int upperBound);
+};
+
+class VertColoring: public VertColoringPar<AlgsDefaultSettings> {};
 
 #include "vertex.hpp"
 
