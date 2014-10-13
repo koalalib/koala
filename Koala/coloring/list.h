@@ -9,6 +9,8 @@
 
 #include "../base/defs.h"
 #include "../graph/view.h"
+#include "edge.h"
+#include "../classes/detect.h"
 
 //TODO: kolorowanie przy listach rozmiarow <=2 (wierzcholkowe, krawedziowe)
 //TODO: kolorowanie krawedziowe dwudzielnych przy listach rozmiarow >=Delta (tj. listowy Konig)
@@ -314,6 +316,23 @@ public:
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int color(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
+    //NEW: algorytm Galvina, kazda lista musi miec >=Delta barw, dopuszczalne kraw. rownolegle
+	/** \brief Color bipartite graph.
+	 *
+	 *  The method colors properly (concerning the partial coloring in map \a colors)  all the edges of bipartite \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].
+	 *  The result is saved in the map \a colors.
+
+	 *  For all vertices the number of available colors is greater or equal the graph degree.
+
+	 *  \param graph the considered graph.
+	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
+	 *  \param colors the associative container (PEdge->int)
+	 *     which assigns a colors (nonnegative integers) to the edges.
+	 *  \return the number of properly colored edges or -1 if none was possible.
+	 */
+	template<typename Graph, typename ColLists, typename ColorMap>
+	static int colorBipartite(const Graph &graph, const ColLists &colLists, ColorMap &colors);
+
 	//testing if graph is properly colored
 	/** \brief Test partial coloring.
 	 *
@@ -382,6 +401,27 @@ protected:
 		template<typename Graph, typename ColList, typename ColorMap>
 		int operator()(const Graph &graph, const ColList &colList,
 				const ColorMap &colors, typename Graph::PEdge edge);
+	};
+
+	struct EColorTakeBipart {
+		int color;
+		EColorTakeBipart(int c): color(c) {}
+		template<typename ColorSet> bool operator()(const ColorSet &cs) const {
+			return cs.isElement(color);
+		}
+	};
+
+	template<typename EVOrder, typename SetV>
+	struct EVOrderBipartite {
+		EVOrder *evOrder;
+		SetV *setV;
+		EVOrderBipartite(EVOrder *evO, SetV *sv): evOrder(evO), setV(sv) {}
+		template<typename Vert, typename Edge>
+		bool operator()(Vert v, Edge e1, Edge e2) { //bool compare(v,e1,e2)  returns true if \p e2 is better then \p e1 looking from \p v.
+			//bool compare(v,e1,e2) e2>e1 _v
+			if( setV->hasKey(v) ) return evOrder->operator[](e1) > evOrder->operator[](e2);
+			else return evOrder->operator[](e1) < evOrder->operator[](e2);
+		}
 	};
 };
 

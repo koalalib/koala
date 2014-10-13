@@ -41,7 +41,8 @@ template<typename Graph, typename ColLists, typename ColorMap,
 int ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, VIter beg, VIter end, ColorChooser chooser)
 {
-	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
+	if(DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getVertNo());
 	int cnt = 0;
 	while(beg!=end) {
 		if(!colorChoose(graph, colLists, colors, *beg, chooser))
@@ -57,7 +58,8 @@ template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
 int ListVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, VIter beg, VIter end)
 {
-	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
+	if(DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getVertNo());
 	int cnt = 0;
 	while(beg!=end) {
 		if(!color(graph, colLists, colors, *beg))
@@ -73,7 +75,8 @@ template<typename Graph, typename ColLists, typename ColorMap, typename ColorCho
 int ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, ColorChooser chooser)
 {
-	colors.reserve(graph.getVertNo());
+	if(DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getVertNo());
 	typedef typename Graph::PVertex Vert;
 	int cnt=0;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
@@ -89,7 +92,8 @@ template<typename Graph, typename ColLists, typename ColorMap>
 int ListVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors)
 {
-	colors.reserve(graph.getVertNo());
+	if(DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getVertNo());
 	typedef typename Graph::PVertex Vert;
 	int cnt=0;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
@@ -181,7 +185,7 @@ int ListVertColoringPar<DefaultStructs>::listColors(
 	const Graph &graph, const ColLists &colLists, Iter out)
 {
 	typedef typename Graph::PVertex Vert;
-	typedef typename ColLists::ValType ListType; //ListType have the Set interface
+	typedef typename ColLists::ValType ListType; //ListType has the Set interface
 	Set<int> colSet;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		ListType lt = colLists[vv];
@@ -198,7 +202,7 @@ Set<int> ListVertColoringPar<DefaultStructs>::listColorsSet(
 	const Graph &graph, const ColLists &colLists)
 {
 	typedef typename Graph::PVertex Vert;
-	typedef typename ColLists::ValType ListType; //ListType have the Set interface
+	typedef typename ColLists::ValType ListType; //ListType has the Set interface
 	Set<int> res;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		ListType lt = colLists[vv];
@@ -230,6 +234,9 @@ int ListVertColoringPar<DefaultStructs>::FirstFit::operator()(
 	else return maxVal+1;
 }
 
+//==============================================================================
+//============================= edge coloring ==================================
+//==============================================================================
 
 template <class DefaultStructs>
 template<typename Graph, typename ColLists, typename ColorMap, typename ColorChooser>
@@ -281,7 +288,9 @@ template<typename Graph, typename ColLists, typename ColorMap, typename EIter,
 int ListEdgeColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, EIter beg, EIter end, ColorChooser chooser)
 {
-    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
+	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	if(DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getEdgeNo(Mask));
 	int cnt=0;
 	while(beg!=end) {
 		if(!colorChoose(graph, colLists, colors, *beg, chooser))
@@ -297,7 +306,9 @@ template<typename Graph, typename ColLists, typename ColorMap, typename EIter>
 int ListEdgeColoringPar<DefaultStructs>::color(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, EIter beg, EIter end)
 {
-	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
+	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	if(DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getEdgeNo(Mask));
 	int cnt=0;
 	while(beg!=end) {
 		if(!color(graph, colLists, colors, *beg))
@@ -313,9 +324,10 @@ template<typename Graph, typename ColLists, typename ColorMap, typename ColorCho
 int ListEdgeColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, ColorChooser chooser)
 {
-	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
-	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	if(DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getEdgeNo(Mask));
+	typedef typename Graph::PEdge Edge;
 	int cnt=0;
 	for(Edge ee = graph.getEdge(Mask); ee; ee = graph.getEdgeNext(ee, Mask)) {
 		if(!colorChoose(graph, colLists, colors, ee, chooser))
@@ -330,14 +342,88 @@ template<typename Graph, typename ColLists, typename ColorMap>
 int ListEdgeColoringPar<DefaultStructs>::color(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors)
 {
-	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
-	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	if(DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getEdgeNo(Mask));
+	typedef typename Graph::PEdge Edge;
 	int cnt=0;
 	for(Edge ee = graph.getEdge(Mask); ee; ee = graph.getEdgeNext(ee, Mask)) {
 		if(!color(graph, colLists, colors, ee))
 			return cnt;
 		++cnt;
+	}
+	return cnt;
+}
+
+template <class DefaultStructs>
+template<typename Graph, typename ColLists, typename ColorMap>
+int ListEdgeColoringPar<DefaultStructs>::colorBipartite(const Graph &graph,
+	const ColLists &colLists, ColorMap &colors)
+{
+	/* 1. test bipartiteness
+	   2. color edges of the graph (edge coloring)
+	   3. foreach uncolored edge
+	     a) take a unused color c from the list of colors available to the edge
+	     b) create a subgraph induced by the color c (from vertices lists)
+	     c) find the stable matching of the subgraph
+	     d) color edges from the matching by color c
+	*/
+	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	if(DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getEdgeNo(Mask));
+	int lenTabV1, n=graph.getVertNo();
+	typename Graph::PVertex LOCALARRAY(tabV1, n);
+	typedef typename DefaultStructs::template AssocCont<typename Graph::PEdge, int>::Type EVWeight;
+	EVWeight evWeight( graph.getEdgeNo(Mask) ); //the edge coloring(not list coloring)
+	Set<int> usedColors;
+	typename DefaultStructs::template AssocCont<typename Graph::PVertex, EmptyVertInfo>::Type setV1(n);
+//	Set<typename Graph::PVertex> setV1;
+
+	// 1.
+	lenTabV1 = IsItPar<DefaultStructs>::Bipartite::getPart(graph, tabV1, true);
+	if(lenTabV1<0) return -1;
+	for(int i=0;i<lenTabV1;i++) setV1[tabV1[i]];
+//	setV1.assign(tabV1, lenTabV1);
+
+	typename Graph::PEdge LOCALARRAY(tabStMatch, lenTabV1);
+	// 2.
+	int colNo = SeqEdgeColoringPar<DefaultStructs>::greedyInter(graph, evWeight); //proper edge coloring
+	EVOrderBipartite<EVWeight, typename DefaultStructs::template AssocCont<typename Graph::PVertex, EmptyVertInfo>::Type >
+        evComparator(&evWeight, &setV1); //compare edges
+	// 3.
+	typename Graph::PEdge ee = graph.getEdge(Mask);
+	int cnt = 0;
+	while( ee ) {
+		if(colors.hasKey(ee)) {
+			ee = graph.getEdgeNext(ee, Mask);
+			continue;
+		}
+		// a)
+		typename ColLists::ValType eColList = colLists[ee]; //do zmiany??
+		if(eColList.size()<=0) return -1;
+		int curColor = eColList.first();
+		while(1) {
+			if(!usedColors.isElement(curColor))
+				break;
+			if(curColor==eColList.last()) return -1;
+			curColor = eColList.next(curColor);
+		}
+		// b)
+		// c)
+		int lenStMatch = StableMatchingPar<DefaultStructs>::bipartFind(
+				makeSubgraph(graph, std::make_pair(stdChoose(true),
+						!extAssocKeyChoose(&colors) && !edgeTypeChoose(Loop)
+                        && extAssocFChoose(&colLists,EColorTakeBipart(curColor)))),
+				tabV1, tabV1+lenTabV1,
+				evComparator, blackHole, tabStMatch);
+		// d)
+		if(lenStMatch<0) return -1;
+		while(lenStMatch) {
+			--lenStMatch;
+			colors[ tabStMatch[lenStMatch] ] = curColor;
+			cnt++;
+		}
+		usedColors += curColor;
 	}
 	return cnt;
 }
