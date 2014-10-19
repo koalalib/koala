@@ -304,8 +304,9 @@ template< class DefaultStructs >
 	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) org2im[u]=ig.addVert( u );
 	for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
         ig.addEdge(org2im[g.getEdgeEnd1(e)],org2im[g.getEdgeEnd2(e)]);
+    ig.delAllParals(EdUndir);
 	// ALG: copy contains all vertices and edges
-	assert( g.getEdgeNo() == ig.getEdgeNo() && g.getVertNo() == ig.getVertNo() );
+	assert( g.getVertNo() == ig.getVertNo() );
 	return TemplateWMIN( ig,out,choose,vertTab);
 }
 
@@ -327,8 +328,8 @@ template< class DefaultStructs >
 	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) org2im[u]=ig.addVert( u );
 	for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
         ig.addEdge(org2im[g.getEdgeEnd1(e)],org2im[g.getEdgeEnd2(e)]);
-	// ALG: copy contains all vertices and edges
-	assert( g.getEdgeNo() == ig.getEdgeNo() && g.getVertNo() == ig.getVertNo() );
+    ig.delAllParals(EdUndir);
+	assert( g.getVertNo() == ig.getVertNo() );
 	return TemplateWMAX( ig,out,choose,vertTab );
 }
 
