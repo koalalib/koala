@@ -59,7 +59,7 @@ void floydTest()
 
     std::cout<< "Odleglosci pomiedzy kazda para wierzcholkow" << std::endl << std::endl;
 
-    g.clear();floydTest();Koala::Floyd::distances(g,twoDimVertCont,edgeCont);
+    g.clear();floydTest();Koala::All2AllDists::floyd(g,twoDimVertCont,edgeCont);
     for(Koala::Graph<OpisV,OpisE>::PVertex u=g.getVert();u;u=g.getVertNext(u)){
         for(Koala::Graph<OpisV,OpisE>::PVertex v=g.getVert();v;v=g.getVertNext(v)){
             std::cout << u->info.name << v->info.name << ":" << twoDimVertCont(u,v).distance << "  ";
@@ -74,7 +74,7 @@ void floydTest()
         int l;
         for(Koala::Graph<OpisV,OpisE>::PVertex v_end=g.getVert();v_end;v_end=g.getVertNext(v_end)){
             std::cout<< std::endl; for(int i=0;i<20;i++) {tabV[i]=0; tabE[i]=0; }
-            l=Koala::Floyd::getPath(g,twoDimVertCont,v_start,v_end,Koala::Floyd::outPath(tabV,tabE));
+            l=Koala::All2AllDists::getPath(g,twoDimVertCont,v_start,v_end,Koala::All2AllDists::outPath(tabV,tabE));
             std::cout << v_start->info.name << v_end->info.name << ":" << l;
             if(l>=0) std::cout<< ", ";
             for(int i=0;i<20;i++) if (tabV[i]) std::cout<< tabV[i]->info.name;
@@ -93,7 +93,7 @@ void floydTest()
         int l;
         for(Koala::Graph<OpisV,OpisE>::PVertex v_end=g.getVert();v_end;v_end=g.getVertNext(v_end)){
             std::cout<< std::endl;
-            l=Koala::Floyd::getPath(g,twoDimVertCont,v_start,v_end,Koala::Floyd::outPath(blackHole,tabE));
+            l=Koala::All2AllDists::getPath(g,twoDimVertCont,v_start,v_end,Koala::All2AllDists::outPath(blackHole,tabE));
             std::cout << v_start->info.name << v_end->info.name << ":" << l;
             if(l>0) std::cout<< ", ";
             for(int i=0;i<l;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
@@ -110,7 +110,7 @@ void floydTest()
         int l;
         for(Koala::Graph<OpisV,OpisE>::PVertex v_end=g.getVert();v_end;v_end=g.getVertNext(v_end)){
             std::cout<< std::endl;
-            l=Koala::Floyd::getPath(g,twoDimVertCont,v_start,v_end,Koala::Floyd::outPath(tabV,blackHole));
+            l=Koala::All2AllDists::getPath(g,twoDimVertCont,v_start,v_end,Koala::All2AllDists::outPath(tabV,blackHole));
             std::cout << v_start->info.name << v_end->info.name << ":" << l;
             if(l>=0) std::cout<< ", ";
             for(int i=0;i<=l;i++) std::cout<< tabV[i]->info.name;

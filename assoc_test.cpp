@@ -377,6 +377,19 @@ int xxx=0;
         cout << hmp.size() << ' ' << hmp[3] << hmp[6];
 
     }
+    {
+        SimpleAssocMatrix<Vert*,std::string,AMatrFull> m;
+        AssocArray<Vert*,std::string> vec;
+
+        Vert *A=new Vert("Ala"),*B=new Vert("Basia"),*C=new Vert("Celina"),*D=new Vert("Dagmara");
+
+        cout << "\n slice:\n\n";
+        m(A,B)="\nWpis wspolny";
+        m(A,A)="\nWpis pojedynczy";
+        m(C,C)="\nWpis";
+        m.slice1(C,vec);
+        t(vec);
+    }
 
     return 0;
 }

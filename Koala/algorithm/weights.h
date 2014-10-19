@@ -511,6 +511,9 @@ namespace Koala
 	 */
 	class BellmanFord: public BellmanFordPar< AlgsDefaultSettings > { };
 
+
+    //NEW: duza zmiana nazewnictwa: zamiast klasy FloydPar mamy klase wyliczajaca odleglosci i sciezki miedzy wszystkimi wierzcholkami
+    //dwoma metodami: Floyda i Johnsona. Obie metody (od nazw. autorow) zastepuja dawna metode distances
 	/* FloydPar
 	 * algorytm liczy najkrotsza sciezke pomiedzy kazda para wierzcholków zostal zaproponowany przez Floyda i oparty na twierdzeniu Warshalla)
 	 */
@@ -518,7 +521,7 @@ namespace Koala
 	 *
 	 *  The Floyd algorithm for shortest path, based on the Warshall theorem.
 	 *  \ingroup DMweight */
-	template< class DefaultStructs > class FloydPar: public PathStructs
+	template< class DefaultStructs > class All2AllDistsPar : public PathStructs
 	{
 	protected:
 		template< class GraphType, class TwoDimVertContainer, class VIter, class EIter > static int
@@ -567,7 +570,7 @@ namespace Koala
 			template< class T > ValType operator[]( T e ) const;
 		};
 
-		// wlasciwa procedura: odleglosc miedzy kazda para wierzcholkow
+		// wlasciwa procedura Floyda: odleglosc miedzy kazda para wierzcholkow
 		// false - wykryto ujemny cykl, wowczas wyniki z vertMatrix nie nadaja sie do uzytku
 		/** \brief Get distances.
 		 *
@@ -576,7 +579,19 @@ namespace Koala
 		 *  \param[out] vertMatrix the two-dimensional associative container (verts,vertd)->VertLabs, which for a pair of vertices  keeps the distance between them and the vertex previous to \a vertd on the path between \a verts and \a vertd.
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the information (weights) about edges.
 		 *  \return true if the distances are successfully calculated, false if a negative cycle was found, then \a vertMatrix shouldn't be used. */
-		template< class GraphType, class TwoDimVertContainer, class EdgeContainer > static bool distances(
+		template< class GraphType, class TwoDimVertContainer, class EdgeContainer > static bool floyd(
+			const GraphType &g, TwoDimVertContainer &vertMatrix, const EdgeContainer &edgeTab );
+
+		// wlasciwa procedura Johnsona: odleglosc miedzy kazda para wierzcholkow
+		// false - wykryto ujemny cykl, wowczas vertMatrix jest puste
+		/** \brief Get distances.
+		 *
+		 *  The method calculates the distances between any two vertices.
+		 *  \param g the considered graph.
+		 *  \param[out] vertMatrix the two-dimensional associative container (verts,vertd)->VertLabs, which for a pair of vertices  keeps the distance between them and the vertex previous to \a vertd on the path between \a verts and \a vertd.
+		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the information (weights) about edges.
+		 *  \return true if the distances are successfully calculated, false if a negative cycle was found, then \a vertMatrix shouldn't be used. */
+		template< class GraphType, class TwoDimVertContainer, class EdgeContainer > static bool johnson(
 			const GraphType &g, TwoDimVertContainer &vertMatrix, const EdgeContainer &edgeTab );
 
 		// wlasciwa procedura: zapisuje najkrotsza sciezke (wierzcholki i krawedzie) pod pare podanych iteratorow,
@@ -604,7 +619,7 @@ namespace Koala
 	 *  \n
 	 *  [See example](examples/weights/floyd/floyd.html)
 	 */
-	class Floyd: public FloydPar< AlgsDefaultSettings > { };
+	class All2AllDists : public All2AllDistsPar< AlgsDefaultSettings > { };
 
 	/* KruskalPar
 	 * najlzejsze lub najciezsze lasy w grafie

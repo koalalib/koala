@@ -385,7 +385,7 @@ public:
 	 *  \return the set equal to the lists of colors union. */
 	template<typename Graph, typename ColLists>
 	static Set<int> listColorsSet(const Graph &graph, const ColLists &colLists);
-protected:
+
 	/** \brief Object function choosing proper color from list of colors.
 	 *
 	 *  The structure is designed to work with the list coloring algorithms, and can be treated as an example.*/
@@ -402,6 +402,8 @@ protected:
 		int operator()(const Graph &graph, const ColList &colList,
 				const ColorMap &colors, typename Graph::PEdge edge);
 	};
+
+protected:
 
 	struct EColorTakeBipart {
 		int color;

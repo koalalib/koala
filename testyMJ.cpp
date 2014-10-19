@@ -997,11 +997,11 @@ void floydDir(const char* napis)
     g.makeAdjMatrix();
     readDigraph(g,napis);
     int u=rand() % g.getVertNo();
-    Settings::AssocCont<MyDigraph::PEdge,FloydPar< Settings >::EdgeLabs<int> >::Type emap;
-    Settings::TwoDimAssocCont<MyDigraph::PVertex,FloydPar< Settings >::VertLabs<int,MyDigraph>,AMatrFull >::Type vmap;
+    Settings::AssocCont<MyDigraph::PEdge,All2AllDistsPar< Settings >::EdgeLabs<int> >::Type emap;
+    Settings::TwoDimAssocCont<MyDigraph::PVertex,All2AllDistsPar< Settings >::VertLabs<int,MyDigraph>,AMatrFull >::Type vmap;
     for(MyDigraph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         emap[e].length=e->info;
-    FloydPar <Settings>::distances(g,vmap,emap);
+    All2AllDistsPar <Settings>::floyd(g,vmap,emap);
 
     cout << '{' << u <<",{";
     for(int i=0;i<g.getVertNo();i++)
@@ -1019,11 +1019,11 @@ void floydUndir(const char* napis)
     g.makeAdjMatrix();
     readGraph(g,napis);
     int u=rand() % g.getVertNo();
-    Settings::AssocCont<MyGraph ::PEdge,FloydPar< Settings >::EdgeLabs<int> >::Type emap;
-    Settings::TwoDimAssocCont<MyGraph ::PVertex,FloydPar< Settings >::VertLabs<int,MyGraph >,AMatrFull >::Type vmap;
+    Settings::AssocCont<MyGraph ::PEdge,All2AllDistsPar< Settings >::EdgeLabs<int> >::Type emap;
+    Settings::TwoDimAssocCont<MyGraph ::PVertex,All2AllDistsPar< Settings >::VertLabs<int,MyGraph >,AMatrFull >::Type vmap;
     for(MyGraph ::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         emap[e].length=e->info;
-    FloydPar <Settings>::distances(g,vmap,emap);
+    All2AllDistsPar <Settings>::floyd(g,vmap,emap);
 
     cout << '{' << u <<",{";
     for(int i=0;i<g.getVertNo();i++)
