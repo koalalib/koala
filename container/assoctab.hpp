@@ -584,7 +584,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
-template <class Elem2, class ExtCont>
+template <class ExtCont>
 	int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::slice1( Klucz v, ExtCont &tab ) const
 {
 	if (!index.hasKey( v )) return 0;
@@ -599,7 +599,7 @@ template <class Elem2, class ExtCont>
 }
 
 template< class Klucz, class Elem, AssocMatrixType aType, class Container, class IndexContainer >
-template< class Elem2, class ExtCont >
+template<class ExtCont >
 	int AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >::slice2( Klucz v, ExtCont &tab ) const
 {
 	if (!index.hasKey( v )) return 0;

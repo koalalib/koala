@@ -363,7 +363,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
 
 template< class DefaultStructs > template< class GraphType, class TwoDimVertContainer, class VIter, class EIter > int
-	FloydPar< DefaultStructs >::getOutPathFromMatrix( const GraphType &g, const TwoDimVertContainer &vertMatrix,
+	All2AllDistsPar< DefaultStructs >::getOutPathFromMatrix( const GraphType &g, const TwoDimVertContainer &vertMatrix,
 	OutPath< VIter,EIter > iters, typename GraphType::PVertex start, typename GraphType::PVertex end )
 {
 	koalaAssert( end,AlgExcNullVert );
@@ -395,8 +395,8 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 }
 
 template< class DefaultStructs > template< class DType > template< class T >
-	typename FloydPar< DefaultStructs >::template UnitLengthEdges< DType >::ValType
-	FloydPar< DefaultStructs >::UnitLengthEdges< DType >::operator[]( T e ) const
+	typename All2AllDistsPar< DefaultStructs >::template UnitLengthEdges< DType >::ValType
+	All2AllDistsPar< DefaultStructs >::UnitLengthEdges< DType >::operator[]( T e ) const
 {
 	ValType res;
 	res.length = DefaultStructs:: template NumberTypeBounds< DType >::one();
@@ -404,7 +404,7 @@ template< class DefaultStructs > template< class DType > template< class T >
 }
 
 template< class DefaultStructs > template< class GraphType, class TwoDimVertContainer, class EdgeContainer > bool
-	FloydPar< DefaultStructs >::distances( const GraphType &g, TwoDimVertContainer &vertMatrix,
+	All2AllDistsPar< DefaultStructs >::floyd( const GraphType &g, TwoDimVertContainer &vertMatrix,
 		const EdgeContainer &edgeTab )
 {
 	const typename EdgeContainer::ValType::DistType inf = DefaultStructs:: template
@@ -485,8 +485,83 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 	return true;
 }
 
+template< class DefaultStructs > template< class GraphType, class TwoDimVertContainer, class EdgeContainer > bool
+	All2AllDistsPar< DefaultStructs >::johnson(const GraphType &g, TwoDimVertContainer &vertMatrix,
+		const EdgeContainer &edgeTab )
+{
+	typedef typename GraphType::PVertex Vert;
+	typedef typename GraphType::PEdge Edge;
+	typedef typename DefaultStructs::template LocalGraph< Vert,Edge,Koala::Directed|Koala::Loop >::Type ImageGraph;
+
+	const typename EdgeContainer::ValType::DistType zero = DefaultStructs:: template
+		NumberTypeBounds< typename EdgeContainer::ValType::DistType >::zero();
+	const typename EdgeContainer::ValType::DistType minusInf = DefaultStructs:: template
+		NumberTypeBounds< typename EdgeContainer::ValType::DistType >::minusInfty();
+    int n=g.getVertNo();
+    int mImage=g.getEdgeNo(Directed)+2*g.getEdgeNo(Undirected)+n;
+
+	//sprawdzenie czy nie ma petli ujemnych
+	for(typename GraphType::PEdge e = g.getEdge(Koala::EdLoop | Koala::EdUndir);
+		e; e = g.getEdgeNext(e, Koala::EdLoop | Koala::EdUndir))
+			if(edgeTab[e].length < zero)
+				return false;
+
+    SimplArrPool<typename ImageGraph::Vertex> valloc(n+1);
+    SimplArrPool<typename ImageGraph::Edge> ealloc(mImage);
+    ImageGraph h(&valloc,&ealloc);
+	typename DefaultStructs::template AssocCont< typename ImageGraph::PVertex,
+		VertLabs< typename EdgeContainer::ValType::DistType,ImageGraph > >::Type vertTab(n+1);
+	typename DefaultStructs::template AssocCont< typename ImageGraph::PEdge,
+		EdgeLabs< typename EdgeContainer::ValType::DistType > >::Type modifiedEdgeTab(mImage);
+
+    typename DefaultStructs:: template AssocCont< Vert, typename ImageGraph::PVertex > ::Type vmapH(n);
+    for(Vert u = g.getVert(); u; u = g.getVertNext(u))
+		vmapH[u] = h.addVert(u);
+
+	for(Edge e = g.getEdge(Koala::EdDirOut | Koala::EdDirIn); e; e = g.getEdgeNext(e, Koala::EdDirOut | Koala::EdDirIn))
+	{
+		typename ImageGraph::PVertex u = vmapH[g.getEdgeEnd1(e)], v = vmapH[g.getEdgeEnd2(e)];
+		modifiedEdgeTab[h.addEdge(u, v, e, g.getEdgeType(e))].length = edgeTab[e].length;
+	}
+	for(Edge e = g.getEdge(Koala::EdUndir); e; e = g.getEdgeNext(e, Koala::EdUndir))
+	{
+		typename ImageGraph::PVertex u = vmapH[g.getEdgeEnd1(e)], v = vmapH[g.getEdgeEnd2(e)];
+		modifiedEdgeTab[h.addArc(u, v, e)].length = edgeTab[e].length;
+		modifiedEdgeTab[h.addArc(v, u, e)].length = edgeTab[e].length;
+	}
+
+	typename ImageGraph::PVertex q = h.addVert();
+	for(typename ImageGraph::PVertex v = h.getVert(); v; v = h.getVertNext(v))
+		if(v != q)
+			modifiedEdgeTab[h.addArc(q, v)].length = zero;
+
+	if(Koala::BellmanFordPar<DefaultStructs>::distances(h,vertTab,modifiedEdgeTab,q) == minusInf)
+		return false;
+
+	h.delVert(q);
+	for(typename ImageGraph::PEdge e = h.getEdge(); e; e = h.getEdgeNext(e))
+		modifiedEdgeTab[e].length = modifiedEdgeTab[e].length + vertTab[h.getEdgeEnd1(e)].distance - vertTab[h.getEdgeEnd2(e)].distance;
+
+	vertMatrix.reserve(n);
+	for(typename ImageGraph::PVertex v = h.getVert(); v; v = h.getVertNext(v))
+	{
+		vertTab.clear(); vertTab.reserve(n);
+		Koala::DijkstraHeapPar<DefaultStructs>::distances(h,vertTab,modifiedEdgeTab,v);
+		for(typename ImageGraph::PVertex u = h.getVert(); u; u = h.getVertNext(u))
+		{
+			VertLabs< typename EdgeContainer::ValType::DistType,ImageGraph > &infoH = vertTab[u];
+
+			vertMatrix(v->info, u->info).distance = infoH.distance;
+			vertMatrix(v->info, u->info).ePrev = infoH.ePrev ? infoH.ePrev->info : 0;
+			vertMatrix(v->info, u->info).vPrev = infoH.vPrev ? infoH.vPrev->info : 0;
+		}
+	}
+
+	return true;
+}
+
 template< class DefaultStructs > template< class GraphType, class TwoDimVertContainer, class VIter, class EIter > int
-	FloydPar< DefaultStructs >::getPath( const GraphType &g, const TwoDimVertContainer &vertMatrix,
+	All2AllDistsPar< DefaultStructs >::getPath( const GraphType &g, const TwoDimVertContainer &vertMatrix,
 		typename GraphType::PVertex start, typename GraphType::PVertex end, PathStructs::OutPath< VIter,EIter > iters )
 {
 	koalaAssert( start && end,AlgExcNullVert );

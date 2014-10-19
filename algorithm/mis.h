@@ -390,6 +390,7 @@ namespace Koala
         template< class GraphType, class OutputIterator > static int
             getSome( GraphType & g, OutputIterator out, int minSize);
 
+            //NEW: testy na zb. niezalezny dziedziczone z MISHeuristicPar
             using MISHeuristicPar<DefaultStructs>::isStable;
             using MISHeuristicPar<DefaultStructs>::isMaxStable;
 

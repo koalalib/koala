@@ -1258,7 +1258,7 @@ namespace Koala
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_slice1.html">See example</a>.
 		 */
-		template< class Elem2, class ExtCont > int slice1( Klucz, ExtCont & ) const;
+		template< class ExtCont > int slice1( Klucz, ExtCont & ) const;
 
 		// ... i drugiej pozycji
 		/** \brief Slice by second key.
@@ -1271,7 +1271,7 @@ namespace Koala
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_slice2.html">See example</a>.
 		 */
-		template< class Elem2, class ExtCont > int slice2( Klucz, ExtCont & ) const;
+		template<class ExtCont > int slice2( Klucz, ExtCont & ) const;
 
 		//W operacjach dzialajacych na kluczach 2-wymiarowych mozna poslugiwac sie para kluczy lub jej dwoma wspolrzednymi
 
@@ -1881,6 +1881,33 @@ namespace Koala
 		Klucz nextInd( Klucz v )const  { return index.nextKey( v ); }
 		Klucz prevInd( Klucz v ) const { return index.prevKey( v ); }
 		int indSize() const { return index.size(); }
+
+        template <class ExtCont> int slice1( Klucz v, ExtCont &tab ) const
+        {
+            if (!index.hasKey( v )) return 0;
+            int licz = 0;
+            for( Klucz x = index.firstKey(); x; x = index.nextKey( x ) )
+                if (hasKey( v,x ))
+                {
+                    tab[x] = this->operator()( v,x );
+                    licz++;
+                }
+            return licz;
+        }
+
+        template <class ExtCont> int slice2( Klucz v, ExtCont &tab ) const
+        {
+            if (!index.hasKey( v )) return 0;
+            int licz = 0;
+            for( Klucz x = index.firstKey(); x; x = index.nextKey( x ) )
+                if (hasKey( x,v ))
+                {
+                    tab[x] = this->operator()( x,v );
+                    licz++;
+                }
+            return licz;
+        }
+
         template< class Iterator > int getInds( Iterator iter ) const {   return index.getKeys(iter); }
 		bool delInd( Klucz v )
         {
