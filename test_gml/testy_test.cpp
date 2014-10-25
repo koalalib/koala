@@ -421,8 +421,8 @@ bool cograph(const char* g6)
 //    Set<MyGraph::PVertex> res;
 //    Set<int> ires;
 //    IO::readG6(g,g6);
-//    MISPar< Settings >::get(g,setInserter(res));
-//    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+//    MaxStablePar< Settings >::get(g,setInserter(res));
+//    assert(MaxStablePar< Settings >::test(g,res.begin(),res.end()));
 //    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
 //        ires+=g.vertPos(i);
 //    cout << ires;
@@ -436,8 +436,8 @@ bool cograph(const char* g6)
 //    Set<MyGraph::PVertex> res;
 //    Set<int> ires;
 //    IO::readG6(g,g6);
-//    MISPar< Settings >::get(g,setInserter(res));
-//    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+//    MaxStablePar< Settings >::get(g,setInserter(res));
+//    assert(MaxStablePar< Settings >::test(g,res.begin(),res.end()));
 //    cout << res.size();
 //    return res.size();
 //}
@@ -450,8 +450,8 @@ bool cograph(const char* g6)
 //    Set<int> ires;
 //    IO::readG6(g,g6);
 //    g.neg(EdUndir);
-//    MISPar< Settings >::get(g,setInserter(res));
-//    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+//    MaxStablePar< Settings >::get(g,setInserter(res));
+//    assert(MaxStablePar< Settings >::test(g,res.begin(),res.end()));
 //    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
 //        ires+=g.vertPos(i);
 //    cout << ires;
@@ -466,8 +466,8 @@ bool cograph(const char* g6)
 //    Set<int> ires;
 //    IO::readG6(g,g6);
 //    g.neg(EdUndir);
-//    MISPar< Settings >::get(g,setInserter(res));
-//    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+//    MaxStablePar< Settings >::get(g,setInserter(res));
+//    assert(MaxStablePar< Settings >::test(g,res.begin(),res.end()));
 //    cout << res.size();
 //    return res.size();
 //}
@@ -480,7 +480,7 @@ int misBipartite(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Bipartite::maxStable(g,setInserter(res));
-    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+    assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
@@ -495,7 +495,7 @@ int misBipartite_SimpleOut(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Bipartite::maxStable(g,setInserter(res));
-    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+    assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     cout << res.size();
     return res.size();
 }
@@ -523,7 +523,7 @@ int misBipartite_SimpleOut(const char* g6)
 IO::readG6(g,"UTKkQZdx[n?QAGhmJt@fLRXWBr}rHTYaK_xG@IWO");
             Set<MyGraph::PVertex> res;
             A=g.addVert();//B=g.addVert();
-//            cout << MISHeuristicPar< Settings >::get(g,setInserter(res)) << endl;
+//            cout << MaxStableHeurPar< Settings >::get(g,setInserter(res)) << endl;
             cout << res <<endl <<g.getVertSet()<<endl<<endl;
 
 //        g.clear();

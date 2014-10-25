@@ -9,19 +9,25 @@
 namespace Koala
 {
 
+    //NEW: generalna zmiana nazw: MIS(Heuristic)(Par) -> MaxStable(Heur)(Par) oraz MISStrategy->MaxStableStrategy
 	/** \brief Vertex choosing strategies (for maximal independent set) .
 	 *
 	 *  The namespace contains functors
 	 *  that chooses a vertex basing on some specific rules.
 	 *  Such rules could be: first vertex, random vertex, vertex that meets
 	 *  the specific requirements (has the largest degree for example).
-	 *  These functions are used within \a getWMin and \a getWMax methods in Koala::MISHeuristicPar
+	 *  These functions are used within \a getWMin and \a getWMax methods in Koala::MaxStableHeurPar
 	 *  to choose one vertex in each algorithm step.
 	 *
 	 *  Each object function overload two parameter call function operator that takes \a g the considered graph and associative container \a vertTab, which assigns weight to each vertex. The functor returns one chosen vertex.
 	 *  \ingroup DMmis */
-	namespace MISStrategy
+	namespace MaxStableStrategy
 	{
+	    namespace Privates {
+            struct WMin_Strategy_tag {};
+            struct WMax_Strategy_tag {};
+            struct Strategy_tag : public WMin_Strategy_tag, WMax_Strategy_tag{};
+	    }
 
 		/* ----------------------------------------------------------------------
 		*
@@ -33,7 +39,7 @@ namespace Koala
 		/** \brief Get first vertex functor.
 		 *
 		 *  The for a graph functor returns always the first vertex on vertex list. Functor can be used in both approaches.*/
-		class First
+		class First : public Privates::Strategy_tag
 		{
 		public:
 			/* \brief Call function operator.
@@ -61,7 +67,7 @@ namespace Koala
 		 *
 		 *  The for a graph functor returns random vertex.  Functor can be used in both approaches.*/
 		template <class RndGen=Koala::StdRandGen<> >
-		class Rand
+		class Rand : public Privates::Strategy_tag
 		{
 		public:
 		    RndGen* rgen;
@@ -84,7 +90,7 @@ namespace Koala
 		 *
 		 *  The for a graph (weights are ignored) functor returns vertex with minimal degree. It is advised to use with method \a getWMin.*/
 		template <class RndGen=Koala::StdRandGen<> >
-		class GMin
+		class GMin : public Privates::WMin_Strategy_tag
 		{
 		public:
 		    RndGen* rgen;
@@ -105,7 +111,7 @@ namespace Koala
 		*
 		*  The for a graph and weights functor returns vertex for which W(v)/( deg(v) +1) is maximal. It is advised to use with method \a getWMin.*/
 		template <class RndGen=Koala::StdRandGen<> >
-		class GWMin
+		class GWMin: public Privates::WMin_Strategy_tag
 		{
 		public:
 		    RndGen* rgen;
@@ -127,7 +133,7 @@ namespace Koala
 		 *
 		 *  The for a graph and weights functor returns vertices \a v for which Σ<sub>u ∈ N[v]</sub>W(u)/( deg(u) +1) ≤ W(v) . It is advised to use with method \a getWMin.*/
 		template <class RndGen=Koala::StdRandGen<> >
-		class GGWMin
+		class GGWMin : public Privates::WMin_Strategy_tag
 		{
 		public:
 		    RndGen* rgen;
@@ -148,7 +154,7 @@ namespace Koala
 		 *
 		 *  The for a graph and weights functor returns vertex for which W(v)/Σ<sub>u ∈ N[v]</sub>W(u) is maximal. It is advised to use with method \a getWMin.*/
 		template <class RndGen=Koala::StdRandGen<> >
-		class GWMin2
+		class GWMin2 : public Privates::WMin_Strategy_tag
 		{
 		public:
 		    RndGen* rgen;
@@ -171,7 +177,7 @@ namespace Koala
 		 *
 		 *  The for a graph gets the vertex with maximum degree. It is advised to use this functor with function \a getWMax.*/
 		template <class RndGen=Koala::StdRandGen<> >
-		class GMax
+		class GMax : public Privates::WMax_Strategy_tag
 		{
 		public:
 		    RndGen* rgen;
@@ -192,7 +198,7 @@ namespace Koala
 		 *
 		 *  The for a graph gets the vertex for which the function W(v) / (deg(v)*(deg(v)-1)) is minimal. It is advised to use this functor with function \a getWMax.*/
 		template <class RndGen=Koala::StdRandGen<> >
-		class GWMax
+		class GWMax: public Privates::WMax_Strategy_tag
 		{
 		public:
 		    RndGen* rgen;
@@ -214,7 +220,7 @@ namespace Koala
 		 *
 		 *  The for a graph and weights gets the vertices v that satisfy  Σ<sub>u ∈ N[v]</sub> W(u) / (deg(u)*(deg(u)-1)) ≥ W(v) /( deg(v) + 1 ). It is advised to use this functor with function \a getWMax.*/
 		template <class RndGen=Koala::StdRandGen<> >
-		class GGWMax
+		class GGWMax: public Privates::WMax_Strategy_tag
 		{
 		public:
 		    RndGen* rgen;
@@ -234,21 +240,21 @@ namespace Koala
 	 *  choice function called "choose".
 	 *
 	 *  \ingroup DMmis */
-	template< class DefaultStructs > class MISHeuristicPar
+	template< class DefaultStructs > class MaxStableHeurPar
 	{
 	public:
 		/** \brief Search maximal independent set (WMin technique).
 		 *
 		 *  The method searches for maximal independent set using the following heuristic,
 		 *  In each step (until the graph has no more vertices):
-		 *   - chooses a vertex according to the choice function (Koala::MISStrategy),
+		 *   - chooses a vertex according to the choice function (Koala::MaxStableStrategy),
 		 *   - adds this vertex to the independent set,
 		 *   - removes the closed neighborhood of this vertex.
 		 *
 		 *  The method outputs the independent set which is maximum in the sense of inclusion.\n
 		 *  \param g the considered graph.
 		 *  \param out the iterator to the container with the output set of vertices.
-		 *  \param choose the strategy (\ref Koala::MISStrategy) of choosing vertices (one in each step) .
+		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
 		 *  \param vertTab the associative container that assigns weight to each vertex.
 		 *  \return the number of vertices in the output set \a out.
 		 *  \n
@@ -263,13 +269,13 @@ namespace Koala
 		 *
 		 *  The method searches for maximal independent set using the following heuristic,
 		 *  In each step (until the graph has no more edges):
-		 *   - chooses a vertex according to the choice function (\ref Koala::MISStrategy) ,
+		 *   - chooses a vertex according to the choice function (\ref Koala::MaxStableStrategy) ,
 		 *   - removes the chosen vertex with adjacent edges.
 		 *
 		 *  The method outputs the remaining independent vertices.
 		 *  \param g the considered graph.
 		 *  \param out the iterator to the container with the output set of vertices.
-		 *  \param choose the strategy (\ref Koala::MISStrategy)  of choosing vertices (one in each step).
+		 *  \param choose the strategy (\ref Koala::MaxStableStrategy)  of choosing vertices (one in each step).
 		 *  \param vertTab the associative container that assigns weight to each vertex.
 		 *  \return the number of vertices in the output set \a out.
 		 *  \n
@@ -280,6 +286,7 @@ namespace Koala
 			static unsigned getWMax( const GraphType &g, OutputIterator out, ChoiceFunction choose,
 				const VertContainer &vertTab );
 
+        //NEW: zmiana nazwy metody, bylo isStable
 		/** \brief Test if stable
 		 *
 		 * Determinate if a set of vertices is independent.
@@ -288,8 +295,9 @@ namespace Koala
 		 *  \param last  - last vertex from the potentially independent set
 		 * \return true is the given set is independent, false otherwise. */
 		template< class GraphType, typename Iterator >
-			static bool isStable( const GraphType &g, Iterator first, Iterator last );
+			static bool test( const GraphType &g, Iterator first, Iterator last );
 
+		//NEW: zmiana nazwy metody, bylo isMaxStable
 		/**\brief Test if max stable.
 		 *
 		 *Determinate if a set of vertices is maximal (in the sense of inclusion) independent.
@@ -298,7 +306,7 @@ namespace Koala
 		 * \param last  - last vertex from the potentially independent set
 		 * \retrun true is the given set is maximal (in the sense of inclusion) independent, false otherwise.*/
 		template< class GraphType, typename Iterator >
-			static bool isMaxStable( const GraphType &g, Iterator first, Iterator last, bool stabilitytest=true );
+			static bool testMax( const GraphType &g, Iterator first, Iterator last, bool stabilitytest=true );
 
 	private:
 		/*
@@ -341,7 +349,7 @@ namespace Koala
 	 *  choice function called "choose".
 	 *
 	 *  \ingroup DMmis */
-	class MISHeuristic: public MISHeuristicPar< Koala::AlgsDefaultSettings > {};
+	class MaxStableHeur: public MaxStableHeurPar< Koala::AlgsDefaultSettings > {};
 
     /*
     * Class for maximum independent set - exact algorithm.
@@ -366,7 +374,7 @@ namespace Koala
 	};
 
     //NEW:
-    template< class DefaultStructs > class MISPar : private MISHeuristicPar<DefaultStructs>
+    template< class DefaultStructs > class MaxStablePar : private MaxStableHeurPar<DefaultStructs>
     {
       public:
         /*
@@ -390,9 +398,9 @@ namespace Koala
         template< class GraphType, class OutputIterator > static int
             getSome( GraphType & g, OutputIterator out, int minSize);
 
-            //NEW: testy na zb. niezalezny dziedziczone z MISHeuristicPar
-            using MISHeuristicPar<DefaultStructs>::isStable;
-            using MISHeuristicPar<DefaultStructs>::isMaxStable;
+            //NEW: testy na zb. niezalezny dziedziczone z MaxStableHeurPar
+            using MaxStableHeurPar<DefaultStructs>::test;
+            using MaxStableHeurPar<DefaultStructs>::testMax;
 
       private:
         /*
@@ -412,9 +420,113 @@ namespace Koala
 			isFoldable( const GraphType &g, typename GraphType::PVertex v );
     };
 
-    class MIS: public MISPar< Koala::LocalGrAdjMatrSettings > {};
-    //class MIS: public MISPar< Koala::AlgsDefaultSettings > {};
+    class MaxStable: public MaxStablePar< Koala::LocalGrAdjMatrSettings > {};
+    //class MaxStable: public MaxStablePar< Koala::AlgsDefaultSettings > {};
 
+
+    template< class DefaultStructs > class MaxCliqueHeurPar
+	{
+	public:
+
+		template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
+			static unsigned getWMin( const GraphType &g, OutputIterator out, ChoiceFunction choose,
+				const VertContainer & vertTab );
+
+		template< class GraphType, class OutputIterator, class ChoiceFunction, class VertContainer >
+			static unsigned getWMax( const GraphType &g, OutputIterator out, ChoiceFunction choose,
+				const VertContainer &vertTab );
+
+		template< class GraphType, typename Iterator >
+			static bool test( const GraphType &g, Iterator first, Iterator last );
+
+		template< class GraphType, typename Iterator >
+			static bool testMax( const GraphType &g, Iterator first, Iterator last, bool stabilitytest=true );
+
+    protected:
+
+        template< class Graph1, class Graph2 >
+        static void copyneg(const Graph1& g, Graph2& h);
+
+        template <class Cont>
+        struct InfoPseudoAssoc {
+            const Cont* cont;
+
+            InfoPseudoAssoc(const Cont& arg) : cont(&arg) {}
+
+            template <class Key>
+            typename Cont::ValType operator[](Key key) const
+            {
+                return (*cont)[key->info];
+            }
+        };
+
+	};
+
+//	class MaxCliqueHeur: public MaxCliqueHeurPar< Koala::AlgsDefaultSettings > {};
+	class MaxCliqueHeur: public MaxCliqueHeurPar< Koala::LocalGrAdjMatrSettings > {};
+
+    //NEW:
+    template< class DefaultStructs > class MaxCliquePar : private MaxCliqueHeurPar<DefaultStructs>
+    {
+      public:
+
+        template< class GraphType, class OutputIterator > static int
+            get( GraphType & g, OutputIterator out, int minSize = 0);
+        template< class GraphType, class OutputIterator > static int
+            getSome( GraphType & g, OutputIterator out, int minSize);
+
+            using MaxCliqueHeurPar<DefaultStructs>::test;
+            using MaxCliqueHeurPar<DefaultStructs>::testMax;
+    };
+
+    class MaxClique: public MaxCliquePar< Koala::LocalGrAdjMatrSettings > {};
+    //class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
+
+    //NEW:
+    template< class DefaultStructs > class MinVertCoverHeurPar
+	{
+	public:
+
+		template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
+			static unsigned getWMin( const GraphType &g, OutputIterator out, ChoiceFunction choose,
+				const VertContainer & vertTab );
+
+		template< class GraphType, class OutputIterator, class ChoiceFunction, class VertContainer >
+			static unsigned getWMax( const GraphType &g, OutputIterator out, ChoiceFunction choose,
+				const VertContainer &vertTab );
+
+		template< class GraphType, typename Iterator >
+			static bool test( const GraphType &g, Iterator first, Iterator last );
+
+		template< class GraphType, typename Iterator >
+			static bool testMin( const GraphType &g, Iterator first, Iterator last, bool stabilitytest=true );
+
+    protected:
+
+        template< class GraphType, typename Iterator, typename IterOut >
+        static int vertSetMinus(const GraphType &g, Iterator first, Iterator last,IterOut out);
+
+	};
+
+//	class MinVertCoverHeur: public MinVertCoverHeurPar< Koala::AlgsDefaultSettings > {};
+	class MinVertCoverHeur: public MinVertCoverHeurPar< Koala::LocalGrAdjMatrSettings > {};
+
+    //NEW:
+    template< class DefaultStructs > class MinVertCoverPar : private MinVertCoverHeurPar<DefaultStructs>
+    {
+      public:
+
+        template< class GraphType, class OutputIterator > static int
+            get( GraphType & g, OutputIterator out, int maxSize = std::numeric_limits< int >::max());
+        template< class GraphType, class OutputIterator > static int
+            getSome( GraphType & g, OutputIterator out, int maxSize);
+
+            using MinVertCoverHeurPar<DefaultStructs>::test;
+            using MinVertCoverHeurPar<DefaultStructs>::testMin;
+    };
+
+    class MinVertCover: public MinVertCoverPar< Koala::LocalGrAdjMatrSettings > {};
+    //class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
 
 #include "mis.hpp"
 }

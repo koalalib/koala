@@ -421,8 +421,8 @@ bool cograph(const char* g6)
 //    Set<MyGraph::PVertex> res;
 //    Set<int> ires;
 //    IO::readG6(g,g6);
-//    MISPar< Settings >::get(g,setInserter(res));
-//    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+//    MaxStablePar< Settings >::get(g,setInserter(res));
+//    assert(MaxStablePar< Settings >::test(g,res.begin(),res.end()));
 //    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
 //        ires+=g.vertPos(i);
 //    cout << ires;
@@ -436,8 +436,8 @@ bool cograph(const char* g6)
 //    Set<MyGraph::PVertex> res;
 //    Set<int> ires;
 //    IO::readG6(g,g6);
-//    MISPar< Settings >::get(g,setInserter(res));
-//    assert(MISPar< Settings >::isStable(g,res.begin(),res.end()));
+//    MaxStablePar< Settings >::get(g,setInserter(res));
+//    assert(MaxStablePar< Settings >::test(g,res.begin(),res.end()));
 //    cout << res.size();
 //    return res.size();
 //}
@@ -450,8 +450,8 @@ bool cograph(const char* g6)
 //    Set<int> ires;
 //    IO::readG6(g,g6);
 //    g.neg(EdUndir);
-//    MISHeuristicPar< Settings >::get(g,setInserter(res));
-//    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+//    MaxStableHeurPar< Settings >::get(g,setInserter(res));
+//    assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
 //    for(MyGraph::PVertex i=res.first();i;i=res.next(i))
 //        ires+=g.vertPos(i);
 //    cout << ires;
@@ -466,8 +466,8 @@ bool cograph(const char* g6)
 //    Set<int> ires;
 //    IO::readG6(g,g6);
 //    g.neg(EdUndir);
-//    MISHeuristicPar< Settings >::get(g,setInserter(res));
-//    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+//    MaxStableHeurPar< Settings >::get(g,setInserter(res));
+//    assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
 //    cout << res.size();
 //    return res.size();
 //}
@@ -480,7 +480,7 @@ int misBipartite(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Bipartite::maxStable(g,setInserter(res));
-    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+    assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
@@ -495,7 +495,7 @@ int misBipartite_SimpleOut(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Bipartite::maxStable(g,setInserter(res));
-    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+    assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     cout << res.size();
     return res.size();
 }
@@ -508,7 +508,7 @@ int misChordal(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Chordal::maxStable(g,setInserter(res));
-    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+    assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
@@ -523,7 +523,7 @@ int misChordal_SimpleOut(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Chordal::maxStable(g,setInserter(res));
-    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+    assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     cout << res.size();
     return res.size();
 }
@@ -540,7 +540,7 @@ int cliqueChordal(const char* g6)
         ires+=g.vertPos(i);
     cout << ires;
         g.neg(EdUndir);
-        assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+        assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     return res.size();
 }
 
@@ -554,7 +554,7 @@ int cliqueChordal_SimpleOut(const char* g6)
     IsItPar< Settings >::Chordal::maxClique(g,setInserter(res));
     cout << res.size();
         g.neg(EdUndir);
-        assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+        assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     return res.size();
 }
 
@@ -566,7 +566,7 @@ int misComparability(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Comparability::maxStable(g,setInserter(res));
-    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+    assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     for(MyGraph::PVertex i=res.first();i;i=res.next(i))
         ires+=g.vertPos(i);
     cout << ires;
@@ -581,7 +581,7 @@ int misComparability_SimpleOut(const char* g6)
     Set<int> ires;
     IO::readG6(g,g6);
     IsItPar< Settings >::Comparability::maxStable(g,setInserter(res));
-    assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+    assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     cout << res.size();
     return res.size();
 }
@@ -598,7 +598,7 @@ int cliqueComparability(const char* g6)
         ires+=g.vertPos(i);
 
         g.neg(EdUndir);
-        assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+        assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     cout << ires;
     return res.size();
 }
@@ -613,7 +613,7 @@ int cliqueComparability_SimpleOut(const char* g6)
     IsItPar< Settings >::Comparability::maxClique(g,setInserter(res));
 
         g.neg(EdUndir);
-        assert(MISHeuristicPar< Settings >::isStable(g,res.begin(),res.end()));
+        assert(MaxStableHeurPar< Settings >::test(g,res.begin(),res.end()));
     cout << res.size();
     return res.size();
 }

@@ -63,12 +63,12 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << (res=IsIt::Bipartite::maxStable(g, verts)) << '\t';
-    cout << boolalpha<< MISHeuristic::isStable(g, verts, &verts[res]) << endl;
+    cout << boolalpha<< MaxStableHeur::test(g, verts, &verts[res]) << endl;
     for(int i=0;i< res; i++ ) cout << g.vertPos(verts[i]);
     cout << endl;
 
 	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << (res=IsIt::Chordal::maxStable(g, verts)) <<'\t';
-    cout << boolalpha<< MISHeuristic::isStable(g, verts, &verts[res]) << endl;
+    cout << boolalpha<< MaxStableHeur::test(g, verts, &verts[res]) << endl;
     for(int i=0;i< res; i++ ) cout << g.vertPos(verts[i]);
     cout << endl;
 
@@ -86,9 +86,9 @@ int main() {
 	cout << "g6 = " << t << endl;
 	TRYKOALA
 	if(IsIt::bipartite(g)) cout << " Bip. indep. set = " << (res=IsIt::Bipartite::maxStable(g, verts)) << '\t';
-    cout << boolalpha<< MISHeuristic::isStable(g, verts, &verts[res]) << endl;
+    cout << boolalpha<< MaxStableHeur::test(g, verts, &verts[res]) << endl;
 	if(IsIt::chordal(g)) cout << " Chord. indep. set = " << (res=IsIt::Chordal::maxStable(g, verts)) <<'\t';
-    cout << boolalpha<< MISHeuristic::isStable(g, verts, &verts[res]) << endl;
+    cout << boolalpha<< MaxStableHeur::test(g, verts, &verts[res]) << endl;
 	CATCHKOALA
 
     cout << "\n\n**********\n\n";
@@ -129,7 +129,7 @@ try {
         IsIt::Comparability::color(g,blackHole) << "\n---\n";
 
 	res = IsIt::Comparability::maxStable(g, verts);
-	cout << boolalpha<< MISHeuristic::isStable(g, verts, &verts[res]) << endl;
+	cout << boolalpha<< MaxStableHeur::test(g, verts, &verts[res]) << endl;
 	cout << "res is " << res << "\n";
 //	CATCHKOALA
     }

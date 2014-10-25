@@ -31,11 +31,11 @@ struct OpisE {
     int dlugosc;
 };
 
-Koala::Graph<OpisV,OpisE> g;
+Koala::Graph<OpisV,OpisE> g,gneg;
 Koala::Graph<OpisV,OpisE>::PVertex A,B,C,D,E,F,G,H,tabV[MAX_OUT_SIZE];
 Koala::Graph<OpisV,OpisE>::PVertex I,J,K,L,M,N,O,P,R,S, Q,V,T,U,W,X,Y,Z;
 
-Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex,double> > vertCont;
+Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex,double> > vertCont,vertContNeg;
 
 void clearOutput() {
     for(unsigned i=0; i<MAX_OUT_SIZE; ++i) {
@@ -45,7 +45,7 @@ void clearOutput() {
 
 int main(void) {
 
-    unsigned MIS = 0;
+    unsigned MaxStable = 0;
     unsigned result = 0;
     string isIndependentStr;
     string isMaxIndependentStr;
@@ -132,16 +132,16 @@ int main(void) {
     // Exact:
 
 //    std::cout << "Exact: " << std::endl;
-//    MIS = Koala::MIS::get(g, tabV);
-//    std::cout << "wierzcholkow: " << MIS << std::endl;
-//    for(unsigned i = 0; i < MIS; i++) {
+//    MaxStable = Koala::MaxStable::get(g, tabV);
+//    std::cout << "wierzcholkow: " << MaxStable << std::endl;
+//    for(unsigned i = 0; i < MaxStable; i++) {
 //        std::cout << tabV[i]->info.name << ", ";
 //    } std::cout << std::endl;
 //
 //    // TODO: try with set output
 //    // TODO: make (it, number) functions?
-//    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
-//    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
+//    isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[MaxStable])) ? "YES" : "NO";
+//    isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[MaxStable])) ? "YES" : "NO";
 //    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
 //    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
 //
@@ -171,23 +171,26 @@ int main(void) {
     g.addEdge(F,D,OpisE(2));
 	g.addEdge(G,H,OpisE(1));
 
-    for(Koala::Graph<OpisV,OpisE>::PVertex vPt=g.getVert();vPt;vPt=g.getVertNext(vPt)) {
+	    gneg=g;gneg.neg(Koala::EdUndir);
+
+    for(Koala::Graph<OpisV,OpisE>::PVertex vPt=g.getVert();vPt;vPt=g.getVertNext(vPt))
         vertCont[vPt] = vPt->info.weight;
-    }
+    for(Koala::Graph<OpisV,OpisE>::PVertex vPt=gneg.getVert();vPt;vPt=gneg.getVertNext(vPt))
+        vertContNeg[vPt] = vPt->info.weight;
 
 
     // -------------------------------------------------------------------
     // Exact:
 
 //    std::cout << "Exact: " << std::endl;
-//    MIS = Koala::MIS::get(g, tabV);
-//    std::cout << "wierzcholkow: " << MIS << std::endl;
-//    for(unsigned i = 0; i < MIS; i++) {
+//    MaxStable = Koala::MaxStable::get(g, tabV);
+//    std::cout << "wierzcholkow: " << MaxStable << std::endl;
+//    for(unsigned i = 0; i < MaxStable; i++) {
 //        std::cout << tabV[i]->info.name << ", ";
 //    } std::cout << std::endl;
 //
-//    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
-//    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
+//    isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[MaxStable])) ? "YES" : "NO";
+//    isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[MaxStable])) ? "YES" : "NO";
 //    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
 //    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
 //
@@ -199,60 +202,171 @@ int main(void) {
     // WMIN:
 
     std::cout << "WMIN: " << std::endl;
-    result = Koala::MISHeuristic::getWMin(
+    result = Koala::MaxStableHeur::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::GMin< RandGenType >(stdgen),
+        Koala::MaxStableStrategy::GMin< RandGenType >(stdgen),
         vertCont/*NULL*/);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
-    } std::cout << std::endl; clearOutput();
+    } std::cout << std::endl;
+   isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
+    std::cout << std::endl; clearOutput();
+    result = Koala::MaxCliqueHeur::getWMin(
+        gneg,
+        tabV,
+        Koala::MaxStableStrategy::GMin< RandGenType >(stdgen),
+        vertContNeg/*NULL*/);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+    isIndependentStr = (Koala::MaxCliqueHeur::test(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs clique set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal clique set: " << isMaxIndependentStr << std::endl << "--\n";
+    clearOutput();
 
-    result = Koala::MISHeuristic::getWMin(
+    result = Koala::MaxStableHeur::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::GWMin<RandGenType>(stdgen),
+        Koala::MaxStableStrategy::GWMin<RandGenType>(stdgen),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
-    } std::cout << std::endl; clearOutput();
+    } std::cout << std::endl;
+   isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
+    std::cout << std::endl; clearOutput();
+    result = Koala::MaxCliqueHeur::getWMin(
+        gneg,
+        tabV,
+        Koala::MaxStableStrategy::GWMin<RandGenType>(stdgen),
+        vertContNeg);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+    isIndependentStr = (Koala::MaxCliqueHeur::test(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs clique set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal clique set: " << isMaxIndependentStr << std::endl;
+    clearOutput();
 
-    result = Koala::MISHeuristic::getWMin(
+    result = Koala::MinVertCoverHeur::getWMin(
+        g,
+        tabV,
+        Koala::MaxStableStrategy::GWMin<RandGenType>(stdgen),
+        vertCont);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+   isIndependentStr = (Koala::MinVertCover::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MinVertCover::testMin(g, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs cover set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs min cover set: " << isMaxIndependentStr << std::endl;
+    std::cout << std::endl << "--\n"; clearOutput();
+
+    result = Koala::MaxStableHeur::getWMin(
             g,
             tabV,
-            Koala::MISStrategy::GWMin2<RandGenType>(stdgen),
+            Koala::MaxStableStrategy::GWMin2<RandGenType>(stdgen),
             vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
-    } std::cout << std::endl; clearOutput();
+    } std::cout << std::endl; isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
+    std::cout << std::endl; clearOutput();
+    result = Koala::MaxCliqueHeur::getWMin(
+        gneg,
+        tabV,
+        Koala::MaxStableStrategy::GWMin2<RandGenType>(stdgen),
+        vertContNeg);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+    isIndependentStr = (Koala::MaxCliqueHeur::test(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs clique set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal clique set: " << isMaxIndependentStr << std::endl << "--\n";
+    clearOutput();
 
-    result = Koala::MISHeuristic::getWMin(
+    result = Koala::MaxStableHeur::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::GGWMin<RandGenType>(stdgen),
+        Koala::MaxStableStrategy::GGWMin<RandGenType>(stdgen),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
     } std::cout << std::endl; clearOutput();
+    result = Koala::MaxCliqueHeur::getWMin(
+        gneg,
+        tabV,
+        Koala::MaxStableStrategy::GGWMin<RandGenType>(stdgen),
+        vertContNeg);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+    isIndependentStr = (Koala::MaxCliqueHeur::test(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs clique set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal clique set: " << isMaxIndependentStr << std::endl << "--\n";
 
-    result = Koala::MISHeuristic::getWMin(
+    result = Koala::MaxStableHeur::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::First(),
+        Koala::MaxStableStrategy::First(),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
     } std::cout << std::endl; clearOutput();
+    result = Koala::MaxCliqueHeur::getWMin(
+        gneg,
+        tabV,
+        Koala::MaxStableStrategy::First(),
+        vertContNeg);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+    isIndependentStr = (Koala::MaxCliqueHeur::test(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs clique set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal clique set: " << isMaxIndependentStr << std::endl << "--\n";
 
-    result = Koala::MISHeuristic::getWMin(
+    result = Koala::MaxCliqueHeur::getWMin(
+        gneg,
+        tabV,
+        Koala::MaxStableStrategy::First(),
+        vertContNeg);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+    isIndependentStr = (Koala::MaxCliqueHeur::test(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs clique set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal clique set: " << isMaxIndependentStr << std::endl << "--\n";
+
+    result = Koala::MaxStableHeur::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::Rand<RandGenType >(stdgen),
+        Koala::MaxStableStrategy::Rand<RandGenType >(stdgen),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
@@ -265,35 +379,105 @@ int main(void) {
     // WMAX:
 
     std::cout << "WMAX: " << std::endl;
-    result = Koala::MISHeuristic::getWMax(
+    result = Koala::MaxStableHeur::getWMax(
         g,
         tabV,
-        Koala::MISStrategy::GMax<RandGenType>(stdgen),
+        Koala::MaxStableStrategy::GMax<RandGenType>(stdgen),
         vertCont/*NULL*/);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
-    } std::cout << std::endl; clearOutput();
+    } std::cout << std::endl;
+   isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
+    std::cout << std::endl; clearOutput();
+    result = Koala::MaxCliqueHeur::getWMax(
+        gneg,
+        tabV,
+        Koala::MaxStableStrategy::GMax<RandGenType>(stdgen),
+        vertContNeg);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+    isIndependentStr = (Koala::MaxCliqueHeur::test(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs clique set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal clique set: " << isMaxIndependentStr << std::endl << "--\n";
+    clearOutput();
 
-    result = Koala::MISHeuristic::getWMax(
+    result = Koala::MaxStableHeur::getWMax(
         g,
         tabV,
-        Koala::MISStrategy::GWMax<RandGenType>(stdgen),
+        Koala::MaxStableStrategy::GWMax<RandGenType>(stdgen),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
-    } std::cout << std::endl; clearOutput();
+    } std::cout << std::endl;
+   isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
+    std::cout << std::endl; clearOutput();
+    result = Koala::MaxCliqueHeur::getWMax(
+        gneg,
+        tabV,
+        Koala::MaxStableStrategy::GWMax<RandGenType>(stdgen),
+        vertContNeg);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+    isIndependentStr = (Koala::MaxCliqueHeur::test(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs clique set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal clique set: " << isMaxIndependentStr << std::endl << "--\n";
+    clearOutput();
 
-    result = Koala::MISHeuristic::getWMax(
+    result = Koala::MaxStableHeur::getWMax(
         g,
         tabV,
-        Koala::MISStrategy::GGWMax<RandGenType>(stdgen),
+        Koala::MaxStableStrategy::GGWMax<RandGenType>(stdgen),
         vertCont);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
-    } std::cout << std::endl; clearOutput();
+    } std::cout << std::endl;    isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
+    std::cout << std::endl; clearOutput();
+    result = Koala::MaxCliqueHeur::getWMax(
+        gneg,
+        tabV,
+        Koala::MaxStableStrategy::GGWMax<RandGenType>(stdgen),
+        vertContNeg);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+    isIndependentStr = (Koala::MaxClique::test(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxClique::testMax(gneg, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs clique set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal clique set: " << isMaxIndependentStr << std::endl ;
+    clearOutput();
+    result = Koala::MinVertCoverHeur::getWMax(
+        g,
+        tabV,
+        Koala::MaxStableStrategy::GGWMax<RandGenType>(stdgen),
+        vertCont);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+   isIndependentStr = (Koala::MinVertCover::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MinVertCover::testMin(g, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs cover set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs min cover set: " << isMaxIndependentStr << std::endl;
+    std::cout << std::endl << "--\n"; clearOutput();
 
 
     // -------------------------------------------------------------------
@@ -415,51 +599,202 @@ int main(void) {
     // Exact:
 
 //    std::cout << "Exact: " << std::endl;
-//    MIS = Koala::MIS::get(g, tabV);
-//    std::cout << "wierzcholkow: " << MIS << std::endl;
-//    for(unsigned i = 0; i < MIS; i++) {
+//    MaxStable = Koala::MaxStable::get(g, tabV);
+//    std::cout << "wierzcholkow: " << MaxStable << std::endl;
+//    for(unsigned i = 0; i < MaxStable; i++) {
 //        std::cout << tabV[i]->info.name << ", ";
 //    } std::cout << std::endl;
-//    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
-//    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[MIS])) ? "YES" : "NO";
+//    isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[MaxStable])) ? "YES" : "NO";
+//    isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[MaxStable])) ? "YES" : "NO";
 //    std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
 //    std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
 //    std::cout << std::endl; clearOutput();
 
     std::cout << "WMIN: " << std::endl;
-    result = Koala::MISHeuristic::getWMin(
+    result = Koala::MaxStableHeur::getWMin(
         g,
         tabV,
-        Koala::MISStrategy::GMin<RandGenType>(stdgen),
+        Koala::MaxStableStrategy::GMin<RandGenType>(stdgen),
         vertCont/*NULL*/);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
     } std::cout << std::endl;
-    isIndependentStr = (Koala::MIS::isStable(g, tabV, &tabV[result])) ? "YES" : "NO";
-    isMaxIndependentStr = (Koala::MIS::isMaxStable(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
     std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
     std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
     std::cout << std::endl; clearOutput();
+    g.neg(Koala::EdUndir);
+    result = Koala::MaxCliqueHeur::getWMin(
+        g,
+        tabV,
+        Koala::MaxStableStrategy::GMin<RandGenType>(stdgen),
+        vertCont/*NULL*/);
+    std::cout << "wierzcholkow: " << result << std::endl;
+    for(unsigned int i=0; i<result; ++i) {
+        std::cout << tabV[i]->info.name << ", ";
+    } std::cout << std::endl;
+    isIndependentStr = (Koala::MaxCliqueHeur::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+    isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
+    std::cout << "\tIs clique set: " << isIndependentStr << std::endl;
+    std::cout << "\tIs maximal clique set: " << isMaxIndependentStr << std::endl;
+
+
 
     {
+            std::cout << "\n\t***************\n";
+
         g.clear();
         A=g.addVert(OpisV("A",1));
         B=g.addVert(OpisV("B",1));
         C=g.addVert(OpisV("C",1));
         D=g.addVert(OpisV("D",1));
 
+        g.addLoop(A,OpisE(1));
+        g.addLoop(D,OpisE(1));
+        g.addLoop(B,OpisE(1));
+//        g.addLoop(C,OpisE(1));
+//        g.addEdge(A,B,OpisE(1));
+//        g.addEdge(C,B,OpisE(1));
+//        g.addEdge(C,D,OpisE(1));
+
+        std::cout << "WMIN: " << std::endl;
+
+//        result = Koala::MaxStableHeur::getWMax(
+//            g,
+//            tabV,
+//            Koala::MaxStableStrategy::GGWMax<RandGenType>(stdgen),
+////            Koala::MaxStableStrategy::GMin<RandGenType>(stdgen),
+//            vertCont/*NULL*/);
+
+        result = Koala::MaxStable::get(
+            g,
+            tabV,1);
+
+
+        std::cout << "wierzcholkow: " << result << std::endl;
+        for(unsigned int i=0; i<result; ++i) {
+            std::cout << tabV[i]->info.name << ", ";
+        } std::cout << std::endl;
+        isIndependentStr = (Koala::MaxStable::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+        isMaxIndependentStr = (Koala::MaxStable::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
+        std::cout << "\tIs independent set: " << isIndependentStr << std::endl;
+        std::cout << "\tIs maximal independent set: " << isMaxIndependentStr << std::endl;
+        std::cout << std::endl; clearOutput();
+    }
+
+    {
+            std::cout << "\n\t!!!!!!!!!!!!!!!\n";
+
+        g.clear();
+        A=g.addVert(OpisV("A",1));
+        B=g.addVert(OpisV("B",1));
+        C=g.addVert(OpisV("C",1));
+        D=g.addVert(OpisV("D",1));
+
+        g.addLoop(C,OpisE(1));
+        g.addEdge(D,B,OpisE(1));
+        g.addEdge(A,B,OpisE(1));
         g.addEdge(A,B,OpisE(1));
         g.addEdge(C,B,OpisE(1));
         g.addEdge(C,D,OpisE(1));
 
-        tabV[0]=A;
-        tabV[1]=D;
-        tabV[2]=C;
+        std::cout << "WMIN: " << std::endl;
 
-        std::cout << std::boolalpha << Koala::MISHeuristic::isStable(g, tabV, tabV+1)
-            << ' ' << Koala::MISHeuristic::isMaxStable(g, tabV, tabV+1);
+//        result = Koala::MaxStableHeur::getWMax(
+//            g,
+//            tabV,
+//            Koala::MaxStableStrategy::GGWMax<RandGenType>(stdgen),
+////            Koala::MaxStableStrategy::GMin<RandGenType>(stdgen),
+//            vertCont/*NULL*/);
 
+        result = Koala::MaxClique::get(
+            g,
+            tabV);
+
+//        result = 2;
+////        tabV[0]=C;
+//        tabV[1]=B;
+//        tabV[0]=D;
+
+
+        std::cout << "wierzcholkow: " << result << std::endl;
+        for(unsigned int i=0; i<result; ++i) {
+            std::cout << tabV[i]->info.name << ", ";
+        } std::cout << std::endl;
+        isIndependentStr = (Koala::MaxCliqueHeur::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+        isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
+        std::cout << "\tIs clique: " << isIndependentStr << std::endl;
+        std::cout << "\tIs maximal clique: " << isMaxIndependentStr << std::endl;
+        std::cout << std::endl; clearOutput();
+
+        result = Koala::MaxClique::getSome(
+            g,
+            tabV,1);
+
+        std::cout << "wierzcholkow: " << result << std::endl;
+        for(unsigned int i=0; i<result; ++i) {
+            std::cout << tabV[i]->info.name << ", ";
+        } std::cout << std::endl;
+        isIndependentStr = (Koala::MaxCliqueHeur::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+        isMaxIndependentStr = (Koala::MaxCliqueHeur::testMax(g, tabV, &tabV[result])) ? "YES" : "NO";
+        std::cout << "\tIs clique: " << isIndependentStr << std::endl;
+        std::cout << "\tIs maximal clique: " << isMaxIndependentStr << std::endl;
+        std::cout << std::endl; clearOutput();
+    }
+
+    {
+        std::cout << "\n\tcccccccccccccccccccc\n";
+
+        g.clear();
+        A=g.addVert(OpisV("A",1));
+        B=g.addVert(OpisV("B",1));
+        C=g.addVert(OpisV("C",1));
+        D=g.addVert(OpisV("D",1));
+
+//        g.addLoop(B,OpisE(1));
+//        g.addLoop(D,OpisE(1));
+        g.addEdge(A,B,OpisE(1));
+        g.addEdge(C,B,OpisE(1));
+        g.addEdge(C,D,OpisE(1));
+
+        result=0;
+        tabV[result]=A;  result++;
+        tabV[result]=D;  result++;
+        tabV[result]=C;  result++;
+        tabV[result]=B;  result++;
+//                result=0;
+//                g.clearEdges();
+//                g.addLoop(A,OpisE(1));
+//                g.addLoop(B,OpisE(1));
+
+        std::cout << std::boolalpha <<"test: " << Koala::MinVertCover::test(g, tabV, tabV+result)
+//        << "\n"
+            << "\ntestMax: " << Koala::MinVertCover::testMin(g, tabV, tabV+result)
+            << "\n";
+
+        clearOutput();
+//        g.clearEdges();
+
+        result = Koala::MinVertCover::getSome(
+            g,
+            tabV,2);
+
+        std::cout << "wierzcholkow: " << result << std::endl;
+        for(unsigned int i=0; i<result; ++i) {
+            std::cout << tabV[i]->info.name << ", ";
+        } std::cout << std::endl;
+        isIndependentStr = (Koala::MinVertCover::test(g, tabV, &tabV[result])) ? "YES" : "NO";
+        isMaxIndependentStr = (Koala::MinVertCover::testMin(g, tabV, &tabV[result])) ? "YES" : "NO";
+        std::cout << "\tIs cover " << isIndependentStr << std::endl;
+        std::cout << "\tIs minimal cover " << isMaxIndependentStr << std::endl;
+        std::cout << std::endl; clearOutput();
 
     }
 }
+
+
+
+
+

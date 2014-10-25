@@ -1,10 +1,10 @@
-// MISStrategy::Rand
+// MaxStableStrategy::Rand
 
 template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::Rand<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
+	MaxStableStrategy::Rand<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
-	unsigned int random = Privates::getRandom(*rgen,g.getVertNo()-1);//rand() % g.getVertNo();
+	unsigned int random = Koala::Privates::getRandom(*rgen,g.getVertNo()-1);//rand() % g.getVertNo();
 	typename GraphType::PVertex v = g.getVert();
 	while (random--) v = g.getVertNext( v );
 	// ALG: no vertex chosen
@@ -13,11 +13,11 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 	return v;
 }
 
-// MISStrategy::GMin
+// MaxStableStrategy::GMin
 
 template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GMin<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
+	MaxStableStrategy::GMin<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMaxs = 0, randomIndex = 0, deg = 0;
 	double max = std::numeric_limits< double >::min(), value = 0.0;
@@ -46,15 +46,15 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 	// ALG: no vertex chosen
 	(void)(vertTab);
 	assert( nMaxs > 0 );
-	randomIndex = Privates::getRandom(*rgen,nMaxs-1);//rand() % nMaxs;
+	randomIndex = Koala::Privates::getRandom(*rgen,nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
-// MISStrategy::GWMin
+// MaxStableStrategy::GWMin
 
 template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GWMin<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
+	MaxStableStrategy::GWMin<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMaxs = 0, randomIndex = 0, deg = 0;
 	double max = std::numeric_limits< double >::min(), value = 0.0;
@@ -84,15 +84,15 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	 // ALG: no vertex chosen
 	assert( nMaxs > 0 );
-	randomIndex = Privates::getRandom(*rgen,nMaxs-1);//rand() % nMaxs;
+	randomIndex = Koala::Privates::getRandom(*rgen,nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
-// MISStrategy::GGWMin
+// MaxStableStrategy::GGWMin
 
 template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GGWMin<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
+	MaxStableStrategy::GGWMin<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMaxs = 0;
 	unsigned int randomIndex = 0;
@@ -124,15 +124,15 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMaxs > 0 );
-	randomIndex = Privates::getRandom(*rgen,nMaxs-1);//rand() % nMaxs;
+	randomIndex = Koala::Privates::getRandom(*rgen,nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
-// MISStrategy::GWMin2
+// MaxStableStrategy::GWMin2
 
 template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GWMin2<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
+	MaxStableStrategy::GWMin2<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMaxs = 0;
 	unsigned int randomIndex = 0;
@@ -166,15 +166,15 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMaxs > 0 );
-	randomIndex = Privates::getRandom(*rgen,nMaxs-1);//rand() % nMaxs;
+	randomIndex = Koala::Privates::getRandom(*rgen,nMaxs-1);//rand() % nMaxs;
 	return vMaxs[randomIndex];
 }
 
-// MISStrategy::GMax
+// MaxStableStrategy::GMax
 
 template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GMax<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
+	MaxStableStrategy::GMax<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMins = 0, randomIndex = 0, deg = 0;
 	double min = std::numeric_limits< double >::max(), value = 0.0;
@@ -202,16 +202,16 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMins > 0 );
-	randomIndex = Privates::getRandom(*rgen,nMins-1);//rand() % nMins;
+	randomIndex = Koala::Privates::getRandom(*rgen,nMins-1);//rand() % nMins;
 	(void)vertTab;
 	return vMins[randomIndex];
 }
 
-// MISStrategy::GWMax
+// MaxStableStrategy::GWMax
 
 template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GWMax<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
+	MaxStableStrategy::GWMax<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMins = 0, randomIndex = 0, deg = 0;
 	double min = std::numeric_limits< double >::max(), value = 0.0;
@@ -239,15 +239,15 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMins > 0 );
-	randomIndex = Privates::getRandom(*rgen,nMins-1);//rand() % nMins;
+	randomIndex = Koala::Privates::getRandom(*rgen,nMins-1);//rand() % nMins;
 	return vMins[randomIndex];
 }
 
-// MISStrategy::GGWMax
+// MaxStableStrategy::GGWMax
 
 template <class RndGen>
 template< class GraphType, class VertContainer > typename GraphType::PVertex
-	MISStrategy::GGWMax<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
+	MaxStableStrategy::GGWMax<RndGen>::operator()( const GraphType &g, const VertContainer& vertTab )
 {
 	unsigned int nMins = 0;
 	unsigned int randomIndex = 0;
@@ -279,63 +279,74 @@ template< class GraphType, class VertContainer > typename GraphType::PVertex
 
 	// ALG: no vertex chosen
 	assert( nMins > 0 );
-	randomIndex = Privates::getRandom(*rgen,nMins-1);//rand() % nMins;
+	randomIndex = Koala::Privates::getRandom(*rgen,nMins-1);//rand() % nMins;
 	return vMins[randomIndex];
 }
 
-// MISHeuristicPar
+// MaxStableHeurPar
 
 template< class DefaultStructs >
 	template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
-	unsigned MISHeuristicPar< DefaultStructs >::getWMin(
+	unsigned MaxStableHeurPar< DefaultStructs >::getWMin(
 		const GraphType &g, OutputIterator out, ChoiceFunction choose, const VertContainer &vertTab )
 {
 	// USR: directed graphs and loops are not allowed
-	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
+//	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
+
+    MaxStableStrategy::Privates::WMin_Strategy_tag chtest=choose;//Wymuszony blad kompilacji w razie uzycia niewlasciwego choose
 
 	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
 		ImageGraph;
 
     SimplArrPool<typename ImageGraph::Vertex> valloc(g.getVertNo());
-    SimplArrPool<typename ImageGraph::Edge> ealloc(g.getEdgeNo());
+    SimplArrPool<typename ImageGraph::Edge> ealloc(g.getEdgeNo(Directed|Undirected));
 	ImageGraph ig(&valloc,&ealloc);
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, typename ImageGraph::PVertex>
         ::Type org2im( g.getVertNo() );
-	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) org2im[u]=ig.addVert( u );
-	for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-        ig.addEdge(org2im[g.getEdgeEnd1(e)],org2im[g.getEdgeEnd2(e)]);
+	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
+        if (!g.getEdgeNo(u,EdLoop)) org2im[u]=ig.addVert( u );
+        else org2im[u]=0;
+    if (!ig.getVertNo()) return 0;
+	for( typename GraphType::PEdge e = g.getEdge(Directed|Undirected); e; e = g.getEdgeNext( e,Directed|Undirected ) )
+        if (org2im[g.getEdgeEnd1(e)] && org2im[g.getEdgeEnd2(e)])
+                ig.addEdge(org2im[g.getEdgeEnd1(e)],org2im[g.getEdgeEnd2(e)]);
     ig.delAllParals(EdUndir);
 	// ALG: copy contains all vertices and edges
-	assert( g.getVertNo() == ig.getVertNo() );
+	//assert( g.getVertNo() == ig.getVertNo() );
 	return TemplateWMIN( ig,out,choose,vertTab);
 }
 
 template< class DefaultStructs >
 	template< class GraphType, class OutputIterator, class ChoiceFunction, class VertContainer >
-	unsigned MISHeuristicPar< DefaultStructs >::getWMax(
+	unsigned MaxStableHeurPar< DefaultStructs >::getWMax(
 		const GraphType &g, OutputIterator out, ChoiceFunction choose, const VertContainer &vertTab )
 {
-	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
+	//koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
+    MaxStableStrategy::Privates::WMax_Strategy_tag chtest=choose;//Wymuszony blad kompilacji w razie uzycia niewlasciwego choose
 	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
 		ImageGraph;
 
     SimplArrPool<typename ImageGraph::Vertex> valloc(g.getVertNo());
-    SimplArrPool<typename ImageGraph::Edge> ealloc(g.getEdgeNo());
+    SimplArrPool<typename ImageGraph::Edge> ealloc(g.getEdgeNo(Directed|Undirected));
 	ImageGraph ig(&valloc,&ealloc);
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, typename ImageGraph::PVertex>
         ::Type org2im( g.getVertNo() );
-	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) org2im[u]=ig.addVert( u );
-	for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-        ig.addEdge(org2im[g.getEdgeEnd1(e)],org2im[g.getEdgeEnd2(e)]);
+	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
+        if (!g.getEdgeNo(u,EdLoop)) org2im[u]=ig.addVert( u );
+        else org2im[u]=0;
+    if (!ig.getVertNo()) return 0;
+	for( typename GraphType::PEdge e = g.getEdge(Directed|Undirected); e; e = g.getEdgeNext( e,Directed|Undirected ) )
+        if (org2im[g.getEdgeEnd1(e)] && org2im[g.getEdgeEnd2(e)])
+                ig.addEdge(org2im[g.getEdgeEnd1(e)],org2im[g.getEdgeEnd2(e)]);
     ig.delAllParals(EdUndir);
-	assert( g.getVertNo() == ig.getVertNo() );
+//	assert( g.getVertNo() == ig.getVertNo() );
 	return TemplateWMAX( ig,out,choose,vertTab );
 }
 
 template< class DefaultStructs >
 	template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
-	unsigned MISHeuristicPar< DefaultStructs >::TemplateWMIN(
+	unsigned MaxStableHeurPar< DefaultStructs >::TemplateWMIN(
 		GraphType &g, OutputIterator out, ChoiceFunction choose, const VertContainer &vertTab )
 {
 	unsigned res = 0;
@@ -364,7 +375,7 @@ template< class DefaultStructs >
 
 template< class DefaultStructs >
 	template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
-	unsigned MISHeuristicPar< DefaultStructs >::TemplateWMAX(
+	unsigned MaxStableHeurPar< DefaultStructs >::TemplateWMAX(
 		GraphType &g, OutputIterator out, ChoiceFunction choose, const VertContainer &vertTab )
 {
 	unsigned res = 0;
@@ -396,12 +407,14 @@ template< class DefaultStructs >
 
 
 template< class DefaultStructs > template< class GraphType, typename Iterator >
-	bool MISHeuristicPar< DefaultStructs >::isStable( const GraphType &g, Iterator first, Iterator last )
+	bool MaxStableHeurPar< DefaultStructs >::test( const GraphType &g, Iterator first, Iterator last )
 {
-	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
+//	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, EmptyVertInfo> ::Type s( g.getVertNo() );
-	for( Iterator pV = first; pV != last; pV++ ) s[*pV]=EmptyVertInfo();
+	for( Iterator pV = first; pV != last; pV++ )
+        if (g.getEdgeNo(*pV,EdLoop)) return false;
+        else s[*pV]=EmptyVertInfo();
 	for( Iterator pV = first; pV != last; pV++ )
         for( typename GraphType::PEdge e=g.getEdge(*pV); e; e=g.getEdgeNext(*pV,e))
             if (s.hasKey(g.getEdgeEnd(e,*pV))) return false;
@@ -410,16 +423,16 @@ template< class DefaultStructs > template< class GraphType, typename Iterator >
 }
 
 template< class DefaultStructs > template< class GraphType, typename Iterator >
-	bool MISHeuristicPar< DefaultStructs >::isMaxStable(const GraphType &g, Iterator first, Iterator last, bool stabilitytest )
+	bool MaxStableHeurPar< DefaultStructs >::testMax(const GraphType &g, Iterator first, Iterator last, bool stabilitytest )
 {
-	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
+//	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
-	if ( stabilitytest && (!isStable( g,first,last ))) return false;
+	if ( stabilitytest && (!test( g,first,last ))) return false;
     typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, EmptyVertInfo> ::Type s( g.getVertNo() );
 	for( Iterator it = first; it != last; it++ ) s[*it]=EmptyVertInfo();
 
 	for( typename GraphType::PVertex pV = g.getVert(); pV; pV = g.getVertNext( pV ) )
-        if (!s.hasKey(pV))
+        if (!s.hasKey(pV) && g.getEdgeNo(pV,EdLoop)==0)
         {
             bool flag=false;
             for( typename GraphType::PEdge e=g.getEdge(pV); e; e=g.getEdgeNext(pV,e))
@@ -434,22 +447,22 @@ template< class DefaultStructs > template< class GraphType, typename Iterator >
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-	int MISPar< DefaultStructs >::get(GraphType & g, OutputIterator out, int minSize)
+	int MaxStablePar< DefaultStructs >::get(GraphType & g, OutputIterator out, int minSize)
 {
 	return get(g, out, minSize, false);
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-	int MISPar< DefaultStructs >::getSome(GraphType & g, OutputIterator out, int minSize)
+	int MaxStablePar< DefaultStructs >::getSome(GraphType & g, OutputIterator out, int minSize)
 {
 	return get(g, out, minSize, true);
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-	int MISPar< DefaultStructs >::get(GraphType & g, OutputIterator out, int minSize, bool skipsearchiffound)
+	int MaxStablePar< DefaultStructs >::get(GraphType & g, OutputIterator out, int minSize, bool skipsearchiffound)
 {
 	koalaAssert(minSize >= 0, AlgExcWrongArg);
-	koalaAssert(g.getEdgeNo(EdLoop) == 0,AlgExcWrongConn);
+//	koalaAssert(g.getEdgeNo(EdLoop) == 0,AlgExcWrongConn);
 
 	typedef typename GraphType::PVertex Vert;
 	typedef typename DefaultStructs::template LocalGraph< Vert,EmptyEdgeInfo,Undirected >::Type ImageGraph;
@@ -457,14 +470,21 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
 
     typename DefaultStructs:: template AssocCont< Vert, typename ImageGraph::PVertex > ::Type vmapH(g.getVertNo());
     for(Vert u = g.getVert(); u; u = g.getVertNext(u))
-		vmapH[u] = h.addVert(u);
+        if (!g.getEdgeNo(u,EdLoop)) vmapH[u] = h.addVert(u);
+        else vmapH[u] = 0;
+    if (!h.getVertNo())
+    {
+         if (minSize==0) return 0;
+         else return -1;
+    }
 
-    for(typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext(e))
-		h.addEdge(vmapH[g.getEdgeEnd1(e)], vmapH[g.getEdgeEnd2(e)]);
-    assert(g.getEdgeNo() == h.getEdgeNo() && g.getVertNo() == h.getVertNo());
+    for(typename GraphType::PEdge e = g.getEdge(Directed|Undirected); e; e = g.getEdgeNext(e,Directed|Undirected))
+		if (vmapH[g.getEdgeEnd1(e)] && vmapH[g.getEdgeEnd2(e)])
+            h.addEdge(vmapH[g.getEdgeEnd1(e)], vmapH[g.getEdgeEnd2(e)]);
+//    assert(g.getEdgeNo() == h.getEdgeNo() && g.getVertNo() == h.getVertNo());
     h.delAllParals(EdUndir);
 
-	Vert LOCALARRAY(outTab,g.getVertNo());
+	Vert LOCALARRAY(outTab,h.getVertNo());
 	int size = getRecursive(h, outTab, false, isBlackHole(out), minSize, skipsearchiffound);
 	if(!isBlackHole(out))
 		for(int i = 0; i < size; i++)
@@ -473,7 +493,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-    int MISPar< DefaultStructs >::getRecursive(GraphType &g, OutputIterator out, bool isConnectedComponent, bool outblackhole, int minSize, bool skipsearchiffound)
+    int MaxStablePar< DefaultStructs >::getRecursive(GraphType &g, OutputIterator out, bool isConnectedComponent, bool outblackhole, int minSize, bool skipsearchiffound)
 {
 	// ==============================
     // (1) empty graph
@@ -686,7 +706,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-	int MISPar< DefaultStructs >::getMirrors(const GraphType & g, typename GraphType::PVertex v, OutputIterator out)
+	int MaxStablePar< DefaultStructs >::getMirrors(const GraphType & g, typename GraphType::PVertex v, OutputIterator out)
 {
 	int outNo = 0, secondNeighNo = 0;
 	typename GraphType::PVertex LOCALARRAY(secondNeigh, g.getEdgeNo());
@@ -725,7 +745,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
     return outNo;
 }
 
-template< class DefaultStructs > template< class GraphType, class InputIterator > bool MISPar< DefaultStructs >::isClique(
+template< class DefaultStructs > template< class GraphType, class InputIterator > bool MaxStablePar< DefaultStructs >::isClique(
     const GraphType &g, InputIterator beg, InputIterator end)
 {
 	for(InputIterator viter=beg; viter!=end; ++viter)
@@ -751,7 +771,7 @@ template< class DefaultStructs > template< class GraphType, class InputIterator 
 	*/
 }
 
-template< class DefaultStructs > template< class GraphType > bool MISPar< DefaultStructs >::isDominated(
+template< class DefaultStructs > template< class GraphType > bool MaxStablePar< DefaultStructs >::isDominated(
     const GraphType &g, typename GraphType::PVertex u, typename GraphType::PVertex v)
 {
 
@@ -779,7 +799,7 @@ template< class DefaultStructs > template< class GraphType > bool MISPar< Defaul
     */
 }
 
-template< class DefaultStructs > template< class GraphType > bool MISPar< DefaultStructs >::isFoldable(
+template< class DefaultStructs > template< class GraphType > bool MaxStablePar< DefaultStructs >::isFoldable(
     const GraphType &g, typename GraphType::PVertex v)
 {
 	int size = g.getNeighNo(v);
@@ -801,4 +821,239 @@ template< class DefaultStructs > template< class GraphType > bool MISPar< Defaul
 
     // vertex is foldable if there are less antiedges than vertices (no anti-triangles)
     return antiedges < size;
+}
+
+
+template< class DefaultStructs > template< class GraphType, typename Iterator >
+	bool MaxCliqueHeurPar< DefaultStructs >::test( const GraphType &g, Iterator first, Iterator last )
+{
+    int n;
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, EmptyVertInfo> ::Type s( n=g.getVertNo() );
+	for( Iterator pV = first; pV != last; pV++ )
+    {
+        s[*pV]=EmptyVertInfo();
+        for( typename GraphType::PEdge e=g.getEdge(*pV,Directed|Undirected); e; e=g.getEdgeNext(*pV,e,Directed|Undirected))
+            s[g.getEdgeEnd(e,*pV)]=EmptyVertInfo();
+        for( Iterator qV = first; qV != last; qV++ ) if (!s.hasKey(*qV)) return false;
+//        s.clear(); s.reserve(n);
+        while(!s.empty()) s.delKey(s.firstKey());
+    }
+    return true;
+}
+
+
+template< class DefaultStructs > template< class GraphType, typename Iterator >
+	bool MaxCliqueHeurPar< DefaultStructs >::testMax(const GraphType &g, Iterator first, Iterator last, bool stabilitytest )
+{
+	if ( stabilitytest && (!test( g,first,last ))) return false;
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, EmptyVertInfo> ::Type s( g.getVertNo() );
+	for( Iterator it = first; it != last; it++ ) s[*it]=EmptyVertInfo();
+	int k=s.size();
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, EmptyVertInfo> ::Type s2( k );
+
+	for( typename GraphType::PVertex pV = g.getVert(); pV; pV = g.getVertNext( pV ) )
+        if (!s.hasKey(pV))
+        {   typename GraphType::PVertex u;
+            for( typename GraphType::PEdge e=g.getEdge(pV,Directed|Undirected); e; e=g.getEdgeNext(pV,e,Directed|Undirected))
+                if (s.hasKey(u=g.getEdgeEnd(e,pV))) s2[u]=EmptyVertInfo();
+            if (s2.size()==k) return false;
+            //s2.clear();s2.reserve(k);
+            while(!s2.empty()) s2.delKey(s2.firstKey());
+        }
+    return true;
+}
+
+template< class DefaultStructs >
+	template< class Graph1, class Graph2 >
+	void MaxCliqueHeurPar< DefaultStructs >::copyneg(const Graph1& g, Graph2& ig)
+{
+    typename DefaultStructs:: template AssocCont< typename Graph1::PVertex, typename Graph2::PVertex>
+        ::Type org2im( g.getVertNo() );
+	for( typename Graph1::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
+        org2im[u]=ig.addVert( u );
+	for( typename Graph1::PEdge e = g.getEdge(Directed|Undirected); e; e = g.getEdgeNext( e,Directed|Undirected ) )
+                ig.addEdge(org2im[g.getEdgeEnd1(e)],org2im[g.getEdgeEnd2(e)]);
+    ig.neg(EdUndir);
+}
+
+template< class DefaultStructs >
+	template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
+	unsigned MaxCliqueHeurPar< DefaultStructs >::getWMin(
+		const GraphType &g, OutputIterator out, ChoiceFunction choose, const VertContainer &vertTab )
+{
+	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
+		ImageGraph;
+
+    int n=g.getVertNo();
+    SimplArrPool<typename ImageGraph::Vertex> valloc(n);
+    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1));
+	ImageGraph ig(&valloc,&ealloc);
+	MaxCliqueHeurPar< DefaultStructs >::copyneg(g,ig);
+
+    typename ImageGraph::PVertex LOCALARRAY(imout,n);
+    int res = MaxStableHeurPar< DefaultStructs >::getWMin(ig, imout, choose, InfoPseudoAssoc<VertContainer>(vertTab) );
+    for(int i=0;i<res;i++)
+    {
+        *out=imout[i]->info;
+        ++out;
+    }
+	return res;
+}
+
+template< class DefaultStructs >
+	template< class GraphType, class OutputIterator, class ChoiceFunction, class VertContainer >
+	unsigned MaxCliqueHeurPar< DefaultStructs >::getWMax(
+		const GraphType &g, OutputIterator out, ChoiceFunction choose, const VertContainer &vertTab )
+{
+	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
+		ImageGraph;
+
+    int n=g.getVertNo();
+    SimplArrPool<typename ImageGraph::Vertex> valloc(n);
+    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1));
+	ImageGraph ig(&valloc,&ealloc);
+	MaxCliqueHeurPar< DefaultStructs >::copyneg(g,ig);
+
+    typename ImageGraph::PVertex LOCALARRAY(imout,n);
+    int res = MaxStableHeurPar< DefaultStructs >::getWMax(ig, imout, choose, InfoPseudoAssoc<VertContainer>(vertTab) );
+    for(int i=0;i<res;i++)
+    {
+        *out=imout[i]->info;
+        ++out;
+    }
+	return res;
+}
+
+template< class DefaultStructs > template< class GraphType, class OutputIterator >
+	int MaxCliquePar< DefaultStructs >::get(GraphType & g, OutputIterator out, int minSize)
+{
+	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
+		ImageGraph;
+
+    int n=g.getVertNo();
+    SimplArrPool<typename ImageGraph::Vertex> valloc(n);
+    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1));
+	ImageGraph ig(&valloc,&ealloc);
+	MaxCliqueHeurPar< DefaultStructs >::copyneg(g,ig);
+
+    typename ImageGraph::PVertex LOCALARRAY(imout,n);
+    int res = MaxStablePar< DefaultStructs >::get(ig, imout, minSize );
+    for(int i=0;i<res;i++)
+    {
+        *out=imout[i]->info;
+        ++out;
+    }
+	return res;
+}
+
+template< class DefaultStructs > template< class GraphType, class OutputIterator >
+	int MaxCliquePar< DefaultStructs >::getSome(GraphType & g, OutputIterator out, int minSize)
+{
+	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
+		ImageGraph;
+
+    int n=g.getVertNo();
+    SimplArrPool<typename ImageGraph::Vertex> valloc(n);
+    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1));
+	ImageGraph ig(&valloc,&ealloc);
+	MaxCliqueHeurPar< DefaultStructs >::copyneg(g,ig);
+
+    typename ImageGraph::PVertex LOCALARRAY(imout,n);
+    int res = MaxStablePar< DefaultStructs >::getSome(ig, imout, minSize );
+    for(int i=0;i<res;i++)
+    {
+        *out=imout[i]->info;
+        ++out;
+    }
+	return res;
+}
+
+
+template< class DefaultStructs > template< class GraphType, typename Iterator, typename IterOut >
+    int MinVertCoverHeurPar< DefaultStructs >::vertSetMinus(const GraphType &g, Iterator first, Iterator last,IterOut out)
+{
+    int n=g.getVertNo(),res=0;
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex, EmptyVertInfo> ::Type s( n );
+	for( Iterator pV = first; pV != last; pV++ )
+        s[*pV]=EmptyVertInfo();
+    for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
+        if (!s.hasKey(v))
+        {
+            *out=v;++out;
+            ++res;
+        }
+    return res;
+}
+
+template< class DefaultStructs > template< class GraphType, typename Iterator >
+	bool MinVertCoverHeurPar< DefaultStructs >::test( const GraphType &g, Iterator first, Iterator last )
+{
+    int n=g.getVertNo();
+    typename GraphType::PVertex LOCALARRAY(vtab,n);
+    int res=MinVertCoverHeurPar< DefaultStructs >::vertSetMinus(g,first, last, vtab);
+    return MaxStableHeurPar< DefaultStructs >::test(g,vtab,vtab+res);
+}
+
+template< class DefaultStructs > template< class GraphType, typename Iterator >
+	bool MinVertCoverHeurPar< DefaultStructs >::testMin( const GraphType &g, Iterator first, Iterator last, bool stabilitytest )
+{
+    int n=g.getVertNo();
+    typename GraphType::PVertex LOCALARRAY(vtab,n);
+    int res=MinVertCoverHeurPar< DefaultStructs >::vertSetMinus(g,first, last, vtab);
+    return MaxStableHeurPar< DefaultStructs >::testMax(g,vtab,vtab+res,stabilitytest);
+}
+
+template< class DefaultStructs >
+	template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
+	unsigned MinVertCoverHeurPar< DefaultStructs >::getWMin(
+		const GraphType &g, OutputIterator out, ChoiceFunction choose, const VertContainer &vertTab )
+{
+    int n=g.getVertNo();
+    typename GraphType::PVertex LOCALARRAY(vtab,n);
+    int res=MaxStableHeurPar< DefaultStructs >::getWMin(g,vtab,choose,vertTab);
+    return MinVertCoverHeurPar< DefaultStructs >::vertSetMinus(g,vtab,vtab+res,out);
+}
+
+template< class DefaultStructs >
+	template< class GraphType, class OutputIterator, class ChoiceFunction, class VertContainer >
+	unsigned MinVertCoverHeurPar< DefaultStructs >::getWMax(
+		const GraphType &g, OutputIterator out, ChoiceFunction choose, const VertContainer &vertTab )
+{
+    int n=g.getVertNo();
+    typename GraphType::PVertex LOCALARRAY(vtab,n);
+    int res=MaxStableHeurPar< DefaultStructs >::getWMax(g,vtab,choose,vertTab);
+    return MinVertCoverHeurPar< DefaultStructs >::vertSetMinus(g,vtab,vtab+res,out);
+}
+
+
+template< class DefaultStructs > template< class GraphType, class OutputIterator >
+	int MinVertCoverPar< DefaultStructs >::get(GraphType & g, OutputIterator out, int maxSize)
+{
+    if (maxSize<0) return -1;
+    if (maxSize==0)
+    {
+        if (g.getEdgeNo()==0) return 0;
+        else return -1;
+    }
+    int n=g.getVertNo();
+    if (n<maxSize) maxSize=n;
+    typename GraphType::PVertex LOCALARRAY(vtab,n);
+    int res=MaxStablePar< DefaultStructs >::get(g,vtab,n-maxSize);
+    return MinVertCoverPar< DefaultStructs >::vertSetMinus(g,vtab,vtab+res,out);
+}
+
+template< class DefaultStructs > template< class GraphType, class OutputIterator >
+	int MinVertCoverPar< DefaultStructs >::getSome(GraphType & g, OutputIterator out, int maxSize)
+{
+    if (maxSize<0) return -1;
+    if (maxSize==0)
+    {
+        if (g.getEdgeNo()==0) return 0;
+        else return -1;
+    }
+    int n=g.getVertNo();
+    if (n<maxSize) maxSize=n;
+    typename GraphType::PVertex LOCALARRAY(vtab,n);
+    int res=MaxStablePar< DefaultStructs >::getSome(g,vtab,n-maxSize);
+    return MinVertCoverPar< DefaultStructs >::vertSetMinus(g,vtab,vtab+res,out);
 }
