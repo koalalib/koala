@@ -499,8 +499,8 @@ template< class RndGen,class GraphType, class VInfoGen, class EInfoGen > typenam
 		for(int j = i + 1; j < n; j++ )
 		{
 			//rnd = (double)rgen.rand() / (double)rgen.maxRand;
-			rnd = (double)Privates::getRandom(rgen) / (double)Privates::getMaxRandom(rgen);
-			if (rnd <= p)
+			rnd = random(rgen);
+			if (rnd < p)
 			{
 				if (eType == Undirected) g.addEdge( vTab[i],vTab[j],eInfoGen( i,j,EdUndir ),EdUndir );
 				if (eType == Directed) g.addEdge( vTab[i],vTab[j],eInfoGen( i,j,EdDirIn ),EdDirIn );
@@ -508,8 +508,8 @@ template< class RndGen,class GraphType, class VInfoGen, class EInfoGen > typenam
 			if (eType == Directed)
 			{
 				//rnd = (double)rgen.rand() / (double)rgen.maxRand;
-				rnd = (double)Privates::getRandom(rgen) / (double)Privates::getMaxRandom(rgen);
-				if (rnd <= p) g.addEdge( vTab[j],vTab[i],eInfoGen( j,i,EdDirIn ),EdDirIn );
+				rnd = random(rgen);
+				if (rnd < p) g.addEdge( vTab[j],vTab[i],eInfoGen( j,i,EdDirIn ),EdDirIn );
 			}
 		}
 	return vTab[0];
@@ -581,13 +581,471 @@ template< class RndGen, class GraphType, class VInfoGen, class EInfoGen > typena
 	return vTab[0];
 }
 
+
+template< class RndGen, class GraphType, class VInfoGen, class EInfoGen >
+typename GraphType::PVertex Creator::barAlb(RndGen& rgen, GraphType &g, int n, int k, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection type, bool shuffle)
+{
+	/*
+	This algorithm is based on the pseudocode from
+	"Efficient generation of large random networks",
+	Vladimir Batagelj and Ulrik Brandes, Phys. Rev. E 71, 036113, 2005.
+	*/
+
+	koalaAssert((k >= 1) && (n > 0) && (type==Undirected || (type&Directed)==type), AlgExcWrongArg);
+
+	int edgesNum = n*k;
+	int i, v, r, vIdx, v1, v2;
+	int LOCALARRAY(M, edgesNum << 1);
+	int LOCALARRAY(perm, n);
+	typename GraphType::PVertex LOCALARRAY(vTab, n);
+
+	//initialization
+	for (i = 0; i < n; ++i)
+	{
+		vTab[i] = g.addVert(vInfoGen(i));
+		perm[i] = i;
+	}
+
+	vIdx = 0;
+	for (v = 0; v < n; ++v)
+	{
+		for (i = 0; i < k; ++i)
+		{
+			M[vIdx] = v;
+			r = random(rgen, 0, vIdx);
+			++vIdx;
+			M[vIdx] = M[r];
+			++vIdx;
+		}
+	}
+	if (shuffle) simpleShuffle(rgen, perm, n);
+
+	for (i = 0; i < (edgesNum << 1); i += 2) {
+		v1 = perm[M[i]];
+		v2 = perm[M[i + 1]];
+
+		if (v2 > v1)
+		{
+			int temp = v1;
+			v1 = v2;
+			v2 = temp;
+		}
+
+		if (v1 == v2) g.addEdge(vTab[v1], vTab[v2], eInfoGen(v1, v2, EdLoop), EdLoop);
+		else if (type == Undirected) g.addEdge(vTab[v1], vTab[v2], eInfoGen(v1, v2, EdUndir), EdUndir);
+		else if (type!=Directed) //g.addEdge(vTab[v1], vTab[v2], eInfoGen(v1, v2, EdDirOut), EdDirOut); //orient edges so that: lower index <- higher index
+                g.addEdge(vTab[v1], vTab[v2], eInfoGen(v1, v2, type), type);
+                else
+                {
+                    EdgeDirection dir =  (random(rgen, 0, 1) == 1) ?  EdDirIn: EdDirOut;
+                    g.addEdge(vTab[v1], vTab[v2], eInfoGen(v1, v2, dir), dir);
+                }
+	}
+	return vTab[0];
+}
+
+template< class RndGen, class GraphType >
+typename GraphType::PVertex Creator::barAlb(RndGen& rgen, GraphType &g, int n, int k, EdgeDirection type, bool shuffle)
+{
+	return Creator::barAlb(rgen, g, n, k, Koala::ConstFunctor< typename GraphType::VertInfoType >(),
+		Koala::ConstFunctor< typename GraphType::EdgeInfoType >(), type, shuffle);
+}
+
+template< class Settings, class RndGen, class GraphType, class VInfoGen, class EInfoGen >
+typename GraphType::PVertex Creator::wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type, bool shuffle)
+{
+	koalaAssert((k <= n - 1) && (k > 0) && ((k & 1) == 0), AlgExcWrongArg); //only even k
+	koalaAssert((beta >= 0) && (beta <= 1), AlgExcWrongArg);
+	koalaAssert(n > 3, AlgExcWrongArg);
+
+	int d = k >> 1, v, w, i, v1, v2;
+	int mNum = n * d;
+//	Koala::HashSet<std::pair<int, int> > edgeSet(mNum*4/3);
+    typename Settings:: template Set<std::pair<int, int> >::Type edgeSet;
+    Settings::reserveSet(edgeSet,mNum*4/3);
+	int LOCALARRAY(degree, n);
+	typename GraphType::PVertex LOCALARRAY(vTab, n);
+	int LOCALARRAY(perm, n);
+
+	//initialization
+	for (i = 0; i < n; ++i)
+	{
+		vTab[i] = g.addVert(vInfoGen(i));
+		perm[i] = i;
+		degree[i] = 0;
+	}
+
+	//creating circle with required edges
+	for (i = 1; i <= d; ++i)
+	{
+		for (v = 0; v < n; ++v)
+		{
+			w = (v + i) % n;
+
+			if (w > v) v1 = v, v2 = w;
+			else v1 = w, v2 = v;
+
+			edgeSet.insert(std::make_pair(v1, v2));
+			++degree[v1], ++degree[v2];
+		}
+	}
+
+	//randomly rewiring edges
+	for (i = 1; i <= d; ++i)
+	{
+		for (v = 0; v < n; ++v)
+		{
+			w = (v + i) % n;
+			double p = random(rgen);
+			if (degree[v] < (n - 1) && p < beta) //if degree[v] == n-1 then there is no place for rewiring
+			{
+				bool ok = false;
+				do
+				{
+					int r = random(rgen, 0, n - 1);
+					if (r > v) v1 = v, v2 = r;
+					else v1 = r, v2 = v;
+
+					if (r != v	&&	//do not allow for loops
+						r != w	&&//do not allow for the same edge
+						edgeSet.find(std::make_pair(v1, v2))==edgeSet.end()) //do not allow for parallel edges
+					{
+						edgeSet.insert(std::make_pair(v1, v2));
+						if (v < w) edgeSet.erase(std::make_pair(v, w));
+						else edgeSet.erase(std::make_pair(w, v));
+						--degree[w]; ++degree[v2];
+						ok = true;
+					}
+				} while (!ok);
+			}
+		}
+	}
+
+	typename Settings:: template Set<std::pair<int, int> >::Type::const_iterator it = edgeSet.begin();
+	while (it != edgeSet.end())
+	{
+		v = it->first;
+		w = it->second;
+		v1 = perm[v];
+		v2 = perm[w];
+
+		if (type == Undirected) g.addEdge(vTab[v1], vTab[v2], eInfoGen(v1, v2, EdUndir), EdUndir);
+		else
+		{
+			//randomly orient edges
+			EdgeType direct = EdDirOut;
+			if (random(rgen, 0, 1) == 1)  direct = EdDirIn;
+			g.addEdge(vTab[v1], vTab[v2], eInfoGen(v1, v2, direct), direct);
+		}
+		it++;
+	}
+	return vTab[0];
+}
+
+template< class RndGen, class GraphType >
+typename GraphType::PVertex Creator::wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, EdgeType type, bool shuffle)
+{
+	return Creator::wattStrog1(rgen, g, n, k, beta, Koala::ConstFunctor< typename GraphType::VertInfoType >(),
+		Koala::ConstFunctor< typename GraphType::EdgeInfoType >(), type, shuffle);
+}
+
+
+template< class Settings,class RndGen, class GraphType, class VInfoGen, class EInfoGen >
+ typename GraphType::PVertex Creator::wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type, bool shuffle)
+{
+	 /*
+	 This algorithm is based on the following concepts:
+	  - virtual Fisher-Yates shuffle
+	  from "Efficient generation of large random networks",
+	  Vladimir Batagelj and Ulrik Brandes, Phys. Rev. E 71, 036113, 2005,
+	  - virtual Fisher-Yates shuffle with deselection
+	  from "An Efficient Generator for Clustered Dynamic Random Networks",
+	  Robert G\"orke, Roland Kluge, Andrea Schumm, Christian Staudt, Dorothea Wagner, LNCS 7659, pp 219-233, 2012.
+	 */
+
+	koalaAssert((k <= n - 1) && (k > 0) && ((k & 1) == 0), AlgExcWrongArg); //only even k
+	koalaAssert((beta >= 0) && (beta <= 1), AlgExcWrongArg);
+	koalaAssert(n > 2, AlgExcWrongArg);
+
+	int d = k >> 1, hSize = k * 4 / 3, v, w, u, v1, v2, i, vv;
+	int mNum = n * d;
+	typename GraphType::PVertex LOCALARRAY(vTab, n);
+	std::pair<typename Settings:: template Map<int, int>::Type*, int>  LOCALARRAY(replace, n);
+	int LOCALARRAY(perm, n);
+	typename Settings:: template Set<std::pair<int, int> >::Type edgeSet;
+	Settings::reserveSet(edgeSet,mNum * 4 / 3);
+	//initialization
+	for (i = 0; i < n; ++i)
+	{
+		vTab[i] = g.addVert(vInfoGen(i));
+		perm[i] = i;
+		replace[i] = std::make_pair(new typename Settings:: template Map<int, int>::Type (hSize, -1), 0);
+		select(replace[i],i); //select current vertex on its own list in order not to allow for loops
+	}
+
+	//creating circle with required edges
+	for (i = 1; i <= d; ++i)
+	{
+		for (v = 0; v < n; ++v)
+		{
+			w = (v + i) % n;
+
+			//add an edge {v, w}
+			if (w > v) v1 = v, v2 = w;
+			else v1 = w, v2 = v;
+			edgeSet.insert(std::make_pair(v1, v2));
+			select(replace[v], w); //mark vertex w as selected on the list of v
+			select(replace[w], v); //mark vertex v as selected on the list of w
+		}
+	}
+
+	//randomly rewiring edges
+	for (i = 1; i <= d; ++i)
+	{
+		for (v = 0; v < n; ++v)
+		{
+			w = (v + i) % n;
+			double p = random(rgen);
+			if (replace[v].second < n && p < beta) //if count[v] == n then there is no place for rewiring
+			{
+				int r = random(rgen, replace[v].second, n - 1);
+
+				//find vertex based o r and assign to u
+				//if there is a replacement then use it
+				vv = (*(replace[v].first))[r];
+				if (vv != -1) u = vv;
+				else u = r;
+
+				//add a new edge {v, u}
+				//assure that v1 < v2, {v1, v2} = {v, u}
+				if (u > v) v1 = v, v2 = u;
+				else v1 = u, v2 = v;
+				edgeSet.insert(std::make_pair(v1, v2));
+				select(replace[v1], v2); //mark vertex v2 as selected on the list of v2
+				select(replace[v2], v1); //mark vertex v1 as selected on the list of v1
+
+				//remove old edge{v, w}
+				if (v < w) edgeSet.erase(std::make_pair(v, w));
+				else edgeSet.erase(std::make_pair(w, v));
+				remove(replace[v], w); //remove vertex w form selected verts on the list of v
+				remove(replace[w], v); //remove vertex v form selected verts on the list of w
+			}
+		}
+	}
+
+	typename Settings:: template Set<std::pair<int, int> >::Type::const_iterator it = edgeSet.begin();
+	while (it != edgeSet.end())
+	{
+		v = it->first;
+		w = it->second;
+		v1 = perm[v];
+		v2 = perm[w];
+
+		if (type == Undirected) g.addEdge(vTab[v1], vTab[v2], eInfoGen(v1, v2, EdUndir), EdUndir);
+		else
+		{
+			//randomly orient edges
+			EdgeType direct = EdDirOut;
+			if (random(rgen, 0, 1) == 1)  direct = EdDirIn;
+			g.addEdge(vTab[v1], vTab[v2], eInfoGen(v1, v2, direct), direct);
+		}
+		it++;
+	}
+
+	for (i = 0; i < n; ++i)	delete replace[i].first;
+	return vTab[0];
+}
+
+template< class RndGen, class GraphType >
+typename GraphType::PVertex Creator::wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, EdgeType type, bool shuffle)
+{
+	return Creator::wattStrog2(rgen, g, n, k, beta, Koala::ConstFunctor< typename GraphType::VertInfoType >(),
+		Koala::ConstFunctor< typename GraphType::EdgeInfoType >(), type, shuffle);
+}
+
 template< class RndGen >
 int Creator::random(RndGen& rgen, int begin, int end )
 {
 	int range = (end - begin) + 1;
 //	return begin + int( range * (rgen.rand()/(rgen.maxRand + 1.0)) );
-	return begin + int( range * (Privates::getRandom(rgen)/(Privates::getMaxRandom(rgen) + 1.0)) );
+//	return begin + int( range * (Privates::getRandom(rgen)/(Privates::getMaxRandom(rgen) + 1.0)) );
+	return begin + Privates::getRandom(rgen, end - begin);
 }
+
+template< class RndGen >
+double Creator::random(RndGen& rgen)
+{
+	int max = Privates::getMaxRandom(rgen);
+	return (double)((long double)Privates::getRandom(rgen) / ((long double) max + 1.0));
+}
+
+template< class RndGen >
+void Creator::simpleShuffle(RndGen& rgen, int tab[], int size)
+{
+	int r, temp;
+	for (int i = 0; i < size - 1; ++i)
+	{
+		r = random(rgen, i, size - 1);
+		temp = tab[i];
+		tab[i] = tab[r];
+		tab[r] = temp;
+	}
+}
+
+template <class Map>
+void Creator::select(std::pair<Map *, int> & replaceInfo, int r)
+{
+	//this method is based on the concept from
+	// "An Efficient Generator for Clustered Dynamic Random Networks",
+	//Robert G\"orke, Roland Kluge, Andrea Schumm, Christian Staudt, Dorothea Wagner, LNCS 7659, pp 219-233, 2012.
+
+	int j = r, ri, rj;
+
+	Map & replaceMap = *(replaceInfo.first);
+	int i = replaceInfo.second;
+	//normalize selection so that j >= i
+	if (r < i)
+	{
+		//there must be a replacement
+		j = replaceMap[r];
+		assert(j >= i);
+	}
+
+	ri = replaceMap[i], rj = replaceMap[j];
+
+	if (i != j)
+	{
+		if (rj != -1)
+		{
+			if (ri != -1)
+			{
+				//case init: j <-> rj, i <-> ri
+				replaceMap[j] = ri;
+				replaceMap[ri] = j;
+				replaceMap.erase(rj);
+				replaceMap.erase(i);
+				//end: j <-> ri
+			}
+			else
+			{
+				//case init: j <-> rj
+				replaceMap[i] = j;
+				replaceMap[j] = i;
+				replaceMap.erase(rj);
+				//end: j <-> i
+			}
+		}
+		else
+		{
+			if (ri != -1)
+			{
+				//case init: i <-> ri
+				replaceMap[ri] = j;
+				replaceMap[j] = ri;
+				replaceMap.erase(i);
+				//end: j <-> ri
+			}
+			else
+			{
+				//case init: no relations
+				replaceMap[i] = j;
+				replaceMap[j] = i;
+				//end: j <-> i
+			}
+		}
+	}
+	else
+	{
+		//i==j - special case
+		if (ri != -1)
+		{
+			//case init: i <-> ri
+			replaceMap.erase(replaceMap[ri]);
+			replaceMap.erase(ri);
+			//end: no relation
+		}
+		//else: do nothing, simply i will be selected
+	}
+	++replaceInfo.second;
+}
+
+template <class Map>
+void Creator::remove(std::pair<Map *, int> & replaceInfo, int r)
+{
+	Map & replaceMap = *(replaceInfo.first);
+	int i = replaceInfo.second;
+	int j = r, ii = i - 1, rii, rj;
+
+	//normalize deletion so that j < i
+	if (r >= i)
+	{
+		//there must be a replacement
+		j = replaceMap[r];
+		assert(j >= 0);
+	}
+	else
+	{
+		assert(replaceMap[r] == -1);
+	}
+
+	rii = replaceMap[ii], rj = replaceMap[j];
+
+	if (ii != j)
+	{
+		if (rj != -1)
+		{
+			if (rii != -1)
+			{
+				//case init: j <-> rj, ii <-> rii
+				replaceMap[j] = rii;
+				replaceMap[rii] = j;
+				replaceMap.erase(rj);
+				replaceMap.erase(ii);
+				//end: j <-> rii
+			}
+			else
+			{
+				//case init: j <-> rj
+				replaceMap[ii] = j;
+				replaceMap[j] = ii;
+				replaceMap.erase(rj);
+				//end: j <-> rii
+			}
+		}
+		else
+		{
+			if (rii != -1)
+			{
+				//case init: ii <-> rii
+				replaceMap[rii] = j;
+				replaceMap[j] = rii;
+				replaceMap.erase(ii);
+				//end: j <-> rii
+			}
+			else
+			{
+				//case init: no relations
+				replaceMap[ii] = j;
+				replaceMap[j] = ii;
+				//end: j <-> ii
+			}
+		}
+	}
+	else
+	{
+		//special case ii=j
+		if (rii != -1)
+		{
+			//case init: ii <-> rii
+			replaceMap.erase(replaceMap[rii]);
+			replaceMap.erase(rii);
+			//end: no relations
+		}
+		//else do nothing, simply i will be removed
+	}
+	--replaceInfo.second;
+}
+
 
 // RelDiagramPar
 

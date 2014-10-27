@@ -8,10 +8,28 @@
 #include "../base/rnd.h"
 #include "../graph/graph.h"
 #include "../algorithm/weights.h"
+#include "../container/hashcont.h"
 
 namespace Koala
 {
 
+namespace Privates {
+
+        template< class A,class B> class StdMapWithDefault : public std::map<A,B>
+        {
+            B def;
+            public:
+            StdMapWithDefault(int arg,B _def) : def(_def) {}
+
+            B& operator[](A key)
+            {
+                if (this->find(key)==this->end()) return std::map<A,B>::operator[](key)=def;
+                return std::map<A,B>::operator[](key);
+            }
+        };
+}
+
+	//WEN: - num, num1, num2 are integers, which indicate numbers of vertices, vertices are numbered from 0 to (n-1)
 	/** \brief Create graphs.
 	 *
 	 *  The utility class for creating different types of graphs.
@@ -30,7 +48,7 @@ namespace Koala
 	public:
 //TODO:
 //          - chocby szczatkowy opis numeracji wprowadzanych wierzcholkow np. zakres+kolejnosc (trzeba ja znac, by napisac funktor generujacy)
-		
+
 		//NEW
 		/** \brief Create empty graph.
 		*
@@ -55,7 +73,7 @@ namespace Koala
 		*   \retrun the pointer to the first added vertex.*/
 		template< class GraphType >
 		static typename GraphType::PVertex empty(GraphType &g, int n);
-	
+
 		/** \brief Create clique.
 		 *
 		 *  The function generates a clique, i.e. for every two vertices, there is created a connection
@@ -84,6 +102,9 @@ namespace Koala
 		template< class GraphType >
 			static typename GraphType::PVertex clique( GraphType &g, int n, EdgeDirection dir = EdUndir );
 
+
+		//WEN: The following connections are created: 0-1, 1-2, 2-3,..., (n-2)-(n-1).
+		//Numbers represent vertices.
 		/** \brief Create path.
 		 *
 		 *  The function generates a path. Additionally, if the mask contains a loop, then a loop is attached
@@ -110,6 +131,8 @@ namespace Koala
 		template< class GraphType >
 			static typename GraphType::PVertex path( GraphType &g, int n, EdgeDirection dir = EdUndir );
 
+		//WEN: The following connections are created: 0-1, 1-2, 2-3,..., (n-2)-(n-1), (n-1)-0.
+		//Numbers represent vertices.
 		/** \brief Create cycle.
 		 *
 		 *  The function generates a cycle. Additionally, if the mask contains a loop, then a loop is attached
@@ -136,18 +159,24 @@ namespace Koala
 		template< class GraphType >
 			static typename GraphType::PVertex cycle( GraphType &g, int n, EdgeDirection dir = EdUndir );
 
+		/*
+		WEN: Central vertex has number 0, the rest of vertices is numbered from 1 to n-1.
+		The following connections are created:
+		 - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
+		 - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1).
+		Numbers represent vertices.*/
 		/** \brief Create fan.
 		 *
 		 *  A fan graph F<sub>n</sub> is defined as the graph  N<sub>1</sub>+ P<sub>n-1</sub>,
 		 *  where N<sub>1</sub> is the empty graph containing one vertex and P<sub>n-1</sub> is the path graph on n-1 vertices.
-		 *  The center vertex is created as the first vertex. Additionally, if the mask contains a loop, then a loop is attached to each vertex. The function generates an usual fan graph containing  n vertices.
+		 *  The central vertex is created as the first vertex. Additionally, if the mask contains a loop, then a loop is attached to each vertex. The function generates an usual fan graph containing  n vertices.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
-		 *  \param centerDir - direction mask for edges connected to center vertex.
+		 *  \param centerDir - direction mask for edges connected to central vertex.
 		 *  \param borderDir - direction mask for edges between border vertices.
-		 *  \return the pointer that indicates the first (and also center) vertex.*/
+		 *  \return the pointer that indicates the first (and also central) vertex.*/
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex fan( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeDirection centerDir, EdgeDirection borderDir );
@@ -156,13 +185,13 @@ namespace Koala
 		 *
 		 *  A fan graph F<sub>n</sub> is defined as the graph  N<sub>1</sub>+ P<sub>n-1</sub>,
 		 *  where N<sub>1</sub> is the empty graph containing one vertex and P<sub>n-1</sub> is the path graph on n-1 vertices.
-		 *  The center vertex is created as the first vertex. Additionally, if the mask contains a loop, then a loop is attached to each vertex. The function generates an usual fan graph containing  n vertices.
+		 *  The central vertex is created as the first vertex. Additionally, if the mask contains a loop, then a loop is attached to each vertex. The function generates an usual fan graph containing  n vertices.
 		 *  \param g - the input/output graph,
 		 *  \param  n - number of vertices to create,
 		 *  \param  vInfoGen - generator for info objects for vertices,
 		 *  \param  eInfoGen - generator for info objects for edges,
 		 *  \param  dir - edges direction mask.
-		 *  \return the pointer that indicates the first (and also center) vertex.*/
+		 *  \return the pointer that indicates the first (and also central) vertex.*/
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex fan( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeDirection dir = EdUndir );
@@ -172,27 +201,33 @@ namespace Koala
 		 *
 		 *  A fan graph F<sub>n</sub> is defined as the graph  N<sub>1</sub>+ P<sub>n-1</sub>,
 		 *  where N<sub>1</sub> is the empty graph containing one vertex and P<sub>n-1</sub> is the path graph on n-1 vertices.
-		 *  The center vertex is created as the first vertex. Additionally, if the mask contains a loop, then a loop is attached to each vertex. The function generates an usual fan graph containing  n vertices.
+		 *  The central vertex is created as the first vertex. Additionally, if the mask contains a loop, then a loop is attached to each vertex. The function generates an usual fan graph containing  n vertices.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param dir - edges direction mask.
-		 *  \return the pointer that indicates the first (and also center) vertex.
+		 *  \return the pointer that indicates the first (and also central) vertex.
 		 */
 		template< class GraphType >
 			static typename GraphType::PVertex fan( GraphType &g, int n, EdgeDirection dir = EdUndir );
 
+		/*
+		WEN: Central vertex has number 0, the rest of vertices is numbered from 1 to n-1.
+		The following connections are created:
+		 - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
+		 - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1), (n-1)-0.
+		Numbers represent vertices.*/
 		/** \brief Create wheel.
 		 *
 		 *  The function generates a wheel. A wheel graph W<sub>n</sub> is a graph with n vertices,
-		 *  formed by connecting a single vertex to all vertices of an (n-1)-cycle. The center vertex is created as the first vertex.
+		 *  formed by connecting a single vertex to all vertices of an (n-1)-cycle. The central vertex is created as the first vertex.
 		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param  n - number of vertices to create,
 		 *  \param  vInfoGen - generator for info objects for vertices,
 		 *  \param  eInfoGen - generator for info objects for edges,
-		 *  \param  centerDir - direction mask for edges connected to center vertex,
+		 *  \param  centerDir - direction mask for edges connected to central vertex,
 		 *  \param  borderDir - direction mask for edges between border vertices.
-		 *  \return the pointer that indicates the first (and also center) vertex.
+		 *  \return the pointer that indicates the first (and also central) vertex.
 		 */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex wheel( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
@@ -201,33 +236,37 @@ namespace Koala
 		/** \brief Create wheel.
 		 *
 		 *  The function generates a wheel. A wheel graph W<sub>n</sub> is a graph with n vertices,
-		 *  formed by connecting a single vertex to all vertices of an (n-1)-cycle. The center vertex is created as the first vertex.
+		 *  formed by connecting a single vertex to all vertices of an (n-1)-cycle. The central vertex is created as the first vertex.
 		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
-		 *  \return the pointer that indicates the first (and also center) vertex.
+		 *  \return the pointer that indicates the first (and also central) vertex.
 		 */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex wheel( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeDirection dir = EdUndir);
 
+
 		/* It is a simpler version of the above function*/
 		/** \brief Create wheel.
 		 *
 		 *  The function generates a wheel. A wheel graph W<sub>n</sub> is a graph with n vertices,
-		 *  formed by connecting a single vertex to all vertices of an (n-1)-cycle. The center vertex is created as the first vertex.
+		 *  formed by connecting a single vertex to all vertices of an (n-1)-cycle. The central vertex is created as the first vertex.
 		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param dir - edges direction mask.
-		 *  \return the pointer that indicates the first (and also center) vertex.
+		 *  \return the pointer that indicates the first (and also central) vertex.
 		 */
 		template< class GraphType >
 			static typename GraphType::PVertex wheel( GraphType &g, int n, EdgeDirection dir = EdUndir );
 
+		/*
+		WEN: Vertices in the first partition are numbered form 0 to (n1-1), vertices from the second partition are numbered form n1 to (n1+n2-1).
+			All vertices from the first partition are connected to all vertices from the second partition.*/
 		/** \brief Create complete bipartite graph.
 		 *
 		 *  The function generates a complete bipartite graph K<sub>n1,n2</sub>. Additionally, if the mask contains a loop then, a loop is attached to each vertex.
@@ -257,6 +296,11 @@ namespace Koala
 			static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 			compBipartite( GraphType &g, int n1, int n2, EdgeDirection dir = EdUndir );
 
+		/*
+		WEN: Vertices in the first partition are numbered form 0 to (k-1),
+			vertices from the second partition are numbered form k to (2k-1),
+			vertices form k-th partition are number from (K-1)*k to (K*k-1).
+		All vertices from a particular partition are connected to all vertices from other partitions.*/
 		/** \brief Create complete K-partite graph.
 		 *
 		 *  The function generates a complete K-partite graph. Each of K partitions has the same number of vertices
@@ -290,6 +334,13 @@ namespace Koala
 			static typename GraphType::PVertex compKPartite( GraphType &g, int K, int k, IterInsert itIns,
 				EdgeDirection dir = EdUndir );
 
+		/*
+		WEN: Vertices are created in the order determined by begin iterator, i.e.
+			vertices in the first partition are numbered from 0 to (k_1-1),
+			vertices in the second partition are numbered from k_1 to (k_1+k_2-1),
+			vertices in K-th partition are numbered from k_1+k_2+...+k_{K-1} to (k_1+k_2+...+k_{K-1}+k_K-1),
+			where k_i is the number of vertices in i-th partition.
+		All vertices from a particular partition are connected to all vertices from other partitions.*/
 		/** \brief Create complete K-partite graph.
 		 *
 		 *  The function generates a complete K-partite graph. The cardinalities of partitions are specified by a sequence of integers.
@@ -326,6 +377,7 @@ namespace Koala
 		template< class GraphType, class Iter, class IterInsert > static typename GraphType::PVertex
 			compKPartite( GraphType &g, Iter begin, Iter end, IterInsert itIns, EdgeDirection dir = EdUndir );
 
+		//WEN: In the description below numbers represent vertices.
 		/** \brief Create Petersen graph.
 		 *
 		 *  The function generates the Petersen graph, i.e., it creates the following undirected edges:\n
@@ -350,6 +402,27 @@ namespace Koala
 		 *  \retrun the pointer to the first added vertex. */
 		template< class GraphType > static typename GraphType::PVertex petersen( GraphType &g );
 
+
+		/* WEN: Vertices are created in order from the root through all vertices on a particular level to leaves, i.e.:
+		- root has number 0,
+		- children of the root are numbered from 1 to deg,
+		- grandchildren are numbered from (deg+1) to (deg+deg^2),
+		- vertices on next levels are numbered analogically.
+		Edges:
+		- root is connected to vertices from 1 to deg,
+		- vertex number 1 is connected to vertices from (deg+1) to (2*deg),
+		- vertex number 2 is connected to vertices from (2*deg+1) to (3*deg),
+		- vertex number deg is connected to vertices from (deg*deg+1) to (deg*(deg+1)),
+		- connections on next levels are created analogically.
+
+		For example for a tree with height = 2 and deg = 3 the structure is as follows:
+		- root vertex: 0,
+		- vertices of heigh = 1: 1, 2, 3,
+		- vertices of heigh = 2: 4, 5, 6, 7, 8, 9, 10, 11, 12.
+		Edges:
+		- 0-1, 0-2, 0-3,
+		- 1-4, 1-5, 1-6, 2-7, 2-8, 2-9, 3-10, 3-11, 3-12.
+		*/
 		/** \brief Create regular tree.
 		 *
 		 *  The function generates a tree in which each non-leaf vertex has the same degree specified by the parameter \a deg.
@@ -380,6 +453,26 @@ namespace Koala
 		template< class GraphType > static typename GraphType::PVertex
 			regTree( GraphType &g, int deg, int height, EdgeDirection dir = EdUndir );
 
+		/* WEN: Vertices are created in order from the root through all vertices on a particular level to leaves, i.e.:
+		- root has number 0,
+		- children of the root are numbered from 1 to deg_0,
+		- grandchildren are numbered from (deg_0+1) to (deg_0+deg_0*deg_1), where deg_i is the degree of vertices of height i,
+		- vertices on next levels are numbered analogically.
+		Edges:
+		- root is connected to vertices from 1 to deg0,
+		- vertex number 1 is connected to vertices from (deg0+1) to (deg0+deg1),
+		- vertex number 2 is connected to vertices from (deg0+deg1+1) to (deg0+2*deg1),
+		- vertex number deg is connected to vertices from (deg0+(deg0-1)*deg1+1) to (deg0+deg0*deg1),
+		- connections on next levels are created analogically.
+
+		For example for a tree with height = 2 and deg0 = 2, deg1=3 the structure is as follows:
+		- root vertex: 0,
+		- vertices of heigh = 1: 1, 2,
+		- vertices of heigh = 2: 3, 4, 5, 6, 7, 8.
+		Edges:
+		- 0-1, 0-2,
+		- 1-3, 1-4, 1-5, 2-6, 2-7, 2-8.
+		*/
 		/** \brief Create regular tree.
 		 *
 		 *  The function generates a tree in which each non-leaf vertex on the same level has the same degree.
@@ -420,6 +513,20 @@ namespace Koala
 		template< class GraphType, class Iter >
 			static typename GraphType::PVertex regTree( GraphType &g, Iter begin, Iter end, EdgeDirection dir = EdUndir );
 
+
+		/* WEN: First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
+		where pathVertNum is the number of vertices on the central path. Next, legs are created so that:
+		- first are all legs that should be connected to the first vertex on the central path are created,
+		- next vertices connected to the second vertex on the central path are crated,
+		- finally all vertex connected to the last vertex on the central path are created.
+
+		For example for caterpillar having pathVertNum = 3 and legNum = [2,3,4] the structure is as follows:
+		- vertices on the central path: 0, 1, 2,
+		- legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
+		Edges:
+		- central path: 0-1, 1-2,
+		- legs: 0-3, 0-4, 1-5, 1-6, 1-7, 2-8, 2-9, 2-10, 2-11.
+		*/
 		/** \brief Create caterpillar.
 		 *
 		 *  The function generates a caterpillar. "A caterpillar is a tree in which every graph vertex
@@ -446,6 +553,19 @@ namespace Koala
 			static typename GraphType::PVertex caterpillar( GraphType &g, Iter begin, Iter end, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection pathDir, EdgeDirection legDir);
 
+		/* WEN: First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
+		where pathVertNum is the number of vertices on the central path. Next, (pathVertNum*legNum) legs are created so that:
+		- first alegNum legs that should be connected to the first vertex on the central path are created,
+		- next vertices connected to the second vertex on the central path are crated,
+		- finally all vertex connected to the last vertex on the central path are created.
+
+		For example for caterpillar having pathVertNum = 3 and legNum = 3 the structure is as follows:
+		- vertices on the central path: 0, 1, 2,
+		- legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
+		Edges:
+		- central path: 0-1, 1-2,
+		- legs: 0-3, 0-4, 0-5, 1-6, 1-7, 1-8, 2-9, 2-10, 2-11.
+		*/
 		/** \brief Create caterpillar.
 		 *
 		 *  The function generates a caterpillar. "A caterpillar is a tree in which every graph vertex
@@ -575,6 +695,161 @@ namespace Koala
 		template< class RndGen,class GraphType >
 			static typename GraphType::PVertex erdRen2( RndGen& rgen,GraphType &g, int n, int m, EdgeType type = Undirected );
 
+		//NEW
+		/* This method generates a random graph according to the Barab\'asi - Albert (BA) model [1].
+		Since the above paper defines a family of models, here the precise variant of BA model described by B. Bollob\'as in [2] has been implemented.
+		The description of this variant taken from [3] is following (d is the number of edges added in each iteration of the process):
+		"Assume d=1, then the i-th vertex is attached to the j-th vertex, j<=i, with probability d(j) / [m(i)+1], if j<i, and 1/ [m(i)+1], if i= j,
+		where d(j) is the current degree of vertex j and m(i)= \sum_{j=0}^{i-1}d(j) is twice the number of edges already created. (...) For d>1, the graph
+		evolves as if d=1 until nd vertices have been created, and	hen intervals of d consecutive vertices are contracted into one."
+		Note that the result of the above procedure is a multigraph, i.e., it may contin loops and parallel edges.
+		The implementation is based on pseudo-code given in [3].
+
+		References:
+		[1] "Emergence of Scaling in Random Networks", A.-L. Barabasi and R. Albert, Science, vol. 286 no. 5439 pp. 509-512, 1999.
+		[2] "Random Graphs (Cambridge Studies in Advanced Mathematics)",B. Bollob\'as, 2001.
+		[3] "Efficient generation of large random networks", V. Batagelj and U. Brandes, Physical Review E, vol. 71, 036113, 2005.
+
+		Parameters:
+			rgen - random number generator,
+			g - the input/output graph,
+			n - number of vertices to create,
+			k - number of edges that are added to the graph at each stage of the algorithm,
+			vInfoGen - generator for info objects for vertices,
+			eInfoGen - generator for info objects for edges,
+			type - the type of edges in the graph, i.e., undirected or directed, so that a newer vertex (with higher index) points to older vertex.
+			shuffle - determines whether the vertices should be introduced to the graph in random order.
+		Function returns the pointer to the first vertex.
+		*/
+
+		//NEW: teraz type=Directed (krawedzie skierowane o losowej orientacji),Undirected (wiadomo),EdDirIn EdDirOut (starsze -> mlodszych), EdDirOut (mlodsze -> starszych)
+		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen  >
+		static typename GraphType::PVertex barAlb(RndGen& rgen, GraphType &g, int n, int k, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection type = Undirected, bool shuffle = false);
+
+		//NEW
+		/* It is a simpler version of the above function*/
+
+		template< class RndGen, class GraphType >
+		static typename GraphType::PVertex barAlb(RndGen& rgen, GraphType &g, int n, int k, EdgeDirection type = Undirected, bool shuffle = false);
+
+        //NEW: wytyczne dla modeli Watts–Strogatz - mozna zmienic wewnetrzne domyslne hashSet/Map (o kluczach int lub pair<int,int>) na stlowe
+        class WattStrogDefaultSettings
+        {
+            public:
+                template< class A> class Set
+                {
+                    public:
+                    typedef Koala::HashSet< A> Type;
+                    //Druga mozliwosc
+                    //typedef std::set< A> Type;
+                };
+
+                template <class A>
+                static void reserveSet(Koala::HashSet< A>&s, int size)
+                {
+                    s.reserve(size);
+                }
+                template <class A>
+                static void reserveSet(std::set< A>&s, int size) {}
+
+
+                template< class A,class B> class Map
+                {
+                    public:
+                        //typedef Koala::HashMap<A, B> Type;
+                        //Druga mozliwosc
+                        typedef Privates::StdMapWithDefault<A, B> Type;
+                };
+        };
+
+		//NEW
+		/*
+		This method generates a random graph according to the Watts–Strogatz model (WS) model [1].
+		The description of this variant taken from [1] is following:
+		"We start with a ring of n vertices, each connected to its k nearest neighbours by undirected edges. (...)
+		We choose a vertex and the edge that connects it to its nearest neighbour in a clockwise sense. With probability p, we reconnect
+		this edge to a vertex chosen uniformly at random over the entire ring, with duplicate edges forbidden; otherwise we leave the edge in place.
+		We repeat this process by moving clockwise around the ring, considering each vertex in turn until one lap is completed. Next, we consider
+		the edges that connect vertices to their second-nearest neighbours clockwise. As before, we randomly rewire each of these edges with probability p,
+		and continue this process, circulating around the ring and proceeding outward to more distant neighbours after each lap, until each edge
+		in the original lattice has been considered once. (As there are nk/2 edges in the entire graph, the rewiring process stops after k/2 laps."
+
+		The implementation examines all edges whether they should stay in place or should be rewired (connected to other vertex).
+		An edge is rewired with probability beta. If during random choice form 1..n possible vertices while rewiring an edge {u,v} for vertex v
+		a forbidden vertex x is chosen, i.e. x=u or x=v or an edge {v,x} already exists, then next random choice is performed. This procedure is
+		repeated until free (not forbidden) vertex is found. This may result in long running time for dense graphs, however in practise this should not be
+		a problem because as reported in [1] in most cases graphs are rather sparse, i.e., n >> k >> ln(n) >> 1.
+		Note that the second implementation of WS model, i.e., wattStrog2 does not have this vulnerability.
+
+		References:
+		[1] "Collective dynamics of 'small-world' networks",D.J. Watts and S.H. Strogatz, Nature vol. 393, pp. 440-442, 1998.
+
+		Parameters:
+			rgen - random number generator,
+			g - the input/output graph,
+			n - number of vertices to create,
+			k - the initial degree of vertices, should be an even integer,
+			beta - the probability 0<= beta <=1 of rewiring initial edges,
+			vInfoGen - generator for info objects for vertices,
+			eInfoGen - generator for info objects for edges,
+			type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
+			shuffle - determines whether the vertices should be introduced to the graph in random order.
+		Function returns the pointer to the first vertex.
+		*/
+        //NEW: najogolniejsza wersja - z wytycznymi
+		template< class Settings, class RndGen, class GraphType, class VInfoGen, class EInfoGen >
+		static typename GraphType::PVertex wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false);
+
+		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen >
+		static typename GraphType::PVertex wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false)
+        {
+            return wattStrog1<WattStrogDefaultSettings>( rgen, g, n,k, beta, vInfoGen, eInfoGen, type , shuffle);
+        }
+
+		//NEW
+		/* It is a simpler version of the above function*/
+		template< class RndGen, class GraphType >
+		static typename GraphType::PVertex wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, EdgeType type = Undirected, bool shuffle = false);
+
+		//NEW
+		/* This is an optimized version of wattStrog1 method so that no retrials is performed while randomly rewiring edges.
+		 This algorithm is based on the following concepts:
+			- virtual Fisher-Yates shuffle [1],
+			- virtual Fisher-Yates shuffle with deselection [2].
+
+		Here for each vertex a "virtual" table of possible (not forbidden) vertices is maintain, so each time a free vertex is randomly chosen.
+		The "virtual" table is realized by hash maps and special counters related to each vertex.
+
+		References:
+			[1] "Efficient generation of large random networks", V. Batagelj and U. Brandes, Physical Review E, vol. 71, 036113, 2005.
+			[2] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
+
+		Parameters:
+			rgen - random number generator,
+			g - the input/output graph,
+			n - number of vertices to create,
+			k - the initial degree of vertices, should be an even integer,
+			beta - the probability 0<= beta <=1 of rewiring initial edges,
+			vInfoGen - generator for info objects for vertices,
+			eInfoGen - generator for info objects for edges,
+			type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
+			shuffle - determines whether the vertices should be introduced to the graph in random order.
+		Function returns the pointer to the first vertex.
+		*/
+		template< class Settings, class RndGen, class GraphType, class VInfoGen, class EInfoGen >
+		static typename GraphType::PVertex wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false);
+
+		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen >
+		static typename GraphType::PVertex wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false)
+        {
+            return wattStrog2<WattStrogDefaultSettings>( rgen, g, n,k, beta, vInfoGen, eInfoGen, type , shuffle);
+        }
+
+		//NEW
+		/* It is a simpler version of the above function*/
+		template< class RndGen, class GraphType >
+		static typename GraphType::PVertex wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, EdgeType type = Undirected, bool shuffle = false);
+
 	protected:
 		/** \brief Add vertices.
 		 *
@@ -641,6 +916,56 @@ namespace Koala
 		 */
         template< class RndGen >
 		static int random(RndGen& rgen, int begin, int end );
+
+		//NEW
+		/*
+		 This function generates a pseudo-random real number r (from uniform distribution) such that 0 <= r < 1.
+		*/
+		template< class RndGen >
+		static double random(RndGen& rgen);
+
+		//NEW
+		/*
+		 This function randomly (according to uniform distribution) permutes given table.
+		*/
+		template< class RndGen >
+		static void simpleShuffle(RndGen& rgen, int tab[], int size);
+
+		//NEW
+		/*
+		This is a helper function used in wattStrog2 generator. It is responsible for marking vertex r
+		as selected on the list of vertices represented by replace. This method is based on the concept taken from [1], i.e.,
+		vertices of num < i, where i is a border index, are treated as selected, vertices of num >=i are treated as free (unselected),
+		exceptions from this rule are stored in replace map.
+
+		References:
+		[1] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
+
+		Parameters:
+			replaceInfo - a pair of pointer to a map of replacements for vertices and a border index i,
+			vertices of num < i are treated as selected, vertices of num >=i are treated as free (unselected), exceptions from this rule are stored in replace map.
+			r - index of vertex that should be selected.
+		*/
+		template <class Map>
+		inline static void select(std::pair<Map *, int> & replaceInfo, int r);
+
+        //NEW
+        /*
+        This is a helper function used in wattStrog2 generator. It is responsible for marking vertex r
+        as unselected on the list of vertices represented by replace. This method is based on the concept taken from [1], i.e.,
+        vertices of num < i, where i is a border index, are treated as selected, vertices of num >=i are treated as free (unselected),
+        exceptions from this rule are stored in replace map.
+
+        References:
+        [1] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
+
+        Parameters:
+        replaceInfo - a pair of pointer to a map of replacements for vertices and a border index i,
+        vertices of num < i are treated as selected, vertices of num >=i are treated as free (unselected), exceptions from this rule are stored in replace map.
+        r - index of vertex that should be removed (unselected).
+        */
+        template <class Map>
+        inline static void remove(std::pair<Map *, int> & replaceInfo, int r);
 	};
 
 	// Operacje na grafie traktowanym jak diagram relacji w zbiorze wierzcholkow
