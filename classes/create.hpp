@@ -656,7 +656,7 @@ typename GraphType::PVertex Creator::wattStrog1(RndGen& rgen, GraphType &g, int 
 {
 	koalaAssert((k <= n - 1) && (k > 0) && ((k & 1) == 0), AlgExcWrongArg); //only even k
 	koalaAssert((beta >= 0) && (beta <= 1), AlgExcWrongArg);
-	koalaAssert(n > 3, AlgExcWrongArg);
+	koalaAssert(n > 2, AlgExcWrongArg);
 
 	int d = k >> 1, v, w, i, v1, v2;
 	int mNum = n * d;

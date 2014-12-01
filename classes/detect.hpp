@@ -729,13 +729,12 @@ template< class DefaultStructs > template< class GraphType >
 
     int n;
     SimplArrPool<typename ImageGraph::Vertex> valloc(n=g.getVertNo());
-    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1)/2-g.getEdgeNo());
+    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1)/2);
 	ImageGraph cg(&valloc,&ealloc);
 
-	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) cg.addVert( u );
-	for( typename ImageGraph::PVertex u = cg.getVert(); u != cg.getVertLast(); u = cg.getVertNext( u ) )
-	for( typename ImageGraph::PVertex v = cg.getVertNext( u ); v; v = cg.getVertNext( v ) )
-		if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v );
+    cg.copy(g,stdChoose(true)&stdChoose(true),stdCast(false)& stdCast(false),
+               stdLink(false,false)&stdLink(false,false));
+    cg.neg(EdUndir);
 	return chordal( cg );
 }
 
@@ -980,12 +979,11 @@ template< class DefaultStructs > template< class GraphType >
 
     int n;
     SimplArrPool<typename ImageGraph::Vertex> valloc(n=g.getVertNo());
-    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1)/2-g.getEdgeNo());
+    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1)/2);
 	ImageGraph cg(&valloc,&ealloc);
-	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) cg.addVert( u );
-	for( typename ImageGraph::PVertex u = cg.getVert(); u != cg.getVertLast(); u = cg.getVertNext( u ) )
-		for( typename ImageGraph::PVertex v = cg.getVertNext( u ); v; v = cg.getVertNext( v ) )
-			if (!g.getEdge( u->info,v->info,EdUndir )) cg.addEdge( u,v );
+    cg.copy(g,stdChoose(true)&stdChoose(true),stdCast(false)& stdCast(false),
+               stdLink(false,false)&stdLink(false,false));
+    cg.neg(EdUndir);
 	return comparability( cg );
 }
 

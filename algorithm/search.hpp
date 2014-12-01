@@ -1594,13 +1594,14 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
 		ImageGraph;
 
     SimplArrPool<typename ImageGraph::Vertex> valloc(n);
-    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1)/2-m);
+    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1)/2);
 	ImageGraph neg(&valloc,&ealloc);
 	typename ImageGraph::PVertex LOCALARRAY( tabvneg,n );
-	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) neg.addVert( v );
-	for( typename ImageGraph::PVertex v = neg.getVert(); v != neg.getVertLast(); v = neg.getVertNext( v ) )
-		for( typename ImageGraph::PVertex u = neg.getVertNext( v ); u; u = neg.getVertNext( u ) )
-			if (!g.getEdge( v->info,u->info,EdUndir )) neg.addEdge( v,u );
+    neg.copy(g,stdChoose(true)&stdChoose(true),stdCast(false)& stdCast(false),
+               Std2Linker<Privates::Std1PtrLinker,Std1NoLinker>(Privates::Std1PtrLinker(),Std1NoLinker())
+               &stdLink(false,false));
+    neg.neg(Undirected);
+
 	compno = BFSPar< DefaultStructs >::split( neg,blackHole,compStore( tabc,tabvneg ),EdUndir );
 	if (compno > 1)
 	{

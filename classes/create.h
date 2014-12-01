@@ -23,8 +23,9 @@ namespace Privates {
 
             B& operator[](A key)
             {
-                if (this->find(key)==this->end()) return std::map<A,B>::operator[](key)=def;
-                return std::map<A,B>::operator[](key);
+//                if (this->find(key)==this->end()) return std::map<A,B>::operator[](key)=def;
+//                return std::map<A,B>::operator[](key);
+                return this->insert(std::make_pair(key,def)).first->second;
             }
         };
 }
