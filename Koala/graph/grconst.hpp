@@ -449,29 +449,26 @@ template< class GraphType > std::pair< typename ConstGraphMethods< GraphType >::
 	ConstGraphMethods< GraphType >::maxMu( EdgeDirection reltype ) const
 {
 	koalaAssert( (reltype == EdDirIn || reltype == EdDirOut || reltype == EdUndir),GraphExcWrongMask );
-	std::pair< PEdge,int > res( (PEdge)0,0 );
-	int m = self.getEdgeNo( EdAll );
-	if (!m) return res;
-	Parals3 LOCALARRAY( edges,self.root().getEdgeNo( EdAll ) );
-	int i = 0, l = 0, nr = 0;
-	PEdge edge;
-	for( PEdge e = this->getEdge( EdAll ); e; e = self.getEdgeNext( e,EdAll ) )
-	{
-		std::pair< PVertex,PVertex > ends = pairMinMax( self.getEdgeEnd1( e ), self.getEdgeEnd2( e ) );
-		edges[i++] = Parals3( ends.first,ends.second,self.getEdgeDir( e,ends.first ),nr++,e );
-	}
-	GraphSettings::sort( edges,edges + i,Parals3cmp() );
-	for( i = 0; i < m; i++ )
-	{
-		if (i ==0 || !this->areParallel( edges[i-1].edge,edges[i].edge,reltype ))
-		{
-			l = 1;
-			edge = edges[i].edge;
-		}
-		else l++;
-		if (l > res.second) res = std::make_pair( edge,l );
-	}
-	return res;
+	std::pair< int, PEdge> res( 0,(PEdge)0 );
+	int pom;
+	if (!self.getEdgeNo( EdAll )) return std::make_pair(res.second,res.first);
+    typename GraphSettings:: template VertEdgeAssocCont< PVertex,ParalsCount >::Type neighs( this->Delta(Directed|Undirected) );
+    for( PVertex v = this->getVert(); v; v = self.getVertNext( v ) )
+        if ((pom=self.getEdgeNo( v,EdLoop ))> res.first) res=std::pair< int,PEdge> (pom,self.getEdge( v,EdLoop ) );
+	for( PVertex v,u = this->getVert(); u; u = self.getVertNext( u ))
+    {
+        for( PEdge e = this->getEdge(u,Directed|Undirected); e; e = self.getEdgeNext(u,e,Directed|Undirected))
+            if ((v = this->getEdgeEnd(e,u)) >u)
+            {
+                if ((++neighs[v].counter(self.getEdgeDir(e,u),reltype).first)==1)
+                    neighs[v].counter(self.getEdgeDir(e,u),reltype).second=e;
+            }
+        for( v= neighs.firstKey(); v ; v = neighs.nextKey( v ))
+            for(EdgeDirection dir=EdUndir;dir<=EdDirOut;dir=dir<<1)
+                if (neighs[v].counter(dir,reltype).first>res.first) res=neighs[v].counter(dir,reltype);
+        while (!neighs.empty()) neighs.delKey(neighs.firstKey());
+    }
+	return std::make_pair(res.second,res.first);
 }
 
 template< class GraphType > template< class Iterator, class OutIter > int

@@ -76,6 +76,25 @@ protected:
 		}
 	};
 
+	struct ParalsCount {
+        std::pair<int, PEdge> dirOutCount,dirInCount,undirCount;
+
+        ParalsCount() : dirOutCount(std::make_pair(0, (typename ConstGraphMethods< GraphType >::PEdge)0)),
+                        dirInCount(std::make_pair( 0,(typename ConstGraphMethods< GraphType >::PEdge)0)),
+                        undirCount(std::make_pair( 0,(typename ConstGraphMethods< GraphType >::PEdge)0))
+                        {}
+
+        std::pair<int, PEdge>& counter(EdgeDirection dir,EdgeDirection reltype)
+        {
+            switch (dir) {
+                case EdDirOut : return dirOutCount;
+                case EdDirIn :  if (reltype==EdDirOut) return dirInCount; else return dirOutCount;
+                case EdUndir :  if (reltype==EdUndir) return dirOutCount; else return undirCount;
+                default : assert(0);
+            }
+        }
+	};
+
     EdgeDirection paralDirs(EdgeDirection dir, EdgeDirection reltype ) const;
 
 public:

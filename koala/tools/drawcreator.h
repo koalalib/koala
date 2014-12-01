@@ -87,6 +87,15 @@ namespace Koala
 		template <class RndGen>
 		static ParSetGraph::PVertex erdRen2(RndGen& rgen, ParSetGraph &g, int n, int m, double size, EdgeType type = Undirected);
 
+		template <class RndGen>
+		static ParSetGraph::PVertex barAlb(RndGen& rgen, ParSetGraph &g, int n, int k, double size, EdgeDirection type = Undirected, bool shuffle = false);
+
+		template <class RndGen>
+		static ParSetGraph::PVertex wattStrog1(RndGen& rgen, ParSetGraph &g, int n, int k, double beta, double size, EdgeType type = Undirected, bool shuffle = false);
+
+		template <class RndGen>
+		static ParSetGraph::PVertex wattStrog2(RndGen& rgen, ParSetGraph &g, int n, int k, double beta, double size, EdgeType type = Undirected, bool shuffle = false);
+
 		/* Line graphs */
 
 		/*
@@ -416,6 +425,21 @@ Koala::DrawCreator::ParSetGraph::PVertex Koala::DrawCreator::erdRen1(RndGen& rge
 template<class RndGen>
 Koala::DrawCreator::ParSetGraph::PVertex Koala::DrawCreator::erdRen2(RndGen& rgen, Koala::DrawCreator::ParSetGraph &g, int n, int m, double size, Koala::EdgeType type) {
 	return Koala::Creator::erdRen2(rgen, g, n, m, Koala::DrawCreator::ParSetCircleFun(n, size), Koala::ConstFunctor < Koala::DrawCreator::ParSetGraph::EdgeInfoType >(), type);
+}
+
+template <class RndGen>
+Koala::DrawCreator::ParSetGraph::PVertex Koala::DrawCreator::barAlb(RndGen& rgen, ParSetGraph &g, int n, int k, double size, EdgeDirection type, bool shuffle) {
+	return Koala::Creator::barAlb(rgen, g, n, k, Koala::DrawCreator::ParSetCircleFun(n, size), Koala::ConstFunctor < Koala::DrawCreator::ParSetGraph::EdgeInfoType >(), type, shuffle);
+}
+
+template <class RndGen>
+Koala::DrawCreator::ParSetGraph::PVertex Koala::DrawCreator::wattStrog1(RndGen& rgen, ParSetGraph &g, int n, int k, double beta, double size, EdgeType type, bool shuffle) {
+	return Koala::Creator::wattStrog1(rgen, g, n, k, beta, Koala::DrawCreator::ParSetCircleFun(n, size), Koala::ConstFunctor < Koala::DrawCreator::ParSetGraph::EdgeInfoType >(), type, shuffle);
+}
+
+template <class RndGen>
+Koala::DrawCreator::ParSetGraph::PVertex Koala::DrawCreator::wattStrog2(RndGen& rgen, ParSetGraph &g, int n, int k, double beta, double size, EdgeType type, bool shuffle) {
+	return Koala::Creator::wattStrog2(rgen, g, n, k, beta, Koala::DrawCreator::ParSetCircleFun(n, size), Koala::ConstFunctor < Koala::DrawCreator::ParSetGraph::EdgeInfoType >(), type, shuffle);
 }
 
 #endif

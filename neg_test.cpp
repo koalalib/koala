@@ -14,9 +14,11 @@ Graph<char,string> g1;
     Vertex<char,string> *A=g1.addVert('A');
     Vertex<char,string> *B=g1.addVert('B');
     Vertex<char,string> *C=g1.addVert('C');
-    Vertex<char,string> *D=g1.addVert('D');
+//    Vertex<char,string> *D=g1.addVert('D');
 
-string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,EdgeDirection dir)
+Graph<Vertex<char,string> *,Edge<char,string> *> gcopy;
+
+string fun(const Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,EdgeDirection dir)
 {   char tab[2]={0,0};
     tab[0]=u->info;
     string su=tab;
@@ -31,8 +33,8 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
 
 #include "main.hpp"
 
-    Vertex<char,string> *tabV[5]={B,A,A,B,A};
-    Vertex<char,string> *tabV3[5]={C,B,B,C,B};
+//    Vertex<char,string> *tabV[7]={B,A,A,B,A,C,D};
+    Vertex<char,string> *tabV3[5]={C,B,C,C,B};
     Vertex<char,string> *tabV2[5];
     Edge<char,string> *tabE[50];
     Set<Vertex<char,string>*> vset;
@@ -40,7 +42,7 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
     vset+=A;
     vset+=B;
 
-    g1.makeAdjMatrix();
+//    g1.makeAdjMatrix();
 
 //    g1.addLoop(A,"A");g1.addLoop(A,"A");
 //    g1.addEdge(A,B,"A--B");g1.addEdge(A,B,"A--B");
@@ -63,16 +65,66 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
 //    IO::writeGraphText(g1,cout,IO::RG_EdgeList);
 
 
-    g1.addLoop(A,"A");g1.addLoop(B,"B");g1.addLoop(C,"C");
-    g1.addEdge(A,B,"A-B");g1.addEdge(A,C,"A-C");g1.addEdge(B,C,"B-C");g1.addEdge(A,D,"A-D");
-    g1.addArc(A,B,"A>B");g1.addArc(A,C,"A>C");g1.addArc(B,C,"B>C");g1.addArc(B,D,"B>D");
-    g1.addArc(B,A,"B>A");g1.addArc(C,A,"C>A");g1.addArc(C,B,"C>B");g1.addArc(D,B,"D>B");
-    g1.addLoop(A,"A");g1.addLoop(B,"B");g1.addLoop(C,"C");
-    g1.addEdge(A,B,"A-B");g1.addEdge(A,C,"A-C");g1.addEdge(B,C,"B-C");g1.addEdge(A,D,"A-D");
-    g1.addArc(A,B,"A>B");g1.addArc(A,C,"A>C");g1.addArc(B,C,"B>C");g1.addArc(B,D,"B>D");
-    g1.addArc(B,A,"B>A");g1.addArc(C,A,"C>A");g1.addArc(C,B,"C>B");g1.addArc(D,B,"D>B");
+//    g1.addLoop(A,"A");g1.addLoop(B,"B");g1.addLoop(C,"C");
+//    g1.addEdge(A,B,"A-B");g1.addEdge(A,C,"A-C");g1.addEdge(B,C,"B-C");g1.addEdge(A,D,"A-D");
+//    g1.addArc(A,B,"A>B");g1.addArc(A,C,"A>C");g1.addArc(B,C,"B>C");g1.addArc(B,D,"B>D");
+//    g1.addArc(B,A,"B>A");g1.addArc(C,A,"C>A");g1.addArc(C,B,"C>B");g1.addArc(D,B,"D>B");
+//    g1.addLoop(A,"A");g1.addLoop(B,"B");g1.addLoop(C,"C");
+//    g1.addEdge(A,B,"A-B");g1.addEdge(A,C,"A-C");g1.addEdge(B,C,"B-C");g1.addEdge(A,D,"A-D");
+//    g1.addArc(A,B,"A>B");g1.addArc(A,C,"A>C");g1.addArc(B,C,"B>C");g1.addArc(B,D,"B>D");
+//    g1.addArc(B,A,"B>A");g1.addArc(C,A,"C>A");g1.addArc(C,B,"C>B");g1.addArc(D,B,"D>B");
+
+
+//    g1.addLoop(A,"A");g1.addLoop(B,"B");g1.addLoop(A,"A");g1.addLoop(B,"B");
+    //g1.addLink(A,B,"A-B");
+    g1.addLink(C,B,"B-C"); // g1.addLink(B,C,"B-C");//g1.addLink(A,B,"A-B");g1.addLink(A,C,"A-C");
+    g1.addArc(A,C,"A>C");    g1.addArc(C,A,"C>A");
+    g1.addArc(B,C,"B>C");
+//    g1.addArc(C,A,"C>A");
+//    g1.addArc(B,A,"B>A");g1.addArc(B,A,"B>A");g1.addArc(B,A,"B>A");
+//    g1.addArc(B,A,"B>A");
+//    g1.addLink(B,C,"B-C");g1.addLink(B,C,"B-C");g1.addLink(B,C,"B-C");
+    g1.addLoop(B,"B");g1.addLoop(A,"A");
+
+    IO::writeGraphText(g1,cout,IO::RG_EdgeList|IO::RG_Info);
+    cout << "\n------------\n";
+    g1.neg(
+//           tabV3, tabV3+5,
+           EdAll,fun);
+    IO::writeGraphText(g1,cout,IO::RG_EdgeList|IO::RG_Info);
 
     cout << endl;
+
+    cout << "\n!!!!!!!!!!!!!!!!!\n";
+
+    gcopy.copy(g1,stdChoose(true)&stdChoose(true),stdCast(false)& stdCast(false),
+               Std2Linker<Privates::Std1PtrLinker,Std1NoLinker>(Privates::Std1PtrLinker(),Std1NoLinker())
+               &
+               stdLink(false,false)
+//               Std2Linker<Privates::Std1PtrLinker,Std1NoLinker>(Privates::Std1PtrLinker(),Std1NoLinker())
+               );
+
+    IO::writeGraphText(gcopy,cout,IO::RG_EdgeList|IO::RG_Info);
+    cout << "\n" << A << ' ' << B << ' '<<C << ' '<< g1.getEdge();
+
+    cout << "\n!!!!!!!!!!!!!!!!!\n";
+
+    g1.clearEdges();
+
+
+    g1.addLoop(B,"B");
+//    g1.addLink(C,B,"B-C"); //g1.addLink(B,C,"B-C");//g1.addLink(A,B,"A-B");g1.addLink(A,C,"A-C");
+    g1.addArc(C,A,"C>A");//g1.addArc(C,A,"C>A");g1.addArc(A,C,"A>C");g1.addArc(A,C,"A>C");
+    g1.addArc(A,C,"A>C");    g1.addArc(A,C,"A>C");
+//    g1.addArc(B,C,"B>C");
+    g1.addLink(B,C,"B-C");g1.addLink(B,C,"B-C");g1.addLink(B,C,"B-C");g1.addLink(A,C,"A-C");
+//    g1.clearEdges();
+    g1.addLoop(C,"C");g1.addLoop(C,"C");g1.addLoop(C,"C");g1.addLoop(C,"C");
+
+    EdgeDirection dir=EdDirIn;
+    cout <<g1.maxMu(dir).second ;
+    cout << '\t' <<g1.maxMu(dir).first->info ;
+
 //    for(int i=0;i<g1.getConEdges(tabE,tabV3,tabV3+5,tabV,tabV+5,EdAll);i++) cout << tabE[i]->info << '\n';
 
 //    char mask=EdAll;

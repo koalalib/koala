@@ -75,6 +75,7 @@ ChTest tests[] = {
 			       rv ? "true" : "false", tests[i].ans ? "true" : "false");
 			};
 		rv = IsIt::cochordal(g);
+//		IsIt::cocomparability(g);
 		if(rv != tests[i].coans) {
 			printf("bad IsCoChordal answer (%s instead of %s)\n",
 			       rv ? "true" : "false", tests[i].ans ? "true" : "false");

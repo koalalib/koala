@@ -312,6 +312,10 @@ namespace Koala
 			{ return *this; }
 		BlackHole operator++( int )
 			{ return *this; }
+        bool operator==(BlackHole)
+            { return true; }
+        bool operator!=(BlackHole)
+            { return false; }
 
 		BlackHole()
 			{}
@@ -2206,6 +2210,17 @@ namespace Koala
 		 *  The function makes connection between the source \a w and the destination \a wsk. Create an element in \a amap which associates the key \a wsk with the mapped value \a w.*/
 		template< class Dest, class Sour > void operator()( Dest *wsk, Sour *w ) { if (wsk) map[wsk] = w; }
 	};
+
+namespace Privates {
+
+	struct Std1PtrLinker
+	{
+		/** \brief Function call operator.
+		 *
+		 *  The function makes connection between the source \a w and the destination \a wsk. Create an element in \a amap which associates the key \a wsk with the mapped value \a w.*/
+		template< class Dest, class Sour > void operator()( Dest *wsk, Sour *w ) { if (wsk) wsk->info = w; }
+	};
+}
 
 	/* Std2Linker
 	 * pelny linker, zawiera obiekty laczace (polowki linkera - j.w.) nowy element ze starym i odwrotnie

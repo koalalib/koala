@@ -1002,72 +1002,51 @@ template< class VertInfo, class EdgeInfo, class Settings > template< class Itera
 {
 	typename Settings:: template VertEdgeAssocCont< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex, EmptyVertInfo>::Type
 		vset( getVertNo() );
-	for( Iterator i = beg; i != end; ++i ) vset[*i] = EmptyVertInfo();
-	for( typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u = vset.firstKey(); u; u = vset.nextKey( u ) )
-	{
-		typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e;
-		if (type & EdLoop)
-		{
-			if (this->getEdge( u,EdLoop ))
-				while ((e = this->getEdge( u,EdLoop ))) delEdge( e );
-			else addLoop(u,infoGen(*this,u,u,EdLoop));
-		}
-	}
-	for( typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u = vset.firstKey(); u != vset.lastKey();
-		 u = vset.nextKey( u ))
-		for( typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v = vset.nextKey( u ); v; v = vset.nextKey( v ))
-		{
-			typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e;
-			if (type & Directed)
-			{
-				bool uvflag = this->getEdge( u,v,EdDirOut ), vuflag = this->getEdge( v,u,EdDirOut );
-				while ((e = this->getEdge( u,v,EdDirOut ))) delEdge( e );
-				while ((e = this->getEdge( v,u,EdDirOut ))) delEdge( e );
+    typename Settings:: template VertEdgeAssocCont< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex, EdgeDirection>::Type
+		neighs( this->Delta(Directed|Undirected) );
 
-				if (!uvflag) addArc( u,v,infoGen( (const Graph< VertInfo,EdgeInfo,Settings > &)(*this),u,v,EdDirOut ) );
-				if (!vuflag) addArc( v,u,infoGen( (const Graph< VertInfo,EdgeInfo,Settings > &)(*this),v,u,EdDirOut ) );
-			}
-			if (type & Undirected)
-			{
-				bool undflag = this->getEdge( u,v,EdUndir );
-				while ((e = this->getEdge( v,u,EdUndir ))) delEdge( e );
-				if (!undflag) addEdge( u,v,infoGen((const Graph< VertInfo,EdgeInfo,Settings > &)(*this),u,v,EdUndir ),EdUndir );
-			}
-		}
+    if (isBlackHole(beg)) this->getVerts(assocInserter(vset,constFun(EmptyVertInfo())));
+	else for( Iterator i = beg; i != end; ++i ) vset[*i] = EmptyVertInfo();
+
+	if (type & EdLoop) for( typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u = vset.firstKey(); u;
+        u = vset.nextKey( u ) )
+	{
+        typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e;
+        if (this->getEdge( u,EdLoop ))
+            while ((e = this->getEdge( u,EdLoop ))) delEdge( e );
+        else addLoop(u,infoGen(*this,u,u,EdLoop));
+	}
+	typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v;
+	for( typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u = vset.firstKey(); u ; u = vset.nextKey( u ))
+    {
+        for( typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e = this->getEdge(u,type&(Directed|Undirected)); e;
+            e = this->getEdgeNext(u,e,type&(Directed|Undirected)))
+            if ((vset.hasKey(v = this->getEdgeEnd(e,u))) && v>u) neighs[v]|=this->getEdgeDir(e,u);
+
+		for(typename Graph< VertInfo,EdgeInfo,Settings >::PEdge enext,e=this->getEdge(u,type&(Directed|Undirected));e;
+            e=enext)
+        {   enext=this->getEdgeNext(u,e,type&(Directed|Undirected));
+            if (vset.hasKey(v = this->getEdgeEnd(e,u))&& v>u) this->delEdge(e);
+        }
+
+		for( v= vset.firstKey(); v ; v = vset.nextKey( v ))
+		if (v>u)
+        {
+            if (((type)& Directed) && ((neighs[v]&EdDirIn)==0))
+                addArc( v,u,infoGen( (const Graph< VertInfo,EdgeInfo,Settings > &)(*this),v,u,EdDirOut ) );
+            if (((type)& Directed) && ((neighs[v]&EdDirOut)==0))
+                addArc( u,v,infoGen( (const Graph< VertInfo,EdgeInfo,Settings > &)(*this),u,v,EdDirOut ) );
+            if (((type)& Undirected) && ((neighs[v]&EdUndir)==0))
+                addLink( u,v,infoGen( (const Graph< VertInfo,EdgeInfo,Settings > &)(*this),u,v,EdUndir ) );
+        }
+        while (!neighs.empty()) neighs.delKey(neighs.firstKey());
+    }
 }
 
 template< class VertInfo, class EdgeInfo, class Settings > template< class EdInfoGen >
 	void Graph< VertInfo,EdgeInfo,Settings >::neg( EdgeType type, EdInfoGen infoGen )
 {
-	if (type & EdLoop)
-		for( typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v = this->getVert(); v; v=getVertNext( v ) )
-		{
-			typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e;
-			if (this->getEdge( v,EdLoop ))
-				while ((e = this->getEdge( v,EdLoop ))) delEdge( e );
-			else addLoop( v,infoGen( *this,v,v,EdLoop ) );
-		}
-	for( typename Graph< VertInfo,EdgeInfo,Settings >::PVertex u = this->getVert(); u; u = getVertNext( u ) )
-		for( typename Graph< VertInfo,EdgeInfo,Settings >::PVertex v = getVertNext( u ); v; v = getVertNext( v ) )
-			if (u != v)
-			{
-				typename Graph< VertInfo,EdgeInfo,Settings >::PEdge e;
-				if (type & Directed)
-				{
-					bool uvflag = this->getEdge( u,v,EdDirOut ), vuflag = this->getEdge( v,u,EdDirOut );
-					while ((e = this->getEdge( u,v,EdDirOut ))) delEdge( e );
-					while ((e = this->getEdge( v,u,EdDirOut ))) delEdge( e );
-
-					if (!uvflag) addArc( u,v,infoGen( *this,u,v,EdDirOut ) );
-					if (!vuflag) addArc( v,u,infoGen( *this,v,u,EdDirOut ) );
-				}
-				if (type & Undirected)
-				{
-					bool undflag = this->getEdge( u,v,EdUndir );
-					while ((e = this->getEdge( v,u,EdUndir ))) delEdge( e );
-					if (!undflag) addEdge( u,v,infoGen( *this,u,v,EdUndir ), EdUndir );
-				}
-			}
+    neg(blackHole, blackHole,type, infoGen);
 }
 
 template< class VertInfo, class EdgeInfo, class Settings > typename Graph< VertInfo,EdgeInfo,Settings >::PVertex

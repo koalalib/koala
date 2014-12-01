@@ -59,6 +59,32 @@ namespace Koala
 	 *  \ingroup DMflow */
 	template< class DefaultStructs > class FlowPar: public PathStructs
 	{
+//maxFlow
+//	maxFlowFF
+//		BFSFlow
+//			usedCap
+//		addFlow
+//	maxFlowMKM
+//		layerFlow
+//			layers
+//				-BFSFlow
+//			findPot
+//				-usedCap
+//			onevert
+//				push
+//					-usedCap
+//					addFlow
+//				-findPot
+//minCostFlow
+//	minCostFlowFF
+//		BellmanFordFlow
+//			usedCapCost
+//			costFlow
+//	minCostFlowGT
+//		minMeanCycle
+//			-usedCapCost
+//			-costFlow
+//		-addFlow
 	public:
 
 		// rekord z danymi (in-out) opisujacy krawedz

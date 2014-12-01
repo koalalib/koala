@@ -873,6 +873,7 @@ template< class DefaultStructs >
         org2im[u]=ig.addVert( u );
 	for( typename Graph1::PEdge e = g.getEdge(Directed|Undirected); e; e = g.getEdgeNext( e,Directed|Undirected ) )
                 ig.addEdge(org2im[g.getEdgeEnd1(e)],org2im[g.getEdgeEnd2(e)]);
+    ig.delAllParals(EdUndir);
     ig.neg(EdUndir);
 }
 
@@ -886,7 +887,7 @@ template< class DefaultStructs >
 
     int n=g.getVertNo();
     SimplArrPool<typename ImageGraph::Vertex> valloc(n);
-    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1));
+    SimplArrPool<typename ImageGraph::Edge> ealloc(std::max(g.getEdgeNo(Directed|Undirected),n*(n-1)));
 	ImageGraph ig(&valloc,&ealloc);
 	MaxCliqueHeurPar< DefaultStructs >::copyneg(g,ig);
 
@@ -910,7 +911,7 @@ template< class DefaultStructs >
 
     int n=g.getVertNo();
     SimplArrPool<typename ImageGraph::Vertex> valloc(n);
-    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1));
+    SimplArrPool<typename ImageGraph::Edge> ealloc(std::max(g.getEdgeNo(Directed|Undirected),n*(n-1)));
 	ImageGraph ig(&valloc,&ealloc);
 	MaxCliqueHeurPar< DefaultStructs >::copyneg(g,ig);
 
@@ -932,7 +933,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
 
     int n=g.getVertNo();
     SimplArrPool<typename ImageGraph::Vertex> valloc(n);
-    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1));
+    SimplArrPool<typename ImageGraph::Edge> ealloc(std::max(g.getEdgeNo(Directed|Undirected),n*(n-1)));
 	ImageGraph ig(&valloc,&ealloc);
 	MaxCliqueHeurPar< DefaultStructs >::copyneg(g,ig);
 
@@ -954,7 +955,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
 
     int n=g.getVertNo();
     SimplArrPool<typename ImageGraph::Vertex> valloc(n);
-    SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1));
+    SimplArrPool<typename ImageGraph::Edge> ealloc(std::max(g.getEdgeNo(Directed|Undirected),n*(n-1)));
 	ImageGraph ig(&valloc,&ealloc);
 	MaxCliqueHeurPar< DefaultStructs >::copyneg(g,ig);
 

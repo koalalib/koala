@@ -161,6 +161,15 @@ int randGraphTests() {
 	out.close();
 
 	cout << "End of randGraphTests" << endl;
+
+	Koala::Privates::StdMapWithDefault<char,int> mapa(0,-1);
+//	cout << mapa['a'] << "\n";
+	mapa['a']=1;
+    cout << mapa['a'] << "\n";
+    mapa['a']=2;
+    cout << mapa['a'] << "\n";
+
+
 	return 0;
 }
 

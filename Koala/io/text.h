@@ -657,11 +657,17 @@ inline bool PSTestBool(const std::string &s, bool *v) {
 };
 
 inline bool PSTestInt(const std::string &s, int *v) {
-	return s.find('.')==std::string::npos && std::sscanf(s.c_str(), "%d", v) == 1;
+	size_t n = 0;
+	return s.find('.')==std::string::npos
+	       && std::sscanf(s.c_str(), "%d%n", v, &n) == 1
+	       && n == s.size();
 };
 
 inline  bool PSTestDouble(const std::string &s, double *v) {
-	return s.find('.')!=std::string::npos && std::sscanf(s.c_str(), "%lf", v) == 1;
+	size_t n = 0;
+	return s.find('.')!=std::string::npos
+	       && std::sscanf(s.c_str(), "%lf%n", v, &n) == 1
+	       && n == s.size();
 };
 
 inline std::string addDot(double d)

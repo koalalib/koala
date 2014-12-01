@@ -291,6 +291,28 @@ int graphTests() {
 	Koala::IO::writeGraphText(g, out, Koala::IO::RG_VInfo);
 	out.close();
 
+
+	g.clear();
+	Koala::DrawCreator::barAlb(rgen, g, 10, 3, 400, EdDirOut);
+	Koala::IO::writeGraphText(g, std::cout, Koala::IO::RG_VInfo);
+	out.open("test-graph22-rand-barAlb1.txt", std::ios::out | std::ios::trunc);
+	Koala::IO::writeGraphText(g, out, Koala::IO::RG_VInfo);
+	out.close();
+
+	g.clear();
+	Koala::DrawCreator::wattStrog1(rgen, g, 20, 6, 0.5, 400, Directed, true);
+	Koala::IO::writeGraphText(g, std::cout, Koala::IO::RG_VInfo);
+	out.open("test-graph23-rand-wattStrog1-1.txt", std::ios::out | std::ios::trunc);
+	Koala::IO::writeGraphText(g, out, Koala::IO::RG_VInfo);
+	out.close();
+
+	g.clear();
+	Koala::DrawCreator::wattStrog2(rgen, g, 20, 6, 0.5, 400);
+	Koala::IO::writeGraphText(g, std::cout, Koala::IO::RG_VInfo);
+	out.open("test-graph24-rand-wattStrog2-1.txt", std::ios::out | std::ios::trunc);
+	Koala::IO::writeGraphText(g, out, Koala::IO::RG_VInfo);
+	out.close();
+
 	return 0;
 }
 
