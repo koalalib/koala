@@ -155,7 +155,7 @@ double kwadrat(int arg) { return arg*arg; }
 //    cout << cout << "\n\nLocals:\n\n";
     cout << "\n\nLocals:\n\n";
     JSPartDesrc< Vert* > buf1[20];
-    Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,JSPartDesrc< Vert* > * > > buf2[20];
+    Privates::BlockOfBlockList< Privates::BlockOfAssocArray< Vert*,JSPartDesrc< Vert* > * > > buf2[20];
     JoinableSets<Vert*>
             locjset(4);
 

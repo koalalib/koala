@@ -71,7 +71,7 @@ void searchTest()
 
     g.addEdge(A,B,OpisE(1));g.addEdge(A,C,OpisE(4));g.addEdge(B,D,OpisE(5));g.addEdge(D,C,OpisE(2));
     g.addEdge(C,E,OpisE(1));g.addEdge(B,C,OpisE(2),Koala::EdDirOut);g.addEdge(D,E,OpisE(1),Koala::EdDirOut);
-    g.addEdge(F,D,OpisE(2),Koala::EdDirOut);
+    g.addEdge(F,D,OpisE(2),Koala::EdDirIn);
     g.addArc(G,H,OpisE(2));
 
     g.addArc(G,H,OpisE(2));g.addArc(G,H,OpisE(2));
@@ -101,13 +101,13 @@ void searchTest2()
 
 
 //#define STRATEGY LexBFS
-#define STRATEGY DFSPreorder
+#define STRATEGY DFSPostorder
 
 #include "main.hpp"
 
     searchTest();
     int licz;
-    std::cout << (licz=Koala::STRATEGY::visitBase(g,A,vertCont,Visitors::EndVertVisitor(G),EdAll,1)) << std::endl;
+    std::cout << (licz=Koala::STRATEGY::visitBase(g,A,vertCont,Visitors::EndVertVisitor(F),EdAll,1)) << std::endl;
     licz=g.getVertNo();
     for(W=g.getVert();W;W=g.getVertNext(W))
         std::cout << W->info.name << ":: dist:" << vertCont[W].distance << " pred:"
@@ -116,6 +116,27 @@ void searchTest2()
     std::cout << "\n***\n";
     for(int i=0;i<licz;i++) std::cout << ((tabV[i]) ? tabV[i]->info.name : string(" NULL"));
     std::cout << "\n***\n";
+
+    searchTest();
+
+    int radius=3;
+    std::cout << (licz=Koala::STRATEGY::visitBase(g,A,vertCont,Visitors::NearVertsVisitor(radius),EdAll,1)) << std::endl;
+    licz=g.getVertNo();
+    for(W=g.getVert();W;W=g.getVertNext(W))
+        std::cout << W->info.name << ":: dist:" << vertCont[W].distance << " pred:"
+        << ( (vertCont[W].vPrev) ? vertCont[W].vPrev->info.name : string(" NULL") )<<
+        " compon:" << vertCont[W].component << std::endl;
+    std::cout << "\n***\n";
+    for(int i=0;i<licz;i++) std::cout << ((tabV[i]) ? tabV[i]->info.name : string(" NULL"));
+    std::cout << "\n***\n";
+
+    searchTest();
+
+    licz=Koala::STRATEGY::scanNear(g,A,radius,vertCont,tabV);
+     for(int i=0;i<licz;i++) std::cout << ((tabV[i]) ? tabV[i]->info.name : string(" NULL"));
+     cout << vertCont.size() << endl <<Koala::STRATEGY::getNearSet(g,A,radius)<< endl;
+     for(int i=0;i<licz;i++) std::cout << tabV[i] <<" ";
+//    return 0;
 
     int comptab[2][10];
     comptab[1][0]=0;

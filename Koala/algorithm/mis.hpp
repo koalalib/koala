@@ -660,7 +660,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
 	typename GraphType::VertInfoType LOCALARRAY(aOut,g.getVertNo());
 
 	typename GraphType::PVertex vG = g.maxDeg().first;
-	if(minSize < g.getVertNo() - g.deg(vG))
+	if(minSize <= g.getVertNo() - g.deg(vG))
 	{
 		ImageGraph h;
         typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename ImageGraph::PVertex >::Type vmapH(g.getVertNo());
@@ -687,7 +687,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
 	{
 		typename GraphType::PVertex LOCALARRAY(vGmirrors, g.deg(vG) + 1);
 		int m = getMirrors(g, vG, vGmirrors);
-		if((minSize > a ? minSize : a + 1) < g.getVertNo() - m)
+		if((minSize > a ? minSize : a + 1) <= g.getVertNo() - m)
 		{
 			g.delVerts(vGmirrors, vGmirrors + m);
 			if(minSize <= g.getVertNo())

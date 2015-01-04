@@ -7,6 +7,7 @@
 
 #include <map>
 #include <vector>
+#include <deque>
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -609,20 +610,20 @@ namespace Koala
 		inline void deregister();
 	};
 
-	/* BlockOfAssocArray
+
+    namespace Privates
+	{
+	/* Privates::BlockOfAssocArray
 	 *
 	 */
-	template< class Klucz, class Elem > struct BlockOfAssocArray
-	{
-		Elem val;
-		Klucz key;
-		AssocContReg assocReg;
+        template< class Klucz, class Elem > struct BlockOfAssocArray
+        {
+            Elem val;
+            Klucz key;
+            AssocContReg assocReg;
 
-		BlockOfAssocArray() : val(), key() {}
-	};
-
-	namespace Privates
-	{
+            BlockOfAssocArray() : val(), key() {}
+        };
 
 		// test czy Klucz jest wskaznikiem zawierajacym pole AssocKeyContReg assocReg - tylko wowczas kompiluje sie konstruktor domyslny
 		template< class Klucz > class KluczTest
@@ -630,15 +631,12 @@ namespace Koala
 		public:
 			KluczTest( Klucz v = 0 ) { AssocKeyContReg *ptr = &v->assocReg; (void)(ptr);}
 		} ;
-	}
 
-	/* AssocArray
-	 *
-	 */
-	template< class Klucz, class Elem > struct AssocArrayInternalTypes
-	{
-		typedef Privates::BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > BlockType;
-	};
+        template< class Klucz, class Elem > struct AssocArrayInternalTypes
+        {
+            typedef BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > BlockType;
+        };
+	}
 
 	// Szybka tablica asocjacyjna np. dla wierz/kraw
 	// Wiekszosc interfejsu jak w innych tabl. assocjacyjnych
@@ -650,12 +648,12 @@ namespace Koala
 	 *  \ingroup cont
 	 */
 	template< class Klucz, class Elem, class Container = std::vector< typename
-		AssocArrayInternalTypes<Klucz,Elem>::BlockType > > class AssocArray:
+		Privates::AssocArrayInternalTypes<Klucz,Elem>::BlockType > > class AssocArray:
 			public AssocContBase,
 			protected Privates::KluczTest< Klucz >, public Privates::AssocTabTag< Klucz >
 	{
 	protected:
-		mutable Privates::BlockList< BlockOfAssocArray< Klucz,Elem >,Container > tab;
+		mutable Privates::BlockList< Privates::BlockOfAssocArray< Klucz,Elem >,Container > tab;
 
 		inline virtual void DelPosCommand( int pos ) { tab.delPos( pos ); }
 		inline virtual AssocContReg &getReg( int pos ) { return tab[pos].assocReg; }
@@ -894,11 +892,11 @@ namespace Koala
 	 *  \ingroup cont
 	 */
 	template< class Klucz, class Elem, class AssocCont, class Container =
-		std::vector< typename AssocArrayInternalTypes< Klucz,Elem >::BlockType > > class PseudoAssocArray:
+		std::vector< typename Privates::AssocArrayInternalTypes< Klucz,Elem >::BlockType > > class PseudoAssocArray:
 			public Privates::AssocTabTag< Klucz >
 		{
 		protected:
-			mutable Privates::BlockList< BlockOfAssocArray< Klucz,Elem >,Container > tab;
+			mutable Privates::BlockList< Privates::BlockOfAssocArray< Klucz,Elem >,Container > tab;
 			AssocCont assocTab;
 
 		public:
@@ -1048,30 +1046,28 @@ namespace Koala
 			{ return pairMinMax( k.first,k.second ); }
 	};
 
-	// BlockOfAssocMatrix
-	template< class Elem > struct BlockOfAssocMatrix
+    namespace Privates
 	{
-		Elem val;
-		int next,prev;
-		bool present() const { return next || prev; }
-		BlockOfAssocMatrix(): val(), next( 0 ), prev( 0 ) { }
-	};
+	// Privates::BlockOfAssocMatrix
+        template< class Elem > struct BlockOfAssocMatrix
+        {
+            Elem val;
+            int next,prev;
+            bool present() const { return next || prev; }
+            BlockOfAssocMatrix(): val(), next( 0 ), prev( 0 ) { }
+        };
 
-	namespace Privates
-	{
 		// kontrola zgodnosci typow kluczy dla przypisan miedzy roznymi tablicami asocjacyjnymi
 		template< class Key,AssocMatrixType > class Assoc2DimTabTag { };
-	}
 
-	/* AssocMatrix
-	 *
-	 */
-	template <class Klucz, class Elem>
-	struct AssocMatrixInternalTypes
-	{
-		typedef BlockOfAssocMatrix< Elem > BlockType;
-		typedef Privates::BlockOfBlockList< BlockOfAssocArray< Klucz,int > > IndexBlockType;
-	};
+        template <class Klucz, class Elem>
+        struct AssocMatrixInternalTypes
+        {
+            typedef BlockOfAssocMatrix< Elem > BlockType;
+            typedef BlockOfBlockList< BlockOfAssocArray< Klucz,int > > IndexBlockType;
+        };
+
+	}
 
 	// 2-wymiarowa tablica asocjacyjna. Uwaga: wersja z IndexContainer = IndexContainer = AssocArray< Klucz,...>
 	// ma te same ograniczenia odnosnie uzywanych kluczy, co AssocArray (j.w.)
@@ -1086,8 +1082,8 @@ namespace Koala
 	 *  \sa Koala::AssocMatrixType
 	 *  \ingroup cont*/
 	template< class Klucz, class Elem, AssocMatrixType aType, class Container =
-		std::vector< typename AssocMatrixInternalTypes<Klucz,Elem>::BlockType >, class IndexContainer =
-			AssocArray< Klucz,int,std::vector< typename AssocMatrixInternalTypes< Klucz,Elem >::IndexBlockType > > >
+		std::vector< typename Privates::AssocMatrixInternalTypes<Klucz,Elem>::BlockType >, class IndexContainer =
+			AssocArray< Klucz,int,std::vector< typename Privates::AssocMatrixInternalTypes< Klucz,Elem >::IndexBlockType > > >
 	// Container - typ wewnetrznego bufora - tablicy przechowujacej opakowany ciag wartosci przypisanych roznym parom kluczy
 	// IndexContainer - typ indeksu tj. tablicy asocjacyjnej przypisujacej pojedynczym kluczom ich liczby wystapien we wpisach oraz (rozne) numery.
 	class AssocMatrix: public Assoc2DimTabAddr< aType >, public Privates::Assoc2DimTabTag< Klucz,aType >
@@ -1711,25 +1707,27 @@ namespace Koala
 
 	};
 
+    namespace Privates {
 
-	template< class Elem > struct BlockOfSimpleAssocMatrix
-	{
-		Elem val;
-		bool present;
-		BlockOfSimpleAssocMatrix(): val(), present( false ) { }
-	};
+        template< class Elem > struct BlockOfSimpleAssocMatrix
+        {
+            Elem val;
+            bool present;
+            BlockOfSimpleAssocMatrix(): val(), present( false ) { }
+        };
 
-	template <class Klucz, class Elem>
-	struct SimpleAssocMatrixInternalTypes
-	{
-		typedef BlockOfSimpleAssocMatrix< Elem > BlockType;
-		typedef Privates::BlockOfBlockList< BlockOfAssocArray< Klucz,int > > IndexBlockType;
-	};
+        template <class Klucz, class Elem>
+        struct SimpleAssocMatrixInternalTypes
+        {
+            typedef BlockOfSimpleAssocMatrix< Elem > BlockType;
+            typedef BlockOfBlockList< BlockOfAssocArray< Klucz,int > > IndexBlockType;
+        };
+    }
 
 
 	template< class Klucz, class Elem, AssocMatrixType aType, class Container =
-		std::vector< std::vector<typename SimpleAssocMatrixInternalTypes<Klucz,Elem>::BlockType> >, class IndexContainer =
-			AssocArray< Klucz,int,std::vector< typename SimpleAssocMatrixInternalTypes< Klucz,Elem >::IndexBlockType > > >
+		std::vector< std::vector<typename Privates::SimpleAssocMatrixInternalTypes<Klucz,Elem>::BlockType> >, class IndexContainer =
+			AssocArray< Klucz,int,std::vector< typename Privates::SimpleAssocMatrixInternalTypes< Klucz,Elem >::IndexBlockType > > >
 	class SimpleAssocMatrix: public Assoc2DimTabAddr< aType >, public Privates::Assoc2DimTabTag< Klucz,aType >
 	{
 		template< class A, class B, AssocMatrixType C, class D, class E > friend class SimpleAssocMatrix;
@@ -1791,7 +1789,7 @@ namespace Koala
             if (!Assoc2DimTabAddr< aType >::correctPos( wsp.first,wsp.second )) return;
             std::pair< int,int > x=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
             if (!bufor.operator[](x.first).operator[](x.second).present) return;
-            bufor.operator[](x.first).operator[](x.second) = BlockOfSimpleAssocMatrix< Elem >();
+            bufor.operator[](x.first).operator[](x.second) = Privates::BlockOfSimpleAssocMatrix< Elem >();
             siz--;
             --index.tab[wsp.first].val;
             --index.tab[wsp.second].val;
@@ -1945,7 +1943,7 @@ namespace Koala
             std::pair< int,int > x=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
             if  (bufor.operator[](x.first).operator[](x.second).present)
             {
-                bufor.operator[](x.first).operator[](x.second) = BlockOfSimpleAssocMatrix< Elem >();
+                bufor.operator[](x.first).operator[](x.second) = Privates::BlockOfSimpleAssocMatrix< Elem >();
                 siz--;
                 if (--index[u] == 0) index.delKey( u );
                 if (--index[v] == 0) index.delKey( v );

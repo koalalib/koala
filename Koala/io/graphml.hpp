@@ -806,7 +806,7 @@ bool GraphML::KeyHolder::set(const std::string &val) {
 }
 
 template<>
-bool GraphML::KeyHolder::get<bool>() {
+inline bool GraphML::KeyHolder::get<bool>() {
 	switch (type) {
 		case GraphMLKeyTypes::Bool:
 			return uVal.intVal;
@@ -824,7 +824,7 @@ bool GraphML::KeyHolder::get<bool>() {
 	}
 }
 template<>
-int GraphML::KeyHolder::get<int>() {
+inline int GraphML::KeyHolder::get<int>() {
 	switch (type) {
 		case GraphMLKeyTypes::Bool:
 			return uVal.intVal;
@@ -842,7 +842,7 @@ int GraphML::KeyHolder::get<int>() {
 	}
 }
 template<>
-int64_t GraphML::KeyHolder::get<int64_t>() {
+inline int64_t GraphML::KeyHolder::get<int64_t>() {
 	switch (type) {
 		case GraphMLKeyTypes::Bool:
 			return uVal.intVal;
@@ -861,7 +861,7 @@ int64_t GraphML::KeyHolder::get<int64_t>() {
 }
 
 template<>
-double GraphML::KeyHolder::get<double>() {
+inline double GraphML::KeyHolder::get<double>() {
 	switch (type) {
 		case GraphMLKeyTypes::Bool:
 			return uVal.intVal;
@@ -882,7 +882,7 @@ double GraphML::KeyHolder::get<double>() {
 }
 
 template<>
-std::string GraphML::KeyHolder::get<std::string>() {
+inline std::string GraphML::KeyHolder::get<std::string>() {
 	return print();
 }
 

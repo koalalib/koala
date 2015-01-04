@@ -46,7 +46,7 @@ struct FunktorReadE {
 void print(const Graph &graph, const Map &colors) {
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
 		cout << vv->info.name << " [";
-		if(colors.hasKey(vv)) cout << colors[vv].min <<", " <<colors[vv].max << ") ";
+		if(colors.hasKey(vv)) cout << colors[vv].left <<", " <<colors[vv].right << ") ";
 		else cout << " ]";
 		cout << " <";
 		for(Edge ee = graph.getEdge(vv); ee; ee = graph.getEdgeNext(vv,ee)) {

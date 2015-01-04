@@ -185,7 +185,6 @@ namespace Koala
 		// TODO: rozwazyc usuniecie w finalnej wersji biblioteki
 		bool check() const;
 
-		template< class InputIterator > void assign2( InputIterator &first, int len );
 	};
 
 	//WEN: do pozostalych 2 kopcow zasadniczo te same poprawki

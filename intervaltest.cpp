@@ -95,8 +95,8 @@ void Test(bool res, const char *id, const char *graph) {
 			   "4(4) 0\n"
 			   "5(5) 1 -6\n"
 			   "6(6) 0", RG_VertexLists);
-	AssocTable<map<Graph<int, int>::PVertex, IsIt::Interval::Segment> > out;
-	map<Graph<int, int>::PVertex, IsIt::Interval::Segment>::iterator it;
+	AssocTable<map<Graph<int, int>::PVertex, Segment> > out;
+	map<Graph<int, int>::PVertex, Segment>::iterator it;
 	IsIt::Interval::graph2segs(g, out);
 	for(it = out.cont.begin(); it != out.cont.end(); it++) {
 		printf("%d: <%d, %d>\n", it->first->info, it->second.left, it->second.right);

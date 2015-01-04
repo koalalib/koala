@@ -156,6 +156,7 @@ using namespace std;
             for(v=g.getVertNext(u);v;v=g.getVertNext(v)) if (v->info!=u->info) g.addEdge(u,v);
 
         int k=IsIt::CompMPartite::split(g,mapa, SearchStructs::compStore(tabi,tabV));
+        IsIt::CompMPartite::split(g,mapa);
         cout << endl;
         for(int i=0;i<k;i++)
         { for(int j=tabi[i];j<tabi[i+1];j++) cout << tabV[j]->info;

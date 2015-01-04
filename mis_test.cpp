@@ -792,6 +792,9 @@ int main(void) {
         std::cout << std::endl; clearOutput();
 
     }
+
+    Koala::StdRandGen<> stdgen2=stdgen;
+    stdgen2=stdgen;
 }
 
 

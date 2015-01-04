@@ -48,7 +48,7 @@ namespace Koala
 
 		public:
 			// Parametry konstruktora określają, co mają zwracać metody line, descr i file.
-			ExcBase( const char *adesc = "", const char *afile = "", int aline = -1);
+			inline ExcBase( const char *adesc = "", const char *afile = "", int aline = -1);
 
 			// Wiersz w kodzie, gdzie wystapił błąd.
 			inline int line() const

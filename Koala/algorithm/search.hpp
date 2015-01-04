@@ -1,29 +1,36 @@
 // PathStructs
 
-template< class Graph > void PathStructs::OutPathTool< Graph >::clear()
+
+template< class Graph, template <typename Elem, typename Alloc> class Container >
+    void PathStructs::OutPathTool< Graph,Container >::clear()
 {
 	verts.clear();
 	edges.clear();
 }
 
-template< class Graph > typename Graph::PEdge PathStructs::OutPathTool< Graph >::edge( int i ) const
+template< class Graph, template <typename Elem, typename Alloc> class Container>
+    typename Graph::PEdge PathStructs::OutPathTool< Graph,Container >::edge( int i ) const
 {
 	koalaAssert( (i >= 0 && i <= this->length() - 1),ContExcOutpass );
 	return edges[i];
 }
 
-template< class Graph > typename Graph::PVertex PathStructs::OutPathTool< Graph >::vertex( int i ) const
+template< class Graph,template <typename Elem, typename Alloc> class Container >
+    typename Graph::PVertex PathStructs::OutPathTool< Graph,Container >::vertex( int i ) const
 {
 	koalaAssert( (i >= 0 && i <= this->length()),ContExcOutpass );
 	return verts[i];
 }
 
-template< class Graph > PathStructs::OutPath< std::back_insert_iterator< std::vector< typename Graph::PVertex > >,
-	std::back_insert_iterator< std::vector< typename Graph::PEdge > > > PathStructs::OutPathTool< Graph >::input()
+template< class Graph,template <typename Elem, typename Alloc> class Container >
+    PathStructs::OutPath< std::back_insert_iterator< Container< typename Graph::PVertex,std::allocator<typename Graph::PVertex> > >,
+	std::back_insert_iterator< Container< typename Graph::PEdge,std::allocator<typename Graph::PEdge> > > >
+        PathStructs::OutPathTool< Graph,Container >::input()
 {
 	this->clear();
 	return outPath( std::back_inserter( verts ),std::back_inserter( edges ) );
 }
+
 
 // ShortPathStructs
 template< class GraphType, class VertContainer, class VIter, class EIter > int
@@ -211,6 +218,7 @@ template< class T > SearchStructs::CompStore< std::back_insert_iterator< std::ve
 	return compStore( std::back_inserter( idx ),std::back_inserter( data ) );
 }
 
+
 // Visitors
 
 template< class VertIter > template< class GraphType, class VisitVertLabsGraphType > bool Visitors::StoreTargetToVertIter< VertIter >::operator()(
@@ -292,6 +300,35 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 {
 	VisitedMap< GraphType > cont( g.getVertNo() );
 	return scanAttainable( g,root,cont,comp,mask );
+}
+
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer, class Iter >
+	int GraphSearchBase< SearchImpl, DefaultStructs >::scanNear( const GraphType &g,
+		typename GraphType::PVertex root, int radius, VertContainer &cont,Iter comp, EdgeDirection mask  )
+{
+	int rv;
+	koalaAssert( root && radius>=0,AlgExcNullVert );
+	mask &= ~EdLoop;
+	rv = SearchImpl::visitBase( g,root,cont,Visitors::NearVertsVisitor( radius ),mask,0 );
+	return cont.getKeys(comp);
+}
+
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertIter >
+	int GraphSearchBase< SearchImpl, DefaultStructs >::scanNear( const GraphType &g,
+		typename GraphType::PVertex root, int radius, BlackHole,VertIter comp, EdgeDirection mask )
+{
+	VisitedMap< GraphType > cont( g.getVertNo() );
+	return scanNear( g,root,radius,cont,comp,mask );
+}
+
+template< class SearchImpl, class DefaultStructs > template< class GraphType >
+	Set< typename GraphType::PVertex > GraphSearchBase< SearchImpl, DefaultStructs >::getNearSet(
+		const GraphType &g, typename GraphType::PVertex root, int radius, EdgeDirection mask )
+{
+	assert( root );
+	Set< typename GraphType::PVertex > res;
+	scanNear( g,root,radius,blackHole,setInserter( res ),mask );
+	return res;
 }
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer, class VertIter >
@@ -1269,16 +1306,37 @@ template< class DefaultStructs > template< class GraphType, class Iterator >
 template< class DefaultStructs > template< class GraphType > void EulerPar< DefaultStructs >::eulerEngine(
 	typename GraphType::PVertex u, typename GraphType::PEdge ed, EulerState<GraphType> &state )
 {
-	typename GraphType::PEdge e;
-	typename GraphType::PVertex v;
-	for( e = state.g.getEdge( u,state.mask ); e != NULL; e = state.g.getEdgeNext( u,e,state.mask ) )
-	{
-		if (state.edgeVisited.hasKey( e )) continue;
-		state.edgeVisited[e] = true;
-		v = state.g.getEdgeEnd( e,u );
-		eulerEngine( v,e,state );
-	}
-	state.stk.push( std::make_pair( u,ed ) );
+    Frame<GraphType> LOCALARRAY(stack,state.g.getEdgeNo(state.mask)+1);
+    stack[0]=Frame<GraphType>(u,ed,0);
+
+    for(int pos=0;pos>=0;)
+    {
+        do
+            stack[pos].e=state.g.getEdgeNext( stack[pos].u,stack[pos].e,state.mask );
+        while (stack[pos].e && state.edgeVisited.hasKey( stack[pos].e ));
+        if (stack[pos].e)
+        {
+            state.edgeVisited[stack[pos].e] = true;
+            stack[pos+1]=Frame<GraphType>(state.g.getEdgeEnd( stack[pos].e,stack[pos].u ),stack[pos].e,0);
+            pos++;
+        } else
+        {
+            state.stk.push( std::make_pair( stack[pos].u,stack[pos].ed ) );
+            pos--;
+        }
+    }
+
+//TODO: usunac - stara wersja rekurencyjna
+//	typename GraphType::PEdge e;
+//	typename GraphType::PVertex v;
+//	for( e = state.g.getEdge( u,state.mask ); e != NULL; e = state.g.getEdgeNext( u,e,state.mask ) )
+//	{
+//		if (state.edgeVisited.hasKey( e )) continue;
+//		state.edgeVisited[e] = true;
+//		v = state.g.getEdgeEnd( e,u );
+//		eulerEngine( v,e,state );
+//	}
+//	state.stk.push( std::make_pair( u,ed ) );
 }
 
 template< class DefaultStructs > template< class GraphType, class VertIter, class EdgeIter > void

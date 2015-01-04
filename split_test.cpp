@@ -68,6 +68,7 @@ const char* print(ModPartType x)
 //    gp4.substitute(gp4.getVertLast(),gk3,make_pair(stdChoose(true),stdChoose(true)),make_pair(stdCast(),stdCast()));
 #define _g g
 	Modules::Partition res=Modules::split(_g,tool.input(),vertTab);
+		Modules::split(_g,blackHole,vertTab);
 
 
 

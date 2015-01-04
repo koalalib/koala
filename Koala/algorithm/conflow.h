@@ -825,6 +825,22 @@ namespace Koala
 			edgeDisjPaths( GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end,
 			CompStore< LenIterV,VIter > voutiter, CompStore< LenIterE,EIter > eoutiter );
 
+        //NEW: wersje bez wybranych CompStorow
+		template< class GraphType, class EIter, class LenIterE > static int
+			edgeDisjPaths( GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end,
+			BlackHole, CompStore< LenIterE,EIter > eoutiter )
+        {   return edgeDisjPaths(g,start,end,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),eoutiter); }
+
+        template< class GraphType, class VIter,  class LenIterV > static int
+			edgeDisjPaths( GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end,
+			CompStore< LenIterV,VIter > voutiter, BlackHole )
+        {   return edgeDisjPaths(g,start,end,voutiter,CompStore< BlackHole,BlackHole>( blackHole,blackHole )); }
+
+        template< class GraphType> static int
+			edgeDisjPaths( GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end, BlackHole, BlackHole )
+        {   return edgeDisjPaths(g,start,end,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),CompStore< BlackHole,BlackHole>( blackHole,blackHole )); }
+
+
 		// znajduje najmniejsze rozciecie wierzcholkowe miedzy start->end
 		// zwraca jego wielkosc (-1 w razie braku), wierzcholki sa wypisywane na iter
 		/** \brief Find smallest vertex cut.
@@ -863,6 +879,22 @@ namespace Koala
 		template< class GraphType, class VIter, class EIter, class LenIterV, class LenIterE > static int
 			vertDisjPaths( const GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end,
 			CompStore< LenIterV,VIter > voutiter, CompStore< LenIterE,EIter > eoutiter );
+
+        //NEW: wersje bez wybranych CompStorow
+		template< class GraphType, class EIter, class LenIterE > static int
+			vertDisjPaths( const GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end,
+			BlackHole, CompStore< LenIterE,EIter > eoutiter )
+        {   return vertDisjPaths(g,start,end,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),eoutiter); }
+
+        template< class GraphType, class VIter,  class LenIterV > static int
+			vertDisjPaths( const GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end,
+			CompStore< LenIterV,VIter > voutiter, BlackHole )
+        {   return vertDisjPaths(g,start,end,voutiter,CompStore< BlackHole,BlackHole>( blackHole,blackHole )); }
+
+        template< class GraphType> static int
+			vertDisjPaths( const GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end, BlackHole, BlackHole )
+        {   return vertDisjPaths(g,start,end,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),CompStore< BlackHole,BlackHole>( blackHole,blackHole )); }
+
 	};
 
 	// wersja dzialajaca na DefaultStructs=FlowAlgsDefaultSettings<false, true>

@@ -152,7 +152,7 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
     IO::writeGraphText(undg,cout,IO::RG_EdgeList);
 
     cout << g1.addArc(B,A);g1.addArc(D,C);g1.addEdge(C,B);g1.addLoop(B);
-    cout << endl << BFS::getPath(makeRevView(g1),A,D,BFS::outPath(blackHole,blackHole));
+    cout << endl << BFS::getPath(makeRevView(g1),A,D,blackHole);
     cout << endl << makeRevView(g1).getEdge(A,EdDirOut);
 
 //    std::cout << "\n\n!!!!!!!!!!!!!!\n\n";

@@ -75,7 +75,7 @@ int xxx=0;
 
 #include "main.hpp"
 
-    Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,std::string > > bufor[10];
+    Privates::BlockOfBlockList< Privates::BlockOfAssocArray< Vert*,std::string > > bufor[10];
     std::map<int,std::string> mapa;
     AssocTabInterface<std::map<int,std::string> > amap=mapa;
 //    AssocTabInterface<std::map<int,std::string> > aaa=assocTabInterf(mapa);
@@ -84,8 +84,8 @@ int xxx=0;
     int xxxtab[xxx];
 
     AssocArray<Vert*,std::string> a(5);
-    BlockOfAssocMatrix< std::string > matbuf[100];
-    Privates::BlockOfBlockList< BlockOfAssocArray< Vert*,int > > indbuf[100];
+    Privates::BlockOfAssocMatrix< std::string > matbuf[100];
+    Privates::BlockOfBlockList< Privates::BlockOfAssocArray< Vert*,int > > indbuf[100];
 
     Vert * tab[5];
 
@@ -177,7 +177,7 @@ int xxx=0;
 
 
     std::cout << "\nMatrixy2:\n";
-    AssocMatrix<Vert*,std::string,AMatrClTriangle,std::vector< BlockOfAssocMatrix< std::string > >
+    AssocMatrix<Vert*,std::string,AMatrClTriangle,std::vector< Privates::BlockOfAssocMatrix< std::string > >
          ,Koala::Privates::PseudoAssocArray<Vert*,int,AssocTable<std::map<Vert*,int> > > > pm,pm1;
 
     pm(A,B)="Wpis wspolny";
@@ -357,7 +357,7 @@ int xxx=0;
         hmapa=pa;
         t(hmapa);
 
-        AssocMatrix<Vert*,std::string,AMatrFull,std::vector< BlockOfAssocMatrix< std::string > >
+        AssocMatrix<Vert*,std::string,AMatrFull,std::vector< Privates::BlockOfAssocMatrix< std::string > >
          ,Koala::Privates::PseudoAssocArray<Vert*,int,AssocTable<std::map<Vert*,int> > > > mat,mat2;
         mat(A,B)="AB";
         mat2=mat;

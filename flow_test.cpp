@@ -21,12 +21,15 @@ Koala::Graph<char,OpisE> g;
 Koala::Graph<char,OpisE>::PVertex A,B,C,D,E,F,V,U,S,T,tabV[20],*tabVit;
 Koala::Graph<char,OpisE>::PEdge tabE[20],ee;
 
-Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeLabs<int> > >edgeCont;
+typedef int CapType;
+typedef int CostType;
+
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::EdgeLabs<CapType,CostType> > >edgeCont;
 Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::UnitEdgeLabs<int> > > unitedgeCont;
 
-Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::TrsEdgeLabs<int> > > tedgeCont;
-Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsVertLoss<int> > > tvertCont;
-Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsEdgeLabs<int> > > t2vertCont;
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PEdge,Koala::Flow::TrsEdgeLabs<CapType,CostType> > > tedgeCont;
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsVertLoss<CapType> > > tvertCont;
+Koala::AssocTable<Koala::BiDiHashMap<Koala::Graph<char,OpisE>::PVertex,Koala::Flow::TrsEdgeLabs<CapType,CostType> > > t2vertCont;
 
 
 template <class T>
@@ -331,7 +334,7 @@ void conTest()
     cout << "\n\n-----------\n\n";
     dijTest3();
         for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeCont[e].capac=1;
-    Koala::Flow::EdgeCut<int> res=Koala::Flow::minEdgeCut(g,edgeCont,S,T,Koala::Flow::outCut(tabV,tabE));
+    Koala::Flow::EdgeCut<CapType> res=Koala::Flow::minEdgeCut(g,edgeCont,S,T,Koala::Flow::outCut(tabV,tabE));
     Koala::Flow::minEdgeCut(g,unitedgeCont,S,T,Koala::Flow::outCut(blackHole,blackHole));
     cout << res.capac << endl;
     for(int i=0;i<res.vertNo;i++) cout << tabV[i]->info;
@@ -341,7 +344,7 @@ void conTest()
     cout << "\n\n////\n\n";
     dijTest3();
 
-    Koala::Flow::EdgeCut2<Koala::Graph<char,OpisE>, int> res2
+    Koala::Flow::EdgeCut2<Koala::Graph<char,OpisE>, CapType> res2
         =Koala::Flow::minEdgeCut(g,edgeCont,Koala::Flow::outCut(tabV,tabE));
     cout << res2.capac << ' ' << res2.first->info << res2.second->info << endl;
     for(int i=0;i<res2.vertNo;i++) if (tabV[i]) cout << tabV[i]->info;
@@ -389,6 +392,7 @@ void conTest()
     SearchStructs::CompStoreTool<Koala::Graph<char,OpisE>::PVertex> vstore;
     SearchStructs::CompStoreTool<Koala::Graph<char,OpisE>::PEdge> estore;
     int p=Koala::Connect::vertDisjPaths(g,S,T,vstore.input(),estore.input());
+    Koala::Connect::edgeDisjPaths(g,S,T,blackHole,estore.input());
 //                : Koala::Connect::vertDisjPaths(g,S,T,Koala::Connect::outPath(tabV,tabE),
 //                                    std::make_pair(blackHole,itab));
 

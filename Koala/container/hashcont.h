@@ -169,7 +169,7 @@ namespace Koala
 		template< class CTYPE > class CStringHash
 		{
 		public:
-			size_t operator()( const CTYPE *key, size_t m ) const;
+			inline size_t operator()( const CTYPE *key, size_t m ) const;
 		};
 
 		/*

@@ -313,6 +313,11 @@ namespace Koala
 			 *  \sa CompStore*/
 			template< class GraphType, class VMap, class Iter, class VIter >
 				static int split( const GraphType &g, VMap& avertCont, CompStore< Iter,VIter > out );
+
+            //NEW: wersja bez out
+            template< class GraphType, class VMap >
+				static int split( const GraphType &g, VMap& avertCont, BlackHole=blackHole )
+            {   return split(g,avertCont,CompStore< BlackHole,BlackHole>( blackHole,blackHole ));  }
 		};
 
 		// czy pelny M-dzielny dla pewnego M>0
@@ -340,7 +345,7 @@ namespace Koala
 		class Chordal
 		{
 		protected:
-			static void RadixSort( std::pair< int,int > *src, int size, int n, int *hints, int *out );
+			inline static void RadixSort( std::pair< int,int > *src, int size, int n, int *hints, int *out );
 
 			// porz¹dkuje wêz³y drzewa zdefiniowanego przez relacjê parent
 			// wszyscy potomkowie p wyst¹pi¹ przed wyst¹pieniem p, ale
@@ -354,7 +359,7 @@ namespace Koala
 			// DFSPostorder da: A B C E D
 			// a poni¿sza funkcja mo¿e zwróciæ np.: A E B C D
 
-			static void SemiPostOrderTree( int *parent, int n, int *out );
+			inline static void SemiPostOrderTree( int *parent, int n, int *out );
 
 
             template <class Elem> struct RekSet {
@@ -709,26 +714,7 @@ namespace Koala
 		class Interval: protected LexBFSPar< DefaultStructs >
 		{
 		public:
-			// Struktura reprezentujaca przedzial domkniety na prostej o koncach calkowitych (dopuszczalna dlugosc 0)
-			/** \brief Line segment.
-			 *
-			 *  Structure represents a closed line segment between two integer points.
-			 */
-			struct Segment
-			{
-				int left, right;
-				Segment( int l = 0, int r = 1 ): left( l ), right( r )
-				{ }
-			};
-
-			// czy dwa takie przedzialy tna sie niepusto
-			/** \brief Test line segments intersection.
-			 *
-			 *  \param a the first line segment.
-			 *  \param b the second line segment.
-			 *  \return true if the line segments \a a and \a b intersect, false otherwise.*/
-			static bool touch( Segment a, Segment b )
-				{ return std::max( a.left,b.left ) <= std::min( a.right,b.right ); }
+		    //NEW: Segment i touch wylecialy do simple.h
 
 			// konwersja zbior przedzialow-> interval graph
 			// pobiera spomiedzy 2 iteratorow ciag przedzialow (struktur typu segment)
@@ -785,17 +771,17 @@ namespace Koala
 					SimplArrPool< Privates::ListNode< Elem > > &a );
 
 				// dodaje trg do zbioru id
-				void add( int id, int trg );
+				inline void add( int id, int trg );
 				// usuwa id ze wszystkich zbiorów
-				void remove( int id );
+				inline void remove( int id );
 				// iloœæ elementów w zbiorze id
-				int count( int id )
+				inline int count( int id )
 					{ return m_data[id].first.size(); }
 				// czy zbiór id pusty
-				bool empty( int id )
+				inline bool empty( int id )
 					{ return m_data[id].first.empty(); };
 				// pierwszy element ze zbioru id (w praktyce -- dowolny)
-				int first( int id )
+				inline int first( int id )
 					{ return m_data[id].first.front().value; }
 
 				std::pair< Entry,Privates::List_iterator< Elem > > *m_data;

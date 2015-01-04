@@ -127,6 +127,9 @@ void searchTest2()
 
     int compno = Koala::Blocks::splitComp(g,C,vertCont,edgeCont,Koala::Blocks::compStore(comptab[0],tabV),
                                    comptab[1]);
+
+        Koala::Blocks::split(g,vertCont,edgeCont,blackHole,
+                                   comptab[1]);
     std::cout << compno<<endl;
     for(int i=0;i<compno;i++)
     {   cout << comptab[0][i] << ':';

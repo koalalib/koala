@@ -41,25 +41,30 @@ namespace Koala
 		template< class VIter, class EIter > static OutPath< VIter,EIter > outPath( VIter av, EIter ei )
 			{ return OutPath< VIter,EIter >( av,ei ); }
 
+        //NEW:
+        inline static OutPath< BlackHole,BlackHole> outPath( BlackHole )
+            { return OutPath< BlackHole,BlackHole>( blackHole,blackHole ); }
+
 		// OutPath moze wspolpracowac z dowolnymi sekwencyjnymi kontenerami, ale ponizsza struktura
 		//  ulatwia obrobke takich danych
+		//NEW: drugi parametr (szablon kontenera) - moze takze byc std::vector
 		/** \brief  Path tool.
 		 *
 		 *  The more complexet (then OutPath) class for representation of path.
 		 *  It is easier to create object of this class and pass it to funcion via parameter using input() method.
 		 *
 		 */
-		template< class Graph > class OutPathTool
+		template< class Graph, template <typename Elem, typename Alloc> class Container=std::deque > class OutPathTool
 		{
 		private:
-			std::vector< typename Graph::PVertex > verts;/**< \brief Vector of vertices.*/
-			std::vector< typename Graph::PEdge > edges;/**< \brief Vector of edges.*/
+			Container< typename Graph::PVertex, std::allocator<typename Graph::PVertex> > verts;/**< \brief deque of vertices.*/
+			Container< typename Graph::PEdge, std::allocator<typename Graph::PEdge> > edges;/**< \brief deque of edges.*/
 
 		public:
 			typedef typename Graph::PVertex PVertex;
 			typedef typename Graph::PEdge PEdge;
-			typedef std::back_insert_iterator< std::vector< typename Graph::PEdge > > EdgeIterType;
-			typedef std::back_insert_iterator< std::vector< typename Graph::PVertex > > VertIterType;
+			typedef std::back_insert_iterator< Container< typename Graph::PEdge,std::allocator<typename Graph::PEdge> > > EdgeIterType;
+			typedef std::back_insert_iterator< Container< typename Graph::PVertex,std::allocator<typename Graph::PVertex> > > VertIterType;
 
 			/** \brief Empty constructor*/
 			OutPathTool()
@@ -81,10 +86,9 @@ namespace Koala
 			/** \brief Create input.
 			 *
 			 *  The method creates input for a function that requires OutPath. */
-			OutPath< std::back_insert_iterator< std::vector< typename Graph::PVertex > >,
-				std::back_insert_iterator< std::vector< typename Graph::PEdge > > > input();
+			OutPath< std::back_insert_iterator< Container< typename Graph::PVertex,std::allocator<typename Graph::PVertex> > >,
+				std::back_insert_iterator< Container< typename Graph::PEdge,std::allocator<typename Graph::PEdge> > > > input();
 		};
-
 	};
 
 	/* ShortPathStructs
@@ -102,6 +106,14 @@ namespace Koala
 		template< class GraphType, class VertContainer, class VIter, class EIter >
 			static int getOutPath( const GraphType &g, const VertContainer &vertTab, OutPath< VIter,EIter > iters,
 			typename GraphType::PVertex end, typename GraphType::PVertex start = 0 );
+
+        //NEW: jak wyzej, bez podawania OutPath (wynik jest zwracany tylko przez return ...)
+        template< class GraphType, class VertContainer >
+			static int getOutPath( const GraphType &g, const VertContainer &vertTab, BlackHole,
+			typename GraphType::PVertex end, typename GraphType::PVertex start = 0 )
+			{
+			    return getOutPath( g,vertTab, OutPath< BlackHole,BlackHole>(blackHole,blackHole),end, start );
+			}
 
 		// Zapisuje na podany iterator wszystkie krawedzie nalezace do drzewa (lasu) tj. uzyte jako wartosci pol ePrev
 		// Zwraca ich liczbe
@@ -181,6 +193,11 @@ namespace Koala
 		 *  \return the CompStore object associated with the sequence of sequences. */
 		template< class CIter, class VIter > static CompStore< CIter,VIter > compStore( CIter ac, VIter av )
 			{ return CompStore< CIter,VIter >( ac,av ); }
+
+        //NEW:
+        inline static CompStore< BlackHole,BlackHole> compStore( BlackHole )
+            { return CompStore< BlackHole,BlackHole>( blackHole,blackHole ); }
+
 
 		// Odwrotne mapowanie ciagu dlugosci size ciagow o elementach typu T o poczatkach w iteratorach
 		// begin (kolejne rozmiary) i sbegin (wartosci) - por. powyzszy format
@@ -427,7 +444,7 @@ namespace Koala
 		class EndVertVisitor: public complex_visitor_tag, public no_component_visitor_tag
 		{
 		public:
-			EndVertVisitor( void *arg ): ptr( arg )
+			EndVertVisitor( void *arg): ptr( arg )
 				{ }
 
 			template< class GraphType, class VisitVertLabsGraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
@@ -449,6 +466,35 @@ namespace Koala
 		private:
 			void *ptr;
 		};
+
+        //NEW: wyzytor przegladajacy graf tylko na podana glebokosc
+		/** \brief  */
+		class NearVertsVisitor: public complex_visitor_tag, public no_component_visitor_tag
+		{
+		public:
+			NearVertsVisitor(int r=std::numeric_limits<int>::max() ): radius(r)
+				{ }
+
+			template< class GraphType, class VisitVertLabsGraphType > bool visitVertexPre( const GraphType &g, typename GraphType::PVertex u,
+				VisitVertLabsGraphType &data )
+				{ return data.distance<radius; }
+
+			template< class GraphType, class VisitVertLabsGraphType > bool visitVertexPost( const GraphType &g, typename GraphType::PVertex u,
+				VisitVertLabsGraphType &v )
+				{ return true; }
+
+			template< class GraphType > bool visitEdgePre( const GraphType &g, typename GraphType::PEdge e,
+				typename GraphType::PVertex u )
+				{ return true; }
+
+			template< class GraphType > bool visitEdgePost( const GraphType &g, typename GraphType::PEdge e,
+				typename GraphType::PVertex u )
+				{ return true; }
+
+		private:
+			int radius;
+		};
+
 
 		/** \brief Visitor stores visited vertices to iterator VertIter.  */
 		template< class VertIter > class StoreTargetToVertIter: public simple_postorder_visitor_tag,
@@ -684,6 +730,19 @@ namespace Koala
 		template< class GraphType > static Set< typename GraphType::PVertex > getAttainableSet( const GraphType &g,
 			typename GraphType::PVertex src, EdgeDirection dir = EdDirOut | EdUndir );
 
+
+        //NEW: ponizsze 3 - przeglad podobny do ScanAttainable wybrana strategia, ale tylko na glebokosc radius w poddrzewie o korzeniu  src
+        // W kontenerze wpisuje (odwiedza) i na iterator zwraca odwiedzone wierzcholki. Zwraca ich liczbe lub zbior.
+		template< class GraphType, class VertContainer, class Iter > static int scanNear( const GraphType &,
+			typename GraphType::PVertex, int radius, VertContainer &, Iter, EdgeDirection dir = EdUndir | EdDirOut );
+
+		template< class GraphType, class Iter > static int scanNear( const GraphType &,
+			typename GraphType::PVertex, int radius, BlackHole, Iter, EdgeDirection dir = EdUndir | EdDirOut );
+
+        template< class GraphType > static Set< typename GraphType::PVertex > getNearSet( const GraphType &g,
+			typename GraphType::PVertex src, int radius, EdgeDirection dir = EdDirOut | EdUndir );
+
+
 		/** \brief Get path.
 		 *
 		 *  The method finds a path between vertices
@@ -699,6 +758,12 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter > static int getPath( const GraphType &g,
 			typename GraphType::PVertex src, typename GraphType::PVertex dest, OutPath< VertIter,EdgeIter > path,
 			EdgeDirection dir = EdUndir | EdDirOut );
+
+        //NEW: wersja bez podawania iteratorow
+		template< class GraphType > static int getPath( const GraphType &g,
+			typename GraphType::PVertex src, typename GraphType::PVertex dest, BlackHole=blackHole,
+			EdgeDirection dir = EdUndir | EdDirOut )
+			{   return getPath( g,src, dest, OutPath< BlackHole,BlackHole>( blackHole,blackHole ),dir );    }
 
 		/** \brief Split into components.
 		 *
@@ -1005,6 +1070,10 @@ namespace Koala
 		template< class GraphType, class VertContainer, class Visitor > static int visitBase( const GraphType & g,
 			typename GraphType::PVertex start, VertContainer &visited, Visitor visit, EdgeDirection mask,
 				int component );
+
+        protected:
+            //TODO: jesli ktores z ogolnych procedur przegladu z GraphSearchBase nie dzialaja dla LexBFS, trzeba je tu sprywatyzowac, jak nizej:
+            //using GraphSearchBase< LexBFSPar< DefaultStructs >,DefaultStructs >::getPath;
 	};
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
@@ -1085,6 +1154,11 @@ namespace Koala
 		 */
 		template< class GraphType, class CompIter, class VertIter, class CompMap > static int
 			split( const GraphType &g, CompStore< CompIter,VertIter > out, CompMap & vtoc );
+
+        //NEW: wersja bez out
+		template< class GraphType, class CompMap > static int
+			split( const GraphType &g,BlackHole, CompMap & vtoc )
+        {   return split(g,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),vtoc);  }
 
 		//    Korzysta z mapy CompMap z poprzedniej procedury. Wyrzuca na iterator wartosci std::pair<int,int> - wszystkie
 		//    pary numerow skladowych silnie spojnych, ktore sa polaczone choc jednym bezposrednim lukiem. Zwraca dlugos
@@ -1296,8 +1370,14 @@ namespace Koala
 		 *  @return the number of biconnected components.
 		 *  \sa CompStore   */
 		template< class GraphType, class VertDataMap, class EdgeDataMap, class CompIter, class VertIter,
-			class VertBlockIter > static int split( const GraphType &g, VertDataMap &, EdgeDataMap &,
+			class VertBlockIter > static int split( const GraphType &g, VertDataMap & vertMap, EdgeDataMap & edgeMap,
 				CompStore< CompIter,VertIter > out, VertBlockIter viter );
+
+        //NEW: wersja bez out
+		template< class GraphType, class VertDataMap, class EdgeDataMap,
+			class VertBlockIter > static int split( const GraphType &g, VertDataMap & vertMap, EdgeDataMap & edgeMap,
+				BlackHole, VertBlockIter viter )
+        {   return split(g,vertMap,edgeMap,CompStore< BlackHole,BlackHole>( blackHole,blackHole ), viter);  }
 
 		/** \brief Get blocks of connected component.
 		 *
@@ -1317,6 +1397,12 @@ namespace Koala
 		template< class GraphType, class VertDataMap, class EdgeDataMap, class CompIter, class VertIter,
 			class VertBlockIter > static int splitComp( const GraphType &g, typename GraphType::PVertex src,
 			VertDataMap &vmap, EdgeDataMap &emap, CompStore< CompIter,VertIter > out, VertBlockIter viter );
+
+        //NEW: wersja bez out
+		template< class GraphType, class VertDataMap, class EdgeDataMap,
+			class VertBlockIter > static int splitComp( const GraphType &g, typename GraphType::PVertex src,VertDataMap & vertMap,
+            EdgeDataMap & edgeMap,BlackHole, VertBlockIter viter )
+        {   return splitComp(g,src,vertMap,edgeMap,CompStore< BlackHole,BlackHole>( blackHole,blackHole ), viter);  }
 
 		// wyrzuca na iterator ciag wierzcholkow tworzacych rdzen grafu tj. podgraf pozostajacy po sukcesywnym
 		// usuwaniu wierzcholkow stopnia < 2. Zwraca dlugosc sekwencji
@@ -1355,6 +1441,14 @@ namespace Koala
 			EulerState( const GraphType &_g, std::pair< typename GraphType::PVertex,typename GraphType::PEdge > *_stk,
 				int nv, EdgeDirection m ): g( _g ), stk( _stk,nv ), edgeVisited( _g.getEdgeNo() ), mask( m )
 				{ }
+		};
+
+		template< class GraphType > struct Frame {
+            typename GraphType::PVertex u;
+            typename GraphType::PEdge e,ed;
+
+            Frame(typename GraphType::PVertex _v=0,typename GraphType::PEdge _ed=0, typename GraphType::PEdge _e=0)
+            : u(_v), e(_e), ed(_ed) {}
 		};
 
 		template< class GraphType > static void eulerEngine( typename GraphType::PVertex u,
@@ -1629,6 +1723,11 @@ namespace Koala
 		 */
 		template< class GraphType, class CompIter, class VertIter, class CompMap > static Partition split(
 			const GraphType &g, CompStore< CompIter,VertIter > out, CompMap &avmap, bool skipifprime = false );
+
+        //NEW: wersja bez out
+		template< class GraphType, class CompMap > static Partition split( const GraphType &g, BlackHole, CompMap &avmap, bool skipifprime = false )
+        {   return split(g,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),avmap,skipifprime);   }
+
 	};
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings

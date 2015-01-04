@@ -13,14 +13,10 @@
 
 namespace Koala
 {
-	/* DijkstraBasePar
-	 *
-	 */
-	/** \brief Dijkstra base. (parametrized).
-	 *  \ingroup DMweight */
-	template< class DefaultStructs > class DijkstraBasePar: public ShortPathStructs
-	{
-	public:
+
+    //NEW: Labele vers/edges we wszystkich algorytmach na wazone sciezki wygladaja tak samo, wiec zostaly wyciagniete do wspolnej klasy
+    template< class DefaultStructs> struct WeightPathStructs {
+
 		// rekord wejsciowy opisujacy krawedz
 		/** \brief The input information for edges.*/
 		template< class DType > struct EdgeLabs
@@ -33,7 +29,7 @@ namespace Koala
 
 		// rekord wyjsciowy opisujacy wierzcholek
 		/** \brief The input/output information for vertices.*/
-		template< class DType, class GraphType > struct VertLabs
+		template< class DType, class GraphType,bool plus > struct VertLabs
 		{
 			// typ wagi liczbowej na krawedzi
 			typedef DType DistType;/**<\brief Type of vertex distance*/
@@ -45,12 +41,34 @@ namespace Koala
 
 			/**\brief Constructor.*/
 			VertLabs():
-				distance( DefaultStructs::template NumberTypeBounds< DType >::plusInfty() ),
+				distance( (plus) ? DefaultStructs::template NumberTypeBounds< DType >::plusInfty() :
+                                    DefaultStructs::template NumberTypeBounds< DType >::minusInfty()),
 				vPrev( 0 ), ePrev( 0 )
 				{ }
 			/**\brief Copy VertLabs*/
 			template< class Rec > void copy( Rec &rec ) const;
 		};
+    };
+
+	/* DijkstraBasePar
+	 *
+	 */
+	/** \brief Dijkstra base. (parametrized).
+	 *  \ingroup DMweight */
+	template< class DefaultStructs > class DijkstraBasePar: public ShortPathStructs
+	{
+	public:
+		// rekord wejsciowy opisujacy krawedz
+		/** \brief The input information for edges.*/
+		template< class DType > struct EdgeLabs
+		: public WeightPathStructs<DefaultStructs>::template EdgeLabs<DType>
+		{};
+
+		// rekord wyjsciowy opisujacy wierzcholek
+		/** \brief The input/output information for vertices.*/
+		template< class DType, class GraphType > struct VertLabs
+		: public WeightPathStructs<DefaultStructs>::template VertLabs<DType,GraphType,true>
+		{};
 
 		// wlasciwa procedura: odleglosc miedzy para wierzcholkow
 		// avertTab, wyjsciowa tablica asocjacyjna PVertex->VertLabs poszczegolnych wierzcholkow
@@ -257,34 +275,18 @@ namespace Koala
 	template< class DefaultStructs > class DAGCritPathPar: public ShortPathStructs
 	{
 	public:
+
 		// rekord wejsciowy opisujacy krawedz
 		/** \brief The input information for edges.*/
 		template< class DType > struct EdgeLabs
-		{
-			// typ wagi liczbowej na krawedzi
-			typedef DType DistType;/**<\brief Type of edge weight.*/
-			// dlugosc krawedzi
-			DistType length; /**< \brief Length (weight) of edge.*/
-		};
+		: public WeightPathStructs<DefaultStructs>::template EdgeLabs<DType>
+		{};
 
 		// rekord wyjsciowy opisujacy wierzcholek
 		/** \brief The input/output information for vertices.*/
 		template< class DType, class GraphType > struct VertLabs
-		{
-			// typ wagi liczbowej na krawedzi`
-			typedef DType DistType;/**<\brief Type of vertex distance*/
-			// znaleziona odleglosc
-			DType distance;/**<\brief Found vertex distance.*/
-			// element sciezki, analogicznie jak VisitVertLabs w search.h
-			typename GraphType::PVertex vPrev;/**<\brief Previous vertex on the path from the source.*/
-			typename GraphType::PEdge  ePrev;/**<\brief Previous edge on the path from the source.*/
-
-			/**\brief Constructor.*/
-			VertLabs():
-				distance( DefaultStructs:: template NumberTypeBounds< DType >::minusInfty() ),
-				vPrev( 0 ), ePrev( 0 )
-				{ }
-		};
+		: public WeightPathStructs<DefaultStructs>::template VertLabs<DType,GraphType,false>
+		{};
 
 		// mozna stosowac jako kontener opisujacy krawedz w przypadkach, gdy chcemy wsystkim krawedziom nadac wagi jednostkowe
 		template< class DType > struct UnitLengthEdges
@@ -389,33 +391,18 @@ namespace Koala
 	template< class DefaultStructs > class BellmanFordPar: public ShortPathStructs
 	{
 	public:
+
 		// rekord wejsciowy opisujacy krawedz
 		/** \brief The input information for edges.*/
 		template< class DType > struct EdgeLabs
-		{
-			// typ wagi liczbowej na krawedzi
-			typedef DType DistType;/**<\brief Type of edge weight.*/
-			// dlugosc krawedzi
-			DistType length; /**< \brief Length (weight) of edge.*/
-		};
+		: public WeightPathStructs<DefaultStructs>::template EdgeLabs<DType>
+		{};
 
 		// rekord wyjsciowy opisujacy wierzcholek
 		/** \brief The input/output information for vertices.*/
 		template< class DType, class GraphType > struct VertLabs
-		{
-			// typ wagi liczbowej na krawedzi
-			typedef DType DistType;/**<\brief Type of vertex distance*/
-			// znaleziona odleglosc
-			DType distance;/**<\brief Vertex distance.*/
-			// element sciezki, analogicznie jak VisitVertLabs w search.h
-			typename GraphType::PVertex vPrev;/**<\brief Previous vertex on the path from the source.*/
-			typename GraphType::PEdge ePrev;/**<\brief Previous edge on the path from the source.*/
-			/**\brief Constructor.*/
-			VertLabs():
-				distance( DefaultStructs:: template NumberTypeBounds< DType >::plusInfty() ),
-				vPrev( 0 ), ePrev( 0 )
-				{ }
-		};
+		: public WeightPathStructs<DefaultStructs>::template VertLabs<DType,GraphType,true>
+		{};
 
 		// wlasciwa procedura: odleglosc miedzy para wierzcholkow
 		// zwraca przy podanym end : min. dlugosc sciezki start->end lub niesk. gdy end jest nieosiagalny
@@ -529,34 +516,18 @@ namespace Koala
 				OutPath< VIter,EIter > iters, typename GraphType::PVertex start, typename GraphType::PVertex end );
 
 	public:
+
 		// rekord wejsciowy opisujacy krawedz
 		/** \brief The input information for edges.*/
 		template< class DType > struct EdgeLabs
-		{
-			// typ wagi liczbowej na krawedzi
-			typedef DType DistType;/**<\brief Type of edge weight.*/
-			// dlugosc krawedzi
-			DistType length;/**< \brief Length (weight) of edge.*/
-		};
+		: public WeightPathStructs<DefaultStructs>::template EdgeLabs<DType>
+		{};
 
 		// rekord wyjsciowy opisujacy wierzcholek
 		/** \brief The input/output information for vertices.*/
 		template< class DType, class GraphType > struct VertLabs
-		{
-			// typ wagi liczbowej na krawedzi
-			typedef DType DistType;/**<\brief Type of vertex distance*/
-			// znaleziona odleglosc
-			DType distance;/**<\brief Vertex distance.*/
-			// element sciezki, analogicznie jak VisitVertLabs w search.h
-			typename GraphType::PVertex vPrev;/**<\brief Previous vertex on the path from the source.*/
-			typename GraphType::PEdge ePrev;/**<\brief Previous edge on the path from the source.*/
-
-			/**\brief Constructor.*/
-			VertLabs():
-					distance( DefaultStructs:: template NumberTypeBounds< DType >::plusInfty() ),
-					vPrev( 0 ), ePrev( 0 )
-					{ }
-		};
+		: public WeightPathStructs<DefaultStructs>::template VertLabs<DType,GraphType,true>
+		{};
 
 		// mozna stosowac jako kontener opisujacy krawedz w przypadkach, gdy chcemy wsystkim krawedziom nadac wagi jednostkowe
 		template< class DType > struct UnitLengthEdges

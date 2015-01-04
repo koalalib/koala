@@ -92,10 +92,13 @@ template< class GraphType, class Iter > static void scanAttainable( const GraphT
         int l;
 
         std::cout<< std::endl;
-//        l=Koala::Dijkstra::getOutPath(g,vertCont,Koala::Dijkstra::outPath(tabV,tabE),V,F);
+        l=Koala::Dijkstra::getOutPath(g,vertCont,blackHole,V,F);
         l=Koala::Dijkstra::getPath(g,vertCont,V,Koala::Dijkstra::outPath(tabV,tabE));
+        Koala::Dijkstra::getPath(g,vertCont,V,Koala::Dijkstra::outPath(blackHole));
+        Koala::SearchStructs::compStore(blackHole);
         std:: cout << "\n\n!!!!!!!!!!!!!\n";
-        Koala::PathStructs::OutPathTool<Koala::Graph<OpisV,OpisE> > tool;
+        Koala::PathStructs::OutPathTool<Koala::Graph<OpisV,OpisE>, std::vector > tool;
+        tool.clear();
         Koala::Dijkstra::getPath(g,vertCont,V,tool.input());
         std::cout << tool.length();
 
@@ -273,6 +276,7 @@ template< class GraphType, class Iter > static void scanAttainable( const GraphT
 
 //    std::cout << "\n" << g.getEdge()->getGraph() << ' ' << (&g);
 
+    g.getNeighs(tabV,U,Koala::EdDirOut|Koala::EdDirIn);
     Koala::EmptyVertInfo eee;
     eee=Koala::EmptyVertInfo();
 

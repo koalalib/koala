@@ -12,33 +12,18 @@
 
 namespace Koala {
 
+
+//NEW: zamiana struktur zagniezdzonych Color -> Segment (simple.h)
+
 /** \brief The methods for interval coloring of graphs (parametrized).
  *  \ingroup color */
 template<class DefaultStructs>
 class IntervalVertColoringPar {
 public:
 	//Weights: Graph::PVertex -> int (length of interval)
-	//ColorMap: Graph::PVertex -> Color
-	/** \brief Color interval.
-	 *
-	 *  The structure represents an interval coloring of vertex. */
-	struct Color { //interval [min, max]
-		int min;/**< \brief the minimal color of the interval.*/
-		int max;/**< \brief the maximal color of the interval.*/
-		/** \brief Constructor*/
-		Color(int l=0, int r=1): min(l), max(r) { koalaAssert(l<=r,ContExcWrongArg); }
-		/** \brief Copy constructor*/
-		Color(const Color &in): min(in.min), max(in.max) { }
-		/** \brief Get interval size.*/
-		int size() const {return max - min + 1;}
-		/** \brief Compare intervals.
-		 *
-		 *  The overloaded operator< test if the \a min fiels of \a a is smaller the \a min field of \a b,
-		 *  or if they are equal if max field of a is smaller then max field of \a b. 	 */
-		friend bool operator<(const Color &a, const Color &b) {
-			return a.min<b.min || (a.min==b.min && a.max<b.max);
-		}
-	};
+	//ColorMap: Graph::PVertex -> Segment
+
+	typedef Segment Color;
 
 	//color vertex with set of consecutive nonnegative integers (or interval)
 	// the set has cardinality weights[vert]
@@ -50,8 +35,8 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param weights the associative container (PVert->int),
 	 *     which assigns the expected size of interval to the vertex.
-	 *  \param colors the associative container (PVert->Color)
-	 *     which assigns a structure \a Color to the vertex.
+	 *  \param colors the associative container (PVert->Segment)
+	 *     which assigns a structure \a Segment to the vertex.
 	 *  \param vert the considered vertex.
 	 *  @return the largest added color i.e. the \a max field in the interval or -1 if was colored. */
 	template<typename Graph, typename Weights, typename ColorMap>
@@ -66,7 +51,7 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param weights the associative container (PVert->int),
 	 *     which assigns the expected size of interval to the vertex.
-	 *  \param colors the associative container (PVert->Color)
+	 *  \param colors the associative container (PVert->Segment)
 	 *     which assigns a structure \a color to the vertex.
 	 *  \param beg the first element of the container with vertices that are to be colored.
 	 *  \param end the past-the-end element of the container with vertices that are to be colored.
@@ -83,8 +68,8 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param weights the associative container (PVert->int),
 	 *     which assigns the expected size of interval to the vertex.
-	 *  \param colors the associative container (PVert->Color)
-	 *     which assigns a structure \a Color to the vertex.
+	 *  \param colors the associative container (PVert->Segment)
+	 *     which assigns a structure \a Segment to the vertex.
 	 *  \return the largest added color i.e. the maximal \a max field in an added interval  or -1 if the graph was colored. */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static int greedy(const Graph &graph, const Weights &weights,
@@ -97,7 +82,7 @@ public:
 	 *  \param weights the map (PVertex->int) which assigns the expected length of interval to vertex.
 	 *  \param beg the iterator to the first element in the container of vertices that are to be colored.
 	 *  \param end the iterator to the past-the-end element in the container of vertices that are to be colored.
-	 *  \param colors the associative container (PVert->Color)
+	 *  \param colors the associative container (PVert->Segment)
 	 *     which assigns a structure \a Color to the vertex.
 	 *  \return the largest color used.	 */
 	template<typename Graph, typename Weights, typename ColorMap, typename VIter>
@@ -109,8 +94,8 @@ public:
 	 *  The method intervally colors all  the uncolored vertices of \a graph. The heuristic LI is used.  The result is stored up in the map \a colors.
 	 *  \param graph the considered graph.
 	 *  \param weights the map (PVertex->int) which assigns the expected length of interval to vertex.
-	 *  \param colors the associative container (PVert->Color)
-	 *     which assigns a structure \a Color to the vertex.
+	 *  \param colors the associative container (PVert->Segment)
+	 *     which assigns a structure \a Segment to the vertex.
 	 *  \return the largest color used.	 */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static int li(const Graph &graph,
@@ -122,8 +107,8 @@ public:
 	 *  The method tests if the partial coloring from the associative table \a colors is a prober interval coloring of \a graph.
 	 *  \param graph the considered graph.
 	 *  \param weights the map (PVertex->int) which assigns the  expected length of interval.
-	 *  \param colors the associative container (PVert->Color)
-	 *     which assigns a structure \a Color to the vertex.
+	 *  \param colors the associative container (PVert->Segment)
+	 *     which assigns a structure \a Segment to the vertex.
 	 *  \return true if the partial coloring is proper, false otherwise.	 */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static bool testPart(const Graph &graph, const Weights &weights,
@@ -134,8 +119,8 @@ public:
 	 *  The method tests if the coloring form associative table \a colors is a proper and complete interval coloring of \a graph.
 	 *  \param graph the considered graph.
 	 *  \param weights the map (PVertex->int) which assigns the expected length of interval.
-	 *  \param colors the associative container (PVert->Color)
-	 *     which assigns a structure \a Color to the vertex.
+	 *  \param colors the associative container (PVert->Segment)
+	 *     which assigns a structure \a Segment to the vertex.
 	 *  \return true if the coloring is proper and complete, false otherwise.	 */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static bool test(const Graph &graph, const Weights &weights,
@@ -153,7 +138,7 @@ public:
 	static int maxColor(const Graph &graph, const ColorMap &colors);
 private:
 	template<typename Graph, typename Weights, typename ColorMap>
-	static Color simulColor(const Graph &graph, const Weights &weights,
+	static Segment simulColor(const Graph &graph, const Weights &weights,
 			const ColorMap &colors, typename Graph::PVertex vert);
 };
 /** \brief The methods for interval coloring of graphs (default).
@@ -166,27 +151,9 @@ template<class DefaultStructs>
 class IntervalEdgeColoringPar {
 public:
 	//Weights: Graph::PEdge -> int (length of interval)
-	//ColorMap: Graph::PEdge -> Color
-	/** \brief Color interval.
-	 *
-	 *  The structure represents an interval coloring of vertex. */
-	struct Color { //interval [min, max]
-		int min; /**< \brief the minimal color of the interval.*/
-		int max; /**< \brief the maximal color of the interval.*/
-		/** \brief Constructor*/
-		Color(int l=0, int r=1): min(l), max(r) { koalaAssert(l<=r,ContExcWrongArg); }
-		/** \brief Copy constructor*/
-		Color(const Color &in): min(in.min), max(in.max) { }
-		/** \brief Get interval size.*/
-		int size() const {return max - min + 1;}
-		/** \brief Compare intervals.
-		 *
-		 *  The overloaded operator< test if the \a min field of \a a is smaller the \a min field of \a b,
-		 *  or if they are equal if max field of a is smaller then max field of \a b. 	 */
-		friend bool operator<(const Color &a, const Color &b) {
-			return a.min<b.min || (a.min==b.min && a.max<b.max);
-		}
-	};
+	//ColorMap: Graph::PEdge -> Segment
+	typedef Segment Color;
+
 	//color edge with set of consecutive nonnegative integers (or interval)
 	// the set has cardinality weights[edge]
 	//@return largest integer contained in added color
@@ -197,8 +164,8 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param weights the associative container (PEdge->int),
 	 *     which assigns the expected size of interval to the edge.
-	 *  \param colors the associative container (PEdge->Color)
-	 *     which assigns a structure \a Color to the edge.
+	 *  \param colors the associative container (PEdge->Segment)
+	 *     which assigns a structure \a Segment to the edge.
 	 *  \param edge the considered edge.
 	 *  \return the largest added color i.e. the \a max field in the interval or -1 if the edge was already colored. */
 	template<typename Graph, typename Weights, typename ColorMap>
@@ -213,8 +180,8 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param weights the associative container (PEdge->int),
 	 *     which assigns the expected size of interval to the edge.
-	 *  \param colors the associative container (PEdge->Color)
-	 *     which assigns a structure \a Color to the edge.
+	 *  \param colors the associative container (PEdge->Segment)
+	 *     which assigns a structure \a Segment to the edge.
 	 *  \param beg the first element of the container with edges that are to be colored.
 	 *  \param end the past-the-end element of the container with edges that are to be colored.
 	 *  \return the largest added color i.e. the maximal \a max field in an added interval  or -1 if all the edge were already colored. */
@@ -230,8 +197,8 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param weights the associative container (PEdge->int),
 	 *     which assigns the expected size of interval to the edge.
-	 *  \param colors the associative container (PEdge->Color)
-	 *     which assigns a structure \a Color to the edge.
+	 *  \param colors the associative container (PEdge->Segment)
+	 *     which assigns a structure \a Segment to the edge.
 	 *  \return the largest added color i.e. the maximal \a max field in an added interval or -1 if the graph was already colored.
 	 *
 	 *  [See example](examples/coloring/edgeIntervalColor.html).
@@ -249,8 +216,8 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param weights the associative container (PEdge->int),
 	 *     which assigns the expected size of interval to the edge.
-	 *  \param colors the associative container (PEdge->Color)
-	 *     which assigns a structure \a Color to the edge.
+	 *  \param colors the associative container (PEdge->Segment)
+	 *     which assigns a structure \a Segment to the edge.
 	 *  \param beg the first element of the container with edges that are to be colored.
 	 *  \param end the past-the-end element of the container with edges that are to be colored.
 	 *  \return the largest added color i.e. the maximal \a max field in an added interval. */
@@ -267,8 +234,8 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param weights the associative container (PEdge->int),
 	 *     which assigns the expected size of interval to the edge.
-	 *  \param colors the associative container (PEdge->Color)
-	 *     which assigns a structure \a Color to the edge.
+	 *  \param colors the associative container (PEdge->Segment)
+	 *     which assigns a structure \a Segment to the edge.
 	 *  \return the largest added color i.e. the maximal \a max field in an added interval.
 	 *
 	 *  [See example](examples/coloring/edgeIntervalColor.html).
@@ -281,8 +248,8 @@ public:
 	 *  The method intervally colors all the uncolored edges from the container given by the iterators \a beg and \a end. The heuristic LI is used.  The result is stored up in the map \a colors.
 	 *  \param graph the considered graph.
 	 *  \param weights the map (PEdge->int) which assigns the expected length of interval to edge.
-	 *  \param colors the associative container (PEdge->Color)
-	 *     which assigns a structure \a Color to the edge.
+	 *  \param colors the associative container (PEdge->Segment)
+	 *     which assigns a structure \a Segment to the edge.
 	 *  \param beg the iterator to the first element in the container of edges that are to be colored.
 	 *  \param end the iterator to the past-the-end element in the container of edges that are to be colored.
 	 *  \return the largest color used.	 */
@@ -295,8 +262,8 @@ public:
 	 *  The method intervally colors all the uncolored edges of the graph. The heuristic LI is used.  The result is stored up in the map \a colors.
 	 *  \param graph the considered graph.
 	 *  \param weights the map (PEdge->int) which assigns the expected length of interval to edge.
-	 *  \param colors the associative container (PEdge->Color)
-	 *     which assigns a structure \a Color to the edge.
+	 *  \param colors the associative container (PEdge->Segment)
+	 *     which assigns a structure \a Segment to the edge.
 	 *  \return the largest color used.
 	 *
 	 *  [See example](examples/coloring/edgeIntervalColor.html).
@@ -310,8 +277,8 @@ public:
 	 *  The method tests if the partial edge coloring form associative table \a colors is a prober interval edge coloring of \a graph.
 	 *  \param graph the considered graph.
 	 *  \param weights the map (PEdge->int) which assigns the expected length of interval.
-	 *  \param colors the associative container (PEdge->Color)
-	 *     which assigns a structure \a Color to the edge.
+	 *  \param colors the associative container (PEdge->Segment)
+	 *     which assigns a structure \a Segment to the edge.
 	 *  \return true if the partial edge coloring is proper, false otherwise.	 */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static bool testPart(const Graph &graph, const Weights &weights, const ColorMap &colors);
@@ -321,8 +288,8 @@ public:
 	 *  The method tests if the edge coloring form associative table \a colors is a prober interval edge coloring of \a graph.
 	 *  \param graph the considered graph.
 	 *  \param weights the map (PEdge->int) which assigns the expected length of interval.
-	 *  \param colors the associative container (PEdge->Color)
-	 *     which assigns a structure \a Color to the edge.
+	 *  \param colors the associative container (PEdge->Segment)
+	 *     which assigns a structure \a Segment to the edge.
 	 *  \return true if the edge coloring is proper, false otherwise.	 */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static bool test(const Graph &graph, const Weights &weights, const ColorMap &colors);
@@ -331,8 +298,8 @@ public:
 	 *
 	 *  The method the maximal color used in edge coloring represented by the map \a colors.
 	 *  \param graph the considered graph.
-	 *  \param colors the associative container (PEdge->Color)
-	 *     which assigns a structure \a Color to the edge.
+	 *  \param colors the associative container (PEdge->Segment)
+	 *     which assigns a structure \a Segment to the edge.
 	 *  \return the maximal color used or -1 if none of vertices is colored.	 */
 	template<typename Graph, typename ColorMap>
 	static int maxColor(const Graph &graph, const ColorMap &colors);
@@ -348,7 +315,7 @@ public:
 	static int getWDegs(const Graph &graph, const Weights &weights);
 private:
 	template<typename Graph, typename Weights, typename ColorMap>
-	static Color simulColor(const Graph &graph, const Weights &weights,
+	static Segment simulColor(const Graph &graph, const Weights &weights,
 			const ColorMap &colors, typename Graph::PEdge edge);
 };
 /** \brief The methods for interval edge coloring of graphs (default).

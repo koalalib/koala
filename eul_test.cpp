@@ -67,13 +67,10 @@ void dijTest3()
     D=g.addVert(OpisV("D"));E=g.addVert(OpisV("E"));F=g.addVert(OpisV("F"));
     G=g.addVert(OpisV("G"));
 
-    g.addArc(A,B,OpisE(1));g.addArc(B,C,OpisE(1));g.addArc(D,E,OpisE(1));g.addArc(E,F,OpisE(1));
-    g.addLink(A,B,OpisE(1));g.addLink(B,C,OpisE(1));g.addLink(D,E,OpisE(1));g.addLink(E,F,OpisE(1));
+g.addArc(G,A,OpisE(1));
+    g.addArc(A,G,OpisE(1));g.addLoop(A,OpisE(1));g.addLoop(A,OpisE(1));
+    g.addArc(A,G,OpisE(1));g.addArc(G,A,OpisE(1));
 
-    g.addLoop(E);g.addLoop(B);
-
-    g.addArc(C,D,OpisE(1));g.addLink(C,D,OpisE(1));
-    g.addArc(F,A,OpisE(1));g.addLink(F,A,OpisE(1));
 
     for(int i=0;i<20;i++) {tabV[i]=0; tabE[i]=0; }
 }
@@ -96,6 +93,7 @@ Koala::EdgeDirection mask=Koala::EdUndir|Koala::EdLoop;
 #define ENDS dirEnds
 
     dijTest3();
+//    g.clearEdges();
 
     para=Koala::Euler:: ENDS (g);
     std::cout << "\n[" << std::boolalpha;
@@ -128,6 +126,7 @@ Koala::EdgeDirection mask=Koala::EdUndir|Koala::EdLoop;
         g.addArc(A,B); g.addEdge(B,A); //g.addLoop(C);
 
 //        std::cout << g.mu(g.getEdge(),Koala::EdUndir);
+
 
     return 0;
 }

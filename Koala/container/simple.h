@@ -36,6 +36,38 @@ namespace Koala
 	template< class T > std::pair< T,T > pairMaxMin( std::pair< T,T > arg )
 		{ return pairMaxMin( arg.first,arg.second ); }
 
+    //NEW: przeniesiony wspolny dublujacy sie fragment: z detect.h (interval) i kolorowania (interval.h, struct Color).
+    // Struktura reprezentujaca przedzial domkniety na prostej o koncach calkowitych (dopuszczalna dlugosc 0)
+    /** \brief Line segment.
+     *
+     *  Structure represents a closed line segment between two integer points.
+     */
+    struct Segment
+    {
+        int left, right;
+        Segment( int l = 0, int r = 1 ): left( l ), right( r )
+        { koalaAssert(l<=r,ContExcWrongArg);  }
+
+		int size() const {return right - left + 1;}
+
+    };
+
+    // czy dwa takie przedzialy tna sie niepusto
+    /** \brief Test line segments intersection.
+     *
+     *  \param a the first line segment.
+     *  \param b the second line segment.
+     *  \return true if the line segments \a a and \a b intersect, false otherwise.*/
+    inline bool touch( Segment a, Segment b )
+        { return std::max( a.left,b.left ) <= std::min( a.right,b.right ); }
+
+    /** \brief Compare intervals.
+     *
+     *  The overloaded operator< test if the \a min fiels of \a a is smaller the \a min field of \a b,
+     *  or if they are equal if max field of a is smaller then max field of \a b. 	 */
+	inline bool operator<(const Segment &a, const Segment &b)
+	{	return a.left<b.left || (a.left==b.left && a.right<b.right); }
+
 
     //NEW: wylecial VectorInterface
 
