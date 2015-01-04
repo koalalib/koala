@@ -42,10 +42,8 @@ template< class Key, class Compare > BinomHeap< Key,Compare >
 template< class Key, class Compare  > template <class InputIterator>
 	void BinomHeap< Key,Compare >::assign( InputIterator first, InputIterator last )
 {
-	int len = 0;
 	clear();
-	for( InputIterator i = first; i != last; ++i ) ++len;
-	assign2( first,len );
+	for( InputIterator i = first; i != last; ++i ) push(*i);
 }
 
 template< class Key, class Compare  > typename BinomHeap< Key,Compare  >::Node
@@ -62,22 +60,6 @@ template< class Key, class Compare  > void BinomHeap< Key,Compare  >::delNode( N
 {
 	if (!allocator) delete node;
 	else allocator->dealloc( node );
-}
-
-template< class Key, class Compare  > template< class InputIterator >
-	void BinomHeap< Key,Compare  >::assign2( InputIterator &first, int len )
-{
-	if (len == 1)
-	{
-		push( *first );
-		++first;
-	}
-	if (len <= 1) return;
-	int half = len/2;
-	BinomHeap< Key,Compare  > heap( *this );
-	assign2( first,half );
-	heap.assign2( first,len - half );
-	merge( heap );
 }
 
 template< class Key, class Compare > inline

@@ -689,7 +689,7 @@ class SeqVertColDefaultSettings: public AlgsDefaultSettings
 		public:
 			typedef Assoc2DimTable< type,std::map<std::pair<A,A>, B> > Type;/**<\brief Define own if intend to change.*/
 			// Nie usuwac komentarza (przykladowe uzycia)
-			// typedef AssocMatrix<A,B,type,std::vector< BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
+			// typedef AssocMatrix<A,B,type,std::vector< Privates::BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
 		};
 
 };

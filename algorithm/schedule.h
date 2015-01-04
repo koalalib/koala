@@ -102,7 +102,7 @@ namespace Koala
 			void clearMachine( int m )
 				{ machines[m].clear(); }
 			/**\brief Clear all machines.*/
-			void clearMachines();
+			inline void clearMachines();
 		};
 
 		/** \brief Sort by longest processing time LPT

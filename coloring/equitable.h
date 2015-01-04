@@ -19,7 +19,7 @@ protected:
 		int comp, diff;
 		CompDiff(): comp(0), diff(0) {}
 		CompDiff(int c, int d): comp(c), diff(d) {}
-		friend bool operator<(const CompDiff &a, const CompDiff &b) {
+		friend inline bool operator<(const CompDiff &a, const CompDiff &b) {
 			return a.diff>b.diff || (a.diff==b.diff&&a.comp<b.comp);
 		}
 	};

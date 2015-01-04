@@ -54,6 +54,8 @@ class StdRandGen {
             for(int i=0;i<digNo2;i++) maks=2*maks+1;
         }
 
+        StdRandGen<Int>& operator=(const StdRandGen<Int>&) {}
+
         Int rand()
         {
             Int res=0;
@@ -70,55 +72,55 @@ class StdRandGen {
 
 };
 
-namespace Privates {
+    namespace Privates {
 
 
-//NEW: W srodku procedur Koali odwolujemy sie do generatorow tylko przy pomocy tych 3 funkcji:
+    //NEW: W srodku procedur Koali odwolujemy sie do generatorow tylko przy pomocy tych 3 funkcji:
 
-//najwieksza liczba losowa, jaka moze sie pojawic. Zwykle cos kolo maxinta
-template <class Gen>
-int getMaxRandom(Gen& g)
-{
-    return std::numeric_limits< int >::max()-1;
-}
+        //najwieksza liczba losowa, jaka moze sie pojawic. Zwykle cos kolo maxinta
+        template <class Gen>
+        int getMaxRandom(Gen& g)
+        {
+            return std::numeric_limits< int >::max()-1;
+        }
 
-// liczba losowa z przedzialu 0,1,...,getMaxRandom
-template <class Gen>
-int getRandom(Gen& g)
-{
-    std::uniform_int_distribution<int> distr(0,getMaxRandom( g));
-    return distr(g);
-}
+        // liczba losowa z przedzialu 0,1,...,getMaxRandom
+        template <class Gen>
+        int getRandom(Gen& g)
+        {
+            std::uniform_int_distribution<int> distr(0,getMaxRandom( g));
+            return distr(g);
+        }
 
-// liczba losowa z przedzialu 0,1,...,maks
-template <class Gen>
-int getRandom(Gen& g,int maks)
-{
-    if (maks<0) maks=-maks;
-    std::uniform_int_distribution<int> distr(0,maks);
-    return distr(g);
-}
+        // liczba losowa z przedzialu 0,1,...,maks
+        template <class Gen>
+        int getRandom(Gen& g,int maks)
+        {
+            if (maks<0) maks=-maks;
+            std::uniform_int_distribution<int> distr(0,maks);
+            return distr(g);
+        }
 
 
-template <>
-inline int getMaxRandom(StdRandGen<int>& g)
-{
-    return g.maxRand;
-}
+        template <>
+        inline int getMaxRandom(StdRandGen<int>& g)
+        {
+            return g.maxRand;
+        }
 
-template <>
-inline int getRandom(StdRandGen<int>& g)
-{
-    return g.rand();
-}
+        template <>
+        inline int getRandom(StdRandGen<int>& g)
+        {
+            return g.rand();
+        }
 
-template <>
-inline int getRandom(StdRandGen<int>& g,int maks)
-{
-    return g.rand(maks);
-}
+        template <>
+        inline int getRandom(StdRandGen<int>& g,int maks)
+        {
+            return g.rand(maks);
+        }
 
-}
+    }
 
 
 }

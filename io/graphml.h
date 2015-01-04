@@ -50,14 +50,14 @@ public:
 	/** \brief Constructor.
 	 *
 	 *  Create empty GraphML object. */
-	GraphML();
-	~GraphML();
+	inline GraphML();
+	inline ~GraphML();
 
 	//use this method to create new GraphML structure
 	/** \brief Clear.
 	 *
 	 *  Clear current GraphML object. */
-	void clearGraphML();
+	inline void clearGraphML();
 
 	//GraphML read/write
 	/** \brief Read from file.
@@ -69,7 +69,7 @@ public:
 	 *
 	 *  [See example](examples/text/graphml.html).
 	 */
-	bool readFile( const char *fileName );
+	inline bool readFile( const char *fileName );
 	/** \brief Write to file.
 	 *
 	 *  The method writes the current [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
@@ -79,7 +79,7 @@ public:
 	 *
 	 *  [See example](examples/text/graphml.html).
 	 */
-	bool writeFile( const char *fileName );
+	inline bool writeFile( const char *fileName );
 
 	/** \brief Read from C string.
 	 *
@@ -87,31 +87,31 @@ public:
 	 *  from C string to the current GraphML object.
 	 *  \param str the pointer to C string.
 	 *  \return true if string was successfully read, false otherwise.*/
-	bool readString(const char *str);
+	inline bool readString(const char *str);
 	/** \brief Read from string.
 	 *
 	 *  The method reads the [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
 	 *  from string to the current GraphML object.
 	 *  \param str the read string.
 	 *  \return true if string was successfully read, false otherwise.*/
-	bool readString(const std::string &str);
+	inline bool readString(const std::string &str);
 	/** \brief Write to C string
 	 *
 	 *  The method writes the current GraphML object to a C string.
 	 *  \param str the pointer to written C string.
 	 *  \param maxlen the maximal length of the string (size of char table).
 	 *  \return the number of written chars.*/
-	int writeString(char *str, int maxlen);
+	inline int writeString(char *str, int maxlen);
 	/** \brief Write to string.
 	 *
 	 *  The method writes the current GraphML object to string and returns it.
 	 *  \return the string with [GraphML](http://graphml.graphdrawing.org/primer/graphml-primer.html).*/
-	std::string writeString();
+	inline std::string writeString();
 
 	/** \brief Get number of graphs
 	 *
 	 *  The method gets the number of graphs in the current GraphML object.*/
-	int graphNo();
+	inline int graphNo();
 
 	/** \brief Get i-th graph name.
 	 *
@@ -120,7 +120,7 @@ public:
 	 *  [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
 	 *  kept in current object.
 	 *  \return the string with the name of i-th graph.*/
-	std::string getGraphName(int i);
+	inline std::string getGraphName(int i);
 
 	/** \brief Get graph number.
 	 *
@@ -131,7 +131,7 @@ public:
 	 *  \return the index number of the graph with proper
 	 *  [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>")
 	 *  of -1 if the is no such graph.*/
-	int getGraphNo(const char *name);
+	inline int getGraphNo(const char *name);
 	/** \brief Test graph name.
 	 *
 	 *  The method tests if the graph with
@@ -141,7 +141,7 @@ public:
 	 *  \return true if there exist a graph with proper
 	 *  [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>"),
 	 *  false otherwise.*/
-	bool isGraphName(const char *name);
+	inline bool isGraphName(const char *name);
 	/** \brief Create graph named \a name.
 	 *
 	 *  The method gets a [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>")
@@ -152,7 +152,7 @@ public:
 	 *
 	 *  [See example](examples/text/graphml.html).
 	 */
-	GraphMLGraph* createGraph(const char *name);
+	inline GraphMLGraph* createGraph(const char *name);
 
 //TODO: dodac metode
 //    GraphMLGraph* createGraph();
@@ -165,7 +165,7 @@ public:
 	 *  If there was no such graph, NULL is returned.
 	 *  \param name the name of searched graph.
 	 *  \return the pointer to GraphMLGraph object with the name \a name, or NULL if there is no such graph.*/
-	GraphMLGraph* getGraph(const char *name); //is there is no graph with id==name then it returns NULL
+	inline GraphMLGraph* getGraph(const char *name); //is there is no graph with id==name then it returns NULL
 	/** \brief Get n-th graph.
 	 *
 	 *  The method gets the n-th [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>").
@@ -175,7 +175,7 @@ public:
 	 *
 	 *  [See example](examples/text/graphml.html).
 	 */
-	GraphMLGraph* getGraph(int n); //get nth graph
+	inline GraphMLGraph* getGraph(int n); //get nth graph
 	/** \brief Delete graph named \a name.
 	 *
 	 *  The method deletes the [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>")
@@ -183,7 +183,7 @@ public:
 	 *  If there was no such graph, false is returned.
 	 *  \param name the name of deleted graph.
 	 *  \return true if graph is deleted, false if there was no such graph.*/
-	bool deleteGraph(const char *name);
+	inline bool deleteGraph(const char *name);
 
 	/** \brief Read graph.
 	 *
@@ -238,7 +238,6 @@ public:
 	 */
 	template< class Graph >
 	bool writeGraph(const Graph &graph, const char *name); //@return false if there is no graph named name
-	template<typename Graph, typename InfoVertex, typename InfoEdge>
 
 	/** \brief Write graph.
 	 *
@@ -255,14 +254,15 @@ public:
 	 *  \param infoEdge the object function that generates edges info, functor should take pointer to edge and pointer to GraphMLKeysWrite as a parameters.
 	 *  \param name the name of written graph.
 	 *  \return true if graph was successfully written, false otherwise.*/
+	template<typename Graph, typename InfoVertex, typename InfoEdge>
 	bool writeGraph(const Graph &graph, InfoVertex infoVert, InfoEdge infoEdge, const char *name);
 
 	/** \brief Get [key type](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
 	 *  ( NotDefined, Bool, Int, Long, Float, Double, String)*/
-	GraphMLKeyTypes::Type getKeyType(const char *name);
+	inline GraphMLKeyTypes::Type getKeyType(const char *name);
 	/** \brief Get [key for](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='...'")
 	 *  (Unknown, All, GraphML, Graph, Node, Edge)*/
-	GraphMLKeyTypes::ForKey getKeyFor(const char *name);
+	inline GraphMLKeyTypes::ForKey getKeyFor(const char *name);
 
 	/** \brief  Get all keys.
 	 *
@@ -282,7 +282,7 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setBool(const char *name, bool val);
+	inline bool setBool(const char *name, bool val);
 	/** \brief Set integer value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -294,7 +294,7 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setInt(const char *name, int val);
+	inline bool setInt(const char *name, int val);
 	/** \brief Set long value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -306,7 +306,7 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setLong(const char *name, int64_t val);
+	inline bool setLong(const char *name, int64_t val);
 	/** \brief Set double value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -318,7 +318,7 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setDouble(const char *name, double val);
+	inline bool setDouble(const char *name, double val);
 	/** \brief Set string value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -330,7 +330,7 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setString(const char *name, const char *val);
+	inline bool setString(const char *name, const char *val);
 	/** \brief Set string value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -342,13 +342,13 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setString(const char *name, const std::string &val);
+	inline bool setString(const char *name, const std::string &val);
 
 	/** \brief Test existence of value for [GraphMLKeyTypes::GraphML](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  \param name the name of tested key.
 	 *  \return true if there exists a value \a name, false otherwise.*/
-	bool isValue(const char *name); //check if value is set
+	inline bool isValue(const char *name); //check if value is set
 
 	/** \brief Get the value of key.
 	 *
@@ -356,41 +356,41 @@ public:
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked value.
 	 *  \return the value associated with key \a name.*/
-	bool getBool(const char *name);
+	inline bool getBool(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	int getInt(const char *name);
+	inline int getInt(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	int64_t getLong(const char *name);
+	inline int64_t getLong(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	double getDouble(const char *name);
+	inline double getDouble(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
 	 *  [graphml or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	std::string getString(const char *name);
+	inline std::string getString(const char *name);
 
 	//--------key type modifications-----------
 	/** \brief Delete key.
 	 *
 	 *  \return true if the key was deleted, false if there wasn't any.*/
-	bool delKeyGlobal(const char *name);
+	inline bool delKeyGlobal(const char *name);
 	/** \brief Set attr.name for key.
 	 *
 	 *  The method sets the [attr.name](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.name='...'")
@@ -399,7 +399,7 @@ public:
 	 *  \param attrName the name for attr.name.
 	 *  \return true if the name was successfully set, false otherwise.*/
     //WEN: czy ustawinie attrName ponowne dla danego name nadpisuje stary attr.name, czy tez jest bledem?
-	bool setKeyAttrName(const char *name, const char *attrName);
+	inline bool setKeyAttrName(const char *name, const char *attrName);
 
 	/** \brief Get attr.name associated with key.
 	 *
@@ -407,7 +407,7 @@ public:
 	 *  of the [key name](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key id='...'").
 	 *  \param name the checked key.
 	 *  \return the string with the attr.name of the key \a name.*/
-	std::string getKeyAttrName(const char *name);
+	inline std::string getKeyAttrName(const char *name);
 
 //TODO: do kompletu brakuje bool delKeyAttrName(const char *name); tzn. usuwanie attr.name keya bez usuwania samego keya
 private:
@@ -416,14 +416,14 @@ private:
 	template<typename InOutType>
 	InOutType get(const char *name, const InOutType def);
 
-	void clear();
-	void createInitial();
-	bool newKey(const char *name, GraphMLKeyTypes::Type type,
+	inline void clear();
+	inline void createInitial();
+	inline bool newKey(const char *name, GraphMLKeyTypes::Type type,
 		GraphMLKeyTypes::ForKey forKey);
-	bool readXML();
-	bool readXMLKey(TiXmlElement *xml);
-	bool readXMLGraph(TiXmlElement *xml);
-	bool readXMLData(TiXmlElement *xml);
+	inline bool readXML();
+	inline bool readXMLKey(TiXmlElement *xml);
+	inline bool readXMLGraph(TiXmlElement *xml);
+	inline bool readXMLData(TiXmlElement *xml);
 
 	struct KeyHolder {
 		GraphMLKeyTypes::Type type;
@@ -433,14 +433,14 @@ private:
 			int64_t longVal;
 		} uVal;
 		std::string sVal;
-		std::string print();
-		bool set(bool val);
-		bool set(int val);
-		bool set(int64_t val);
-		bool set(double val);
-		bool set(const char *val);
-		bool set(const std::string &val);
-		template<typename T> T get();
+		inline std::string print();
+		inline bool set(bool val);
+		inline bool set(int val);
+		inline bool set(int64_t val);
+		inline bool set(double val);
+		inline bool set(const char *val);
+		inline bool set(const std::string &val);
+		template<typename T> inline T get();
 	};
 	struct NameDef : public KeyHolder {
 		std::string id, attrName;
@@ -479,7 +479,7 @@ public:
 	 *  The method gets [the name](http://graphml.graphdrawing.org/primer/graphml-primer.html#Graph "see <graph id='...'")
 	 *  of current graph.
 	 *  \return the string with the name of current graph.*/
-	std::string getName();
+	inline std::string getName();
 
 	/** \brief Read graph.
 	 *
@@ -536,9 +536,9 @@ public:
 	bool writeGraph(const Graph &graph, InfoVertex infoVert, BlackHole);
 
 	/** \brief Get key value type (NotDefined, Bool, Int, Long, Float, Double, String).*/
-	GraphMLKeyTypes::Type getKeyType(const char *name);
+	inline GraphMLKeyTypes::Type getKeyType(const char *name);
 	/** \brief Get key value placement (Unknown, All, GraphML, Graph, Node, Edge).*/
-	GraphMLKeyTypes::ForKey getKeyFor(const char *name);
+	inline GraphMLKeyTypes::ForKey getKeyFor(const char *name);
 
 	/** \brief  Get all keys.
 	 *
@@ -557,7 +557,7 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setBool(const char *name, bool val);
+	inline bool setBool(const char *name, bool val);
 	/** \brief Set integer value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -569,7 +569,7 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setInt(const char *name, int val);
+	inline bool setInt(const char *name, int val);
 	/** \brief Set long value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -581,7 +581,7 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setLong(const char *name, int64_t val);
+	inline bool setLong(const char *name, int64_t val);
 	/** \brief Set double value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -593,7 +593,7 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setDouble(const char *name, double val);
+	inline bool setDouble(const char *name, double val);
 	/** \brief Set string value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -605,7 +605,7 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setString(const char *name, const char *val);
+	inline bool setString(const char *name, const char *val);
 	/** \brief Set string value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -617,13 +617,13 @@ public:
 	 *  \return false if the key is not set to
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setString(const char *name, const std::string &val);
+	inline bool setString(const char *name, const std::string &val);
 
 	/** \brief Test existence of value for [GraphMLKeyTypes::Graph](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  \param name the name of tested key.
 	 *  \return true if there exists a value \a name, false otherwise.*/
-	bool isValue(const char *name);
+	inline bool isValue(const char *name);
 
 	/** \brief Get the value of key.
 	 *
@@ -631,43 +631,43 @@ public:
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	bool getBool(const char *name);
+	inline bool getBool(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	int getInt(const char *name);
+	inline int getInt(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	int64_t getLong(const char *name);
+	inline int64_t getLong(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	double getDouble(const char *name);
+	inline double getDouble(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
 	 *  [graph or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	std::string getString(const char *name);
+	inline std::string getString(const char *name);
 private:
-	GraphMLGraph();
-	~GraphMLGraph();
+	inline GraphMLGraph();
+	inline ~GraphMLGraph();
 	template<GraphMLKeyTypes::Type, typename InType>
 	bool set(const char *name, InType val);
 	template<typename InOutType>
 	InOutType get(const char *name, const InOutType def);
-	void readXML();
+	inline void readXML();
 
 	GraphMLGraph *prev, *next;
 	TiXmlElement *xml;
@@ -688,10 +688,10 @@ class GraphMLKeysRead {
 public:
 	/** \brief Get [key type](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
 	 *  ( NotDefined, Bool, Int, Long, Float, Double, String)*/
-	GraphMLKeyTypes::Type getKeyType(const char *name);
+	inline GraphMLKeyTypes::Type getKeyType(const char *name);
 	/** \brief Get [key for](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='...'")
 	 *  (Unknown, All, GraphML, Graph, Node, Edge)*/
-	GraphMLKeyTypes::ForKey getKeyFor(const char *name);
+	inline GraphMLKeyTypes::ForKey getKeyFor(const char *name);
 
 	/** \brief  Get all keys.
 	 *
@@ -704,7 +704,7 @@ public:
 	 *
 	 *  \param name the name of tested key.
 	 *  \return true if there exists a value \a name, false otherwise.*/
-	bool isValue(const char *name);
+	inline bool isValue(const char *name);
 
 	/** \brief Get the value of key.
 	 *
@@ -713,7 +713,7 @@ public:
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	bool getBool(const char *name);
+	inline bool getBool(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
@@ -721,7 +721,7 @@ public:
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	int getInt(const char *name);
+	inline int getInt(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
@@ -729,7 +729,7 @@ public:
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	int64_t getLong(const char *name);
+	inline int64_t getLong(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
@@ -737,7 +737,7 @@ public:
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	double getDouble(const char *name);
+	inline double getDouble(const char *name);
 	/** \brief Get the value of key.
 	 *
 	 *  The method gets the value of the key named \a name for
@@ -745,11 +745,11 @@ public:
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type.
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
-	std::string getString(const char *name);
+	inline std::string getString(const char *name);
 private:
 	template<typename InOutType>
 	InOutType get(const char *name, const InOutType def);
-	bool set(const char *key, const char *val);
+	inline bool set(const char *key, const char *val);
 	GraphMLKeyTypes::ForKey forKey;
 	GraphML *graphML;
 	GraphML::NameVals nameVals;
@@ -764,10 +764,10 @@ class GraphMLKeysWrite {
 public:
 	/** \brief Get [key type](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
 	 *  ( NotDefined, Bool, Int, Long, Float, Double, String)*/
-	GraphMLKeyTypes::Type getKeyType(const char *name);
+	inline GraphMLKeyTypes::Type getKeyType(const char *name);
 	/** \brief Get [key for](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key for='...'")
 	 *  (Unknown, All, GraphML, Graph, Node, Edge)*/
-	GraphMLKeyTypes::ForKey getKeyFor(const char *name);
+	inline GraphMLKeyTypes::ForKey getKeyFor(const char *name);
 
 	/** \brief  Get all keys.
 	 *
@@ -788,7 +788,7 @@ public:
 	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setBool(const char *name, bool val);
+	inline bool setBool(const char *name, bool val);
 	/** \brief Set integer value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -801,7 +801,7 @@ public:
 	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setInt(const char *name, int val);
+	inline bool setInt(const char *name, int val);
 	/** \brief Set long value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -814,7 +814,7 @@ public:
 	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setLong(const char *name, int64_t val);
+	inline bool setLong(const char *name, int64_t val);
 	/** \brief Set double value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -827,7 +827,7 @@ public:
 	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setDouble(const char *name, double val);
+	inline bool setDouble(const char *name, double val);
 	/** \brief Set string value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -840,7 +840,7 @@ public:
 	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setString(const char *name, const char *val);
+	inline bool setString(const char *name, const char *val);
 	/** \brief Set string value for [GraphMLKeyTypes::Node or GraphMLKeyTypes::Edge](\ref GraphMLKeyTypes::ForKey).
 	 *
 	 *  The method sets the value named \a name with value \a val.
@@ -853,11 +853,11 @@ public:
 	 *  [node or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type
 	 *  or [edge or all](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'") type,
 	 *  true otherwise.  */
-	bool setString(const char *name, const std::string &val);
+	inline bool setString(const char *name, const std::string &val);
 private:
 	template<GraphMLKeyTypes::Type, typename InType>
 	bool set(const char *name, InType val);
-	std::string print(); ////not yet
+	inline std::string print(); ////not yet
 	GraphMLKeyTypes::ForKey forKey;
 	GraphML *graphML;
 	GraphML::NameVals nameVals;
@@ -1181,7 +1181,7 @@ struct GMLStringField<Info,unsigned char[N]> : public GMLCharField <Info, char, 
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
  *  \ingroup DMiographmlA */
-Privates::GMLBoolFieldPlain
+inline Privates::GMLBoolFieldPlain
 gmlBoolField(std::string name) {
 	return Privates::GMLBoolFieldPlain(name);
 }
@@ -1207,7 +1207,7 @@ gmlBoolField(FieldType Info::*wsk,std::string name) {
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
  * \ingroup DMiographmlA */
-Privates::GMLIntFieldPlain
+inline Privates::GMLIntFieldPlain
 gmlIntField(std::string name) {
 	return Privates::GMLIntFieldPlain(name);
 }
@@ -1233,7 +1233,7 @@ gmlIntField(FieldType Info::*wsk,std::string name) {
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
  * \ingroup DMiographmlA */
-Privates::GMLDoubleFieldPlain
+inline Privates::GMLDoubleFieldPlain
 gmlDoubleField(std::string name) {
 	return Privates::GMLDoubleFieldPlain(name);
 }
@@ -1259,7 +1259,7 @@ gmlDoubleField(FieldType Info::*wsk,std::string name) {
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
  * \ingroup DMiographmlA */
-Privates::GMLLongFieldPlain
+inline Privates::GMLLongFieldPlain
 gmlLongField(std::string name) {
 	return Privates::GMLLongFieldPlain(name);
 }
@@ -1285,7 +1285,7 @@ gmlLongField(FieldType Info::*wsk,std::string name) {
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
  * \ingroup DMiographmlA */
-Privates::GMLStringFieldPlain
+inline Privates::GMLStringFieldPlain
 gmlStringField(std::string name) {
 	return Privates::GMLStringFieldPlain(name);
 }

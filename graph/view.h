@@ -34,7 +34,7 @@ namespace Koala
                     vcount(-1), eloopcount(-1), edircount(-1), eundircount(-1)
             {}
 
-            void reset(bool vf,bool ef)
+            inline void reset(bool vf,bool ef)
             {
                 if (vf) vcount=-1;
                 if (ef) eloopcount= edircount= eundircount=-1;

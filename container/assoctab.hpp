@@ -536,7 +536,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	else last = bufor[x].prev;
 	if (bufor[x].prev != -1) bufor[bufor[x].prev].next = bufor[x].next;
 	else first = bufor[x].next;
-	bufor[x] = BlockOfAssocMatrix< Elem >();
+	bufor[x] = Privates::BlockOfAssocMatrix< Elem >();
 	siz--;
 	--index.tab[wsp.first].val;
 	--index.tab[wsp.second].val;
@@ -637,7 +637,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 		else last = bufor[x].prev;
 		if (bufor[x].prev != -1) bufor[bufor[x].prev].next = bufor[x].next;
 		else first = bufor[x].next;
-		bufor[x] = BlockOfAssocMatrix< Elem >();
+		bufor[x] = Privates::BlockOfAssocMatrix< Elem >();
 		siz--;
 		if (--index[u] == 0) index.delKey( u );
 		if (--index[v] == 0) index.delKey( v );
@@ -771,7 +771,7 @@ template< class Klucz, class Elem, AssocMatrixType aType, class Container, class
 	for( int i = first; i != -1; i = in )
 	{
 		in = bufor[i].next;
-		bufor[i] = BlockOfAssocMatrix< Elem >();
+		bufor[i] = Privates::BlockOfAssocMatrix< Elem >();
 	}
 	siz = 0;
 	first = last = -1;

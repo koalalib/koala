@@ -32,16 +32,6 @@ namespace Koala
 	};
 
 
-	/* JoinableSetsInternalTypes
-	 *
-	 */
-	template< class ITEM > struct JoinableSetsInternalTypes
-	{
-		typedef Privates::BlockOfBlockList< BlockOfAssocArray< ITEM,JSPartDesrc< ITEM > * > > AssocBlockType;
-		typedef JSPartDesrc< ITEM > BufElementType;
-	} ;
-
-
     namespace Privates {
 
         template <class Klucz> struct JoinSetsIntPseudoMap {

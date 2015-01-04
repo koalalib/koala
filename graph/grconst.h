@@ -68,7 +68,7 @@ protected:
 
 	struct Parals3cmp
 	{
-		bool operator()( Parals3 a, Parals3 b )
+		inline bool operator()( Parals3 a, Parals3 b )
 		{
 			return (a.v1 < b.v1) || (a.v1 == b.v1 && a.v2 < b.v2) ||
 				(a.v1 == b.v1 && a.v2 == b.v2 && a.direct < b.direct ) ||
@@ -84,7 +84,7 @@ protected:
                         undirCount(std::make_pair( 0,(typename ConstGraphMethods< GraphType >::PEdge)0))
                         {}
 
-        std::pair<int, PEdge>& counter(EdgeDirection dir,EdgeDirection reltype)
+        inline std::pair<int, PEdge>& counter(EdgeDirection dir,EdgeDirection reltype)
         {
             switch (dir) {
                 case EdDirOut : return dirOutCount;
