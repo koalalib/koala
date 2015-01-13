@@ -252,7 +252,7 @@ int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
 	EdgeDirection mask = EdUndir | EdDirOut | EdDirIn;
 	//Privates::BlockListAllocator< Node<typename GraphType::PVertex> >
 	SimplArrPool<Node<typename GraphType::PVertex> > allocat(3*n+3);
-	//TODO:size?
+	//TODO:size? - wazne
 
 	CyclicList<typename GraphType::PVertex> pathl(&allocat), pathr(&allocat);
 //	CyclicList<typename GraphType::PVertex> pathl, pathr;
@@ -277,6 +277,7 @@ int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
 		e = *initialBegin;
 		++initialBegin;
 		ends = g.getEdgeEnds(e);
+		if (ends.first==ends.second) continue;
 		if(data[ends.first].mate) return -1;
 		if(data[ends.second].mate) return -1;
 		data[ends.first].mate = ends.second;
@@ -456,6 +457,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
 	//przegladamy podane krawedzie
 	for( EIterIn itE = edgeIterInBegin; itE != edgeIterInEnd; ++itE )
+    if (g.getEdgeType(*itE)!=Loop)
 	{
 		//jezeli osiagniemy zadany rozmiar skojarzenia - koniec
 		if (matchSize == (vertNo - expo) / 2) break;
@@ -492,7 +494,7 @@ template< class DefaultStructs > template< class GraphType, class EIterIn > bool
 		U = g.getEdgeEnd1( *itE );
 		V = g.getEdgeEnd2( *itE );
 		//jezeli ktorykolwiek z wierzcholkow tworzacych krawedz nie jest wolny to nie mamy matchingu
-		if (vertTabMatch.hasKey( U ) || vertTabMatch.hasKey( V )) return false;
+		if ( U==V || vertTabMatch.hasKey( U ) || vertTabMatch.hasKey( V )) return false;
 		vertTabMatch[U] = EmptyVertInfo();
 		vertTabMatch[V] = EmptyVertInfo();
 	}

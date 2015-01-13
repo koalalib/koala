@@ -1471,6 +1471,7 @@ int SeqVertColoringPar<DefaultStructs>::brooks(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
+    colors.clear();
     colors.reserve(graph.getVertNo());
 	BrooksState<Graph, ColorMap> bState(graph, colors);
 
@@ -1511,7 +1512,7 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	colors.reserve(graph.getVertNo());
+	colors.clear();colors.reserve(graph.getVertNo());
 
 	typedef typename DefaultStructs::template
 		LocalGraph<Vert, Koala::EmptyEdgeInfo, Undirected>::Type Subgraph;
@@ -1540,6 +1541,7 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	}
 
 	int col = -1;
+	//TODO: v/e-alokatory, size ???
 	Subgraph procGraph;
 	while(subgraph.getVertNo()>0) {
 		++col;
@@ -1578,6 +1580,7 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	colors.clear();
 	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
 
 	typedef typename DefaultStructs::template
@@ -1609,6 +1612,7 @@ int GisVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	}
 
 	int col = -1;
+	//TODO: v/e-alokatory, size ???
 	Subgraph procGraph;
 	while(subgraph.getVertNo()>0) {
 		++col;
@@ -1667,10 +1671,10 @@ int VertColoringPar<DefaultStructs>::colorIterative(const Graph &graph, ColorMap
 
 	int n = graph.getVertNo(), r = 0, max_used = 0, index = -1, color;
 	typename DefaultStructs::template AssocCont<Vert, int>::Type colors_temp(n);
-	for(Vert v=graph.getVert();v;v=graph.getVertNext(v)) if (colors.hasKey(v)) colors_temp[v]=colors[v];
+	//for(Vert v=graph.getVert();v;v=graph.getVertNext(v)) if (colors.hasKey(v)) colors_temp[v]=colors[v];
 	Vert LOCALARRAY(vertices, n);
 	graph.getVerts(vertices);
-    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getVertNo());
+    colors.clear(); colors.reserve(graph.getVertNo());
 
 	ColorSet LOCALARRAY(FC, n);
 	IndexSet CP, LOCALARRAY(P, n);
@@ -1756,8 +1760,8 @@ int VertColoringPar<DefaultStructs>::colorIterative(const Graph &graph, ColorMap
 				for(int j = r + 1; j < n; j++)
 					colors_temp.delKey(vertices[j]);
 				for (typename Graph::PVertex k = colors_temp.firstKey(); k; k = colors_temp.nextKey(k))
-					if(colors[k] > max_used)
-						max_used = colors[k];
+					if(colors_temp[k] > max_used)
+						max_used = colors_temp[k];
 				break;
 			}
 		}

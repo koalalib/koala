@@ -44,7 +44,7 @@ namespace Koala
      */
     struct Segment
     {
-        int left, right;
+        int left, right; //WEN: min. i max. element przedzialu calkowitego
         Segment( int l = 0, int r = 1 ): left( l ), right( r )
         { koalaAssert(l<=r,ContExcWrongArg);  }
 

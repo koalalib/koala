@@ -606,30 +606,52 @@ int SeqEdgeColoringPar<DefaultStructs>::vizingSimple(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
+	colors.clear();
 	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 
 	int degree = graph.Delta(Mask);
 	VizingState<Graph, ColorMap> vState(graph, colors, degree+1);
 
 	int LOCALARRAY(tmpTab, vState.notColored);
+
 	//freeColor set
-	if(colors.size()>0) { //tmpTab - is used to checking free color availability
-		for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
-			for(int i=0; i<vState.notColored; i++)
-				tmpTab[i] = 0;
-			for(Edge ee=graph.getEdge(vv, Mask); ee;
-				ee = graph.getEdgeNext(vv, ee, Mask))
-			{
-				if(!colors.hasKey(ee)) continue;
-				int tmpCol = colors[ee];
-				if(tmpCol<0 || tmpCol>=vState.notColored) continue;
-				tmpTab[ tmpCol ] = 1;
-			}
-			int i=0;
-			while(i<vState.notColored && tmpTab[i]==1) i++;
-			vState.tabVert[ vState.vertToTab[vv] ].freeColor = i;
-		}
-	}
+
+//TODO: AJ: wykomentowalem, ale po co to bylo?
+//	if(colors.size()>0) { //tmpTab - is used to checking free color availability
+//
+//		for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
+//
+//			for(int i=0; i<vState.notColored; i++)
+//
+//				tmpTab[i] = 0;
+//
+//			for(Edge ee=graph.getEdge(vv, Mask); ee;
+//
+//				ee = graph.getEdgeNext(vv, ee, Mask))
+//
+//			{
+//
+//				if(!colors.hasKey(ee)) continue;
+//
+//				int tmpCol = colors[ee];
+//
+//				if(tmpCol<0 || tmpCol>=vState.notColored) continue;
+//
+//				tmpTab[ tmpCol ] = 1;
+//
+//			}
+//
+//			int i=0;
+//
+//			while(i<vState.notColored && tmpTab[i]==1) i++;
+//
+//			vState.tabVert[ vState.vertToTab[vv] ].freeColor = i;
+//
+//		}
+//
+//	}
+
+
 	//init edges by degree colors
 	int ii;
 	for(Edge edge = graph.getEdge(Mask); edge;
@@ -694,9 +716,9 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
+	colors.clear(); colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int degree = graph.Delta(Mask);
-	int mu = graph.mu();
+	int mu = makeSubgraph(graph, std::make_pair(stdChoose(true), !edgeTypeChoose(Loop))).mu();
 	VizingState<Graph, ColorMap> vState(graph, colors, degree+mu);
 	if(degree-1>vState.maxColor)
 		vState.maxColor = degree-1;
@@ -722,7 +744,7 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int degree = graph.Delta(Mask);
-	int mu = graph.mu();
+	int mu = makeSubgraph(graph, std::make_pair(stdChoose(true), !edgeTypeChoose(Loop))).mu();
 	VizingState<Graph, ColorMap> vState(graph, colors, degree+mu);
 	if(degree-1>vState.maxColor)
 		vState.maxColor = degree-1;
@@ -744,7 +766,7 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int degree = graph.Delta(Mask);
-	int mu = graph.mu();
+	int mu = makeSubgraph(graph, std::make_pair(stdChoose(true), !edgeTypeChoose(Loop))).mu();
 	VizingState<Graph, ColorMap> vState(graph, colors, degree+mu);
 	vState.maxColor = maxCol;
 

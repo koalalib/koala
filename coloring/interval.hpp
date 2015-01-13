@@ -686,9 +686,9 @@ Segment IntervalEdgeColoringPar<DefaultStructs>::simulColor(const Graph &graph,
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int range = weights[ edge ] - 1;
 	Vert v = graph.getEdgeEnd1(edge);
-	int lenInterv = graph.deg(v);
+	int lenInterv = graph.deg(v,Mask);
 	v = graph.getEdgeEnd2(edge);
-	lenInterv += graph.deg(v);
+	lenInterv += graph.deg(v,Mask);
 	Color LOCALARRAY(interv, lenInterv);
 	lenInterv = 0;
 

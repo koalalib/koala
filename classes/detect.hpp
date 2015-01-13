@@ -696,7 +696,7 @@ template< class DefaultStructs > template< class Graph, class IterOut >
 {
 	int n = g.getVertNo();
 	typename Graph::PVertex LOCALARRAY( vbegin,n * n );
-	//TODO: size?
+	//TODO: size? - chyba mozna sporo zmniejszyc
 	int LOCALARRAY( begin,n + 1 );
 	std::pair< int,int > LOCALARRAY( ebegin,n );
 	int qn = maxCliques( g,compStore( begin,vbegin ),ebegin );
@@ -1051,7 +1051,7 @@ template< class DefaultStructs > template< class GraphType, class IntMap >
 
 		//TODO: size?
 	SimplArrPool< Privates::ListNode< typename Sets::Elem > > allocat3( 2 * n * n + 2);
-		//TODO: size?
+		//TODO: size? - wazne, bo przez to procedura przestaje byc liniowa
 
 	std::pair< typename Sets::Entry,typename Sets::Entry::iterator > LOCALARRAY( Abuf,n );
 	std::pair< typename Sets::Entry,typename Sets::Entry::iterator > LOCALARRAY( Bbuf,n );
@@ -1539,9 +1539,6 @@ template< class DefaultStructs > template< class GraphType >
 	if (!undir( g,false )) return false;
 	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,EmptyVertInfo >::Type subset( g.getVertNo() );
 	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) ) subset[u]=EmptyVertInfo();
-//TODO: co to bylo?
-//	typename ModulesPar< DefaultStructs >::Partition res =
-//		ModulesPar< DefaultStructs >::split( g,compStore( blackHole,blackHole ),blackHole );
 	return Cograph::cograph( g,subset );
 }
 

@@ -916,6 +916,9 @@ namespace Koala
 		inline typename GraphType::PEdge addEdge( PVertex vert1, PVertex vert2, EdgeDirection direct = EdUndir );
 
 		// Dodajemy nową krawędź do grafu (z etykietą).
+		//NEW: ponizsza metoda:
+		//WEN: poprawka, direct moze takze miec postac Loop| (pojedynczy inny bit albo ew. Directed). Wtedy metoda dziala jak direct==Loop lub direct bez bitu Loop - stosownie do warunku vert1==vert2
+        //Po ew. uwzglednieniu tego jest jak dotad tzn. direct moze miec ustawiony tylko 1 bit z wyjatkiem wartosci Undirected automat. zamienianej na EdDirOut
 		/** \brief Add edge.
 		 * WEN: j.w. odnosnie maski
 		 *  A new edge (directed or not depending on direct) spanned on two vertices is added to the graph.
@@ -927,6 +930,10 @@ namespace Koala
 		 *
 		 *  [See example](examples/graph/graph_clear.html).
 		 */
+
+		//NEW: ponizsza metoda:
+		//WEN: poprawka, direct moze takze miec postac Loop| (pojedynczy inny bit albo ew. Directed). Wtedy metoda dziala jak direct==Loop lub direct bez bitu Loop - stosownie do warunku vert1==vert2
+        //Po ew. uwzglednieniu tego jest jak dotad tzn. direct moze miec ustawiony tylko 1 bit z wyjatkiem wartosci Undirected automat. zamienianej na EdDirOut
 		inline typename GraphType::PEdge addEdge( PVertex vert1, PVertex vert2, EdgeInfo info, EdgeDirection direct= EdUndir );
 		/** \brief Add undirected edge.
 		 *
@@ -1801,7 +1808,7 @@ namespace Koala
         }
 
 	private:
-		AdjMatrix< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed > *pAdj;
+		Privates::AdjMatrix< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed > *pAdj;
 
 		PVertex first_vert,last_vert;
 		PEdge first_edge,last_edge;

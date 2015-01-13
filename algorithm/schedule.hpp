@@ -208,7 +208,6 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 		HeapCont< Pair,compareSecondFirst< Pair > >::Type pq(&available);
 
 	// To samo zadanie nie jest wykonywane jednoczenie na obu maszynach
-	// TODO: można posortować
 	for( typename Schedule::Type::const_iterator i = schedule.machines.begin(); i != schedule.machines.end(); ++i )
 		for( typename Schedule::Machine::const_iterator j = i->begin(); j != i->end(); ++j )
 			pq.push( Pair( *j,j->start ) );

@@ -16,7 +16,6 @@ namespace Koala
 			AdjMatrixParals(): first( NULL ), last( NULL ), degree( 0 )
 				{ }
 		};
-	}
 
 	/* AdjMatrix
 	 *
@@ -97,6 +96,8 @@ namespace Koala
 				return (Privates::AdjMatrixParals< VertInfo,EdgeInfo,Settings >*)(&blackHole);
 			}
 	};
+
+	}
 
 #include "adjmatrix.hpp"
 }

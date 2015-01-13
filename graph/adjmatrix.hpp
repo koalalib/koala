@@ -1,3 +1,5 @@
+namespace Privates {
+
 // AdjMatrix
 
 template< class VertInfo, class EdgeInfo, class Settings >
@@ -57,4 +59,6 @@ template< class VertInfo, class EdgeInfo, class Settings > void
 		pole.last = edge;
 		pole.degree++;
 	}
+}
+
 }

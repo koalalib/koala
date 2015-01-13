@@ -33,16 +33,42 @@ namespace Privates {
 
 };
 
+//NEW: etykieta wierzcholka jest wspolna w obu klasach, wiec wywalilem tutaj
+struct MatchingStructs {
+
+		/** \brief Auxiliary matching structure for vertices. */
+		template< class GraphType > struct VertLabs
+		{
+				typename GraphType::PVertex vMatch;/**< \brief Matched vertex. WEN: 0 dla vert niezmachowanego */
+				typename GraphType::PEdge eMatch;/**< \brief Matched edge.WEN: 0 dla vert niezmachowanego  */
+			/**\brief Constructor*/
+			VertLabs( typename GraphType::PVertex v = 0, typename GraphType::PEdge e = 0 ): vMatch( v ), eMatch( e )
+				{ }
+
+            //WEN: opis
+			template <class T> void copy(T& arg) const
+			{
+				arg.vMatch=vMatch;
+				arg.eMatch=eMatch;
+			}
+
+			void copy(BlackHole&) const
+				{ }
+		};
+
+};
+
 /* MatchingPar
  * algorytm szukajacy najliczniejszego skojarzenia w grafie dowolnym
  */
 /** \brief Matching (parametrized).
  *
- *  The set of structures and methods allowing to find maximal matching in graph.
+ *  The set of structures and methods allowing to find maximal
+ WEN: cardinality tj. radze zaznaczac ze chodzi o najwiekszy liczebnie (dotyczy tego miejsca i ponizszych uzyc tego zwrotu) matching in graph. WEN: no i pokrewne problemy tez
  *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
  *  \ingroup DMmatch
  */
-template< class DefaultStructs > class MatchingPar
+template< class DefaultStructs > class MatchingPar : public MatchingStructs
 {
 private:
 
@@ -275,17 +301,9 @@ private:
 				 bool makeCover = false);
 
 	public:
-		/** \brief Auxiliary matching structure for vertices. */
-		template< class GraphType > struct VertLabs
-		{
-				typename GraphType::PVertex vMatch;/**< \brief Matched vertex. */
-				typename GraphType::PEdge eMatch;/**< \brief Matched edge.*/
-				VertLabs(): vMatch( 0 ), eMatch( 0 )
-					{}
-		};
 
 	/** \brief Find maximum matching.
-	 *
+	 * WEN: jak w metodzie nizej
 	 *  The method finds maximum matching in a given \a g.
 	 *  @param[in] g the considered graph.
 	 *  @param[out] matching the list of edges in found matching.
@@ -301,11 +319,11 @@ private:
 
 	/** \brief Find maximum matching .
 	 *
-	 *  The method finds maximum matching in a given \a g.
-	 *  @param[in] g the considered graph.
-	 *  @param[out] vertTab an associative container from PVertex to VertLabs, which keeps matched edges and vertices (BlackHole possible).
-	 *  @param[out] matching the list of edges in found matching.
-	 *  @param[in] matchSize the desired size of a matching, leave out or -1 for a maximum
+	 *  The method finds maximum matching in a given \a g. WEN: w zasadzie to mach. o podanej liczebnosci, a max domyslnie
+	 *  @param[in] g the considered graph, WEN: dowolny (np. z kraw. rownoleglymi, petlami),  luki  krawedzie sa traktowane jak undir.
+	 *  @param[out] vertTab an associative container from PVertex to VertLabs, which keeps matched edges and vertices WEN: dla zmachowanych wierzcholkow a dla innych NULLe (BlackHole possible).
+	 *  @param[out] matching the list of edges in found matching. WEN: no chyba inserter na krawedzie
+	 *  @param[in] matchSize the desired size of a matching, leave out or -1 for a maximum, WEN: jak rowniez gdy matchSize jest za duzy tj. nieosiagalny
 	 *  @return the actual number of edges in found matching
 	 *
 	 *  [See example](examples/matching/matching_findMax.html).
@@ -322,13 +340,14 @@ private:
 
 	/** \brief Find maximum matching.
 	 *
-	 *  The method finds maximum matching in a given \a g. The initial matching is passed to function via iterators \a initialBegin and \a initialEnd
-	 *  \param[in] g the considered graph.
-	 *  \param[out] vertTab an associative container from PVertex to VertLabs which keeps matched edges and vertices (BlackHole possible).
+	 *  The method finds maximum WEN: w zasadzie to mach. o podanej liczebnosci, a max domyslnie matching in a given \a g. The initial matching is passed to function via iterators \a initialBegin and \a initialEnd WEN: tj. start-zalast przedzial iteratorow na krawedzie
+	 *  \param[in] g the considered graph. WEN: dowolny (np. z kraw. rownoleglymi, petlami),  luki  krawedzie sa traktowane jak undir
+	 *  \param[out] vertTab an associative container from PVertex to VertLabs which keeps matched edges and vertices (BlackHole possible). WEN: jak w met. wyzej przy tym parametrze
 	 *  @param[in] initialBegin the iterator to the beginning of given initial matching  (list of edges).
 	 *  @param[in] initialEnd the iterator to the past-the-end element of given initial matching  (list of edges).
-	 *  @param[out] matching the list of edges in found matching.
-	 *  @param[in] matchSize the desired size of a matching, leave out or set to -1 for a maximum.
+	 *  @param[out] matching the list of edges in found matching. WEN: no chyba inserter na krawedzie
+	 *  @param[in] matchSize the desired size of a matching, leave out or set to -1 for a maximum. WEN: jak rowniez gdy matchSize jest za duzy tj. nieosiagalny.
+	 Jesli zas matchSize>=0, to powinien byc >= od mocy match. inicjalnego
 	 *  @return  the actual number of edges in found matching. Additionally, the method can return -1 if initial matching is invalid.
 	 *
 	 *  [See example](examples/matching/matching_findMax.html).
@@ -346,8 +365,8 @@ private:
 	/** \brief Find minimal edge cover.
 	 *
 	 *  The method finds a minimal edge cover of a given \a g.
-	 *  @param[in] g the considered graph.
-	 *  @param[out] cover the list of edges in found cover.
+	 *  @param[in] g the considered graph. WEN: dowolny (np. z kraw. rownoleglymi, petlami),  luki  krawedzie sa traktowane jak undir
+	 *  @param[out] cover the list of edges in found cover. WEN: nie, inserter na krawedzie
 	 *  @return the actual number of edges in found cover.
 	 *
 	 *  [See example](examples/matching/matching_minEdgeCover.html).
@@ -360,11 +379,11 @@ private:
 	}
 
 	/** \brief Greedy matching.
-	 *
+	 *  WEN: to samo co w met. nizej i dopisac, ze to jest tamten greedy z ustalona sekwencja krawedzi
 	 *  Fast but inaccurate procedure searches greedily for a maximum (in the sense of inclusion) matching.
 	 *  \param[in] g the considered graph.
 	 *  \param[out] avertTab an associative container from PVertex to VertLabs which keeps matched edges and vertices (BlackHole possible).
-	 *  @param[out] edgeIterOut the list of edges in found matching.
+	 *  @param[out] edgeIterOut the list of edges in found matching. WEN: nie, inserter na krawedzie
 	 *  @param[in] matchSize the desired size of a matching, leave out or -1 for a maximum.
 	 *  @return  the size of found matching.
 	 *
@@ -376,11 +395,11 @@ private:
 	/**\brief Greedy matching.
 	 *
 	 *  The method searches greedily for a matching in the graph \a g. The edges are taken form the sequence given by iterators \a edgeIterInBegin and \a edgesiIterInEnd.
-	 *  \param[in] g the considered graph.
-	 *  \param[out] avertTab an associative container from PVertex to VertLabs which keeps matched edges and vertices (BlackHole possible).
+	 *  \param[in] g the considered graph. WEN: dowolny (np. z kraw. rownoleglymi, petlami),  luki  krawedzie sa traktowane jak undir
+	 *  \param[out] avertTab an associative container from PVertex to VertLabs which keeps matched edges and vertices  WEN: dla zmachowanych wierzcholkow a dla innych NULLe (BlackHole possible).
 	 *  \param edgeIterInBegin the iterator to the first element of the edge sequence used by the greedy algorithm.
 	 *  \param edgeIterInEnd the iterator to the past-the-end element of the edge sequence used by the greedy algorithm.
-	 *  @param[out] edgeIterOut the list of edges in found matching.
+	 *  @param[out] edgeIterOut the list of edges in found matching. WEN: nie, inserter na krawedzie
 	 *  @param[in] matchSize the desired size of a matching, leave out or set to -1 for a maximum.
 	 *  @return  the size of found matching.
 	 *
@@ -394,7 +413,7 @@ private:
 	/** \brief Test if matching.
 	 *
 	 *  The method tests if the given set of edges is a matching in a graph.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. WEN: dowolny (np. z kraw. rownoleglymi, petlami),  luki  krawedzie sa traktowane jak undir
 	 *  \param edgeIterInBegin the iterator to the first element of the container with the edges of tested set.
 	 *  \param edgeIterInEnd the iterator to the past-the-end element of the container with the edges of tested set.
 	 *  \return true if the edge set form a matching, false otherwise.
@@ -419,11 +438,11 @@ private:
 	 */
 	/** \brief Stable matching (parametrized).
 	 *
-	 *  The set of structures and methods allowing to find stable maximal matching in graph.
+	 *  The set of structures and methods allowing to find stable maximal matching in graph. WEN: tylko dwudzielnych, w dowolnych jedynie test stabilnosci
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup DMmatch
 	 */
-	template< class DefaultStructs > class StableMatchingPar
+	template< class DefaultStructs > class StableMatchingPar : public MatchingStructs
 	{
 	protected:
 		template< class Graph, class Cmp > struct SortCmp
@@ -438,28 +457,6 @@ private:
 		};
 
 	public:
-		/** \brief Auxiliary matching structure for vertices. */
-		template< class GraphType > struct VertLabs
-		{
-			//wierzcholek skojarzany lub 0 w razie braku
-			typename GraphType::PVertex vMatch;/**< \brief Matched vertex. */
-			// i krawedz skojarzenia
-			typename GraphType::PEdge eMatch;/**< \brief Matched edge.*/
-
-			/**\brief Constructor*/
-			VertLabs( typename GraphType::PVertex v = 0, typename GraphType::PEdge e = 0 ): vMatch( v ), eMatch( e )
-				{ }
-
-			template <class T> void copy(T& arg) const
-			{
-				arg.vMatch=vMatch;
-				arg.eMatch=eMatch;
-			}
-
-			void copy(BlackHole&) const
-				{ }
-
-		};
 
         //NEW: pomocniczy funktor porownujacy stykajace sie przy danym wierzcholku krawedzie - ulatwia
         //podawanie porzadkow (preferencji) krawedzi przy wierzcholkach
@@ -553,24 +550,27 @@ private:
 		/** \brief Test if stable matching.
 		 *
 		 *  The method tests if the given set of edges is a stable matching in a graph.
-		 *  \param g the considered graph.
+		 *  \param g the considered graph. WEN: dowolny (np. z kraw. rownoleglymi, petlami),  luki  krawedzie sa traktowane jak undir
 		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view. <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.
+            WEN: tj. dla kazdego wierzcholka porzadek liniowy krawedzi sasiednich
 		 *  \param edgeIterInBegin the iterator to the first element of the container with the edges of tested set.
 		 *  \param edgeIterInEnd the iterator to the past-the-end element of the container with the edges of tested set.
-		 *  \return the standard pair consisting of the bool value (pair true if the edge set form a stable matching, false otherwise) and the breaking edge.
+		 *  \return the standard pair consisting of the bool value (pair true if the edge set form a stable matching, false otherwise) and the breaking edge WEN: lub NULL jesli to nawet nie byl matching.
 		 */
 		template< class GraphType, class EIterIn, class Comp > static std::pair< bool,typename GraphType::PEdge >
 			test( const GraphType &g, Comp compare, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd );
 		/** \brief Find stable matching in bipartite graph.
 		 *
 		 *  The method finds the stable matching in bipartite graph.
-		 *  \param g the considered graph.
-		 *  \param begin the iterator to the first element of the container with vertexes.
+		 *  \param g the considered graph. WEN: dowolny ale dwudzielny (np. z kraw. rownoleglymi),  luki  krawedzie sa traktowane jak undir
+		 *  \param begin the iterator to the first element of the container with vertexes. WEN: jakich? - z wybranej partycji dwudzielnosci!
 		 *  \param end the iterator to the past-the-end element of the container with vertexes.
+		 WEN: jakich? - z wybranej partycji dwudzielnosci! Tu link do IsItPar<...>::Bipartite::getPart (detect.h)
 		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view. <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.
-		 *  \param verttab an associative container from PVertex to VertLabs, which keeps matched edges and vertices (BlackHole possible).
-		 *  \param out  the list of edges in found matching.
-		 *  \return the number of edges in found strong matching.
+		 WEN: tj. dla kazdego wierzcholka porzadek liniowy krawedzi sasiednich
+		 *  \param verttab an associative container from PVertex to VertLabs, which keeps matched edges and vertices WEN: dla zmachowanych wierzcholkow a dla innych NULLe  (BlackHole possible).
+		 *  \param out  the list of edges in found matching. WEN: nie, inserter na krawedzie
+		 *  \return the number of edges in found strong WEN: strong??? matching.
 		 */
 		template< class GraphType, class VIterIn, class Comp, class vertCont, class EIterOut >
 			static int bipartFind( const GraphType &g, VIterIn begin, VIterIn end, Comp compare, vertCont &verttab,

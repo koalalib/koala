@@ -18,8 +18,6 @@ typedef __int64 int64_t;
 namespace Koala {
 namespace IO {
 
-//TODO: generalnie brakuje inlineow (a jakby chciec porzadnie, to i constow) przy metodach nieszablonowych - beda klopoty z linkerem
-
 class GraphMLGraph;
 class GraphMLKeysRead;
 class GraphMLKeysWrite;

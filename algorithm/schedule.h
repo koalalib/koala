@@ -18,6 +18,7 @@ namespace Koala
 	/** \brief Scheduling algorithms (parametrized).
 	 *
 	 *  The class provides some implementations of scheduling algorithms in the major part based on graphs.
+	 WEN: konkretnie DAGach reprezentujacych rel. prec na taskach (tj. zadania pokazuja reprezentujace je wierzcholki DAGa).
 	 *  All the parameters associated with scheduling like due dates, lengths, weights are assumed to be integers.
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup DMschedule   */
@@ -32,23 +33,24 @@ namespace Koala
 			int length/**\brief Length*/,release/**\brief Release time*/,duedate/**\brief Due date*/;
 			typename GraphType::PVertex vertex;/**<\brief Pointer to vertex in graph of conflicts or digraph of precedence constraints.*/
 
-			/** \brief Constructor*/
-			Task( typename GraphType::PVertex _vertex = 0): length( 1 ), release( 0 ),
-				duedate(AlgsDefaultSettings::NumberTypeBounds< int >::plusInfty()), vertex(_vertex)
+			/** \brief Constructor WEN: opis argumentow */
+			Task( typename GraphType::PVertex _vertex = 0,int _length =1): length( _length ), release( 0 ),
+				duedate(std::numeric_limits< int >::max()), vertex(_vertex)
 				{ }
 
-			/** \brief Constructor*/
+			/** \brief Constructor WEN: opis argumentow*/
 			Task( int _length, int _release, int _duedate, typename GraphType::PVertex _vertex = 0 ):
 				length( _length ), release( _release ), duedate( _duedate ), vertex( _vertex )
 				{ }
 		};
 		/** \brief Scheduled task part.
 		 *
-		 *  The structure represent the continuous time interval associated with part of task. */
+		 *  The structure represent the continuous time interval associated with part of task.
+		 WEN: w uszeregowaniu tj. stuktura wynikowa */
 		struct TaskPart
 		{
+		    //WEN: co to jest task i part?
 			int task/**\brief Task index*/,start/**\brief Starting time*/,end/**\brief Finishing time*/,part/**\brief Part index*/;
-
 			/**\brief Constructor*/
 			TaskPart( int _task = 0, int _start = 0, int _end = 0, int _part = 0):
 				task( _task ), start( _start ), end( _end ), part( _part )
@@ -58,9 +60,12 @@ namespace Koala
 		/** \brief Task window.
 		 *
 		 *  The structure is used by critical path algorithm. It represents  the time windows in which a task can be executed without spoiling the schedule.
+		 WEN: w uszeregowaniu tj. stuktura wynikowa
 		 */
 		struct TaskWindow
 		{
+		    //WEN: opisy pol, w szczegolnosci co zawieraja dwa ostatnie (spytac KT) najpozniejsze
+		    //"without spoiling the schedule." tj. nie wplywajace na reszte zadan czy najpozniejsze mozliwe nie psujace opt. Cmax?
 			int earliestStart/** */,earliestFinish/** */,latestStart/** */,latestFinish/** */;
 
 			/**\brief Constructor.*/
@@ -84,17 +89,23 @@ namespace Koala
 			typedef std::vector< Machine > Type;/**< */
 
 			/** \brief Vector of vector of TaskPart structures.
-			 *
+			 *   WEN: wiecej o strukturze: na kolejnych mszynach w machines (num. od 0) kolejno odpalane fragmenty zadan TaskPart
+			 o kolejnych od 0 numerach (czy ja dobrze widze, ze pole part jest nadmiarowe, bo dany TaskPart lezy zawsze w wektorze
+            swojej maszyny na pozycji part?). Bloki idle nie sa reprezentowane. Dopytac KT czy na pewno tak?
+            Dane wejsciowe algorytmow szeregowania: ciag (zakresu iteratorow od poz 0 do n-1) zadan Task + DAG z wierzcholkami odpowiadajacyhmi
+            zadaniom + pusty schedule z ustawiona liczba maszyn.
+            Najwczesniejszy mozliwy moment uruchomienia to 0 (chyba ze release jest ostrzejszy), starty/endy/przerwania tylko w punktach calkowitych.
+            To wszystko musi byc wylozone gdzies: w doxy lub ebooku.
 			 *  Structure assigns to each machine the vector of TaskPart structures that represents tasks executed on this machine.
 			 *  Hence this is an STL vector of vector of TaskParts. */
-			Type machines;
+			Type machines; //WEN: opis pola oraz argumentow metod
 
 			/**\brief Constructor.*/
 			Schedule( int m = 0 )
 				{ setMachNo( m ); }
 			/**\brief Set number of machines.*/
 			void setMachNo( int m )
-				{ machines.resize( m ); }
+				{ machines.clear(); machines.resize( m ); }
 			/**\brief Get number of machines.*/
 			int getMachNo()
 				{ return machines.size(); }
@@ -110,7 +121,8 @@ namespace Koala
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param[out] out the iterator to the container with output container of tasks (Task).
-		 *  \return the number of tasks in the \a out container.	*/
+		 WEN: bzdura! na wyjscie leca numery (od 0) pozycji posortowanych zadan z ciagu wejsciowego, out to inserter na inty
+		 *  \return the number of tasks WEN: nie, ich numery in the \a out container.	WEN: czyli po prostu dlugosc ciagu wejsciowego */
 		template< typename TaskIterator, typename Iterator >
 			static int sortLPT( TaskIterator begin, TaskIterator end, Iterator out )
 			{
@@ -118,7 +130,7 @@ namespace Koala
 			}
 
 		/** \brief Sort by shortest processing time SPT
-		 *
+		 *  WEN: jw.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param[out] out the iterator to the container with output container of tasks (Task).
@@ -130,7 +142,7 @@ namespace Koala
 			}
 
 		/** \brief Sort by earliest due date EDD.
-		 *
+		 *  WEN: jw.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param[out] out the iterator to the container with output container of tasks (Task).
@@ -145,7 +157,7 @@ namespace Koala
 		 *
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param schedule the reference to the tested Schedule object.
+		 *  \param schedule the reference to the tested Schedule object. WEN: tj. gotowy harmonogram dla tego calego ciagu zadan
 		 *  \return the makespan of the \a schedule.*/
 		template< typename TaskIterator >
 			static int CMax( TaskIterator begin, TaskIterator end, const Schedule &schedule );
@@ -153,7 +165,7 @@ namespace Koala
 		 *
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param schedule the reference to the tested Schedule object.
+		 *  \param schedule the reference to the tested Schedule object. WEN: tj. gotowy harmonogram dla tego calego ciagu zadan
 		 *  \return the sum of completion times for \a schedule.*/
 		template< typename TaskIterator >
 			static int SigmaCi( TaskIterator begin, TaskIterator end, const Schedule &schedule );
@@ -161,7 +173,7 @@ namespace Koala
 		 *
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param schedule the reference to the tested Schedule object.
+		 *  \param schedule the reference to the tested Schedule object. WEN: tj. gotowy harmonogram dla tego calego ciagu zadan
 		 *  \return the sum of tardinesses for \a schedule.*/
 		template< typename TaskIterator >
 			static int SigmaTi( TaskIterator begin, TaskIterator end, const Schedule &schedule );
@@ -169,7 +181,7 @@ namespace Koala
 		 *
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param schedule the reference to the tested Schedule object.
+		 *  \param schedule the reference to the tested Schedule object. WEN: tj. gotowy harmonogram dla tego calego ciagu zadan
 		 *  \return the number of latenesses for \a schedule.*/
 		template< typename TaskIterator >
 			static int SigmaUi( TaskIterator, TaskIterator, const Schedule &schedule );
@@ -177,7 +189,7 @@ namespace Koala
 		 *
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param schedule the reference to the tested Schedule object.
+		 *  \param schedule the reference to the tested Schedule object. WEN: tj. gotowy harmonogram dla tego calego ciagu zadan
 		 *  \return the maximal lateness for \a schedule.*/
 		template< typename TaskIterator >
 			static int LMax( TaskIterator, TaskIterator, const Schedule &schedule );
@@ -187,7 +199,7 @@ namespace Koala
 		 *
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param DAG an directed acyclic graph representing the precedence constraints
+		 *  \param DAG an directed acyclic graph representing the precedence constraints WEN: gdzies opis ze pola vertex pokazuja bijekcje z przedzialu zadan w wierzcholki DAG
 		 *  \param schedule the reference to the tested Schedule object.
 		 *  \param nonPmtn if true, tasks are non-preemptible. If false, tasks are preemptible.
 		 *  \return true if \a schedule is correct, false if any kind of conflict arise. */
@@ -200,9 +212,10 @@ namespace Koala
 		 *  For a given sequence of task and precenence constraints (directed acyclic graph) the method finds the schedule using critical path method.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param DAG an directed acyclic graph representing the precedence constraints
-		 *  \param[out] schedule the TaskWindow iterator, to which additional information is written.
-		 *  \return the length of longest path in the schedule.
+		 *  \param DAG an directed acyclic graph representing the precedence constraints WEN: gdzies opis ze pola vertex pokazuja bijekcje z przedzialu zadan w wierzcholki DAG
+		 *  \param[out] schedule the TaskWindow iterator WEN: inserter, to which additional information is written.
+		 WEN: dobre sobie, ciekawe jakie? Toz to wynikowy schedule (tylko bez przypisania maszyn) kolejne elementy to polozenia w czasie zadan z wejscia
+		 *  \return the length of longest path in the schedule. WEN: czy to aby nie jest Cmax?
 		 *
 		 *  [See example](examples/schedule/scheduling_critical.html).
 		 */
@@ -210,12 +223,12 @@ namespace Koala
 			static int critPath( TaskIterator begin, TaskIterator end, const GraphType &DAG, TaskWindowIterator schedule );
 
 		//P|prec|- - szeregowanie listowe przy zadanej liście
-		/** \brief Solve P|prec|-.
-		 *
+		/** \brief Solve P|prec|-. WEN: no ... aprox. przecie
+		 *  WEN: ignoruje sie duedate ale uwzglednia release zadan (o to ostatnie upewnic sie u KT)
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param DAG an directed acyclic graph representing the precedence constraints
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
+		 *  \param DAG an directed acyclic graph representing the precedence constraints WEN: gdzies opis ze pola vertex pokazuja bijekcje z przedzialu zadan w wierzcholki DAG
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. WEN: na starcie ma byc pusty z poprawna wartoscia m
 		 *  \return the makespan of schedule.	*/
 		template< typename GraphType, typename TaskIterator >
 			static int ls( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
@@ -225,9 +238,9 @@ namespace Koala
 		 *
 		 *  The problem is solved with Coffman-Graham algorithm.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
-		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param DAG an directed acyclic graph representing the precedence constraints
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
+		 *  \param end the iterator to past-the-end element of the container with tasks (Task). WEN: zadania musza byc jednostkowe, releasy i deadline ignorowane
+		 *  \param DAG an directed acyclic graph representing the precedence constraints WEN: gdzies opis ze pola vertex pokazuja bijekcje z przedzialu zadan w wierzcholki DAG
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. WEN: na starcie ma byc pusty z poprawna wartoscia m=2
 		 *  \return the makespan for P2|UET,prec|C<sub>max</sub>.
 		 *
 		 *  [See example](examples/schedule/scheduling_coffman.html).
@@ -241,8 +254,8 @@ namespace Koala
 		 *  The problem is solved with Liu algorithm.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param DAG an directed acyclic graph representing the precedence constraints
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
+		 *  \param DAG an directed acyclic graph representing the precedence constraints WEN: gdzies opis ze pola vertex pokazuja bijekcje z przedzialu zadan w wierzcholki DAG
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. WEN: na starcie ma byc pusty z poprawna wartoscia m=1
 		 *  \return the minimal possible L<sub>max</sub> (maximal lateness).
 		 *
 		 *  [See example](examples/schedule/scheduling_precliu.html).
@@ -255,9 +268,10 @@ namespace Koala
 		 *
 		 *  The problem is solved with Brucker algorithm.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
-		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param DAG an directed acyclic graph representing the precedence constraints
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
+		 *  \param end the iterator to past-the-end element of the container with tasks (Task).  WEN: zadania musza byc jednostkowe, releasy  ignorowane
+		 *  \param DAG an directed acyclic graph representing the precedence constraints WEN: gdzies opis ze pola vertex pokazuja bijekcje z przedzialu zadan w wierzcholki DAG
+		 WEN: obowiazkowo in-forest
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. WEN: na starcie ma byc pusty z poprawna wartoscia m
 		 *  \return the minimal possible L<sub>max</sub> (maximal lateness).
 		 *
 		 *  [See example](examples/schedule/scheduling_brucker.html).
@@ -270,9 +284,9 @@ namespace Koala
 		 *
 		 *  The problem is solved with Hu algorithm.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
-		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param DAG an directed acyclic graph representing the precedence constraints
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
+		 *  \param end the iterator to past-the-end element of the container with tasks (Task). WEN: zadania musza byc jednostkowe, releasy  i deadline ignorowane
+		 *  \param DAG an directed acyclic graph representing the precedence constraints  WEN: obowiazkowo in-forest, gdzies opis ze pola vertex pokazuja bijekcje z przedzialu zadan w wierzcholki DAG
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. WEN: na starcie ma byc pusty z poprawna wartoscia m
 		 *  \return the makespan of optimal schedule.
 		 *
 		 *  [See example](examples/schedule/scheduling_hu.html).
@@ -284,8 +298,8 @@ namespace Koala
 		/** \brief Solve P||ΣC<sub>i</sub>.
 		 *
 		 *  \param begin the iterator to first element of the container with tasks (Task).
-		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
+		 *  \param end the iterator to past-the-end element of the container with tasks (Task). WEN: releasy, deadline i vertex  ignorowane
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. WEN: na starcie ma byc pusty z poprawna wartoscia m
 		 *  \return the minimal sum of completion times for P||ΣC<sub>i</sub>*/
 		template< typename TaskIterator > static int spt( TaskIterator begin, TaskIterator end, Schedule &schedule );
 
@@ -294,8 +308,8 @@ namespace Koala
 		 *
 		 *  The method solves the problem using the Hodgson algorithm.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
-		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param[out] schedule the reference to the Schedule object to which the optimal schedule is written.
+		 *  \param end the iterator to past-the-end element of the container with tasks (Task). WEN: releasy, i vertex  ignorowane
+		 *  \param[out] schedule the reference to the Schedule object to which the optimal schedule is written. WEN: na starcie ma byc pusty z poprawna wartoscia m=1
 		 *  \return the minimal number of late tasks.
 		 *
 		 *  [See example](examples/schedule/scheduling_hodgson.html).
