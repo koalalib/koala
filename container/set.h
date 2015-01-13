@@ -13,8 +13,6 @@
 // oraz bazujaca na koalowej tablicy haszujacej
 //Wersje niedomyslne wlacza zdefiniowanie stalej czasu kompilacji KOALA_SET_ON_VECTOR lub KOALA_SET_ON_HASHSET
 
-// TODO: przebadac obie implementacje pod katem efektywnosci np. niepotrzebne kopiowanie kontenerow
-
 #include <limits>
 
 #include "localarray.h"
