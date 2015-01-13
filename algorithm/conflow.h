@@ -20,8 +20,10 @@ namespace Koala
 {
 
 //WEN: Uwaga globalna do calego pliku: wszystkie procedury tutaj uwzgledniaja krawedzie (z przypisanymi przepustowosciami) wszystkich rodzajow
-// rownoleglosci dozwolone. Jesli gdzies w wejsciu do proc. podajemy wyroznione wierzcholki start end, musza byc rozne
-// - chyba ze przy procedurze jawnie napisano inaczej Obowiazuje do konca pliku
+// rownoleglosci dozwolone. Jesli gdzies w wejsciu do proc. podajemy wyroznione wierzcholki start end, musza byc rozne, bo poleci wyjatek
+// - to powinno byc w opisach metod (chyba ze przy procedurze juz teraz jawnie napisano inaczej).
+//Zwracam uwage, ze edgeTab czesto nie jest ani tylko [in] ani [out] np. dostarcza przepustowosci lukow i zbiera znaleziony flow.
+//Obowiazuje do konca pliku
 
     namespace Privates {
 
@@ -103,7 +105,7 @@ namespace Koala
 			typedef CType CostType;/**<\brief Type of cost variables.*/
 
 			// przepustowosc (dana wejsciowa), wartosc znalezionego przeplywu w kierunku getEdgeEnd1->getEdgeEnd2
-			CapacType capac/**\brief Capacity of edge. WEN: pole wejsciowe, musi miec wartosc >=0*/,
+			CapacType capac/**\brief Capacity of edge. WEN: pole wejsciowe, musi miec wartosc >=0 inaczej leci wyjatek z procedury*/,
                     flow/** \brief Actual flow through edge WEN: pole wynikowe, interpetacja: prawdziwy przeplyw
                     przez krawedz (a wiec nieujemny) to jego wartosc bezwzgledna, bo dla Undirected znak flow okresla kierunek
                     + -> od End1 do End2 - -> odwr. */;
@@ -469,7 +471,7 @@ namespace Koala
 		 *  \param[in] type the flag decides about the type of considered flow:
 		 *   - EdDirOut - outflow, WEN: z uwzg. ew. krazacego w petlach
 		 *   - EdDirIn - inflow, WEN: z uwzg. ew. krazacego w petlach
-		 *   - EdUndir - flow balance. tj. powyzszy EdDirOut - pow. EdDirIn
+		 *   - EdUndir - flow balance. tj. powyzszy EdDirOut - pow. EdDirIn WEN: inne wartosci zakazane
 		 *  \return the size of the flow. */
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			vertFlow( const GraphType &g, const EdgeContainer &edgeTab, typename GraphType::PVertex v,
@@ -516,6 +518,7 @@ namespace Koala
 		 *  \param[in] start the starting vertex.
 		 *  \param[in] end the terminal vertex.
 		 *  \param[in] limit the upper bound of flow size. After reaching the limit WEN: lub maks. mozliwa wartosc the method terminates. If default of infinity then the maximal flow is searched.
+            WEN: parametr ten musi byc >=0
 		 *  \return the size of the achieved flow.         */
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
@@ -553,7 +556,7 @@ namespace Koala
 		 *  \param[out] edgeTab the the associative table (PEdge -> EdgeLabs) which assigns EdgeLabs structure (WEN: jw. keeping: capacity, flow and cost) to each edge. Array provides both input (capacity) and output (flow) data.
 		 *  \param[in] start the starting vertex.
 		 *  \param[in] end the terminal vertex.
-		 *  \param[in] val the upper bound of flow size. After reaching the limit \a val WEN: lub maks mozliwa wartosc the method terminates. If default of infinity then the maximal flow is searched.
+		 *  \param[in] val the upper bound of flow size. WEN: musi byc >=0. After reaching the limit \a val WEN: lub maks mozliwa wartosc the method terminates. If default of infinity then the maximal flow is searched.
 		 *  \return the standard pair (cost, size) of the achieved flow.         */
 		template< class GraphType, class EdgeContainer > static
 			std::pair< typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType >
@@ -610,7 +613,7 @@ namespace Koala
 		/** \brief Get minimal weighted cut-set.
 		 *  WEN: jw.
 		 *  The method calculated the minimal (concerning the capacities) cut-set of graph.
-		 *  \param[in] g the reference graph.
+		 *  \param[in] g the reference graph. WEN: co najmniej 2-wierzcholkowy
 		 *  \param[in] edgeTab the associative array (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge.
 		 *  \param[out] iters the pair of iterators to the containers with the reachable vertices (after subtraction of cut) and the edges of output  cut-set.
 		 *  \return the EdgeCut2 structure whit the size of minimal cut-set, the number of reachable vertices and the stating and WEN: sa rozne terminating points. */
@@ -891,7 +894,8 @@ namespace Koala
 		// znajduje najwiekszy zbior wewnetrznie wierzcholkowo rozlaczych sciezek start->end
 		// zwraca ich liczbe
 		/** \brief Get set of vertex disjointed paths.
-		 * WEN: naruszamy tw. Mengele (czy jak mu tam bylo): tutejszy wynik = wynikowi odpowiedniego minVertCut + liczba krawedzi start->end typu EdDirOut | EdUndir
+		 * WEN: naruszamy tw. Mengele (czy jak mu tam bylo): tu zezwanamy na bezposrednie krawedzie start->end typu EdUndir|EdDirOut i kazda z nich rowniez zaliczamy
+		 jako wynikowa sciezke
 		 *  The method gets the maximal set of vertex disjoint WEN: internally paths between vertices \a start and \a end
 		 *    (obviously vertices \a start and \a end are shared for all paths).
 		 *  \param[in] g the considered graph.
