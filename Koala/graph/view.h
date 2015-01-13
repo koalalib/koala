@@ -527,16 +527,16 @@ namespace Koala
 		 *  \param vert the tested vertex.
 		 *  \param deep the flag determining if all choosers of ancestors are checked.
 		 *  \return true if vertex belongs to subgraph, false otherwise.*/
-		bool good( PVertex, bool = false ) const
-			{ return true; } //TODO: chyba blad, czy ten view moze byc zrobiony do subgraphu?
+		bool good( PVertex vert, bool deep = false ) const
+			{ if (deep) return up().good( vert,true ); else return true; }
 		/** \brief Check edge presence.
 		 *
 		 *  The method tests if the edge form parent belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph and both ends satisfy \a vchoose. WEN: przeciez nie jestesmy w klasie subgrafu!If the flag \a deep is set to true all the ancestors choosers are tested.
 		 *  \param edge the tested edge.
 		 *  \param deep the flag determining if all choosers of ancestors are checked.
 		 *  \return true if edge belongs to subgraph, false otherwise.*/
-		bool good( PEdge, bool = false ) const
-			{ return true; } //TODO: chyba blad, czy ten view moze byc zrobiony do subgraphu?
+		bool good( PEdge edge, bool deep = false ) const
+			{ if (deep) return up().good( edge,true ); else return true; }
 
 		// na uzytek ConstGraphMethods
 		//------------- Methods sent to ConstGraphMethods --------------------------------------
@@ -817,17 +817,16 @@ namespace Koala
 		 * \param vert the tested vertex.
 		 * \param deep the flag determining if all choosers of ancestors are checked.
 		 *  \return true if vertex belongs to subgraph, false otherwise.*/
-		bool good( PVertex, bool = false ) const
-			{ return true; } //TODO: chyba blad, czy ten view moze byc zrobiony do subgraphu?
-		/** \brief Check edge presence.
+        bool good( PVertex vert, bool deep = false ) const
+			{ if (deep) return up().good( vert,true ); else return true; }
+        /** \brief Check edge presence.
 		 *
 		 *  The method tests if the edge form ancestor belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph WEN: nie jestesmy w subgrafie, jaki chooser? and both ends satisfy \a vchoose. If the flag \a deep is set to true all the ancestors choosers are tested.
 		 * \param edge the tested edge.
 		 * \param deep the flag determining if all choosers of ancestors are checked.
 		 *  \return true if edge belongs to subgraph, false otherwise.*/
-		bool good( PEdge, bool = false ) const
-			{ return true; } //TODO: chyba blad, czy ten view moze byc zrobiony do subgraphu?
-
+        bool good( PEdge edge, bool deep = false ) const
+			{ if (deep) return up().good( edge,true ); else return true; }
 		// na uzytek ConstGraphMethods
 		//------------- Methods sent to ConstGraphMethods --------------------------------------
         //WEN: co do reszty metod klasy - to samo, co w grconst.h

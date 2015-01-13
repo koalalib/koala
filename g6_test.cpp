@@ -29,8 +29,10 @@ int main(int argc, char **argv) {
 	Koala::StdRandGen<> rgen;
 	Koala::Creator::erdRen1(rgen,g1, n, ro, Gene(), Gene(),  Koala::EdUndir);
 
+//    g1.clear();g1.addVert();g1.addVert();g1.addVert();g1.addVert();
 	int ans = Koala::IO::writeG6(g1, txt, 9999);
 	printf("%d %s\n", ans, txt);
+
 	ans = Koala::IO::readG6(g2, txt);
 	printf("%d %s\n", ans, txt);
 

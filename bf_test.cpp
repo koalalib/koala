@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include "Koala/graph/graph.h"
+//#include "Koala/algorithm/weights2.h"
 #include "Koala/algorithm/weights.h"
 
 

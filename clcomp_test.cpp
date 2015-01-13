@@ -32,7 +32,7 @@ using namespace std;
 		"4\n"
 		"0 3 -1 -2 -3\n"
 		"1 0\n"
-		"2 1 -3n"
+		"2 1 -3\n"
 		"3 0\n",
 #endif
 #if defined(TEST_2)

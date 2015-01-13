@@ -28,7 +28,10 @@ int main()
 	G.addEdge(V[1], V[2]), G.addEdge(V[1], V[4]), G.addEdge(V[1], V[5]), G.addEdge(V[1], V[6]),
 	G.addEdge(V[2], V[3]), G.addEdge(V[2], V[4]), G.addEdge(V[3], V[4]);
 
-	assert(Koala::VertColoring::color(G, S, 3) == 3), S.clear();
+
+	assert(Koala::VertColoring::color(G, S, 3) == 3);
+	assert(Koala::VertColoring::maxColor(G,S)==3);
+	S.clear();
 	assert(Koala::VertColoring::color(G, S) == 3), S.clear();
 	assert(Koala::VertColoring::color(G, S, 2) == -1), S.clear();
 	G.clearEdges();
@@ -40,7 +43,8 @@ int main()
 	G.addEdge(V[4], V[6]), G.addEdge(V[5], V[6]), G.addEdge(V[5], V[7]), G.addEdge(V[6], V[7]);
 
 	assert(Koala::VertColoring::color(G, S, 4) == 4), S.clear();
-	assert(Koala::VertColoring::color(G, S) == 4), S.clear();
+	assert(Koala::VertColoring::color(G, S) == 4);
+	assert(Koala::VertColoring::maxColor(G,S)==4);  S.clear();
 	assert(Koala::VertColoring::color(G, S, 3) == -1), S.clear();
 	G.clearEdges();
 

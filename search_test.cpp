@@ -100,8 +100,10 @@ void searchTest2()
 
 
 
-//#define STRATEGY LexBFS
-#define STRATEGY DFSPostorder
+#define STRATEGY LexBFS
+//#define STRATEGY BFS
+//#define STRATEGY DFSPreorder
+//#define STRATEGY DFSPostorder
 
 #include "main.hpp"
 
@@ -119,7 +121,7 @@ void searchTest2()
 
     searchTest();
 
-    int radius=3;
+    int radius=2;
     std::cout << (licz=Koala::STRATEGY::visitBase(g,A,vertCont,Visitors::NearVertsVisitor(radius),EdAll,1)) << std::endl;
     licz=g.getVertNo();
     for(W=g.getVert();W;W=g.getVertNext(W))
@@ -132,11 +134,12 @@ void searchTest2()
 
     searchTest();
 
-    licz=Koala::STRATEGY::scanNear(g,A,radius,vertCont,tabV);
+    for(int i=0;i<10;i++) {tabV[i]=0; tabE[i]=0; }
+    licz=Koala::STRATEGY::scanNear(g,A,radius,vertCont,EdAll);
+    vertCont.getKeys(tabV);
      for(int i=0;i<licz;i++) std::cout << ((tabV[i]) ? tabV[i]->info.name : string(" NULL"));
-     cout << vertCont.size() << endl <<Koala::STRATEGY::getNearSet(g,A,radius)<< endl;
-     for(int i=0;i<licz;i++) std::cout << tabV[i] <<" ";
-//    return 0;
+     assert(!tabV[licz]);
+
 
     int comptab[2][10];
     comptab[1][0]=0;
@@ -164,7 +167,7 @@ void searchTest2()
     Koala::STRATEGY::split(g,vertCont,Koala::SearchStructs::compStore(comptab[0],tabV),EdAll);
 
 #undef STRATEGY
-#define STRATEGY LexBFS
+#define STRATEGY DFSPostorder
     Koala::STRATEGY::visitAllBase(g,vertCont,Visitors::EndVertVisitor(G),EdAll);
     Koala::STRATEGY::scanAttainable(g,A,vertCont,blackHole,EdAll);
     Koala::STRATEGY::scanAttainable(g,A,blackHole,blackHole,EdAll);
@@ -189,8 +192,9 @@ void searchTest2()
     std::cout<< Koala::STRATEGY::getAttainableSet(g,A,EdAll) << std::endl;
         searchTest();
     std::cout << "\n***getpath\n";
-    std::cout<< (licz=Koala::STRATEGY::getPath(g,A,B,Koala::STRATEGY::outPath(tabV,tabE),EdAll));
+    std::cout<< (licz=Koala::STRATEGY::getPath(g,A,E,Koala::STRATEGY::outPath(tabV,tabE),EdAll));
     for(int i=0;i<licz+1;i++) std::cout << ((tabV[i]) ? tabV[i]->info.name : string(" NULL"));
+
     std::cout << "\n***\n";
         searchTest();
 

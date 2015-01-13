@@ -81,6 +81,34 @@ namespace Koala
 	template< class VertInfo, class EdgeInfo, class Settings > class Edge;
 	template< EdgeType mask, bool matr > class GrDefaultSettings;
 
+
+    //NEW: znowu wylecialo do glownego zasiegu namespaca Koala
+    // Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych w
+    // algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda.
+    /** \brief Numeric types specialization.
+     *  WEN: to jest taka wersja std::numeric_limits ograniczona do potrzeb algorytmow Koali, w ktorych krawedziom na wejsciu przypisane sa etykiety
+     numeryczne (weight.h, conflow.h)
+     *  Class allows to choose own numeric types for data in algorithms.*/
+    template< class T > class NumberTypeBounds
+    {
+    public:
+        //WEN: opisy
+        static T plusInfty()
+            { return std::numeric_limits< T >::max(); }
+        static bool isPlusInfty( T arg )
+            { return arg == plusInfty(); }
+        static T minusInfty()
+            { return std::numeric_limits< T >::min(); }
+        static bool isMinusInfty( T arg )
+            { return arg == minusInfty(); }
+        static T zero()
+            { return (T)0; }
+        static T one()
+            { return (T)1; }
+        static bool isZero( T arg )
+            { return arg == zero(); }
+    };
+
 	/* AlgsDefaultSettings
 	 * Wytyczne parametryzujace dzialanie algorytmow biblioteki. Z reguly klasy z procedurami maja postac
 	 * NazwaPar<DefaultStructs> oraz pochodna klase Nazwa dzialajaca z ustawieniem DefaultStructs=AlgsDefaultSettings
@@ -146,6 +174,8 @@ namespace Koala
             //  typedef  Assoc2DimTable< type, HashMap<std::pair<A,A>, B > > Type;
 		};
 
+		//NEW: NumberTypeBounds wylecialo do globalnego zasiegu - por. wyzej
+
 		// typ struktury kopca i jego wezla
 		//NEW: zmiana HeapCont w zwiazku z rezygnacja z uzywania trzeciego parametru szablonow kopca (wylecial Allocator)
 		/** \brief Heap container.
@@ -181,31 +211,6 @@ namespace Koala
 		// Czy dostosowywać rozmiar pamięci wyjściowych tablic asocjacyjnych?
 		/** \brief Should the out associative container be allocated at the beginning.?*/
 		enum { ReserveOutAssocCont = true };
-
-		// Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych w
-		// algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda.
-		/** \brief Numeric types specialization.
-		 *  WEN: to jest taka wersja std::numeric_limits ograniczona do potrzeb algorytmow Koali
-		 *  Class allows to choose own numeric types for data in algorithms.*/
-		template< class T > class NumberTypeBounds
-		{
-		public:
-		    //WEN: opisy
-			static T plusInfty()
-				{ return std::numeric_limits< T >::max(); }
-			static bool isPlusInfty( T arg )
-				{ return arg == plusInfty(); }
-			static T minusInfty()
-				{ return std::numeric_limits< T >::min(); }
-			static bool isMinusInfty( T arg )
-				{ return arg == minusInfty(); }
-			static T zero()
-				{ return (T)0; }
-			static T one()
-				{ return (T)1; }
-			static bool isZero( T arg )
-				{ return arg == zero(); }
-		};
 
 		// Wybrany do użytku wewnętrznego algorytm sortowania tablic. Domsyslnie sort. kopcowe
 		/**  \brief Table sorting algorithm*/
@@ -283,9 +288,6 @@ namespace Koala
 		template< class A, class B, class C,class D, class E, class F > T operator()( const A&,const B&,const C&,const D&,const E&,const F& )
 				{ return val; }
 	};
-
-
-
 
 	// Funkcja tworząca powyższy funktor.
 	/** \brief Generating function for constant functor. \ingroup def*/

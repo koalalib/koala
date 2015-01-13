@@ -222,7 +222,7 @@ void searchTest2()
 
         int res=Koala::Blocks::getCore(g,tabV);
 
-        for(int i=0;i<res;i++) std::cout << tabV[i]->info.name << ' ';
+        for(int i=0;i<res;i++) std::cout << tabV[i]->info.name << '.';
 
 
     }

@@ -23,7 +23,7 @@ namespace Koala
 	/** \brief Test classes (parametrized).
 	 *
 	 *  The class delivers the range of methods which check if a graph belongs to various families of graphs. \n
-	 *  By default it is assumed that considered graphs are simple. But there are some families of graphs which make sense for multigraps. Then the flag \a allowmulti is available. \n
+	 *  By default it is assumed that considered graphs are simple WEN: i undirected. But there are some families of graphs which make sense for WEN: grafow z krawedziami rownol. lub petlami. Then the flag \a allowmulti is available. \n
 	 *  In the class also some specialized algorithms which work only on certain families of graph are implemented.
 	 *  \tparam DefaultStructs the class used to parametrize algorithms. It decides about basic algorithms and structs that are used by algorithms.
 	 *  \ingroup detect
@@ -35,8 +35,8 @@ namespace Koala
 		// Ta metoda jest wyjatkiem, sprawdza czy n=0
 		/** \brief Test if empty vertex set.
 		 *
-		 *  The method tests if the graph has the empty vertex set.
-		 *  \param g the considered graph.
+		 *  The method tests if the graph has the empty vertex set. WEN: pewnie gdzies trzeba zaznaczyc, ze wszedzie dalej zakladamy wejscie z !zero(g) - war. poprawnosci
+		 *  \param WEN: zapytanie ogolne (dot. calego Doxy), czemu czasami przy param jest [in|out], a czasami nie? g the considered graph.
 		 *  \return true if the graph has an empty vertex set, otherwise false. */
 		template< class GraphType > static bool zero( const GraphType &g )
 			{ return !g.getVertNo(); }
@@ -46,8 +46,8 @@ namespace Koala
 		 *
 		 *  The method tests if a graph has only unique undirected edges (simple graph). Or if \a allowmulti is true, the method tests if the graph is an undirected multigraph.
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges.
-		 *  \return true if \a g is a simple graph (allowmulti false) or multigraph (allowmulti true), otherwise false. */
+		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: i loops.
+		 *  \return true if \a g is a simple graph (allowmulti false) or WEN: nie wiem, czy zdefiniujemy to slowo: multigraph (allowmulti true), otherwise false. */
 		template< class GraphType > static bool undir( const GraphType &g, bool allowmulti = false );
 
 		// czy spojny
@@ -55,7 +55,7 @@ namespace Koala
 		 *
 		 *  The method tests if the graph \a g is connected i.e. for each pair of vertices there exists a path between the vertices.
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges.
+		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: i petle.
 		 *  \return true if connected,  otherwise false. */
 		template< class GraphType > static bool connected( const GraphType &g, bool allowmulti = false );
 
@@ -80,7 +80,7 @@ namespace Koala
 		// las
 		/** \brief Test if forest.
 		 *
-		 *  The method tests if the graph \a g is a forest, in other words, is it a set of trees.
+		 *  The method tests if the graph \a g is a forest, in other words, is it a set of WEN: separate trees.
 		 *  \param g the considered graph.
 		 *  \return true if the graph is a forest, false otherwise. */
 		template< class GraphType > static bool forest( const GraphType &g )
@@ -107,7 +107,7 @@ namespace Koala
 		 *
 		 *  The method tests if each vertex of the graph has the same degree.
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges.
+		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: i petle.
 		 *  \return true if regular, otherwise false. */
 		template< class GraphType > static bool regular( const GraphType &g, bool allowmulti = false );
 
@@ -123,7 +123,7 @@ namespace Koala
 			 *
 			 *  The method gets the ends of the path.
 			 *  \param g the considered graph.
-			 *  \return the standard pair of vertices, which are the ends of path. If any error occur pair (NULL,NULL) is returnd.*/
+			 *  \return the standard pair of vertices, which are the ends of path. If any error occur WEN: nie, po prostu gdy nie jest path pair (NULL,NULL) is returnd.*/
 			template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 				ends( const GraphType &g );
 		};
@@ -149,7 +149,7 @@ namespace Koala
 			 *
 			 *  The method gets the ends of the central path of the caterpillar \a g.
 			 *  \param g the considered graph.
-			 *  \return the standard pair of vertices, which are the ends of the central path. If any error occur, a pair (NULL,NULL) is returnd.*/
+			 *  \return the standard pair of vertices, which are the ends of the central path. If any error occur WEN: nie, po prostu gdy nie jest cater., a pair (NULL,NULL) is returnd.*/
 			template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 				spineEnds( const GraphType &g );
 		};
@@ -168,7 +168,7 @@ namespace Koala
 		 *
 		 *  The method tests if the considered graph \a g is a cycle.
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges.
+		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: lub petle tj. po prostu cykle dl 1 i 2 (K1 nigdy nie jest cyklem).
 		 *  \return true if the graph \a g is a cycle, false  otherwise. */
 		template< class GraphType > static bool cycle( const GraphType &g, bool allowmulti = false )
 			{ return connected( g,allowmulti ) && g.deg( g.getVert() ) == 2 && regular( g,true ); }
@@ -176,7 +176,7 @@ namespace Koala
 		// zbior niezalezny krawedzi
 		/** \brief Test if matching.
 		 *
-		 *  The method tests if the considered graph \a g is a matching (is of degree 1).
+		 *  The method tests if the considered graph \a g is a matching (is of degree WEN: <= 1).
 		 *  \param g the considered graph.
 		 *  \param allowmulti the flag allowing or disabling multiple edges.
 		 *  \return true if the graph \a g is a matching, false  otherwise. */
@@ -188,7 +188,7 @@ namespace Koala
 		 *
 		 *  The method tests if the considered graph \a g is subcubic (the maximum degree is not grater then three).
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges.
+		 *  \param allowmulti the flag allowing or disabling multiple edges. WEN: lub petle
 		 *  \return true if the graph \a g is subcubic, false  otherwise. */
 		template< class GraphType > static bool subcubic( const GraphType &g, bool allowmulti = false )
 			{ return undir( g,allowmulti ) && g.Delta() <= 3; }
@@ -198,7 +198,7 @@ namespace Koala
 		 *
 		 *  The method tests if the considered graph \a g is cubic (the degree of each vertex is exactly three).
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges.
+		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: lub petle
 		 *  \return true if the graph \a g is cubic, false  otherwise. */
 		template< class GraphType > static bool cubic( const GraphType &g, bool allowmulti = false )
 			{ return g.getVert() && g.deg( g.getVert() ) == 3 && regular( g,allowmulti ); }
@@ -217,7 +217,7 @@ namespace Koala
 		 *
 		 *  The method checks for which smallest  \a K a graph is an almost K-tree.
 		 *  \param g the considered graph.
-		 *  \return the smallest \a K for which  the graph \a g is an almost K-tree.  If any error occurs -1 is returned.*/
+		 *  \return the smallest \a K for which  the graph \a g is an almost K-tree.  If any error occurs WEN: "konkretnie gdy !undir( g,allowmulti )" -1 is returned.*/
 		template< class GraphType > static int almostTree( const GraphType &g, bool allowmulti=false );
 
 		/* Bipartite
@@ -229,13 +229,15 @@ namespace Koala
 
 		public:
 			// wypisuje na iterator wierzcholki jednej partycji grafu dwudzielnego. Zwraca licznosc partycji (-1 w razie bledu)
+			// WEN: jest to tez kolorowania optymalne, jesli tym wierzcholkom nadac 0 a pozostalym 1 (ta partycja zawiera wszystkie z deg=0)
+			// Ponadto bezposrednie kolorowanie optymalne:trzeba tu odeslac, ze dla bipartite zapewnia je kolorowanie sekwen. SLF (odsylacz do procedury w Koali)
 			/** \brief Get partition.
 			 *
 			 *  The method gets a partition of \a g  and stores up in the container represented by iterator \a out.
 			 *  \param g the considered graph.
 			 *  \param out the iterator of the container keeping the output partition.
-			 *  \param allowmulti the flag allowing or disabling multiple edges.
-			 *  \return the number of vertices in set \a out or if any error occur -1.*/
+			 *  \param allowmulti the flag allowing or disabling multiple edges
+			 *  \return the number of vertices in set \a out or if any error occur -1 WEN: po prostu gdy nie jest bip. lub narusza allowmulti - to tez jest test dwudzielnosci.*/
 			template< class GraphType, class Iter >
 				static int getPart( const GraphType &g, Iter out, bool allowmulti = false );
 
@@ -243,8 +245,8 @@ namespace Koala
 			/** \brief Get maximal independent set.
 			 *
 			 *  The method gets the maximal independent (stable) set of the graph \a g.
-			 *  \param g the considered graph.
-			 *  \param out the iterator of the container keeping the output set (partition).
+			 *  \param g the considered graph WEN: zalozenie - dwudzielny.
+			 *  \param out the WEN: ogolnie wszedzie (w calym DOXY!!!) - jak iter. jest inserterem to o tym pisac!!! iterator of the container keeping the output set (partition).
 			 *  \return the number of vertices in the maximal stable set kept in the container \a out.*/
 			template< class GraphType, class Iter > static int maxStable( const GraphType &g, Iter out );
 
@@ -252,7 +254,7 @@ namespace Koala
 			/** \brief Get minimal vertex cover.
 			 *
 			 *  The method gets the minimal vertex set such that each edge of the graph is incident to at least one vertex in the set.
-			 *  \param g the considered graph.
+			 *  \param g the considered graph WEN: zalozenie - dwudzielny.
 			 *  \param out the iterator of the container keeping the output minimal vertex cover.
 			 *  \return the number of vertices in the output set.*/
 			template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
@@ -264,7 +266,7 @@ namespace Koala
 		 *
 		 *  The method tests if vertices can be partitioned into two sets such that vertices in each set are independent.
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges.
+		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: i loops.
 		 *  \return true if the graph \a g is bipartite, false  otherwise. */
 		template< class GraphType > static bool bipartite( const GraphType &g, bool allowmulti = false )
 			{ return Bipartite::getPart( g,blackHole,allowmulti ) != -1; }
@@ -303,13 +305,13 @@ namespace Koala
 		{
 		public:
 			// wyrzuca na out ciagi wierzcholkow tworzacych partycje grafu pelnego M-dzielnego. Zwraca liczbe partycji M lub -1 w razie bledu
-			//NEW: argument w postaci kontenera wyjsciowego PVertex->int (tj. numer partycji)
+			//NEW: argument w postaci kontenera wyjsciowego PVertex->int (tj. numer partycji). Wolno blackholizowac
 			/** \brief Get partitions.
 			 *
 			 *  The method gets all the partitions of graph and stores it up in the CompStore \a out.
 			 *  \param g the considered graph.
 			 *  \param[out] out the CompStore iterator of a container with the partitions.
-			 *  \return the number of partitions or -1 if any error occur.
+			 *  \return the number of partitions or -1 WEN: gdy wyjdzie, ze nie jest compMPartite.
 			 *  \sa CompStore*/
 			template< class GraphType, class VMap, class Iter, class VIter >
 				static int split( const GraphType &g, VMap& avertCont, CompStore< Iter,VIter > out );
@@ -328,8 +330,6 @@ namespace Koala
 		 *  \return true if the graph \a g is a complete M-partite, false  otherwise. */
 		template< class GraphType > static bool compMPartite( const GraphType &g )
 			{ return CompMPartite::split( g,blackHole,compStore( blackHole,blackHole )) != -1; }
-
-		public:
 
 		/* Chordal
 		 * M. Habib, R. McConnel, C. Paul, L.Viennot
@@ -449,7 +449,7 @@ namespace Koala
 
 			// wyrzuca na iterator odwrotny perf. ellimination order chordal grafu tj. porzadek doklejania nowych wierzcholkow za podkliki
 			// false gdy graf nie byl chordal
-			/** \brief Get perfect elimination order.
+			/** \brief Get perfect WEN: ustalic w koncu, reversed czy nie? elimination order.
 			 *
 			 *  The method gets the reversed perfect elimination order of \a g, which exist if and only if \a g is chordal. That is why the method returns false if the graph is not chordal.
 			 *  \param g the considered graph.
@@ -462,11 +462,12 @@ namespace Koala
 			/** \brief Get maximum cliques tree representation.
 			 *
 			 *  The method gets the maximum cliques tree representation basing on the perfect elimination order of \a g.
-			 *  \param g the considered graph.
-			 *  \param begin the iterator to the first element of the container with prefect elimination order of \a g.
-			 *  \param end the iterator to the last element of the container with prefect elimination order of \a g.
+			 *  \param g the considered graph. WEN: z zalozenia choradl.
+			 *  \param begin the iterator to the first element of the container with prefect elimination order of \a g. WEN: czy moze rev? anyway - tak samo, jak w wyjsciu z getOrder
+			 *  \param end the iterator to the WEN: za-last element of the container with prefect elimination order of \a g. WEN: czy moze rev? anyway - tak samo, jak w wyjsciu z getOrder
 			 *  \param[out] out the CompStore object that keeps maximal cliques.
-			 *  \param[out] qte the iterator of the container with pairs of integers. The pair (\a i , \a j ) stands for the connection between \a i-th and \a j-th clique. \a i and \a j are the positions of clique in  \a out.
+			 *  \param[out] qte the iterator of the container with pairs of integers WEN: piszmy po ludzku tj. std::pair<int,int>.
+			 The pair (\a i , \a j ) stands for the connection between \a i-th and \a j-th clique. \a i and \a j are the positions of clique in  \a out. WEN: numeracja klik od 0
 			 *  \return the number of cliques. */
 			template< class Graph, class VIter, class VIterOut, class QIter, class QTEIter >
 				static int maxCliques( const Graph &g, VIter begin, VIter end, CompStore< QIter,VIterOut > out, QTEIter qte );
@@ -477,18 +478,19 @@ namespace Koala
 			 *  The method gets the maximum cliques tree representation.
 			 *  \param g the considered graph.
 			 *  \param[out] out the CompStore object that keeps maximal cliques.
-			 *  \param[out] qte the iterator of the container with pairs of integers. The pair (\a i , \a j ) stands for the connection between \a i-th and \a j-th clique. \a i and \a j are the positions of clique in  \a out.
-			 *  \return the number of cliques.*/
+			 *  \param[out] qte the iterator of the container with pairs of integers. The pair (\a i , \a j ) stands for the connection between \a i-th and \a j-th clique. \a i and \a j are the positions of clique in  \a out.  WEN: numeracja klik od 0
+			 *  \return the number of cliques WEN: -1 dla niechordala.*/
 			template< class Graph, class VIterOut, class QIter, class QTEIter >
 				static int maxCliques( const Graph &g, CompStore< QIter,VIterOut > out, QTEIter qte );
 
+            //WEN: kolorowania optymalnego nie ma, ale trzeba tu odeslac, ze dla chordali zapewnia je kolorowanie sekwen. (odsylacz do procedury) zgodne z wynikiem gettopOrd
 			// znajduje najwieksza klike w grafie, zwraca jej rozmiar
 			/** \brief Get maximal clique.
 			 *
 			 *  The method gets the maximal clique of \a g basing on the perfect elimination order.
-			 *  \param g the considered graph.
-			 *  \param begin the iterator to the first element of the container with prefect elimination order.
-			 *  \param end the iterator to the last element of the container with prefect elimination order.
+			 *  \param g the considered graph, WEN: z zalozenia choradl.
+			 *  \param begin the iterator to the first element of the container with prefect elimination order. WEN: czy moze rev? anyway - tak samo, jak w wyjsciu z getOrder
+			 *  \param end the iterator to the WEN: za-last element of the container with prefect elimination order. WEN: czy moze rev? anyway - tak samo, jak w wyjsciu z getOrder
 			 *  \param out the iterator of a container with all the vertices of clique.
 			 *  \return the maximal clique size.*/
 			template< class Graph, class VIter, class VIterOut >
@@ -500,7 +502,7 @@ namespace Koala
 			 *  The method gets the maximal clique of \a g.
 			 *  \param g the considered graph.
 			 *  \param out the iterator of a container with all the vertices of the clique.
-			 *  \return the maximal clique size.*/
+			 *  \return the maximal clique size. WEN: lub -1 dla niechordala */
 			template< class Graph, class VIterOut > static int maxClique( const Graph &g, VIterOut out );
 
 			// znajduje najwiekszy zbior niezalezny (wypuszczany na out), zwraca jego rozmiar
@@ -509,9 +511,10 @@ namespace Koala
 			 *
 			 *  The method gets the set of vertices that make a maximal stable (independent) set of \a g.
 			 *  The method uses the maximum clique tree representation.
-			 *  \param g the considered graph.
+			 *  \param g the considered graph WEN: z zlalozenia chordal .
 			 *  \param gn the number of cliques in the clique tree representation.
-			 *  \param begin the iterator of the container with the positions of first elements of cliques in the concatenated sequences kept in \a vbegin.
+			 *  \param begin the iterator of the container with the positions of first elements of cliques in the concatenated sequences kept in \a vbegin. WEN: opisy tych 3 iteratorow to czad - najlepiej chyba napisac, ze to poczatki
+			 tych sekwencji, ktore wypelnilo getMaxQliques
 			 *  \param vbegin the iterator of the container with the concatenated sequence of vertices that are the maximum clique representation. \a vbegin together with \a begin make the maximal clique representation.
 			 *  \param ebegin iterator of container with pairs of integers (i,j) which represent the connection between i-th and j-th clique in the clique tree representation.
 			 *  \param out the iterator of a container with all the vertices of output the stable set.
@@ -521,7 +524,7 @@ namespace Koala
 
 			// znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
 			// sens parametrow j.w.
-			/** \brief Get minimal vertex cover.
+			/** \brief Get minimal vertex cover. WEN: jak w poprzedniej
 			 *
 			 *  The method gets the set of vertices that make a minimal vertex cover of \a g.
 			 *  \param g the considered graph.
@@ -541,7 +544,7 @@ namespace Koala
 			 *  The method gets the set of vertices that make a maximal stable (independent set  of \a g.
 			 *  \param g the considered graph.
 			 *  \param out the iterator of the output container with all the vertices of the stable set.
-			 *  \return the number of element in the output set \a out or -1 if any error occur.*/
+			 *  \return the number of element in the output set \a out or -1 if WEN: niechordal.*/
 			template< class Graph, class IterOut > static int maxStable( const Graph &g, IterOut out );
 
 			// znajduje najwieksze pokrycie wierzcholkowe (wypuszczane na out), zwraca jego rozmiar lub -1 w razie bledu
@@ -551,7 +554,7 @@ namespace Koala
 			 *  The method gets the set of vertices that make a minimal vertex cover of \a g.
 			 *  \param g the considered graph.
 			 *  \param out the iterator of a container with all the vertices of the minimal vertex cover.
-			 *  \return the number of element in the output set \a out.*/
+			 *  \return the number of element in the output set \a out  WEN: or -1 if niechordal..*/
 			template< class Graph, class IterOut > static int minVertCover( const Graph &g, IterOut out );
 		};
 
@@ -628,8 +631,10 @@ namespace Koala
 			 *  The method bases on <em> M.C. Golumbic, The Complexity of Comparability Graph Recognition and Coloring Computing 18, 199-208 (1977)\n
 			 *  It finds and exemplary orientation of edges, optimal coloring and maximal clique.
 			 *  \param g the considered graph.
-			 *  \param[out] dirmap an associative container (PEdge  -> EdgeDirection) which determines an exemplary partial order.
-			 *  \param[out] aheightmap an associative container (PVertex -> int) with an exemplary optimal coloring.
+			 *  \param[out] dirmap an associative container (PEdge  -> EdgeDirection) which determines an exemplary partial order
+			 WEN: nie wiem jeszcze jak to sie bedzie nazyawc w ebooku, w kazdym razie chodzi o zrobienie diagramu rel. przeciwzwrotnej i przechodniej w zbiorze verts.
+			 Mozna BlackHole
+			 *  \param[out] aheightmap an associative container (PVertex -> int) with an exemplary optimal coloring. WEN: numeracja od 0, Mozna BlackHole
 			 *  \param[out] cliqueiter the iterator of the container with the vertices of the maximal clique.
 			 *  \return the chromatic number of \a g or -1 if graph was not comparability.*/
 			template< class Graph, class DirMap, class OutMap, class OutIter >
@@ -640,28 +645,29 @@ namespace Koala
 			// (kierunek krawedzi miedzy getEdgeEnd1 a getEdgeEnd2). Lub BlackHole
 			/** \brief Test if comparability.
 			 *
-			 *  The method tests if the graph \a g is a comparability graph and finds the orientation of edges.
+			 *  The method tests if the graph \a g is a comparability graph and finds the orientation of edges. WEN: jaka - por. jak wyzej
 			 *  \param g the considered graph.
-			 *  \param[out] dirmap an associative container (PEdge  -> EdgeDirection) which determines an exemplary partial order.
+			 *  \param[out] dirmap an associative container (PEdge  -> EdgeDirection) which determines an exemplary partial order. WEN: por. wyzej uwaga o part. ord.  Mozna BlackHole
 			 *  \return true if \a g is a comparability graph, false otherwise.*/
 			template< class Graph, class DirMap > static bool getDirs( const Graph &g, DirMap& adirmap )
 				{ return explore( g,adirmap,blackHole,blackHole ) != -1; }
 
 			// sprawdza, czy graf byl comparability. Jesli tak, nadaje krawedziom wlasciwa orientacje
-			/** \brief Convert to partial order.
+			/** \brief Convert to partial order. WEN: por. wyzej uwaga o part. ord.
 			 *
-			 *  The method tests if the graph \a g is a comparability graph. If positive, converts all the edges to arcs that represent an exemplary partial order.
+			 *  The method tests if the graph \a g is a comparability graph. If positive, converts all the edges to arcs that represent an exemplary partial order.WEN: por. wyzej uwaga o part. ord.
 			 *  \param g the considered graph.
 			 *  \return true if \a g is a comparability graph, false otherwise and the graph remains unchanged. */
 			template< class Graph > static bool getDirs( Graph &g );
 
 			// zwraca liczbe chromatyczna lub -1 jesli graf nie byl comparability
 			// avmap - wysciowa tablica asocjacyjna PVertex->int z optymalnym pokolorowaniem wierzcholkowym. Lub BlackHole.
+			//TODO: WEN: procedury z katalogu coloring zwracaja max. used colors tj. o 1 mniej, albo jawne ostrzezenie w dokumentacji, albo poprawiamy  albo tu przynajmniej zmiana nawy color->chi
 			/** \brief Get optimal coloring.
 			 *
 			 *  The method gets an optimal vertex coloring of \a g.
 			 *  \param g the considered graph.
-			 *  \param[out] avmap the associative container (PVert -> int) with the optimal coloring of \a g.
+			 *  \param[out] avmap the associative container (PVert -> int) with the optimal coloring of \a g. WEN: mozna BlackHole, numeracja od 0
 			 *  \return the chromatic number of \g or -1 if \a g is not a comparability graph.*/
 			template< class Graph, class OutMap > static int color( const Graph &g, OutMap &avmap )
 				{ return explore( g,blackHole,avmap,blackHole ); }
@@ -670,7 +676,7 @@ namespace Koala
 			 *  The method finds a largest clique in a comparability graph
 			 *  @param[in] g the considered graph
 			 *  @param[out] iter the iterator to write the vertices of clique or BlackHole.
-			 *  @return the number of vertices in the maximal clique */
+			 *  @return the number of vertices in the maximal clique WEN: or -1 if graph was not comparability.*/
 			template< class Graph, class OutIter > static int maxClique( const Graph &g, OutIter iter )
 				{ return explore( g,blackHole,blackHole,iter ); }
 
@@ -678,7 +684,7 @@ namespace Koala
 			/** \brief Get maximal stable (independent) set.
 			 *
 			 *  The method gets the set of vertices that make a stable set of \a g.
-			 *  \param g the considered graph.
+			 *  \param g the considered graph, WEN: z zalozenia comparability.
 			 *  \param[out] out the iterator of a container with all the vertices of the stable set.
 			 *  \return the cardinality of stable set i.e. the number of element in the output set \a out.*/
 			template< class GraphType, class VIterOut > static int maxStable( const GraphType &g, VIterOut out );
@@ -687,7 +693,7 @@ namespace Koala
 			/** \brief Get minimal vertex cover.
 			 *
 			 *  The method gets the set of vertices that make a minimal vertex cover of \a g.
-			 *  \param g the considered graph.
+			 *  \param g the considered graph.WEN: z zalozenia comparability.
 			 *  \param[out] out the iterator of a container with all the vertices of the cover.
 			 *  \return the size of minimal vertex cover i.e. the number of element in the output set \a out.*/
 			template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
@@ -724,13 +730,13 @@ namespace Koala
 			// na iterator out zwraca sekwencje stworzonych wierzcholkow zgodna z cagiem przedzialow
 			/** \brief Convert intervals to graph.
 			 *
-			 *  The method add to \a g an interval graph generated from the set of line segments kept in the container represented by iterators \a begin and \a end.
+			 *  The method add to \a g an interval graph generated from the set of line segments kept in the container represented by iterators WEN: przedzial pocz-za.koniec \a begin and \a end.
 			 *  \param g[out] the target graph.
-			 *  \param begin the iterator to the first element of the container with the line segments set.
-			 *  \param end the second iterator of the line segments set.
+			 *  \param begin the iterator to the first element of the container with the line segments set WEN: kontener na struct. Segment (simple.h).
+			 *  \param end the second iterator of the line segments set. WEN: za-last kontener na struct. Segment (simple.h).
 			 *  \param out[out] the iterator of a container with all the new-created vertices (the same order as the line segments).
-			 *  \param vinfo the function object automatically generating the info for vertex. Should allow to call vinfo(int), where the parameter are the position of the line segment.
-			 *  \param einfo the function object automatically generating the info for edge. Should allow to call vinfo(int, int), where the integers are the position of the corresponding  line segments.
+			 *  \param vinfo the function object automatically generating the info for vertex. Should allow to call vinfo(int), where the parameter are the position of the line segment WEN: tj. pozycja w powyzszym ciagu iteratorow.
+			 *  \param einfo the function object automatically generating the info for edge. Should allow to call vinfo(int, int), where the integers are the position WEN: tj. pozycja w powyzszym ciagu iteratorow of the corresponding  line segments.
 			 *  \return the first new-created vertex.*/
 			template< class GraphType, class Iter, class IterOut, class VInfoGen, class EInfoGen >
 				static typename GraphType::PVertex segs2graph( GraphType &g, Iter begin, Iter end, IterOut out,
@@ -739,6 +745,8 @@ namespace Koala
 			/** \brief Convert intervals to graph.
 			 *
 			 *  The method add to \a g an interval graph generated from the set of line segments kept in the container  represented by the iterators \a begin and \a end.
+			 WEN: infa nowych elementow maja warto. domyslne.
+			 WEN: reszta uwag jak wyzej
 			 *  \param[out] g the target graph.
 			 *  \param begin the iterator to the first element of the container with the line segments set.
 			 *  \param end the second iterator of the line segments set.
@@ -844,8 +852,12 @@ namespace Koala
 		 *  @param[in] g graph
 		 *  @return true if \a g is interval, false otherwise. */
 		template< class GraphType > static bool interval( const GraphType &g )
-		//     { return chordal( g ) && cocomparability( g ); }
 			{ return Interval::graph2segs(g, blackHole); }
+
+		//NEW: jw.
+		//TODO: trzeba sie bedzie zdecydowac na wersje
+        template< class GraphType > static bool interval2( const GraphType &g )
+		     { return chordal( g ) && cocomparability( g ); }
 
 		// czy pierwszy
 		/** \brief Test if prime graph.
@@ -867,14 +879,14 @@ namespace Koala
 			/** \brief Get the maximal clique.
 			 *
 			 *  The method gets the maximal clique of \a g and writes  it (the vertices) down to the container represented by the iterator \a out.
-			 *  \param g the considered graph.
+			 *  \param g the considered graph, WEN: z zalozenia cograph.
 			 *  \param out the iterator of a container with all the vertices of the clique.
 			 *  \return the number of element in the output set \a out.*/
 			template< class GraphType, class VIterOut > static int maxClique( const GraphType &g, VIterOut out );
 			/** \brief Get the maximal stable set.
 			 *
 			 *  The method gets the maximal stable (independent) set of \a g.
-			 *  \param g the considered graph.
+			 *  \param g the considered graph WEN: z zalozenia cograph.
 			 *  \param out the iterator of the output container with all the vertices of the stable set.
 			 *  \return the number of element in the output set \a out i.e. the cardinality of the stable set of \a g.*/
 			template< class GraphType, class VIterOut > static int maxStable( const GraphType &g, VIterOut out );
@@ -882,10 +894,12 @@ namespace Koala
 			/** \brief Get the minimal vertex cover.
 			 *
 			 *  The method gets the set of vertices that make a vertex cover of \a g.
-			 *  \param g the considered graph.
+			 *  \param g the considered graph WEN: z zalozenia cograph.
 			 *  \param out the iterator of the output container with all the vertices of the vertex cover.
 			 *  \return the number of element in the output set \a out i.e. the cardinality of the vertex cover of \a g.*/
 			template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
+
+            //WEN: kolorowania optymalnego nie ma, ale trzeba tu odeslac, ze dla chordali zapewnia je kolorowanie sekwen. (odsylacz do procedury) zgodne z dowolna permut. wierzcholkow
 
 		protected:
 			template< class GraphType, class Assoc > static bool cograph( const GraphType &ag, Assoc &subset );

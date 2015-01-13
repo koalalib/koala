@@ -49,6 +49,7 @@ void scheduling_brucker()
 	for(int m = 0; m < 3; m++)
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
 			cout << "Z" << T[i->task].vertex->info << " " << i->start << " " << i->end << endl;
+
 }
 
 void scheduling_coffman()

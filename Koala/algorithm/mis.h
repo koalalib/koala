@@ -10,16 +10,19 @@ namespace Koala
 {
 
     //NEW: generalna zmiana nazw: MIS(Heuristic)(Par) -> MaxStable(Heur)(Par) oraz MISStrategy->MaxStableStrategy
-	/** \brief Vertex choosing strategies (for maximal independent set) .
+	/** \brief Vertex choosing strategies (for maximal independent set WEN: no, teraz to i 2 pozostalych) .
 	 *
 	 *  The namespace contains functors
 	 *  that chooses a vertex basing on some specific rules.
 	 *  Such rules could be: first vertex, random vertex, vertex that meets
 	 *  the specific requirements (has the largest degree for example).
-	 *  These functions are used within \a getWMin and \a getWMax methods in Koala::MaxStableHeurPar
-	 *  to choose one vertex in each algorithm step.
+	 *  These functions are used within \a getWMin and \a getWMax methods in Koala::MaxStableHeurPar WEN: i nie tylko
+	 *  to choose one vertex in each algorithm step. WEN: zawsze sa uzywane dla grafow prostych nieskierowanych
 	 *
-	 *  Each object function overload two parameter call function operator that takes \a g the considered graph and associative container \a vertTab, which assigns weight to each vertex. The functor returns one chosen vertex.
+	 *  Each object function overload two parameter call function operator that takes \a g the considered graph and associative container \a vertTab, which assigns WEN: liczbowe weight to each vertex.
+	 WEN: Nie wszystkie, nie korzystaja z wag funktory First, Rand, GMin, GMax,
+	 The functor returns one chosen vertex.
+	 WEN: tu lub w ebooku nalezy podac publikacje P. Borowieckiego z tymi heurezami (od wielkiej biedy - mgr TK).
 	 *  \ingroup DMmis */
 	namespace MaxStableStrategy
 	{
@@ -49,7 +52,7 @@ namespace Koala
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab )
 				{
-					return g.getVert();
+					(void)(vertTab); return g.getVert();
 				}
 		};
 
@@ -71,6 +74,8 @@ namespace Koala
 		{
 		public:
 		    RndGen* rgen;
+
+		    //WEN: opis?
 		    Rand(RndGen& rg) : rgen(&rg) {}
 
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
@@ -94,6 +99,7 @@ namespace Koala
 		{
 		public:
 		    RndGen* rgen;
+		    //WEN: opis? - to samo nizej w konstruktorach funktorow
 		    GMin(RndGen& rg) : rgen(&rg) {}
 
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
@@ -253,9 +259,16 @@ namespace Koala
 		 *
 		 *  The method outputs the independent set which is maximum in the sense of inclusion.\n
 		 *  \param g the considered graph.
+		 WEN: sposob traktowania grafu (obowiazuje tu i w dalszych metodach/klasach) graf dowolny tj. dopuszczalne kraw. rownolegle
+		 reszte wklejam z maila:
+		 > Roma locuta, causa finita.
+        - po namysle nie zgadzam sie z ta wykladnia. Teraz skierowane sa traktowane jak nieskierowane, a petle:
+        * w zbiorze niezaleznym nie moze byc wierzcholka z petla
+        * w pokryciu vert. musza byc wszystkie wierzcholki z petlami
+        * dla kliki petle sa ignorowane tj. zbior vert jest klika, jesli jego podgraf indukowany zawiera klike o tych wszystkich wierzcholkach.
 		 *  \param out the iterator to the container with the output set of vertices.
 		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
-		 *  \param vertTab the associative container that assigns weight to each vertex.
+		 *  \param vertTab the associative container that assigns weight to each vertex. WEN: jesli funktor nie uzywa wag (por. wyzej) - mozna podac BlackHole
 		 *  \return the number of vertices in the output set \a out.
 		 *  \n
 		 *
@@ -266,7 +279,7 @@ namespace Koala
 				const VertContainer & vertTab );
 
 		/** \brief Search maximal independent set (WMax technique).
-		 *
+		 *  WEN: to samo, co wyzej
 		 *  The method searches for maximal independent set using the following heuristic,
 		 *  In each step (until the graph has no more edges):
 		 *   - chooses a vertex according to the choice function (\ref Koala::MaxStableStrategy) ,
@@ -292,7 +305,7 @@ namespace Koala
 		 * Determinate if a set of vertices is independent.
 		 *  \param g     - graph to process
 		 *  \param first - first vertex from the potentially independent set
-		 *  \param last  - last vertex from the potentially independent set
+		 *  \param last  - WEN: za-last vertex from the potentially independent set
 		 * \return true is the given set is independent, false otherwise. */
 		template< class GraphType, typename Iterator >
 			static bool test( const GraphType &g, Iterator first, Iterator last );
@@ -303,8 +316,9 @@ namespace Koala
 		 *Determinate if a set of vertices is maximal (in the sense of inclusion) independent.
 		 * \param  g     - graph to process
 		 * \param first - first vertex from the potentially independent set
-		 * \param last  - last vertex from the potentially independent set
+		 * \param last  - WEN: za-last vertex from the potentially independent set
 		 * \retrun true is the given set is maximal (in the sense of inclusion) independent, false otherwise.*/
+		 //WEN: brak opisu stabilitytest
 		template< class GraphType, typename Iterator >
 			static bool testMax( const GraphType &g, Iterator first, Iterator last, bool stabilitytest=true );
 
@@ -346,7 +360,7 @@ namespace Koala
 	 *
 	 *  Contains methods for two main templates: WMIN and WMAX.
 	 *  It has to be initialized by a class containing a vertex
-	 *  choice function called "choose".
+	 *  choice function called "choose". WEN: odsylacz do opisu namespaca z funktorami
 	 *
 	 *  \ingroup DMmis */
 	class MaxStableHeur: public MaxStableHeurPar< Koala::AlgsDefaultSettings > {};

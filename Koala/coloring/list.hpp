@@ -9,11 +9,13 @@ bool ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	koalaAssert( colLists.hasKey(vert), AlgExcWrongArg );
 	if( colors.hasKey(vert) ) {
 		int col = colors[vert];
-		if( col>=0 && colLists[vert].isElement(col) )
+		if( //col>=0 &&
+            colLists[vert].isElement(col) )
 			return true;
 	}
 	int res = chooser(graph, colLists[vert], colors, vert);
-	if(res<0 || !colLists[vert].isElement(res))
+	if(//res<0 ||
+        !colLists[vert].isElement(res))
 		return false;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	for(Edge ee = graph.getEdge(vert, Mask); ee;
@@ -75,8 +77,7 @@ template<typename Graph, typename ColLists, typename ColorMap, typename ColorCho
 int ListVertColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, ColorChooser chooser)
 {
-	if(DefaultStructs::ReserveOutAssocCont)
-		colors.reserve(graph.getVertNo());
+	colors.reserve(graph.getVertNo());
 	typedef typename Graph::PVertex Vert;
 	int cnt=0;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
@@ -92,8 +93,7 @@ template<typename Graph, typename ColLists, typename ColorMap>
 int ListVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors)
 {
-	if(DefaultStructs::ReserveOutAssocCont)
-		colors.reserve(graph.getVertNo());
+    colors.reserve(graph.getVertNo());
 	typedef typename Graph::PVertex Vert;
 	int cnt=0;
 	for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
@@ -165,12 +165,12 @@ std::pair<int,int> ListVertColoringPar<DefaultStructs>::listMinMax(
 {
 	typedef typename Graph::PVertex Vert;
 	Vert vv = graph.getVert();
-	int min = colLists[vv].first(), max = colLists[vv].last();
+	int min = colLists[vv].min(), max = colLists[vv].max();
 	vv = graph.getVertNext(vv);
 	while(vv) {
-		int tmp = colLists[vv].first();
+		int tmp = colLists[vv].min();
 		if(min>tmp) min = tmp;
-		tmp = colLists[vv].last();
+		tmp = colLists[vv].max();
 		if(max<tmp) max = tmp;
 		vv = graph.getVertNext(vv);
 	}
@@ -247,11 +247,13 @@ bool ListEdgeColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	koalaAssert( colLists.hasKey(edge), AlgExcWrongArg );
 	if(colors.hasKey(edge)) {
 		int col = colors[edge];
-		if(col>=0 && colLists[edge].isElement(col))
+		if(//col>=0 &&
+            colLists[edge].isElement(col))
 			return true;
 	}
 	int res = chooser(graph, colLists[edge], colors, edge);
-	if(res<0 || !colLists[edge].isElement(res))
+	if(//res<0 ||
+        !colLists[edge].isElement(res))
 		return false;
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
@@ -325,8 +327,7 @@ int ListEdgeColoringPar<DefaultStructs>::colorChoose(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors, ColorChooser chooser)
 {
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	if(DefaultStructs::ReserveOutAssocCont)
-		colors.reserve(graph.getEdgeNo(Mask));
+	colors.reserve(graph.getEdgeNo(Mask));
 	typedef typename Graph::PEdge Edge;
 	int cnt=0;
 	for(Edge ee = graph.getEdge(Mask); ee; ee = graph.getEdgeNext(ee, Mask)) {
@@ -343,8 +344,7 @@ int ListEdgeColoringPar<DefaultStructs>::color(const Graph &graph,
 	const ColLists &colLists, ColorMap &colors)
 {
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	if(DefaultStructs::ReserveOutAssocCont)
-		colors.reserve(graph.getEdgeNo(Mask));
+	colors.reserve(graph.getEdgeNo(Mask));
 	typedef typename Graph::PEdge Edge;
 	int cnt=0;
 	for(Edge ee = graph.getEdge(Mask); ee; ee = graph.getEdgeNext(ee, Mask)) {
@@ -369,8 +369,7 @@ int ListEdgeColoringPar<DefaultStructs>::colorBipartite(const Graph &graph,
 	     d) color edges from the matching by color c
 	*/
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	if(DefaultStructs::ReserveOutAssocCont)
-		colors.reserve(graph.getEdgeNo(Mask));
+	colors.clear(); colors.reserve(graph.getEdgeNo(Mask));
 	int lenTabV1, n=graph.getVertNo();
 	typename Graph::PVertex LOCALARRAY(tabV1, n);
 	typedef typename DefaultStructs::template AssocCont<typename Graph::PEdge, int>::Type EVWeight;
@@ -381,7 +380,7 @@ int ListEdgeColoringPar<DefaultStructs>::colorBipartite(const Graph &graph,
 
 	// 1.
 	lenTabV1 = IsItPar<DefaultStructs>::Bipartite::getPart(graph, tabV1, true);
-	if(lenTabV1<0) return -1;
+	koalaAssert( lenTabV1>=0, AlgExcWrongArg );
 	for(int i=0;i<lenTabV1;i++) setV1[tabV1[i]];
 //	setV1.assign(tabV1, lenTabV1);
 
@@ -400,12 +399,12 @@ int ListEdgeColoringPar<DefaultStructs>::colorBipartite(const Graph &graph,
 		}
 		// a)
 		typename ColLists::ValType eColList = colLists[ee]; //do zmiany??
-		if(eColList.size()<=0) return -1;
+		assert(eColList.size());//if(eColList.size()<=0) return -1;
 		int curColor = eColList.first();
 		while(1) {
 			if(!usedColors.isElement(curColor))
 				break;
-			if(curColor==eColList.last()) return -1;
+			assert(curColor!=eColList.last());//if(curColor==eColList.last()) return -1;
 			curColor = eColList.next(curColor);
 		}
 		// b)
@@ -417,7 +416,7 @@ int ListEdgeColoringPar<DefaultStructs>::colorBipartite(const Graph &graph,
 				tabV1, tabV1+lenTabV1,
 				evComparator, blackHole, tabStMatch);
 		// d)
-		if(lenStMatch<0) return -1;
+		assert(lenStMatch>=0);//if(lenStMatch<0) return -1;
 		while(lenStMatch) {
 			--lenStMatch;
 			colors[ tabStMatch[lenStMatch] ] = curColor;
@@ -497,12 +496,12 @@ std::pair<int,int> ListEdgeColoringPar<DefaultStructs>::listMinMax(
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	Edge ee = graph.getEdge(Mask);
-	int min = colLists[ee].first(), max = colLists[ee].last();
+	int min = colLists[ee].min(), max = colLists[ee].max();
 	ee = graph.getEdgeNext(ee, Mask);
 	while(ee) {
-		int tmp = colLists[ee].first();
+		int tmp = colLists[ee].min();
 		if(min>tmp) min = tmp;
-		tmp = colLists[ee].last();
+		tmp = colLists[ee].max();
 		if(max<tmp) max = tmp;
 		ee = graph.getEdgeNext(ee, Mask);
 	}

@@ -28,12 +28,12 @@ Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> > g;
 Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> >::PVertex A,B,C,D,E,F,V,U,W,X,Y,Z,tabV[20];
 Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> >::PEdge tabE[20];
 
-Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> >::PEdge,Koala::Dijkstra::EdgeLabs<int> > > edgeCont;
+Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> >::PEdge,Koala::All2AllDists::EdgeLabs<int> > > edgeCont;
 
 //dwuwymiarowa tablica asocjacyjna - zawiera dlugosci najkrotszych sciezek pomiedzy kazda para wierzcholkow
 //twoDimVertCont(A,B).distance zawierac bedzie najkrotsza sciezke z A do B
 Koala::AssocMatrix<Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> >::PVertex,
-        Koala::Dijkstra::VertLabs<int, Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> > >,
+        Koala::All2AllDists::VertLabs<int, Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> > >,
             Koala::AMatrFull> twoDimVertCont;
 
 void JohnsonTest1()

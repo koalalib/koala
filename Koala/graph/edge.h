@@ -3,19 +3,21 @@
 
 namespace Koala
 {
-	/** \brief Edge constants
-	 *
-	 * Constants for edge. */
-	class EdgeConst
-	{
-	public:
-		//do not change constans
-		enum { V_U = 0, V_out = 0, V_loop = 0};
-		enum { V_V = 1, V_in = 1, V_Nloop = 1};
-	};
 
 	namespace Privates
 	{
+
+        /** \brief Edge constants
+         *
+         * Constants for edge. */
+        class EdgeConst
+        {
+        public:
+            //do not change constans
+            enum { V_U = 0, V_out = 0, V_loop = 0};
+            enum { V_V = 1, V_in = 1, V_Nloop = 1};
+        };
+
 
         template <class T,bool> class MainGraphPtr
 	    {
@@ -101,14 +103,14 @@ namespace Koala
 	 *  \tparam Settings the type of objects which keep parameters of a graph.
 	 *  \ingroup DMgraph */
 	template< class VertInfo = EmptyVertInfo, class EdgeInfo = EmptyEdgeInfo,
-		class Settings = GrDefaultSettings< EdAll,true > > class Edge: public EdgeConst,
+		class Settings = GrDefaultSettings< EdAll,true > > class Edge: public Privates::EdgeConst,
 		public Settings::template EdgeAdditData< VertInfo,EdgeInfo,Settings >,
 		public Privates::ParalLink< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed >,
         public Privates::MainGraphPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>
 	{
 		friend class Graph< VertInfo,EdgeInfo,Settings >;
 		friend class Vertex< VertInfo,EdgeInfo,Settings >;
-		friend class AdjMatrix< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed >;
+		friend class Privates::AdjMatrix< VertInfo,EdgeInfo,Settings,Settings::AdjMatrixAllowed >;
 		friend class SimplArrPool<Koala::Edge< VertInfo,EdgeInfo,Settings > >;
 
 	public:

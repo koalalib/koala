@@ -87,7 +87,8 @@ void dijTest()
 
     // pobieramy wyznaczona wczesniej sicezke
 
-    if (V) {
+    if (V)
+    {
         int l;
 
         std::cout<< std::endl;
@@ -100,12 +101,13 @@ void dijTest()
     }
 
 
-    if (V) {
+    if (V)
+    {
         Koala::DAGCritPath::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); dijTest();
         res=Koala::DAGCritPath::findPath(g,edgeCont,U,V,Koala::DAGCritPath::outPath(tabV,tabE));
-        std::cout<<"Odleglosc: "<< res.length<<std::endl;
+        std::cout<<"Odleglosc: "<< res.length<< " Liczba krawedzi: "<< res.edgeNo<<std::endl;
         for(int i=0;i<=res.edgeNo;i++) std::cout<< tabV[i]->info.name; std::cout<< std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";
@@ -117,6 +119,7 @@ void dijTest()
 
         std::cout<< std::endl;g.clear(); dijTest();
         res=Koala::DAGCritPath::findPath(g,edgeCont,U,V,Koala::DAGCritPath::outPath(blackHole,tabE));
+        //res=Koala::DAGCritPath::findPath(g,edgeCont,Koala::DAGCritPath::outPath(blackHole,tabE));
         std::cout<<"Odleglosc: "<< res.length<<std::endl;
         for(int i=0;i<res.edgeNo;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}";

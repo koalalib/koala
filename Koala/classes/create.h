@@ -30,7 +30,6 @@ namespace Privates {
         };
 }
 
-	//WEN: - num, num1, num2 are integers, which indicate numbers of vertices, vertices are numbered from 0 to (n-1)
 	/** \brief Create graphs.
 	 *
 	 *  The utility class for creating different types of graphs.
@@ -39,16 +38,14 @@ namespace Privates {
 	 *  - g the input/output graph to which the new-created graph is added.
 	 *  - num, num1, num2 are integers, which indicate numbers of vertices.
 	 *  - dir is of EdgeDirection type and indicate the type and direction of corresponding edge.
-	 *  - vInfoGen - the generator for info objects for vertices used in form: vInfoGen(num).
-	 *  - eInfoGen - the generator for info objects for edges used in form: eInfoGen(num1, num2, dir).
+	 *  - vInfoGen - the generator for info objects for vertices used in form: vInfoGen(num). WEN: numeracja od 0 dodawanych wierzcholkow
+	 *  - eInfoGen - the generator for info objects for edges used in form: eInfoGen(num1, num2, dir). WEN: jw.
 	 *  \ingroup detect
 	 *
 	 *  [See example](examples/create/example_Creator.html).
 	 */
 	class Creator{
 	public:
-//TODO:
-//          - chocby szczatkowy opis numeracji wprowadzanych wierzcholkow np. zakres+kolejnosc (trzeba ja znac, by napisac funktor generujacy)
 
 		//NEW
 		/** \brief Create empty graph.
@@ -142,7 +139,7 @@ namespace Privates {
 		 *  \param n - number of vertices to create,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
-		 *  \param dir - edges direction mask.
+		 *  \param dir - edges direction mask. WEN: ale w przypadku n==1 kazda maska EdUndir, EdDirIn, EdDirOut dodaje jedna petle
 		 *  \retrun the pointer to the first added vertex.*/
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex cycle( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
@@ -975,18 +972,20 @@ namespace Privates {
 	 */
 	/** \brief Binary relation operations.
 	 *
-	 *  The set of methods which consider a graph as a binary relation.
+	 *  The set of methods which consider a graph as a binary relation. WEN: na zbiorze wierzcholkow
 	 *  \tparam DefaultStructs parameter allows to adjust the settings for internal procedures.
 	 *  \ingroup detect
 	 */
 	template< class DefaultStructs > class RelDiagramPar
-	{
+	{ 	    //WEN: cyt. z ebook: Krawędzie pozostające w wyniku nie są modyfikowane, w szczególności nie zmieniają swych inf. W każdej poniższych metod, jeśli wejściem był diagram, wyjściem też będzie diagram.
 	public:
+
 		// doprowadza diagram do zwyklej postaci, bez krawedzi nieskierowanych ani rownoleglych
 		/** \brief Normalize.
 		 *
 		 *  Method allows to normalize graph i.e. it deletes all the undirected and parallel edges.
-		 *  Graph is modified in a way to create a digraph of relation.
+		 *  Graph is modified in a way to create a digraph WEN: nie wiem, czy to slowo bedzie definiowane, ale w ebooku jest
+		 rozroznienie miedzy diagramem i reprezentowaniem relacji of relation.
 		 *  \param g the modified graph.
 		 */
 		template< class Graph > static void repair( Graph &g );
@@ -1002,7 +1001,8 @@ namespace Privates {
 		// wpisz relacje kazdy z kazdym na istniejacych wierzcholkach. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Create total relation.
 		 *
-		 *  A graph which represents the total relation is created on the same set of vertexes. The final graph consists each possible directed pair between the vertices of graph. (edges in initial graph if existed are deleted)
+		 *  A graph which represents (WEN: a moze diagam? por. z ebook) the total relation is created on the same set of vertexes. The final graph consists each possible directed pair between the vertices of graph. (edges in initial graph if existed are deleted)
+		 WEN: graf nie zawiera par :-) terminologia!
 		 *  \param g the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge.
 		 */
@@ -1012,7 +1012,7 @@ namespace Privates {
 		// zamienia w relacje odwrotna
 		/** \brief Inverse
 		 *
-		 *  Each arc in graph is inversed.
+		 *  Each arc in graph is inversed. WEN: czyli zmiana repr. relacji na repr. relacji odwrotnej
 		 *  \param g the modified graph.
 		 */
 		template< class Graph > static void inv( Graph &g ) { g.rev(); }
@@ -1020,14 +1020,14 @@ namespace Privates {
 		// przeprowadza domkniecie zwrotne. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Reflexive closure.
 		 *
-		 *  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) reflexive.
+		 *  The function adds the minimal number of arc WEN: chyba loops in order to make the relation (represented by the graph \a g) reflexive.
 		 *  \param g the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
 		template< class Graph > static void
 			reflClousure( Graph &g, const typename Graph::EdgeInfoType &einfo= typename Graph::EdgeInfoType() );
 
 		// przeprowadza domkniecie symetryczne. Mozna podac pole info wprowadzanych krawedzi
-		/** \brief Symmetric closure.
+		/** \brief Symmetric closure. WEN: tu sie cos nie zgadza (2 wersje metody). I nizej tez
 		 *
 		 *  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) symmetric.
 		 *  \param g the modified graph.
@@ -1043,7 +1043,7 @@ namespace Privates {
 		// przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Transitiv clousure.
 		 *
-		 *  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) transitive.
+		 *  The function adds the minimal number of arc WEN: i loops in order to make the relation (represented by the graph \a g) transitive.
 		 *  \param g the modified graph.
 		 */
 		template< class Graph > static void
@@ -1052,7 +1052,7 @@ namespace Privates {
 
 		/** \brief Transitive closure.
 		 *
-		 *  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) transitive.
+		 *  The function adds the minimal number of arc WEN: i loops in order to make the relation (represented by the graph \a g) transitive.
 		 *  \param g the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
 		template< class Graph > static void
@@ -1109,7 +1109,7 @@ namespace Privates {
 	 */
 	/** \brief Linegraph creator (parametrized).
 	 *
-	 *  The class allows to generate the line graph of a graph.
+	 *  The class allows to generate the line graph WEN: oraz skierowany of a graph.
 	 *  To change options of used algorithms class \a DefaultStructs should be modified.
 	 *  \ingroup detect
 	 */
@@ -1134,11 +1134,12 @@ namespace Privates {
 		 *  \param g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
 		 *  \param casters a standard pair of casters. \n
-		 *    The first one create information for the linegraph vertices basing on edges of \a g.\n
-		 *    The second caster generates information for the linegraph edges basing on vertices of \a g.
+		 *    The first one create information for the linegraph vertices basing on edges WEN: tej z ktorej sie wywodzi of \a g.\n
+		 *    The second caster generates information for the linegraph edges basing on vertices of \a g. WEN: odsylacz do ebooka - ktory wierzcholek g jest utozsamiany z ktora kraw. linegrafu
 		 *  \param linkers a standard pair of linkers. \n
-		 *    The first one links the edges of \a g with the vertices of \a lg.\n
-		 *    The second on links the vertices of \a g with the edges of \a lg.
+		 *    The first one links the edges of \a g with the vertices of \a lg. WEN: ale dotychczasowe wierzcholki lg sa linkowane z NULL\n
+		 WEN: sprawdzic z ksiazka, czy aby nie odwrotnie (spojnosc okreslen), to nizej tez
+		 *    The second on links the vertices of \a g with the edges of \a lg. WEN: odsylacz do ebooka - ktory wierzcholek g jest wiazany z ktora kraw. lg. Nie uwzglednione tu wierzcholki linkuje sie do NULL
 		 *  \return the first created vertex of \a lg.
 		 */
 		template< class GraphIn, class GraphOut, class VCaster, class ECaster, class VLinker, class ELinker >
@@ -1146,7 +1147,7 @@ namespace Privates {
 				std::pair< VLinker,ELinker > linkers );
 		// jw. bez linkerow
 		/** \brief Create undirected linegraph.
-		 *
+		 *  WEN: te same co wyzej (jesli sie lapia)
 		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
 		 *  \param g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
@@ -1182,7 +1183,7 @@ namespace Privates {
 		//         Drugi laczy wierzcholki g z polaczeniami wierzcholkow w lg (ktore zachodza w tych wierzcholkach)
 		//      Zwraca pierwszy utworzony wierzcholek
 		/** \brief Create directed linegraph.
-		 *
+		 *  WEN: to samo, co w undir
 		 *  A directed linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
 		 *  \param g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
@@ -1199,7 +1200,7 @@ namespace Privates {
 				std::pair< VLinker,ELinker > linkers );
 		// jw. bez linkerow
 		/** \brief Create directed linegraph.
-		 *
+		 *  WEN: to samo, co w undir
 		 *  A directed linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
 		 *  \param g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
@@ -1369,6 +1370,9 @@ namespace Privates {
 		//    link.first.second - przywiazuje do wierzcholka wynikowego wierzcholek drugiego grafu lub NULL w razie braku
 		//    link.second.first - przywiazuje do krawedzi wynikowej krawedz pierwszego grafu lub NULL w razie braku
 		//    link.second.second - przywiazuje do krawedzi wynikowej krawedz drugiego grafu lub NULL w razie braku
+
+		//WEN: OK, ale zdajemy sobie sprawe, ze opis dzialania casterow i inkerow wszedzie nizej jest do d... Opisalem to w schemacie
+		// i gdzies (np. w ebooku) to sie musi pojawic, a jesli nie tu, to stad przynajmniej musi byc inteligentnie tamze polinkowane
 		/** \brief Generate Cartesian product.
 		 *
 		 *  The Cartesian product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)

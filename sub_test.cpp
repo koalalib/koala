@@ -117,10 +117,10 @@ Koala::Subgraph<Koala::Subgraph<Koala::Graph<OpisV,OpisE>,Koala::SetChooser<Koal
 
     std::cout << "\n";
     for(Koala::Graph<OpisV,OpisE>::PVertex v=g.getVert();v;v=g.getVertNext(v))
-        if (ssg.good(v,true)) std::cout << v->info.name;
+        if (Koala::makeRevView(ssg).good(v,true)) std::cout << v->info.name;
     std::cout << "\n";
     for(Koala::Graph<OpisV,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
-        if (ssg.good(e,true)) std::cout << '(' << e->getEnds().first->info.name << e->getEnds().second->info.name <<')';
+        if (Koala::makeRevView(ssg).good(e,true)) std::cout << '(' << e->getEnds().first->info.name << e->getEnds().second->info.name <<')';
     std::cout << "\n";
 
     std::cout << "\n";

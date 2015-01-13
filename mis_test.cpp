@@ -330,7 +330,7 @@ int main(void) {
         g,
         tabV,
         Koala::MaxStableStrategy::First(),
-        vertCont);
+        blackHole);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";
@@ -383,7 +383,7 @@ int main(void) {
         g,
         tabV,
         Koala::MaxStableStrategy::GMax<RandGenType>(stdgen),
-        vertCont/*NULL*/);
+        blackHole/*NULL*/);
     std::cout << "wierzcholkow: " << result << std::endl;
     for(unsigned int i=0; i<result; ++i) {
         std::cout << tabV[i]->info.name << ", ";

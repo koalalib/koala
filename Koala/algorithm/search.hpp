@@ -302,33 +302,21 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 	return scanAttainable( g,root,cont,comp,mask );
 }
 
-template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer, class Iter >
+template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer >
 	int GraphSearchBase< SearchImpl, DefaultStructs >::scanNear( const GraphType &g,
-		typename GraphType::PVertex root, int radius, VertContainer &cont,Iter comp, EdgeDirection mask  )
+		typename GraphType::PVertex root, int radius, VertContainer &cont, EdgeDirection mask  )
 {
-	int rv;
 	koalaAssert( root && radius>=0,AlgExcNullVert );
 	mask &= ~EdLoop;
-	rv = SearchImpl::visitBase( g,root,cont,Visitors::NearVertsVisitor( radius ),mask,0 );
-	return cont.getKeys(comp);
-}
-
-template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertIter >
-	int GraphSearchBase< SearchImpl, DefaultStructs >::scanNear( const GraphType &g,
-		typename GraphType::PVertex root, int radius, BlackHole,VertIter comp, EdgeDirection mask )
-{
-	VisitedMap< GraphType > cont( g.getVertNo() );
-	return scanNear( g,root,radius,cont,comp,mask );
+	return SearchImpl::visitBase( g,root,cont,Visitors::NearVertsVisitor( radius ),mask,0 );
 }
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType >
-	Set< typename GraphType::PVertex > GraphSearchBase< SearchImpl, DefaultStructs >::getNearSet(
-		const GraphType &g, typename GraphType::PVertex root, int radius, EdgeDirection mask )
+	int GraphSearchBase< SearchImpl, DefaultStructs >::scanNear( const GraphType &g,
+		typename GraphType::PVertex root, int radius, BlackHole, EdgeDirection mask )
 {
-	assert( root );
-	Set< typename GraphType::PVertex > res;
-	scanNear( g,root,radius,blackHole,setInserter( res ),mask );
-	return res;
+	VisitedMap< GraphType > cont( g.getVertNo() );
+	return scanNear( g,root,radius,cont,mask );
 }
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer, class VertIter >
@@ -838,13 +826,13 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 		u = cont.top();
 		depth = visited[u].distance;
 		visited[u].component = component;
-
+		cont.pop();
 		if (!Visitors::visitVertexPre( g,visit,u,visited[u],visit))
 		{
 			retVal++;
 			continue;
 		}
-		cont.pop();
+//		cont.pop();
 		for( e = g.getEdge( u,mask ); e != NULL; e = g.getEdgeNext( u,e,mask ) )
 		{
 			v = g.getEdgeEnd( e,u );
@@ -1325,18 +1313,6 @@ template< class DefaultStructs > template< class GraphType > void EulerPar< Defa
             pos--;
         }
     }
-
-//TODO: usunac - stara wersja rekurencyjna
-//	typename GraphType::PEdge e;
-//	typename GraphType::PVertex v;
-//	for( e = state.g.getEdge( u,state.mask ); e != NULL; e = state.g.getEdgeNext( u,e,state.mask ) )
-//	{
-//		if (state.edgeVisited.hasKey( e )) continue;
-//		state.edgeVisited[e] = true;
-//		v = state.g.getEdgeEnd( e,u );
-//		eulerEngine( v,e,state );
-//	}
-//	state.stk.push( std::make_pair( u,ed ) );
 }
 
 template< class DefaultStructs > template< class GraphType, class VertIter, class EdgeIter > void
@@ -1492,7 +1468,6 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
 	if (res.first == 0 || res.first != res.second) return false;
 	std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
 		LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
-		//TODO: size? - spr
 	EulerState< GraphType > state( g,_vstk,n + m + 1,EdUndir | EdLoop );
 	eulerEngine< GraphType >( res.first,NULL,state );
 	eulerResult( state,out );
@@ -1508,7 +1483,6 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
 	if (res.first == 0 || res.first != res.second) return false;
 	std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
 		LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) );
-		//TODO: size? - spr
 	EulerState< GraphType > state( g,_vstk,n + m + 1,EdDirOut | EdLoop );
 	eulerEngine< GraphType >( res.first,NULL,state );
 	eulerResult( state,out );
@@ -1525,7 +1499,6 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
 	if (res.first == 0 || res.first != res.second) return false;
 	std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
 		LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
-		//TODO: size? - spr
 	EulerState< GraphType > state( g,_vstk,n + m + 1,EdUndir | EdLoop );
 //	eulerEngine< GraphType >( g.getEdge( prefstart,EdUndir | EdLoop) ? prefstart : res.first,NULL,state );
 	eulerEngine< GraphType >( (g.getEdgeNo( prefstart,EdUndir | EdLoop)>0 || g.getEdgeNo( EdUndir | EdLoop)==0) ?
@@ -1544,7 +1517,6 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
 	if (res.first == 0 || res.first != res.second) return false;
 	std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
 		LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) );
-		//TODO: size? - spr
 	EulerState< GraphType > state( g,_vstk,n + m + 1,EdDirOut | EdLoop );
 //	eulerEngine< GraphType >( g.getEdge( prefstart,EdDirOut | EdLoop ) ? prefstart : res.first,NULL,state );
 	eulerEngine< GraphType >( (g.getEdgeNo( prefstart,EdDirOut | EdLoop )>0 ||  g.getEdgeNo( Directed | EdLoop)==0) ?
@@ -1562,7 +1534,6 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
 	if (res.first == 0 || res.first == res.second) return false;
 	std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
 		LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
-		//TODO: size? - spr
 	EulerState< GraphType > state( g,_vstk,n + m + 1,EdUndir | EdLoop );
 	eulerEngine< GraphType >( res.first,NULL,state );
 	eulerResult( state,out );
@@ -1578,7 +1549,6 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
 	if (res.first == 0 || res.first == res.second) return false;
 	std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
 		LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(Directed | EdLoop)) );
-		//TODO: size? - spr
 	EulerState< GraphType > state( g,_vstk,n + m + 1,EdDirOut | EdLoop );
 	eulerEngine< GraphType >( res.first,NULL,state );
 	eulerResult( state,out );
@@ -1595,7 +1565,6 @@ template< class DefaultStructs > template< class GraphType, class VertIter, clas
 	if (res.first == 0 || res.first == res.second) return false;
 	std::pair< typename GraphType::PVertex,typename GraphType::PEdge >
 		LOCALARRAY( _vstk,(n = g.getVertNo()) + (m = g.getEdgeNo(EdUndir | EdLoop)) );
-		//TODO: size? - spr
 	EulerState< GraphType > state( g,_vstk,n + m + 1,EdUndir | EdLoop );
 	eulerEngine< GraphType >( (prefstart == res.second) ? res.second : res.first,NULL,state );
 	eulerResult( state,out );

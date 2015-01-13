@@ -12,10 +12,24 @@
 #include "edge.h"
 #include "../classes/detect.h"
 
-//TODO: kolorowanie przy listach rozmiarow <=2 (wierzcholkowe, krawedziowe)
-//TODO: kolorowanie krawedziowe dwudzielnych przy listach rozmiarow >=Delta (tj. listowy Konig)
 
 namespace Koala {
+
+
+//WEN: Uwaga! globalna! Wszedzie
+//kolory - liczby int , mapa kolorow - czesciowe (lub calkowite - one z reszta jest szczegolnym przypadkiem czesciowego) pokolorowanie.
+//Tzn. pokolorowane (na wej/wyj) sa te krawedzie, ktore sa kluczami w mapie, reszta nie.
+//Listy dopuszczalnych kolorow colLists: zaklada sie,ze na wejsciu przypisuja wszystkim vert/edge (poza petlami) niepuste podzbiory int
+//a poczatkowe pokolorowania czesciowe (oraz wynikowe rzecz jasna) tez respektuja te listy
+//Dalej, rozwazane sa krawedzie typow Directed|Undirected - ich rodzaj jest ignorowany (po prostu krawedzie),
+//Loopy sa ignorowane i nie powinny wystapic w wejsciowych przedzialach iteratorow. Rownoleglosci dozwolone
+//Wejsciowe przedzialy iteratorow na krawedzie nie powinny zawierac petli ani powtorzen (ostatnie takze dla verts)
+//(precyzyjniej: powtorzenie zostanie zignorowane przy kolorowaniu, ale zawyzy wynik return funkcji, podobnie z elementami prekolorowanymi
+//   - nie przebarwia sie, ale beda zliczone do ret).
+//Uwaga: teraz listy barw i same kolory moga byc dowolnymi intami, takze ujemnymi (dla listowego zalozenie o dodatnich barwach
+//nie ma sensu, wiec usunalem) - trzeba wiec usunac z doxy stare zastrzezenia.
+
+
 /** \brief Methods for list coloring of graphs (parametrized).
  *  \ingroup color */
 template<class DefaultStructs>
@@ -38,17 +52,17 @@ public:
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     which assigns a color (nonnegative integer number) to the vertex.
-	 *  \param vert the considered vertex.
+	 *  \param vert the considered vertex. WEN: powinien byc niepokolorowany, lub pokolorowany poprawnie (wtedy return true i metoda nic nie robi)
 	 *  \param chooser the object function allow to choose proper color from the list of available colors. It should overload the call function operator \n
 	 *     <tt> int chooser(const Graph &, const Set<int>, const ColorMap&, Graph::PVertex vert);</tt> that returns the chosen color for vertex \a vert.
-	 *  \return true if the chooser returned the correct color, false otherwise.	 */
+	 *  \return true if the chooser returned the correct color, false otherwise. WEN: i wtedy kolorowanie nie zmienia sie	 */
 	template<typename Graph, typename ColLists, typename ColorMap, typename ColorChooser>
 	static bool colorChoose(const Graph &graph, const ColLists &colLists, ColorMap &colors,
 			typename Graph::PVertex vert, ColorChooser chooser );
 
 	//like method above with chooser=FirstFit
 	/** \brief Choose color.
-	 *
+	 *  WEN: j.w.
 	 *  The method chooses proper color (concerning the partial coloring in map \a colors) for the vertex \a vert from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors. The color from the list \t colList[vert] is chosen by the FirstFit method.
 	 *  \param graph the considered graph.
@@ -70,11 +84,12 @@ public:
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     which assigns a color (nonnegative integer number) to the vertex.
+        WEN: pok. czesciowe in/out
 	 *  \param beg the iterator to the first element of the container with vertices that are to be colored.
-	 *  \param end the iterator to the past-the-end element of the container with vertices that are to be colored.
+	 *  \param end the iterator to the past-the-end element of the container with vertices that are to be colored. WEN: jeszcze niepokolorowane
 	 *  \param chooser the object function allow to choose proper color from the list of available colors. It should overload the call function operator \n
 	 *     <tt> int chooser(const Graph &, const Set<int>, const ColorMap&, Graph::PVertex vert);</tt> that returns the chosen color for vertex \a vert.
-	 *  \return the number of colored vertices. */
+	 *  \return the number of colored vertices. WEN: bo funkcja konczy prace wraz z pierwszym wierzcholkiek przedzialu, ktorego nie dalo sie pokolorowac */
 	template<typename Graph, typename ColLists, typename ColorMap,
 			typename VIter, typename ColorChooser>
 	static int colorChoose(const Graph &graph, const ColLists &colLists,
@@ -82,7 +97,7 @@ public:
 
 	//@return number of colored vertices
 	/** \brief Choose colors.
-	 *
+	 *  WEN: j.w.
 	 *  For all uncolored vertices from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors. The colors from the lists \t colList[vert] are chosen by the FirstFit method.
 	 *  \param graph the considered graph.
@@ -100,21 +115,23 @@ public:
 	/** \brief Choose colors.
 	 *
 	 *  For all uncolored vertices from \a graph, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
+            WEN:  przedluza podane pokolorowanie czesciowe (lub puste) na caly graf
 	 *  The result is saved in the map \a colors. The object function \a chooser decides which color from the list should be taken.
 	 *  \param graph the considered graph.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     which assigns a color (nonnegative integer number) to the vertex.
+	 WEN: pok. czesciowe in/out
 	 *  \param chooser the object function allow to choose proper color from the list of available colors. It should overload the call function operator \n
 	 *     <tt> int chooser(const Graph &, const Set<int>, const ColorMap&, Graph::PVertex vert);</tt> that returns the chosen color for vertex \a vert.
-	 *  \return the number of colored vertices. */
+	 *  \return the number of colored vertices. WEN: bo funkcja konczy prace wraz z pierwszym wierzcholkiek, ktorego nie dalo sie pokolorowac*/
 	template<typename Graph, typename ColLists, typename ColorMap, typename ColorChooser>
 	static int colorChoose(const Graph &graph, const ColLists &colLists,
 			ColorMap &colors, ColorChooser chooser);
 
 	//@return number of colored vertices
 	/** \brief Color.
-	 *
+	 *  WEN: jw.
 	 *  For all uncolored vertices from \a graph, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors. The colors from the lists \t colList[vert] are chosen by the FirstFit method.
 	 *  \param graph the considered graph.
@@ -130,7 +147,7 @@ public:
 	//testing if graph is properly colored
 	/** \brief Test partial coloring.
 	 *
-	 *  The method tests if the partial coloring from the associative array \a colors is a proper list coloring of \a graph.
+	 *  The method tests if the partial coloring from the associative array \a colors is a proper list coloring of \a graph.  WEN: raczej podgrafu indukowanego przez pokolorowane wierzcholki
 	 *  \param graph the considered graph.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
@@ -166,7 +183,7 @@ public:
 	 *
 	 *  \param graph the considered graph.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
-	 *  \param out the iterator to the output container with the sorted union of all lists of colors.
+	 *  \param out the iterator to the output container with the WEN: nie musi byc sorted! union of all lists of colors. WEN: inserter na inty
 	 *  \return the lenght of the union of colors lists. */
 	template<typename Graph, typename ColLists, typename Iter>
 	static int listColors(const Graph &graph, const ColLists &colLists, Iter out);
@@ -218,7 +235,7 @@ public:
 	//   the return value should be in the Set<int>
 	//@return true if the chooser returns correct value
 	/** \brief Choose color.
-	 *
+	 *  WEN: jak w ListVertColoringPar::(const Graph &graph, const ColLists &colLists, ColorMap &colors, typename Graph::PVertex, ColorChooser chooser)
 	 *  The method chooses proper color (concerning the partial coloring in map \a colors) for the edge \a edge from the list of colors \t colList[edge].
 	 *  The result is saved in the map \a colors. The object function \a chooser decides which color from the list should be taken.
 	 *  \param graph the considered graph.
@@ -235,7 +252,7 @@ public:
 
 	//like method above with chooser=FirstFit
 	/** \brief Choose color.
-	 *
+	 *  WEN: jak w ListVertColoringPar::color(const Graph &graph, const ColLists &colLists,ColorMap &colors, typename Graph::Vertex);
 	 *  The method chooses proper color (concerning the partial coloring in map \a colors) for the edge \a edge from the list of colors \t colList[edge].
 	 *  The result is saved in the map \a colors. The FirstFit method for choosing the proper color from the list \p colLists[edge] is implemented.
 	 *  \param graph the considered graph.
@@ -262,7 +279,8 @@ public:
 	 *  \param end the iterator to the past-the-end element of the container with the edges that are to be colored.
 	 *  \param chooser the object function allow to choose proper color from the list of available colors. It should overload the call function operator \n
 	 *     <tt> int chooser(const Graph &, const Set<int>&, const ColorMap&, Graph::PEdge edge);</tt> that returns the chosen color for \a edge.
-	 *  \return the number of properly colored edges or -1 if none was possible.	 */
+	 *  \return the number of properly colored edges or -1 if none was possible.
+	 WEN: jakie -1??? wszystkie weny jak w ListVertColoringPar::colorChoose(const Graph &graph, const ColLists &colLists, ColorMap &colors, beg, end, ColorChooser chooser); */
 	template<typename Graph, typename ColLists, typename ColorMap,
 			typename EIter, typename ColorChooser>
 	static int colorChoose(const Graph &graph, const ColLists &colLists, ColorMap &colors,
@@ -279,7 +297,8 @@ public:
 	 *     which assigns a colors (nonnegative integers) to the edges.
 	 *  \param beg the iterator to the first element  of the container with the edges that are to be colored.
 	 *  \param end the iterator to the past-the-end element of the container with the edges that are to be colored.
-	 *  \return the number of properly colored edges or -1 if none was possible.	 */
+	 *  \return the number of properly colored edges or WEN: ??? -1  if none was possible.
+	 WEN: jw. tj. por. ListVertColoringPar::color (const Graph &graph, const ColLists &colLists, ColorMap &colors,beg, end)*/
 	template<typename Graph, typename ColLists, typename ColorMap, typename EIter>
 	static int color(const Graph &graph, const ColLists &colLists, ColorMap &colors,
 			EIter beg, EIter end);
@@ -295,14 +314,17 @@ public:
 	 *     which assigns a colors (nonnegative integers) to the edges.
 	 *  \param chooser the object function allow to choose proper color from the list of available colors. It should overload the call function operator \n
 	 *     <tt> int chooser(const Graph &, const Set<int>&, const ColorMap&, Graph::PEdge edge);</tt> that returns the chosen color for \a edge.
-	 *  \return the number of properly colored edges or -1 if none was possible.	 */
+	 *  \return the number of properly colored edges or -1 if none was possible.
+	 WEN: oczywiscie -1 to bzdura, wszystkie weny jak w ListVertColoringPar::colorChoose(const Graph &graph, const ColLists &colLists,
+			ColorMap &colors, ColorChooser chooser)	 */
 	template<typename Graph, typename ColLists, typename ColorMap, typename ColorChooser>
 	static int colorChoose(const Graph &graph, const ColLists &colLists,
 			ColorMap &colors, ColorChooser chooser);
 
 	//@return number of colored edges
 	/** \brief Choose colors.
-	 *
+	 *  WEN: oczywiscie -1 to bzdura, wszystkie weny jak w ListVertColoringPar::color(const Graph &graph, const ColLists &colLists,
+			ColorMap &colors, ColorChooser chooser)
 	 *  The method colors  properly (concerning the partial coloring in map \a colors)  all the uncolored edges of \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].
 	 *  The result is saved in the map \a colors. The FirstFit method for choosing the proper color from the list \p colLists[edge] is used here.
 	 *  \param graph the considered graph.
@@ -319,7 +341,8 @@ public:
     //NEW: algorytm Galvina, kazda lista musi miec >=Delta barw, dopuszczalne kraw. rownolegle
 	/** \brief Color bipartite graph.
 	 *
-	 *  The method colors properly (concerning the partial coloring in map \a colors)  all the edges of bipartite \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].
+	 *  The method colors properly WEN: nieprawda, tu mapa na starcie powinna byc pusta
+        (concerning the partial coloring in map \a colors)  all the edges of bipartite \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].
 	 *  The result is saved in the map \a colors.
 
 	 *  For all vertices the number of available colors is greater or equal the graph degree.
@@ -328,7 +351,7 @@ public:
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
-	 *  \return the number of properly colored edges or -1 if none was possible.
+	 *  \return the number of properly colored edges WEN: czyli wszystkie, dalej nieprawda or -1 if none was possible.
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int colorBipartite(const Graph &graph, const ColLists &colLists, ColorMap &colors);
@@ -336,7 +359,7 @@ public:
 	//testing if graph is properly colored
 	/** \brief Test partial coloring.
 	 *
-	 *  The method tests if the partial coloring from the associative array \a colors is a proper list edge coloring of \a graph.
+	 *  The method tests if the partial coloring from the associative array \a colors is a proper list edge coloring of \a graph. WEN: raczej podgrafu zlozonego przez pokolorowane krawedzie
 	 *  \param graph the considered graph.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
@@ -369,7 +392,7 @@ public:
 	//sorted sequence of the numbers used in the lists elements (unique numbers)
 	//@return the sequence length
 	/** \brief Union of available colors sets.
-	 *
+	 *  WEN: to samo, co w ListVertColoringPar::listColors
 	 *  \param graph the considered graph.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param out the iterator to the output container with the sorted union of all lists of colors.

@@ -277,8 +277,6 @@ void HKTest()
     std::cout<< "Znalezione skojarzenie-strumien krawedzi nalezacych do skojarzenia" << std::endl;
     for(int i=0;i<matchSize;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}\n";
-
-
     edmTest();
     std::cout<< "\n12. Chcemy sprawdzic czy krawedzie podane na wejsciu tworza skojarzenie {J,B} {A,B} {A,C} {H,I}\n";
     std::vector<Koala::Graph<OpisV,OpisE>::PEdge> tabEdIn2;
@@ -287,6 +285,7 @@ void HKTest()
     tabEdIn2.push_back(g.getEdge(A,C));
     tabEdIn2.push_back(g.getEdge(H,I));
     std::cout<< "Odp: " << Koala::Matching::test (g,tabEdIn2.begin(),tabEdIn2.end());
+
 
     edmTest();
     std::cout<< "\n13. Chcemy sprawdzic czy krawedzie podane na wejsciu tworza skojarzenie {J,B} {F,G} {A,C} {H,I}\n";

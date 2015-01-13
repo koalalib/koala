@@ -25,6 +25,17 @@ struct bezop {
     int a,b;
 };
 
+struct Lapacz {
+    int a;
+
+    template <class T>
+    Lapacz& operator=(const T&){}
+};
+
+AssocTable<std::map<int,Lapacz> > mapint1,mapint2;
+Set<int> setint;
+
+
 template <class T>
 void printInfo(T* w)
 {
@@ -97,7 +108,7 @@ void printInfo(T* w)
     cout << writeGraphText(g, text, 10000, RG_EdgeList|RG_Info);
     cout << "text=" << text << "text"<<endl;
     g.clear();
-    cout << readGraphText(g, text, RG_EdgeList);
+    cout << readGraphText(g, text, RG_EdgeList|RG_Info);
     cout << writeGraphText(g, cout, RG_VertexLists|RG_Info);
     cout << endl;cout << endl;
 
@@ -117,8 +128,54 @@ void printInfo(T* w)
     v2int[g.getVertNext(g.getVert())]=99;
     e2int[g.getEdge(EdLoop)]=102;
 
-	writeGraphText(g, cout, RG_EdgeList|RG_Info,v2int,e2int);
+	writeGraphText(g, cout, RG_VertexLists|RG_Info,v2int,e2int);
     cout << "\n!!!!!!!!!!!!!!!!\n";
+    {
+
+
+//    typedef bezop Char;
+        typedef char Char;
+        typedef bezop String;
+    //    typedef string String;
+
+//        Graph<Char,String> _g;
+//        _g.copy(g);
+//        AssocTable<std::map<Graph<Char,String>::PVertex,int> > _v2int;
+//        AssocTable<std::map<Graph<Char,String>::PEdge,int> > _e2int;
+//        _v2int[_g.getVertNext(_g.getVert())]=99;
+//        _e2int[_g.getEdge(EdLoop)]=102;
+//        writeGraphText(_g, cout, RG_VertexLists|RG_Info,_v2int,_e2int);
+//
+
+
+        int format = RG_EdgeList;
+//        int format = RG_VertexLists;
+        cout << "\ncccccccccccccccc\n";
+        char tekst[1000]={0};
+        writeGraphText(g, tekst, 1000, format|RG_Info
+                       ,v2int,e2int);
+        cout << '\n' << tekst << '\n';
+
+    typedef bezop Char3;
+//        typedef char Char3;
+        typedef bezop String3;
+//        typedef string String3;
+
+        Graph<Char3,String3> g3;
+        readGraphText(g3, tekst, format|RG_Info
+                      ,mapint1,mapint2);
+        writeGraphText(g3, cout,  format|RG_Info);
+
+        mapint1.getKeys(setInserter(setint));
+        cout << endl << endl << setint;
+        setint.clear();
+        mapint2.getKeys(setInserter(setint));
+        cout << endl << endl << setint;
+
+
+//         return 0; //qqq
+
+    }
 	writeGraphText(g, cout, RG_EdgeList|RG_Info,blackHole,blackHole);
 	ofstream pliko("plik.txt");
 //	writeGraphText(g, pliko, RG_VertexLists,form,v2int,e2int);
@@ -209,7 +266,7 @@ void printInfo(T* w)
 //            writeGraphText(g, cout, RG_VertexLists|RG_Info);
 
 //            cout << "\n" << g.getVertNo() << "\n*******\n";
-            return 0;
+            //return 0;
 
         }
         {
@@ -255,6 +312,13 @@ void printInfo(T* w)
 
             g2.getVertNo();
 
+        }
+        {
+            g.clear();
+            cout << "\n!!!!!!!!!!\n";
+            A=g.addVert('A');B=g.addVert('B');
+           	d=g.addEdge(A,B,EdDirOut|EdLoop);
+            writeGraphText(g, cout, RG_VertexLists|RG_Info);
         }
 
 //    cin << bz1;
