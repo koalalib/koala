@@ -1,4 +1,3 @@
-// AlgsDefaultSettings
 
 
 // BlackHole

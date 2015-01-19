@@ -198,7 +198,7 @@ int ListVertColoringPar<DefaultStructs>::listColors(
 //ColLists should have interface like AssocTabInterface
 template <class DefaultStructs>
 template<typename Graph, typename ColLists>
-Set<int> ListVertColoringPar<DefaultStructs>::listColorsSet(
+Set<int> ListVertColoringPar<DefaultStructs>::listColorSet(
 	const Graph &graph, const ColLists &colLists)
 {
 	typedef typename Graph::PVertex Vert;
@@ -532,7 +532,7 @@ int ListEdgeColoringPar<DefaultStructs>::listColors(
 //ColLists should have interface like AssocTabInterface
 template <class DefaultStructs>
 template<typename Graph, typename ColLists>
-Set<int> ListEdgeColoringPar<DefaultStructs>::listColorsSet(
+Set<int> ListEdgeColoringPar<DefaultStructs>::listColorSet(
 	const Graph &graph, const ColLists& colLists)
 {
 	typedef typename Graph::PEdge Edge;

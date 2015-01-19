@@ -1,12 +1,21 @@
 // DijkstraBasePar
 
-template< class DefaultStructs > template< class DType, class GraphType,bool plus > template< class Rec >
-	void WeightPathStructs< DefaultStructs >::VertLabs< DType,GraphType,plus >::copy( Rec &rec ) const
+template< class DType, class GraphType,bool plus > template< class Rec >
+	void WeightPathStructs::VertLabs< DType,GraphType,plus >::copy( Rec &rec ) const
 {
 	rec.distance = distance;
 	rec.vPrev = vPrev;
 	rec.ePrev = ePrev;
 
+}
+
+template< class DType > template< class T >
+    typename WeightPathStructs::template UnitLengthEdges< DType >:: ValType
+	WeightPathStructs:: UnitLengthEdges< DType >::operator[]( T e ) const
+{
+	ValType res;
+	res.length = NumberTypeBounds< DType >::one();
+	return res;
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EdgeContainer >
@@ -134,15 +143,6 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
 
 // DAGCritPathPar
-
-template< class DefaultStructs > template< class DType > template< class T >
-	typename DAGCritPathPar< DefaultStructs >::template UnitLengthEdges< DType >::ValType
-	DAGCritPathPar< DefaultStructs >::UnitLengthEdges< DType >::operator[]( T e ) const
-{
-	ValType res;
-	res.length = NumberTypeBounds< DType >::one();
-	return res;
-}
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EdgeContainer >
 	typename EdgeContainer::ValType::DistType DAGCritPathPar< DefaultStructs >::critPathLength(
@@ -394,14 +394,6 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 	return len;
 }
 
-template< class DefaultStructs > template< class DType > template< class T >
-	typename All2AllDistsPar< DefaultStructs >::template UnitLengthEdges< DType >::ValType
-	All2AllDistsPar< DefaultStructs >::UnitLengthEdges< DType >::operator[]( T e ) const
-{
-	ValType res;
-	res.length = NumberTypeBounds< DType >::one();
-	return res;
-}
 
 template< class DefaultStructs > template< class GraphType, class TwoDimVertContainer, class EdgeContainer > bool
 	All2AllDistsPar< DefaultStructs >::floyd( const GraphType &g, TwoDimVertContainer &vertMatrix,
@@ -512,7 +504,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 	typename DefaultStructs::template AssocCont< typename ImageGraph::PVertex,
 		VertLabs< typename EdgeContainer::ValType::DistType,ImageGraph > >::Type vertTab(n+1);
 	typename DefaultStructs::template AssocCont< typename ImageGraph::PEdge,
-		EdgeLabs< typename EdgeContainer::ValType::DistType > >::Type modifiedEdgeTab(mImage);
+		typename WeightPathStructs:: template EdgeLabs< typename EdgeContainer::ValType::DistType > >::Type modifiedEdgeTab(mImage);
 
     typename DefaultStructs:: template AssocCont< Vert, typename ImageGraph::PVertex > ::Type vmapH(n);
     for(Vert u = g.getVert(); u; u = g.getVertNext(u))

@@ -284,7 +284,7 @@ namespace Koala
 			 *  The method gets the set of vertices that make a partition of \a g.
 			 *  \param g the considered graph.
 			 *  \param out the iterator of a container with all the vertices of the partition.
-			 *  \return the number of element in the output set \a out.*/
+			 *  \return the number of element in the output set \a out. WEN: lub -1 gdy graf nie jest comp bip.*/
 			template< class GraphType, class Iter > static int getPart( const GraphType &g, Iter out );
 		};
 
