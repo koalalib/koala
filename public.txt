@@ -1,0 +1,174 @@
+search.h
+	OutPath -> wiadomo, co to jest (para inserterow na verts/edges drogi). Czy ktos ma pomysl, jak to mozna nieco madrzej nazwac?
+	CompStore -> wiadomo, co to jest (para inserterow na ciag ciagow). Czy ktos ma pomysl, jak to mozna nieco madrzej nazwac?
+	ShortPathStructs
+		getOutPath
+		getUsedEdge[s|Set]
+	SearchStructs::
+		revCompStore
+	GraphSearchBase, DFS[Pre|Post]Ord, BFS, LexBFS
+		visitBase
+		visitAllBase
+		scanAttainable
+		getAttainableSet
+		scanNear
+		scan
+		cyclNo
+		getPath	-> findPath (bo robi dokladnie to, co wszystkie fidnPathy w weight.h na grafie bez wag, w przeciwienstwie do tamtejszych getPahtow. To chyba najwieksza znaleziona niespojnosc)
+		split
+	SCC
+		split
+		connections
+	DAGAlgs
+		topOrd
+		isDAG
+		transEdges
+		makeHasse
+	Blocks
+		split
+		splitComp
+		getCore	-> core
+	Euler
+		has[|Dir]Cycle
+		has[|Dir]Cycle
+		get[|Dir]Cycle
+	Modules
+		split
+
+weights.h
+	Dijkstra[|Heap]
+		distances
+		getPath
+		findPath
+	DAGCritPath
+		critPathLength
+		getPath
+		findPath
+	BellmanFord
+		distances
+		getPath
+		findPath
+	All2AllDists
+		floyd
+		johnson
+		getPath
+	Kruskal
+		getMinForest -> minForest, albo findMin
+		getMaxForest	-> maxForest, albo findMax
+		
+mis.h
+	MaxStableHeur, MaxCliqueHeur
+		getWMin
+		getWMax
+		test
+		testMax
+	MaxStable, MaxCliqueHeur
+		get	-> findMax
+		getSome	-> findSome
+		test
+		testMax
+	MinVertCoverHeur
+		getWMin
+		getWMax
+		test
+		testMin
+	MinVertCover
+		get	-> findMin
+		getSome	-> findSome
+		test
+		testMin
+matching.h
+	Matching
+		findMax
+		minEdgeCover
+		greedy
+		test
+	 StableMatching
+		test
+		bipartFind
+schedule.h
+	Scheduling
+		Schedule
+		sortLPT
+		sortSPT
+		sortEDD
+conflow.h
+	Flow
+		vertFlow
+		testFlow
+		maxFlow
+		minCostFlow
+		minEdgeCut
+		transship
+		minCostTransship
+		findGHTree	-> gHTree
+	Connect
+		minEdgeCut
+		edgeDisjPaths
+		minVertCut
+		vertDisjPaths
+detect.h
+	IsIt
+		zero
+		undir
+		connected
+		empty
+		tree
+		forest
+		clique
+		cliques
+		regular
+		Path
+			ends
+		path
+		Caterpillar
+			spineEnds
+		caterpillar
+		cycle
+		matching
+		subcubic
+		cubic
+		block
+		almostTree
+		Bipartite
+			getPart
+			maxStable
+			minVertCover
+		bipartite
+		CompBipartite
+			getPart
+		CompMPartite
+			split
+		compMPartite
+		Chordal
+			getOrder
+			maxCliques
+			maxClique
+			maxStable
+			minVertCover
+		chordal
+		cochordal
+		split
+		Comparability
+			explore
+			getDirs
+			color	-> chi (por. koment. detect.h line 665)
+			maxClique
+			maxStable
+			minVertCover
+		comparability
+		cocomparability
+		Interval
+			segs2graph
+			graph2segs
+		interval[|2]
+		prime
+		Cograph
+			maxClique
+			maxStable
+			minVertCover
+		cograph
+list.h
+		List[Vert|Edge]Coloring
+			listColors
+			listColorsSet	-> listColorSet

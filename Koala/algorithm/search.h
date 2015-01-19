@@ -67,6 +67,8 @@ namespace Koala
 			typedef typename Graph::PEdge PEdge;
 			typedef std::back_insert_iterator< Container< typename Graph::PEdge,std::allocator<typename Graph::PEdge> > > EdgeIterType;
 			typedef std::back_insert_iterator< Container< typename Graph::PVertex,std::allocator<typename Graph::PVertex> > > VertIterType;
+			typedef OutPath< std::back_insert_iterator< Container< typename Graph::PVertex,std::allocator<typename Graph::PVertex> > >,
+				std::back_insert_iterator< Container< typename Graph::PEdge,std::allocator<typename Graph::PEdge> > > > InputType;
 
 			/** \brief Empty constructor*/
 			OutPathTool()
@@ -242,6 +244,7 @@ namespace Koala
 			typedef T ValueType;
 			typedef std::back_insert_iterator< std::vector< int > > CIterType;
 			typedef std::back_insert_iterator< std::vector< T > > VIterType;
+			typedef CompStore< std::back_insert_iterator< std::vector< int > >,std::back_insert_iterator< std::vector< T > > > InputType;
 
 			CompStoreTool()
 				{ clear(); }
@@ -668,7 +671,7 @@ namespace Koala
 		 *  @param[in] src the given vertex
 		 *  @param[out] out the iterator to write visited vertices in order given by the strategy  SearchImpl.
 		 *  @param[in] dir the direction of edges to consider WEN: raczej podczas trawersacji krawedzie sa przechodzone zgodnie z maska, loops are ignored regardless of the mask.
-		 *  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole forbidden.
+		 *  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole forbidden. WEN: tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania ze start sa ustawiane w tej mapie
 		 *   After the execution of the method, the associative container represent the search in-tree WEN: o korzeniu src
 		 *   where fields \p vPrev and \p ePrev keep the previous vertex and edge, and the field \p distance keeps the distance from the root.
 		 *   finally \p field component = 0.
@@ -749,7 +752,7 @@ namespace Koala
 
 
         //NEW: ponizsze 2 - przeglad podobny do ScanAttainable wybrana strategia, ale tylko na glebokosc radius w poddrzewie o korzeniu  src
-        // W kontenerze wpisuje (odwiedza) odwiedzone wierzcholki. Zwraca ich liczbe
+        // W kontenerze wpisuje (odwiedza) odwiedzone wierzcholki. Zwraca ich liczbe. WEN: tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania start sa ustawiane w tej mapie
 		template< class GraphType, class VertContainer> static int scanNear( const GraphType &,
 			typename GraphType::PVertex, int radius, VertContainer &, EdgeDirection dir = EdUndir | EdDirOut );
 
@@ -888,7 +891,7 @@ namespace Koala
 		* @param[in] g the graph containing vertices to visit
 		* @param[in] src the given vertex
 		* @param[in] visited the container to store data (map PVertex -> VisitVertLabs), (BlackHole forbidden). The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
-            WEN: [in]?
+            WEN: [in]? WEN: tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania ze start sa ustawiane w tej mapie
 		* @param[in] visitor visitor called for each vertex
 		* @param[in] dir direction of edges to consider
 		 * - EdDirOut arcs are traversed according to their direction,
@@ -1408,7 +1411,7 @@ namespace Koala
 		 *  @param[in] g the graph to split.
 		 *  @param[in] src the reference vertex.
 		 *  @param[out] vmap the map PVertex->VertData sqould be considered together with sequence viter (BlackHole possible).
-		 *  @param[out] emap the map PEdge->int associating each edge with a block number. (BlackHole possible)
+		 *  @param[out] emap the map PEdge->int associating each edge with a block number. (BlackHole possible) WEN: tylko wartosci dla wierzcholkow ze skladowej start sa ustawiane w tej mapie
 		 *  @param[out] out the CompStore object with a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
 		 *  @param[out] viter the iterator to the container with concatenated sequences of blocks to which the each vertex belongs to.
 		 *   For each vertex the starting point of sequence of blocks is given by \a vmap in the VertData field firstBlock.

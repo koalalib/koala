@@ -14,18 +14,19 @@
 namespace Koala
 {
 
-//WEN: Uwaga globalna do calego pliku: wszystkie procedury tutaj uwzgledniaja krawedzie (z przypisanymi length) wszystkich rodzajow, wyjatkiem jest KruskalPar, ktora ignoruje Loopy.
+//WEN: Uwaga globalna do calego pliku: wszystkie procedury tutaj uwzgledniaja krawedzie (z przypisanymi length) wszystkich rodzajow
 //WEN: rownoleglosci dozwolone zawsze
 //Obowiazuje do konca pliku
 
     //NEW: Labele vers/edges we wszystkich algorytmach na wazone sciezki wygladaja tak samo, wiec zostaly wyciagniete do wspolnej klasy
-    template< class DefaultStructs> struct WeightPathStructs {
+    struct WeightPathStructs {
         //WEN: OK, ale gdzies trzeba zaznaczyc, ze tu jest podobna struktura jak VisitVertLabs (search.h) i dlatego
         //klasy algorytmow sciezkowych w weights.h dziedzicza po ShortPathStructs (mozna uzywac tamtych metod dla kontenera wierzcholkowego)
 
-        //WEN: ponizsze struktury maja trywialnych potomkow w klasach algorytmow sciezkowych, ale w tych procedurach mozna
+        //WEN: ponizszedwie  struktury maja trywialnych potomkow w klasach algorytmow sciezkowych, ale w tych procedurach mozna
         //tez bezposrednio uzywac tutejszych struktur jako labelsow dla verts/edges
 		// rekord wejsciowy opisujacy krawedz
+		//NEW: przeniesione i uwspolnione z dalszych klas algorytmow sciezkowych
 		/** \brief The input information for edges.*/
 		template< class DType > struct EdgeLabs
 		{
@@ -56,6 +57,35 @@ namespace Koala
 			/**\brief Copy VertLabs*/
 			template< class Rec > void copy( Rec &rec ) const;
 		};
+
+        //WEN: opis
+		//NEW: przeniesione i uwspolnione z dalszych klas algorytmow sciezkowych
+		// Rekord wyjsciowy zawierajacy od razu dlugosc najkr. sciezki i jej liczbe krawedzi
+		/** \brief Structure auxiliary for the method findPath.*/
+		template< class DistType > struct PathLengths
+		{
+			DistType length;
+			int edgeNo;
+
+			PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano )
+				{ }
+			PathLengths()
+				{ }
+		};
+		// mozna stosowac jako kontener opisujacy krawedz w przypadkach, gdy chcemy wsystkim krawedziom nadac wagi jednostkowe
+		//WEN: opis
+		//NEW: przeniesione i uwspolnione z All2AllDistsPar i DAGCritPathPar
+		template< class DType > struct UnitLengthEdges
+		{
+			struct  ValType
+			{
+				typedef DType DistType;
+				DistType length;
+			};
+
+			template< class T > ValType operator[]( T e ) const;
+		};
+
     };
 
 	/* DijkstraBasePar
@@ -63,19 +93,14 @@ namespace Koala
 	 */
 	/** \brief Dijkstra base. (parametrized).
 	 *  \ingroup DMweight */
-	template< class DefaultStructs > class DijkstraBasePar: public ShortPathStructs
+	template< class DefaultStructs > class DijkstraBasePar: public WeightPathStructs, public ShortPathStructs
 	{
 	public:
-		// rekord wejsciowy opisujacy krawedz
-		/** \brief The input information for edges.*/
-		template< class DType > struct EdgeLabs
-		: public WeightPathStructs<DefaultStructs>::template EdgeLabs<DType>
-		{};
 
 		// rekord wyjsciowy opisujacy wierzcholek
 		/** \brief The input/output information for vertices.*/
 		template< class DType, class GraphType > struct VertLabs
-		: public WeightPathStructs<DefaultStructs>::template VertLabs<DType,GraphType,true>
+		: public WeightPathStructs::template VertLabs<DType,GraphType,true>
 		{};
 
 		// wlasciwa procedura: odleglosc miedzy para wierzcholkow
@@ -186,20 +211,6 @@ namespace Koala
 	template< class DefaultStructs, class DijBase > class DijkstraMainPar: public DijBase
 	{
 	public:
-		// Rekord wyjsciowy zawierajacy od razu dlugosc najkr. sciezki i jej liczbe krawedzi
-		/** \brief Structure auxiliary for the method findPath.*/
-		template< class DistType > struct PathLengths
-		{
-			DistType length;/**<\brief Length of path.*/
-			int edgeNo;/**<\brief Number of path edges .*/
-
-			/**\brief Constructor.*/
-			PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano )
-				{ }
-			/**\brief Constructor.*/
-			PathLengths()
-				{ }
-		};
 
 		// zapisuje od razu sciezke  start->end (wierzcholki i krawedzie) pod pare podanych iteratorow
 		// Znajduje wszystko w jedym etapie
@@ -212,9 +223,9 @@ namespace Koala
 		 *  \param start the starting vertex of the searched path.
 		 *  \param end the terminal  vertex of the searched path.
 		 *  \param[out] iters an OutPath object that keeps the output path.
-		 *  \return the PathLengths object that keeps both the length and the edge number of path.*/
+		 *  \return the PathLengths object that keeps both the length and the edge number of path. WEN: a co przy braku polaczenia?*/
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
-			PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType& g,
+			typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType& g,
 				const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
 				ShortPathStructs::OutPath< VIter,EIter > iters )
 				// Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
@@ -230,10 +241,10 @@ namespace Koala
 					dist = DijBase::distances( g,vertTab,edgeTab,start,end );
 
 					if (PlusInfty == dist)
-					return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
+					return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
 
 					int len = DijBase::getPath( g,vertTab,end,iters );
-					return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
+					return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
 					// dlugosc najkr. siezki i jej liczba krawedzi
 				}
 	};
@@ -283,34 +294,15 @@ namespace Koala
 	 */
 	/** \brief Get the longest path in directed acyclic graph (parametrized)
 	 *  \ingroup DMweight */
-	template< class DefaultStructs > class DAGCritPathPar: public ShortPathStructs
+	template< class DefaultStructs > class DAGCritPathPar: public WeightPathStructs, public ShortPathStructs
 	{
 	public:
-
-		// rekord wejsciowy opisujacy krawedz
-		/** \brief The input information for edges.*/
-		template< class DType > struct EdgeLabs
-		: public WeightPathStructs<DefaultStructs>::template EdgeLabs<DType>
-		{};
 
 		// rekord wyjsciowy opisujacy wierzcholek
 		/** \brief The input/output information for vertices.*/
 		template< class DType, class GraphType > struct VertLabs
-		: public WeightPathStructs<DefaultStructs>::template VertLabs<DType,GraphType,false>
+		: public WeightPathStructs::template VertLabs<DType,GraphType,false>
 		{};
-
-		// mozna stosowac jako kontener opisujacy krawedz w przypadkach, gdy chcemy wsystkim krawedziom nadac wagi jednostkowe
-		//WEN: opis
-		template< class DType > struct UnitLengthEdges
-		{
-			struct  ValType
-			{
-				typedef DType DistType;
-				DistType length;
-			};
-
-			template< class T > ValType operator[]( T e ) const;
-		};
 
 		// pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
 		// start=NULL - szukamy najdluzszych sciezek w grafie o dowolnym poczatku
@@ -348,18 +340,6 @@ namespace Koala
 			GraphType &g, const VertContainer &vertTab, typename GraphType::PVertex end,
 			ShortPathStructs::OutPath< VIter,EIter > iters );
 
-		// Rekord wyjsciowy zawierajacy od razu dlugosc najdluzszej sciezki i jej liczbe krawedzi
-		template< class DistType > struct PathLengths
-		{
-			DistType length;
-			int edgeNo;
-
-			PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano )
-				{ }
-			PathLengths()
-				{ }
-		};
-
 		// zapisuje od razu sciezke krytyczna (wierzcholki i krawedzie) pod pare podanych iteratorow
 		// Znajduje wszystko w jedym etapie
 		 /** \brief Get critical path.
@@ -372,7 +352,7 @@ namespace Koala
 		 *  \param[out] iters an OutPath object that keeps the output path.
 		 *  \return the PathLenghts object that keeps both the length and the edge number of path WEN: dla nieosiogalnego (-infty,-1).*/
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
-			PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
+			typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
 				const EdgeContainer& edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
 				ShortPathStructs::OutPath< VIter,EIter > iters )
 				// Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
@@ -385,7 +365,7 @@ namespace Koala
 					EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
 
 					if (MinusInfty == (dist = critPathLength( g,vertTab,edgeTab,start,end )))
-					return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
+					return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
 
                     if (start==0 && end==0)
                     {
@@ -396,12 +376,12 @@ namespace Koala
                     }
 
 					int len = getPath( g,vertTab,end,iters );
-					return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
+					return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
 				}
 
         //NEW: jw. ale start=0 tzn. najdluzsza sciezka do end w calym grafie, domyslnie - w ogle w calym
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
-			PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
+			typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
 				const EdgeContainer& edgeTab, ShortPathStructs::OutPath< VIter,EIter > iters, typename GraphType::PVertex end=0 )
             {
                 return findPath(g,edgeTab,0,end,iters);
@@ -423,20 +403,14 @@ namespace Koala
 	 */
 	/** \brief Bellman-Ford shortest path algorithm (parametrized).
 	 *  \ingroup DMweight */
-	template< class DefaultStructs > class BellmanFordPar: public ShortPathStructs
+	template< class DefaultStructs > class BellmanFordPar: public WeightPathStructs, public ShortPathStructs
 	{
 	public:
-
-		// rekord wejsciowy opisujacy krawedz
-		/** \brief The input information for edges.*/
-		template< class DType > struct EdgeLabs
-		: public WeightPathStructs<DefaultStructs>::template EdgeLabs<DType>
-		{};
 
 		// rekord wyjsciowy opisujacy wierzcholek
 		/** \brief The input/output information for vertices.*/
 		template< class DType, class GraphType > struct VertLabs
-		: public WeightPathStructs<DefaultStructs>::template VertLabs<DType,GraphType,true>
+		: public WeightPathStructs::template VertLabs<DType,GraphType,true>
 		{};
 
 		// wlasciwa procedura: odleglosc miedzy para wierzcholkow
@@ -477,22 +451,6 @@ namespace Koala
 			const GraphType &g, VertContainer &vertTab, typename GraphType::PVertex end,
 			ShortPathStructs::OutPath< VIter,EIter > iters );
 
-		// Rekord wyjsciowy zawierajacy od razu dlugosc najkr. sciezki i jej liczbe krawedzi
-		/** \brief Structure auxiliary for the method findPath.
-		 *   */
-		template< class DistType > struct PathLengths
-		{
-			DistType length;/**<\brief Length of path.*/
-			int edgeNo;/**<\brief Number of path edges .*/
-
-			/**\brief Constructor.*/
-			PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano )
-				{ }
-			/**\brief Constructor.*/
-			PathLengths()
-				{ }
-		};
-
 		// zapisuje od razu sciezke krytyczna (wierzcholki i krawedzie) pod pare podanych iteratorow
 		// Znajduje wszystko w jedym etapie
 		// zwraca rekord PathLengths z parametrami sciezki (dlugosc najdl siezki i jej liczba krawedzi)
@@ -508,7 +466,7 @@ namespace Koala
 		 *  \return the PathLenghts object that keeps both the length and the edge number of path.
 		 WEN: ( infty,-1 )- end nieosiagalny, ( -infty,-2 ) - ujemny cykl przeszkodzil w wyliczeniu0, */
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
-			PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
+			typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
 				const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
 				ShortPathStructs::OutPath< VIter,EIter > iters )
 				// Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
@@ -520,13 +478,13 @@ namespace Koala
 
 					if (NumberTypeBounds< typename EdgeContainer::ValType::DistType >
 						::isPlusInfty(dist = distances( g,vertTab,edgeTab,start,end)))
-							return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
+							return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
 					else if (NumberTypeBounds< typename EdgeContainer::ValType::DistType >
 						::isMinusInfty( dist ))
-							return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-2 ); // w grafie jest cykl ujemny
+							return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,-2 ); // w grafie jest cykl ujemny
 
 					int len = getPath( g,vertTab,end,iters );
-					return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
+					return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
 					// dlugosc najkr. siezki i jej liczba krawedzi
 				}
 	};
@@ -550,7 +508,7 @@ namespace Koala
 	 *
 	 *  The Floyd algorithm for shortest path, based on the Warshall theorem.
 	 *  \ingroup DMweight */
-	template< class DefaultStructs > class All2AllDistsPar : public PathStructs
+	template< class DefaultStructs > class All2AllDistsPar : public WeightPathStructs, public PathStructs
 	{
 	protected:
 		template< class GraphType, class TwoDimVertContainer, class VIter, class EIter > static int
@@ -559,30 +517,11 @@ namespace Koala
 
 	public:
 
-		// rekord wejsciowy opisujacy krawedz
-		/** \brief The input information for edges.*/
-		template< class DType > struct EdgeLabs
-		: public WeightPathStructs<DefaultStructs>::template EdgeLabs<DType>
-		{};
-
 		// rekord wyjsciowy opisujacy wierzcholek
 		/** \brief The input/output information for vertices.*/
 		template< class DType, class GraphType > struct VertLabs
-		: public WeightPathStructs<DefaultStructs>::template VertLabs<DType,GraphType,true>
+		: public WeightPathStructs::template VertLabs<DType,GraphType,true>
 		{};
-
-		// mozna stosowac jako kontener opisujacy krawedz w przypadkach, gdy chcemy wsystkim krawedziom nadac wagi jednostkowe
-		//WEN: opis?
-		template< class DType > struct UnitLengthEdges
-		{
-			struct  ValType
-			{
-				typedef DType DistType;
-				DistType length;
-			};
-
-			template< class T > ValType operator[]( T e ) const;
-		};
 
 		// wlasciwa procedura Floyda: odleglosc miedzy kazda para wierzcholkow
 		// false - wykryto ujemny cykl, wowczas wyniki z vertMatrix nie nadaja sie do uzytku

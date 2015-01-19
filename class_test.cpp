@@ -66,7 +66,9 @@ using namespace std;
 //        g.addEdge(u8,u9);
 //        g.addEdge(u1,u9);
 
-
+//    g.clearEdges();
+//    g.addEdge(u4,u6);g.addEdge(u1,u6);g.addEdge(u2,u6);g.addEdge(u6,u3);
+//    g.addEdge(u5,u6);g.addEdge(u7,u6);g.addEdge(u9,u6);g.addEdge(u6,u8);
 
 
     cout << IsIt::chordal(g) << "\nOrder: ";

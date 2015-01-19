@@ -113,6 +113,7 @@ void bfTest()
     std::cout<< std::endl;
     bfTest();
     std::cout<< "Odleglosc: "<< Koala::BellmanFord::distances(g,blackHole,edgeCont,U,V);
+    std::cout<< "Odleglosc: "<< Koala::BellmanFord::distances(g,blackHole,Koala::All2AllDists::UnitLengthEdges<int>(),U,V);
 
     return 0;
 }

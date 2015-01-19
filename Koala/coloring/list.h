@@ -195,7 +195,7 @@ public:
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \return the set equal to the lists of colors union. */
 	template<typename Graph, typename ColLists>
-	static Set<int> listColorsSet(const Graph &graph, const ColLists &colLists);
+	static Set<int> listColorSet(const Graph &graph, const ColLists &colLists);
 protected:
 	/** \brief Object function choosing proper color from list of colors.
 	 *
@@ -407,7 +407,7 @@ public:
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \return the set equal to the lists of colors union. */
 	template<typename Graph, typename ColLists>
-	static Set<int> listColorsSet(const Graph &graph, const ColLists &colLists);
+	static Set<int> listColorSet(const Graph &graph, const ColLists &colLists);
 
 	/** \brief Object function choosing proper color from list of colors.
 	 *

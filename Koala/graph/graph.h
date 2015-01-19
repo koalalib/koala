@@ -266,6 +266,8 @@ namespace Koala
 
 	};
 
+//#include "settings.h"
+
 	namespace Privates
 	{
 

@@ -90,6 +90,8 @@ void JohnsonTest2()
 
     std::cout<< "Odleglosci pomiedzy kazda para wierzcholkow" << std::endl << std::endl;
 
+    Koala::All2AllDists::johnson(g,twoDimVertCont,Koala::All2AllDists::UnitLengthEdges<int>());
+    twoDimVertCont.clear();
 	Koala::All2AllDists::johnson(g,twoDimVertCont,edgeCont);
     for(Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> >::PVertex u=g.getVert();u;u=g.getVertNext(u)){
         for(Koala::Graph<OpisV,OpisE,Koala::GrDefaultSettings<Allow,AdjAllow> >::PVertex v=g.getVert();v;v=g.getVertNext(v)){

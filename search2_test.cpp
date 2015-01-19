@@ -125,7 +125,7 @@ void searchTest2()
 
     std::cout<<std::endl;
 
-    int compno = Koala::Blocks::splitComp(g,C,vertCont,edgeCont,Koala::Blocks::compStore(comptab[0],tabV),
+    int compno = Koala::Blocks::split(g,vertCont,edgeCont,Koala::Blocks::compStore(comptab[0],tabV),
                                    comptab[1]);
 
         Koala::Blocks::split(g,vertCont,edgeCont,blackHole,
@@ -136,6 +136,7 @@ void searchTest2()
         for(int j=comptab[0][i];j<comptab[0][i+1];j++) cout << tabV[j]->info.name << " ";
         cout << endl;
     }
+
 //    std::cout << endl;
 //    for(int i=0;i<compno;i++)
 //    {   cout << comptab[1][i] << ':';
@@ -151,6 +152,7 @@ void searchTest2()
     std::cout << std::endl;
     for(EE=g.getEdge();EE;EE=g.getEdgeNext(EE))
         std::cout << " {" << EE->getEnds().first->info.name << EE->getEnds().second->info.name << "}:" << edgeCont[EE];
+
 }
 {
     searchTest();

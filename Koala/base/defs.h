@@ -243,6 +243,8 @@ namespace Koala
 
 	};
 
+//#include "settings.h"
+
 
 	/* ConstFunctor
 	 *

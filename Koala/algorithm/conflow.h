@@ -195,6 +195,9 @@ namespace Koala
 		template< class GraphType, class CapacType > struct EdgeCut2: public EdgeCut< CapacType >
 		{
 			typename GraphType::PVertex first/**\brief Starting vertex*/,second/**\brief Terminal vertex*/;
+
+			EdgeCut2() : first(0), second(0)
+			{}
 		};
 
 		// Do odczytu rozciecia krawedziowego miedzy para wierzcholkow
@@ -235,10 +238,6 @@ namespace Koala
 			GHTreeEdge( ): first( 0 ), second( 0 ),
 				capac( NumberTypeBounds< CapacType >::zero() )
 				{ }
-			/**\brief Constructor.*/
-			GHTreeEdge( typename GraphType::PVertex f ): first( f ), second( 0 ),
-				capac( NumberTypeBounds< CapacType >::zero() )
-				{ }
 			/**\brief Constructor.
 			 *
 			 *  Assigns the both ends of edge and capacity.
@@ -271,9 +270,9 @@ namespace Koala
 				lo(NumberTypeBounds< CapacType >::zero())
 				{ }
 			/**\brief Constructor.*/
-			TrsVertLoss( CapacType alo):
-				hi(NumberTypeBounds< CapacType >::zero()),
-				lo( alo )
+			TrsVertLoss( CapacType ahi):
+				hi(ahi),
+				lo( NumberTypeBounds< CapacType >::zero() )
 				{ }
 			/**\brief Constructor*/
 			TrsVertLoss( CapacType alo, CapacType ahi): hi( ahi ), lo( alo )
@@ -306,9 +305,9 @@ namespace Koala
 				cost(NumberTypeBounds< CostType >::zero())
 			{ }
 			/** \brief Constructor.*/
-			TrsEdgeLabs( CapacType alo):
-				hi(NumberTypeBounds< CapacType >::zero()),
-				lo( alo ),
+			TrsEdgeLabs( CapacType ahi):
+				hi(ahi ),
+				lo( NumberTypeBounds< CapacType >::zero() ),
 				cost(NumberTypeBounds< CostType >::zero())
 			{ }
 			/** \brief Constructor.*/
@@ -471,7 +470,7 @@ namespace Koala
 		 *  \param[in] type the flag decides about the type of considered flow:
 		 *   - EdDirOut - outflow, WEN: z uwzg. ew. krazacego w petlach
 		 *   - EdDirIn - inflow, WEN: z uwzg. ew. krazacego w petlach
-		 *   - EdUndir - flow balance. tj. powyzszy EdDirOut - pow. EdDirIn WEN: inne wartosci zakazane
+		 *   - EdUndir - flow balance. WEN: tj. powyzszy EdDirOut - pow. EdDirIn WEN: inne wartosci zakazane
 		 *  \return the size of the flow. */
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			vertFlow( const GraphType &g, const EdgeContainer &edgeTab, typename GraphType::PVertex v,
@@ -734,7 +733,7 @@ namespace Koala
 		/** \brief Get Gomory-Hu tree.
 		 *
 		 *  The method calculates the Gomory-Hu tree of undirected graph \a g.
-		 *  \param g the considered graph., WEN: musi byc undirected ew. z petlami, bo one nie maja znaczenia
+		 *  \param g the considered graph., WEN: musi byc undirected ew. z petlami, bo one nie maja znaczenia, z n>1
 		 *  \param edgeTab  the the associative table (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost, WEN: czyli ktore? - tu liczy sie tylko pole wejsciowe capacity) to each edge.
 		 *  \param out the iterator of the container with output edges of Gomory-Hu tree in form of GHTreeEdge. WEN: dokladnie inserter na te struktury
                 There is exactly n-1 of them.*/
@@ -785,7 +784,7 @@ namespace Koala
 			// liczba krawedzi
 			int edgeNo;/**\brief The number of edges in the cut set.*/
 			/**\brief Constructor.*/
-			EdgeCut()
+			EdgeCut() : first(0), second(0), edgeNo(0)
 				{ }
 		};
 

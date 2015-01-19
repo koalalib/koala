@@ -328,9 +328,9 @@ void conTest()
 
     cout << "\n***\n" << boolalpha;
     cout << Koala::Flow::maxFlow(g,edgeCont,S,T) << '\n';
+    assert(Koala::Flow::testFlow(g,edgeCont,S,T));
     for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
-
     cout << "\n\n-----------\n\n";
     dijTest3();
         for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeCont[e].capac=1;
