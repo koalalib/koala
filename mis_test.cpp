@@ -132,7 +132,7 @@ int main(void) {
     // Exact:
 
 //    std::cout << "Exact: " << std::endl;
-//    MaxStable = Koala::MaxStable::get(g, tabV);
+//    MaxStable = Koala::MaxStable::findMax(g, tabV);
 //    std::cout << "wierzcholkow: " << MaxStable << std::endl;
 //    for(unsigned i = 0; i < MaxStable; i++) {
 //        std::cout << tabV[i]->info.name << ", ";
@@ -183,7 +183,7 @@ int main(void) {
     // Exact:
 
 //    std::cout << "Exact: " << std::endl;
-//    MaxStable = Koala::MaxStable::get(g, tabV);
+//    MaxStable = Koala::MaxStable::findMax(g, tabV);
 //    std::cout << "wierzcholkow: " << MaxStable << std::endl;
 //    for(unsigned i = 0; i < MaxStable; i++) {
 //        std::cout << tabV[i]->info.name << ", ";
@@ -599,7 +599,7 @@ int main(void) {
     // Exact:
 
 //    std::cout << "Exact: " << std::endl;
-//    MaxStable = Koala::MaxStable::get(g, tabV);
+//    MaxStable = Koala::MaxStable::findMax(g, tabV);
 //    std::cout << "wierzcholkow: " << MaxStable << std::endl;
 //    for(unsigned i = 0; i < MaxStable; i++) {
 //        std::cout << tabV[i]->info.name << ", ";
@@ -668,7 +668,7 @@ int main(void) {
 ////            Koala::MaxStableStrategy::GMin<RandGenType>(stdgen),
 //            vertCont/*NULL*/);
 
-        result = Koala::MaxStable::get(
+        result = Koala::MaxStable::findMax(
             g,
             tabV,1);
 
@@ -709,7 +709,7 @@ int main(void) {
 ////            Koala::MaxStableStrategy::GMin<RandGenType>(stdgen),
 //            vertCont/*NULL*/);
 
-        result = Koala::MaxClique::get(
+        result = Koala::MaxClique::findMax(
             g,
             tabV);
 
@@ -729,7 +729,7 @@ int main(void) {
         std::cout << "\tIs maximal clique: " << isMaxIndependentStr << std::endl;
         std::cout << std::endl; clearOutput();
 
-        result = Koala::MaxClique::getSome(
+        result = Koala::MaxClique::findSome(
             g,
             tabV,1);
 
@@ -777,9 +777,9 @@ int main(void) {
         clearOutput();
 //        g.clearEdges();
 
-        result = Koala::MinVertCover::getSome(
+        result = Koala::MinVertCover::findMin(
             g,
-            tabV,2);
+            tabV);
 
         std::cout << "wierzcholkow: " << result << std::endl;
         for(unsigned int i=0; i<result; ++i) {

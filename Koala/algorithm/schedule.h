@@ -15,16 +15,9 @@
 
 namespace Koala
 {
-	/** \brief Scheduling algorithms (parametrized).
-	 *
-	 *  The class provides some implementations of scheduling algorithms in the major part based on graphs.
-	 WEN: konkretnie DAGach reprezentujacych rel. prec na taskach (tj. zadania pokazuja reprezentujace je wierzcholki DAGa).
-	 *  All the parameters associated with scheduling like due dates, lengths, weights are assumed to be integers.
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
-	 *  \ingroup DMschedule   */
-	template< class DefaultStructs > class SchedulingPar
-	{
-	public:
+    //NEW: typy zagniezszone przeniesione z SchedulingPar
+    struct SchedulingStructs {
+
 		/** \brief Single task.
 		 *
 		 *  The class of task keep some basic information: length of task, release time, due date and the pointer to the vertex associated with task.*/
@@ -115,6 +108,20 @@ namespace Koala
 			/**\brief Clear all machines.*/
 			inline void clearMachines();
 		};
+
+
+    };
+
+	/** \brief Scheduling algorithms (parametrized).
+	 *
+	 *  The class provides some implementations of scheduling algorithms in the major part based on graphs.
+	 WEN: konkretnie DAGach reprezentujacych rel. prec na taskach (tj. zadania pokazuja reprezentujace je wierzcholki DAGa).
+	 *  All the parameters associated with scheduling like due dates, lengths, weights are assumed to be integers.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
+	 *  \ingroup DMschedule   */
+	template< class DefaultStructs > class SchedulingPar : public SchedulingStructs
+	{
+	public:
 
 		/** \brief Sort by longest processing time LPT
 		 *

@@ -55,45 +55,8 @@ namespace Koala
 	};
 
 
-	/* FlowPar
-	 * Algorytmy znajdowania przeplywu, najwiekszego przeplywu, najtanszego przeplywu, rozciec, transhipments itd.
-	 * DefaultStructs - wytyczne dla wewnetrznych procedur
-	 */
-	/** \brief Flow algorithms (parametrized).
-	 *
-	 *  The class provides the algorithms for finding flow, maximal flow, minimal cost flow, cuts and solutions for transshipment problem.
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
-	 *    See FlowAlgsDefaultSettings and AlgsDefaultSettings.
-	 *  \ingroup DMflow */
-	template< class DefaultStructs > class FlowPar: public PathStructs
-	{
-//maxFlow
-//	maxFlowFF
-//		BFSFlow
-//			usedCap
-//		addFlow
-//	maxFlowMKM
-//		layerFlow
-//			layers
-//				-BFSFlow
-//			findPot
-//				-usedCap
-//			onevert
-//				push
-//					-usedCap
-//					addFlow
-//				-findPot
-//minCostFlow
-//	minCostFlowFF
-//		BellmanFordFlow
-//			usedCapCost
-//			costFlow
-//	minCostFlowGT
-//		minMeanCycle
-//			-usedCapCost
-//			-costFlow
-//		-addFlow
-	public:
+    //NEW: wydzielone z FlowPar
+    struct FlowStructs {
 
 		// rekord z danymi (in-out) opisujacy krawedz
 		/** \brief Edge information for flow WEN: i ogolniej transship. problems algorithms.*/
@@ -323,6 +286,46 @@ namespace Koala
 			{ }
 		};
 
+    };
+
+	/* FlowPar
+	 * Algorytmy znajdowania przeplywu, najwiekszego przeplywu, najtanszego przeplywu, rozciec, transhipments itd.
+	 * DefaultStructs - wytyczne dla wewnetrznych procedur
+	 */
+	/** \brief Flow algorithms (parametrized).
+	 *
+	 *  The class provides the algorithms for finding flow, maximal flow, minimal cost flow, cuts and solutions for transshipment problem.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
+	 *    See FlowAlgsDefaultSettings and AlgsDefaultSettings.
+	 *  \ingroup DMflow */
+	template< class DefaultStructs > class FlowPar: public PathStructs, public FlowStructs
+	{
+//maxFlow
+//	maxFlowFF
+//		BFSFlow
+//			usedCap
+//		addFlow
+//	maxFlowMKM
+//		layerFlow
+//			layers
+//				-BFSFlow
+//			findPot
+//				-usedCap
+//			onevert
+//				push
+//					-usedCap
+//					addFlow
+//				-findPot
+//minCostFlow
+//	minCostFlowFF
+//		BellmanFordFlow
+//			usedCapCost
+//			costFlow
+//	minCostFlowGT
+//		minMeanCycle
+//			-usedCapCost
+//			-costFlow
+//		-addFlow
 	protected:
 		// rekord pomocniczy opisujacy wierzcholek
 		template< class GraphType, class CapacType > struct VertLabs
@@ -750,7 +753,7 @@ namespace Koala
 	 *  \tparam WEN: bzdura, tu jest ustawione na domyslny we FlowAlgsDefaultSettings tj. true, przeciez jest tylko jeden param szablonu
         costFF if treu the augmenting paths are used for calculating the smalest cost of flow (pseudoplynomial). If false???
 	 *  \ingroup DMflow */
-	template< bool FF > class Flow2: public FlowPar< FlowAlgsDefaultSettings< FF > > { };
+	template< bool FF > class FlowPar2: public FlowPar< FlowAlgsDefaultSettings< FF > > { };
 
 	// i z domyslnyna flaga wyboru algorytmow
 	/** \brief Flow algorithms (default).
@@ -758,23 +761,11 @@ namespace Koala
 	 *  The class provides the algorithms for finding flow, maximal flow, minimal cost flow, cuts and sollutions for transshipment problem.
 	 *  Simpler version (WEN: bo dziala na domyslnych wytycznych) of the class FlowPar in which MKM and augmenting paths algorithms are used.
 	 *  \ingroup DMflow */
-	class Flow: public Flow2< false > { };
+	class Flow: public FlowPar2< false > { };
 
-	/* ConnectPar
-	 * Procedury badania spojnosci grafu (bez wag na wierz/kraw)
-	 * DefaultStructs - wytyczne dla wewnetrznych procedur
-	 */
-	/** \brief Connectivity testing algorithms (parametrized).
-	 *
-	 *  The class consists of some methods calculating and testing connectivity.
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
-	 *    See FlowAlgsDefaultSettings and AlgsDefaultSettings.
-	 *  \ingroup DMconnect
-	 */
-	template< class DefaultStructs > class ConnectPar: public SearchStructs
-	//WEN: oczywiscie slowa path skas gdzies w dokumentacji do jej metod rozumiemy jako marszruty bez powtorzen uwzgledniajace orientacje przechodzonych krawedzi
-	{
-	public:
+	//NEW: wydzielone z ConnectPar
+	struct ConnectStructs {
+
 		// rekord wyjsciowy opisujacy rozciecie krawedziowe w grafie
 		/** \brief The output structure for edge cut problem in graph.*/
 		template< class GraphType > struct EdgeCut
@@ -788,6 +779,22 @@ namespace Koala
 				{ }
 		};
 
+	};
+
+	/* ConnectPar
+	 * Procedury badania spojnosci grafu (bez wag na wierz/kraw)
+	 * DefaultStructs - wytyczne dla wewnetrznych procedur
+	 */
+	/** \brief Connectivity testing algorithms (parametrized).
+	 *
+	 *  The class consists of some methods calculating and testing connectivity.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
+	 *    See FlowAlgsDefaultSettings and AlgsDefaultSettings.
+	 *  \ingroup DMconnect
+	 */
+	template< class DefaultStructs > class ConnectPar: public SearchStructs, public ConnectStructs
+	//WEN: oczywiscie slowa path skas gdzies w dokumentacji do jej metod rozumiemy jako marszruty bez powtorzen uwzgledniajace orientacje przechodzonych krawedzi
+	{
 	protected:
 		struct EdgeLabs
 		{

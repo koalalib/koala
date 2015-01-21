@@ -1256,7 +1256,7 @@ template< class DefaultStructs > template< class GraphType, class VertDataMap, c
 
 
 template< class DefaultStructs > template< class GraphType, class Iterator >
-	int BlocksPar< DefaultStructs >::getCore( const GraphType &g, Iterator out )
+	int BlocksPar< DefaultStructs >::core( const GraphType &g, Iterator out )
 {
 	const EdgeType mask = EdAll;
 	int n=g.getVertNo();

@@ -1221,7 +1221,7 @@ int kruskal(const char* napis)
     Settings::AssocCont<MyGraph::PEdge,KruskalPar< Settings >::EdgeLabs<int> >::Type emap;
     for(MyGraph::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         emap[e].weight=e->info;
-    KruskalPar< Settings >::Result<int> res=KruskalPar< Settings >::getMinForest(g,emap,tabe,blackHole);
+    KruskalPar< Settings >::Result<int> res=KruskalPar< Settings >::findMin(g,emap,tabe,blackHole);
     cout << '{';
     for(int i=0;i<res.edgeNo;i++)
     {

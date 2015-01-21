@@ -447,13 +447,13 @@ template< class DefaultStructs > template< class GraphType, typename Iterator >
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-	int MaxStablePar< DefaultStructs >::get(GraphType & g, OutputIterator out, int minSize)
+	int MaxStablePar< DefaultStructs >::findMax(GraphType & g, OutputIterator out, int minSize)
 {
 	return get(g, out, minSize, false);
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-	int MaxStablePar< DefaultStructs >::getSome(GraphType & g, OutputIterator out, int minSize)
+	int MaxStablePar< DefaultStructs >::findSome(GraphType & g, OutputIterator out, int minSize)
 {
 	return get(g, out, minSize, true);
 }
@@ -926,7 +926,7 @@ template< class DefaultStructs >
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-	int MaxCliquePar< DefaultStructs >::get(GraphType & g, OutputIterator out, int minSize)
+	int MaxCliquePar< DefaultStructs >::findMax(GraphType & g, OutputIterator out, int minSize)
 {
 	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
 		ImageGraph;
@@ -938,7 +938,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
 	MaxCliqueHeurPar< DefaultStructs >::copyneg(g,ig);
 
     typename ImageGraph::PVertex LOCALARRAY(imout,n);
-    int res = MaxStablePar< DefaultStructs >::get(ig, imout, minSize );
+    int res = MaxStablePar< DefaultStructs >::findMax(ig, imout, minSize );
     for(int i=0;i<res;i++)
     {
         *out=imout[i]->info;
@@ -948,7 +948,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-	int MaxCliquePar< DefaultStructs >::getSome(GraphType & g, OutputIterator out, int minSize)
+	int MaxCliquePar< DefaultStructs >::findSome(GraphType & g, OutputIterator out, int minSize)
 {
 	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
 		ImageGraph;
@@ -960,7 +960,7 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
 	MaxCliqueHeurPar< DefaultStructs >::copyneg(g,ig);
 
     typename ImageGraph::PVertex LOCALARRAY(imout,n);
-    int res = MaxStablePar< DefaultStructs >::getSome(ig, imout, minSize );
+    int res = MaxStablePar< DefaultStructs >::findSome(ig, imout, minSize );
     for(int i=0;i<res;i++)
     {
         *out=imout[i]->info;
@@ -1028,7 +1028,7 @@ template< class DefaultStructs >
 
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-	int MinVertCoverPar< DefaultStructs >::get(GraphType & g, OutputIterator out, int maxSize)
+	int MinVertCoverPar< DefaultStructs >::findMin(GraphType & g, OutputIterator out, int maxSize)
 {
     if (maxSize<0) return -1;
     if (maxSize==0)
@@ -1039,12 +1039,12 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
     int n=g.getVertNo();
     if (n<maxSize) maxSize=n;
     typename GraphType::PVertex LOCALARRAY(vtab,n);
-    int res=MaxStablePar< DefaultStructs >::get(g,vtab,n-maxSize);
+    int res=MaxStablePar< DefaultStructs >::findMax(g,vtab,n-maxSize);
     return MinVertCoverPar< DefaultStructs >::vertSetMinus(g,vtab,vtab+res,out);
 }
 
 template< class DefaultStructs > template< class GraphType, class OutputIterator >
-	int MinVertCoverPar< DefaultStructs >::getSome(GraphType & g, OutputIterator out, int maxSize)
+	int MinVertCoverPar< DefaultStructs >::findSome(GraphType & g, OutputIterator out, int maxSize)
 {
     if (maxSize<0) return -1;
     if (maxSize==0)
@@ -1055,6 +1055,6 @@ template< class DefaultStructs > template< class GraphType, class OutputIterator
     int n=g.getVertNo();
     if (n<maxSize) maxSize=n;
     typename GraphType::PVertex LOCALARRAY(vtab,n);
-    int res=MaxStablePar< DefaultStructs >::getSome(g,vtab,n-maxSize);
+    int res=MaxStablePar< DefaultStructs >::findSome(g,vtab,n-maxSize);
     return MinVertCoverPar< DefaultStructs >::vertSetMinus(g,vtab,vtab+res,out);
 }

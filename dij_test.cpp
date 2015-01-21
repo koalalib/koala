@@ -21,6 +21,8 @@ struct OpisE {
     int dlugosc; // dla Dijkstry niepotrzebne
 };
 
+struct MySetting : public Koala::AlgsDefaultSettings {};
+
 Koala::SimplArrPool<Koala::Vertex<OpisV,OpisE> > vpool(10);
 Koala::SimplArrPool<Koala::Edge<OpisV,OpisE> > epool(50);
 
@@ -37,8 +39,8 @@ struct VLab {
     typedef int DistType;
 };
 
-Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex, VLab> > vertCont;
-//            Koala::Dijkstra::VertLabs<int, Koala::Graph<OpisV,OpisE> > > > vertCont;
+Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PVertex,//, VLab> > vertCont;
+            Koala::Dijkstra::VertLabs<int, Koala::Graph<OpisV,OpisE> > > > vertCont;
 
 Koala::AssocTable<std::map<Koala::Graph<OpisV,OpisE>::PEdge,Koala::Dijkstra::EdgeLabs<int> > > edgeCont;
 
@@ -125,7 +127,7 @@ template< class GraphType, class Iter > static void scanAttainable( const GraphT
     // ten sam graf raz jeszcze, szukamy sciezki od nowa
 
     if (V) {
-        Koala::Dijkstra::PathLengths<int> res;
+        Koala::DijkstraPar<MySetting>::PathLengths<int> res;
 
         std::cout<< std::endl;g.clear(); dijTest();
         res=Koala::Dijkstra::findPath(g,edgeCont,U,V,Koala::Dijkstra::outPath(tabV,tabE));
@@ -285,6 +287,16 @@ template< class GraphType, class Iter > static void scanAttainable( const GraphT
                //Koala::stdChoose(true)
                Koala::Undirected|Koala::Directed
                );
+    {
+        using namespace Koala;
+
+        Kruskal::EdgeLabs<int> rec;
+        KruskalPar<MySetting>::EdgeLabs<int> rec2;
+//        rec2=rec; Blad
+        BellmanFord::PathLengths<int> recb;
+        BellmanFordPar<MySetting>::PathLengths<int> recb2;
+        recb2=recb;
+    }
 
     return 0;
 }

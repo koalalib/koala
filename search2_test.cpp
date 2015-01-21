@@ -222,7 +222,7 @@ void searchTest2()
 //    g.addEdge(J,M,OpisE(1));
         std::cout << g.getVertNo() << ' ' << g.getEdgeNo() << '\n';
 
-        int res=Koala::Blocks::getCore(g,tabV);
+        int res=Koala::Blocks::core(g,tabV);
 
         for(int i=0;i<res;i++) std::cout << tabV[i]->info.name << '.';
 

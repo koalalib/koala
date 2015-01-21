@@ -687,8 +687,8 @@ Kruskal::Result<int> kruskalExamp(const MyGraph& g,const AssocArray<PEdge,Kruska
 {
     Kruskal::Result<int> blad; blad.edgeNo=-1;
     if (!g.getVert()) return blad;
-    if (maks) return Kruskal::getMaxForest(g,lengs,out,blackHole);
-    else return Kruskal::getMinForest(g,lengs,out,blackHole);
+    if (maks) return Kruskal::findMax(g,lengs,out,blackHole);
+    else return Kruskal::findMin(g,lengs,out,blackHole);
 }
 
 void kruskalMain()

@@ -115,5 +115,7 @@ void bfTest()
     std::cout<< "Odleglosc: "<< Koala::BellmanFord::distances(g,blackHole,edgeCont,U,V);
     std::cout<< "Odleglosc: "<< Koala::BellmanFord::distances(g,blackHole,Koala::All2AllDists::UnitLengthEdges<int>(),U,V);
 
+    std::cout << '\n'<< Koala::BellmanFord::VertLabs<int, Koala::Graph<OpisV,OpisE> >().distance;
+
     return 0;
 }
