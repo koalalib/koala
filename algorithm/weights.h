@@ -23,8 +23,8 @@ namespace Koala
         //WEN: OK, ale gdzies trzeba zaznaczyc, ze tu jest podobna struktura jak VisitVertLabs (search.h) i dlatego
         //klasy algorytmow sciezkowych w weights.h dziedzicza po ShortPathStructs (mozna uzywac tamtych metod dla kontenera wierzcholkowego)
 
-        //WEN: ponizszedwie  struktury maja trywialnych potomkow w klasach algorytmow sciezkowych, ale w tych procedurach mozna
-        //tez bezposrednio uzywac tutejszych struktur jako labelsow dla verts/edges
+        //WEN: w klasach algorytmow sciezkowych, ich procedurach mozna
+        //bezposrednio uzywac tutejszych struktur jako labelsow dla verts/edges
 		// rekord wejsciowy opisujacy krawedz
 		//NEW: przeniesione i uwspolnione z dalszych klas algorytmow sciezkowych
 		/** \brief The input information for edges.*/
@@ -37,8 +37,8 @@ namespace Koala
 		};
 
 		// rekord wyjsciowy opisujacy wierzcholek
-		/** \brief The input/output information for vertices. WEN: plus==false tylko dla procedur z DAGCritPathPar*/
-		template< class DType, class GraphType,bool plus > struct VertLabs
+		/** \brief The input/output information for vertices. WEN: nie dziala z DAGCritPathPar, bo tam inicjacja distance jest inna */
+		template< class DType, class GraphType> struct VertLabs
 		{
 			// typ wagi liczbowej na krawedzi
 			typedef DType DistType;/**<\brief Type of vertex distance*/
@@ -50,8 +50,7 @@ namespace Koala
 
 			/**\brief Constructor.*/
 			VertLabs():
-				distance( (plus) ? NumberTypeBounds< DType >::plusInfty() :
-                                    NumberTypeBounds< DType >::minusInfty()),
+				distance(NumberTypeBounds< DType >::plusInfty()),
 				vPrev( 0 ), ePrev( 0 )
 				{ }
 			/**\brief Copy VertLabs*/
@@ -96,12 +95,6 @@ namespace Koala
 	template< class DefaultStructs > class DijkstraBasePar: public WeightPathStructs, public ShortPathStructs
 	{
 	public:
-
-		// rekord wyjsciowy opisujacy wierzcholek
-		/** \brief The input/output information for vertices.*/
-		template< class DType, class GraphType > struct VertLabs
-		: public WeightPathStructs::template VertLabs<DType,GraphType,true>
-		{};
 
 		// wlasciwa procedura: odleglosc miedzy para wierzcholkow
 		// avertTab, wyjsciowa tablica asocjacyjna PVertex->VertLabs poszczegolnych wierzcholkow
@@ -289,20 +282,37 @@ namespace Koala
 	 */
 	class DijkstraHeap: public DijkstraHeapPar< AlgsDefaultSettings > { };
 
+
+	struct DAGCritPathStructs : public WeightPathStructs
+	{
+
+        //NEW: Poprawna etykieta wierzcholka dla DAGCritPathPar
+		template< class DType, class GraphType> struct VertLabs
+		{
+			// typ wagi liczbowej na krawedzi
+			typedef DType DistType;/**<\brief Type of vertex distance*/
+			// znaleziona odleglosc
+			DType distance;/**<\brief Vertex distance from source.*/
+			// element sciezki, analogicznie jak VisitVertLabs w search.h
+			typename GraphType::PVertex vPrev;/**<\brief Previous vertex on the path from the source.*/
+			typename GraphType::PEdge ePrev;/**<\brief Previous edge on the path from the source.*/
+
+			/**\brief Constructor.*/
+			VertLabs():
+				distance(NumberTypeBounds< DType >::minusInfty()),
+				vPrev( 0 ), ePrev( 0 )
+				{ }
+		};
+    };
+
 	/* DAGCritPathPar
 	 * najdluzsze sciezki w DAGu z wagami na krawedziach
 	 */
 	/** \brief Get the longest path in directed acyclic graph (parametrized)
 	 *  \ingroup DMweight */
-	template< class DefaultStructs > class DAGCritPathPar: public WeightPathStructs, public ShortPathStructs
+	template< class DefaultStructs > class DAGCritPathPar: public DAGCritPathStructs, public ShortPathStructs
 	{
 	public:
-
-		// rekord wyjsciowy opisujacy wierzcholek
-		/** \brief The input/output information for vertices.*/
-		template< class DType, class GraphType > struct VertLabs
-		: public WeightPathStructs::template VertLabs<DType,GraphType,false>
-		{};
 
 		// pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
 		// start=NULL - szukamy najdluzszych sciezek w grafie o dowolnym poczatku
@@ -352,7 +362,7 @@ namespace Koala
 		 *  \param[out] iters an OutPath object that keeps the output path.
 		 *  \return the PathLenghts object that keeps both the length and the edge number of path WEN: dla nieosiogalnego (-infty,-1).*/
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
-			typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
+			PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
 				const EdgeContainer& edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
 				ShortPathStructs::OutPath< VIter,EIter > iters )
 				// Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
@@ -365,7 +375,7 @@ namespace Koala
 					EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
 
 					if (MinusInfty == (dist = critPathLength( g,vertTab,edgeTab,start,end )))
-					return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
+					return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
 
                     if (start==0 && end==0)
                     {
@@ -376,7 +386,7 @@ namespace Koala
                     }
 
 					int len = getPath( g,vertTab,end,iters );
-					return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
+					return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
 				}
 
         //NEW: jw. ale start=0 tzn. najdluzsza sciezka do end w calym grafie, domyslnie - w ogle w calym
@@ -406,12 +416,6 @@ namespace Koala
 	template< class DefaultStructs > class BellmanFordPar: public WeightPathStructs, public ShortPathStructs
 	{
 	public:
-
-		// rekord wyjsciowy opisujacy wierzcholek
-		/** \brief The input/output information for vertices.*/
-		template< class DType, class GraphType > struct VertLabs
-		: public WeightPathStructs::template VertLabs<DType,GraphType,true>
-		{};
 
 		// wlasciwa procedura: odleglosc miedzy para wierzcholkow
 		// zwraca przy podanym end : min. dlugosc sciezki start->end lub niesk. gdy end jest nieosiagalny
@@ -517,12 +521,6 @@ namespace Koala
 
 	public:
 
-		// rekord wyjsciowy opisujacy wierzcholek
-		/** \brief The input/output information for vertices.*/
-		template< class DType, class GraphType > struct VertLabs
-		: public WeightPathStructs::template VertLabs<DType,GraphType,true>
-		{};
-
 		// wlasciwa procedura Floyda: odleglosc miedzy kazda para wierzcholkow
 		// false - wykryto ujemny cykl, wowczas wyniki z vertMatrix nie nadaja sie do uzytku
 		/** \brief Get distances.
@@ -577,16 +575,9 @@ namespace Koala
 	 */
 	class All2AllDists : public All2AllDistsPar< AlgsDefaultSettings > { };
 
-	/* KruskalPar
-	 * najlzejsze lub najciezsze lasy w grafie
-	 */
-	/** \brief Spanning forest algorithm for weighted graphs (parametrized).
-	 *  WEN: tu jest nieco ogolniej, znajdujemy minimum/maximum weight forest o podanej liczbie krawedzi, a domyslnie spanning
-	 *  The class solves minimum/maximum spanning forest problem using the Kruskal technique.
-	 *  \ingroup DMweight */
-	template< class DefaultStructs > class KruskalPar
-	{
-	public:
+
+	//NEW: przeniesienie defs z KruskalPar
+	struct KruskalStructs {
 		// rekord wejsciowy opisujacy krawedz
 		/** \brief The input information for edges.*/
 		template< class DType > struct EdgeLabs
@@ -597,7 +588,7 @@ namespace Koala
 			WeightType weight; /**< \brief Length (weight) of edge.*/
 		};
 
-		/** \brief Structure returned by \a getMinForest and \a getMaxForest.*/
+		/** \brief Structure returned by \a getMinForest and \a getMaxForest. WEN: ale zmiana nazwy*/
 		template< class DType > struct Result
 		{
 			// waga znalezionego lasu
@@ -605,6 +596,18 @@ namespace Koala
 			// jego liczba krawedzi
 			int edgeNo;/**<\brief Number of edges in output forest.*/
 		};
+
+	};
+
+	/* KruskalPar
+	 * najlzejsze lub najciezsze lasy w grafie
+	 */
+	/** \brief Spanning forest algorithm for weighted graphs (parametrized).
+	 *  WEN: tu jest nieco ogolniej, znajdujemy minimum/maximum weight forest o podanej liczbie krawedzi, a domyslnie spanning
+	 *  The class solves minimum/maximum spanning forest problem using the Kruskal technique.
+	 *  \ingroup DMweight */
+	template< class DefaultStructs > class KruskalPar : public 	KruskalStructs
+	{
 
 	protected:
 		template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
@@ -669,6 +672,7 @@ namespace Koala
 		// asets, wynikowa struktura JoinableSets<PVertex> ze skladowymi spojnosci znalezionego lasu (lub BlackHole)
 		// edgeNo, limit liczby krawedzi - znaleziony las bedzie mial najwieksza mozliwa liczbe krawedzi nie przekraczajaca tego parametru
 		// pominiecie parametru - znaleziony las bedzie mial najwieksza mozliwa liczbe krawedzi
+		//NEW: zmiana nazwy getMinForest -> jn.
 		/** \brief Get minimum spanning WEN: nie bardzo, por. wyzej forest.
 		 *
 		 *  The method finds minimum spanning forest using the Kruskal algorithm.
@@ -680,12 +684,13 @@ namespace Koala
 		 *  \param edgeNo the maximal WEN: nie - zadana number of edges in the forest. If it is default or -1 WEN: lub wieksza od l. kraw. lasu spinajacego, the maximal spanning forest is found.
 		 *  \return the KruskalPar::Result object that keeps the weight of the found forest and the number of edges there.       */
 		template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
-			Result< typename EdgeContainer::ValType::WeightType > getMinForest( const GraphType &g,
+			Result< typename EdgeContainer::ValType::WeightType > findMin( const GraphType &g,
 				const EdgeContainer &edgeTab, Iter out, VertCompContainer &asets, int edgeNo = -1 )
 			{
 				return getForest( g,edgeTab,out,asets,edgeNo,true );
 			}
 
+        //NEW: zmiana nazwy getMaxForest -> jn.
 		// znajduje najciezszy las
 		/** \brief Get maximum spanning WEN: nie bardzo spanning forest.
 		 *  WEN: wszystkie uwagi j.w.
@@ -697,7 +702,7 @@ namespace Koala
 		 *  \param edgeNo the maximal number of edges in the spanning forest. If it is default or -1 the forest with maximal number of edges is found.
 		 *  \return the KruskalPar::Result object that keeps the weight of the found forest and the number of edges there.       */
 		template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
-			Result< typename EdgeContainer::ValType::WeightType > getMaxForest( const GraphType &g,
+			Result< typename EdgeContainer::ValType::WeightType > findMax( const GraphType &g,
 				const EdgeContainer &edgeTab, Iter out, VertCompContainer &asets, int edgeNo = -1 )
 			{
 				return getForest( g,edgeTab,out,asets,edgeNo,false );
