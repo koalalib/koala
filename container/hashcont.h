@@ -133,7 +133,7 @@ namespace Koala
 		{
 		public:
 			// explicit pointer truncation in 64bit
-			 size_t operator()( KeyType key, size_t m ) const
+			size_t operator()( KeyType key, size_t m ) const
 				{ return ((uint64_t)(uint32_t)(((uint32_t)(size_t)key) * 2654435769u) * m) >> 32; }
 		};
 
@@ -144,7 +144,7 @@ namespace Koala
 		template<class KeyType>
 		class FloatHash {
 		public:
-			 size_t operator ()(KeyType key, size_t m) const {
+			size_t operator ()(KeyType key, size_t m) const {
 				// explicit pointer truncation in 64bit
 				uint64_t iv = key * 2654435769u;
 				iv = iv ^ (iv >> 32);
@@ -681,7 +681,7 @@ namespace Koala
 		size_t m_resizeFactor;
 	};
 
-    //WEN: opis? por. AssocTabConstInterface < std::map<..> > z assoctab.h
+    //WEN: opis? por. AssocTabConstInterface < std::map<..> > z assoctab.h  przerabia hashcont do tablicy assocjacyjnej skopiowaæ metody.
 	template< class T > class AssocTabConstInterface;
 	namespace Privates
 	{
@@ -727,7 +727,7 @@ namespace Koala
 		V &get( K arg ) { return (_cont())[arg]; }
 	};
 
-    //WEN: opis? por. AssocTabConstInterface < std::map<..> > z assoctab.h
+    //WEN: opis? por. AssocTabConstInterface < std::map<..> > z assoctab.h skopowiaæ interface tak jak ni¿e !
 	template< class K, class V > class AssocTabConstInterface< HashMap< K,V > >: public Privates::AssocTabTag< K >
 	{
 	public:

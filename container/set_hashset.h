@@ -1,3 +1,6 @@
+/** \file set_hashset.h
+ *
+ */
 #include <set>
 #include <vector>
 #include <algorithm>
@@ -17,6 +20,12 @@ namespace Koala
 	 */
 
 	// wypisywanie zbioru do strumienia dziala dla typu Element obslugujacego wypisywanie przez <<
+	/** \brief Insert formatted output 
+	 *
+	 *  Overloaded operator<< applied to output stream inserts a formatted set. 
+	 *  In other words, it allows to print the set on output stream.
+	 *  \relates Koala::Set
+	 */
 	template< typename Element > std::ostream& operator<<(std::ostream& ,const Set<Element> &);
 template< typename Element > class Set;
 
@@ -43,7 +52,9 @@ template< typename Element >
  *  - The one working on the STL vector. This option is turned on if constant KOALA_SET_ON_VECTOR is defined.
  *  - The one working on hash sets is turned on if constant KOALA_SET_ON_HASHSET is defined.
  *
- *  In all those cases the interface remains the same and sets are expected to behave in the same way. The difference may occur if the order of the elements. That is why the methods searching through the elements returns elements in a different order. Also the complexity of some operations may vary.
+ *  In all those cases the interface remains the same and sets are expected to behave in the same way. 
+ *  The difference may occur if the order of the elements. That is why the methods searching through the elements returns elements in a different order.
+ *  Also complexity and practical computations time of some operations may vary.
  *
  *  The operator<< of output stream is overloaded, hence the sets can be easily printed.
  *  \ingroup cont */
@@ -238,7 +249,7 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		/** \brief Get subset.
 		 *
 		 *  The method returns the set satisfying the predicate \a fun.
-		 *  \param fun the function object that for element of the set returns boolean value.
+		 *  \param fun the function object that for element of the set returns Boolean value.
 		 *  \return the set of elements satisfying the functor \a fun. */
 		template <class Funktor>
 			Set<Element> subset( Funktor ) const;
@@ -254,7 +265,7 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 /** \brief Get elements.
 		 *
 		 *  The method writes all the elements to the container represented by the iterator \a out.
-		 *  \param out the iterator of the container in which all the element of the set are sored.
+		 *  \param out the iterator of the container in which all the element of the set are stored.
 		 *  \return the number of elements in the set and in the container \a out. */
 		template <class Iter>
 			int getElements( Iter ) const;

@@ -14,7 +14,7 @@
 //Kontenery kolejek priorytetowych szybko zlaczalnych dla porownywalnych typow kluczy: dwumianowej i Fibonacziego.
 
 
-//NEW: rezygnacja z parametru Allocator szablonow kopcow - kopce lokalne uzywaja puli pamieci typu SimplArrPool (simple.h)
+//rezygnacja z parametru Allocator szablonow kopcow - kopce lokalne uzywaja puli pamieci typu SimplArrPool (simple.h)
 
 namespace Koala
 {
@@ -24,9 +24,10 @@ namespace Koala
 	 * reprezentanta bedacego wskaznikiem na obiekt tego typu. Nie uzywany bezposrednio przez uzytkownika.
 	 * Reprezentant nie zmienia sie przez caly czas istnienia kolejki, bez wzgledu na jej ew. zmiany
 	 */
-	/** \brief Binominal heal node.
+	/** \brief Binominal heap node.
 	 *
-	 *  An auxiliary object representing single key (node) of binominal heap.
+	 *  An auxiliary object representing (wrapping) single key (node) of binominal heap.
+	 *  \tparam Key type of data stored in heap.
 	 */
 	template< class Key > class BinomHeapNode
 	{
@@ -42,7 +43,10 @@ namespace Koala
 		/**\brief Constructor*/
 		BinomHeapNode( const Key &key = Key() ): parent( 0 ), child( 0 ), next( 0 ), degree( 0 ), key( key )
 			{ }
-		/**\brief Get key.*/
+		/**\brief Get key.
+		 *
+		 *  \return the value of kept object.
+		 */
 		Key get()
 			{ return key; }
 	};
@@ -58,19 +62,19 @@ namespace Koala
 	 *
 	 *  Standard binominal heap structure.
 	 *  \tparam Key the class of stored objects.
-	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>. WEN: to powinien byc strict weak ordering
-	 *  \tparam Allocator the class allows to use own memory allocator. WEN: juz nie ma, zastapiono ew. pula podawana w konstruktorze
+	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>. The function should generate strict weak ordering.
 	 *  \ingroup cont
 	 *
-	 *  [See example](examples/heap/example_BinomHeap.html).
-	 */
+	 *  \wikipath{Binominal_heap}
+	 *
+	 *  [See example](examples/heap/example_BinomHeap.html). */
 	template< class Key, class Compare = std::less< Key > >
 		class BinomHeap
 	{
 	public:
-		typedef BinomHeapNode< Key > Node;/**\brief Node of heap. */
-		typedef BinomHeapNode< Key > *Repr;/**\brief Pointer to heap node. */
-		typedef SimplArrPool<BinomHeapNode< Key > > Allocator; //WEN: zewnetrzna pula na wezly
+		typedef BinomHeapNode< Key > Node;/**<\brief Node of heap type. */
+		typedef BinomHeapNode< Key > *Repr;/**<\brief Type of the pointer to a heap node. */
+		typedef SimplArrPool<BinomHeapNode< Key > > Allocator; /**<\brief Type of memory allocator.*/
 
 	protected:
 		Node *root,*minimum;
@@ -80,23 +84,36 @@ namespace Koala
 
 	public:
 		// podajemy komparator,
-		/** \brief Constructor.*/
+		/** \brief Constructor.
+		 *
+		 *  The default constructor generates empty heap.
+		 *  \param function the comparison functor, that should define strict weak ordering on the set of keys. By default the constructor from template parameter class Compare is used. 
+		 */
 		inline BinomHeap( const Compare &function = Compare() ):
 			root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( 0 )
 				{ }
 		// podajemy komparator, kolejka powiazana z alokatorem zewnetrznym
 		/** \brief Constructor.
 		*
-		*   The constructor allows to use external memory.
-		*   \param all memory buffer.
+		*   The version of constructor that generates empty heap and allows to use external memory. The memory should be already allocated using class SimplArrPool. Then it is impossible to reallocate the pool.
+		*   \param all memory buffer address.
 		*   \param function the comparison functor should define strict weak ordering on set of keys. */
 		inline BinomHeap( Allocator *all, const Compare &function = Compare() ):
 			root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( all )
 				{ }
-		// WEN: konstruktor kopiujacy, obiekt wiaze sie z ta sama pula, co oryginal
-		/** \brief Copy constructor.*/
-		inline BinomHeap( const BinomHeap< Key,Compare> & );
-		/** \brief Copy content operator.*/ //WEN: nie zmienia swojej puli
+		// konstruktor kopiujacy, obiekt wiaze sie z ta sama pula, co oryginal 
+		/** \brief Copy constructor.
+		 *
+		 *  Constructor copies the object. If the storage pool was used for the copied object, the copy will use the same pool.
+		 *  \param X copied heap.
+		 *  \return the new heap. */
+		inline BinomHeap( const BinomHeap< Key,Compare> &X );
+		/** \brief Copy content operator.
+		 *
+		 *  Operator copies the heap, If the storage pool was used for the copied object, the copy will use the same pool.
+		 *  \param X copied heap.
+		 *  \return the reference to itself.		 
+		 */ 
 		BinomHeap &operator=( const BinomHeap &X );
 		~BinomHeap()
 			{ clear(); }
@@ -112,7 +129,7 @@ namespace Koala
 		/** \brief Get top node.
 		 *
 		 *  The method gets the top heap node. If default std::less functor is used the method gets one with the minimum key.
-		 *  \return the top key.*/
+		 *  \return the reference to the node on the top of heap.*/
 		 Node* topRepr() const
 			{ return minimum; }
 
@@ -120,7 +137,8 @@ namespace Koala
 		/**\brief Insert key.
 		 *
 		 * The method inserts \a key on heap.
-		 * \return the reference WEN: raczej pointer to the new-created node for a key.*/
+		 * \param key the inserted element.
+		 * \return the pointer to the new-created node for a key.*/
 		Node* push( const Key &key );
 		// usun najmniejszy
 		/** \brief Remove top element.
@@ -131,7 +149,7 @@ namespace Koala
 		 // zmniejszenie klucza danego wezla, podanie wiekszej wartosci rzuca blad
 		/** \brief Decrease top element.
 		 *
-		 *  The method decreases the key of the node \a A to \a key. The new key needs to be smaller WEN: nie! not greater than the previous one, if not an exception is thrown.
+		 *  The method decreases the key of the node \a A to \a key. The new key needs to be not greater than the previous one, if not an exception is thrown.
 		 *  \param A the modified node
 		 *  \param key the new key.*/
 		void decrease( Node *A, const Key &key );
@@ -139,15 +157,15 @@ namespace Koala
 		/** \brief Delete node.
 		 *
 		 *  The node A is deleted from heap.
-		 *  \param the deleted node.*/
+		 *  \param A the pointer to the deleted node.*/
 		void del( Node *A );
 
 		// dopisuje klucze z drugiej kolejki, ktora jest czyszczona
 		/** \brief Merge heaps.
 		 *
 		 *  The keys from \a heap are moved to the current heap. All the keys from \a heap are deleted.
-		    WEN: jesli ktorys z kopcow uzywa puli na wezly, oba kopce musza uzywac tej samej
-		 *  \param A the moved heap.*/
+		 *  If any of heaps use pool of memory than both heaps should use the same pool.
+		 *  \param heap the moved heap.*/
 		void merge( BinomHeap & );
 		/** \brief Clear heap.*/
 		void clear();
@@ -159,7 +177,10 @@ namespace Koala
 		 *  \param end the iterator to the past-the-end element of the container with new content. */
 		template< class InputIterator > void assign( InputIterator beg, InputIterator end );
 
-		/** \brief Number of nodes.*/
+		/** \brief Number of nodes.
+		 *
+		 * \return the number of elements in the heap.
+		 */
 		unsigned size() const
 			{ return nodes; }
 
@@ -187,8 +208,6 @@ namespace Koala
 
 	};
 
-	//WEN: do pozostalych 2 kopcow zasadniczo te same poprawki
-
 	/** \brief Fibonacci heap node.
 	 *
 	 *  An auxiliary object representing single key (node) of Fibonacci heap. */
@@ -206,9 +225,11 @@ namespace Koala
 		void init( const Key & =Key() );
 
 	public:
-		/**\brief Get key.*/
+		/*\brief Get key.*/
+		/** \copydoc BinomHeapNode::get */
 		Key get() { return key; }
-		/**\brief Constructor*/
+		/*\brief Constructor*/
+		/** \copydoc BinomHeapNode::BinomHeapNode */
 		FibonHeapNode( const Key &_key = Key() )
 			{ init( _key ); }
 	};
@@ -218,7 +239,6 @@ namespace Koala
 	 *  Standard Fibonacci heap structure.
 	 *  \tparam Key the class of stored objects.
 	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>.
-	 *  \tparam Allocator the class allows to use own memory allocator.
 	 *  \ingroup cont
 	 *
 	 *  [See example](examples/heap/example_FibonHeap.html).
@@ -227,9 +247,9 @@ namespace Koala
 		class FibonHeap
 	{
 	public:
-		typedef FibonHeapNode< Key > Node;/**\brief Node of heap. */
-		typedef FibonHeapNode< Key > *Repr;/**\brief Pointer to heap node. */
-		typedef SimplArrPool<FibonHeapNode< Key > > Allocator;
+		typedef FibonHeapNode< Key > Node;/**<\brief Node of heap. */
+		typedef FibonHeapNode< Key > *Repr;/**<\brief Pointer to heap node. */
+		typedef SimplArrPool<FibonHeapNode< Key > > Allocator;/**<\brief Type of memory allocator.*/
 
 	private:
 		Node *root;
@@ -242,79 +262,95 @@ namespace Koala
 		void clear( Node * );
 
 	public:
-		/** \brief Empty constructor.*/
+		/* \brief Empty constructor.*/
+		/** \copydoc BinomHeap::BinomHeap( const Compare &function = Compare() ) */
 		inline FibonHeap( const Compare &function = Compare() ):
 			root( 0 ), nodes( 0 ), function( function ), allocator( 0 )
 				{ }
-		/** \brief Constructor.
+		/* \brief Constructor.
 		*
 		*   The constructor allows to use external memory.
 		*   \param all memory buffer.
 		*   \param function the comparison functor should define strict weak ordering on set of keys. */
+		/** \copydoc BinomHeap::BinomHeap( Allocator *all, const Compare &function = Compare() ) */
 		inline FibonHeap( Allocator *all, const Compare &function = Compare() ):
 			root( 0 ), nodes( 0 ), function( function ), allocator( all )
 				{ }
-		/** \brief Copy constructor.*/
-		inline FibonHeap( const FibonHeap< Key,Compare > & );
-		/** \brief Copy content operator.*/
+		/* \brief Copy constructor.*/
+		/** \copydoc BinomHeap::BinomHeap( const FibonHeap< Key,Compare > &X )*/
+		inline FibonHeap( const FibonHeap< Key,Compare > &X );
+		/* \brief Copy content operator.*/
+		/** \copydoc BinomHeap::operator=*/
 		FibonHeap& operator=( const FibonHeap< Key,Compare > &X );
 		~FibonHeap()
 			{ clear(); }
 
-		/** \brief Get top key.
+		/* \brief Get top key.
 		 *
 		 *  The method gets the top key of the heap. If default std::less functor is used the method gets the minimum key.
 		 *  \return the top key.*/
+		/** \copydoc BinomHeap::top*/
 		Key top() const;
-		/** \brief Get top node.
+		/* \brief Get top node.
 		 *
 		 *  The method gets the top heap node. If default std::less functor is used the method gets one with the minimum key.
 		 *  \return the top key.*/
+		/** \copydoc BinomHeap::topRepr*/
 		 Node *topRepr() const
 			{ return root; }
-		/**\brief Insert key.
+		/*\brief Insert key.
 		 *
 		 * The method inserts \a key on heap.
 		 * \return the reference to the new-created node for a key.*/
+		/** \copydoc BinomHeap::push*/
 		Node *push( const Key & );
-		/** \brief Remove top element.
+		/* \brief Remove top element.
 		 *
 		 *  The method removes the top element from the heap.*/
+		/** \copydoc BinomHeap::pop*/
 		void pop();
 
-		/** \brief Decrease top element.
+		/* \brief Decrease top element.
 		 *
 		 *  The method decreases the key of the node \a A to \a key. The new key needs to be smaller than the previous one, if not an exception is thrown.
 		 *  \param A the modified node
 		 *  \param key the new key.*/
-		void decrease( Node *, const Key & );
-		/** \brief Delete node.
+		/** \copydoc BinomHeap::decrease*/
+		void decrease( Node *A, const Key &key );
+		/* \brief Delete node.
 		 *
-		 *  The node A is deleted from heap.
+		 *  The node \a A is deleted from heap.
+		 * 
 		 *  \param the deleted node.*/
-		void del( Node * );
+		/** \copydoc BinomHeap::del*/
+		void del( Node *A );
 
-		/** \brief Merge heaps.
+		/* \brief Merge heaps.
 		 *
 		 *  The keys from \a heap are moved to the current heap. All the keys from \a heap are deleted.
 		 *  \param A the moved heap.*/
-		void merge( FibonHeap & );
-		/** \brief Clear heap.*/
+		/** \copydoc BinomHeap::merge*/
+		void merge( FibonHeap & heap);
+		/* \brief Clear heap.*/
+		/** \copydoc BinomHeap::clear*/
 		void clear();
 
-		/** \brief Assign heap content.
+		/* \brief Assign heap content.
 		 *
 		 *  The method clears the container and assigns new content from container defined by the iterators \a beg and \a end.
 		 *  \param beg the iterator to the first element of the container with new content.
 		 *  \param end the iterator to the past-the-end element of the container with new content. */
-		template< class InputIterator > void assign( InputIterator first, InputIterator last );
+		/** \copydoc BinomHeap::assign*/
+		template< class InputIterator > void assign( InputIterator beg, InputIterator end );
 
-		/** \brief Number of nodes.*/
+		/* \brief Number of nodes.*/
+		/** \copydoc BinomHeap::size*/
 		unsigned size() const { return nodes; }
-		/** \brief Test if empty.
+		/* \brief Test if empty.
 		 *
 		 *  The method only checks if there is no elements in the heap. The content remains intact.
 		 *  \return true if heap is empty, false if there is as least one element in heap. */
+		/** \copydoc BinomHeap::empty*/
 		bool empty() const { return !root; }
 
 	protected:
@@ -365,9 +401,9 @@ namespace Koala
 	class PairHeap
 	{
 	public:
-		typedef PairHeapNode<Key> Node;/**\brief Node of heap. */
-		typedef PairHeapNode<Key> * Repr;/**\brief Pointer to heap node. */
-		typedef SimplArrPool<PairHeapNode<Key> > Allocator;
+		typedef PairHeapNode<Key> Node;/**<\brief Node of heap. */
+		typedef PairHeapNode<Key> * Repr;/**<\brief Pointer to heap node. */
+		typedef SimplArrPool<PairHeapNode<Key> > Allocator; /**<\brief Type of memory allocator.*/
 
 	protected:
 		Node *root;
@@ -379,80 +415,95 @@ namespace Koala
 		void delNode( Node *node );
 		void clear( Node * );
 	public:
-		/** \brief Constructor.*/
+		/* \brief Constructor.*/
+		/** \copydoc BinomHeap::BinomHeap( const Compare &function = Compare() )*/
 		inline PairHeap( const Compare &function = Compare() ):
 			root( 0 ), nodes( 0 ), function( function ), allocator( 0 )
 				{ }
-		/** \brief Constructor.
+		/* \brief Constructor.
 		*
 		*   The constructor allows to use external memory.
 		*   \param all memory buffer.
 		*   \param function the comparison functor should define strict weak ordering on set of keys. */
+		/** \copydoc BinomHeap::BinomHeap( Allocator *all, const Compare &function = Compare() )*/
 		inline PairHeap( Allocator *all, const Compare &function = Compare() ):
 			root( 0 ), nodes( 0 ), function( function ), allocator( all )
 				{ }
-		/** \brief Copy constructor.*/
-		inline PairHeap( const PairHeap< Key,Compare > & );
-		/** \brief Copy content operator.*/
+		/* \brief Copy constructor.*/
+		/** \copydoc BinomHeap::BinomHeap( const BinomHeap< Key,Compare> &X ) */
+		inline PairHeap( const PairHeap< Key,Compare > &X );
+		/* \brief Copy content operator.*/
+		/** \copydoc BinomHeap::operator=( const BinomHeap &X )*/
 		PairHeap& operator=( const PairHeap< Key,Compare > &X );
 		~PairHeap()
 			{ clear(); }
 
-		/** \brief Get top key.
+		/* \brief Get top key.
 		 *
 		 *  The method gets the top key of the heap. If default std::less functor is used the method gets the minimum key.
 		 *  \return the top key.*/
+		/** \copydoc BinomHeap::top() */
 		Key top() const;
-		/** \brief Get top node.
+		/* \brief Get top node.
 		 *
 		 *  The method gets the top heap node. If default std::less functor is used the method gets one with the minimum key.
 		 *  \return the top key.*/
+		/** \copydoc BinomHeap::topRepr() */
 		Node *topRepr() const
 			{ return root; }
-		/**\brief Insert key.
+		/*\brief Insert key.
 		 *
 		 * The method inserts \a key on heap.
 		 * \return the reference to the new-created node for a key.*/
+		/** \copydoc BinomHeap::push */
 		Node *push( const Key & );
-		/** \brief Remove top element.
+		/* \brief Remove top element.
 		 *
 		 *  The method removes the top element from the heap.*/
+		/** \copydoc BinomHeap::pop */
 		void pop();
 
-		/** \brief Decrease top element.
+		/* \brief Decrease top element.
 		 *
 		 *  The method decreases the key of the node \a A to \a key. The new key needs to be smaller than the previous one, if not an exception is thrown.
 		 *  \param A the modified node
 		 *  \param key the new key.*/
-		void decrease( Node *, const Key & );
-		/** \brief Delete node.
+		/** \copydoc BinomHeap::decrease */
+		void decrease( Node *A, const Key &key );
+		/* \brief Delete node.
 		 *
 		 *  The node A is deleted from heap.
 		 *  \param the deleted node.*/
-		void del( Node * );
+		/** \copydoc BinomHeap::del */
+		void del( Node *A);
 
-		/** \brief Merge heaps.
+		/* \brief Merge heaps.
 		 *
 		 *  The keys from \a heap are moved to the current heap. All the keys from \a heap are deleted.
-		 *  \param A the moved heap.*/
-		void merge( PairHeap & );
-		/** \brief Clear heap.*/
+		 *  \param heap the moved heap.*/
+		/** \copydoc BinomHeap::merge */
+		void merge( PairHeap & heap);
+		/* \brief Clear heap.*/
+		/** \copydoc BinomHeap::clear */
 		void clear();
 
-		/** \brief Assign heap content.
+		/* \brief Assign heap content.
 		 *
 		 *  The method clears the container and assigns new content from container defined by the iterators \a beg and \a end.
 		 *  \param beg the iterator to the first element of the container with new content.
 		 *  \param end the iterator to the past-the-end element of the container with new content. */
-		template< class InputIterator > void assign( InputIterator first, InputIterator last );
+		/** \copydoc BinomHeap::assign */
+		template< class InputIterator > void assign( InputIterator beg, InputIterator end );
 
-		/** \brief Number of nodes.*/
+		/* \brief Number of nodes.*/
+		/** \copydoc BinomHeap::size */
 		unsigned size() const
 			{ return nodes; }
-		/** \brief Test if empty.
+		/* \brief Test if empty.
 		 *
 		 *  The method only checks if there is no elements in the heap. The content remains intact.
 		 *  \return true if heap is empty, false if there is as least one element in heap. */
+		/** \copydoc BinomHeap::empty */
 		bool empty() const
 			{ return !root; }
 

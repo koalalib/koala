@@ -32,12 +32,10 @@ namespace Koala
 	/** \brief Edge types.
 	 *
 	 *  Type used for variables storing basic information about edge type. Applied to masks with bit meaning as follows:
-	 *  - Detached   = 0x0  - Not connected WEN: tego user nie powinien nigdy zobaczyc
 	 *  - Loop       = 0x1  - edges with only one vertex.
-	 *  - Undirected = 0x2  - simple undirected edges .
-	 *  - Directed   = 0xC  - arcs (directed pair of vertices) WEN: arc nie jest para wierzcholkow.
-	 *  \ingroup DMgraph
-	 */
+	 *  - Undirected = 0x2  - undirected edges .
+	 *  - Directed   = 0xC  - arcs - directed edge.
+	 *  \ingroup DMgraph */
 	typedef unsigned char EdgeType;
 
 	// ... i ich orientacje względem wierzchołka.
@@ -46,14 +44,12 @@ namespace Koala
 	 *  The type used for variables storing the information about direction of edge.
 	 *  Variables of this type can be used as masks.\n
 	 *  Bits meaning:
-	 *  -  EdNone   = 0x00  - edge not defined.
-	 *  -  EdLoop   = 0x01  - edge with only one vertex.
-	 *  -  EdUndir  = 0x02  - simple undirected edge (undirected pair of vertices) WEN: link nie jest para wierzcholkow.
+	 *  -  EdLoop   = 0x01  - edge with only one vertex
+	 *  -  EdUndir  = 0x02  - undirected edge
 	 *  -  EdDirIn  = 0x04  - for directed edge in direction
 	 *  -  EdDirOut = 0x08  - for directed edge out direction
 	 *  -  EdAll    = 0x0F  - for all above options
-	 *   \ingroup DMgraph
-	 */
+	 *   \ingroup DMgraph */
 	typedef unsigned char EdgeDirection;
 
 	// Dopuszczalne wartości orientacji: brak, pętla, nieskierowana, wchodząca do wierzchołka, wychodząca z
@@ -71,9 +67,15 @@ namespace Koala
 	static const EdgeType Directed   = 0xC;
 
 	// Domyślne struktury (puste) z opisem krawędzi/wierzchołka.
-	/**\brief Structures for empty vertex info. \ingroup DMdef*/
+	/** \brief Structures for empty vertex info.
+	 *
+	 *  The empty structure often used as default value for info attributes in vertices.
+	 *  \ingroup DMdef*/
 	struct EmptyVertInfo { } ;
-	/**\brief Structures for empty edge info. \ingroup DMdef*/
+	/**\brief Structures for empty edge info. 
+	 *
+	 *  The empty structure often used as default value for info attributes in edges.
+	 *  \ingroup DMdef*/
 	struct EmptyEdgeInfo { } ;
 
 	template< class VertInfo, class EdgeInfo, class Settings > class Graph;
@@ -83,12 +85,11 @@ namespace Koala
 
 
     //NEW: znowu wylecialo do glownego zasiegu namespaca Koala
-    // Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych w
-    // algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda.
-    /** \brief Numeric types specialization.
-     *  WEN: to jest taka wersja std::numeric_limits ograniczona do potrzeb algorytmow Koali, w ktorych krawedziom na wejsciu przypisane sa etykiety
-     numeryczne (weight.h, conflow.h)
-     *  Class allows to choose own numeric types for data in algorithms.*/
+	// Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych w
+	// algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda.
+	/** \brief Numeric types specialization.
+	 *  WEN?: to jest taka wersja std::numeric_limits ograniczona do potrzeb algorytmow Koali
+	 *  Class allows to choose own numeric types for data in internal Koala algorithms.*/
     template< class T > class NumberTypeBounds
     {
     public:
@@ -115,23 +116,30 @@ namespace Koala
 	 */
 	/** \brief Default algorithms settings.
 	 *
-	 *  This is an useful plug-in that allows to parametrize some algorithms in this library with default values.
+	 *  This is an useful plug-in that allows to parameterize some algorithms in this library with default values.
 	 *  An usual class is declared  <tt> SomeNamePar<class DefaultStructs> </tt> In most cases there is also
 	 *  a class \a SomeName which is achieved from the original one by simply setting <tt>DefaultStructs = AlgsDefaultSettings</tt>
-	 *  \ingroup DMdef*/
-
+	 *  \ingroup DMdef */
 	class AlgsDefaultSettings
 	{
 	public:
 		// Typ klasy tablicy asocjacyjnej przypisującej np. wierzchołkowi/krawędzi wartości typu B.
 		/** \brief Type of associative container
 		 *
+		 *  The class is most often used to assign some values (colors weights priority etc.) to vertices (PVertex) or edges (PEdge).
 		 *  \tparam A key type.
 		 *  \tparam B mapped value type. */
 		template< class A, class B > class AssocCont
 		{
 		public:
-			typedef AssocArray< A,B > Type;/**<\brief Define own if intend to change.*/
+			/**\brief Associative contariner type.
+			 *
+			 * Define this type as other associative container in order to introduce changes.
+			 * Exemplary other possibilities:
+			 * - typedef AssocTable < BiDiHashMap<A,B> > Type;
+			 * - typedef AssocTable < HashMap<A,B> > Type;
+			 * - typedef AssocTable < std::map<A,B> > Type;	 */
+			typedef AssocArray< A,B > Type;
 
 			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
 
@@ -144,7 +152,7 @@ namespace Koala
 
 		// Typ 2-wymiarowej tablicy assocjacyjnej o kluczu A i wartości B. Kluczami są pary uporzadkowane lub
 		// nieuporzadkowane (por. assoctab.h).
-		/** \brief Two dimensional associative table.
+		/** \brief Two dimensional associative array.
 		 *
 		 *  \tparam A the key type.
 		 *  \tparam B the mapped value type.
@@ -174,20 +182,16 @@ namespace Koala
             //  typedef  Assoc2DimTable< type, HashMap<std::pair<A,A>, B > > Type;
 		};
 
-		//NEW: NumberTypeBounds wylecialo do globalnego zasiegu - por. wyzej
-
 		// typ struktury kopca i jego wezla
-		//NEW: zmiana HeapCont w zwiazku z rezygnacja z uzywania trzeciego parametru szablonow kopca (wylecial Allocator)
 		/** \brief Heap container.
 		 *
 		 *  \tparam key the key class.
-		 *  \tparam Compare the comparison object function.
-		 *  \tparam Allocator the memory allocator class.*/
+		 *  \tparam Compare the comparison object function.*/
 		template< class Key, class Compare = std::less< Key > >
 			class HeapCont
 		{
 		public:
-			typedef FibonHeap< Key,Compare > Type;/**<\brief Define own if intend to change.???*/
+			typedef FibonHeap< Key,Compare > Type;/**<\brief Define own if intend to change.WEN?:*/
                     typedef FibonHeapNode< Key > NodeType;/**<\brief Define own if intend to change.???*/
 
 			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
@@ -201,30 +205,43 @@ namespace Koala
 		// Typ grafu pomocniczego stosowanego wewnątrz procedury.
 		/** \brief Auxiliary graph.
 		 *  WEN: opis parametrow szablonu (podobnie jak w grafie glownym)
-		 *  The structure is used for internal purposes in various procedures.*/
+		 *  The structure is used for internal purposes in various procedures.
+		 *  \tparam A VertInfo type.
+		 *  \tparam B EdgeInfo type
+		 *  \tparam mask Edge types in graph. \wikipath{EdgeType,See wiki page for EdgeType.}*/
 		template< class A, class B, EdgeType mask> class LocalGraph
 		{
 		public:
+			/** \brief Define in order to set own */
 			typedef Graph< A,B,GrDefaultSettings< mask,false > > Type;
 		};
 
 		// Czy dostosowywać rozmiar pamięci wyjściowych tablic asocjacyjnych?
-		/** \brief Should the out associative container be allocated at the beginning.?*/
+		/** \brief Should the out associative container be allocated at the beginning?*/
 		enum { ReserveOutAssocCont = true };
 
-		// Wybrany do użytku wewnętrznego algorytm sortowania tablic. Domsyslnie sort. kopcowe
-		/**  \brief Table sorting algorithm*/
+		// Wybrany do użytku wewnętrznego algorytm sortowania tablic.
+		/**  \brief Container sorting algorithm
+		 *
+		 * The functions sorts elements in container given by iterators first last. Define own in order to introduce changes.
+		 * \tparam Iterator the iterator class for container.
+		 * \param first the iterator of the first element in container.
+		 * \param last the iterator of the past the last element in container.*/
 		template< class Iterator > static void sort( Iterator first, Iterator last )
 		{
             std::make_heap( first,last );
             std::sort_heap( first,last );
         }
 		// ... i to samo z funkcją porównującą.
-		/** \brief Table sorting algorithm
-		 *
-		 *  \tparam Iterator the iterator class. WEN: a opis przedzialu poczatkowo-zakoncowego?
-		 *  \tparam Comp the comparison object function. WEN: powinien byc strict weak order, jak w std::sort
-		 */
+		/**  \brief Container sorting algorithm
+		*
+		* The functions sorts elements in container given by iterators first last. The object function comp is used for comparing elements.
+		* Define own in order to introduce changes.
+		* \tparam Iterator the iterator class for container.
+		* \param first the iterator of the first element in container.
+		* \param last the iterator of the past the last element in container.
+		* \tparam Comp the class of comparison object function. The functor should give strict weak order.  Similar to one in std::sort.
+		* \param comp the comparison object function.*/
 		template< class Iterator, class Comp > static void sort( Iterator first, Iterator last, Comp comp )
 		{
             std::make_heap( first,last,comp );
@@ -243,8 +260,6 @@ namespace Koala
 
 	};
 
-//#include "settings.h"
-
 
 	/* ConstFunctor
 	 *
@@ -255,7 +270,12 @@ namespace Koala
 	 *
 	 *  The default function object can be used if method requires the object function, generating for example
 	 *   edge info, but the user does not need to specify it. The functor works with 0 to 6 arguments and always
-	 *   returns the value prespecified in constructor. WEN: typ T powinien spelniac tradycyjne zalozenia STLowe
+	 *   returns the value prespecified in constructor. 
+	 *   \tparam T The type of returned object, the type have minimal requirements similar to STL objects. I.e. it must implement:
+	 *   - empty constructor
+	 *   - copy constructor
+	 *   - destructor
+	 *   - operator=
 	 *  \ingroup DMdef*/
 	template< class T > class ConstFunctor
 	{
@@ -292,7 +312,9 @@ namespace Koala
 	};
 
 	// Funkcja tworząca powyższy funktor.
-	/** \brief Generating function for constant functor. \ingroup def*/
+	/** \brief Generating function for constant functor. 
+	 * \relates ConstFuctor
+	 * \ingroup def*/
 	template< class T > ConstFunctor< T > constFun( const T &a = T() )
 				{ return ConstFunctor< T >( a ); }
 
@@ -303,7 +325,8 @@ namespace Koala
 	 */
 	/** \brief Black hole.
 	 *
-	 *  Sometimes method does more than the user wans. Than the class succor. It can supersede WEN: chodzi o iterator-wstawiacz iterators of containers or associative tables as long as the result is never used by the user.
+	 *  Sometimes method does more than the user wants. Than the class succor. It can supersede \wikipath{insert iterators, WEN?:} 
+	 *  of containers or associative tables as long as the result is never used by the user.
 	 *  \ingroup DMdef */
 	struct BlackHole: public std::iterator< std::output_iterator_tag,void,void,void,void >
 	{
@@ -355,14 +378,25 @@ namespace Koala
 
 
 	// Makra blackHole można używać jak zmiennej globalnej typu BlackHole.
-	//WEN: opis?
+	/** \brief BlackHole generating function.
+	 *
+	 *  The macro acts as generating function for BlackHole object.
+	 *  \related BlackHole */
 	#define blackHole ((*((Koala::BlackHole*)( &std::cout ))))
 
 	// Test na to, czy argument jest typu BlackHole.
-	/** \brief Test if black hole.*/
+	/** \brief Test if black hole.
+	 *
+	 *  The	method tests if type \a T is BlackHole. Although it always returns false, 
+	 *  there is a specialization of it available for BlackHole type, which returns true. 
+	 *  \return false unless the specialization for BlackHole is called.
+	 *  \related BlackHole */
 	template< class T > bool isBlackHole( const T & )
 		{ return false; }
-	/** \brief Test if black hole.*/
+	/* \brief Test if black hole.
+	 *
+	 *  \return true if the tested type is BlackHole.
+	 *  \related BlackHole*/
 	inline bool isBlackHole( const BlackHole & )
 		{ return true; }
 
@@ -371,7 +405,9 @@ namespace Koala
 	 * tego kontenera - tworzy go sobie sama lokalnie. Ta klasa pozwala sprawdzić, czy taki przypadek zaszedł i
 	 * przełączyć kontener na odpowiednio: dostarczony lub lokalny (nie będący BlackHolem).
 	 */
-	 //WEN: tez opis by sie przydal
+	/** \brief  WEN?:
+	 *
+	 */
 	template< class Cont1, class Cont2 > struct BlackHoleSwitch
 	{
 		// Typ kontenera, na którym będziemy działać.
@@ -406,14 +442,17 @@ namespace Koala
 	/** \brief Fixed chooser
 	 *
 	 *  Function object class that always returns value true or false, depending on the value set in constructor.
-	 *  This chooser should be used whenever each (or none) object is to be chosen.
-	 *  \ingroup DMchooser*/
-	struct BoolChooser //WEN: dla kazdego
+	 *  This chooser should be used whenever each (or none) object is to be chosen. The chooser works with both edges and vertices. 
+	 *  \wikipath{Chooser, See for more details about choosers.}
+	 *  \ingroup DMchooser */
+	struct BoolChooser //WEN?: dla kazdego
 	{
 		bool val;/**<\brief Logic value fixed in constructor returned by each call of function object. */
 
 		// Każdy chooser ma swój wlasny typ zdefiniowany jako ChoosersSelfType.
-		/** Type obligatory for chooser in Koala. If the type is defined, logic operations (&&, ||, !, ^)  work properly. */
+		/** \brief Chooser obligatory type.
+		 *  
+		 *  The type is obligatory for chooser in Koala. Logic operations (&&, ||, !, ^)  work properly as long as it is defined. */
 		typedef BoolChooser ChoosersSelfType;
 
 		/** \brief Constructor
@@ -424,7 +463,7 @@ namespace Koala
 		// Główny operator choosera, testujący prawdziwość jego predykatu.
 		/** \brief Overloaded operator()
 		 *
-		 *  Function call operator returning boolean value \a val.
+		 *  Function call operator returning Boolean value \a val (the same in each call of operator). 
 		 *  \param elem the considered object.
 		 *  \param gr reference to considered graph (not used in this chooser).
 		 *  \return the value \a val. */
@@ -435,8 +474,10 @@ namespace Koala
 	// Funkcja tworząca chooser typu BoolChooser.
 	// TODO: sprawdzic, czy rozne przeciazenia funkcji tworzacych nie wywoluja niejednoznacznosci w rozstrzyganiu przeciazen
 	/** \brief Generating  function of fixed chooser (BoolChooser).
-	//WEN: opis arg?
-	 *  \ingroup DMchooser*/
+	 *
+	 *  \param arg Boolean that will be returned by each call of the chooser.
+	 *  \ingroup DMchooser 
+	 *  \related BoolChooser */
 	inline BoolChooser stdChoose( bool arg ) { return BoolChooser( arg ); }
 
 	/* ValChooser
