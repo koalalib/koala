@@ -30,7 +30,7 @@ namespace Koala
 	template< class T > std::pair< T,T > pairMinMax( std::pair< T,T > arg )
 		{ return pairMinMax( arg.first,arg.second ); }
 
-    //NEW:
+	/** \brief Make sorted pair.*/
 	template< class T > std::pair< T,T > pairMaxMin( T a, T b );
 	/** \brief Make sorted pair.*/
 	template< class T > std::pair< T,T > pairMaxMin( std::pair< T,T > arg )
@@ -78,6 +78,7 @@ namespace Koala
 	/** \brief Stack
 	 *
 	 *  Simple stack structure based on a table. The interface is similar to the one in STL.
+	 *  \wikipath{stack(class)}
 	 *  \tparam T the type of stored variables.
 	 *  \ingroup DMsimplecont*/
 	template< class T > class StackInterface< T * >
@@ -118,11 +119,11 @@ namespace Koala
 
 		/** \brief Pop
 		 *
-		 *  The method takes of the top element from the stack.*/
+		 *  The method takes of the top element from the stack. The stack should be nonempty.*/ 
 		void pop();
 		/** \brief Access top.
-		 * WEN: kontener musi byc niepusty
-		 *  \returns the reference to the top element on the stack. */
+		 * 
+		 *  \returns the reference to the top element on the stack, however if the stack is empty the exception is thrown. */
 		T &top();
 
 		/** \brief Clear stack.*/
@@ -143,6 +144,7 @@ namespace Koala
 	/** \brief Queue.
 	 *
 	 *  Simple queue structure based on a table. The interface is similar to the one in STL.
+	 *  \wikipath{Queue(class)}
 	 *  \tparam T the type of stored variables.
 	 *  \ingroup DMsimplecont*/
 	template< class T > class QueueInterface< T * >
@@ -184,25 +186,30 @@ namespace Koala
 		 *  \param val the inserted value.*/
 		void push( const T& val );
 		/** \brief Pop
-		 * WEN: kontener musi byc niepusty
-		 *  The method takes of the top (first) element from the queue.*/
-		void pop();
-		/**\brief Access first element. WEN: kontener musi byc niepusty
 		 *
-		 *  \return the reference to the first element in the queue.*/
+		 *  The method takes of the top (first) element from the queue. However, the container must be nonempty. */
+		void pop();
+		/**\brief Access first element.
+		 *
+		 *  \return the reference to the first element in the queue. However, the container must be nonempty.*/
 		T &front();
 		/**\brief Access first element.
 		 * WEN: kontener musi byc niepusty
 		 *  \return the reference to the first element in the queue.*/
 		T &top();
-		/**\brief Access last element. WEN: kontener musi byc niepusty
+		/**\brief Access last element.
 		 *
-		 *  \return the reference to the last element in the queue.*/
+		 *  \return the reference to the last element in the queue. However, the container must be nonempty.*/
 		T &back();
 		/** \brief Clear stack.*/
-        //NEW:
+        /** \brief Push front.
+		 *
+		 *  The method inserts the value \a val at the beginning of queue.
+		 *  \param val the inserted value.*/
 		void pushFront( const T& val );
-        //NEW:
+        /** \brief Pop
+		 *
+		 *  The method takes of the last element from the queue. However, the container must be nonempty. */
 		void popBack();
 
 		void clear() { beg = end = 0; }
@@ -216,9 +223,14 @@ namespace Koala
 	};
 
 
-    //NEW: wspolna tablicowa pula pamieci dla lokalnych kontenerow, ktore posluguja sie wieloma alokowanymi
+    //NEW:  wspolna tablicowa pula pamieci dla lokalnych kontenerow, ktore posluguja sie wieloma alokowanymi
     //skladnikami tj. LocalGraph (wierzcholki/krawedzie), List, Heaps.
-    template <class Elem> class SimplArrPool {
+    /** \brief Common storage pool.
+	 *
+	 *  Common memory based on simple array. It is used by some algorithms and containers to accelerate location process. 
+	 *  \wikipath{Common_storage_pool} 
+	 *  \tparam Elem the type of stored element. */
+	template <class Elem> class SimplArrPool {
     private:
 
         struct Block {
@@ -241,8 +253,13 @@ namespace Koala
 
         // Flagi: czy rzucac wyjatek przy przepelnieniu (albo zwracac NULL)
         // Czy rzucac wyjatek przy zamykaniu puli, jesli nie wszystko zostalo zdealokowane
-        bool throwIfFull, throwIfNotEmpty;
-
+        bool throwIfFull; /**<\brief Flag decides if throw exception (or return 0) if the array was full.*/
+		bool throwIfNotEmpty; /**<\brief Flag decides if throw exception if not everything was deallocated.*/
+		
+		/** \breif Constructor
+		 *
+		 *  The constructor allocates array of \a n elements.
+		 *  \param n the number of allocated elements.*/
         SimplArrPool(int n) : siz(n), used(0), first(0), throwIfFull(true), throwIfNotEmpty(true)
         {
             buf = new char[n*sizeof(Block)];
@@ -257,18 +274,26 @@ namespace Koala
                 for(int i=0;i<siz;i++) if (blocks()[i].next==-2) blocks()[i].elem.~Elem();
             delete [] buf;
         }
-
+		/** \brief Size of array
+		 *
+		 * \return the capacity of the array.*/
         int size() const
         {
             return siz;
         }
 
         // Liczba zaalokowanych elementow
+		/** \brief Number of used elements.
+		 *
+		 *  \return the number of cells already used.*/
         int busy() const
         {
             return used;
         }
         // zwraca adres z puli na uzytek placement new (nie tworzy obiektu!)
+		/** \brief Get element from pool.
+		 *
+		 *  \return the pointer from the pull for an new locally allocated element.*/
         void* alloc()
         {
             koalaAssert(used<siz || !throwIfFull,ContExcFull);
@@ -280,6 +305,9 @@ namespace Koala
             return &(ptr->elem);
         }
         // dealokuje obiekt z wczesniej przydzielonego adresu
+		/** \brief Deallocate.
+		 *
+		 * The method frees memory pointed by \a wsk. The element should be allocated earlier. */
         void dealloc(Elem* wsk)
         {
             char* chwsk=(char*) wsk;

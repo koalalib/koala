@@ -89,7 +89,9 @@ namespace Koala
 
 	/** \brief Vertex of graph
 	 *
-	 *  The class used as a basic structure of graph representing a vertex (node) WEN: tak na prawde to wskazniki na nia. Objects of this uncopyable class can be created only from the friend classes.
+	 *  The class used as a basic structure of graph representing a vertex (node). 
+	 *  Note that, most methods and objects use as vertex representative pointers (PVertex) to objects of this class. 
+	 *  Objects of this uncopyable class can be created only from the friend classes.
 	 *  \tparam VertInfo the type of objects that store any information connected with vertex.
 	 *  \tparam EdgeInfo the type of objects that store any information connected with edge.
 	 *  \tparam Settings the type of objects which store parameters of graph.
@@ -108,38 +110,33 @@ namespace Koala
 		friend class SimplArrPool<Koala::Vertex< VertInfo,EdgeInfo,Settings > >;
 
 	public:
-        //NEW:
-		typedef Graph< VertInfo,EdgeInfo,Settings > GraphType;
-
+		typedef Graph< VertInfo,EdgeInfo,Settings > GraphType;/**<\brief The type of current graph.*/
 
 		/** \brief Additional user information kept in vertex.
 		 *
 		 *  This member object should be used any time additional information associated with vertex is necessary.
-		 *  \a info may be used for algorithmic purposes but also to keep any data relevant from the point of view of an application.
-		 */
+		 *  \a info may be used for algorithmic purposes but also to keep any data relevant from the point of view of an application. */
 		VertInfo info;
 
 		/** \brief Get vertex information object.
 		 *
-		 *  \returns the information object associated with the vertex.
-		 */
+		 *  \returns the information object associated with the vertex. */
 		VertInfo getInfo()
 			{ return info; }
 
 		/** \brief Set vertex information object.
 		 *
 		 *  The method sets \a info as the new value for data member info.
-		 *  \param info the value to be stored as a new vertex information.
-		 */
+		 *  \param info the value to be stored as a new vertex information.	 */
 		void setInfo( const VertInfo &info )
 			{ this->info = info; }
 
 	private:
 		// klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
-		/** Standard constructor*/
+		/* Standard constructor*/
 		Vertex(): info (), next( NULL ), prev( NULL )
 			{ }
-		/** Constructor sets info variable */
+		/* Constructor sets info variable */
 		Vertex( const VertInfo &infoExt, const Graph< VertInfo,EdgeInfo,Settings >* wsk ):
 		    Privates::MainGraphPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>(wsk),
             info( infoExt ), next( NULL ), prev( NULL )

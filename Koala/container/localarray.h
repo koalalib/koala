@@ -1,3 +1,4 @@
+/** \file localarray.h*/
 #include <cstdio>
 #ifndef KOALA_LOCALTABLE_H
 #define KOALA_LOCALTABLE_H
@@ -116,15 +117,17 @@ namespace Koala
 #endif
 
 #if defined(KOALA_FORCE_VLARRAY)
+/** \brief LOCALARRAY
+ */
 #define LOCALARRAY(name, size)                          \
 	name[size];
-	//TODO: jesli uzycie alloca jest warunkowane pojemnoscia KOALA_STACK_THRESHOLD, to VLArraye chyba tez tak poinny funkcjonowac, tj. po przekroczeniu KOALA_STACK_THRESHOLD przechodzic na operator new
+	//TODO: jesli uzycie alloca jest warunkowane pojemnoscia KOALA_STACK_THRESHOLD, to VLArraye chyba tez tak poinny funkcjonowac
 
 // Intel Compiler, GCC-likes, Visual Studio have alloca
 #elif defined(KOALA_USES_ALLOCA) && \
 	(defined(_MSC_VER) || defined(__INTEL_COMPILER) || defined(__GNUC__))
 //TODO: chyba drugi warunek jest zbednyu, nie wiemy jakie komp. dostarczaja alloca, a jesli gdzies jej nie ma to po prostu kod sie nie skompluje z usawionym KOALA_USES_ALLOCA
-// name = NULL a dopiero potem name = cast ... 縠by unikn规 warningu
+// name = NULL a dopiero potem name = cast ... � by unikn规 warningu
 // od VS o wykorzystaniu niezainicjowanej zmiennej
 #define LOCALARRAY(name, size)                          \
 	*name LA_SETTONULL;                         \

@@ -89,7 +89,7 @@ namespace Koala
 		// metody do iterowania po kolejnych kluczach tablicy. Zwracaja 0 gdy odpowiedniego klucza nie ma
 		/** \brief Get the first key.
 		 *
-		 *  \return the key of the first element in the container. WEN: lub 0 kontener pusty
+		 *  \return the key of the first element in the container or 0 if empty.
 		 *
 		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_firstKey.html">See example</a>.
 		 */
@@ -97,7 +97,7 @@ namespace Koala
 
 		/** \brief Get the last key.
 		 *
-		 *  \return the key of the last element in the container. WEN: lub 0 kontener pusty
+		 *  \return the key of the last element in the container or 0 if empty.
 		 *
 		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_lastKey.html">See example</a>.
 		 */
@@ -169,8 +169,8 @@ namespace Koala
 		 */
 		template< class Iterator > int getKeys( Iterator iter ) const;
 
-		// referencja do oryginalnego kontenera, na ktorym operuje wrapper
-		/** \brief Original container. WEN: referencja do zewnetrznego!
+		// referencja do oryginalnego kontenera, na ktorym operuje wrapper 
+		/** \brief Reference to the original container. 
 		 *
 		 *	The reference to the original container. The one the class wraps.
 		 *
@@ -207,17 +207,18 @@ namespace Koala
 	};
 
 	//Funkcja tworzaca wrapper do podanego kontenera
-	/** \brief Generating function of constant wrapper of STL map object. WEN: nie tylko STL
-	*  \ingroup cont*/
+	/** \brief Generating function of constant wrapper of map object.
+	 *
+	 *   \relates AssocTabConstInterface<T> WEN?:
+	 *   \ingroup cont */
 	template< class T > AssocTabConstInterface< T > assocTabInterf( const T &cont )
 		{ return AssocTabConstInterface< T >( cont ); }
 
-	// wrapper do kontenera asocjacyjnego nie-stalego, metody tworzone sa na podstawie metod chronionych z AssocTabConstInterface
-	/** \brief STL map wrapper. WEN: tak na prawde to nie tylko STL, AssocTabInterface jest tworzony na podstawie dobrze zrobionego (wraz z metodami protected)
-        AssocTabConstInterface. Nie trzeba go pisac dla kazdej mapy od zera. Por. np. koncowka hashcont.h
+	// wrapper do kontenera asocjacyjnego nie-stalego, metody tworzone sa na podstawie metod chronionych z AssocTabConstInterface  AssocTabConstInterface. Nie trzeba go pisac dla kazdej mapy od zera. Por. np. koncowka hashcont.h
+	/** \brief Map container wrapper. 
 	 *
-	 *  This is the class of objects that wraps an STL map objects.
-	 *  This interface delivers the standard WEN: not only const! non-constant  methods for containers in koala and
+	 *  This is the class of objects that wraps map objects (for example from STL).
+	 *  This interface delivers the standard not only constant  methods for containers in koala and
 	 *   together with the  AssocTabConstInterface methods make the whole interface of the container.
 	 *  \ingroup cont
 	 */
@@ -228,7 +229,7 @@ namespace Koala
 		typedef typename AssocTabConstInterface< T >::ValType ValType;
 
 		// referencja do oryginalnego kontenera
-		/** \brief Original container. WEN: referencja do zewnetrznego
+		/** \brief Reference to the original container.
 		 *
 		 *	The reference to the original container. The one wrapped by the class.
 		 *
@@ -239,7 +240,7 @@ namespace Koala
 		// W konstruktorze podajemy oryginalny kontener
 		/** \brief Constructor.
 		 *
-		 *  Assigns the original container \a acont (for example STL map) to the current WEN: reference container \a cont.
+		 *  Assigns the original container \a acont (for example STL map) to the reference variable \a cont.
 		 *	\param acont the original container.
 		 *
 		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_constructor.html">See example</a>.
@@ -250,6 +251,7 @@ namespace Koala
 		 *
 		 *  Overloaded operator= copies the content of \a arg to the current container.
 		 *  \param arg  the copied container.
+		 *  \return the reference to the current object.
 		 *
 		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_operator_assignment.html">See example</a>.
 		 */
@@ -259,18 +261,27 @@ namespace Koala
 		 *
 		 *  Overloaded operator= copies the content of \a arg to the current container.
 		 *  \param arg  the copied container.
+		 *  \return the reference to the current object.
 		 *
 		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_operator_assignment.html">See example</a>.
 		 */
 		AssocTabInterface< T > &operator=( const AssocTabConstInterface< T > &arg );
-		//WEN: czym sie rozni od poprzedniego? To jest unikatowe w Koali, ze mozesz np. przypisac AssocArray<...> = AssocTable<...> jesli zgadzaja sie typy kluczy, a wartosci mapowane daja sie przepisac
+		// czym sie rozni od poprzedniego? To jest unikatowe w Koali, ze mozesz np. przypisac AssocArray<...> = AssocTable<...> jesli zgadzaja sie typy kluczy, a wartosci mapowane daja sie przepisac
+		/** \brief Copy content of container.
+		 *
+		 *  Overloaded operator= copies the content of \a arg to the current container. The container may be of any type for which the types of keys match with the current object and the mapped values may be copied.
+		 *  \tparam AssocCont the type of copied container.
+		 *  \param arg  the copied container.
+		 *  \return the reference to the current object.
+		 *
+		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_operator_assignment.html">See example</a>.
+		 */
 		template< class AssocCont > AssocTabInterface< T > &operator=( const AssocCont &arg );
 
 		/** \brief Reserve memory.
 		 *
 		 *  The method reserves the amount of memory sufficient for \a arg elements.
-		 *  As long as the number of elements is not grater than \a arg, reallocation is not necessary. It is recommended to use when beginning the work with the object.
-		 WEN: moze nic nie robic dla pewnych typow T
+		 *  As long as the number of elements is not grater than \a arg, reallocation is not necessary. It is recommended to use when beginning the work with the object. However, for some types \a T  the method does nothing.
 		 *  \param arg the number of elements for which memory is allocated.
 		 *
 		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_reserve.html">See example</a>.
@@ -299,20 +310,24 @@ namespace Koala
 		 *
 		 *	The method gets the pointer to the value associated with the key \a arg.
 		 *  \param arg the key of the searched element.
-		 *  \return the pointer to the mapped value associated with the key \a arg. WEN: lub NULL gdy klucza nie bylo
+		 *  \return the pointer to the mapped value associated with the key \a arg. NULL if the key does not match the key of any element in the container. 
+		 *
 		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_valPtr.html">See example</a>.
 		 */
 		ValType* valPtr( KeyType arg ) { return AssocTabConstInterface< T >::valPtr( arg ); }
 
 		/** \brief Get value.
 		 *
-		 *  The constant method gets the value associated with \a arg.WEN: lub wartosc domyslna przy braku klucza*/
+		 * The constant method gets the value associated with \a arg.
+		 *  \param arg the key of the searched element.
+		 *  \return the mapped value of type \a ValType associated with key \a arg or default value if the key does not match the key of any element in the container.
+		 */
 		ValType operator[]( KeyType arg ) const { return AssocTabConstInterface< T >::operator[]( arg ); }
 
-		// w przypadku obiektu nie-stalego zwraca referencje do przypisanej kluczowi wartosci. Nowy klucz dostaje wartosc domyslna typu ValType
+		// w przypadku obiektu nie-stalego zwraca referencje do przypisanej kluczowi wartosci. Nowy klucz dostaje wartosc domyslna typu ValType 
 		/** \brief Access element.
 		 *
-		 *  If the key \a arg exists the reference to the mapped value is returned, otherwise a new element associated with the \a arg is created with default mapped value gained from the call of the empty constructor of ValType.
+		 *  If the key \a arg exists the reference to the mapped value is returned, otherwise a new element associated with the \a arg is created with default mapped value gained from the call of the empty constructor of ValType. The method works with non-constant objects.
 		 *  \param arg the considered key.
 		 *  \return the reference to the mapped value associated with the key \a arg or if the key does not exist the reference to the new-created element.
 		 *
@@ -335,7 +350,7 @@ namespace Koala
 	 */
 	/** \brief Wrapper for external container.
 	 *
-	 *  This is the class of objects that wraps any container implemented outside the Koala WEN: nie bardzo any (asocjacyjny), nie bardzo outside np. BiDiHashMap.
+	 *  This is the class of objects that wraps associative container.
 	 *  Methods are similar to the ones in AssocTabInterface and AssocTabConstInterface.
 	 *  \ingroup cont
 	 */
@@ -374,6 +389,7 @@ namespace Koala
 		 *
 		 *  Overloaded operator= copies the content of AssocCont \a X to the current container.
 		 *  \param X  the copied container.
+		 *  \return the reference to the current container.
 		 *
 		 *  <a href="examples/assoctab/assocTable/assocTable_operator_assignment.html">See example</a>.
 		 */
@@ -382,15 +398,17 @@ namespace Koala
 		 *
 		 *  Overloaded operator= copies the container \a arg to the member \a cont.
 		 *  \param arg  the copied container.
+		 *  \return the reference to the current container.
 		 *
 		 *  <a href="examples/assoctab/assocTable/assocTable_operator_assignment.html">See example</a>.
 		 */
 		AssocTable< T > &operator=( const T &arg );
 		/** \brief Copy content of container.
 		 *
-		 *  Overloaded operator= copies the container \a arg to the member \a cont. WEN: roznica z poprzednim? Dopuszcza kopiowanie miedzy roznymi typami tablic
-		 WEN: To jest unikatowe w Koali, ze mozesz np. przypisac AssocArray<...> = AssocTable<...> jesli zgadzaja sie typy kluczy, a wartosci mapowane daja sie przepisac
+		 *  Overloaded operator = copies the container \a arg of type \a T to the member \a cont. Hence, it is possible to copy associative type of other type as long as the keys match and the values may be copied. 
+		 *  \tparam AssocCont the type of copied associative container. 
 		 *  \param arg  the copied container.
+		 *  \return the reference to the current container.
 		 *
 		 *  <a href="examples/assoctab/assocTable/assocTable_operator_assignment.html">See example</a>.
 		 */
@@ -410,9 +428,9 @@ namespace Koala
 		bool hasKey( KeyType arg ) const { return inter.hasKey( arg ); }
 		/** \brief Get pointer to value.
 		 *
-		 *  The method gets the pointer to the value associated with the key \a arg.
+		 *  The method gets the pointer to the object associated with the key \a arg.
 		 *  \param arg the key of the searched element.
-		 *  \return the pointer to the mapped value associated with the key \a arg. WEN: albo NULL gdy klucza nie ma
+		 *  \return the pointer to the mapped value associated with the key \a arg or NULL if \a arg does not math the key in element from the container.
 		 *
 		 *  <a href="examples/assoctab/assocTable/assocTable_valPtr.html">See example</a>.
 		 */
@@ -421,21 +439,21 @@ namespace Koala
 		 *
 		 *  The method deletes the element associated with the key \a arg.
 		 *  \param arg the key of the considered element.
-		 *  \return true if the element existed.
+		 *  \return true if the element existed, false otherwise.
 		 *
 		 *  <a href="examples/assoctab/assocTable/assocTable_delKey.html">See example</a>.
 		 */
 		bool delKey( KeyType arg ) { return inter.delKey( arg ); }
 		/** \brief Get the first key.
 		 *
-		 *  \return the key of the first element in the container. WEN: lub 0 gdy kontener jest pusty
+		 *  \return the key of the first element in the container of 0 if container is empty.
 		 *
 		 *  <a href="examples/assoctab/assocTable/assocTable_firstKey.html">See example</a>.
 		 */
 		KeyType firstKey() const { return inter.firstKey(); }
 		/** \brief Get the last key.
 		 *
-		 *  \return the key of the last element in the container. WEN: lub 0 gdy kontener jest pusty
+		 *  \return the key of the last element in the container or 0 if the container is empty.
 		 *
 		 *  <a href="examples/assoctab/assocTable/assocTable_lastKey.html">See example</a>.
 		 */
@@ -485,6 +503,7 @@ namespace Koala
 		 *  <a href="examples/assoctab/assocTable/assocTable_size.html">See example</a>.
 		 */
 		unsigned size() const { return inter.size(); }
+		
 		/** \brief Test if empty.
 		 *
 		 *  \return the boolean value, true if the container has no elements, false otherwise.
@@ -492,6 +511,7 @@ namespace Koala
 		 *  <a href="examples/assoctab/assocTable/assocTable_empty.html">See example</a>.
 		 */
 		bool empty() const { return inter.empty(); }
+
 		/** \brief Test if empty.
 		 *
 		 *  The overloaded operator!, tests if the container is empty.
@@ -511,7 +531,7 @@ namespace Koala
 		/** \brief Get keys.
 		 *
 		 *  All the keys in the container are stored in another container with a defined iterator.
-		 *  \tparam Iterator the class of iterator for the container storing the output set keys.
+		 *  \tparam Iterator the class of iterator for the container storing the output set of keys.
 		 *  \param[out] iter the iterator connected with the container of output keys.
 		 *  \return the number of keys.
 		 *
@@ -523,7 +543,7 @@ namespace Koala
 		/** \brief Get capacity.
 		 *
 		 *  The method gets the container capacity i.e. the number of elements which fit in the container without reallocation.
-		 WEN: moze nic nie robic dla niektorych typow kontenera T
+		 *  For some types of containers \a T the method dose nothing.
 		 *  \return the capacity of the container.
 		 *
 		 *  <a href="examples/assoctab/assocTable/assocTable_capacity.html">See example</a>.
@@ -534,14 +554,14 @@ namespace Koala
 		 *
 		 *  The method reserves the amount of memory sufficient for \a arg elements.
 		 *  As long as the number of elements is not grater than \a arg, reallocation is not necessary. It is recommended to use when beginning the work with the object.
-		 WEN: moze nic nie robic dla niektorych typow kontenera T
+		 *  For some types of containers \a T the method dose nothing.
 		 *  \param arg the number of elements for which memory is allocated.
 		 *
 		 *  <a href="examples/assoctab/assocTable/assocTable_reserve.html">See example</a>.
 		 */
 		void reserve( int n ) { inter.reserve( n ); }
 
-        //NEW: generalnie: rezygnacja z tworzenia map z zewnetrzna tablica pamieci (konstruktory z dodatkowymi
+        // generalnie: rezygnacja z tworzenia map z zewnetrzna tablica pamieci (konstruktory z dodatkowymi
         // parametrami wskaznikowymi. Zarowno tu, jak i w dalszych mapach.
 		/** \brief Constructor
 		 *
@@ -558,6 +578,11 @@ namespace Koala
 
 	// Funkcja tworzaca kopie podanego kontenera opakowana w AssocTable
 	/** \brief Generating function for AssocTable.
+	 *
+	 *  \tparam T the type of container.
+	 *  \param cont the reference to wrapped container.
+	 *  \return the AssocTable container wrapping \a cont. 
+	 *  \relates AssocTable
 	 *  \ingroup cont*/
 	template< class T > AssocTable< T > assocTab( const T &cont ) { return AssocTable< T >( cont ); }
 
@@ -595,6 +620,9 @@ namespace Koala
 	 *
 	 * Pole publiczne assocReg tego typu powinny miec obiekty, wskazniki na ktore moga byc kluczami w AssocArray
 	 */
+	/** \brief Mapped objects attribute in AssocArray.
+	 *
+	 *  If AssocArray is used, mapped objects must have an public attribute assocReg of this type.*/
 	class AssocKeyContReg: public AssocContReg
 	{
 		template< class K, class E, class Cont > friend class AssocArray;
@@ -632,21 +660,26 @@ namespace Koala
 			KluczTest( Klucz v = 0 ) { AssocKeyContReg *ptr = &v->assocReg; (void)(ptr);}
 		} ;
 
-        template< class Klucz, class Elem > struct AssocArrayInternalTypes
-        {
+		/* AssocArray
+		 *
+		 */
+		template< class Klucz, class Elem > struct AssocArrayInternalTypes
+		{
             typedef BlockOfBlockList< BlockOfAssocArray< Klucz,Elem > > BlockType;
-        };
+		};
 	}
 
 	// Szybka tablica asocjacyjna np. dla wierz/kraw
 	// Wiekszosc interfejsu jak w innych tabl. assocjacyjnych
-	/** \brief Associative container.
+	// wskazywany przez klucz obiekt musi miec pole AssocKeyContReg assocReg 
+	/** \brief Fast associative container.
 	 *
-	 *  The fast associative container.
-	 *  The interface similar to other containers.
-	 WEN: wskazywany przez klucz obiekt musi miec pole AssocKeyContReg assocReg
-	 *  \ingroup cont
-	 */
+	 *  The fast associative container with interface similar to other containers. 
+	 *  Mapped value object must have attribute AssocKeyContReg assocReg.
+	 *  \tparam Klucz the type of key.
+	 *  \tparam Elem the type of mapped value.
+	 *  \tparam Container the type of container that stores pairs (key, element).
+	 *  \ingroup cont */
 	template< class Klucz, class Elem, class Container = std::vector< typename
 		Privates::AssocArrayInternalTypes<Klucz,Elem>::BlockType > > class AssocArray:
 			public AssocContBase,
@@ -664,11 +697,10 @@ namespace Koala
 
 		typedef Container ContainerType;/**< \brief Type of container.*/
 
-		// asize - rozmiar poczatkowy, drugi arg. ignorowany
+		// asize - rozmiar poczatkowy
 		/** \brief Constructor
 		 *
 		 *  Reserves memory necessary for \a asize elements.
-		 *  \param p should be ignored. WEN: jakie p?
 		 *  \param asize the size of allocated memory.
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_constructor.html">See example</a>.
@@ -686,32 +718,41 @@ namespace Koala
 		/** \brief Copy content of container.
 		 *
 		 *  Overloaded operator= copies the content of AssocArray \a X to the current container.
-		 *  \param X  the copied container. WEN: zwraca referencje do siebie
+		 *  \param X  the copied container.
+		 *  \return reference to current object.
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_operator_assignment.html">See example</a>.
 		 */
 		AssocArray< Klucz,Elem,Container > &operator=( const AssocArray< Klucz,Elem,Container > &X );
 
+		// roznica z poprzednim? Dopuszcza kopiowanie miedzy roznymi typami tablic
+		// czym sie rozni od poprzedniego? To jest unikatowe w Koali, ze mozesz np. przypisac 
+		// AssocArray<...> = 	AssocTable<...> jesli zgadzaja sie typy kluczy, a wartosci mapowane daja sie przepisac
 		/** \brief Copy content of container.
 		 *
-		 *  Overloaded operator= copies the content of a container AssocCont \a arg to the current container.
-		 *  \param X  the copied container. WEN: roznica z poprzednim? Dopuszcza kopiowanie miedzy roznymi typami tablic
-		 * WEN: czym sie rozni od poprzedniego? To jest unikatowe w Koali, ze mozesz np. przypisac AssocArray<...> = AssocTable<...> jesli zgadzaja sie typy kluczy, a wartosci mapowane daja sie przepisac
+		 *  Overloaded operator= copies the content of a container AssocCont \a arg to the current container. 
+		 *  The method allows to copy content of another associative container.
+		 *  \tparam AssocCont type of associative container copied. The types of keys must much and mapped values can be copied.
+		 *  \param arg  the copied container. 
+		 *  \return reference to current object.
+		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_operator_assignment.html">See example</a>.
 		 */
 		template< class AssocCont > AssocArray &operator=( const AssocCont &arg );
 
-		/** \brief Test if empty. WEN: bzdura!
+		/** \brief Get the size of container.
 		 *
-		 *  \return the boolean value, true if the container has no elements, false otherwise.
+		 *  \return the number of elements in container.
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_size.html">See example</a>.
 		 */
 		int size() const
 			{ return tab.size(); }
         //NEW: ilosc obecnie zaalokowanych miejsc na elementy - w tym zakresie moga byc wartosci funkcji keyPos
-        // zaalokowanych elementow
-        int contSize() const
+        /** \brief Get maximal index.
+		 *
+		 *  \return the maximal index of that may be returned by method keyPos().	 */
+		int contSize() const
                 { return tab.contSize(); }
 
 		/** \brief Test if empty.
@@ -751,11 +792,11 @@ namespace Koala
 		 */
 		int capacity() const
 			{ return tab.capacity(); }
-		/** \brief Get pointer to value. WEN: bzdura!
+		/** \brief Test if the key exist.
 		 *
-		 *  The method gets the pointer to the value associated with the key \a v.
+		 *  The method if the key \a v match the key of any element int array.
 		 *  \param v the key of the searched element.
-		 *  \return the pointer to the mapped value associated with the key \a v.
+		 *  \return true if the key exists false otherwise.
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_hasKey.html">See example</a>.
 		 */
@@ -765,7 +806,7 @@ namespace Koala
 		 *
 		 *  The method gets the pointer to the value associated with the key \a v.
 		 *  \param v the key of the searched element.
-		 *  \return the pointer to the mapped value associated with the key \a v. WEN: albo NULL gdy klucza nie ma
+		 *  \return the pointer to the mapped value associated with the key \a v or NULL if the key does not match the key of any element from array. 
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_valPtr.html">See example</a>.
 		 */
@@ -782,7 +823,7 @@ namespace Koala
 
 		/** \brief Delete element.
 		 *
-		 *  The method deletes the element associated with the key \a v. WEN: no, sam klucz tez kasuje
+		 *  The method deletes the element associated with the key \a v. 
 		 *  \param v the key of the considered element.
 		 *  \return true if the element existed.
 		 *
@@ -809,7 +850,7 @@ namespace Koala
 		/** \brief Get next key.
 		 *
 		 *  \param v the reference key.
-		 *  \return the key next to \a v. If \a v == 0, the first key is returned. WEN: dla ostatniego klucza zwraca 0
+		 *  \return the key next to \a v. If \a v == 0, the first key is returned. If \a v is the last element the method returns 0.
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_nextKey.html">See example</a>.
 		 */
@@ -818,7 +859,7 @@ namespace Koala
 		/** \brief Get previous key.
 		 *
 		 *  \param v the reference key.
-		 *  \return the key prior to \a v.  If \a v == 0, the last key is returned. WEN: dla pierwszego klucza zwraca 0
+		 *  \return the key prior to \a v.  If \a v == 0, the last key is returned.  If \a v is the first element the method returns 0. 
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_prevKey.html">See example</a>.
 		 */
@@ -884,13 +925,11 @@ namespace Koala
 	// wewnetrznego kontenera typu AssocCont (mapa: Klucz->int). Nie oferuje automatycznego wypisywania kluczy bedacych
 	// wskaznikami na znikajace obiekty. Chyba jedyne sensowne zastosowanie, to wykorzystanie jako IndexContainer
 	// w ponizszejh AssocMatrix w sytuacji, gdy jej klucz nie obsluguje AssocArray
-
 	/** \brief Pseudo associative array.
 	 *
 	 *  The class pretending to be the AssocArray for keys that are not designed to work with AssocArray. The interface remains the same.
 	 *  May be useful if the usage of AssocMatrix is necessary.
-	 *  \ingroup cont
-	 */
+	 *  \ingroup cont */
 	template< class Klucz, class Elem, class AssocCont, class Container =
 		std::vector< typename Privates::AssocArrayInternalTypes< Klucz,Elem >::BlockType > > class PseudoAssocArray:
 			public Privates::AssocTabTag< Klucz >
@@ -900,41 +939,59 @@ namespace Koala
 			AssocCont assocTab;
 
 		public:
-			typedef Klucz KeyType;
-			typedef Elem ValType;
+			typedef Klucz KeyType;/**< \brief Type of key. */
+			typedef Elem ValType;/**< \brief Type of mapped value.*/
 
-			typedef Container ContainerType;
-			typedef AssocCont AssocContainerType;
-
+			typedef Container ContainerType;/**< \brief Type of container.*/
+			typedef AssocCont AssocContainerType;/**<\brief WEN?:*/
+			/** \copydoc AssocArray::AssocArray( int asize ) */
 			PseudoAssocArray( int asize = 0): tab( asize ), assocTab( asize ) { }
-
+			/** \copydoc AssocArray::operator= */
 			template< class AssocCont2 >
 				PseudoAssocArray< Klucz,Elem,AssocCont,Container > &operator=( const AssocCont2 &arg );
+			/** \copydoc AssocArray::size */
 			int size() const
 				{ return tab.size(); }
+			/** \copydoc AssocArray::contSize */
             int contSize() const
                 { return tab.contSize(); }
+			/** \copydoc AssocArray::empty */
 			bool empty() const
 				{ return tab.empty(); }
+			/** \copydoc AssocArray::operator! */
 			bool operator!() const
 				{ return empty(); }
+			/** \copydoc AssocArray::reserve */
 			void reserve( int arg );
+			/** \copydoc AssocArray::capacity */
 			int capacity() const
 				{ return tab.capacity(); }
+			/** \copydoc AssocArray::hasKey */
 			bool hasKey( Klucz v ) const
 				{ return keyPos( v ) != -1; }
+			/** \copydoc AssocArray::valPtr */
 			Elem *valPtr( Klucz v );
+			/** \copydoc AssocArray::keyPos */
 			int keyPos( Klucz ) const;
+			/** \copydoc AssocArray::delKey */
 			bool delKey( Klucz );
+			/** \copydoc AssocArray::firstKey */
 			Klucz firstKey() const;
+			/** \copydoc AssocArray::lastKey */
 			Klucz lastKey() const;
+			/** \copydoc AssocArray::nextKey */
 			Klucz nextKey( Klucz ) const;
+			/** \copydoc AssocArray::prevKey */
 			Klucz prevKey( Klucz ) const;
+			/** \copydoc AssocArray::operator[]( Klucz ) */
 			Elem &operator[]( Klucz );
+			/** \copydoc AssocArray::operator[]( Klucz ) const; */
 			Elem operator[]( Klucz ) const;
+			/** \copydoc AssocArray::defrag */
 			void defrag();
+			/** \copydoc AssocArray::clear */
 			void clear();
-
+			/** \copydoc AssocArray::getKeys */
 			template< class Iterator > int getKeys( Iterator ) const;
 
 			~PseudoAssocArray()
@@ -954,10 +1011,9 @@ namespace Koala
 		AMatrFull, // pelna tablica 2-wymiarowa
 		/** \brief 2-dimensional matrix without elements on diagonal, identical coordinates are forbidden.*/
 		AMatrNoDiag, // tablica 2-wymiarowa nie akceptujaca kluczy o obu wspolrzednych rownych (kluczami sa tylko 2-elementowe pary)
-		/** \brief Triangular matrix, elements (a,b) are regarded as (b,a).*/
+		/** \brief Triangular matrix, elements (a,b) are regarded as (b,a). Elements (a,a) are not allowed.*/
 		AMatrTriangle, // tablica traktujaca klucze jako pary nieuporzadkowane tj. klucz (a,b) jest utozsamiany z (b,a)
-		/** \brief Diagonal matrix, only elements on the diagonal are allowed i.e. only elements (a,a) are in the matrix and it becomes "1-dimensional".*/
-		//WEN: bzdura, dopuszcza sie rowniez (a,a) w przeciwienstwie do AMatrTriangle, reszta tak samo jak w AMatrTriangle
+		/** \brief Triangular matrix, elements (a,b) are regarded as (b,a). Elements (a,a) are allowed.*/
 		AMatrClTriangle  // j.w. ale dopusza sie klucze "jednoelementowe" tj. postaci (a,a)
 	};
 
@@ -1071,21 +1127,23 @@ namespace Koala
 
 	// 2-wymiarowa tablica asocjacyjna. Uwaga: wersja z IndexContainer = IndexContainer = AssocArray< Klucz,...>
 	// ma te same ograniczenia odnosnie uzywanych kluczy, co AssocArray (j.w.)
+	// Container - typ wewnetrznego bufora - tablicy przechowujacej opakowany ciag wartosci przypisanych roznym parom kluczy
+	// IndexContainer - typ indeksu tj. tablicy asocjacyjnej przypisujacej pojedynczym kluczom ich liczby wystapien we wpisach oraz (rozne) numery.
+
 	/** \brief Associative matrix.
 	 *
 	 *  Two-dimensional associative container. That assigns an element to the pair of keys.
 	 *  \tparam aType decides over the type of matrix (AssocMatrixType).
-	 *  \tparam Container the type of internal container used to store mapped values.
-	 *  \tparam IndexContainer the type of internal associative table used to assign various date (numbers) to single keys.
-	 WEN: uwaga - domyslnie jest to  AssocArray, ale wowczas WEN: wskazywany przez klucz obiekt musi mieæ pole AssocKeyContReg assocReg
+	 *  \tparam Container the type of internal container used to store mapped values. 
+	 *  \tparam IndexContainer the type of internal associative table used to assign various data (numbers) to single keys.
+	 WEN: uwaga - domyslnie jest to  AssocArray, ale wowczas WEN?: wskazywany przez klucz obiekt musi mieæ pole AssocKeyContReg assocReg
 	 Jesli tak nie jest, mozna zastapic AssocArray udajaca ja mapa PseudoAssocArray, ktora zapewnia podobna numeracje, lecz jest inaczej zorganizowana
 	 *  \sa Koala::AssocMatrixType
 	 *  \ingroup cont*/
 	template< class Klucz, class Elem, AssocMatrixType aType, class Container =
 		std::vector< typename Privates::AssocMatrixInternalTypes<Klucz,Elem>::BlockType >, class IndexContainer =
 			AssocArray< Klucz,int,std::vector< typename Privates::AssocMatrixInternalTypes< Klucz,Elem >::IndexBlockType > > >
-	// Container - typ wewnetrznego bufora - tablicy przechowujacej opakowany ciag wartosci przypisanych roznym parom kluczy
-	// IndexContainer - typ indeksu tj. tablicy asocjacyjnej przypisujacej pojedynczym kluczom ich liczby wystapien we wpisach oraz (rozne) numery.
+
 	class AssocMatrix: public Assoc2DimTabAddr< aType >, public Privates::Assoc2DimTabTag< Klucz,aType >
 	{
 		template< class A, class B, AssocMatrixType C, class D, class E > friend class AssocMatrix;
@@ -1148,8 +1206,6 @@ namespace Koala
 		 *
 		 *  Creates the associative matrix and allocates memory for \a asize elements.
 		 *  \param asize the number of element that can be added to matrix without reallocation.
-		 *  \param p should be ignored. WEN: juz ich nie ma
-		 *  \param q should be ignored.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_constructor_AMatrClTriangle.html">See example with AMatrFull</a>.
 		 *
@@ -1167,10 +1223,19 @@ namespace Koala
 
 		/** \brief Copy content operator.
 		 *
-		 * \param X the copied matrix.*/
+		 *  \param X the copied matrix.
+		 *  \return the reference to the current container.
+		 */
 		AssocMatrix< Klucz,Elem,aType,Container,IndexContainer >
 			&operator=( const AssocMatrix< Klucz,Elem,aType,Container,IndexContainer > & );
-    //WEN: czym sie rozni od poprzedniego? To jest unikatowe w Koali, ze mozesz np. przypisac AssocArray<...> = AssocTable<...> jesli zgadzaja sie typy kluczy, a wartosci mapowane daja sie przepisac
+	    // WEN: czym sie rozni od poprzedniego? To jest unikatowe w Koali, ze mozesz np. przypisac AssocArray<...> = AssocTable<...> jesli zgadzaja sie typy kluczy, a wartosci mapowane daja sie przepisac
+		/** \brief Copy content operator.
+		 *
+		 *  Overloaded assignment operator. Allows to make a copy of any type of two dimensional associative container as long as the types of keys match and mapped values can be copied.
+		 *  \tparam MatrixContainer the type of copied container.
+		 *  \param X the copied matrix.
+		 *  \return the reference to the current container.
+		 */
 		template< class MatrixContainer > AssocMatrix &operator=( const MatrixContainer &X );
 
 
@@ -1181,14 +1246,13 @@ namespace Koala
 		 *  \param v the tested key.
 		 *  \return true if there exist an element for which \a v is one of keys, false otherwise.
 		 *
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_hasInd.html">See example</a>.
-		 */
+		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_hasInd.html">See example</a>.	 */
 		bool hasInd( Klucz v ) const { return index.hasKey( v ); }
 
 		// usuwa takze wszystkie wpisy zawierajace argument jako jeden z elementow pary kluczy
 		/** \brief Delete single key.
 		 *
-		 *  The method deletes all the elements for which WEN: chyba co najmniej jeden? rowniez on of the keys is \a v.
+		 *  The method deletes all the elements for which one of the keys is \a v.
 		 *  \param the eliminated key.
 		 *  \return true if at least one element was deleted.
 		 *
@@ -1199,7 +1263,7 @@ namespace Koala
 		/** \brief Get first key.
 		 *
 		 *  The method allows to get to the first element on the list of single keys that appear in associative matrix.
-		 *  \return  the first key on the list of all single keys. WEN: lub 0 przy pustym kont.
+		 *  \return  the first key on the list of all single keys or 0 if the container is empty.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_firstInd.html">See example</a>.
 		 */
@@ -1208,7 +1272,7 @@ namespace Koala
 		/** \brief Get last key.
 		 *
 		 *  The method allows to get to the last element on the list of single keys that appear in associative matrix.
-		 *  \return  the last key on the list of all single keys. WEN: lub 0 przy pustym kont.
+		 *  \return  the last key on the list of all single keys or 0 if the container is empty.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_lastInd.html">See example</a>.
 		 */
@@ -1217,7 +1281,8 @@ namespace Koala
 		/** \brief Get next key.
 		 *
 		 *  The method allows to get to the next element after \a v from the list of single keys that appear in associative matrix.
-		 *  \return  the next key on the list of all single keys. WEN: lub NULL dla ostatniego, lub pierwszy indeks dla arg=0
+		 *  \param v the reference key.
+		 *  \return  the next key on the list of all single keys or the first key if \a v == 0. If \a v is the last key, 0 is returned.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_nextInd.html">See example</a>.
 		 */
@@ -1226,7 +1291,7 @@ namespace Koala
 		/** \brief Get previous key.
 		 *
 		 *  The method allows to get to the element previous to \a v from the list of single keys that appear in associative matrix.
-		 *  \return  the previous key on the list of all single keys. WEN: lub NULL dla pierwszego, lub ostatni indeks dla arg=0
+		 *  \return  the previous key on the list of all single keys or the last key if \a v == 0. If \a v is the first key, 0 is returned.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_prevInd.html">See example</a>.
 		 */
@@ -1240,7 +1305,11 @@ namespace Koala
 		 */
 		int indSize() const { return index.size(); }
 
-        //WEN: opis?
+        /** \brief Get single keys.
+		 *
+		 *  The method gets all single keys and puts them into container given by \wikipath{Iterator,iterator} \a iter.
+		 *  \param iter the \wikipath{Iterator,iterator} to container with single keys.
+		 *  \return the number of keys. */
 		template< class Iterator > int getInds( Iterator iter ) const {   return index.getKeys(iter); }
 
 		// zapis do zewnetrznej mapy (Klucz->ValType) wartosci wszystkich wpisow dla kluczy 2-wymiarowych zawierajacych argument na pierwszej pozycji
@@ -1360,8 +1429,7 @@ namespace Koala
 		 *  The method gets the pointer to the element associated with the pair \p (u,v).
 		 *  \param u the first key of the key pair of element.
 		 *  \param v the second key of the key pair of element.
-		 *  \return the pointer to the element associated with pair \p (u,v). WEN: albo NULL gdy klucza nie ma
-		 *
+		 *  \return the pointer to the element associated with pair \p (u,v) or NULL if there is no such an element.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_valPtr.html">See example</a>.
 		 */
@@ -1370,7 +1438,7 @@ namespace Koala
 		 *
 		 *  The method gets the pointer to the element associated with the pair \a k.
 		 *  \param k the key pair of element.
-		 *  \return the pointer to the element associated with pair \a k. WEN: albo NULL gdy klucza nie ma
+		 *  \return the pointer to the element associated with pair \a k or NULL if there is no such an element.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_valPtr2.html">See example</a>.
 		 */
@@ -1399,8 +1467,7 @@ namespace Koala
 		 *  The method gets the keys of the element next to the one associated with \p (u,v).
 		 *  \param u the reference element first key.
 		 *  \param v the reference element second key.
-		 *  \return the standard pair representing the keys of element next after \p (u,v), or (0,0) it matrix is empty.
-		 WEN: nie! jesli ten byl ostatni.
+		 *  \return the standard pair representing the keys of element next after \p (u,v), or (0,0) if element \p (u,v) was last.
 		 *    If \a u == 0 and \a v == 0 the first element key is returned.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_nextKey.html">See example</a>.
@@ -1410,8 +1477,7 @@ namespace Koala
 		 *
 		 *  The method gets the keys of element next to the one associated with \p k.
 		 *  \param k the reference element key.
-		 *  \return the standard pair representing the keys of element next after \p k, or (0,0) it matrix is empty.
-		 WEN: nie! jesli ten byl ostatni.
+		 *  \return the standard pair representing the keys of element next after \p k, or (0,0) if element  \p k is last.
 		 *    If \a k == (0,0) the first element key is returned.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_nextKey2.html">See example</a>.
@@ -1423,8 +1489,7 @@ namespace Koala
 		 *  The method gets the keys of the element prior to the one associated with \p (u,v).
 		 *  \param u the reference element first key.
 		 *  \param v the reference element second key.
-		 *  \return the standard pair representing the keys of element prior to \p (u,v), or (0,0) it matrix is empty.
-		 WEN: nie! jesli ten byl pierwszy.
+		 *  \return the standard pair representing the keys of element prior to \p (u,v), or (0,0) if element \p (u,v) is first.
 		 *    If \a u == 0 and \a v == 0 the last element key is returned.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_prevKey.html">See example</a>.
@@ -1434,8 +1499,7 @@ namespace Koala
 		 *
 		 *  The method gets the keys of element prior to the one associated with \p k.
 		 *  \param k the reference element key.
-		 *  \return the standard pair representing the keys of element prior to \p k, or (0,0) it matrix is empty.
-		 WEN: nie! jesli ten byl pierwszy.
+		 *  \return the standard pair representing the keys of element prior to \p k, or (0,0) if element \a k if first.
 		 *    If \a k == (0,0) the last element key is returned.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_prevKey2.html">See example</a>.
@@ -1478,9 +1542,8 @@ namespace Koala
 		// zaalokowuje pamiec na podana liczbe kluczy (1-wymiarowych)
 		/** \brief Reserve memory.
 		 *
-		 *  The method reserves sufficient amount of memory for \a arg elements
-		 *    hence there is no need to allocate memory unless the number of added elements passes \a arg.
-		 WEN: ok, tylko pamietajmy, ze tu chodzi o rozmiar indeksu pojedynczych roznych kluczy, a nie par, ktorym przypisano elementy
+		 *  The method reserves sufficient amount of memory for \a arg keys (single keys not elements).
+		 *  Hence, there is no need to allocate memory unless the number of single keys passes \a arg.
 		 *  \param arg the size of allocated buffer.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_reserve.html">See example</a>.
@@ -1500,8 +1563,7 @@ namespace Koala
 		/** \brief Get keys.
 		 *
 		 *  The method gets all the pairs of keys in the matrix and writes it down to the iterator \a iter.
-		 *  \param[out] iter the iterator to the container with all the pairs of keys.
-		 		 WEN: to musi byc kontener na elementy typu std::pair< Klucz,Klucz >
+		 *  \param[out] iter the iterator to the container with all the pairs of keys. Note that the container must store elements of type std::pair< Klucz,Klucz >.
 		 *  \return the number of pairs.
 		 *
 		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_getKeys.html">See example</a>.
@@ -2042,28 +2104,77 @@ namespace Koala
 
 	// wypisywanie do strumienia wszystkich wpisow w podanych tablicach asocjacyjnych, dziala jesli typ wartosci takze obsluguje <<
 
-    // WEN: opis?
+
+	/** \brief Print elements of container.
+	 *
+	 * Overloaded operator<< allows to print all the elements of container \a cont using the output stream object \a cout form library iostream.
+	 *  \param out the reference to the standard output object.
+	 *  \param cont the reference to the printed container.
+	 *  \return the reference to out.
+	 *  \relates  AssocTabConstInterface<T> WEN?:*/
 	template< typename T > std::ostream &operator<<( std::ostream &out, const AssocTabConstInterface< T > & cont )
 		{ return Privates::printAssoc( out,cont,cont ); }
 
+	/** \brief Print elements of container.
+	 *
+	 * Overloaded operator<< allows to print all the elements of container \a cont using the output stream object \a cout form library iostream.
+	 *  \param out the reference to the standard output object.
+	 *  \param cont the reference to the printed container.
+	 *  \return the reference to out.
+	 *  \relates  AssocTable*/
 	template< typename T > std::ostream &operator<<( std::ostream &out, const AssocTable< T > & cont )
 		{ return Privates::printAssoc( out,cont,cont ); }
 
+	/** \brief Print elements of container.
+	 *
+	 * Overloaded operator<< allows to print all the elements of container \a cont using the output stream object \a cout form library iostream.
+	 *  \param out the reference to the standard output object.
+	 *  \param cont the reference to the printed container.
+	 *  \return the reference to out.
+	 *  \relates  AssocArray*/
 	template< class K, class V,class C > std::ostream &operator<<( std::ostream &out, const AssocArray< K,V,C > & cont )
 		{ return Privates::printAssoc( out,cont,cont ); }
 
+	/** \brief Print elements of container.
+	 *
+	 * Overloaded operator<< allows to print all the elements of container \a cont using the output stream object \a cout form library iostream.
+	 *  \param out the reference to the standard output object.
+	 *  \param cont the reference to the printed container.
+	 *  \return the reference to out.
+	 *  \relates  PseudoAssocArray*/
 	template< typename K, typename V, typename A, typename C >
 		std::ostream &operator<<( std::ostream &out, const Privates::PseudoAssocArray< K,V,A,C > & cont )
 		{ return Privates::printAssoc( out,cont,cont ); }
 
+	/** \brief Print elements of container.
+	 *
+	 * Overloaded operator<< allows to print all the elements of container \a cont using the output stream object \a cout form library iostream.
+	 *  \param out the reference to the standard output object.
+	 *  \param cont the reference to the printed container.
+	 *  \return the reference to out.
+	 *  \relates  AssocMatrix*/
 	template< class Klucz, class Elem, AssocMatrixType aType, class C, class IC >
 		std::ostream &operator<<( std::ostream &out, const AssocMatrix< Klucz,Elem,aType,C,IC > & cont )
 		{ return Privates::printAssoc( out,cont,cont ); }
 
+	/** \brief Print elements of container.
+	 *
+	 * Overloaded operator<< allows to print all the elements of container \a cont using the output stream object \a cout form library iostream.
+	 *  \param out the reference to the standard output object.
+	 *  \param cont the reference to the printed container.
+	 *  \return the reference to out.
+	 *  \relates Assoc2DimTable*/
 	template<AssocMatrixType aType, class Container>
 		std::ostream &operator<<( std::ostream &out, const Assoc2DimTable< aType,Container > & cont )
 		{ return Privates::printAssoc( out,cont,cont ); }
 
+	/** \brief Print elements of container.
+	 *
+	 * Overloaded operator<< allows to print all the elements of container \a cont using the output stream object \a cout form library iostream.
+	 *  \param out the reference to the standard output object.
+	 *  \param cont the reference to the printed container.
+	 *  \return the reference to out.
+	 *  \relates  SimpleAssocMatrix*/
 	template< class Klucz, class Elem, AssocMatrixType aType, class C, class IC >
 		std::ostream &operator<<( std::ostream &out, const SimpleAssocMatrix< Klucz,Elem,aType,C,IC > & cont )
 		{
