@@ -596,7 +596,7 @@ void ghTest2()
     Koala::Flow::GHTreeEdge<Koala::Graph<char,OpisE>,int16_t> pairTab[1000];
 
     cout << "\n\n";
-    Koala::Flow::findGHTree(g,edgeCont,pairTab);
+    Koala::Flow::gHTree(g,edgeCont,pairTab);
 
     cout << "\n\n";
     for(int i=0;i<g.getVertNo()-1;i++)
@@ -616,7 +616,7 @@ void ghTest2()
         for(Koala::Graph<char,OpisE>::PVertex v=g.getVert();v;v=g.getVertNext(v))
             ghlink[v]=ghcopy.addVert();
 
-        Koala::Flow::findGHTree(g,edgeCont,pairTab);
+        Koala::Flow::gHTree(g,edgeCont,pairTab);
 
         for(int i=0;i<g.getVertNo()-1;i++)
             ghcopy.addEdge(ghlink[pairTab[i].first],ghlink[pairTab[i].second],pairTab[i].capac);
