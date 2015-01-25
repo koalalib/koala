@@ -104,6 +104,170 @@ int ListVertColoringPar<DefaultStructs>::color(const Graph &graph,
 	return cnt;
 }
 
+//NEW
+template <class DefaultStructs>
+template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
+int ListVertColoringPar<DefaultStructs>::color2ElemLists(
+	const Graph &graph, const ColLists &colLists, ColorMap &colors, VIter beg, VIter end)
+{
+	typedef typename Graph::PVertex Vert;
+	typedef typename Graph::PEdge Edge;
+	const EdgeDirection Mask = EdDirIn | EdDirOut | EdUndir;
+	typename DefaultStructs::template AssocCont<typename Graph::PVertex, std::pair<int, int> >::Type vertToVarsMap(graph.getVertNo());
+	if (DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getVertNo());
+	int cnt = 0, varNum = 0, eNum = 0;
+
+	//a pair in the below array is holding a pointer to a vertex and boolean value with the following meaning:
+	//- true -> list has 2 elements,
+	//- false -> list has 1 element.
+	std::pair<Vert, bool> LOCALARRAY(blankVerts, graph.getVertNo());
+
+	for (VIter it = beg; it != end; ++it)
+	{
+		Vert vv = *it;
+		bool isInMap = colors.hasKey(vv);
+		if (!isInMap || (isInMap && colors[vv] < 0))
+		{
+			//found uncolored element
+			koalaAssert(colLists.hasKey(vv), AlgExcWrongArg);
+			typename ColLists::ValType vColList = colLists[vv];
+			int listSize = vColList.size();
+			koalaAssert(((listSize > 0) && (listSize < 3)), AlgExcWrongArg);
+			if (listSize == 2)
+			{
+				vertToVarsMap[vv] = std::make_pair(varNum, varNum + 1);
+				blankVerts[cnt] = std::make_pair(vv, true);
+				++varNum;
+			}
+			else
+			{
+				vertToVarsMap[vv] = std::make_pair(varNum, -1);
+				blankVerts[cnt] = std::make_pair(vv, false);
+			}
+			++varNum;
+			eNum += graph.getEdgeNo(vv, Mask);
+			++cnt;
+		}
+	}
+	typename Sat2CNFPar<DefaultStructs>::Clause LOCALARRAY(clauses, varNum + (eNum << 1)); //one clause for each of color in each vertex
+	//at most 2 clauses for each edge saying that neighboring elements have 2 common colors on their lists
+
+	int cl = 0;
+	for (int i = 0; i < cnt; ++i)
+	{
+		Vert vv = blankVerts[i].first;
+		typename ColLists::ValType vvColList = colLists[vv];
+		//add clauses for colors on the list of vv
+		std::pair<int, int> vvp = vertToVarsMap[vv];
+		if (vvp.second != -1)
+		{
+			clauses[cl] = std::make_pair(std::make_pair(vvp.first, true), std::make_pair(vvp.second, true));
+			++cl;
+			clauses[cl] = std::make_pair(std::make_pair(vvp.first, false), std::make_pair(vvp.second, false));
+			++cl;
+		}
+		else
+		{
+			clauses[cl] = std::make_pair(std::make_pair(vvp.first, true), std::make_pair(vvp.first, true));
+			++cl;
+		}
+
+		for (Edge ee = graph.getEdge(vv, Mask); ee; ee = graph.getEdgeNext(vv, ee, Mask))
+		{
+			Vert u = graph.getEdgeEnd(ee, vv);
+			if (vertToVarsMap.hasKey(u))
+			{
+				if (u < vv) continue; //we want to consider edges between vertices to be colored only once
+				//u - uncolored vertex that should be colored
+
+				typename ColLists::ValType uColList = colLists[u];
+				std::pair<int, int> up = vertToVarsMap[u];
+
+				//we have to consider 4 cases:
+				// 1 element of list of vv, 1 element of of list of u
+				if (vvColList.first() == uColList.first())
+				{
+					clauses[cl] = std::make_pair(std::make_pair(vvp.first, false), std::make_pair(up.first, false));
+					++cl;
+				}
+				// 1 element of list of vv, 2 element of of list of u
+				if ((up.second != -1) && (vvColList.first() == uColList.last()))
+				{
+					clauses[cl] = std::make_pair(std::make_pair(vvp.first, false), std::make_pair(up.second, false));
+					++cl;
+				}
+				// 2 element of list of vv, 1 element of of list of u
+				if ((vvp.second != -1) && (vvColList.last() == uColList.first()))
+				{
+					clauses[cl] = std::make_pair(std::make_pair(vvp.second, false), std::make_pair(up.first, false));
+					++cl;
+				}
+				// 2 element of list of vv, 2 element of of list of u
+				if ((vvp.second != -1) && (up.second != -1) && (vvColList.last() == uColList.last()))
+				{
+					clauses[cl] = std::make_pair(std::make_pair(vvp.second, false), std::make_pair(up.second, false));
+					++cl;
+				}
+			}
+			else
+			{
+				if (colors.hasKey(u) && colors[u] >= 0)
+				{
+					//u - colored vertex
+					int usedCol = colors[u];
+					if (vvColList.isElement(usedCol))
+					{
+						//color used by vertex u is forbidden for vv
+						if (vvColList.first() == usedCol)
+							clauses[cl] = std::make_pair(std::make_pair(vvp.first, false), std::make_pair(vvp.first, false));
+						else
+							clauses[cl] = std::make_pair(std::make_pair(vvp.second, false), std::make_pair(vvp.second, false));
+						++cl;
+					}
+				}
+			}
+		}
+	}
+
+	bool LOCALARRAY(sol, varNum);
+	bool canColor = Sat2CNFPar<DefaultStructs>::solve(clauses, clauses + cl, sol);
+	if (!canColor)
+		return -1;
+
+	int varIt = 0;
+	for (int i = 0; i < cnt; ++i)
+	{
+		Vert vv = blankVerts[i].first;
+		bool c1 = sol[varIt];
+		if (c1) colors[vv] = colLists[vv].first();
+		else colors[vv] = colLists[vv].last();
+
+		if (blankVerts[i].second) varIt += 2;
+		else varIt++;
+	}
+	return cnt;
+}
+
+//NEW
+template <class DefaultStructs>
+template<typename Graph, typename ColLists, typename ColorMap>
+int ListVertColoringPar<DefaultStructs>::color2ElemLists(
+	const Graph &graph, const ColLists &colLists, ColorMap &colors)
+{
+	typedef typename Graph::PVertex Vert;
+	colors.reserve(graph.getVertNo());
+	Vert LOCALARRAY(verts, graph.getVertNo())
+	int i = 0;
+	for (Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv))
+	{
+		verts[i] = vv;
+		++i;
+	}
+	return color2ElemLists(graph, colLists, colors, verts, verts + i);
+}
+
+
 //testing if graph is properly colored
 template <class DefaultStructs>
 template<typename Graph, typename ColLists, typename ColorMap>
@@ -425,6 +589,224 @@ int ListEdgeColoringPar<DefaultStructs>::colorBipartite(const Graph &graph,
 		usedColors += curColor;
 	}
 	return cnt;
+}
+
+//NEW
+template <class DefaultStructs>
+template<typename Graph, typename ColLists, typename ColorMap, typename EIter>
+int ListEdgeColoringPar<DefaultStructs>::color2ElemLists(
+	const Graph &graph, const ColLists &colLists, ColorMap &colors, EIter beg, EIter end)
+{
+	typedef typename Graph::PVertex Vert;
+	typedef typename Graph::PEdge Edge;
+	const EdgeDirection Mask = EdDirIn | EdDirOut | EdUndir;
+	typename DefaultStructs::template AssocCont<typename Graph::PEdge, std::pair<int, int> >::Type edgeToVarsMap(graph.getEdgeNo(Mask));
+	if (DefaultStructs::ReserveOutAssocCont)
+		colors.reserve(graph.getEdgeNo(Mask));
+	int cnt = 0, varNum = 0, neighNum = 0;
+
+	//a pair in the below array is holding a pointer to an edge and boolean value with the following meaning:
+	//- true -> list has 2 elements,
+	//- false -> list has 1 element.
+	std::pair<Edge, bool> LOCALARRAY(blankEdges, graph.getEdgeNo(Mask));
+	int maxEdgePairNum = 0;
+	Vert v1, v2;
+	for (EIter it = beg; it != end; ++it)
+	{
+		Edge edge = *it;
+
+		//loops cannot be colored
+		koalaAssert(graph.getEdgeType(edge) != EdLoop, AlgExcWrongArg);
+
+		bool isInMap = colors.hasKey(edge);
+		if (!isInMap || (isInMap && colors[edge] < 0))
+		{
+			//found uncolored element
+			koalaAssert(colLists.hasKey(edge), AlgExcWrongArg);
+			typename ColLists::ValType eColList = colLists[edge];
+			int listSize = eColList.size();
+			koalaAssert(((listSize > 0) && (listSize < 3)), AlgExcWrongArg);
+			if (listSize == 2)
+			{
+				edgeToVarsMap[edge] = std::make_pair(varNum, varNum + 1);
+				blankEdges[cnt] = std::make_pair(edge, true);
+				++varNum;
+			}
+			else
+			{
+				edgeToVarsMap[edge] = std::make_pair(varNum, -1);
+				blankEdges[cnt] = std::make_pair(edge, false);
+			}
+			v1 = graph.getEdgeEnd1(edge);
+			v2 = graph.getEdgeEnd2(edge);
+			maxEdgePairNum += graph.getEdgeNo(v1, Mask) + graph.getEdgeNo(v2, Mask) - 2;
+			++varNum;
+			++cnt;
+		}
+	}
+
+	std::pair<Edge, Edge> LOCALARRAY(neighEdges, maxEdgePairNum);
+	int ne = 0;
+	for (int i = 0; i < cnt; ++i)
+	{
+		Edge edge = blankEdges[i].first;
+
+		Vert vv = graph.getEdgeEnd1(edge);
+		for (Edge ee = graph.getEdge(vv, Mask); ee; ee = graph.getEdgeNext(vv, ee, Mask))
+		{
+			bool isColored = (colors.hasKey(ee) && colors[ee] >= 0);
+			if (ee == edge || (!isColored && !edgeToVarsMap.hasKey(ee))) continue;
+			if (ee < edge) 	neighEdges[ne++] = std::make_pair(ee, edge);
+			else neighEdges[ne++] = (std::make_pair(edge, ee));
+
+		}
+		vv = graph.getEdgeEnd2(edge);
+		for (Edge ee = graph.getEdge(vv, Mask); ee; ee = graph.getEdgeNext(vv, ee, Mask))
+		{
+			bool isColored = (colors.hasKey(ee) && colors[ee] >= 0);
+			if (ee == edge || (!isColored && !edgeToVarsMap.hasKey(ee))) continue;
+			if (ee < edge) 	neighEdges[ne++] = std::make_pair(ee, edge);
+			else neighEdges[ne++] = std::make_pair(edge, ee);
+		}
+	}
+
+	//remove duplicates
+	DefaultStructs::template sort(neighEdges, neighEdges + ne);
+	ne = std::unique(neighEdges, neighEdges + ne) - neighEdges;
+
+	typename Sat2CNFPar<DefaultStructs>::Clause LOCALARRAY(clauses, varNum + (ne << 1)); //one clause for each of color in each edge
+	//at most 2 clauses for each pair of neighboring edges
+
+	int cl = 0;
+	//clauses for colors on the lists of edges
+	for (int i = 0; i < cnt; ++i)
+	{
+		Edge ee = blankEdges[i].first;
+		typename ColLists::ValType eeColList = colLists[ee];
+		//add clauses for colors on the list of ee
+		std::pair<int, int> eep = edgeToVarsMap[ee];
+		if (eep.second != -1)
+		{
+			clauses[cl] = std::make_pair(std::make_pair(eep.first, true), std::make_pair(eep.second, true));
+			++cl;
+			clauses[cl] = std::make_pair(std::make_pair(eep.first, false), std::make_pair(eep.second, false));
+			++cl;
+		}
+		else
+		{
+			clauses[cl] = std::make_pair(std::make_pair(eep.first, true), std::make_pair(eep.first, true));
+			++cl;
+		}
+	}
+	//clauses for colors on neighboring edges
+
+	for (int i = 0; i < ne; ++i)
+	{
+		Edge e1 = neighEdges[i].first;
+		Edge e2 = neighEdges[i].second;
+
+		//add clauses for colors on the list of ee
+		bool e1InMap = edgeToVarsMap.hasKey(e1);
+		bool e2InMap = edgeToVarsMap.hasKey(e2);
+		if (e1InMap && e2InMap)
+		{
+			std::pair<int, int> e1p = edgeToVarsMap[e1];
+			std::pair<int, int> e2p = edgeToVarsMap[e2];
+			typename ColLists::ValType e1ColList = colLists[e1];
+			typename ColLists::ValType e2ColList = colLists[e2];
+
+			//comparing all elements from the first list with all elements on the second list
+			//lists can have 1 or 2 elements
+			if (e1ColList.first() == e2ColList.first())
+			{
+				clauses[cl] = std::make_pair(std::make_pair(e1p.first, false), std::make_pair(e2p.first, false));
+				++cl;
+			}
+
+			if ((e2p.second != -1) && (e1ColList.first() == e2ColList.last()))
+			{
+				clauses[cl] = std::make_pair(std::make_pair(e1p.first, false), std::make_pair(e2p.second, false));
+				++cl;
+			}
+
+			if ((e1p.second != -1) && (e1ColList.last() == e2ColList.first()))
+			{
+				clauses[cl] = std::make_pair(std::make_pair(e1p.second, false), std::make_pair(e2p.first, false));
+				++cl;
+			}
+
+			if ((e1p.second != -1) && (e2p.second != -1) && (e1ColList.last() == e2ColList.last()))
+			{
+				clauses[cl] = std::make_pair(std::make_pair(e1p.second, false), std::make_pair(e2p.second, false));
+				++cl;
+			}
+		}
+		else
+		{
+			Edge ee = e1;
+			Edge ff = e2;
+			//either e1 is uncolored, e2 is colored either symmetric situation holds
+			if (colors.hasKey(e1))
+			{
+				ff = e1;
+				ee = e2;
+			}
+			//ee - an edge to be colored
+			//ff - an edge already colored
+			std::pair<int, int> eep = edgeToVarsMap[ee];
+			typename ColLists::ValType eeColList = colLists[ee];
+			typename ColLists::ValType ffColList = colLists[ff];
+
+			//u - colored vertex
+			int usedCol = colors[ff];
+			if (eeColList.isElement(usedCol))
+			{
+				//color used by edge ff is forbidden for ee
+				if (eeColList.first() == usedCol)
+					clauses[cl] = std::make_pair(std::make_pair(eep.first, false), std::make_pair(eep.first, false));
+				else
+					clauses[cl] = std::make_pair(std::make_pair(eep.second, false), std::make_pair(eep.second, false));
+				++cl;
+			}
+		}
+	}
+
+	//compute 2-SAT problem
+	bool LOCALARRAY(sol, varNum);
+	bool canColor = Sat2CNFPar<DefaultStructs>::solve(clauses, clauses + cl, sol);
+	if (!canColor)
+		return -1;
+
+	int varIt = 0;
+	for (int i = 0; i < cnt; ++i)
+	{
+		Edge ee = blankEdges[i].first;
+		bool c1 = sol[varIt];
+		if (c1) colors[ee] = colLists[ee].first();
+		else colors[ee] = colLists[ee].last();
+
+		if (blankEdges[i].second) varIt += 2;
+		else varIt++;
+	}
+	return cnt;
+}
+//NEW
+template <class DefaultStructs>
+template<typename Graph, typename ColLists, typename ColorMap>
+int ListEdgeColoringPar<DefaultStructs>::color2ElemLists(
+	const Graph &graph, const ColLists &colLists, ColorMap &colors)
+{
+	typedef typename Graph::PEdge Edge;
+	const EdgeDirection Mask = EdDirIn | EdDirOut | EdUndir;
+	Edge LOCALARRAY(edges, graph.getEdgeNo(Mask));
+	colors.reserve(graph.getEdgeNo(Mask));
+	int i = 0;
+	for (Edge ee = graph.getEdge(Mask); ee; ee = graph.getEdgeNext(ee, Mask))
+	{
+		edges[i] = ee;
+		++i;
+	}
+	return color2ElemLists(graph, colLists, colors, edges, edges + i);
 }
 
 //testing if graph is properly colored

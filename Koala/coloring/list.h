@@ -11,6 +11,7 @@
 #include "../graph/view.h"
 #include "edge.h"
 #include "../classes/detect.h"
+#include "../algorithm/sat2cnf.h"
 
 
 namespace Koala {
@@ -143,6 +144,45 @@ public:
 	 *  \return the number of colored vertices. */
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int color(const Graph &graph, const ColLists &colLists, ColorMap &colors);
+
+	//NEW
+	/*
+	Probuje przedluzyc kolorowanie czesci grafu zawarte w mapie colors na wierzcholki z zakresu iteratorow beg - end,
+	zwraca liczbe elementow, ktorym nadano kolor (tj.nie pokolorowanych wstepnie) lub - 1, gdy to niemozliwe.
+	*/
+	/**
+	 * Coloring of vertices with the list of colors of length at most 2.
+	 *
+	 *  For all uncolored vertices from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
+	 *  The result is saved in the map \a colors.
+	 *  \param graph the considered graph.
+	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
+	 *  \param colors the associative container (PVert->int)
+	 *     which assigns a color (nonnegative integer number) to the vertex.
+	 *  \param beg the iterator to the first element of the container with vertices that are to be colored.
+	 *  \param end the iterator to the past-the-end element of the container with vertices that are to be colored.
+	 *  \return the number of colored vertices or -1 if none was possible. */
+	template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
+	static int color2ElemLists(const Graph &graph, const ColLists &colLists, ColorMap &colors, VIter beg, VIter end);
+
+	//NEW
+	/*
+	Probuje przedluzyc kolorowanie czesci grafu zawarte w mapie colors na wszystkie niepokolorowane wierzcholki,
+	zwraca liczbe elementow, ktorym nadano kolor (tj.nie pokolorowanych wstepnie) lub - 1, gdy to niemozliwe.
+	*/
+	/**
+	 * Coloring of vertices with the list of colors of length at most 2.
+	 *
+	 * For all uncolored vertices from \a graph, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
+	 *  The result is saved in the map \a colors.
+	 *  \param graph the considered graph.
+	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
+	 *  \param colors the associative container (PVert->int)
+	 *     which assigns a color (nonnegative integer number) to the vertex.
+	 *  \return the number of colored vertices or -1 if none was possible. */
+
+	template<typename Graph, typename ColLists, typename ColorMap>
+	static int color2ElemLists(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
 	//testing if graph is properly colored
 	/** \brief Test partial coloring.
@@ -355,6 +395,44 @@ public:
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int colorBipartite(const Graph &graph, const ColLists &colLists, ColorMap &colors);
+
+	//NEW
+	/*
+	Probuje przedluzyc kolorowanie czesci grafu zawarte w mapie colors na krawedzie z zakresu iteratorow beg - end,
+	zwraca liczbe elementow, ktorym nadano kolor (tj.nie pokolorowanych wstepnie) lub - 1, gdy to niemozliwe.
+	*/
+		/**
+	 * Coloring of edges with the list of colors of length at most 2.
+	 *
+	 *  For all uncolored edges from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
+	 *  The result is saved in the map \a colors.
+	 *  \param graph the considered graph.
+	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
+	 *  \param colors the associative container (PEdge->int)
+	 *     which assigns a colors (nonnegative integers) to the edges.
+	 *  \param beg the iterator to the first element  of the container with the edges that are to be colored.
+	 *  \param end the iterator to the past-the-end element of the container with the edges that are to be colored.
+	 *  \return the number of properly colored edges or -1 if none was possible.	 */
+	template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
+	static int color2ElemLists(const Graph &graph, const ColLists &colLists, ColorMap &colors, VIter beg, VIter end);
+
+	//NEW
+	/*
+	Probuje przedluzyc kolorowanie czesci grafu zawarte w mapie colors na wszystkie niepokolorowane krawedzie,
+	zwraca liczbe elementow, ktorym nadano kolor (tj.nie pokolorowanych wstepnie) lub - 1, gdy to niemozliwe.
+	*/
+	/**
+	 * Coloring of edges with the list of colors of length at most 2.
+	 *
+	 *  The method colors  properly (concerning the partial coloring in map \a colors)  all the uncolored edges of \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].
+	 *  The result is saved in the map \a colors.
+	 *  \param graph the considered graph.
+	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
+	 *  \param colors the associative container (PEdge->int)
+	 *     which assigns a colors (nonnegative integers) to the edges.
+	 *  \return the number of properly colored edges or -1 if none was possible.	 */
+	template<typename Graph, typename ColLists, typename ColorMap>
+	static int color2ElemLists(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
 	//testing if graph is properly colored
 	/** \brief Test partial coloring.
