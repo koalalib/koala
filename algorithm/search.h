@@ -185,6 +185,7 @@ namespace Koala
 		 *  The structure consist of two iterators  WEN: wyjsciowe. \a vertIter point to the concatenated sequenced of objects. \a compIter point to the container with integers such that each integer is a position of starting point of next sequence, the last integer represents the number of all elements in the \a vertIter.	 */
 		template< class CIter, class VIter > struct CompStore
 		{
+		    //WEN:bzdura! odwrotnie
 			CIter compIter;/**<\brief the iterator WEN: wstawiacz to the container with concatenated sequences.*/
 			VIter vertIter;/**< \brief the iterator WEN: wstawiacz  to the container with position of starting points of consecutive sequences.*/
 
@@ -196,7 +197,7 @@ namespace Koala
 		// Funkcja tworzaca, analogia make_pair
 		// Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
 		/** \brief Generating function for CompStore.
-		 *
+		 *  //WEN:bzdura! odwrotnie
 		 *  \param ac the iterator WEN: wstawiacz to the container with concatenated sequences of entities.
 		 *  \param av the iterator WEN: wstawiacz to the container with integers representing the positions of first elements of consecutive sequences.
 		 *  \return the CompStore object associated with the sequence of sequences. */
@@ -771,15 +772,34 @@ namespace Koala
 		 *  \sa PathStructs::OutPath
 		 *  \sa PathStructs::OutPathTool
 		 */
-		template< class GraphType, class VertIter, class EdgeIter > static int getPath( const GraphType &g,
+		template< class GraphType, class VertIter, class EdgeIter > static int findPath( const GraphType &g,
 			typename GraphType::PVertex src, typename GraphType::PVertex dest, OutPath< VertIter,EdgeIter > path,
 			EdgeDirection dir = EdUndir | EdDirOut );
 
         //NEW: wersja bez podawania iteratorow
-		template< class GraphType > static int getPath( const GraphType &g,
+		template< class GraphType > static int findPath( const GraphType &g,
 			typename GraphType::PVertex src, typename GraphType::PVertex dest, BlackHole=blackHole,
 			EdgeDirection dir = EdUndir | EdDirOut )
-			{   return getPath( g,src, dest, OutPath< BlackHole,BlackHole>( blackHole,blackHole ),dir );    }
+			{   return findPath( g,src, dest, OutPath< BlackHole,BlackHole>( blackHole,blackHole ),dir );    }
+
+        //TODO: wersja tymczasowa, do usunięcia!!!
+		template< class GraphType, class VertIter, class EdgeIter > static int getPath( const GraphType &g,
+			typename GraphType::PVertex src, typename GraphType::PVertex dest, OutPath< VertIter,EdgeIter > path,
+			EdgeDirection dir = EdUndir | EdDirOut )
+			{
+			    std::cerr<< "!!!!!Zmiana nazwy metody getPath-> findPath!!!";
+			    return findPath(g,src,dest,path,dir);
+			}
+
+        //TODO: wersja tymczasowa, do usunięcia!!!
+		template< class GraphType > static int getPath( const GraphType &g,
+			typename GraphType::PVertex src, typename GraphType::PVertex dest, BlackHole,
+			EdgeDirection dir = EdUndir | EdDirOut )
+			{
+			    std::cerr<< "!!!!!Zmiana nazwy metody getPath-> findPath!!!";
+			    return findPath(g,src,dest,blackHole,dir);
+			}
+
 
 		/** \brief Split into components.
 		 *
