@@ -404,13 +404,15 @@ namespace Koala
         */
         //NEW: znajduje najliczniejszy zbior niezalezny (procedura niewielomianowa). Jesli w trakcie szukania
         //wykryje, ze rozmiar minSize jest nieosioagalny, przerywa zwracajac -1
+        //NEW: zmiana nazwy get    -> findMax
         template< class GraphType, class OutputIterator > static int
-            get( GraphType & g, OutputIterator out, int minSize = 0);
+            findMax( GraphType & g, OutputIterator out, int minSize = 0);
 
         //NEW: znajduje zbior niezalezny mocy >= minSize (procedura niewielomianowa). Jesli w trakcie szukania
         //wykryje, ze rozmiar minSize jest nieosioagalny, przerywa zwracajac -1
+        //NEW: zmiana nazwy getSome    -> findSome
         template< class GraphType, class OutputIterator > static int
-            getSome( GraphType & g, OutputIterator out, int minSize);
+            findSome( GraphType & g, OutputIterator out, int minSize);
 
             //NEW: testy na zb. niezalezny dziedziczone z MaxStableHeurPar
             using MaxStableHeurPar<DefaultStructs>::test;
@@ -484,10 +486,12 @@ namespace Koala
     {
       public:
 
+        //NEW: zmiana nazwy get    -> findMax
         template< class GraphType, class OutputIterator > static int
-            get( GraphType & g, OutputIterator out, int minSize = 0);
+            findMax( GraphType & g, OutputIterator out, int minSize = 0);
+        //NEW: zmiana nazwy getSome    -> findSome
         template< class GraphType, class OutputIterator > static int
-            getSome( GraphType & g, OutputIterator out, int minSize);
+            findSome( GraphType & g, OutputIterator out, int minSize);
 
             using MaxCliqueHeurPar<DefaultStructs>::test;
             using MaxCliqueHeurPar<DefaultStructs>::testMax;
@@ -530,10 +534,12 @@ namespace Koala
     {
       public:
 
+        //NEW: zmiana nazwy get    -> findMin
         template< class GraphType, class OutputIterator > static int
-            get( GraphType & g, OutputIterator out, int maxSize = std::numeric_limits< int >::max());
+            findMin( GraphType & g, OutputIterator out, int maxSize = std::numeric_limits< int >::max());
+        //NEW: zmiana nazwy getSome    -> findSome
         template< class GraphType, class OutputIterator > static int
-            getSome( GraphType & g, OutputIterator out, int maxSize);
+            findSome( GraphType & g, OutputIterator out, int maxSize);
 
             using MinVertCoverHeurPar<DefaultStructs>::test;
             using MinVertCoverHeurPar<DefaultStructs>::testMin;

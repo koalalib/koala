@@ -1,6 +1,6 @@
 // SchedulingPar
 
-template< class DefaultStructs > void SchedulingPar< DefaultStructs >::Schedule::clearMachines()
+void SchedulingStructs::Schedule::clearMachines()
 {
 	int m = getMachNo();
 	machines.clear();

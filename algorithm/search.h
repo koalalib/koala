@@ -1193,7 +1193,7 @@ namespace Koala
 		 *    as pairs of indexes of components in \a comp.
 		 *  \param g the considered graph
 		 *  \param comp the map achieved by the above \p split method.
-		 *  \param[out] iter the iterator WEN: wstawiacz to the container with pairs of integers that represent the numbers of components in
+		 *  \param[out] iter the iterator WEN: wstawiacz to the container with pairs of integers WEN: piszmy po ludzku std::pair<int,int> that represent the numbers of components in
 		 *   \a comp that share a vertex. WEN: nawet jesli miedzy komponentami jest kilka lukow, dana para pojawia sie raz
 		 *  \return the number of pairs in \a iter.	 */
 		template< class GraphType, class CompMap, class PairIter >
@@ -1286,11 +1286,39 @@ namespace Koala
 	 *  \ingroup search    */
 	class DAGAlgs: public DAGAlgsPar< AlgsDefaultSettings > { };
 
+	//NEW: typy zagniezdzone przeniesione z BlocksPar
+	struct BlocksStructs {
+		// wynikowa etykieta wierzcholka
+		/**\brief Vertex data used to represent blocks. */
+		struct VertData {
+			// w ilu blokach lezy ten wierzcholek
+			int blockNo; /**<\brief Number of blocks the vertex is in.*/
+			// pozycja pierwszego w sekwencji numerow blokow (por. viter nizej) bloku zawierajacego
+			/** \brief First block position.
+			 *
+			 *  The position of the first block the vertex belongs to in the sequence \a viter in \p split method. WEN:numeracja od 0 */
+			int firstBlock;
+			// ten wierzcholek (jego pozostale bloki wystepuja kolejno za nim)
+			VertData( int b = 0, int f = -1 ): blockNo( b ), firstBlock( f )
+				{ }
+			/** \brief Copy.*/
+			//WEN: opis?
+			template <class T> void copy(T& arg) const
+			{
+				arg.blockNo=blockNo;
+				arg.firstBlock=firstBlock;
+			}
+			/** \brief Copy.*/
+			void copy(BlackHole&) const
+				{ }
+		};
+	};
+
 	/** \brief Searching blocks = biconnected components.
 	 *
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup search    */
-	template< class DefaultStructs > class BlocksPar: public SearchStructs
+	template< class DefaultStructs > class BlocksPar: public SearchStructs, public BlocksStructs
 	{
 	protected:
 		template< class GraphType > struct BiConVData
@@ -1359,30 +1387,6 @@ namespace Koala
 			static void storeBlocksData( State &, VertBlockList *, VertMap &, VertBlockIter & );
 
 	public:
-		// wynikowa etykieta wierzcholka
-		/**\brief Vertex data used to represent blocks. */
-		struct VertData {
-			// w ilu blokach lezy ten wierzcholek
-			int blockNo; /**<\brief Number of blocks the vertex is in.*/
-			// pozycja pierwszego w sekwencji numerow blokow (por. viter nizej) bloku zawierajacego
-			/** \brief First block position.
-			 *
-			 *  The position of the first block the vertex belongs to in the sequence \a viter in \p split method. WEN:numeracja od 0 */
-			int firstBlock;
-			// ten wierzcholek (jego pozostale bloki wystepuja kolejno za nim)
-			VertData( int b = 0, int f = -1 ): blockNo( b ), firstBlock( f )
-				{ }
-			/** \brief Copy.*/
-			//WEN: opis?
-			template <class T> void copy(T& arg) const
-			{
-				arg.blockNo=blockNo;
-				arg.firstBlock=firstBlock;
-			}
-			/** \brief Copy.*/
-			void copy(BlackHole&) const
-				{ }
-		};
 
 		/** \brief Get blocks. WEN: znalezione bloki sa numerowane od 0
 		 * WEN: cos sie nazwy zmiennyhch nie zgadzaja ...
@@ -1440,7 +1444,8 @@ namespace Koala
 		 *  \param out the iterator to the container with vertices of the core of graph.
 		 *  \return the number of vertices in the core of graph.
 		 */
-		template< class GraphType,class Iterator > static int getCore( const GraphType &g, Iterator out );
+		 //NEW: zmiana nazwy getCore -> core
+		template< class GraphType,class Iterator > static int core( const GraphType &g, Iterator out );
 	};
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
@@ -1701,15 +1706,8 @@ namespace Koala
 	// strong modules rozpinaja graf pierwszy
 	enum ModPartType { mpTrivial,mpConnected,mpDisconnected,mpPrime };
 
-	// Znajdowanie robicia grafow na maksymalne silne moduly
-	/** \brief Maximal strong modules decomposition (parametrized).
-	 *
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
-	 *  \ingroup search
-	 */
-	template< class DefaultStructs > class ModulesPar: public SearchStructs
-	{
-	public:
+	//NEW: wydzielone z ModulesPar
+	struct ModulesStructs {
 		// opis najwyzszego wezla drzewa dekompozycji modulowej grafu
 		/** \brief The top node in modular decomposition tree.*/
 		struct Partition
@@ -1730,6 +1728,18 @@ namespace Koala
 
 			Partition( int s, ModPartType t ): size( s ), type( t ) { }
 		};
+
+	};
+
+	// Znajdowanie robicia grafow na maksymalne silne moduly
+	/** \brief Maximal strong modules decomposition (parametrized).
+	 *
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
+	 *  \ingroup search
+	 */
+	template< class DefaultStructs > class ModulesPar: public SearchStructs, public ModulesStructs
+	{
+	public:
 
 		// znajduje rozbicie grafu na maksymalne silne moduly
 		// g, badany graf, powinien byc prosty, nieskierowany
