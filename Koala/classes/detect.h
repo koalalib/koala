@@ -673,6 +673,13 @@ namespace Koala
 			template< class Graph, class OutMap > static int chi( const Graph &g, OutMap &avmap )
 				{ return explore( g,blackHole,avmap,blackHole ); }
 
+            //TODO: wersja tymczasowa, do usunięcia!!!
+            template< class Graph, class OutMap > static int color( const Graph &g, OutMap &avmap )
+            {
+                std::cerr<< "!!!!!Zmiana nazwy metody color-> chi!!!";
+                return chi(g,avmap);
+            }
+
 			/** \brief Get maximal clique.
 			 *  The method finds a largest clique in a comparability graph
 			 *  @param[in] g the considered graph

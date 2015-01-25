@@ -627,7 +627,7 @@ void ghTest2()
     for(U=g.getVert();U!=g.getVertLast();U=g.getVertNext(U))
         for(V=g.getVertNext(U);V;V=g.getVertNext(V))
     //U=A; V=D;
-    {   int len=Koala::BFS::getPath(ghcopy,ghlink[U],ghlink[V],Koala::BFS::outPath(blackHole,ecopytab));
+    {   int len=Koala::BFS::findPath(ghcopy,ghlink[U],ghlink[V],Koala::BFS::outPath(blackHole,ecopytab));
         gtmin=std::numeric_limits<int>::max();
         for(int i=0;i<len;i++) gtmin=std::min(gtmin,ecopytab[i]->info);
         truemin=Koala::Flow::minEdgeCut(g,edgeCont,U,V,Koala::Flow::outCut(blackHole,blackHole)).capac;

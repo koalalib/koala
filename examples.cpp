@@ -158,7 +158,7 @@ void bfsOneVertMain()
 int bfsGetPathExamp(const MyGraph& g,PVertex start, PVertex end, PVertex vout[], PEdge eout[])
 {
     if (! start || !g.has(start) || ! end || !g.has(end)) return -2; //bledne dane
-    int res=BFS::getPath(g,start,end,BFS::outPath(vout,eout),EdUndir | EdDirOut);
+    int res=BFS::findPath(g,start,end,BFS::outPath(vout,eout),EdUndir | EdDirOut);
     return res;
 }
 
