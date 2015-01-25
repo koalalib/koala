@@ -663,13 +663,14 @@ namespace Koala
 			// zwraca liczbe chromatyczna lub -1 jesli graf nie byl comparability
 			// avmap - wysciowa tablica asocjacyjna PVertex->int z optymalnym pokolorowaniem wierzcholkowym. Lub BlackHole.
 			//TODO: WEN: procedury z katalogu coloring zwracaja max. used colors tj. o 1 mniej, albo jawne ostrzezenie w dokumentacji, albo poprawiamy  albo tu przynajmniej zmiana nawy color->chi
+			//NEW: jednak zmienilem nazwe
 			/** \brief Get optimal coloring.
 			 *
 			 *  The method gets an optimal vertex coloring of \a g.
 			 *  \param g the considered graph.
 			 *  \param[out] avmap the associative container (PVert -> int) with the optimal coloring of \a g. WEN: mozna BlackHole, numeracja od 0
 			 *  \return the chromatic number of \g or -1 if \a g is not a comparability graph.*/
-			template< class Graph, class OutMap > static int color( const Graph &g, OutMap &avmap )
+			template< class Graph, class OutMap > static int chi( const Graph &g, OutMap &avmap )
 				{ return explore( g,blackHole,avmap,blackHole ); }
 
 			/** \brief Get maximal clique.

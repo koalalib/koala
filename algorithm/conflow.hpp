@@ -1072,7 +1072,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class IterOut >
-	void FlowPar< DefaultStructs >::findGHTree( GraphType &g, EdgeContainer &edgeTab, IterOut out )
+	void FlowPar< DefaultStructs >::gHTree( GraphType &g, EdgeContainer &edgeTab, IterOut out )
 {
 	koalaAssert( g.getVertNo() > 1,AlgExcWrongArg );
 	int n;
