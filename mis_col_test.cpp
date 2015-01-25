@@ -190,12 +190,12 @@ int main()
 	for(int i = 0; i <= q * p; i++)
 		G.addEdge(U[q * p + 1], U[i]), G.addEdge(U[q * p + 2], U[i]);
 
-	assert(Koala::MaxStable::get(G, IS) == 7);
+	assert(Koala::MaxStable::findMax(G, IS) == 7);
 	for(int i = 0; i < 6; i++)
-		assert(Koala::MaxStable::getSome(G, IS, i) >= i && Koala::MaxStable::getSome(G, IS, i) < 7);
-	assert(Koala::MaxStable::getSome(G, IS, 10) == -1);
-	assert(Koala::MaxStable::get(G, IS, 6) == 7);
-	assert(Koala::MaxStable::get(G, IS, 10) == -1);
+		assert(Koala::MaxStable::findSome(G, IS, i) >= i && Koala::MaxStable::findSome(G, IS, i) < 7);
+	assert(Koala::MaxStable::findSome(G, IS, 10) == -1);
+	assert(Koala::MaxStable::findMax(G, IS, 6) == 7);
+	assert(Koala::MaxStable::findMax(G, IS, 10) == -1);
 	G.clear();
 
 	for(int i = 0; i < size; i++)
@@ -203,7 +203,7 @@ int main()
 	/*for(int i = 0; i < size / 3; i++)
 		G.addEdge(U[3 * i], U[3 * i + 1]), G.addEdge(U[3 * i + 2], U[3 * i + 1]), G.addEdge(U[3 * i], U[3 * i + 2]);
 	for(int i = 10; i < 30; i++)
-		printf("%d\n", Koala::MaxStable::get(G, IS, i));
+		printf("%d\n", Koala::MaxStable::findMax(G, IS, i));
 	*/
 
 	for(int test = 0; test < 5; test++)
@@ -215,7 +215,7 @@ int main()
 					G.addEdge(U[i], U[j]);
 
 		clock_t startTime = clock();
-		Koala::MaxStable::get(G, IS);
+		Koala::MaxStable::findMax(G, IS);
 		cout << ((double) clock() - startTime) / (double)CLOCKS_PER_SEC << endl;
 		G.clearEdges();
 	}
@@ -231,19 +231,19 @@ int main()
 	for(int test = 0; test < size; test++)
 	{
 		clock_t startTime = clock();
-		int isSize = Koala::MaxStable::get(G, IS, test);
+		int isSize = Koala::MaxStable::findMax(G, IS, test);
 		double isTime = ((double) clock() - startTime) / (double)CLOCKS_PER_SEC;
 		cout << isSize << "\t" << isTime << endl;
 	}
 
 //    G2=G; G+=G2;
-	assert(Koala::MaxStable::get(G, IS) == 9);
+	assert(Koala::MaxStable::findMax(G, IS) == 9);
 	for(int i = 0; i < 9; i++)
 		printf("%d ", G.getVertInfo(IS[i]));
     Koala::Graph<std::string,std::string> Gstr;
     Gstr.copy(G);
     Koala::Graph<std::string, std::string>::PVertex ISstr[100];
-    assert(Koala::MaxStable::get(Gstr, ISstr) == 9);
+    assert(Koala::MaxStable::findMax(Gstr, ISstr) == 9);
 
     std::vector<Koala::Graph<int, int>::PVertex> vec;
     std::back_insert_iterator<std::vector<Koala::Graph<int, int>::PVertex> > viter=std::back_inserter(vec);
@@ -252,10 +252,10 @@ int main()
     *viter=G.getVert();viter++;
     std::cout << '\n' << vec.size();
     vec.clear();vec.resize(100);
-    assert(Koala::MaxStable::get(G, vec.begin()) == 9);
+    assert(Koala::MaxStable::findMax(G, vec.begin()) == 9);
     vec.clear();
     viter=std::back_inserter(vec);
-    assert(Koala::MaxStable::get(G, viter) == 9);
+    assert(Koala::MaxStable::findMax(G, viter) == 9);
 
 
 	S.clear(), G.clear(), delete[] IS, delete[] U;

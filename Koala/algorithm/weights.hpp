@@ -1,7 +1,7 @@
 // DijkstraBasePar
 
-template< class DType, class GraphType,bool plus > template< class Rec >
-	void WeightPathStructs::VertLabs< DType,GraphType,plus >::copy( Rec &rec ) const
+template< class DType, class GraphType > template< class Rec >
+	void WeightPathStructs::VertLabs< DType,GraphType>::copy( Rec &rec ) const
 {
 	rec.distance = distance;
 	rec.vPrev = vPrev;
