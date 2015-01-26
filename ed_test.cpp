@@ -104,13 +104,13 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
 //    RepsDeleter<Vertex<char,string> *> repd(tabVVV,tabVVV+5);
 //    cout << "\n\n";
 //    for(int i=0;i<repd.len;i++) cout << repd.buf[i]->info;
-    return 0;
+//    return 0;
     cout <<endl << boolalpha <<g1.areParallel(f,e,EdDirOut) << endl << endl;
 
     cout << endl << g1.delAllParals(B,A,EdDirIn) << endl << endl ;
     IO::writeGraphText(g1,cout,IO::RG_EdgeList);
 
-    return 0;
+//    return 0;
 
 //    g1.addArc(A,D,"A>D");
     #define mask EdDirIn
@@ -119,7 +119,7 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
 //    cout << res<<endl;
 //    for(int i=0;i<res;i++) cout << tabE[i]->info << endl;
     for(int i=0;i<g1.getIncVerts(tabV,vset,EdDirIn,Directed);i++) cout << tabV[i]->info << ' ';
-    return 0;
+//    return 0;
 //    g1.getIncVerts(tabV,vset.begin(),vset.end(),mask,mask);
 //    g1.getIncVertSet(vset.begin(),vset.end(),mask,mask);
 //    g1.getIncVertSet(vset,mask,mask);
@@ -152,7 +152,7 @@ string fun(Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string> *v,E
     IO::writeGraphText(undg,cout,IO::RG_EdgeList);
 
     cout << g1.addArc(B,A);g1.addArc(D,C);g1.addEdge(C,B);g1.addLoop(B);
-    cout << endl << BFS::getPath(makeRevView(g1),A,D,blackHole);
+    cout << endl << BFS::findPath(makeRevView(g1),A,D,blackHole);
     cout << endl << makeRevView(g1).getEdge(A,EdDirOut);
 
 //    std::cout << "\n\n!!!!!!!!!!!!!!\n\n";

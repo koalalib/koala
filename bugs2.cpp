@@ -126,7 +126,7 @@ try {
 	if (!res) return 0;
 	g2=g; IsIt::Comparability::getDirs(g2);
 	cout << "\n Dag: " << DAGAlgs::isDAG(g2) << " color: " <<
-        IsIt::Comparability::color(g,blackHole) << "\n---\n";
+        IsIt::Comparability::chi(g,blackHole) << "\n---\n";
 
 	res = IsIt::Comparability::maxStable(g, verts);
 	cout << boolalpha<< MaxStableHeur::test(g, verts, &verts[res]) << endl;

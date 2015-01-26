@@ -192,7 +192,7 @@ void searchTest2()
     std::cout<< Koala::STRATEGY::getAttainableSet(g,A,EdAll) << std::endl;
         searchTest();
     std::cout << "\n***getpath\n";
-    std::cout<< (licz=Koala::STRATEGY::getPath(g,A,E,Koala::STRATEGY::outPath(tabV,tabE),EdAll));
+    std::cout<< (licz=Koala::STRATEGY::findPath(g,A,E,Koala::STRATEGY::outPath(tabV,tabE),EdAll));
     for(int i=0;i<licz+1;i++) std::cout << ((tabV[i]) ? tabV[i]->info.name : string(" NULL"));
 
     std::cout << "\n***\n";

@@ -73,7 +73,7 @@ using namespace std;
 
 		AssocTable<map<Graph<int, int>::PVertex, int> > colors;
 		map<Graph<int, int>::PVertex, int>::iterator ci;
-		q = IsIt::Comparability::color(g, colors);
+		q = IsIt::Comparability::chi(g, colors);
 		printf("COLORING: ");
 		for(ci = colors.cont.begin(); ci != colors.cont.end(); ++ci) {
 			printf("%p: %d  ", ci->first, ci->second);

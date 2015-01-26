@@ -807,7 +807,7 @@ int distUndir(const char* g6)
     g.makeAdjMatrix();
     IO::readG6(g,g6);
     int u=rand() % g.getVertNo(),v=rand() % g.getVertNo();
-    int res=BFSPar< Settings >::getPath(g,g.vertByNo(u),g.vertByNo(v),PathStructs::outPath(blackHole,blackHole));
+    int res=BFSPar< Settings >::findPath(g,g.vertByNo(u),g.vertByNo(v),PathStructs::outPath(blackHole,blackHole));
     cout << '{' << res << ',' << u << ',' << v << '}';
     return res;
 }
@@ -819,7 +819,7 @@ int distDir(const char* napis)
     g.makeAdjMatrix();
     readDigraph(g,napis);
     int u=rand() % g.getVertNo(),v=rand() % g.getVertNo();
-    int res=BFSPar< Settings >::getPath(g,g.vertByNo(u),g.vertByNo(v),PathStructs::outPath(blackHole,blackHole));
+    int res=BFSPar< Settings >::findPath(g,g.vertByNo(u),g.vertByNo(v),PathStructs::outPath(blackHole,blackHole));
     cout << '{' << res << ',' << u << ',' << v << '}';
     return res;
 }
