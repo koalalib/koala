@@ -707,6 +707,25 @@ namespace Koala
 			{
 				return getForest( g,edgeTab,out,asets,edgeNo,false );
 			}
+
+        //TODO: wersja tymczasowa, do usunięcia!!!
+        template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
+			Result< typename EdgeContainer::ValType::WeightType > getMinForest( const GraphType &g,
+				const EdgeContainer &edgeTab, Iter out, VertCompContainer &asets, int edgeNo = -1 )
+        {
+            std::cerr<< "!!!!!Zmiana nazwy metody getMinForest-> findMin!!!";
+            return findMin(g,edgeTab,out,asets,edgeNo);
+        }
+
+        //TODO: wersja tymczasowa, do usunięcia!!!
+        template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
+			Result< typename EdgeContainer::ValType::WeightType > getMaxForest( const GraphType &g,
+				const EdgeContainer &edgeTab, Iter out, VertCompContainer &asets, int edgeNo = -1 )
+        {
+            std::cerr<< "!!!!!Zmiana nazwy metody getMaxForest-> findMax!!!";
+            return findMax(g,edgeTab,out,asets,edgeNo);
+        }
+
 	};
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings

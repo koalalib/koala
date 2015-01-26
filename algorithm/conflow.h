@@ -740,7 +740,8 @@ namespace Koala
 		 *  \param edgeTab  the the associative table (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost, WEN: czyli ktore? - tu liczy sie tylko pole wejsciowe capacity) to each edge.
 		 *  \param out the iterator of the container with output edges of Gomory-Hu tree in form of GHTreeEdge. WEN: dokladnie inserter na te struktury
                 There is exactly n-1 of them.*/
-		template< class GraphType, class EdgeContainer, class IterOut > static void findGHTree( GraphType &g,
+        //NEW: zmiana nazwy findGHTree    -> gHTree
+		template< class GraphType, class EdgeContainer, class IterOut > static void gHTree( GraphType &g,
 			EdgeContainer& edgeTab, IterOut out );
 	};
 

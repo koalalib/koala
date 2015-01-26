@@ -1072,7 +1072,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class IterOut >
-	void FlowPar< DefaultStructs >::findGHTree( GraphType &g, EdgeContainer &edgeTab, IterOut out )
+	void FlowPar< DefaultStructs >::gHTree( GraphType &g, EdgeContainer &edgeTab, IterOut out )
 {
 	koalaAssert( g.getVertNo() > 1,AlgExcWrongArg );
 	int n;
@@ -1144,7 +1144,7 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
 	int lv = 0, le = 0;
 	for( r = 0; r < res; r++ )
 	{
-		int j = BFSPar< DefaultStructs >:: template getPath( makeSubgraph( g,std::make_pair( stdChoose(true),
+		int j = BFSPar< DefaultStructs >:: template findPath( makeSubgraph( g,std::make_pair( stdChoose(true),
 			extAssocChoose( &(paths),r ) ),std::make_pair(true,true) ),start,end,BFSPar< DefaultStructs >::outPath( vout,eout ),EdDirOut );
 		lv += j + 1;
 		le += j;

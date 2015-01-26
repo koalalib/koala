@@ -346,7 +346,7 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType >
 }
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertIter, class EdgeIter >
-	int GraphSearchBase< SearchImpl, DefaultStructs >::getPath( const GraphType &g, typename GraphType::PVertex start,
+	int GraphSearchBase< SearchImpl, DefaultStructs >::findPath( const GraphType &g, typename GraphType::PVertex start,
 		typename GraphType::PVertex end, OutPath< VertIter,EdgeIter > path, EdgeDirection mask )
 {
 	koalaAssert(  start && end,AlgExcNullVert );
@@ -1004,7 +1004,7 @@ template< class DefaultStructs > template< class GraphType, class Iter >
 	for( typename GraphType::PEdge e = g.getEdge( EdDirIn | EdDirOut ); e; e = g.getEdgeNext( e,EdDirIn | EdDirOut ) )
 	{
 		std::pair< typename GraphType::PVertex,typename GraphType::PVertex > ends = g.getEdgeEnds( e );
-		if (BFSPar<DefaultStructs>::getPath( makeSubgraph( g,std::make_pair( stdChoose( true ),!stdValChoose( e ) ),std::make_pair(true,true) ),
+		if (BFSPar<DefaultStructs>::findPath( makeSubgraph( g,std::make_pair( stdChoose( true ),!stdValChoose( e ) ),std::make_pair(true,true) ),
 			ends.first,ends.second,PathStructs::outPath( blackHole,blackHole ),EdDirOut ) != -1)
 		{
 			*out = e;
