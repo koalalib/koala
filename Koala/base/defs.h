@@ -1898,14 +1898,27 @@ namespace Koala
 		 * The constructor sets up the choosers. */
 		OrChooser( Ch1 a = Ch1(), Ch2 b = Ch2() ): ch1( a ), ch2( b ) { }
 
-		template< class Elem, class Graph > bool operator()( Elem *elem, const Graph &graph ) const
+		/** \brief Overloaded operator()
+		*
+		*  Function call operator returning true if and only if chooser \a ch1 or \a ch2 returns true for given element \a elem.
+		*  \param elem the checked object.
+		*  \param graph the considered graph.
+		*  \return true if and only if choosers \a ch1 or \a ch2 return true. */
+		template< class Elem, class Graph > bool operator()(Elem *elem, const Graph &graph) const
 			{ return (ch1( elem,graph ) || ch2( elem,graph )); }
 	};
 
 	/** \brief Generating  function of OrChooser.
-	WEN: opis param.
-	 *  \ingroup DMchooser*/
-	template< class  Ch1, class Ch2 > OrChooser< Ch1,Ch2 >
+	*
+	*  OrChooser function object is generated. The functor chooses elements that are chosen for at least one of choosers \a ch1 or \a ch2.  
+	*  \wikipath{chooser, Get more information about choosers.}
+	*  \tparam Ch1 the type of the first chooser.
+	*  \tparam Ch2 the type of the second chooser.
+	*  \param a the first chooser.
+	*  \param b the second chooser
+	*  \related OrChooser
+	*  \ingroup DMchooser*/
+	template< class  Ch1, class Ch2 > OrChooser< Ch1, Ch2 >
 		orChoose( Ch1 a, Ch2 b ) { return OrChooser< Ch1,Ch2 >( a,b ); }
 
 	// w kodzie funkcje tworzace zlozonych chooserow mozna zastapic odpowiednimi operatorami logicznymi
