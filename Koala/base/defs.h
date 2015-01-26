@@ -884,7 +884,7 @@ namespace Koala
 	 *  The chooser works for both edges and vertices. \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Info the class of object info.
 	 *  \tparam T the type of compared field.
-	 *  \tparam Obj the function object class that provides function testing the field.
+	 *  \tparam Obj the function object class that provides function testing the field. The object function must work with type of pointed member. 
 	 *  \ingroup DMchooser */
 	template< class Info, class T, class Obj > struct FieldObjChooser 
 	{
@@ -919,7 +919,7 @@ namespace Koala
 	 *  \tparam T the type of compared field.
 	 *  \tparam Obj the type of wrapped function object.
 	 *  \param wsk pointer to tested member in \a Info object.
-	 *  \param obj the wrapped function object.
+	 *  \param obj the wrapped function object. Should implement overloaded function call operator for single parameter of pointed member type   
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \related FieldObjChooser
 	 *  \ingroup DMchooser*/
@@ -1886,8 +1886,8 @@ namespace Koala
 	 *  \ingroup DMchooser */
 	template< class Ch1, class Ch2 > struct OrChooser 
 	{
-		Ch1 ch1;/**<\brief The first chooser */
-		Ch2 ch2;/**<\brief The second chooser */
+		Ch1 ch1;/**<\brief The first chooser. */
+		Ch2 ch2;/**<\brief The second chooser. */
 
 		/** \brief Chooser obligatory type.
 		*
@@ -1923,89 +1923,128 @@ namespace Koala
 
 	// w kodzie funkcje tworzace zlozonych chooserow mozna zastapic odpowiednimi operatorami logicznymi
 
-	/** \brief The overloaded operator||. Calls the generating  function of OrChooser i.e. generate chooser that joins two choosers with logic or operator.
+	/** \brief The overloaded operator||. Chooser alternative.
+	 * 
+	 *  The operator calls the generating  function of OrChooser i.e. generate chooser that joins two choosers with logic or operator.
 	 *  \wikipath{chooser, Get more information about choosers.}
+	 *  \related OrChooser
 	 *  \ingroup DMchooser*/
 	template <class  Ch1, class Ch2> OrChooser< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >
 		operator||( Ch1 a, Ch2 b ) { return OrChooser< Ch1,Ch2 >( a,b ); }
 
-	/* AndChooser
-	 * WEN: jw.
-	 */
 	/** \brief And chooser.
 	 *
-	 *  The function object that joins two choosers. It returns true value if and only if the first one gives the opposite result to the second one.
+	 *  The function object that joins two choosers. It returns true value if and only if both choosers return true when called with the element.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Ch1 the first chooser class.
 	 *  \tparma Ch2 the second chooser class.
 	 *  \ingroup DMchooser */
 	template< class Ch1, class Ch2 > struct AndChooser
 	{
-		Ch1 ch1;
-		Ch2 ch2;
+		Ch1 ch1;/**<\brief The first chooser. */
+		Ch2 ch2;/**<\brief The second chooser. */
 
 		/** \brief Chooser obligatory type.
 		*
 		*  The type is obligatory for choosers in Koala. Logic operations (&&, ||, !, ^)  work properly as long as it is defined. */
 		typedef AndChooser< Ch1, Ch2 > ChoosersSelfType;
 
-		AndChooser( Ch1 a = Ch1(), Ch2 b = Ch2() ): ch1( a ), ch2( b ) { }
+		/**\brief Constructor
+		*
+		* The constructor sets up the choosers. */
+		AndChooser(Ch1 a = Ch1(), Ch2 b = Ch2()) : ch1(a), ch2(b) { }
 
-		template< class Elem, class Graph > bool operator()( Elem *elem, const Graph &graph ) const
+		/** \brief Overloaded operator()
+		*
+		*  Function call operator returning true if and only if both choosers \a ch1 and \a ch2 return true for given element \a elem.
+		*  \param elem the checked object.
+		*  \param graph the considered graph.
+		*  \return true if and only if choosers \a ch1 and \a ch2 return true. */
+		template< class Elem, class Graph > bool operator()(Elem *elem, const Graph &graph) const
 			{ return (ch1( elem,graph ) && ch2( elem,graph )); }
 	};
 
 	/** \brief Generating  function of AndChooser.
-	 *  \ingroup DMchooser*/
-	template< class  Ch1, class Ch2 > AndChooser< Ch1,Ch2 >
+	*
+	*  AndChooser function object is generated. The functor chooses elements that are chosen for both choosers \a ch1 and \a ch2.
+	*  \wikipath{chooser, Get more information about choosers.}
+	*  \tparam Ch1 the type of the first chooser.
+	*  \tparam Ch2 the type of the second chooser.
+	*  \param a the first chooser.
+	*  \param b the second chooser
+	*  \related AndChooser
+	*  \ingroup DMchooser*/
+	template< class  Ch1, class Ch2 > AndChooser< Ch1, Ch2 >
 		andChoose( Ch1 a, Ch2 b ) { return AndChooser< Ch1,Ch2 >( a,b ); }
 
-	/** \brief The overloaded operator&&. Calls the generating  function of AndChooser i.e. generate chooser that joins two choosers with logic and operator.
+	/** \brief The overloaded operator&&. Chooser conjunction.
+	 *
+	 *  The operator calls the generating  function of AndChooser i.e. it generates chooser that joins two choosers with logic and operator.
 	 *  \wikipath{chooser, Get more information about choosers.}
+	 *  \related AndChooser
 	 *  \ingroup DMchooser*/
 	template< class Ch1, class Ch2 > AndChooser< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >
 		operator&&( Ch1 a, Ch2 b ) { return AndChooser< Ch1,Ch2 >( a,b ); }
 
-	/* XorChooser
-	 * WEN: jw.
-	 */
 	/** \brief Xor chooser.
 	 *
-	 *  The function object that joins two choosers. It returns true value if and only if the first one or the second one return true.
+	 *  The function object that joins two choosers. It returns true value if and only if either the first one or the second one return true
+	 *  (both may not be true).
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Ch1 the first chooser class.
 	 *  \tparma Ch2 the second chooser class.
 	 *  \ingroup DMchooser */
 	template< class Ch1, class Ch2 > struct XorChooser
 	{
-		Ch1 ch1;
-		Ch2 ch2;
+		Ch1 ch1;/**<\brief The first chooser. */
+		Ch2 ch2;/**<\brief The second chooser. */
 
 		/** \brief Chooser obligatory type.
 		*
 		*  The type is obligatory for choosers in Koala. Logic operations (&&, ||, !, ^)  work properly as long as it is defined. */
 		typedef XorChooser< Ch1, Ch2 > ChoosersSelfType;
 
-		XorChooser( Ch1 a = Ch1(), Ch2 b = Ch2() ): ch1( a ), ch2( b ) { }
+		/**\brief Constructor
+		*
+		* The constructor sets up the choosers. */
+		XorChooser(Ch1 a = Ch1(), Ch2 b = Ch2()) : ch1(a), ch2(b) { }
 
-		template< class Elem, class Graph > bool operator()( Elem *elem, const Graph &graph ) const
+		/** \brief Overloaded operator()
+		*
+		*  Function call operator returning true if and only if exactly one chooser either \a ch1 or \a ch2 return true for given element \a elem.
+		*  \param elem the checked object.
+		*  \param graph the considered graph.
+		*  \return true if and only if only one of choosers \a ch1 and \a ch2 return true. */
+		template< class Elem, class Graph > bool operator()(Elem *elem, const Graph &graph) const
 			{ return (ch1( elem,graph ) != ch2( elem,graph )); }
 	};
 
 	/** \brief Generating  function of XorChooser.
-	 *  \ingroup DMchooser*/
-	template< class Ch1, class Ch2 > XorChooser< Ch1,Ch2 >
+	*
+	*  XorChooser function object is generated. The functor chooses elements for which exactly one of choosers \a ch1 and \a ch2 returns true.
+	*  \wikipath{chooser, Get more information about choosers.}
+	*  \tparam Ch1 the type of the first chooser.
+	*  \tparam Ch2 the type of the second chooser.
+	*  \param a the first chooser.
+	*  \param b the second chooser
+	*  \related XorChooser
+	*  \ingroup DMchooser*/
+	template< class Ch1, class Ch2 > XorChooser< Ch1, Ch2 >
 		xorChoose( Ch1 a, Ch2 b ) { return XorChooser< Ch1,Ch2 >( a,b ); }
 
-	/** \brief The overloaded operator^. Calls the generating  function of XorChooser i.e. generate chooser that joins two choosers with logic exclusive or operator.
+	/** \brief The overloaded operator^. Chooser exclusive or.
+	 *
+	 *  The operator calls the generating  function of XorChooser which generates chooser that joins two choosers with logic exclusive or operation.
 	 *  \wikipath{chooser, Get more information about choosers.}
+	 *  \tparam Ch1 the type of the first chooser.
+	 *  \tparam Ch2 the type of the second chooser.
+	 *  \param a the first chooser.
+	 *  \param b the second chooser
+	 *  \related XorChooser
 	 *  \ingroup DMchooser*/
 	template< class Ch1, class Ch2 > XorChooser< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >
 		operator^( Ch1 a, Ch2 b ) { return XorChooser< Ch1,Ch2 >( a,b ); }
 
-	/* NotChooser WEN:jw.
-	 *
-	 */
 	/** \brief Not chooser.
 	 *
 	 *  The function object that gives the opposite result to the given chooser.
@@ -2014,26 +2053,46 @@ namespace Koala
 	 *  \ingroup DMchooser */
 	template< class Ch1 > struct NotChooser
 	{
-		Ch1 ch1;
+		Ch1 ch1;/**<\brief The negated chooser type.*/
 
 		/** \brief Chooser obligatory type.
 		*
 		*  The type is obligatory for choosers in Koala. Logic operations (&&, ||, !, ^)  work properly as long as it is defined. */
 		typedef NotChooser< Ch1 > ChoosersSelfType;
 
+		/**\brief Constructor
+		 *
+		 * The constructor sets up the negated chooser.*/
 		NotChooser( Ch1 a = Ch1() ): ch1( a ) { }
 
-		template< class Elem, class Graph >  bool operator()( Elem *elem, const Graph &graph) const
+		/** \brief Overloaded operator()
+		*
+		*  Function call operator returning true if and only chooser \a ch1 returns false.
+		*  \param elem the checked object.
+		*  \param graph the considered graph.
+		*  \return negation of chooser \a ch1. */
+		template< class Elem, class Graph >  bool operator()(Elem *elem, const Graph &graph) const
 			{ return !ch1( elem,graph ); }
 	};
 
 	/** \brief Generating  function of NotChooser.
-	 *  \ingroup DMchooser*/
+	*
+	*  NotChooser function object is generated. The functor chooses elements that are not chosen by \a ch1.
+	*  \wikipath{chooser, Get more information about choosers.}
+	*  \tparam Ch1 the chooser type.
+	*  \param a the chooser.
+	*  \related NotChooser
+	*  \ingroup DMchooser*/
 	template< class  Ch1 >
 		NotChooser< Ch1 > notChoose( Ch1 a ) { return NotChooser< Ch1 >( a ); }
 
-	/** \brief The overloaded operator!. Calls the generating  function of NotChooser i.e. generate chooser that negates the given chooser.
+	/** \brief The overloaded operator!. Chooser negation.
+	 *
+	 *  The operator calls the generating  function of NotChooser i.e. generate chooser that negates the given chooser.
 	 *  \wikipath{chooser, Get more information about choosers.}
+	 *  \tparam Ch1 the chooser type.
+	 *  \param a the chooser.
+	 *  \related NotChooser
 	 *  \ingroup DMchooser*/
 	template< class  Ch1 > NotChooser< typename Ch1::ChoosersSelfType >
 		operator!( Ch1 a ) { return NotChooser< Ch1 >( a ); }
@@ -2044,14 +2103,15 @@ namespace Koala
 	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma podana
 	 * wartosc
 	 */
-	/** \brief Vertex degree value chooser.
+	/** \brief Choose vertices of given degree.
 	 *
-	 *  The function object that checks if the vertex degree concerning the edge direction WEN: por. metode deg is equal to the prespecified value.
+	 *  The function object that checks if the vertex degree equals given common value.
+	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection} mask like in method ConstGraphMethods::deg. 
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
-	struct VertDegValChooser //WEN: dla wierzcholkow
+	struct VertDegValChooser 
 	{
-		int deg; /**< \brief the desired degree*/
+		int deg; /**< \brief the desired degree.*/
 		Koala::EdgeDirection type; /**< \brief the considered edge direction.*/
 
 		/** \brief Chooser obligatory type.
@@ -2077,8 +2137,12 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of VertDegChoose.
-	WEN: opis param.
+	 *
+	 *  \param adeg the defined degree.
+	 *  \param atype type of direction used for degree calculation.
+	 *  \return chooser of type VertDegValChooser, which chooses vertices of degree \a adag exclusively.  
 	 *  \wikipath{chooser, Get more information about choosers.}
+	 *  \related VertDegValChooser
 	 *  \ingroup DMchooser*/
 	inline VertDegValChooser vertDegChoose( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
 		{ return VertDegValChooser( adeg,atype ); }
@@ -2087,10 +2151,10 @@ namespace Koala
 	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc
 	 * mniejsza od zadanej
 	 */
-	 //WEN: j.w
-	/** \brief Vertex degree less chooser.
+	/** \brief Choose vertices of degree less then.
 	 *
-	 *  The function object that checks if the vertex degree concerning the edge direction type is less then the prespecified value.
+	 *  The function object that checks if the vertex degree is less then the prespecified value.
+	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection} mask like in method ConstGraphMethods::deg. 
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
 	struct VertDegValChooserL
@@ -2112,7 +2176,7 @@ namespace Koala
 
 		/** \brief Overloaded operator()
 		 *
-		 *  Function call operator returning boolean value true if the vertex \a v degree is smaller than \a deg.
+		 *  Function call operator returning boolean value true if vertex \a v degree is smaller than \a deg.
 		 *  \param v the tested vertex.
 		 *  \param g reference to considered graph.
 		 *  \return the true if degree of the vertex is smaller than \a deg, false otherwise. */
@@ -2120,20 +2184,25 @@ namespace Koala
 			{ return g.deg( v,type ) < deg; }
 	};
 
-	/** \brief Generating  function of vertDegChooseL.
-	 *  \wikipath{chooser, Get more information about choosers.}
-	 *  \ingroup DMchooser*/
-	inline VertDegValChooserL vertDegChooseL( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
+	/** \brief Generating  function of VertDegValChooserL.
+	*
+	*  \param adeg the defined degree.
+	*  \param atype type of direction used for degree calculation.
+	*  \return chooser of type VertDegValChooserL, which chooses vertices of degree less than \a adag.
+	*  \wikipath{chooser, Get more information about choosers.}
+	*  \related VertDegValChooserL
+	*  \ingroup DMchooser*/
+	inline VertDegValChooserL vertDegChooseL(int adeg, Koala::EdgeDirection atype = Koala::EdAll)
 		{ return VertDegValChooserL( adeg,atype ); }
 
-    //WEN: jw.
 	/* VertDegValChooserG
 	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc
 	 * wieksza od zadanej
 	 */
-	/** \brief Vertex degree greater chooser.
+	/** \brief Choose vertices of degree greater then.
 	 *
-	 *  The function object that checks if the vertex degree concerning the edge direction type is greater then the prespecified value.
+	 *  The function object that checks if the vertex degree is greater then the prespecified value.
+	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection} mask like in method ConstGraphMethods::deg.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
 	struct VertDegValChooserG
@@ -2163,10 +2232,15 @@ namespace Koala
 			{ return g.deg( v,type ) > deg; }
 	};
 
-	/** \brief Generating  function of vertDegChooseG.
-	 *  \wikipath{chooser, Get more information about choosers.}
-	 *  \ingroup DMchooser*/
-	inline VertDegValChooserG vertDegChooseG( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
+	/** \brief Generating  function of VertDegValChooserG.
+	*
+	*  \param adeg the defined degree.
+	*  \param atype type of direction used for degree calculation.
+	*  \return chooser of type VertDegValChooserL, which chooses vertices of degree greater than \a adag.
+	*  \wikipath{chooser, Get more information about choosers.}
+	*  \related VertDegValChooserG
+	*  \ingroup DMchooser*/
+	inline VertDegValChooserG vertDegChooseG(int adeg, Koala::EdgeDirection atype = Koala::EdAll)
 		{ return VertDegValChooserG( adeg,atype ); }
 
     //WEN: jw.
