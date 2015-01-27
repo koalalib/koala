@@ -518,6 +518,7 @@ namespace Koala
 		 *  \return true if \a elem equals to \a val false otherwise.	 */
 		template< class Graph > bool operator()( Elem elem, const Graph &gr) const { return elem == val; }
 	};
+	
 	/** \brief Generating function of value chooser (ValCooser).
 	 *
 	 *  The function generates ValChooser function object that tests whether checked element equals \a arg. \wikipath{chooser, Get more information about choosers.}
@@ -2730,18 +2731,27 @@ namespace Koala
 	 * caster zwyklego rzutowania miedzy dwoma strukturami
 	 */
 	/** \brief Standard caster.
-	 *  WEN: wykorzystywane w metodach copy, substitute z grafu oraz linegrafach i produktach (create.h) do tworzenia inf nowych elementow na podstawie oryginalow - to dot. wszystkich casterow
-	 *  The structure overload call function operator for two parameters. The value of source is simply casted on the destination. The inbuilt type conversion is used.
+	 *  
+	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges) 
+	 *   in methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others. 
+	 *  
+	 *  The structure overloads call function operator for two parameters. The first parameter is the reference to new-created info object.
+	 *  The second parameter is the source info. 
+	 *  Standard caster tries to simply cast source object on destination object or if this is not possible it calls destination default value (calls empty constructor).
+	 *  \wikipath{caster, Get more information about casters.}
 	 *  \ingroup DMcaster*/
-	struct StdCaster // NEW: tu opis nie bedzie sie zgadzal, tera to robi HardCaster
+	struct StdCaster
 	{
-		typedef StdCaster CastersSelfType;
+		typedef StdCaster CastersSelfType;/**<\brief Caster self type, the type defined for each caster.*/
 
-		/** \brief Call function operator.
+		/** \brief Function call operator.
 		 *
-		 *  The overloaded call function operator with two parameters, that uses the inbuilt type conversion of \a sour to \a dest.
-		 *  \param dest the reference to the destination object.
-		 *  \param sour the source object. */
+		 *  The template overloaded function call operator with two parameters, that uses the inbuilt type cast of \a sour to \a dest.
+		 *  It it is impossible \a dest gets its type default value (empty constructor is called).
+		 *  \tparam InfoDest the type of destination info object.
+		 *  \tparam InfoSour the type of source info object.
+		 *  \param dest the reference to the destination new-created info object.
+		 *  \param sour the source info object, casted if possible. */
 		template< class InfoDest, class InfoSour >
 			void operator()( InfoDest &dest, InfoSour sour )
 			{
@@ -2752,22 +2762,39 @@ namespace Koala
 			}
 	};
 
-	// i jego funkcja tworzaca
-	/** \brief Generating function for standard caster (StdCaster).
+	/** \brief Generating function for StdCaster.
+	 *
+	 *  \return StdCaster function object that implements overloaded template function call operator which 
+	 *  tries to cast source info object to destination info object or if it is impossible destination gets the default value.
+	 *  \related StdCaster
 	 *  \ingroup DMcaster*/
 	inline StdCaster stdCast() { return StdCaster(); }
 
-    //NEW: stdCaster probuje przekonwertowac InfoSour->InfoDest, a jesli sie nie uda, inicjuje InfoDest wart. domyslna
+    // stdCaster probuje przekonwertowac InfoSour->InfoDest, a jesli sie nie uda, inicjuje InfoDest wart. domyslna
     //HardCaster bezposrednio rzutuje (InfoDest)InfoSour, co jesli jest nielegalne - wywola blad kompilacji
+	/** \brief Standard hard caster.
+	 *
+	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges)
+	 *   in methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others.
+	 *
+	 *  The structure overloads call function operator for two parameters. The first parameter is the reference to new-created info object.
+	 *  The second parameter is the source info.
+	 *  Hard caster tries to simply cast source object on destination object. However, such cast may cause compilation error.
+	 *  \wikipath{caster, Get more information about casters.}
+	 *  \warning This method may cause compilation error, if the cast is not possible.
+	 *  \ingroup DMcaster*/
 	struct HardCaster
 	{
-		typedef HardCaster CastersSelfType;
+		typedef HardCaster CastersSelfType;/**<\brief Caster self type, the type defined for each caster.*/
 
-		/** \brief Call function operator.
-		 * WEN: wykorzystywane w metodach copy, substitute z grafu oraz linegrafach i produktach (create.h) do tworzenia inf nowych elementow na podstawie oryginalow - to dot. wszystkich casterow
-		 *  The overloaded call function operator with two parameters, that uses the inbuilt type conversion of \a sour to \a dest.
-		 *  \param dest the reference to the destination object.
-		 *  \param sour the source object. */
+		/** \brief Function call operator.
+		 *
+		 *  The template overloaded function call operator with two parameters, that uses the inbuilt type cast of \a sour to \a dest.
+		 *  It it is impossible the method may cause compilation error.
+		 *  \tparam InfoDest the type of destination info object.
+		 *  \tparam InfoSour the type of source info object.
+		 *  \param dest the reference to the destination new-created info object.
+	 	 *  \param sour the source info object, casted if possible. */
 		template< class InfoDest, class InfoSour >
 			void operator()( InfoDest &dest, InfoSour sour )
 			{
@@ -2775,8 +2802,12 @@ namespace Koala
 			}
 	};
 
-	// i jego funkcja tworzaca
-	/** \brief Generating function for standard caster (StdCaster).
+	/** \brief Generating function for HardCaster.
+	 *
+	 *  \return HardCaster function object that implements overloaded template function call operator which
+	 *  tries to cast source info object to destination info object.
+	 *  \warning Generated caster may cause compilation error, if the cast from source to destination is impossible.
+	 *  \related HardCaster
 	 *  \ingroup DMcaster*/
 	inline HardCaster hardCast() { return HardCaster(); }
 
@@ -2786,35 +2817,51 @@ namespace Koala
 	 * takze operator 3-argumentowy)
 	 */
 	/** \brief No cast caster.
-	 * WEN: wykorzystywane w metodach copy, substitute z grafu oraz linegrafach i produktach (create.h) do tworzenia inf nowych elementow na podstawie oryginalow - to dot. wszystkich casterow
-	 *  The caster ignores the sources and simply calls the default values. Also three parameter call function is overloaded here.
+	 *
+	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges)
+	 *   in methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others.
+	 *
+	 *  The structure overloads call function operator for two and three parameters. The first parameter is the reference to new-created info object.
+	 *  The remaining parameters are the source infos. However, NoCastCaster ignores the source infos and sets up the destination for its type 
+	 *  default value (empty constructor is called). 
+	 *  \wikipath{caster, Get more information about casters.}
 	 *  \ingroup DMcaster*/
 	struct NoCastCaster
 	{
-		typedef NoCastCaster CastersSelfType;
+		typedef NoCastCaster CastersSelfType;/**<\brief Caster self type, the type defined for each caster.*/
 
-		/** \brief Call function operator.
+		/** \brief Function call operator.
 		 *
-		 *  The overloaded call function operator with two parameters. The empty constructor of InfoDest is called and the result is assigned to \a dest.
-		 *  \param dest the reference to the destination object.
-		 *  \param sour the source object (ignored). */
+		 *  The template overloaded function call operator with two parameters. However, the second parameter is ignored and the destination 
+		 *  gets its type default value.
+		 *  \tparam InfoDest the type of destination info object.
+		 *  \tparam InfoSour the type of source info object.
+		 *  \param dest the reference to the destination new-created info object.
+	 	 *  \param sour the source info object, ignored. */
 		template< class InfoDest, class InfoSour >
 			void operator()( InfoDest &dest, InfoSour sour ) { dest = InfoDest(); }
 
-		/** \brief Call function operator.
+		/** \brief Function call operator.
 		 *
-		 *  The overloaded call function operator with three parameters. The empty constructor of InfoDest is called and the result is assigned to \a dest.
-		 *  \param dest the reference to the destination object.
-		 *  \param sour1 the first source object (ignored).
-		 *  \param sour2 the second source object (ignored). */
+		 *  The template overloaded function call operator with three parameters. However, the second and the third parameter are ignored and the destination 
+		 *  gets its type default value.
+		 *  \tparam InfoDest the type of destination info object.
+		 *  \tparam InfoSour1 the type of first source info object.
+		 *  \tparam InfoSour2 the type of second source info object.
+		 *  \param dest the reference to the destination new-created info object.
+	 	 *  \param sour1 the first source info object, ignored. 
+		 *  \param sour2 the second source info object, ignored. */
 		template< class InfoDest, class InfoSour1, class InfoSour2 >
 			void operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) { dest = InfoDest(); }
 	};
 
 	// funkcja tworzaca - dopuszczalny jedynie argument false
-	/** \brief Generating function for no cast caster (NoCastCaster).
+	/** \brief Generating function for NoCastCaster.
 	 *
+	 *  \return NoCastCaster function object that implements overloaded template function call operator for two and three parameters which
+	 *  ignores source info objects and sets destination into object with its type default empty value (the empty constructor is called).
 	 *  \param arg only false values are allowed.
+	 *  \related NoCastCaster
 	 *  \ingroup DMcaster*/
 	inline NoCastCaster stdCast( bool arg );
 
@@ -2822,36 +2869,48 @@ namespace Koala
 	 * wyliczenie wartosci nowego info poprzez podany funktor wspolpracuje z produktami grafow (stad takze operator
 	 * 3-argumentowy) jesli funktor je obsluguje
 	 */
-
 	/** \brief Functor caster.
-	 * WEN: wykorzystywane w metodach copy, substitute z grafu oraz linegrafach i produktach (create.h) do tworzenia inf nowych elementow na podstawie oryginalow - to dot. wszystkich casterow
-	 *  The caster calls the functor defined in constructor to produce the info object. WEN: ale jaki funktor? 1-argumentowy, bierzemy jego wynik ...
+	 *
+	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges)
+	 *   in methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others.
+	 *
+	 *  The structure overloads call function operator for two and three parameters. The first parameter is the reference to new-created info object.
+	 *  The remaining parameters are the source infos. Function object defined in constructor takes source info objects 
+	 *  and returns new info object that is casted on destination object type. 
+	 *  \wikipath{caster, Get more information about casters.}
 	 *  \ingroup DMcaster*/
 	template< class Fun > struct ObjCaster
 	{
-		typedef ObjCaster< Fun > CastersSelfType;
+		typedef ObjCaster< Fun > CastersSelfType;/**<\brief Caster self type, the type defined for each caster.*/
 
 		mutable Fun funktor;/**< \brief the functor defined in constructor.*/
+		
 		/**\brief Constructor.
 		 *
 		 *  The constructor assigns the value to \a functor.*/
 		ObjCaster( Fun afun = Fun() ): funktor( afun ) { }
 
-		/** \brief Call function operator.
+		/** \brief Function call operator.
 		 *
-		 *  The overloaded call function operator with two parameters. The method passes \a sour1 to \a functor and cast the result to \a dest.
-		 *  \param dest the reference to the destination object.
-		 *  \param sour1 the first source object.
-		 *  \param sour2 the second source object. */
+		 *  The template overloaded function call operator with two parameters. Source info object is sent to function object \a funktor the result 
+		 *  is casted on destination type and save in \a dest.
+		 *  \tparam InfoDest the type of destination info object.
+		 *  \tparam InfoSour the type of source info object.
+		 *  \param dest the reference to the destination new-created info object.
+		 *  \param sour the source info object, sent to \a funkotr. */
 		template< class InfoDest, class InfoSour >
 			void operator()( InfoDest &dest, InfoSour sour ) { dest = (InfoDest)funktor( sour ); }
 
-		/** \brief Call function operator.
+		/** \brief Function call operator.
 		 *
-		 *  The overloaded call function operator with three parameters. The method passes \a sour1 and \a sour2 to \a functor and cast the result to \a dest.
-		 *  \param dest the reference to the destination object.
-		 *  \param sour1 the first source object.
-		 *  \param sour2 the second source object. */
+		 *  The template overloaded function call operator with three parameters. Source info objects are sent to function object \a funktor. The returned value 
+		 *  is casted on destination type and save in \a dest.
+		 *  \tparam InfoDest the type of destination info object.
+		 *  \tparam InfoSour1 the type of the first source info object.
+		 *  \tparam InfoSour2 the type of the second source info object.
+		 *  \param dest the reference to the destination new-created info object.
+		 *  \param sour1 the first source info object, sent to \a funkotr.
+		 *  \param sour2 the second source info object, sent to \a funkotr.*/
 		template< class InfoDest, class InfoSour1, class InfoSour2 > void
 			operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) { dest = (InfoDest)funktor( sour1,sour2 ); }
 	};
@@ -2860,7 +2919,16 @@ namespace Koala
 	 *
 	 *  \param f the object function that generates the appropriate info.
 	 *  \ingroup DMcaster*/
-	template< class Funktor > ObjCaster< Funktor > stdCast( Funktor f ) { return ObjCaster< Funktor >( f ); }
+	/** \brief Generating function for ObjCaster.
+	 *
+	 *  \param f the functor object 
+	 *  \return ObjCaster function object that implements overloaded template function call operator for two and three parameters.
+	 *  
+	 *  \tparam Funkotr the type of object function.
+	 *  \param f the function object that generates new info object.
+	 *  \related ObjCaster
+	 *  \ingroup DMcaster*/
+	template< class Funktor > ObjCaster< Funktor > stdCast(Funktor f) { return ObjCaster< Funktor >(f); }
 
 	/* ValueCaster
 	 * Caster wpisujacy ustalona wartosc wspolpracuje z produktami grafow (stad takze operator 3-argumentowy)
@@ -2871,7 +2939,7 @@ namespace Koala
 	 *  \ingroup DMcaster*/
 	template< class T > struct ValueCaster
 	{
-		typedef ValueCaster< T > CastersSelfType;
+		typedef ValueCaster< T > CastersSelfType;/**<\brief Caster self type, the type defined for each caster.*/
 
 		T val;/**<\brief the fixed value set up in constructor.*/
 		/** \brief Constructor.
