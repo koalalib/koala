@@ -2379,7 +2379,7 @@ namespace Koala
 		 *  The function call operator that returns value returns by \ a funktor casted to bool .
 		 *  \param v the tested vertex.
 		 *  \param g reference to considered graph.
-		 *  \return the value returned by \a functor. */
+		 *  \return the value returned by \a funktor. */
 		template< class Graph > bool operator()( typename Graph::PVertex v, const Graph &g ) const
 			{ return (bool)funktor( g.deg( v,typ ) ); }
 	};
@@ -2401,12 +2401,13 @@ namespace Koala
 	/* EdgeTypeChooser
 	 * testuje, czy typ krawedzi spelnia podana maske
 	 */
-	/** \brief Edge direction chooser. WEN: chyba rodzaj nie direction, dot. calej dokumentacji choosera
+	/** \brief Choose edges of given type. 
 	 *
-	 *  The function object chooses the edges with WEN: chyba rodzaj nie direction direction congruent with the mask prespecified in constructor.
+	 *  The function object chooses the edges of type congruent with the Koala::EdgeType mask defined in constructor. 
+	 *  \wikipath{EdgeType,See possible values of EdgeType.}
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
-	struct EdgeTypeChooser //WEN: dla krawedzi
+	struct EdgeTypeChooser 
 	{
 		Koala::EdgeDirection mask;/**< \brief the considered edge direction.*/
 
@@ -2418,23 +2419,26 @@ namespace Koala
 		/** \brief Constructor
 		 *
 		 *  The direction of edge to choose is defined here.
-		 *  \param amask the mask of considered edge directions. WEN: ustawienie ktoregos z bitow Directed dziala jak ustawienie calego Directed */
+		 *  \param amask the mask of considered edge types. \wikipath{EdgeType} */
 		EdgeTypeChooser( Koala::EdgeDirection amask = Koala::EdAll ): mask( amask )
 			{ mask |= (mask & Directed) ? Directed : 0; }
 
 		/** \brief Overloaded operator()
 		 *
-		 *  The function call operator returning true if \a e direction is congruent with \a mask.
+		 *  The function call operator returning true if \a e type is congruent with Koala::EdgeType \a mask. \wikipath{EdgeType, See wiki for EdgeType}.
 		 *  \param e the tested edge.
 		 *  \param g reference to considered graph.
-		 *  \return true if \a e direction is congruent with the attribute \a mask, false otherwise. */
+		 *  \return true if \a e type is congruent with the attribute \a mask, false otherwise. */
 		template< class Graph > bool operator()( typename Graph::PEdge e, const Graph &g ) const
 			{ return bool( g.getType( e ) & mask ); }
 	};
 
 	/** \brief Generating  function of EdgeTypeChooser.
-	WEN: opis param.
+	 * 
 	 *  \wikipath{chooser, Get more information about choosers.}
+	 *  \param mask the Koala::EdgeType mask that defines the types of edges to be taken. \wikipath{EdgeType, See wiki for EdgeType}.
+	 *  \return EdgeTypeChooser function object that chooses only edges with type congruent with \a mask.
+	 *  \related EdgeTypeChooser
 	 *  \ingroup DMchooser*/
 	inline EdgeTypeChooser edgeTypeChoose( Koala::EdgeDirection mask ) { return EdgeTypeChooser( mask ); }
 
@@ -2443,23 +2447,24 @@ namespace Koala
 	/* EdgeFirstEndChooser
 	 * test pierwszego konca krawedzi
 	 */
-	/** \brief Edge first end satisfy functor chooser.
+	/** \brief Choose edges for which first end satisfy given chooser.
 	 *
-	 *  The function object chooses the edges with first end satisfy a functor (ex. some vertex chooser)  defined in constructor.
+	 *  The function object chooses edges for which the first end satisfy a functor (ex. some vertex chooser)  defined in constructor.
+	 *  \tparam Ch the type of vertex chooser. The class should implement function call operator for two parameters: PVertex and a reference to graph.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
-	template< class Ch > struct EdgeFirstEndChooser //WEN: dla krawedzi
+	template< class Ch > struct EdgeFirstEndChooser
 	{
 		Ch ch;/**< \brief the function object that checks the first end of edge.*/
 
 		/** \brief Chooser obligatory type.
-		*
-		*  The type is obligatory for choosers in Koala. Logic operations (&&, ||, !, ^)  work properly as long as it is defined. */
+		 *
+		 *  The type is obligatory for choosers in Koala. Logic operations (&&, ||, !, ^)  work properly as long as it is defined. */
 		typedef EdgeFirstEndChooser< Ch > ChoosersSelfType;
 
 		/** \brief Constructor
 		 *
-		 *  The \a ch functor is defined here. WEN: po prostu chooser dla wierzcholka
+		 *  Vertex chooser \a ch  is defined here.
 		 *  \param funktor the functor assigned to attribute \a ch.*/
 		EdgeFirstEndChooser( Ch funktor = Ch() ): ch( funktor ) { }
 
@@ -2473,8 +2478,12 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of EdgeFirstEndChooser.
-	//WEN: opis param.
+	 *
 	 *  \wikipath{chooser, Get more information about choosers.}
+	 *  \tparam Ch the type of vertex chooser.
+	 *  \param ch the vertex chooser.
+	 *  \return EdgeFirstEndChooser function object that chooses edges for which the first vertex satisfy chooser \a ch.  
+	 *  \related EdgeFirstEndChooser
 	 *  \ingroup DMchooser*/
 	template< class Ch > EdgeFirstEndChooser< Ch >
 		edgeFirstEndChoose( Ch ch ) { return EdgeFirstEndChooser< Ch >( ch ); }
@@ -2482,12 +2491,13 @@ namespace Koala
 	/* EdgeSecondEndChooser
 	 * test drugiego konca krawedzi
 	 */
-	/** \brief Edge second end satisfy functor chooser.
+	/** \brief Choose edges for which second end satisfy given chooser.
 	 *
-	 *  The function object chooses the edges with second end satisfy a functor (ex. some vertex chooser)  defined in constructor.
+	 *  The function object chooses edges for which the second end satisfy a functor (ex. some vertex chooser)  defined in constructor.
+	 *  \tparam Ch the type of vertex chooser. The class should implement function call operator for two parameters: PVertex and a reference to graph.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
-	template <class Ch> struct EdgeSecondEndChooser //WEN: dla krawedzi
+	template <class Ch> struct EdgeSecondEndChooser 
 	{
 		Ch ch;/**< \brief the function object that checks the second end of edge.*/
 
@@ -2497,10 +2507,10 @@ namespace Koala
 		typedef EdgeSecondEndChooser< Ch > ChoosersSelfType;
 
 		/** \brief Constructor
-		 *
-		 *  The \a ch functor is defined here. WEN: po prostu chooser dla wierzcholka
-		 *  \param funktor the functor assigned to attribute \a ch.*/
-		EdgeSecondEndChooser( Ch funktor = Ch() ): ch( funktor ) { }
+		*
+		*  Vertex chooser \a ch  is defined here.
+		*  \param funktor the functor assigned to attribute \a ch.*/
+		EdgeSecondEndChooser(Ch funktor = Ch()) : ch(funktor) { }
 
 		/** \brief Overloaded operator()
 		 *
@@ -2512,9 +2522,13 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of EdgeSecondEndChooser.
-	WEN: opis param.
-	 *  \wikipath{chooser, Get more information about choosers.}
-	 *  \ingroup DMchooser*/
+	*
+	*  \wikipath{chooser, Get more information about choosers.}
+	*  \tparam Ch the type of vertex chooser.
+	*  \param ch the vertex chooser.
+	*  \return EdgeSecondEndChooser function object that chooses edges for which the first vertex satisfy chooser \a ch.
+	*  \related EdgeSecondEndChooser
+	*  \ingroup DMchooser*/
 	template< class Ch > EdgeSecondEndChooser< Ch >
 		edgeSecondEndChoose( Ch ch ) { return EdgeSecondEndChooser< Ch >( ch ); }
 
