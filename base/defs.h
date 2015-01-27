@@ -2243,14 +2243,14 @@ namespace Koala
 	inline VertDegValChooserG vertDegChooseG(int adeg, Koala::EdgeDirection atype = Koala::EdAll)
 		{ return VertDegValChooserG( adeg,atype ); }
 
-    //WEN: jw.
 	/* VertDegSetChooser
 	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc z
 	 * podanego zbioru
 	 */
-	/** \brief Vertex degree from set chooser.
+	/** \brief Choose vertices of degree from set.
 	 *
-	 *  The function object that checks if the vertex degree concerning the edge direction belongs the set prespecified in constructor. (also the direction to considered is defined there)
+	 *  The function object that checks if the vertex degree belongs the set prespecified in constructor.
+	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection}) mask like in method ConstGraphMethods::deg.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
 	template< class Int > struct VertDegSetChooser
@@ -2265,7 +2265,7 @@ namespace Koala
 
 		/** \brief Constructor
 		 *
-		 *  The set with acceptable degree and the edge direction to consider are defined here.
+		 *  The set with acceptable degrees and the edge direction to consider are defined here.
 		 *  \param aset the set with degrees.
 		 *  \param atype the mask of considered edge directions.*/
 		VertDegSetChooser( const Koala::Set< Int > &aset = Koala::Set< Int >(),
@@ -2273,7 +2273,7 @@ namespace Koala
 
 		/** \brief Overloaded operator()
 		 *
-		 *  Function call operator returning boolean value true if the vertex \a v degree belongs to \a set.
+		 *  Function call operator returning Boolean value true if the vertex \a v degree belongs to \a set.
 		 *  \param v the tested vertex.
 		 *  \param g reference to considered graph.
 		 *  \return the true if degree of the vertex belongs to \a set, false otherwise. */
@@ -2282,26 +2282,32 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of VertDegSetChooser.
-	 *  \wikipath{chooser, Get more information about choosers.}
-	 *  \ingroup DMchooser*/
-	template< class Int > VertDegSetChooser< Int > vertDegChoose( Koala::Set< Int > aset,
+	*
+	*  \param adeg the defined degree.
+	*  \param atype type of direction used for degree calculation.
+	*  \return chooser of type VertDegSetChooser, which chooses vertices as long as their degree belongs to \a aset.
+	*  \wikipath{chooser, Get more information about choosers.}
+	*  \related VertDegSetChooser
+	*  \ingroup DMchooser*/
+	template< class Int > VertDegSetChooser< Int > vertDegChoose(Koala::Set< Int > aset,
 		Koala::EdgeDirection atype = Koala::EdAll ) { return VertDegSetChooser< Int >( aset,atype ); }
 
-    // WEN: jw oraz
-    //WEN: chodzi o STL-like containers tj. obslugujace algorytm std::find
-    //WEN: jest odpowiedzialnoscia uzytkownika, by przedzial iteratorow byl wazny podczas uzywania choosera (kontener nie jest kopiowany)
+    //chodzi o STL-like containers tj. obslugujace algorytm std::find
+    //jest odpowiedzialnoscia uzytkownika, by przedzial iteratorow byl wazny podczas uzywania choosera (kontener nie jest kopiowany)
 	/* VertDegContainerChooser
 	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc
 	 * z zakresu miedzy podanymi iteratorami - uzywa STLowego find
 	 */
-	/** \brief Vertex degree from container chooser.
+	/** \brief Choose vertices of degree from container.
 	 *
-	 *  The function object that checks if the vertex degree concerning the edge direction is an element of the container prespecified in constructor. (also the direction to considered is defined there)
-	 *  \wikipath{chooser, Get more information about choosers.}
+	 *  The function object that checks if the vertex degree is an element of the container prespecified in constructor. 
+	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection}) mask like in method ConstGraphMethods::deg.
+	 *  The container should be STL-like and it must allow std::fiend algorithm. The container is not copied and it is users prerogative to keep the container valid 
+	 *  and up to date. \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
 	template< class Iter > struct VertDegContainerChooser
 	{
-		Iter begin/**\brief iterator to the first element of container*/, end/**\brief iterator to the past-the-end element of container*/;
+		Iter begin/**<\brief iterator to the first element of container*/, end/**<\brief iterator to the past-the-end element of container*/;
 		Koala::EdgeDirection typ;/**< \brief the considered edge direction.*/
 
 		/** \brief Chooser obligatory type.
@@ -2320,7 +2326,7 @@ namespace Koala
 
 		/** \brief Overloaded operator()
 		 *
-		 *  Function call operator returning boolean value true if the vertex \a v degree belongs to the container.
+		 *  Function call operator returning Boolean value true if the vertex \a v degree belongs to the container.
 		 *  \param v the tested vertex.
 		 *  \param g reference to considered graph.
 		 *  \return the true if degree of the vertex belongs to the container, false otherwise. */
@@ -2329,23 +2335,30 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of VertDegContainerChooser.
-	 *  \wikipath{chooser, Get more information about choosers.}
-	 *  \ingroup DMchooser*/
-	template< class Iter > VertDegContainerChooser< Iter > vertDegChoose( Iter begin, Iter end,
+	*
+	*  \wikipath{chooser, Get more information about choosers.}
+	*  \param begin iterator to the first element of container.
+	*  \param end iterator to the past-the-end element of container
+	*  \param atype type of direction used for degree calculation.
+	*  \return chooser of type VertDegContainerChooser, which chooses vertices as long as their degree is an element in container.
+	*  \related VertDegContainerChooser
+	*  \ingroup DMchooser*/
+	template< class Iter > VertDegContainerChooser< Iter > vertDegChoose(Iter begin, Iter end,
 		Koala::EdgeDirection atype = Koala::EdAll ) { return VertDegContainerChooser< Iter >( begin,end,atype ); }
 
-    //WEN: jw. oraz powinno sie podac sygnature tj. jak dziala funktor
-	/* VertDegFunctorChooser
+    /* VertDegFunctorChooser
 	 * decyzja podejmowana na podstawie wartosci obiektu funktora policzonego na stopniu wierzcholka
 	 */
-	/** \brief Vertex degree functor chooser.
+	/** \brief Choose vertices of degree accepted by functor.
 	 *
 	 *  The function object that for a given vertex tests if the vertex degree satisfy the functor defined in the constructor.
+	 *  The functor must return value convertible to bool for various degree values. 
+	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection}) mask like in method ConstGraphMethods::deg.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
 	template< class Obj > struct VertDegFunctorChooser
 	{
-		mutable Obj funktor;/** \brief the object function qualifying degrees.*/
+		mutable Obj funktor;/**< \brief the object function qualifying degrees.*/
 		Koala::EdgeDirection typ;/**< \brief the considered edge direction.*/
 
 		/** \brief Chooser obligatory type.
@@ -2363,7 +2376,7 @@ namespace Koala
 
 		/** \brief Overloaded operator()
 		 *
-		 *  The function call operator returning converted to bool value returned the functor .
+		 *  The function call operator that returns value returns by \ a funktor casted to bool .
 		 *  \param v the tested vertex.
 		 *  \param g reference to considered graph.
 		 *  \return the value returned by \a functor. */
@@ -2372,9 +2385,15 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of VertDegFunctorChooser.
-	 *  \wikipath{chooser, Get more information about choosers.}
-	 *  \ingroup DMchooser*/
-	template< class Obj > VertDegFunctorChooser< Obj > vertDegFChoose( Obj afun,
+	*
+	*  \wikipath{chooser, Get more information about choosers.}
+	*  \tparam Obj the type of functor
+	*  \param afun the function object approving vertex degrees.
+	*  \param atype the type of direction used for degree calculation.
+	*  \return chooser of type VertDegFunctorChooser, which chooses vertices as long as functor \a afun returns true for tested vertex degree.
+	*  \related VertDegFunctorChooser
+	*  \ingroup DMchooser*/
+	template< class Obj > VertDegFunctorChooser< Obj > vertDegFChoose(Obj afun,
 		Koala::EdgeDirection atype = Koala::EdAll ) { return VertDegFunctorChooser< Obj >( afun,atype ); }
 
 	// choosery do wybierania krawedzi
