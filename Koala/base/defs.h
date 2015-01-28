@@ -2939,8 +2939,7 @@ namespace Koala
 	 *
 	 *  The structure overloads call function operator for two and three parameters. The first parameter is the reference to new-created info object.
 	 *  The remaining parameters are the source infos. However, ValueCaster ignores them and sets the destination info with common value \a val defined in constructor.
-	 *  That value is casted on destination info object type.
-	 *  default value (empty constructor is called).
+	 *  That value is casted on destination info object type. Hence, such cast must be possible.
 	 *  \wikipath{caster, Get more information about casters.}
 	 *  \ingroup DMcaster*/
 	template< class T > struct ValueCaster
@@ -2994,8 +2993,12 @@ namespace Koala
 	 * tylko false jest dopuszczalne - brak polaczenia
 	 */
 	/** \brief No link.
-	 * WEN: rowniez jakis opis do czego sa uzywane - wszystkie linkery
-	 *  This linker should be used in in cases when user doesn't need a link and doesn't want to create one but function in Koala require some.
+	 * 
+	 *  Methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others generate new elements like edges and vertices. 
+	 *  Sometimes user may want to preserve the information from where new elements origin. For such purposes linkers are designed.
+	 *  The linkers are object functions with overloaded call function operator. The first parameter of that function is destination object the second is 
+	 *  source object.
+	 *  Std1NoLinker is a linker that makes no link. It should be used in cases when user doesn't need a link and doesn't want to create one but function in Koala require some.
 	 *
 	 *  \ingroup DMlinker */
 	struct Std1NoLinker
@@ -3004,10 +3007,13 @@ namespace Koala
 		 *
 		 * \param arg always false.*/
 		Std1NoLinker( bool arg = false ) { koalaAssert( !arg,ExcBase ); }
+		
 		/** \brief Function call operator.
 		 *
-		 *  Does nothing.*/0
-		template< class Dest, class Sour > void operator()( Dest *, Sour * ) { }
+		 *  Does nothing.
+		 *  \param wsk the pointer to destination object (ignored).
+		 *  \param w the pointer to source object (ignored).*/
+		template< class Dest, class Sour > void operator()( Dest *wsk, Sour *w ) { }
 	};
 
 	/* Std1FieldLinker
@@ -3015,17 +3021,22 @@ namespace Koala
 	 */
 	/** \brief Object info one direction linker.
 	 *
-	 *  This linker uses the member of the object info that should be the pointer to the linked object.
+	 *  Methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others generate new elements like edges and vertices. 
+	 *  Sometimes user may want to preserve the information from where new elements origin. For such purposes linkers are designed.
+	 *  The linkers are object functions with overloaded call function operator. The first parameter of that function is destination object, the second is 
+	 *  source object.
+	 *
+	 *  Std1FieldLinker uses the member of the destination info object to point to object of origin.
 	 *  The modified field of the object info is set in constructor via pointer to member.
-	 *  \ingroup DMlinker
-	 */
+	 *  \wikipath{linker, Get more data about linkers.}
+	 *  \ingroup DMlinker */
 	template< class Info, class T > struct Std1FieldLinker
 	{
-		T Info:: *pt;/**< \brief the pointer to member in the info object.*/
+		T Info:: *pt;/**< \brief Pointer to member in new element info object that keeps a pointer to origin .*/
 
 		/** \brief Constructor.
 		 *
-		 *  Sets \a pt as a pointer to expected member in info of element.*/
+		 *  Sets \a pt as a pointer to member in new element info object that stores pointer to origin.*/
 		Std1FieldLinker( T Info:: *awsk = 0): pt( awsk ) { }
 
 		/** \brief Function call operator.
@@ -3040,13 +3051,20 @@ namespace Koala
 	 * nie byl NULLem)
 	 */
 	/** \brief Associative array one direction linker.
-	 * WEN: uzywa mapy zewnetrznej, a wiec user jest odpowiedzialny za stan obiektu mapy podczas dzialania linkera
-	 *  This linker uses the associative array which is a map that associate pointer of destination element with the pointer of source. WEN: tj. te asocjacje dopiero zostana wpisane
-	 *  \ingroup DMlinker
-	 */
+	 *
+	 *  Methods like Graph::copy, Graph::substitute or methods in classes LineGraph, Product and others generate new elements edges or vertices. 
+	 *  Sometimes user may want to preserve the information from where new elements origin. For such purposes linkers are designed.
+	 *  The linkers are object functions with overloaded call function operator. The first parameter of that function is pointer to destination object, the second is 
+	 *  pointer to source object.
+	 *
+	 *  Std1AssocLinker function object is equipped with external associative container, which keeps information about the link. If this linker is used 
+	 *  for each new-created element there is a new key (pointer to new element) inserted into associative array where the mapped value is the pointer to the origin. 
+	 *  Since the map is external and it is not copied, user should keep it valid and up to date.
+	 *  \wikipath{linker, Get more data about linkers.}
+	 *  \ingroup DMlinker */
 	template< class Map > struct Std1AssocLinker
 	{
-		Map &map;/**< \brief the associative container (destination -> source).*/
+		Map &map;/**< \brief The associative container (pointer to destination -> pointer to source).*/
 
 		/** \brief Constructor.
 		 *
@@ -3055,7 +3073,12 @@ namespace Koala
 
 		/** \brief Function call operator.
 		 *
-		 *  The function makes connection between the source \a w and the destination \a wsk. Create an element in \a amap which associates the key \a wsk with the mapped value \a w.*/
+		 *  The template function makes connection between the source \a w and the destination \a wsk.
+		 *  The operator adds a pair to associative array \a amap in which \a wsk is a key and \a w is a mapped value.
+		 *  \tparam Dest the type of destination object.
+		 *  \tparam Sour the type of source object.
+		 *  \param wsk pointer to destination element (PEdge or PVert).
+		 *  \param w the pointer to source element (PEdge or PVert).*/
 		template< class Dest, class Sour > void operator()( Dest *wsk, Sour *w ) { if (wsk) map[wsk] = w; }
 	};
 
@@ -3073,13 +3096,13 @@ namespace Privates {
 	/* Std2Linker
 	 * pelny linker, zawiera obiekty laczace (polowki linkera - j.w.) nowy element ze starym i odwrotnie
 	 */
-	/** \brief Two directions linker .
+	/** \brief Bidirectional linker .
 	 *
-	 *  This linker joins two linkers in order to create two way connection.\n
+	 *  This linker joins two linkers in order to create two way connection.
 	 *  \tparam Link1 the type of linker for destination -> source connection.
 	 *  \tparam Link2 the type of linker source -> destination connection.
-	 *  \ingroup DMlinker
-	 */
+	 *  \wikipath{linker, Get more data about linkers.}
+	 *  \ingroup DMlinker */
 	template< class Link1, class Link2 > struct Std2Linker
 	{
 		typedef Std2Linker< Link1, Link2> LinkersSelfType;
@@ -3097,7 +3120,8 @@ namespace Privates {
 
 		/** \brief Function call operator.
 		 *
-		 *  The function makes connection between the source \a w and the destination \a wsk and another way round. */
+		 *  The function makes connection between the source \a w and the destination \a wsk and another way round. 
+		 *  The operator uses methods lining elements delivered by linkers set up in constructor.*/
 		template< class Dest, class Sour > void operator()( Dest *wsk, Sour *w );
 	};
 
@@ -3105,25 +3129,27 @@ namespace Privates {
 	/** \brief Generating function of no linker (Std1NoLinker).
 	 *
 	 *  \param a1 always false
-	 *  \return the linker that does not make a connection.
+	 *  \return linker Std1NoLinker that does not make a connection.
+	 *  \related Std1NoLinker
 	 *  \ingroup DMlinker */
 	inline Std1NoLinker stdLink( bool a1 ) { return Std1NoLinker( a1 ); }
 
 	/** \brief Generating function of one direction info linker (Std1FieldLinker).
 	 *
-	 *  The function generates and returns the one direction linker object the uses the info object of elements.
+	 *  The function generates and returns the one direction linker object the uses the info object of destination elements.
 	 *  \param awsk1 the pointer to the member of info object.
-	 *  \return the linker function object that is able to connect two elements.
-	 *  \ingroup DMlinker
-	 */
+	 *  \return Std1FieldLinker function object that is able to connect two elements using member of destination info object..
+	 *  \related Std1FieldLinker
+	 *  \ingroup DMlinker */
 	template< class Info1, class T1 >
 		Std1FieldLinker< Info1,T1 > stdLink( T1 Info1:: *awsk1 ) { return Std1FieldLinker< Info1,T1 >( awsk1 ); }
 
 	/** \brief Generating function of standard one direction linker (Std1AssocLinker).
 	 *
-	 *  The function generates and returns the one direction linker object the uses the associative table \a tab.
-	 *  \param tab1 the reference to the associative table that keeps all the connections.
-	 *  \return the linker function object that is able to connect two elements.
+	 *  The function generates and returns the one direction linker object the uses external associative array \a tab1.
+	 *  \param tab1 the reference to the associative array that keeps all the connections.
+	 *  \return the linker function object that is able to connect two elements via associative array.
+	 *  \related Std1AssocLinker
 	 *  \ingroup DMlinker     */
 	template< class Map1 >
 		Std1AssocLinker< Map1 > stdLink( Map1 &tab1 ) { return Std1AssocLinker< Map1 >( tab1 ); }
@@ -3133,24 +3159,33 @@ namespace Privates {
 	//
 	/** \brief Generating function for no linker based on Std2Linker.
 	 *
-	 *   Both boolean parameters take only false value, then the link is not created.
-	 *  \ingroup DMlinker     */
+	 *  The function generates two directional link, however both links are dummy.
+	 *  Boolean parameters take only false value, then the link is not created.
+	 *  \related Std2Linker
+	 *  \related Std1NoLinker
+	 *  \ingroup DMlinker */
 	inline Std2Linker< Std1NoLinker,Std1NoLinker > stdLink( bool a1, bool a2 );
 
-	/** \brief Generating function of one way linker based on Std2Linker.
+	/** \brief Generating function of one way field linker based on Std2Linker.
 	 *
-	 *  \param a1 boolean parameter take only false,
-	 *  \param awsk pointer to member
-	 *  \return the linker with one way connection source to destination, using field pointed by \a awsk in source info object.
+	 *  \param a1 Boolean parameter take only false,
+	 *  \param awsk pointer to member in source info object where pointer to destination object is stored.
+	 *  \return the linker with one way connection source -> destination, using field pointed by \a awsk in source info object.
+	 *  \related Std2Linker
+	 *  \related Std1NoLinker
+	 *  \related Std1FieldLinker
 	 *  \ingroup DMlinker     */
 	template< class Info,class T >
 		Std2Linker< Std1NoLinker,Std1FieldLinker< Info,T > > stdLink( bool a1, T Info:: *awsk );
 
 	/** \brief Generating function of one way linker based on Std2Linker.
 	 *
-	 *  \param a1 boolean parameter take only false,
-	 *  \param tab associative container assigning  destination to source.
-	 *  \return the linker with one way connection source to destination, basing on associative container.
+	 *  \param a1 Boolean parameter take only false,
+	 *  \param tab associative container assigning  destination to source (pairs (sour, dest)).
+	 *  \return the linker with one way connection source to destination, based on associative container.
+	 *  \related Std2Linker
+	 *  \related Std1NoLinker
+	 *  \related Std1AssocLinker
 	 *  \ingroup DMlinker     */
 	template< class Map >
 		Std2Linker< Std1NoLinker,Std1AssocLinker< Map > > stdLink( bool a1, Map &tab );
@@ -3158,8 +3193,11 @@ namespace Privates {
 	/** \brief Generating function for one way linker based on Std2Linker.
 	 *
 	 *  \param awsk1 pointer to member
-	 *  \param a2 boolean parameter take only false,
+	 *  \param a2 Boolean parameter take only false,
 	 *  \return the linker with one way connection destination to source, using field pointed by \a awsk1 in destination info object.
+	 *  \related Std2Linker
+	 *  \related Std1FieldLinker
+	 *  \related Std1NoLinker
 	 *  \ingroup DMlinker     */
 	template< class Info1, class T1 >
 		Std2Linker< Std1FieldLinker< Info1,T1 >,Std1NoLinker > stdLink( T1 Info1:: *awsk1, bool a2 );
@@ -3169,6 +3207,8 @@ namespace Privates {
 	 *  \param awsk1 the pointer to member in destination info
 	 *  \param awsk2 the pointer to member in source info.
 	 *  \return the linker with two way connection, using field pointed by \a awsk1 in destination info object and the field pointed by \a awsk2 in source info object.
+	 *  \related Std2Linker
+	 *  \related Std1FieldLinker
 	 *  \ingroup DMlinker     */
 	template< class Info1, class T1, class Info, class T >
 		Std2Linker< Std1FieldLinker< Info1,T1 >,Std1FieldLinker< Info,T > > stdLink( T1 Info1:: *awsk1, T Info:: *awsk );
@@ -3177,7 +3217,11 @@ namespace Privates {
 	 *
 	 *  \param awsk1 the pointer to member in destination info
 	 *  \param tab the associative container assigning destination to source.
-	 *  \return the linker with two way connection, using field pointed by \a awsk1 in destination info object and associative container.
+	 *  \return the linker with two way connection, using field pointed by \a awsk1 in destination info object (storing pointer to source)
+	 *  and associative container (pairs (sour,dest)).
+	 *  \related Std2Linker
+	 *  \related Std1FieldLinker
+	 *  \related Std1AssocLinker
 	 *  \ingroup DMlinker     */
 	template< class Info1, class T1, class Map >
 		Std2Linker< Std1FieldLinker< Info1,T1 >,Std1AssocLinker< Map > > stdLink( T1 Info1:: *awsk1, Map &tab);
@@ -3185,8 +3229,11 @@ namespace Privates {
 	/** \brief Generating function of one way linker based on Std2Linker.
 	 *
 	 *  \param a2 boolean parameter take only false,
-	 *  \param tab1 associative container assigning  source to destination.
+	 *  \param tab1 associative container assigning  source to destination (pairs (sour, dest)).
 	 *  \return the linker with one way connection destination to source, basing on associative container.
+	 *  \related Std2Linker
+	 *  \related Std1AssocLinker
+	 *  \related Std1NoLinker
 	 *  \ingroup DMlinker     */
 	template< class Map1 >
 		Std2Linker< Std1AssocLinker< Map1 >,Std1NoLinker > stdLink( Map1 &tab1, bool a2 );
@@ -3194,17 +3241,22 @@ namespace Privates {
 	/** \brief Generating function for two way linker based on Std2Linker.
 	 *
 	 *  \param tab1 the associative container assigning source to destination.
-	 *  \param awsk the pointer to member in source info
-	 *  \return the linker with two way connection, using field pointed by \a awsk in the source info object and associative container.
+	 *  \param awsk the pointer to member in source info object where pointer to destination is stored.
+	 *  \return the linker with two way connection, using associative container and field pointed by \a awsk in the source info object.
+	 *  \related Std2Linker
+	 *  \related Std1AssocLinker
+	 *  \related Std1FieldLinker
 	 *  \ingroup DMlinker     */
 	template< class Map1, class Info, class T >
 		Std2Linker< Std1AssocLinker< Map1 >,Std1FieldLinker< Info,T > > stdLink( Map1 &tab1, T Info:: *awsk );
 
 	/** \brief Generating function for two way linker based on Std2Linker.
 	 *
-	 *  \param tab1 the associative container assigning source to destination .
-	 *  \param tab the associative container assigning destination to source.
+	 *  \param tab1 the associative container assigning source to destination (pairs (dest, sour)).
+	 *  \param tab the associative container assigning destination to source  (pairs (sour, dest)).
 	 *  \return the linker with two way connection, based on two associative containers.
+	 *  \related Std2Linker
+	 *  \related Std1AssocLinker
 	 *  \ingroup DMlinker     */
 	template< class Map1, class Map >
 		Std2Linker< Std1AssocLinker< Map1 >,Std1AssocLinker< Map > > stdLink( Map1 &tab1, Map &tab );
@@ -3212,7 +3264,8 @@ namespace Privates {
 	// wygodne laczenie chooserow, casterow i linkerow w pary za pomoca &
 	/**\brief Make pair of choosers.
 	 *
-	 * Overloaded operator& allows to create easily a std::pair of choosers \a a and \a b.*/
+	 * Overloaded operator& allows to create easily a std::pair of choosers \a a and \a b.*  
+	 * \ingroup DMchooser */
 	template <class  Ch1, class Ch2> std::pair< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >
 		operator&( Ch1 a, Ch2 b )
 		{
@@ -3228,7 +3281,8 @@ namespace Privates {
 	 * \related ValueCaster
 	 * \related HardCaster
 	 * \related StdCaster
-	 * \related ObjCaster */
+	 * \related ObjCaster 
+	 *  \ingroup DMcaster */
 	template <class  Ch1, class Ch2> std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >
 		operator&( Ch1 a, Ch2 b )
 		{
@@ -3237,7 +3291,11 @@ namespace Privates {
 
 	/**\brief Make pair of linkers.
 	 *
-	 * Overloaded operator& allows to create easily a pair of std::linkers \a a and \a b.*/
+	 * Overloaded operator& allows to create easily a pair of std::linkers \a a and \a b.
+	 * \related Std1NoLinker 
+	 * \related Std1FieldLinker 
+	 * \related Std1AssocLinker 
+	 * \ingroup DMlinker */
 	template <class  Ch1, class Ch2> std::pair< typename Ch1::LinkersSelfType,typename Ch2::LinkersSelfType >
 		operator&( Ch1 a, Ch2 b )
 		{
