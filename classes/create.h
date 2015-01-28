@@ -32,56 +32,51 @@ namespace Privates {
 
 	/** \brief Create graphs.
 	 *
-	 *  The utility class for creating different types of graphs.
+	 *  The utility class for creating various types of graphs. Created graphs are added to graph as a new component.
 	 *  Most of the methods return a pointer indicating the first vertex that has been created.
 	 *  Common variables used in edge/vertex generators:
 	 *  - g the input/output graph to which the new-created graph is added.
 	 *  - num, num1, num2 are integers, which indicate numbers of vertices.
 	 *  - dir is of EdgeDirection type and indicate the type and direction of corresponding edge.
-	 *  - vInfoGen - the generator for info objects for vertices used in form: vInfoGen(num). WEN: numeracja od 0 dodawanych wierzcholkow
-	 *  - eInfoGen - the generator for info objects for edges used in form: eInfoGen(num1, num2, dir). WEN: jw.
+	 *  - vInfoGen - the generator for info objects for vertices. It is used in form: vInfoGen(num). Indexes start with 0.
+	 *  - eInfoGen - the generator for info objects for edges. It is used in form: eInfoGen(num1, num2, dir). Indexes start with 0.
 	 *  \ingroup detect
 	 *
-	 *  [See example](examples/create/example_Creator.html).
-	 */
+	 *  [See example](examples/create/example_Creator.html).*/
 	class Creator{
 	public:
 
-		//NEW
 		/** \brief Create empty graph.
 		*
-		*  The function generates an empty graph.
+		*  The method generates an empty graph.
 		*
 		*  \param g  the input/output graph,
-		*  \param n  number of vertices to create,
-		*  \param vInfoGen  generator for info objects for vertices used in form: vInfoGen(num),
-		*   \retrun the pointer to the first added vertex.*/
+		*  \param n the number of vertices to create,
+		*  \param vInfoGen  the vertex info generator. The method uses it in form: vInfoGen(num),
+		*  \retrun the pointer to the first added vertex.*/
 		template< class GraphType, class VInfoGen >
 		static typename GraphType::PVertex empty(GraphType &g, int n, VInfoGen vInfoGen);
 
-
-		//NEW
 		/** \brief Create empty graph.
 		*
 		*  The function generates an empty graph.
 		*
 		*  \param g  the input/output graph,
-		*  \param n  number of vertices to create,
-		*  \param vInfoGen  generator for info objects for vertices used in form: vInfoGen(num),
-		*   \retrun the pointer to the first added vertex.*/
+		*  \param n  the number of vertices to create,
+		*  \retrun the pointer to the first added vertex.*/
 		template< class GraphType >
 		static typename GraphType::PVertex empty(GraphType &g, int n);
 
 		/** \brief Create clique.
 		 *
-		 *  The function generates a clique, i.e. for every two vertices, there is created a connection
-		 *  according to EdgeDirection mask. Additionally if the mask contains a loop then a loop is attached to each vertex.
+		 *  The method generates and adds a clique, i.e. for every two vertices, there is created a connection
+		 *  according to Koala::EdgeDirection mask. Additionally if the mask contains a loop then a loop is attached to each vertex.
 		 *
 		 *  \param g  the input/output graph,
 		 *  \param n  number of vertices to create,
 		 *  \param vInfoGen  generator for info objects for vertices used in form: vInfoGen(num),
 		 *  \param eInfoGen  generator for info objects for edges used in form: eInfoGen(num1, num2, dir),
-		 *  \param dir edges direction mask.
+		 *  \param dir Koala::EdgeDirection mask.
 		 *  \retrun the pointer to the first added vertex.*/
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex clique( GraphType &g, int n,  VInfoGen vInfoGen, EInfoGen eInfoGen,
@@ -100,13 +95,10 @@ namespace Privates {
 		template< class GraphType >
 			static typename GraphType::PVertex clique( GraphType &g, int n, EdgeDirection dir = EdUndir );
 
-
-		//WEN: The following connections are created: 0-1, 1-2, 2-3,..., (n-2)-(n-1).
-		//Numbers represent vertices.
 		/** \brief Create path.
 		 *
 		 *  The function generates a path. Additionally, if the mask contains a loop, then a loop is attached
-		 *  to each vertex.
+		 *  to each vertex. The following connections are created: 0-1, 1-2, 2-3,..., (n-2)-(n-1), where numbers represent vertices.
 		 *  \param g the input/output graph,
 		 *  \param n  number of vertices to create,
 		 *  \param vInfoGen  generator for info objects for vertices,
@@ -121,7 +113,7 @@ namespace Privates {
 		/** \brief Create path.
 		 *
 		 *  The function generates a path. Additionally, if the mask contains a loop, then a loop is attached
-		 *  to each vertex.
+		 *  to each vertex. The following connections are created: 0-1, 1-2, 2-3,..., (n-2)-(n-1), where numbers represent vertices.
 		 *  \param g the input/output graph,
 		 *  \param n  number of vertices to create,
 		 *  \param dir - edges direction mask.
@@ -129,17 +121,15 @@ namespace Privates {
 		template< class GraphType >
 			static typename GraphType::PVertex path( GraphType &g, int n, EdgeDirection dir = EdUndir );
 
-		//WEN: The following connections are created: 0-1, 1-2, 2-3,..., (n-2)-(n-1), (n-1)-0.
-		//Numbers represent vertices.
 		/** \brief Create cycle.
 		 *
 		 *  The function generates a cycle. Additionally, if the mask contains a loop, then a loop is attached
-		 *  to each vertex.
+		 *  to each vertex. The following connections are created: 0-1, 1-2, 2-3,..., (n-2)-(n-1), (n-1)-0, where the numbers represent vertices.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
-		 *  \param dir - edges direction mask. WEN: ale w przypadku n==1 kazda maska EdUndir, EdDirIn, EdDirOut dodaje jedna petle
+		 *  \param dir - Koala::EdgesDirection mask. However for n==1 each mask EdUndir, EdDirIn, EdDirOut generate loop.
 		 *  \retrun the pointer to the first added vertex.*/
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex cycle( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
@@ -149,16 +139,15 @@ namespace Privates {
 		/** \brief Create cycle.
 		 *
 		 *  The function generates a cycle. Additionally, if the mask contains a loop, then a loop is attached
-		 *  to each vertex.
+		 *  to each vertex. The following connections are created: 0-1, 1-2, 2-3,..., (n-2)-(n-1), (n-1)-0, where the numbers represent vertices.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
-		 *  \param dir - edges direction mask.
+		 *  \param dir - Koala::EdgesDirection mask. However, for n==1 each mask EdUndir, EdDirIn, EdDirOut generate loop.
 		 *  \retrun the pointer to the first added vertex. */
 		template< class GraphType >
 			static typename GraphType::PVertex cycle( GraphType &g, int n, EdgeDirection dir = EdUndir );
 
-		/*
-		WEN: Central vertex has number 0, the rest of vertices is numbered from 1 to n-1.
+		/* Central vertex has number 0, the rest of vertices is numbered from 1 to n-1.
 		The following connections are created:
 		 - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
 		 - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1).
@@ -167,9 +156,18 @@ namespace Privates {
 		 *
 		 *  A fan graph F<sub>n</sub> is defined as the graph  N<sub>1</sub>+ P<sub>n-1</sub>,
 		 *  where N<sub>1</sub> is the empty graph containing one vertex and P<sub>n-1</sub> is the path graph on n-1 vertices.
-		 *  The central vertex is created as the first vertex. Additionally, if the mask contains a loop, then a loop is attached to each vertex. The function generates an usual fan graph containing  n vertices.
+		 *  The function generates an usual fan graph containing n vertices.
+		 *
+		 *  The central vertex is created as the first vertex.  
+		 *  The following connections are created:
+		 *  - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
+		 *  - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1).
+		 *
+		 *  where numbers represent vertices.
+		 * 
+		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
-		 *  \param n - number of vertices to create,
+		 *  \param n - the number of vertices to create,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param centerDir - direction mask for edges connected to central vertex.
@@ -183,7 +181,16 @@ namespace Privates {
 		 *
 		 *  A fan graph F<sub>n</sub> is defined as the graph  N<sub>1</sub>+ P<sub>n-1</sub>,
 		 *  where N<sub>1</sub> is the empty graph containing one vertex and P<sub>n-1</sub> is the path graph on n-1 vertices.
-		 *  The central vertex is created as the first vertex. Additionally, if the mask contains a loop, then a loop is attached to each vertex. The function generates an usual fan graph containing  n vertices.
+		 *  The function generates an usual fan graph containing n vertices.
+		 *
+		 *  The central vertex is created as the first vertex.  
+		 *  The following connections are created:
+		 *  - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
+		 *  - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1).
+		 *
+		 *  where numbers represent vertices.
+		 * 
+		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param  n - number of vertices to create,
 		 *  \param  vInfoGen - generator for info objects for vertices,
@@ -199,83 +206,102 @@ namespace Privates {
 		 *
 		 *  A fan graph F<sub>n</sub> is defined as the graph  N<sub>1</sub>+ P<sub>n-1</sub>,
 		 *  where N<sub>1</sub> is the empty graph containing one vertex and P<sub>n-1</sub> is the path graph on n-1 vertices.
-		 *  The central vertex is created as the first vertex. Additionally, if the mask contains a loop, then a loop is attached to each vertex. The function generates an usual fan graph containing  n vertices.
+		 *  The function generates an usual fan graph containing n vertices.
+		 *
+		 *  The central vertex is created as the first vertex.  
+		 *  The following connections are created:
+		 *  - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
+		 *  - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1).
+		 *
+		 *  where numbers represent vertices.
+		 * 
+		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param dir - edges direction mask.
-		 *  \return the pointer that indicates the first (and also central) vertex.
-		 */
+		 *  \return the pointer that indicates the first (and also central) vertex. */
 		template< class GraphType >
 			static typename GraphType::PVertex fan( GraphType &g, int n, EdgeDirection dir = EdUndir );
 
-		/*
-		WEN: Central vertex has number 0, the rest of vertices is numbered from 1 to n-1.
-		The following connections are created:
-		 - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
-		 - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1), (n-1)-0.
-		Numbers represent vertices.*/
 		/** \brief Create wheel.
 		 *
-		 *  The function generates a wheel. A wheel graph W<sub>n</sub> is a graph with n vertices,
+		 *  The function generates a wheel. A wheel graph W<sub>n</sub> is a graph with \a n vertices,
 		 *  formed by connecting a single vertex to all vertices of an (n-1)-cycle. The central vertex is created as the first vertex.
+		 *
+		 *  The following connections are created:
+		 *  - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
+		 *  - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1), (n-1)-0.
+		 *
+		 *  Where 0 represents the central vertex and the remaining numbers stand for the other vertices.
+		 *
 		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
-		 *  \param  n - number of vertices to create,
+		 *  \param  n - the number of vertices to create,
 		 *  \param  vInfoGen - generator for info objects for vertices,
 		 *  \param  eInfoGen - generator for info objects for edges,
 		 *  \param  centerDir - direction mask for edges connected to central vertex,
 		 *  \param  borderDir - direction mask for edges between border vertices.
-		 *  \return the pointer that indicates the first (and also central) vertex.
-		 */
+		 *  \return the pointer that indicates the first (and also central) vertex. */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex wheel( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeDirection centerDir, EdgeDirection borderDir );
 
 		/** \brief Create wheel.
 		 *
-		 *  The function generates a wheel. A wheel graph W<sub>n</sub> is a graph with n vertices,
+		 *  The function generates a wheel. A wheel graph W<sub>n</sub> is a graph with \a n vertices,
 		 *  formed by connecting a single vertex to all vertices of an (n-1)-cycle. The central vertex is created as the first vertex.
+		 *
+		 *  The following connections are created:
+		 *  - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
+		 *  - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1), (n-1)-0.
+		 *
+		 *  Where 0 represents the central vertex and the remaining numbers stand for the other vertices.
+		 *
 		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
-		 *  \return the pointer that indicates the first (and also central) vertex.
-		 */
+		 *  \return the pointer that indicates the first (and also central) vertex.  */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex wheel( GraphType &g, int n, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeDirection dir = EdUndir);
 
-
 		/* It is a simpler version of the above function*/
 		/** \brief Create wheel.
 		 *
-		 *  The function generates a wheel. A wheel graph W<sub>n</sub> is a graph with n vertices,
+		 *  The function generates a wheel. A wheel graph W<sub>n</sub> is a graph with \a n vertices,
 		 *  formed by connecting a single vertex to all vertices of an (n-1)-cycle. The central vertex is created as the first vertex.
+		 *
+		 *  The following connections are created:
+		 *  - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
+		 *  - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1), (n-1)-0.
+		 *
+		 *  Where 0 represents the central vertex and the remaining numbers stand for the other vertices.
+		 *
 		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param dir - edges direction mask.
-		 *  \return the pointer that indicates the first (and also central) vertex.
-		 */
+		 *  \return the pointer that indicates the first (and also central) vertex. */
 		template< class GraphType >
 			static typename GraphType::PVertex wheel( GraphType &g, int n, EdgeDirection dir = EdUndir );
 
-		/*
-		WEN: Vertices in the first partition are numbered form 0 to (n1-1), vertices from the second partition are numbered form n1 to (n1+n2-1).
-			All vertices from the first partition are connected to all vertices from the second partition.*/
 		/** \brief Create complete bipartite graph.
 		 *
-		 *  The function generates a complete bipartite graph K<sub>n1,n2</sub>. Additionally, if the mask contains a loop then, a loop is attached to each vertex.
+		 *  The function generates a complete bipartite graph K<sub>n1,n2</sub>. 
+		 *  Vertices in the first partition are numbered form 0 to (n1-1), vertices from the second partition are numbered form n1 to (n1+n2-1).
+		 *  All vertices from the first partition are connected to all vertices from the second partition.
+		 *
+		 *  Additionally, if the mask contains a loop then, a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param n1 - number of vertices to create in the first partition,
 		 *  \param n1 - number of vertices to create in the second partition,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
-		 *  \return a pair of pointers. The pointers indicate the first vertices in the partitions.
-		 */
+		 *  \return a pair of pointers. The pointers indicate the first vertices in the partitions.  */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 			compBipartite( GraphType &g, int n1, int n2, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection dir = EdUndir );
@@ -283,26 +309,31 @@ namespace Privates {
 		/* It is a simpler version of the above function*/
 		/** \brief Create complete bipartite graph.
 		 *
-		 *  The function generates a complete bipartite graph K<sub>n1,n2</sub>. Additionally, if the mask contains a loop then, a loop is attached to each vertex.
+		 *  The function generates a complete bipartite graph K<sub>n1,n2</sub>. 
+		 *  Vertices in the first partition are numbered form 0 to (n1-1), vertices from the second partition are numbered form n1 to (n1+n2-1).
+		 *  All vertices from the first partition are connected to all vertices from the second partition.
+		 *
+		 *  Additionally, if the mask contains a loop then, a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param n1 - number of vertices to create in the first partition,
 		 *  \param n1 - number of vertices to create in the second partition,
 		 *  \param dir - edges direction mask.
-		 *  \return a pair of pointers. The pointers indicate the first vertices in the partitions.
-		 */
+		 *  \return a pair of pointers. The pointers indicate the first vertices in the partitions. */
 		template< class GraphType >
 			static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 			compBipartite( GraphType &g, int n1, int n2, EdgeDirection dir = EdUndir );
 
-		/*
-		WEN: Vertices in the first partition are numbered form 0 to (k-1),
-			vertices from the second partition are numbered form k to (2k-1),
-			vertices form k-th partition are number from (K-1)*k to (K*k-1).
-		All vertices from a particular partition are connected to all vertices from other partitions.*/
 		/** \brief Create complete K-partite graph.
 		 *
 		 *  The function generates a complete K-partite graph. Each of K partitions has the same number of vertices
-		 *  specified by the input parameter k. Additionally, if the mask contains a loop, then a loop is attached to each vertex.
+		 *  specified by the input parameter k. 
+		 *
+		 *  Vertices in the first partition are numbered form 0 to (k-1),\n
+		 *  vertices from the second partition are numbered form k to (2k-1),\n
+		 *  vertices form k-th partition are number from (K-1)*k to (K*k-1).\n
+		 *  All vertices from a particular partition are connected to all vertices from other partitions.
+		 *
+		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g the input/output graph,
 		 *  \param K number of partition,
 		 *  \param k number of vertices to create in each of the K partitions,
@@ -320,7 +351,14 @@ namespace Privates {
 		/** \brief Create complete K-partite graph.
 		 *
 		 *  The function generates a complete K-partite graph. Each of K partitions has the same number of vertices
-		 *  specified by the input parameter k. Additionally, if the mask contains a loop, then a loop is attached to each vertex.
+		 *  specified by the input parameter k. 
+		 *
+		 *  Vertices in the first partition are numbered form 0 to (k-1),\n
+		 *  vertices from the second partition are numbered form k to (2k-1),\n
+		 *  vertices form k-th partition are number from (K-1)*k to (K*k-1).\n
+		 *  All vertices from a particular partition are connected to all vertices from other partitions.
+		 *
+		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g the input/output graph,
 		 *  \param K number of partition,
 		 *  \param k number of vertices to create in each of the K partitions,
@@ -332,17 +370,18 @@ namespace Privates {
 			static typename GraphType::PVertex compKPartite( GraphType &g, int K, int k, IterInsert itIns,
 				EdgeDirection dir = EdUndir );
 
-		/*
-		WEN: Vertices are created in the order determined by begin iterator, i.e.
-			vertices in the first partition are numbered from 0 to (k_1-1),
-			vertices in the second partition are numbered from k_1 to (k_1+k_2-1),
-			vertices in K-th partition are numbered from k_1+k_2+...+k_{K-1} to (k_1+k_2+...+k_{K-1}+k_K-1),
-			where k_i is the number of vertices in i-th partition.
-		All vertices from a particular partition are connected to all vertices from other partitions.*/
 		/** \brief Create complete K-partite graph.
 		 *
 		 *  The function generates a complete K-partite graph. The cardinalities of partitions are specified by a sequence of integers.
 		 *  The sequence is defined by two iterators: \a begin and \a end that are passed to the function as input parameters.
+		 *
+		 *  Vertices are created in the order determined by begin iterator, i.e.\n
+		 *  vertices in the first partition are numbered from 0 to (k_1-1),\n
+		 *  vertices in the second partition are numbered from k_1 to (k_1+k_2-1),\n
+		 *  vertices in K-th partition are numbered from k_1+k_2+...+k_{K-1} to (k_1+k_2+...+k_{K-1}+k_K-1),\n
+		 *  where k_i is the number of vertices in i-th partition.\n
+		 *  All vertices from a particular partition are connected to all vertices from other partitions.
+		 *
 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
 		 *  \param g the input/output graph,
 		 *  \param begin input iterator; it should indicate the integer that corresponds to the cardinality of the first partition,
@@ -363,6 +402,14 @@ namespace Privates {
 		 *
 		 *  The function generates a complete K-partite graph. The cardinalities of partitions are specified by a sequence of integers.
 		 *  The sequence is defined by two iterators: \a begin and \a end that are passed to the function as input parameters.
+		 *
+		 *  Vertices are created in the order determined by begin iterator, i.e.\n
+		 *  vertices in the first partition are numbered from 0 to (k_1-1),\n
+		 *  vertices in the second partition are numbered from k_1 to (k_1+k_2-1),\n
+		 *  vertices in K-th partition are numbered from k_1+k_2+...+k_{K-1} to (k_1+k_2+...+k_{K-1}+k_K-1),\n
+		 *  where k_i is the number of vertices in i-th partition.\n
+		 *  All vertices from a particular partition are connected to all vertices from other partitions.
+		 *
 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
 		 *  \param g the input/output graph,
 		 *  \param begin input iterator; it should indicate the integer that corresponds to the cardinality of the first partition,
@@ -375,13 +422,13 @@ namespace Privates {
 		template< class GraphType, class Iter, class IterInsert > static typename GraphType::PVertex
 			compKPartite( GraphType &g, Iter begin, Iter end, IterInsert itIns, EdgeDirection dir = EdUndir );
 
-		//WEN: In the description below numbers represent vertices.
 		/** \brief Create Petersen graph.
 		 *
 		 *  The function generates the Petersen graph, i.e., it creates the following undirected edges:\n
 		 *   0 - 1, 1 - 2, 2 - 3, 3 - 4, 4 - 0,\n
 		 *   5 - 6, 6 - 7, 7 - 8, 8 - 9, 9 - 5,\n
 		 *   0 - 8, 1 - 6, 2 - 9, 3 - 7, 4 - 5.\n
+		 *  Where the numbers represent vertices.
 		 *  \param g - the input/output graph,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges.
@@ -396,43 +443,46 @@ namespace Privates {
 		 *   0 - 1, 1 - 2, 2 - 3, 3 - 4, 4 - 0,\n
 		 *   5 - 6, 6 - 7, 7 - 8, 8 - 9, 9 - 5,\n
 		 *   0 - 8, 1 - 6, 2 - 9, 3 - 7, 4 - 5.\n
+		 *  Where the numbers represent vertices.
 		 *  \param g - the input/output graph,
 		 *  \retrun the pointer to the first added vertex. */
 		template< class GraphType > static typename GraphType::PVertex petersen( GraphType &g );
 
-
-		/* WEN: Vertices are created in order from the root through all vertices on a particular level to leaves, i.e.:
-		- root has number 0,
-		- children of the root are numbered from 1 to deg,
-		- grandchildren are numbered from (deg+1) to (deg+deg^2),
-		- vertices on next levels are numbered analogically.
-		Edges:
-		- root is connected to vertices from 1 to deg,
-		- vertex number 1 is connected to vertices from (deg+1) to (2*deg),
-		- vertex number 2 is connected to vertices from (2*deg+1) to (3*deg),
-		- vertex number deg is connected to vertices from (deg*deg+1) to (deg*(deg+1)),
-		- connections on next levels are created analogically.
-
-		For example for a tree with height = 2 and deg = 3 the structure is as follows:
-		- root vertex: 0,
-		- vertices of heigh = 1: 1, 2, 3,
-		- vertices of heigh = 2: 4, 5, 6, 7, 8, 9, 10, 11, 12.
-		Edges:
-		- 0-1, 0-2, 0-3,
-		- 1-4, 1-5, 1-6, 2-7, 2-8, 2-9, 3-10, 3-11, 3-12.
-		*/
 		/** \brief Create regular tree.
 		 *
 		 *  The function generates a tree in which each non-leaf vertex has the same degree specified by the parameter \a deg.
-		 *  The height of the tree is defined by the parameter \a height. Additionally if the mask contains a loop then the loop is attached to each vertex.
+		 *  The height of the tree is defined by the parameter \a height. 
+		 *
+		 *  Vertices are created in order from the root through all vertices on a particular level to leaves, i.e.:
+		 *  - root has number 0,
+		 *  - children of the root are numbered from 1 to deg,
+		 *  - grandchildren are numbered from (deg+1) to (deg+deg^2),
+		 *  - vertices on next levels are numbered analogically.
+		 *  
+		 *  Edges:
+		 *  - root is connected to vertices from 1 to deg,
+		 *  - vertex number 1 is connected to vertices from (deg+1) to (2*deg),
+		 *  - vertex number 2 is connected to vertices from (2*deg+1) to (3*deg),
+		 *  - vertex number deg is connected to vertices from (deg*deg+1) to (deg*(deg+1)),
+		 *  - connections on next levels are created analogically.
+		 *
+		 *  For example for a tree with height = 2 and deg = 3 the structure is as follows:
+		 *  - root vertex: 0,
+		 *  - vertices of heigh = 1: 1, 2, 3,
+		 *  - vertices of heigh = 2: 4, 5, 6, 7, 8, 9, 10, 11, 12.
+		 *  
+		 *  Edges:
+		 *  - 0-1, 0-2, 0-3,
+		 *  - 1-4, 1-5, 1-6, 2-7, 2-8, 2-9, 3-10, 3-11, 3-12.
+		 *  
+		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param deg - degree of non-leaf vertices
 		 *  \param height - the height of the tree, height = 0 means that there is only the root,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
-		 *  \return a pointer that indicates the root.
-		 */
+		 *  \return a pointer that indicates the root. */
 		template< class GraphType, class VInfoGen, class EInfoGen>
 			static typename GraphType::PVertex regTree( GraphType &g, int deg, int height, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection dir = EdUndir);
@@ -441,36 +491,39 @@ namespace Privates {
 		/** \brief Create regular tree.
 		 *
 		 *  The function generates a tree in which each non-leaf vertex has the same degree specified by the parameter \a deg.
-		 *  The height of the tree is defined by the parameter \a height. Additionally if the mask contains a loop then the loop is attached to each vertex.
+		 *  The height of the tree is defined by the parameter \a height. 
+		 *
+		 *  Vertices are created in order from the root through all vertices on a particular level to leaves, i.e.:
+		 *  - root has number 0,
+		 *  - children of the root are numbered from 1 to deg,
+		 *  - grandchildren are numbered from (deg+1) to (deg+deg^2),
+		 *  - vertices on next levels are numbered analogically.
+		 *  
+		 *  Edges:
+		 *  - root is connected to vertices from 1 to deg,
+		 *  - vertex number 1 is connected to vertices from (deg+1) to (2*deg),
+		 *  - vertex number 2 is connected to vertices from (2*deg+1) to (3*deg),
+		 *  - vertex number deg is connected to vertices from (deg*deg+1) to (deg*(deg+1)),
+		 *  - connections on next levels are created analogically.
+		 *
+		 *  For example for a tree with height = 2 and deg = 3 the structure is as follows:
+		 *  - root vertex: 0,
+		 *  - vertices of height = 1: 1, 2, 3,
+		 *  - vertices of height = 2: 4, 5, 6, 7, 8, 9, 10, 11, 12.
+		 *  
+		 *  Edges:
+		 *  - 0-1, 0-2, 0-3,
+		 *  - 1-4, 1-5, 1-6, 2-7, 2-8, 2-9, 3-10, 3-11, 3-12.
+		 *  
+		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param deg - degree of non-leaf vertices
 		 *  \param height - the height of the tree, height = 0 means that there is only the root,
 		 *  \param dir - edges direction mask.
-		 *  \return the pointer that indicates the root.
-		 */
+		 *  \return the pointer that indicates the root. */
 		template< class GraphType > static typename GraphType::PVertex
 			regTree( GraphType &g, int deg, int height, EdgeDirection dir = EdUndir );
 
-		/* WEN: Vertices are created in order from the root through all vertices on a particular level to leaves, i.e.:
-		- root has number 0,
-		- children of the root are numbered from 1 to deg_0,
-		- grandchildren are numbered from (deg_0+1) to (deg_0+deg_0*deg_1), where deg_i is the degree of vertices of height i,
-		- vertices on next levels are numbered analogically.
-		Edges:
-		- root is connected to vertices from 1 to deg0,
-		- vertex number 1 is connected to vertices from (deg0+1) to (deg0+deg1),
-		- vertex number 2 is connected to vertices from (deg0+deg1+1) to (deg0+2*deg1),
-		- vertex number deg is connected to vertices from (deg0+(deg0-1)*deg1+1) to (deg0+deg0*deg1),
-		- connections on next levels are created analogically.
-
-		For example for a tree with height = 2 and deg0 = 2, deg1=3 the structure is as follows:
-		- root vertex: 0,
-		- vertices of heigh = 1: 1, 2,
-		- vertices of heigh = 2: 3, 4, 5, 6, 7, 8.
-		Edges:
-		- 0-1, 0-2,
-		- 1-3, 1-4, 1-5, 2-6, 2-7, 2-8.
-		*/
 		/** \brief Create regular tree.
 		 *
 		 *  The function generates a tree in which each non-leaf vertex on the same level has the same degree.
@@ -478,7 +531,30 @@ namespace Privates {
 		 *  The sequence is defined by two iterators: \a begin and \a end that are passed to the function as input parameters.
 		 *  The first integer in the sequence corresponds to degree of the root, next element corresponds to the degree of
 		 *  children of the root, etc.
-		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
+		 *
+		 *  Vertices are created in order from the root through all vertices on a particular level to leaves, i.e.:
+		 *  - root has number 0,
+		 *  - children of the root are numbered from 1 to deg_0,
+		 *  - grandchildren are numbered from (deg_0+1) to (deg_0+deg_0*deg_1), where deg_i is the degree of vertices of height i,
+		 *  - vertices on next levels are numbered analogically.
+		 *  
+		 *  Edges:
+		 *  - root is connected to vertices from 1 to deg0,
+		 *  - vertex number 1 is connected to vertices from (deg0+1) to (deg0+deg1),
+		 *  - vertex number 2 is connected to vertices from (deg0+deg1+1) to (deg0+2*deg1),
+		 *  - vertex number deg is connected to vertices from (deg0+(deg0-1)*deg1+1) to (deg0+deg0*deg1),
+		 *  - connections on next levels are created analogically.
+		 *
+		 *  For example for a tree with height = 2 and deg0 = 2, deg1=3 the structure is as follows:
+		 *  - root vertex: 0,
+		 *  - vertices of height = 1: 1, 2,
+		 *  - vertices of height = 2: 3, 4, 5, 6, 7, 8.
+		 *
+		 *  Edges:
+		 *  - 0-1, 0-2,
+		 *  - 1-3, 1-4, 1-5, 2-6, 2-7, 2-8.
+		 *
+ 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param begin - input iterator; it should indicate the integer that corresponds to the degree of the root of the tree,
 		 *  \param end - iterator that should indicate the end of the sequence of integers, i.e., it should indicate the past-the-end element
@@ -486,8 +562,7 @@ namespace Privates {
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
-		 *  \return the pointer that indicates the root.
-		 */
+		 *  \return the pointer that indicates the root. */
 		template< class GraphType, class VInfoGen, class EInfoGen, class Iter >
 			static typename GraphType::PVertex regTree( GraphType &g, Iter begin, Iter end, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection dir = EdUndir);
@@ -500,7 +575,30 @@ namespace Privates {
 		 *  The sequence is defined by two iterators: \a begin and \a end that are passed to the function as input parameters.
 		 *  The first integer in the sequence corresponds to degree of the root, next element corresponds to the degree of
 		 *  children of the root, etc.
-		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
+		 *
+		 *  Vertices are created in order from the root through all vertices on a particular level to leaves, i.e.:
+		 *  - root has number 0,
+		 *  - children of the root are numbered from 1 to deg_0,
+		 *  - grandchildren are numbered from (deg_0+1) to (deg_0+deg_0*deg_1), where deg_i is the degree of vertices of height i,
+		 *  - vertices on next levels are numbered analogically.
+		 *  
+		 *  Edges:
+		 *  - root is connected to vertices from 1 to deg0,
+		 *  - vertex number 1 is connected to vertices from (deg0+1) to (deg0+deg1),
+		 *  - vertex number 2 is connected to vertices from (deg0+deg1+1) to (deg0+2*deg1),
+		 *  - vertex number deg is connected to vertices from (deg0+(deg0-1)*deg1+1) to (deg0+deg0*deg1),
+		 *  - connections on next levels are created analogically.
+		 *
+		 *  For example for a tree with height = 2 and deg0 = 2, deg1=3 the structure is as follows:
+		 *  - root vertex: 0,
+		 *  - vertices of height = 1: 1, 2,
+		 *  - vertices of height = 2: 3, 4, 5, 6, 7, 8.
+		 *
+		 *  Edges:
+		 *  - 0-1, 0-2,
+		 *  - 1-3, 1-4, 1-5, 2-6, 2-7, 2-8.
+		 *
+ 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param begin - input iterator; it should indicate the integer that corresponds to the degree of the root of the tree,
 		 *  \param end - iterator that should indicate the end of the sequence of integers, i.e., it should indicate the past-the-end element

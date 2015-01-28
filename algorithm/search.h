@@ -22,45 +22,56 @@ namespace Koala
 		// Uzytkownik podaje, pare iteratorow, gdzie wpisac wierzcholki i krawedzie najkrotszej sciezki
 		/** \brief Path structure.
 		 *
-		 *  The structure used by various algorithms. It is designe to keep a path i.e. a sequence of vertices and edges.
-		 WEN: krawedzi o 1 mniej niz wierzcholkow, ktore wierzcholki sa koncami ktorej krawedzi (reprezentacja marszruty, nie wiem czy w ebooku to sie nazwie path)?
-		 *  \n
+		 *  The structure used by various algorithms. It is designed to keep a path i.e. a sequence of vertices and edges.
+		 *  Mind that both edges and vertices may be repeated, though from theoretical point of view it is a walk.
+		 *  WEN?: krawedzi o 1 mniej niz wierzcholkow, ktore wierzcholki sa koncami ktorej krawedzi?
+		 *  \wikipath{Graph_search_algorithms#Search-path-structure, For wider outlook see wiki.} 
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 */
+		 *  [See example](examples/search/euler/euler.html). */
 		template< class VIter, class EIter > struct OutPath
 		{
-			VIter vertIter;/**<\brief the iterator WEN: wstawiacz to the container with vertices. */
-			EIter edgeIter;/**<\brief the iterator WEN: wstawiacz to the container with edges. */
+			VIter vertIter;/**<\brief the insert iterator to the container with vertices. */
+			EIter edgeIter;/**<\brief the insert iterator to the container with edges. */
 			/** \brief Constructor.*/
 			OutPath( VIter av, EIter ei ): vertIter( av ), edgeIter( ei ) { }
 		};
 
 		// funkcja tworzaca, analogia make_pair
 		// Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
-		/**\brief The generating function for OutPath, takes two iterators WEN: wstawiacze and returnes OutPath*/
+		/**\brief The generating function for OutPath.
+		 *
+		 *  The function takes two insert iterators and returns OutPath.
+		 *  \related OutPath*/
 		template< class VIter, class EIter > static OutPath< VIter,EIter > outPath( VIter av, EIter ei )
 			{ return OutPath< VIter,EIter >( av,ei ); }
 
-        //NEW:
+		/** \brief OutPath specialization for blackHole generating function. 
+		 *
+		 *  The function generates dummy OutPath for cases 
+		 *  \wikipath{BlackHole, See wiki for blackHole}
+		 *  \related OutPath */
         inline static OutPath< BlackHole,BlackHole> outPath( BlackHole )
             { return OutPath< BlackHole,BlackHole>( blackHole,blackHole ); }
 
 		// OutPath moze wspolpracowac z dowolnymi sekwencyjnymi kontenerami, ale ponizsza struktura
 		//  ulatwia obrobke takich danych
-		//NEW: drugi parametr (szablon kontenera) - moze takze byc std::vector
+		// drugi parametr (szablon kontenera) - moze takze byc std::vector
 		/** \brief  Path tool.
 		 *
-		 *  The more complexet (then OutPath) class for representation of path.
-		 *  It is easier to create object of this class and pass it to funcion via parameter using input() method.
-		 WEN: to jest po prostu prosty kontener na walks oferujacy zapis przez OutPath, podczas gdy outPath laczy dwa iteratory do zewnetrznych kontenerow
+		 *  The container for paths that cooperates with OutPath in the insertion process simplifies manipulation on Paths.
+		 *  Mind that the class consists of two containers one for pointer to vertices and one for pointers to edges.
+		 *  The process of filling up the container is served by OutPath returned by method input().
 		 *
-		 */
+		 *  Mind that path is understood as a sequence of vertices and a sequence of edges. As both vertices and edges may be repeated in those sequences, 
+		 *  from theoretical point of view it is walk.
+		 *  \wikipath{Graph_search_algorithms#Search-path-structure-management, Refer here for wider perspective.}
+		 *  \tparam Graph the type of served graph.
+		 *  \tparam Container the template of container for vertices and edges.*/
 		template< class Graph, template <typename Elem, typename Alloc> class Container=std::deque > class OutPathTool
 		{
 		private:
-			Container< typename Graph::PVertex, std::allocator<typename Graph::PVertex> > verts;/**< \brief deque of vertices.*/
-			Container< typename Graph::PEdge, std::allocator<typename Graph::PEdge> > edges;/**< \brief deque of edges.*/
+			Container< typename Graph::PVertex, std::allocator<typename Graph::PVertex> > verts;/*< \brief deque of vertices.*/
+			Container< typename Graph::PEdge, std::allocator<typename Graph::PEdge> > edges;/*< \brief deque of edges.*/
 
 		public:
 			typedef typename Graph::PVertex PVertex;
@@ -76,20 +87,30 @@ namespace Koala
 			/** \brief Clear path.*/
 			void clear();
 			// dlugosc wpisanej sciezki, -1 w razie bledu (jeszcze zadnej nie wpisano)
-			/** \brief Length of path, the number of vertices - 1 WEN: = liczba krawedzi */
+			/** \brief Get length of path
+			 *
+			 *  \return the number of vertices - 1 which equals the number of edges. */
 			int length() const
 				{ return verts.size() - 1; }
 			// i-ta krawedz
-			/** \brief Get i-th edge. WEN: numeracja od 0*/
+			/** \brief Get i-th edge.
+			 *
+			 *  \param i the index of edge on the path.
+			 *  \return the pointer to i-th edge in path. Indexes start with 0. If the index excides the range exception is thrown.*/
 			PEdge edge( int i ) const;
 			// i-ta wierzcholek
-			/** \brief Get i-th vertex WEN: numeracja od 0.*/
+			/** \brief Get i-th vertex 
+			 *  
+			 *  \param i the index of vertex on the path.
+			 *  \return the pointer to i-th vertex in path. Indexes start with 0. If the index excides the range exception is thrown.*/
 			PVertex vertex( int i) const;
 			//Umiesczamy wywolanie funkcji w miejsu outPath a pozniej przetwarzamy zebrane ciagi
 			// czysci kontener
-			/** \brief Create input.
-			 * WEN: cykl pracy struktury: input -> gety (->ew. ->input->get...) ->clear ->input ... Brak mozliwosci usuwania wybranych elementow z sekwencji
-			 *  The method creates input for a function that requires OutPath. */
+			/** \brief Prepare OutPath.
+			 * 
+			 *  The method clears container and creates input for a function that requires OutPath.
+			 *  Mind that there is no possibility of partial clearing or filling of path.
+			 *  \return OutPath object associated with current object.*/
 			OutPath< std::back_insert_iterator< Container< typename Graph::PVertex,std::allocator<typename Graph::PVertex> > >,
 				std::back_insert_iterator< Container< typename Graph::PEdge,std::allocator<typename Graph::PEdge> > > > input();
 		};
@@ -622,7 +643,7 @@ namespace Koala
 	 * DefaultStructs dostarcza wytycznych dla wewnetrznych procedur por. np. AlgsDefaultSettings z def_struct.h
 	 *
 	 */
-	/** \brief Basic graph search algorithms (parametrized).
+	/** \brief Basic graph search algorithms (parameterized).
 	 *
 	 *  The general implementation of graph search strategies (DFS, BFS, LexBFS).
 	 *  \tparam SearchImpl the class should deliver a method visitBase, which decides about the order of visiting vertices.
