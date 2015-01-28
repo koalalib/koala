@@ -2764,6 +2764,7 @@ namespace Koala
 
 	/** \brief Generating function for StdCaster.
 	 *
+	 *  \wikipath{caster, Get more information about casters.}
 	 *  \return StdCaster function object that implements overloaded template function call operator which 
 	 *  tries to cast source info object to destination info object or if it is impossible destination gets the default value.
 	 *  \related StdCaster
@@ -2804,6 +2805,7 @@ namespace Koala
 
 	/** \brief Generating function for HardCaster.
 	 *
+	 *  \wikipath{caster, Get more information about casters.}
 	 *  \return HardCaster function object that implements overloaded template function call operator which
 	 *  tries to cast source info object to destination info object.
 	 *  \warning Generated caster may cause compilation error, if the cast from source to destination is impossible.
@@ -2858,6 +2860,7 @@ namespace Koala
 	// funkcja tworzaca - dopuszczalny jedynie argument false
 	/** \brief Generating function for NoCastCaster.
 	 *
+	 *  \wikipath{caster, Get more information about casters.}
 	 *  \return NoCastCaster function object that implements overloaded template function call operator for two and three parameters which
 	 *  ignores source info objects and sets destination into object with its type default empty value (the empty constructor is called).
 	 *  \param arg only false values are allowed.
@@ -2915,17 +2918,13 @@ namespace Koala
 			operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) { dest = (InfoDest)funktor( sour1,sour2 ); }
 	};
 
-	/** \brief Generating function for functor caster (ObjCaster).
-	 *
-	 *  \param f the object function that generates the appropriate info.
-	 *  \ingroup DMcaster*/
 	/** \brief Generating function for ObjCaster.
 	 *
-	 *  \param f the functor object 
-	 *  \return ObjCaster function object that implements overloaded template function call operator for two and three parameters.
-	 *  
+	 *  \wikipath{caster, Get more information about casters.}
 	 *  \tparam Funkotr the type of object function.
-	 *  \param f the function object that generates new info object.
+	 *  \param f the function object that generates new info object basing on source infos.
+	 *  \return ObjCaster function object that implements overloaded template function call operator for two and three parameters.
+	 *  The returned functor generates new info object basing on its source info passed to object function \a f.
 	 *  \related ObjCaster
 	 *  \ingroup DMcaster*/
 	template< class Funktor > ObjCaster< Funktor > stdCast(Funktor f) { return ObjCaster< Funktor >(f); }
@@ -2933,32 +2932,42 @@ namespace Koala
 	/* ValueCaster
 	 * Caster wpisujacy ustalona wartosc wspolpracuje z produktami grafow (stad takze operator 3-argumentowy)
 	 */
-	/** \brief Fixed value caster.
-	 * WEN: wykorzystywane w metodach copy, substitute z grafu oraz linegrafach i produktach (create.h) do tworzenia inf nowych elementow na podstawie oryginalow - to dot. wszystkich casterow
-	 * The caster assigns the same value to info WEN: ignorujac argument. The value is set up in constructor.
+	/** \brief Common value caster.
+	 *
+	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges)
+	 *   in methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others.
+	 *
+	 *  The structure overloads call function operator for two and three parameters. The first parameter is the reference to new-created info object.
+	 *  The remaining parameters are the source infos. However, ValueCaster ignores them and sets the destination info with common value \a val defined in constructor.
+	 *  That value is casted on destination info object type.
+	 *  default value (empty constructor is called).
+	 *  \wikipath{caster, Get more information about casters.}
 	 *  \ingroup DMcaster*/
 	template< class T > struct ValueCaster
 	{
 		typedef ValueCaster< T > CastersSelfType;/**<\brief Caster self type, the type defined for each caster.*/
 
-		T val;/**<\brief the fixed value set up in constructor.*/
+		T val;/**<\brief the fixed value set up in constructor, assigned to each new-created info object.*/
+		
 		/** \brief Constructor.
 		 *
-		 *  Sets the value \a val up.*/
+		 *  Sets value \a val up.*/
 		ValueCaster( T arg = T() ): val( arg ) { }
 
 		/** \brief Call function operator.
 		 *
 		 *  The overloaded call function operator with two parameters. The method casts the \a val to \a dest.
-		 *  \param dest the reference to the destination object.
-		 *  \param sour2 the second source object (ignored). */
+		 *  Parameter \a sour is ignored.
+		 *  \param dest the reference to the destination info object.
+		 *  \param sour the source object (ignored). */
 		template< class InfoDest, class InfoSour >
 			void operator()( InfoDest &dest, InfoSour sour ) { dest = (InfoDest)val; }
 
 		/** \brief Call function operator.
 		 *
 		 *  The overloaded call function operator with three parameters. The method casts the \a val to \a dest.
-		 *  \param dest the reference to the destination object.
+		 *  Parameters \a sour1 and \a sour2 are ignored.
+		 *  \param dest the reference to the destination info object.
 		 *  \param sour1 the first source object (ignored).
 		 *  \param sour2 the second source object (ignored). */
 		template< class InfoDest, class InfoSour1, class InfoSour2 >
@@ -2968,7 +2977,11 @@ namespace Koala
 	// funkcja tworzaca - podajemy stala wartosc
 	/** \brief Generating function for fixed value caster (ObjCaster).
 	 *
+  	 *  \wikipath{caster, Get more information about casters.}
+	 *  \tparam T the type of common value.
 	 *  \param arg the value assigned to each info.
+	 *  \return ValueCaster function object, that assigns constant value \a arg to each new-created info object.
+	 *  \related ValueCaster
 	 *  \ingroup DMcaster*/
 	template< class T > ValueCaster< T > valCast( T arg = T() ) { return ValueCaster< T >( arg ); }
 
@@ -2993,7 +3006,7 @@ namespace Koala
 		Std1NoLinker( bool arg = false ) { koalaAssert( !arg,ExcBase ); }
 		/** \brief Function call operator.
 		 *
-		 *  Does nothing.*/
+		 *  Does nothing.*/0
 		template< class Dest, class Sour > void operator()( Dest *, Sour * ) { }
 	};
 
@@ -3198,8 +3211,14 @@ namespace Koala
 
 	/**\brief Make pair of casters.
 	 *
-	 * Overloaded operator& allows to create easily a std::pair of casters \a a and \a b.*/
-		template <class  Ch1, class Ch2> std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >
+	 * Overloaded operator& allows to create easily a std::pair of casters \a a and \a b.
+	 *  
+	 * \related NoCastCaster
+	 * \related ValueCaster
+	 * \related HardCaster
+	 * \related StdCaster
+	 * \related ObjCaster */
+	template <class  Ch1, class Ch2> std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >
 		operator&( Ch1 a, Ch2 b )
 		{
 			return std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >(a,b);
