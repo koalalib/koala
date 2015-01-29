@@ -168,7 +168,9 @@ namespace Koala
 		//chodzi o reprezentacje in-forest w grafie tj. etykieta przy wierzcholku pokazuje przejscie do rodzica
 		/** \brief Auxiliary visit vertex structure
 		 * 
-		 *  Structure used by search procedures. To represent in-forest the structure keeps the pointer to parent vertex and PEdge leading to it. */
+		 *  Structure used by search procedures. To represent in-forest the structure keeps the pointer to parent vertex and PEdge leading to it.
+		 *
+		 *  For example, it may be used as mapped value in associative container associated with vertex (PVert -> VisitVertLabs). */
 		template< class GraphType > struct VisitVertLabs
 		{
 			// rodzic danego wierzcholka w drzewie (lesie), NULL dla korzenia
@@ -718,16 +720,13 @@ namespace Koala
 		 *
 		 *  Visit all vertices in a graph in order given by the strategy SearchImpl
 		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
-		 *  @param[in] visited the container to store data (np. map PVertex -> VisitVertLabs), BlackHole forbidden.
-		 *   After the execution of the method, the associative container represent the search WEN: in-forest tree (forst)
-		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distance keeps the distance from the root.
-		 WEN: fajnie i wlasnie czegos takiego mi brakowalo przy VisitVertLabs.
-		 *   finally field component keeps the index of the connected component of graph.
-		 WEN: z tym component to jest bardziej zlozone w skierowanych - raczej numer in-treesa w in-forescie
-		 WEN: czy on na pewno jest [in]?
+		 *  @param[out] visited the container to store data (ex. map) in format PVertex -> VisitVertLabs. BlackHole is forbidden.
+		 *   After the execution of the method, the associative container represent the search in-forest or in-tree
+		 *   where fields vPrev and ePrev (in VisitVertLabs) keep the parent vertex and connecting edge. Field distance keeps the distance from the root.
+		 *   Finally attribute component keeps the index of the in-tree in in-forest.
 		 *  @param[in] visitor object that delivers a set of functions which are called for each vertex and for various stages of algorithm.
-		 *  @param[in] dir the direction of edges to consider. WEN: link do opisu co to znaczy przejsc krawedz danego rodzaju w sposob zgodny z maska (wiele razy tu sie przyda, nizej takze)
-		 *  @return the number of components WEN: ... components ??? .
+		 *  @param[in] dir the Koala::EdgeDirection mask representing direction of edges to consider. \wikipath{EdgeDirection}
+		 *  @return the number of in-trees in in-forest.
 		 *  \sa SearchStructs::VisitVertLabs
 		 *  \sa Visitors */
 		template< class GraphType, class VertContainer, class Visitor >
@@ -735,53 +734,40 @@ namespace Koala
 
 		//Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia, component=0
 		/** \brief Visit attainable.
-		 * WEN: chyba kolejnosc parametrow jest inna
-		 *  Visit all vertices in the same component as a given vertex in order given by the strategy SearchImpl
-		 WEN: to nie musi byc skladowa, tylko zbior wierzholkow osiagalnych z danego przy przechodzeniu krawedzi zgodnie z maska (por. wyzej)
+		 * 
+		 *  Visit all vertices attainable from a given vertex in order given by the strategy SearchImpl.
+		 *  Note that vertex is attainable if it is in the same connected component but also the direction of edges if included in mask \a dir may influence the relation. 
 		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
 		 *  @param[in] src the given vertex
-		 *  @param[out] out the iterator to write visited vertices in order given by the strategy  SearchImpl.
-		 *  @param[in] dir the direction of edges to consider WEN: raczej podczas trawersacji krawedzie sa przechodzone zgodnie z maska, loops are ignored regardless of the mask.
-		 *  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole forbidden. WEN: tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania ze start sa ustawiane w tej mapie
-		 *   After the execution of the method, the associative container represent the search in-tree WEN: o korzeniu src
+		 *  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole allowed. 
+		 *   After the execution of the method, the associative container represent the search in-tree rooted in \a src.
 		 *   where fields \p vPrev and \p ePrev keep the previous vertex and edge, and the field \p distance keeps the distance from the root.
-		 *   finally \p field component = 0.
+		 *   finally \p field component = 0. The vertices that are not attainable from \a src are not keys in this map.
+		 *  @param[out] out the output iterator to write visited vertices in order given by the strategy  SearchImpl.
+		 *  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
 		 *  @return the number of visited vertices.
 		 *  \sa SearchStructs::VisitVertLabs
 		 *
 		 * [See example](examples/search/search/search.html).
 		 */
-		template< class GraphType, class VertContainer, class Iter > static int scanAttainable( const GraphType &,
-			typename GraphType::PVertex, VertContainer &, Iter, EdgeDirection dir = EdUndir | EdDirOut );
+		template< class GraphType, class VertContainer, class Iter > static int scanAttainable( const GraphType &g,
+			typename GraphType::PVertex src, VertContainer &visited, Iter out, EdgeDirection dir = EdUndir | EdDirOut );
 
-		/* \brief Visit attainable.WEN: rozumiem, ze to wylatuje
+		/* \brief Visit attainable. (specialization for BlackHole) 
 		*
-		*  Visit all vertices in the same component as a given vertex. Behaves similarlly previous method by uses own map PVertex -> VisitVertLabs.
-		*  @param[in] g the graph containing vertices to visit
+		*  Visit all vertices in the same component as a given vertex. Behaves similarly previous method but uses own map PVertex -> VisitVertLabs.
+		*  @param[in] g the graph containing vertices to visit. Any graph may be used.
 		*  @param[in] src the given vertex
 		*  @param[out] out the iterator to write vertices to, in order given by the strategy SearchImpl
 		*  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
 		*  @return the number of visited vertices. */
 		template< class GraphType, class Iter > static int scanAttainable( const GraphType &g,
 			typename GraphType::PVertex src, BlackHole, Iter out, EdgeDirection dir = EdUndir | EdDirOut );
-        //NEW: zmiana naglowkow metod tej klasy (kolejnosc parametrow!) - teraz kontener asocjacyjny
-        //dla wierzcholkow moze byc blackholizowany
-
-		/* \brief Visit attainable.WEN: rozumiem, ze to wylatuje
-		 *
-		 *  Visit all vertices in the same component as a given vertex. Behaves similarlly previous method by uses own map PVertex -> VisitVertLabs.
-		 *  @param[in] g the graph containing vertices to visit
-		 *  @param[in] src the given vertex
-		 *  @param[out] out the iterator to write vertices to, in order given by the strategy SearchImpl
-		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
-		 *  @return the number of visited vertices. */
-//		template< class GraphType, class VertIter > static int scanAttainable( const GraphType &g,
-//			typename GraphType::PVertex src, VertIter out, EdgeDirection dir = EdUndir | EdDirOut );
-
+        
 		/** \brief Visit all vertices.
 		 *
 		 *  Visit all vertices in a graph
-		 *  @param[in] g the graph containing vertices to visit
+		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
 		 *  @param[out] out the iterator to write visited vertices to, in order given by the strategy SearchImpl
 		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask. WEN: por. wyzej
 		 *  @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole forbidden.
@@ -801,7 +787,7 @@ namespace Koala
 		/** \brief Visit all vertices.
 		 *
 		 *  Visit all vertices in a graph.
-		 *  @param[in] g the graph containing vertices to visit
+		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
 		 *  @param[out] out iterator to write vertices to, in order given by the strategy SearchImpl
 		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
 		 *  @return the number of components.*/
