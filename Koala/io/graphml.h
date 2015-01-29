@@ -18,6 +18,8 @@ typedef __int64 int64_t;
 namespace Koala {
 namespace IO {
 
+//TODO: generalnie brakuje inlineow (a jakby chciec porzadnie, to i constow) przy metodach nieszablonowych - beda klopoty z linkerem
+
 class GraphMLGraph;
 class GraphMLKeysRead;
 class GraphMLKeysWrite;
@@ -396,7 +398,8 @@ public:
 	 *  \param name the considered key.
 	 *  \param attrName the name for attr.name.
 	 *  \return true if the name was successfully set, false otherwise.*/
-    //WEN: czy ustawinie attrName ponowne dla danego name nadpisuje stary attr.name, czy tez jest bledem?
+	//WEN: czy ustawinie attrName ponowne dla danego name nadpisuje stary attr.name, czy tez jest bledem?
+	//jendrek: nadpisuje i nie jest to błąd
 	inline bool setKeyAttrName(const char *name, const char *attrName);
 
 	/** \brief Get attr.name associated with key.
@@ -464,7 +467,7 @@ private:
 	NameVals nameVals;
 };
 
-/** \brief %GraphML graph representation.
+/** \brief GraphML graph representation.
  *
  *  The class provides a set of methods to manage
  *  [GraphML graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html#Graph "see <graph").
@@ -538,7 +541,7 @@ public:
 	/** \brief Get key value placement (Unknown, All, GraphML, Graph, Node, Edge).*/
 	inline GraphMLKeyTypes::ForKey getKeyFor(const char *name);
 
-	/** \brief  Get all keys.
+	/** \brief Get all keys.
 	 *
 	 *  The method gets all the keys for [Graph](GraphMLKeyTypes::ForKey) or [All]((GraphMLKeyTypes::ForKey).
 	 *  and writes them down to the associative container res: key name -> type of the key.
@@ -684,6 +687,9 @@ private:
 class GraphMLKeysRead {
 	friend class GraphMLGraph;
 public:
+	// TODO: doc
+	GraphMLKeysRead(GraphML *gml): graphML(gml), cnt(0), cntNodeId(0) {};
+
 	/** \brief Get [key type](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.type='...'")
 	 *  ( NotDefined, Bool, Int, Long, Float, Double, String)*/
 	inline GraphMLKeyTypes::Type getKeyType(const char *name);
@@ -744,6 +750,10 @@ public:
 	 *  \param name the name of checked key.
 	 *  \return the value associated with key \a name.*/
 	inline std::string getString(const char *name);
+	// TODO: doc
+	inline std::string getId();
+	// TODO: doc
+	inline void next() {cnt++;}
 private:
 	template<typename InOutType>
 	InOutType get(const char *name, const InOutType def);
@@ -751,7 +761,10 @@ private:
 	GraphMLKeyTypes::ForKey forKey;
 	GraphML *graphML;
 	GraphML::NameVals nameVals;
-	int cnt;
+	int cnt, cntNodeId;
+
+	inline void setId(const char *id);
+	std::string nodeId;
 };
 
 /** \brief Auxiliary class for writing  values to edges and nodes

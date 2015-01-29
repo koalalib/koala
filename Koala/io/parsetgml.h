@@ -12,13 +12,15 @@ namespace Koala {
 namespace IO {
 
 struct ParSetVertRead {
-	ParSetVertRead(GraphML &g): m_gml(g)	{};
+	ParSetVertRead(GraphML &g): m_gml(g), m_idkey(), m_readid(false)			{};
+	ParSetVertRead(GraphML &g, std::string ik): m_gml(g), m_idkey(ik), m_readid(true)	{};
 	ParSet operator()(GraphMLKeysRead *gmlkr) {
 		std::map<std::string, GraphMLKeyTypes::Type> keys;
 		std::map<std::string, GraphMLKeyTypes::Type>::iterator it;
 		std::string name;
 		ParSet p;
 		gmlkr->getKeys(keys);
+		if(m_readid) p.set(m_idkey, gmlkr->getId().c_str());
 		for(it = keys.begin(); it != keys.end(); ++it) {
 			name = m_gml.getKeyAttrName(it->first.c_str());
 			if(name == "") name = it->first;
@@ -36,6 +38,8 @@ struct ParSetVertRead {
 		};
 private:
 	GraphML &m_gml;
+	std::string m_idkey;
+	bool m_readid;
 	};
 
 struct ParSetEdgeRead {

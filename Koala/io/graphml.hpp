@@ -959,9 +959,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, BlackHole)
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 
-	GraphMLKeysRead gmlData;
-	gmlData.graphML = this->graphML;
-	gmlData.cnt = 0;
+	GraphMLKeysRead gmlData(this->graphML);
 
 	bool isDirected = true;
 	const char *edgeDef = this->xml->Attribute( "edgedefault" );
@@ -973,7 +971,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, BlackHole)
 	gmlData.forKey = GraphMLKeyTypes::Node;
 	while (xmlVert)
 	{
-		++gmlData.cnt;
+		gmlData.next();
 		TiXmlElement *xmlKey = xmlVert->FirstChildElement( "data" );
 		while (xmlKey)
 		{
@@ -983,6 +981,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, BlackHole)
 			xmlKey = xmlKey->NextSiblingElement( "data" );
 		}
 		const char *id = xmlVert->Attribute( "id" );
+		gmlData.setId(id);
 		verts[id] = graph.addVert( infoVert( &gmlData ) );
 		xmlVert = xmlVert->NextSiblingElement( "node" );
 	}
@@ -1021,9 +1020,7 @@ bool GraphMLGraph::readGraph(Graph &graph, BlackHole, InfoEdge infoEdge)
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 
-	GraphMLKeysRead gmlData;
-	gmlData.graphML = this->graphML;
-	gmlData.cnt = 0;
+	GraphMLKeysRead gmlData(this->graphML);
 
 	bool isDirected = true;
 	const char *edgeDef = this->xml->Attribute( "edgedefault" );
@@ -1043,7 +1040,7 @@ bool GraphMLGraph::readGraph(Graph &graph, BlackHole, InfoEdge infoEdge)
 	gmlData.forKey = GraphMLKeyTypes::Edge;
 	while (xmlEdge)
 	{
-		++gmlData.cnt;
+		gmlData.next();
 		TiXmlElement *xmlKey = xmlEdge->FirstChildElement( "data" );
 		while (xmlKey)
 		{
@@ -1052,6 +1049,8 @@ bool GraphMLGraph::readGraph(Graph &graph, BlackHole, InfoEdge infoEdge)
 			gmlData.set(keyId, val);
 			xmlKey = xmlKey->NextSiblingElement( "data" );
 		}
+		const char *id = xmlVert->Attribute( "id" );
+		if (id!=NULL) gmlData.setId(id);
 
 		const char *source = xmlEdge->Attribute( "source" );
 		const char *target = xmlEdge->Attribute( "target" );
@@ -1084,9 +1083,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdg
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 
-	GraphMLKeysRead gmlData;
-	gmlData.graphML = this->graphML;
-	gmlData.cnt = 0;
+	GraphMLKeysRead gmlData(this->graphML);
 
 	bool isDirected = true;
 	const char *edgeDef = this->xml->Attribute( "edgedefault" );
@@ -1098,7 +1095,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdg
 	gmlData.forKey = GraphMLKeyTypes::Node;
 	while (xmlVert)
 	{
-		++gmlData.cnt;
+		gmlData.next();
 		TiXmlElement *xmlKey = xmlVert->FirstChildElement( "data" );
 		while (xmlKey)
 		{
@@ -1108,6 +1105,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdg
 			xmlKey = xmlKey->NextSiblingElement( "data" );
 		}
 		const char *id = xmlVert->Attribute( "id" );
+		gmlData.setId(id);
 		verts[id] = graph.addVert( infoVert( &gmlData ) );
 		xmlVert = xmlVert->NextSiblingElement( "node" );
 	}
@@ -1116,7 +1114,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdg
 	gmlData.forKey = GraphMLKeyTypes::Edge;
 	while (xmlEdge)
 	{
-		++gmlData.cnt;
+		gmlData.next();
 		TiXmlElement *xmlKey = xmlEdge->FirstChildElement( "data" );
 		while (xmlKey)
 		{
@@ -1125,6 +1123,8 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdg
 			gmlData.set(keyId, val);
 			xmlKey = xmlKey->NextSiblingElement( "data" );
 		}
+		const char *id = xmlVert->Attribute( "id" );
+		if (id!=NULL) gmlData.setId(id);
 
 		const char *source = xmlEdge->Attribute( "source" );
 		const char *target = xmlEdge->Attribute( "target" );
@@ -1598,6 +1598,12 @@ std::string GraphMLKeysRead::getString(const char *name) {
 	return get<std::string>(name, "");
 }
 
+std::string GraphMLKeysRead::getId() {
+	if(this->cnt==this->cntNodeId)
+		return nodeId;
+	return "";
+}
+
 template<typename InOutType>
 InOutType GraphMLKeysRead::get(const char *name, InOutType def) {
 	GraphML::NameVals::iterator nvIter = nameVals.find(name);
@@ -1627,6 +1633,11 @@ bool GraphMLKeysRead::set(const char *name, const char *val) {
 	data.set(val);
 	nameVals[name] = data;
 	return true;
+}
+
+void GraphMLKeysRead::setId(const char *id) {
+	this->cntNodeId = this->cnt;
+	this->nodeId = id;
 }
 //-----------------------------------------------------------------------------
 //------------------------------ GraphMLKeysWrite -----------------------------
@@ -1704,4 +1715,3 @@ bool GraphMLKeysWrite::set(const char *name, InType val)
 
 	return true;
 }
-
