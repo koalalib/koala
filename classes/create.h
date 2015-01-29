@@ -610,19 +610,7 @@ namespace Privates {
 			static typename GraphType::PVertex regTree( GraphType &g, Iter begin, Iter end, EdgeDirection dir = EdUndir );
 
 
-		/* WEN: First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
-		where pathVertNum is the number of vertices on the central path. Next, legs are created so that:
-		- first are all legs that should be connected to the first vertex on the central path are created,
-		- next vertices connected to the second vertex on the central path are crated,
-		- finally all vertex connected to the last vertex on the central path are created.
-
-		For example for caterpillar having pathVertNum = 3 and legNum = [2,3,4] the structure is as follows:
-		- vertices on the central path: 0, 1, 2,
-		- legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
-		Edges:
-		- central path: 0-1, 1-2,
-		- legs: 0-3, 0-4, 1-5, 1-6, 1-7, 2-8, 2-9, 2-10, 2-11.
-		*/
+		
 		/** \brief Create caterpillar.
 		 *
 		 *  The function generates a caterpillar. "A caterpillar is a tree in which every graph vertex
@@ -635,6 +623,20 @@ namespace Privates {
 		 *  The first integer in the sequence corresponds to the number of legs of the first vertex on the central path,
 		 *  next element corresponds to the number of legs for the next vertex and so on.
 		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
+		 *
+		 *  First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
+		 *  where pathVertNum is the number of vertices on the central path. Next, legs are created so that:
+		 *  - first are all legs that should be connected to the first vertex on the central path are created,
+		 *  - next vertices connected to the second vertex on the central path are crated,
+		 *  - finally all vertex connected to the last vertex on the central path are created.
+		 *
+		 *  For example for caterpillar having pathVertNum = 3 and legNum = [2,3,4] the structure is as follows:
+		 *  - vertices on the central path: 0, 1, 2,
+		 *  - legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
+		 *  
+		 *  Edges:
+		 *  - central path: 0-1, 1-2,
+		 *  - legs: 0-3, 0-4, 1-5, 1-6, 1-7, 2-8, 2-9, 2-10, 2-11.
 		 *  \param g - the input/output graph,
 		 *  \param  begin - input iterator; it should indicate the integer that describe the number of legs for the first vertex on the central path,
 		 *  \param  end - iterator that should indicate the end of the sequence of integers, i.e., it should indicate the past-the-end element
@@ -643,25 +645,12 @@ namespace Privates {
 		 *  \param  eInfoGen - generator for info objects for edges,
 		 *  \param  pathDir - direction mask for edges that form the central path,
 		 *  \param  legDir - direction mask for edges that correspond to legs (leaves) of the caterpillar.
-		 *  \returns the pointer that indicates the first vertex on the central path.
-		 */
+		 *  \returns the pointer that indicates the first vertex on the central path. */
 		template< class GraphType, class VInfoGen, class EInfoGen, class Iter >
 			static typename GraphType::PVertex caterpillar( GraphType &g, Iter begin, Iter end, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection pathDir, EdgeDirection legDir);
 
-		/* WEN: First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
-		where pathVertNum is the number of vertices on the central path. Next, (pathVertNum*legNum) legs are created so that:
-		- first alegNum legs that should be connected to the first vertex on the central path are created,
-		- next vertices connected to the second vertex on the central path are crated,
-		- finally all vertex connected to the last vertex on the central path are created.
-
-		For example for caterpillar having pathVertNum = 3 and legNum = 3 the structure is as follows:
-		- vertices on the central path: 0, 1, 2,
-		- legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
-		Edges:
-		- central path: 0-1, 1-2,
-		- legs: 0-3, 0-4, 0-5, 1-6, 1-7, 1-8, 2-9, 2-10, 2-11.
-		*/
+		
 		/** \brief Create caterpillar.
 		 *
 		 *  The function generates a caterpillar. "A caterpillar is a tree in which every graph vertex
@@ -671,6 +660,21 @@ namespace Privates {
 		 *  (leaves or legs) are created and attached to vertices on the path. The number of legs for each vertex
 		 *  on the path is specified by the parameter \a legNnm.
 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
+		 *  
+		 *  First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
+		 *  where pathVertNum is the number of vertices on the central path. Next, (pathVertNum*legNum) legs are created so that:
+		 *  - first alegNum legs that should be connected to the first vertex on the central path are created,
+		 *  - next vertices connected to the second vertex on the central path are crated,
+		 *  - finally all vertex connected to the last vertex on the central path are created.
+		 *
+		 *  For example for caterpillar having pathVertNum = 3 and legNum = 3 the structure is as follows:
+		 *  - vertices on the central path: 0, 1, 2,
+		 *  - legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
+		 *  
+		 *  Edges:
+		 *  - central path: 0-1, 1-2,
+		 *  - legs: 0-3, 0-4, 0-5, 1-6, 1-7, 1-8, 2-9, 2-10, 2-11.
+		 *
 		 *  \param g - the input/output graph,
 		 *  \param pathVertNum - number of vertices on the central path,
 		 *  \param  legNnm - number of legs that should be attached to each vertex on the central path,
@@ -678,8 +682,7 @@ namespace Privates {
 		 *  \param  eInfoGen - generator for info objects for edges,
 		 *  \param  pathDir - direction mask for edges that form the central path,
 		 *  \param  legDir - direction mask for edges that correspond to legs (leaves) of the caterpillar.
-		 *  \returns the pointer that indicates the first vertex on the central path.
-		 */
+		 *  \returns the pointer that indicates the first vertex on the central path.*/
 		template< class GraphType, class VInfoGen, class EInfoGen > static typename GraphType::PVertex
 			caterpillar( GraphType &g, int pathVertNum, int legNnm, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeDirection pathDir, EdgeDirection legDir);
@@ -693,14 +696,28 @@ namespace Privates {
 		 *  (leaves or legs) are created and attached to vertices on the path. The number of legs for each vertex
 		 *  on the path is specified by the parameter \a legNnm.
 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
+		 *  
+		 *  First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
+		 *  where pathVertNum is the number of vertices on the central path. Next, (pathVertNum*legNum) legs are created so that:
+		 *  - first alegNum legs that should be connected to the first vertex on the central path are created,
+		 *  - next vertices connected to the second vertex on the central path are crated,
+		 *  - finally all vertex connected to the last vertex on the central path are created.
+		 *
+		 *  For example for caterpillar having pathVertNum = 3 and legNum = 3 the structure is as follows:
+		 *  - vertices on the central path: 0, 1, 2,
+		 *  - legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
+		 *  
+		 *  Edges:
+		 *  - central path: 0-1, 1-2,
+		 *  - legs: 0-3, 0-4, 0-5, 1-6, 1-7, 1-8, 2-9, 2-10, 2-11.
+		 *
 		 *  \param g - the input/output graph,
 		 *  \param pathVertNum - number of vertices on the central path,
 		 *  \param legNnm - number of legs that should be attached to each vertex on the central path,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
-		 *  \returns the pointer that indicates the first vertex on the central path.
-		 */
+		 *  \returns the pointer that indicates the first vertex on the central path. */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex caterpillar( GraphType &g, int pathVertNum, int legNnm, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection dir = EdUndir);
@@ -715,22 +732,37 @@ namespace Privates {
 		 *  (leaves or legs) are created and attached to vertices on the path. The number of legs for each vertex
 		 *  on the path is specified by the parameter \a legNnm.
 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
+		 *  
+		 *  First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
+		 *  where pathVertNum is the number of vertices on the central path. Next, (pathVertNum*legNum) legs are created so that:
+		 *  - first alegNum legs that should be connected to the first vertex on the central path are created,
+		 *  - next vertices connected to the second vertex on the central path are crated,
+		 *  - finally all vertex connected to the last vertex on the central path are created.
+		 *
+		 *  For example for caterpillar having pathVertNum = 3 and legNum = 3 the structure is as follows:
+		 *  - vertices on the central path: 0, 1, 2,
+		 *  - legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
+		 *  
+		 *  Edges:
+		 *  - central path: 0-1, 1-2,
+		 *  - legs: 0-3, 0-4, 0-5, 1-6, 1-7, 1-8, 2-9, 2-10, 2-11.
+		 *
 		 *  \param g - the input/output graph,
 		 *  \param pathVertNum - number of vertices on the central path,
 		 *  \param legNnm - number of legs that should be attached to each vertex on the central path,
 		 *  \param dir - edges direction mask.
-		 *  \returns the pointer that indicates the first vertex on the central path.
-		 */
+		 *  \returns the pointer that indicates the first vertex on the central path.*/
 		template< class GraphType > static typename GraphType::PVertex
 			caterpillar( GraphType &g, int pathVertNum, int legNnm, EdgeDirection dir = EdUndir );
 
-        //NEW: nowy pierwszy parametr w generatorach grafow losowych - generator losowy
-		/** \brief Create random graph.
+        /** \brief Create random graph.
 		 *
 		 *  The function generates a random graph on \a n vertices according to ErdosRenyi model G(\a n,\a p).
 		 *  Each edge is included in the graph with probability \a p independent from every other edge.
 		 *  If the type of the graph is set to directed, then each of the two possible (opposite directed) edges
-		 *  between two particular vertices is drawn independently. (to initialize pseudo-random number generator use srand() from stdlib.h).
+		 *  between two particular vertices is drawn independently.
+		 *  \param rgen - the reference to the class that generates pseudo random numbers, 
+		 *   use C++11 <random> library or in lower standard Koala::StdRandGen or other with the same interface.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param p - probability of edge's creation,
@@ -749,6 +781,8 @@ namespace Privates {
 		 *  Each edge is included in the graph with probability \a p independent from every other edge.
 		 *  If the type of the graph is set to directed, then each of the two possible (opposite directed) edges
 		 *  between two particular vertices is drawn independently.
+		 *  \param rgen - the reference to the class that generates pseudo random numbers, 
+		 *   use C++11 <random> library or in lower standard Koala::StdRandGen or other with the same interface.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param p - probability of edge's creation,
@@ -764,6 +798,8 @@ namespace Privates {
 		 *   - in the case of undirected graphs the collection contains \a n(\a n-1)/2 edges,
 		 *   - in the case of directed graphs the collection contains \a n(\a n-1) edges.
 		 *
+		 *  \param rgen - the reference to the class that generates pseudo random numbers, 
+		 *   use C++11 <random> library or in lower standard Koala::StdRandGen or other with the same interface.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param m - number of edges to create,
@@ -783,6 +819,8 @@ namespace Privates {
 		 *   - in the case of undirected graphs the collection contains \a n(\a n-1)/2 edges,
 		 *   - in the case of directed graphs the collection contains \a n(\a n-1) edges.
 		 *
+		 *  \param rgen - the reference to the class that generates pseudo random numbers, 
+		 *   use C++11 <random> library or in lower standard Koala::StdRandGen or other with the same interface.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
 		 *  \param m - number of edges to create,
@@ -791,47 +829,79 @@ namespace Privates {
 		template< class RndGen,class GraphType >
 			static typename GraphType::PVertex erdRen2( RndGen& rgen,GraphType &g, int n, int m, EdgeType type = Undirected );
 
-		//NEW
-		/* This method generates a random graph according to the Barab\'asi - Albert (BA) model [1].
-		Since the above paper defines a family of models, here the precise variant of BA model described by B. Bollob\'as in [2] has been implemented.
-		The description of this variant taken from [3] is following (d is the number of edges added in each iteration of the process):
-		"Assume d=1, then the i-th vertex is attached to the j-th vertex, j<=i, with probability d(j) / [m(i)+1], if j<i, and 1/ [m(i)+1], if i= j,
-		where d(j) is the current degree of vertex j and m(i)= \sum_{j=0}^{i-1}d(j) is twice the number of edges already created. (...) For d>1, the graph
-		evolves as if d=1 until nd vertices have been created, and	hen intervals of d consecutive vertices are contracted into one."
-		Note that the result of the above procedure is a multigraph, i.e., it may contin loops and parallel edges.
-		The implementation is based on pseudo-code given in [3].
+		/** \brief Barab\'asi - Albert random graph.
+		 *
+		 *  This method generates a random graph according to the Barab\'asi - Albert (BA) model [1].
+		 *
+		 *  Since the above paper defines a family of models, here the precise variant of BA model described by B. Bollob\'as in [2] has been implemented.
+		 *  The description of this variant taken from [3] is following (d is the number of edges added in each iteration of the process):
+		 *  "Assume d=1, then the i-th vertex is attached to the j-th vertex, j<=i, with probability d(j) / [m(i)+1], if j<i, and 1/ [m(i)+1], if i= j,
+		 *  where d(j) is the current degree of vertex j and m(i)= \sum_{j=0}^{i-1}d(j) is twice the number of edges already created. (...) For d>1, the graph
+		 *  evolves as if d=1 until nd vertices have been created, and	hen intervals of d consecutive vertices are contracted into one."
+		 *  Note that the result of the above procedure is a multigraph, i.e., it may contin loops and parallel edges.
+		 *  The implementation is based on pseudo-code given in [3].
+		 *
+		 *  References:\n
+		 *  [1] "Emergence of Scaling in Random Networks", A.-L. Barabasi and R. Albert, Science, vol. 286 no. 5439 pp. 509-512, 1999.\n
+		 *  [2] "Random Graphs (Cambridge Studies in Advanced Mathematics)",B. Bollob\'as, 2001.\n
+		 *  [3] "Efficient generation of large random networks", V. Batagelj and U. Brandes, Physical Review E, vol. 71, 036113, 2005.
 
-		References:
-		[1] "Emergence of Scaling in Random Networks", A.-L. Barabasi and R. Albert, Science, vol. 286 no. 5439 pp. 509-512, 1999.
-		[2] "Random Graphs (Cambridge Studies in Advanced Mathematics)",B. Bollob\'as, 2001.
-		[3] "Efficient generation of large random networks", V. Batagelj and U. Brandes, Physical Review E, vol. 71, 036113, 2005.
-
-		Parameters:
-			rgen - random number generator,
-			g - the input/output graph,
-			n - number of vertices to create,
-			k - number of edges that are added to the graph at each stage of the algorithm,
-			vInfoGen - generator for info objects for vertices,
-			eInfoGen - generator for info objects for edges,
-			type - the type of edges in the graph, i.e., undirected or directed, so that a newer vertex (with higher index) points to older vertex.
-			shuffle - determines whether the vertices should be introduced to the graph in random order.
-		Function returns the pointer to the first vertex.
-		*/
-
-		//NEW: teraz type=Directed (krawedzie skierowane o losowej orientacji),Undirected (wiadomo),EdDirIn EdDirOut (starsze -> mlodszych), EdDirOut (mlodsze -> starszych)
+		 * \param rgen - random number generator,
+		 * \param g - the input/output graph,
+		 * \param n - number of vertices to create,
+		 * \param k - number of edges that are added to the graph at each stage of the algorithm,
+		 * \param vInfoGen - generator for info objects for vertices,
+		 * \param eInfoGen - generator for info objects for edges,
+		 * \param type - the Koala::EdgeDirction type that determines the type of new-created edges:
+		 *  - undirected - no direction
+		 *  - directed - random direction
+		 *  - EdDirIn - direction older numbers to younger numbers
+		 *  - EdDirOut - direction numbers numbers to younger older
+		 * \param shuffle - determines whether the vertices should be introduced to the graph in random order.
+		 * \return the pointer to the first vertex.*/
 		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen  >
 		static typename GraphType::PVertex barAlb(RndGen& rgen, GraphType &g, int n, int k, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection type = Undirected, bool shuffle = false);
 
-		//NEW
 		/* It is a simpler version of the above function*/
+		/** \brief Barab\'asi - Albert random graph.
+		*
+		*  This method generates a random graph according to the Barab\'asi - Albert (BA) model [1].
+		*
+		*  Since the above paper defines a family of models, here the precise variant of BA model described by B. Bollob\'as in [2] has been implemented.
+		*  The description of this variant taken from [3] is following (d is the number of edges added in each iteration of the process):
+		*  "Assume d=1, then the i-th vertex is attached to the j-th vertex, j<=i, with probability d(j) / [m(i)+1], if j<i, and 1/ [m(i)+1], if i= j,
+		*  where d(j) is the current degree of vertex j and m(i)= \sum_{j=0}^{i-1}d(j) is twice the number of edges already created. (...) For d>1, the graph
+		*  evolves as if d=1 until nd vertices have been created, and	hen intervals of d consecutive vertices are contracted into one."
+		*  Note that the result of the above procedure is a multigraph, i.e., it may contin loops and parallel edges.
+		*  The implementation is based on pseudo-code given in [3].
+		*
+		*  References:\n
+		*  [1] "Emergence of Scaling in Random Networks", A.-L. Barabasi and R. Albert, Science, vol. 286 no. 5439 pp. 509-512, 1999.\n
+		*  [2] "Random Graphs (Cambridge Studies in Advanced Mathematics)",B. Bollob\'as, 2001.\n
+		*  [3] "Efficient generation of large random networks", V. Batagelj and U. Brandes, Physical Review E, vol. 71, 036113, 2005.
 
+		* \param rgen - random number generator,
+		* \param g - the input/output graph,
+		* \param n - number of vertices to create,
+		* \param k - number of edges that are added to the graph at each stage of the algorithm,
+		* \param type - the Koala::EdgeDirction type that determines the type of new-created edges:
+		*  - undirected - no direction
+		*  - directed - random direction
+		*  - EdDirIn - direction older numbers to younger numbers
+		*  - EdDirOut - direction numbers numbers to younger older
+		* \param shuffle - determines whether the vertices should be introduced to the graph in random order.
+		* \return the pointer to the first vertex.*/
 		template< class RndGen, class GraphType >
 		static typename GraphType::PVertex barAlb(RndGen& rgen, GraphType &g, int n, int k, EdgeDirection type = Undirected, bool shuffle = false);
 
-        //NEW: wytyczne dla modeli Watts–Strogatz - mozna zmienic wewnetrzne domyslne hashSet/Map (o kluczach int lub pair<int,int>) na stlowe
-        class WattStrogDefaultSettings
+        // wytyczne dla modeli Watts–Strogatz - mozna zmienic wewnetrzne domyslne hashSet/Map (o kluczach int lub pair<int,int>) na stlowe
+        /** \brief Parameters for Watts–Strogatz model. 
+		 *
+		 *  The class parameterize internal structures in Watts–Strogatz random graph generation model. */
+		class WattStrogDefaultSettings
         {
             public:
+				/**\brief Type of set*/
                 template< class A> class Set
                 {
                     public:
@@ -839,7 +909,7 @@ namespace Privates {
                     //Druga mozliwosc
                     //typedef std::set< A> Type;
                 };
-
+				/**\brief Memory allocation for set*/
                 template <class A>
                 static void reserveSet(Koala::HashSet< A>&s, int size)
                 {
@@ -848,7 +918,7 @@ namespace Privates {
                 template <class A>
                 static void reserveSet(std::set< A>&s, int size) {}
 
-
+				/** \brief Type of associative container. */
                 template< class A,class B> class Map
                 {
                     public:
@@ -858,91 +928,196 @@ namespace Privates {
                 };
         };
 
-		//NEW
-		/*
-		This method generates a random graph according to the Watts–Strogatz model (WS) model [1].
-		The description of this variant taken from [1] is following:
-		"We start with a ring of n vertices, each connected to its k nearest neighbours by undirected edges. (...)
-		We choose a vertex and the edge that connects it to its nearest neighbour in a clockwise sense. With probability p, we reconnect
-		this edge to a vertex chosen uniformly at random over the entire ring, with duplicate edges forbidden; otherwise we leave the edge in place.
-		We repeat this process by moving clockwise around the ring, considering each vertex in turn until one lap is completed. Next, we consider
-		the edges that connect vertices to their second-nearest neighbours clockwise. As before, we randomly rewire each of these edges with probability p,
-		and continue this process, circulating around the ring and proceeding outward to more distant neighbours after each lap, until each edge
-		in the original lattice has been considered once. (As there are nk/2 edges in the entire graph, the rewiring process stops after k/2 laps."
+		/** \brief Random graph generator in Watts–Strogatz model (parameterized).
+		 *
+		 *  This method generates a random graph according to the Watts–Strogatz model (WS) model [1].
+		 *  The description of this variant taken from [1] is following:
+		 *  "We start with a ring of n vertices, each connected to its k nearest neighbors by undirected edges. (...)
+		 *  We choose a vertex and the edge that connects it to its nearest neighbor in a clockwise sense. With probability p, we reconnect
+		 *  this edge to a vertex chosen uniformly at random over the entire ring, with duplicate edges forbidden; otherwise we leave the edge in place.
+		 *  We repeat this process by moving clockwise around the ring, considering each vertex in turn until one lap is completed. Next, we consider
+		 *  the edges that connect vertices to their second-nearest neighbors clockwise. As before, we randomly rewire each of these edges with probability p,
+		 *  and continue this process, circulating around the ring and proceeding outward to more distant neighbours after each lap, until each edge
+		 *  in the original lattice has been considered once. (As there are nk/2 edges in the entire graph, the rewiring process stops after k/2 laps."
+		 *
+		 *  The implementation examines all edges whether they should stay in place or should be rewired (connected to other vertex).
+		 *  An edge is rewired with probability beta. If during random choice form 1..n possible vertices while rewiring an edge {u,v} for vertex v
+		 *  a forbidden vertex x is chosen, i.e. x=u or x=v or an edge {v,x} already exists, then next random choice is performed. This procedure is
+		 *  repeated until free (not forbidden) vertex is found. This may result in long running time for dense graphs, however in practice this should not be
+		 *  a problem because as reported in [1] in most cases graphs are rather sparse, i.e., n >> k >> ln(n) >> 1.
+		 *  Note that the second implementation of WS model, i.e., wattStrog2 does not have this vulnerability.
 
-		The implementation examines all edges whether they should stay in place or should be rewired (connected to other vertex).
-		An edge is rewired with probability beta. If during random choice form 1..n possible vertices while rewiring an edge {u,v} for vertex v
-		a forbidden vertex x is chosen, i.e. x=u or x=v or an edge {v,x} already exists, then next random choice is performed. This procedure is
-		repeated until free (not forbidden) vertex is found. This may result in long running time for dense graphs, however in practise this should not be
-		a problem because as reported in [1] in most cases graphs are rather sparse, i.e., n >> k >> ln(n) >> 1.
-		Note that the second implementation of WS model, i.e., wattStrog2 does not have this vulnerability.
+		 *  References:\n
+		 *  [1] "Collective dynamics of 'small-world' networks",D.J. Watts and S.H. Strogatz, Nature vol. 393, pp. 440-442, 1998.
 
-		References:
-		[1] "Collective dynamics of 'small-world' networks",D.J. Watts and S.H. Strogatz, Nature vol. 393, pp. 440-442, 1998.
-
-		Parameters:
-			rgen - random number generator,
-			g - the input/output graph,
-			n - number of vertices to create,
-			k - the initial degree of vertices, should be an even integer,
-			beta - the probability 0<= beta <=1 of rewiring initial edges,
-			vInfoGen - generator for info objects for vertices,
-			eInfoGen - generator for info objects for edges,
-			type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
-			shuffle - determines whether the vertices should be introduced to the graph in random order.
-		Function returns the pointer to the first vertex.
-		*/
-        //NEW: najogolniejsza wersja - z wytycznymi
-		template< class Settings, class RndGen, class GraphType, class VInfoGen, class EInfoGen >
+		 *  \param rgen - random number generator,
+		 *  \param g - the input/output graph,
+		 *  \param n - number of vertices to create,
+		 *  \param k - the initial degree of vertices, should be an even integer,
+		 *  \param beta - the probability 0<= beta <=1 of rewiring initial edges,
+		 *  \param vInfoGen - generator for info objects for vertices,
+		 *  \param eInfoGen - generator for info objects for edges,
+		 *  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
+		 *  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
+		 *  \returns the pointer to the first vertex.*/
+        template< class Settings, class RndGen, class GraphType, class VInfoGen, class EInfoGen >
 		static typename GraphType::PVertex wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false);
 
+		/** \brief Random graph generator in Watts–Strogatz model.
+		*
+		*  This method generates a random graph according to the Watts–Strogatz model (WS) model [1].
+		*  The description of this variant taken from [1] is following:
+		*  "We start with a ring of n vertices, each connected to its k nearest neighbors by undirected edges. (...)
+		*  We choose a vertex and the edge that connects it to its nearest neighbor in a clockwise sense. With probability p, we reconnect
+		*  this edge to a vertex chosen uniformly at random over the entire ring, with duplicate edges forbidden; otherwise we leave the edge in place.
+		*  We repeat this process by moving clockwise around the ring, considering each vertex in turn until one lap is completed. Next, we consider
+		*  the edges that connect vertices to their second-nearest neighbors clockwise. As before, we randomly rewire each of these edges with probability p,
+		*  and continue this process, circulating around the ring and proceeding outward to more distant neighbours after each lap, until each edge
+		*  in the original lattice has been considered once. (As there are nk/2 edges in the entire graph, the rewiring process stops after k/2 laps."
+		*
+		*  The implementation examines all edges whether they should stay in place or should be rewired (connected to other vertex).
+		*  An edge is rewired with probability beta. If during random choice form 1..n possible vertices while rewiring an edge {u,v} for vertex v
+		*  a forbidden vertex x is chosen, i.e. x=u or x=v or an edge {v,x} already exists, then next random choice is performed. This procedure is
+		*  repeated until free (not forbidden) vertex is found. This may result in long running time for dense graphs, however in practice this should not be
+		*  a problem because as reported in [1] in most cases graphs are rather sparse, i.e., n >> k >> ln(n) >> 1.
+		*  Note that the second implementation of WS model, i.e., wattStrog2 does not have this vulnerability.
+
+		*  References:\n
+		*  [1] "Collective dynamics of 'small-world' networks",D.J. Watts and S.H. Strogatz, Nature vol. 393, pp. 440-442, 1998.
+
+		*  \param rgen - random number generator,
+		*  \param g - the input/output graph,
+		*  \param n - number of vertices to create,
+		*  \param k - the initial degree of vertices, should be an even integer,
+		*  \param beta - the probability 0<= beta <=1 of rewiring initial edges,
+		*  \param vInfoGen - generator for info objects for vertices,
+		*  \param eInfoGen - generator for info objects for edges,
+		*  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
+		*  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
+		*  \returns the pointer to the first vertex.*/
 		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen >
 		static typename GraphType::PVertex wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false)
         {
             return wattStrog1<WattStrogDefaultSettings>( rgen, g, n,k, beta, vInfoGen, eInfoGen, type , shuffle);
         }
 
-		//NEW
 		/* It is a simpler version of the above function*/
+		/** \brief Random graph generator in Watts–Strogatz model.
+		*
+		*  This method generates a random graph according to the Watts–Strogatz model (WS) model [1].
+		*  The description of this variant taken from [1] is following:
+		*  "We start with a ring of n vertices, each connected to its k nearest neighbors by undirected edges. (...)
+		*  We choose a vertex and the edge that connects it to its nearest neighbor in a clockwise sense. With probability p, we reconnect
+		*  this edge to a vertex chosen uniformly at random over the entire ring, with duplicate edges forbidden; otherwise we leave the edge in place.
+		*  We repeat this process by moving clockwise around the ring, considering each vertex in turn until one lap is completed. Next, we consider
+		*  the edges that connect vertices to their second-nearest neighbors clockwise. As before, we randomly rewire each of these edges with probability p,
+		*  and continue this process, circulating around the ring and proceeding outward to more distant neighbours after each lap, until each edge
+		*  in the original lattice has been considered once. (As there are nk/2 edges in the entire graph, the rewiring process stops after k/2 laps."
+		*
+		*  The implementation examines all edges whether they should stay in place or should be rewired (connected to other vertex).
+		*  An edge is rewired with probability beta. If during random choice form 1..n possible vertices while rewiring an edge {u,v} for vertex v
+		*  a forbidden vertex x is chosen, i.e. x=u or x=v or an edge {v,x} already exists, then next random choice is performed. This procedure is
+		*  repeated until free (not forbidden) vertex is found. This may result in long running time for dense graphs, however in practice this should not be
+		*  a problem because as reported in [1] in most cases graphs are rather sparse, i.e., n >> k >> ln(n) >> 1.
+		*  Note that the second implementation of WS model, i.e., wattStrog2 does not have this vulnerability.
+
+		*  References:\n
+		*  [1] "Collective dynamics of 'small-world' networks",D.J. Watts and S.H. Strogatz, Nature vol. 393, pp. 440-442, 1998.
+
+		*  \param rgen - random number generator,
+		*  \param g - the input/output graph,
+		*  \param n - number of vertices to create,
+		*  \param k - the initial degree of vertices, should be an even integer,
+		*  \param beta - the probability 0<= beta <=1 of rewiring initial edges,
+		*  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
+		*  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
+		*  \returns the pointer to the first vertex.*/
 		template< class RndGen, class GraphType >
 		static typename GraphType::PVertex wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, EdgeType type = Undirected, bool shuffle = false);
 
-		//NEW
-		/* This is an optimized version of wattStrog1 method so that no retrials is performed while randomly rewiring edges.
-		 This algorithm is based on the following concepts:
-			- virtual Fisher-Yates shuffle [1],
-			- virtual Fisher-Yates shuffle with deselection [2].
-
-		Here for each vertex a "virtual" table of possible (not forbidden) vertices is maintain, so each time a free vertex is randomly chosen.
-		The "virtual" table is realized by hash maps and special counters related to each vertex.
-
-		References:
-			[1] "Efficient generation of large random networks", V. Batagelj and U. Brandes, Physical Review E, vol. 71, 036113, 2005.
-			[2] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
-
-		Parameters:
-			rgen - random number generator,
-			g - the input/output graph,
-			n - number of vertices to create,
-			k - the initial degree of vertices, should be an even integer,
-			beta - the probability 0<= beta <=1 of rewiring initial edges,
-			vInfoGen - generator for info objects for vertices,
-			eInfoGen - generator for info objects for edges,
-			type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
-			shuffle - determines whether the vertices should be introduced to the graph in random order.
-		Function returns the pointer to the first vertex.
-		*/
+		/** \brief Random graph generator in Watts–Strogatz model (parameterized).
+		 * 
+		 *  This is an optimized version of wattStrog1 method so that no retrials is performed while randomly rewiring edges.
+		 *
+		 *  This algorithm is based on the following concepts:
+		 *  - virtual Fisher-Yates shuffle [1],
+		 *  - virtual Fisher-Yates shuffle with deselection [2].
+		 *
+		 *  Here for each vertex a "virtual" table of possible (not forbidden) vertices is maintain, so each time a free vertex is randomly chosen.
+		 *  The "virtual" table is realized by hash maps and special counters related to each vertex.
+		 *
+		 *  References:\n
+		 *  [1] "Efficient generation of large random networks", V. Batagelj and U. Brandes, Physical Review E, vol. 71, 036113, 2005.\n
+		 *  [2] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
+		 *
+		 *  \param rgen - random number generator,
+		 *  \param g - the input/output graph,
+		 *  \param n - number of vertices to create,
+		 *  \param k - the initial degree of vertices, should be an even integer,
+		 *  \param beta - the probability 0<= beta <=1 of rewiring initial edges,
+		 *  \param vInfoGen - generator for info objects for vertices,
+		 *  \param eInfoGen - generator for info objects for edges,
+		 *  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
+		 *  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
+		 *  \returns the pointer to the first vertex. */
 		template< class Settings, class RndGen, class GraphType, class VInfoGen, class EInfoGen >
 		static typename GraphType::PVertex wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false);
 
+		/** \brief Random graph generator in Watts–Strogatz model.
+		*
+		*  This is an optimized version of wattStrog1 method so that no retrials is performed while randomly rewiring edges.
+		*
+		*  This algorithm is based on the following concepts:
+		*  - virtual Fisher-Yates shuffle [1],
+		*  - virtual Fisher-Yates shuffle with deselection [2].
+		*
+		*  Here for each vertex a "virtual" table of possible (not forbidden) vertices is maintain, so each time a free vertex is randomly chosen.
+		*  The "virtual" table is realized by hash maps and special counters related to each vertex.
+		*
+		*  References:\n
+		*  [1] "Efficient generation of large random networks", V. Batagelj and U. Brandes, Physical Review E, vol. 71, 036113, 2005.\n
+		*  [2] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
+		*
+		*  \param rgen - random number generator,
+		*  \param g - the input/output graph,
+		*  \param n - number of vertices to create,
+		*  \param k - the initial degree of vertices, should be an even integer,
+		*  \param beta - the probability 0<= beta <=1 of rewiring initial edges,
+		*  \param vInfoGen - generator for info objects for vertices,
+		*  \param eInfoGen - generator for info objects for edges,
+		*  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
+		*  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
+		*  \returns the pointer to the first vertex. */
 		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen >
 		static typename GraphType::PVertex wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false)
         {
             return wattStrog2<WattStrogDefaultSettings>( rgen, g, n,k, beta, vInfoGen, eInfoGen, type , shuffle);
         }
 
-		//NEW
 		/* It is a simpler version of the above function*/
+		/** \brief Random graph generator in Watts–Strogatz model.
+		*
+		*  This is an optimized version of wattStrog1 method so that no retrials is performed while randomly rewiring edges.
+		*
+		*  This algorithm is based on the following concepts:
+		*  - virtual Fisher-Yates shuffle [1],
+		*  - virtual Fisher-Yates shuffle with deselection [2].
+		*
+		*  Here for each vertex a "virtual" table of possible (not forbidden) vertices is maintain, so each time a free vertex is randomly chosen.
+		*  The "virtual" table is realized by hash maps and special counters related to each vertex.
+		*
+		*  References:\n
+		*  [1] "Efficient generation of large random networks", V. Batagelj and U. Brandes, Physical Review E, vol. 71, 036113, 2005.\n
+		*  [2] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
+		*
+		*  \param rgen - random number generator,
+		*  \param g - the input/output graph,
+		*  \param n - number of vertices to create,
+		*  \param k - the initial degree of vertices, should be an even integer,
+		*  \param beta - the probability 0<= beta <=1 of rewiring initial edges,
+		*  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
+		*  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
+		*  \returns the pointer to the first vertex. */
 		template< class RndGen, class GraphType >
 		static typename GraphType::PVertex wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, EdgeType type = Undirected, bool shuffle = false);
 
@@ -958,8 +1133,7 @@ namespace Privates {
 		 *  \param dir - edges direction mask,
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
-		 *  \returns a pair of pointers. The pointers indicate the first and the last vertex.
-		 */
+		 *  \returns a pair of pointers. The pointers indicate the first and the last vertex. */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 				addVertices( GraphType &g, int n, int num, EdgeDirection dir, VInfoGen vInfoGen, EInfoGen eInfoGen );
@@ -978,8 +1152,7 @@ namespace Privates {
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param type - the type of edges in the graph, i.e., directed or undirected.
-		 *  \returns a pair of pointers. The pointers indicate the first and the last vertex.
-		 */
+		 *  \returns a pair of pointers. The pointers indicate the first and the last vertex. */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 			addVertices2Tab( GraphType &g, typename GraphType::PVertex *vTab, int n, int num, EdgeDirection dir,
@@ -1000,66 +1173,58 @@ namespace Privates {
 		 *  \param num2 - the value that is passed to eInfoGen generator,
 		 *  \param dir - edges direction mask,
 		 *  \param eInfoGen - generator for info objects for edges.
-		 *  \returns a pointer that indicates the created edge.
-		 */
+		 *  \returns a pointer that indicates the created edge. */
 		template< class GraphType, class EInfoGen > static typename GraphType::PEdge
 			addEdges( GraphType &g, typename GraphType::PVertex v1, typename GraphType::PVertex v2, int num1, int num2,
 				EdgeDirection dir, EInfoGen eInfoGen );
 
 		/** \brief Get random.
 		 *
-		 *  The function generates a pseudo-random number \a num (from uniform distribution) such that \a begin <= \a num <= \a end.
-		 */
+		 *  The function generates a pseudo-random number \a num (from uniform distribution) such that \a begin <= \a num <= \a end. */
         template< class RndGen >
 		static int random(RndGen& rgen, int begin, int end );
 
-		//NEW
-		/*
-		 This function generates a pseudo-random real number r (from uniform distribution) such that 0 <= r < 1.
-		*/
+		/** \brief Get pseudo-random floating point number.
+		 *
+		 *  This function generates a pseudo-random real number r (from uniform distribution) such that 0 <= r < 1.*/
 		template< class RndGen >
 		static double random(RndGen& rgen);
 
-		//NEW
-		/*
-		 This function randomly (according to uniform distribution) permutes given table.
-		*/
+		/** \brief Random permute array.
+		 *
+		 *  This function randomly (according to uniform distribution) permutes given array. */
 		template< class RndGen >
 		static void simpleShuffle(RndGen& rgen, int tab[], int size);
 
-		//NEW
-		/*
-		This is a helper function used in wattStrog2 generator. It is responsible for marking vertex r
-		as selected on the list of vertices represented by replace. This method is based on the concept taken from [1], i.e.,
-		vertices of num < i, where i is a border index, are treated as selected, vertices of num >=i are treated as free (unselected),
-		exceptions from this rule are stored in replace map.
-
-		References:
-		[1] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
-
-		Parameters:
-			replaceInfo - a pair of pointer to a map of replacements for vertices and a border index i,
-			vertices of num < i are treated as selected, vertices of num >=i are treated as free (unselected), exceptions from this rule are stored in replace map.
-			r - index of vertex that should be selected.
-		*/
+		/** \brief Select vertex.
+		 *
+		 *  This is a helper function used in wattStrog2 generator. It is responsible for marking vertex r
+		 *  as selected on the list of vertices represented by replace. This method is based on the concept taken from [1], i.e.,
+		 *  vertices of num < i, where i is a border index, are treated as selected, vertices of num >=i are treated as free (unselected),
+		 *  exceptions from this rule are stored in replace map.
+		 *
+		 *  References:\n
+		 *  [1] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
+		 *
+		 *  \param replaceInfo - a pair of pointer to a map of replacements for vertices and a border index i,
+		 *  vertices of num < i are treated as selected, vertices of num >=i are treated as free (unselected), exceptions from this rule are stored in replace map.
+		 *  \param r - index of vertex that should be selected.	*/
 		template <class Map>
 		inline static void select(std::pair<Map *, int> & replaceInfo, int r);
 
-        //NEW
-        /*
-        This is a helper function used in wattStrog2 generator. It is responsible for marking vertex r
-        as unselected on the list of vertices represented by replace. This method is based on the concept taken from [1], i.e.,
-        vertices of num < i, where i is a border index, are treated as selected, vertices of num >=i are treated as free (unselected),
-        exceptions from this rule are stored in replace map.
-
-        References:
-        [1] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
-
-        Parameters:
-        replaceInfo - a pair of pointer to a map of replacements for vertices and a border index i,
-        vertices of num < i are treated as selected, vertices of num >=i are treated as free (unselected), exceptions from this rule are stored in replace map.
-        r - index of vertex that should be removed (unselected).
-        */
+        /** \brief Unselect vertex
+		 *
+         *  This is a helper function used in wattStrog2 generator. It is responsible for marking vertex r
+         *  as unselected on the list of vertices represented by replace. This method is based on the concept taken from [1], i.e.,
+         *  vertices of num < i, where i is a border index, are treated as selected, vertices of num >=i are treated as free (unselected),
+         *  exceptions from this rule are stored in replace map.
+		 *
+         *  References:\n
+         *  [1] "An Efficient Generator for Clustered Dynamic Random Networks", R. G\"orke, R. Kluge, A. Schumm, C. Staudt and D Wagner, LNCS 7659, pp. 219-233, 2012.
+		 *
+         *  \param replaceInfo - a pair of pointer to a map of replacements for vertices and a border index i,
+         *  vertices of num < i are treated as selected, vertices of num >=i are treated as free (unselected), exceptions from this rule are stored in replace map.
+         *  \param r - index of vertex that should be removed (unselected).  */
         template <class Map>
         inline static void remove(std::pair<Map *, int> & replaceInfo, int r);
 	};
@@ -1068,12 +1233,12 @@ namespace Privates {
 	/* RelDiagramPar
 	 * DefaultStructs - wytyczne dla wewnetrznych procedur
 	 */
-	/** \brief Binary relation operations.
+	/** \brief Binary relation operations (parameterized).
 	 *
-	 *  The set of methods which consider a graph as a binary relation. WEN: na zbiorze wierzcholkow
+	 *  The set of methods which consider a graph as a binary relation on the set of vertices.
+	 *  \wikipath{Graph_and_relations}
 	 *  \tparam DefaultStructs parameter allows to adjust the settings for internal procedures.
-	 *  \ingroup detect
-	 */
+	 *  \ingroup detect */
 	template< class DefaultStructs > class RelDiagramPar
 	{ 	    //WEN: cyt. z ebook: Krawędzie pozostające w wyniku nie są modyfikowane, w szczególności nie zmieniają swych inf. W każdej poniższych metod, jeśli wejściem był diagram, wyjściem też będzie diagram.
 	public:

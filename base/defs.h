@@ -2997,7 +2997,8 @@ namespace Koala
 	 *  Methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others generate new elements like edges and vertices. 
 	 *  Sometimes user may want to preserve the information from where new elements origin. For such purposes linkers are designed.
 	 *  The linkers are object functions with overloaded call function operator. The first parameter of that function is destination object the second is 
-	 *  source object.
+	 *  source object. 
+	 *  This is auxiliary single direction linker, that may be used in bidirectional linker Std2Linker.
 	 *  Std1NoLinker is a linker that makes no link. It should be used in cases when user doesn't need a link and doesn't want to create one but function in Koala require some.
 	 *
 	 *  \ingroup DMlinker */
@@ -3028,6 +3029,7 @@ namespace Koala
 	 *
 	 *  Std1FieldLinker uses the member of the destination info object to point to object of origin.
 	 *  The modified field of the object info is set in constructor via pointer to member.
+	 *  This is auxiliary single direction linker, that may be used in bidirectional linker Std2Linker.
 	 *  \wikipath{linker, Get more data about linkers.}
 	 *  \ingroup DMlinker */
 	template< class Info, class T > struct Std1FieldLinker
@@ -3060,6 +3062,7 @@ namespace Koala
 	 *  Std1AssocLinker function object is equipped with external associative container, which keeps information about the link. If this linker is used 
 	 *  for each new-created element there is a new key (pointer to new element) inserted into associative array where the mapped value is the pointer to the origin. 
 	 *  Since the map is external and it is not copied, user should keep it valid and up to date.
+	 *  This is auxiliary single direction linker, that may be used in bidirectional linker Std2Linker.
 	 *  \wikipath{linker, Get more data about linkers.}
 	 *  \ingroup DMlinker */
 	template< class Map > struct Std1AssocLinker
@@ -3282,7 +3285,7 @@ namespace Privates {
 	 * \related HardCaster
 	 * \related StdCaster
 	 * \related ObjCaster 
-	 *  \ingroup DMcaster */
+	 * \ingroup DMcaster */
 	template <class  Ch1, class Ch2> std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >
 		operator&( Ch1 a, Ch2 b )
 		{
