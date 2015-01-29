@@ -23,8 +23,11 @@ namespace Koala
 		/** \brief Path structure.
 		 *
 		 *  The structure used by various algorithms. It is designed to keep a path i.e. a sequence of vertices and edges.
-		 *  Mind that both edges and vertices may be repeated, though from theoretical point of view it is a walk.
-		 *  WEN?: krawedzi o 1 mniej niz wierzcholkow, ktore wierzcholki sa koncami ktorej krawedzi?
+		 *  Both vertices and edges are represented by pointers.
+		 *  Mind that edges and vertices may be repeated, though from theoretical point of view it is a walk.
+		 *  The sequences of vertices and of edges must be arrange in proper order.
+		 *  If the vertex container consists of sequence of vertices (v_0, v_1, v_2, ..., v_{n-1}) then obviously
+		 *  edges are stored in edge container in the order ({v_0,v_1},{v_1,v_2},...{v_{n-2},v_{n-1}}). 
 		 *  \wikipath{Graph_search_algorithms#Search-path-structure, For wider outlook see wiki.} 
 		 *
 		 *  [See example](examples/search/euler/euler.html). */
@@ -32,6 +35,7 @@ namespace Koala
 		{
 			VIter vertIter;/**<\brief the insert iterator to the container with vertices. */
 			EIter edgeIter;/**<\brief the insert iterator to the container with edges. */
+			
 			/** \brief Constructor.*/
 			OutPath( VIter av, EIter ei ): vertIter( av ), edgeIter( ei ) { }
 		};
@@ -47,7 +51,7 @@ namespace Koala
 
 		/** \brief OutPath specialization for blackHole generating function. 
 		 *
-		 *  The function generates dummy OutPath for cases 
+		 *  The function generates dummy OutPath for cases in which this output structure is not needed.
 		 *  \wikipath{BlackHole, See wiki for blackHole}
 		 *  \related OutPath */
         inline static OutPath< BlackHole,BlackHole> outPath( BlackHole )
@@ -539,7 +543,7 @@ namespace Koala
 		};
 
 
-		/** \brief Visitor stores visited vertices to iterator WEN: wstawiacz VertIter.  */
+		/** \brief Visitor stores visited vertices to insert iterator VertIter.  */
 		template< class VertIter > class StoreTargetToVertIter: public simple_postorder_visitor_tag,
 			public no_component_visitor_tag
 		{
@@ -554,8 +558,7 @@ namespace Koala
 			VertIter &m_iter;
 		} ;
 
-		/** \brief Visitor stores visited vertices to CompStore.WEN: ale jak??? a no z podzialem na znalezione skladowe
-		 */
+		/** \brief Visitor stores visited vertices divided into its connected components in CompStore. */
 		template< class CompIter, class VertIter > class StoreCompVisitor: public simple_postorder_visitor_tag,
 			public component_visitor_tag
 		{
