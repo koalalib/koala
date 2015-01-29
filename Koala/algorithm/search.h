@@ -158,30 +158,35 @@ namespace Koala
 	};
 
 
-	/* SearchStructs
+	/** \brief Search structures
 	 *
-	 */
+	 *  Collection of auxiliary structures for search algorithms.*/
 	class SearchStructs
 	{
 	public:
 		// Struktura wartosci przypisywanej wierzcholkowi w procedurach przeszukiwania grafu
+		//chodzi o reprezentacje in-forest w grafie tj. etykieta przy wierzcholku pokazuje przejscie do rodzica
 		/** \brief Auxiliary visit vertex structure
-		 *  WEN: chodzi o reprezentacje in-forest w grafie tj. etykieta przy wierzcholku pokazuje przejscie do rodzica
-		 *  Structure used by search procedures. */
+		 * 
+		 *  Structure used by search procedures. To represent in-forest the structure keeps the pointer to parent vertex and PEdge leading to it. */
 		template< class GraphType > struct VisitVertLabs
 		{
 			// rodzic danego wierzcholka w drzewie (lesie), NULL dla korzenia
-			/** \brief Parent WEN: w czym parent? of vertex.*/
+			/** \brief Parent 
+			 *
+			 *  The parent vertex in in-forest or NULL if current vertex is root.*/
 			typename GraphType::PVertex vPrev;
 			// krawedz prowadzaca do rodzica
-			/** \brief Edge leading to parent of vertex WEN: tez w tym in-forest.*/
+			/** \brief Edge leading to parent of vertex in in-forest, or NULL if current vertex is root.*/
 			typename GraphType::PEdge ePrev;
 
 			// odleglosc od korzenia (liczba krawedzi) i numer skladowej spojnosci (od 0)
-			int distance;/**< \brief Distance (number of edges) from root WEN: w tym in-forest i chyba raczej to niz from.*/
-			int component;/**< \brief Index of connected component WEN: czy komponent ... numer in-treesa w in-forescie tak na prawde.*/
+			int distance;/**< \brief Distance (number of edges) to root in in-forest.*/
+			int component;/**< \brief Index of connected component (in-tree) in in-forest.*/
 
-            //WEN:opis
+			/** \brief Copy.
+			 *
+			 *  The method copies the current structer to arg*/
 			template <class T> void copy(T& arg) const
 			{
 				arg.vPrev=vPrev;
@@ -189,11 +194,19 @@ namespace Koala
 				arg.distance=distance;
 				arg.component=component;
 			}
-			/** \brief Copy.*/
+			/** \brief Copy for BlackHole.
+			 *
+			 *  Does nothing.*/
 			void copy(BlackHole&) const
 				{ }
 
-			/**\brief Constructor WEN: ma jakies parametry i jakies dzialanie domyslne, prawda? */
+			/**\brief Constructor
+			 *
+			 * The constructor sets all structure fields.
+			 * \param vp pointer to parent.
+			 * \param ep pointer to edge leading to parent.
+			 * \param dist the distance to root.
+			 * \param comp the indec of connected component in in-tree.*/
 			VisitVertLabs( typename GraphType::PVertex vp = 0, typename GraphType::PEdge ep = 0,
 				int dist = std::numeric_limits< int >::max(), int comp = -1 ):
 					vPrev( vp ), ePrev( ep ), distance( dist ), component( comp )
@@ -211,7 +224,7 @@ namespace Koala
 		 *  - \a vertIter point to the concatenated sequenced of objects. 
 		 *  - \a compIter point to the container with integers such that each integer is a position of starting point of associated sequence, 
 		 *  the first element is always 0 and the last integer represents the number of all elements in the \a vertIter. 
-		 *  \wikipath{Graph_search_algorithms#Sequence-of-sequences, See wiki page for CompStore. */
+		 *  \wikipath{Graph_search_algorithms#Sequence-of-sequences, See wiki page for CompStore.} */
 		template< class CIter, class VIter > struct CompStore
 		{
 			CIter compIter;/**< \brief the insert iterator to the container with starting point positions of consecutive sequences.*/
@@ -229,7 +242,7 @@ namespace Koala
 		 *  \param ac  the insert iterator to the container with integers representing the positions of first elements of consecutive sequences.
 		 *  \param av the insert iterator to the container with concatenated sequences of entities.
 		 *  \return the CompStore object associated with the sequence of sequences. 
-		 *  \related CompStore */
+		 *  \related CompStore*/
 		template< class CIter, class VIter > static CompStore< CIter,VIter > compStore( CIter ac, VIter av )
 			{ return CompStore< CIter,VIter >( ac,av ); }
 
@@ -266,6 +279,15 @@ namespace Koala
 		// ulatwia obrobke takich danych
 		// T typ elementu ciagow skladowych
 		//WEN: opis kontenera i metod?
+		/**\brief Sequence of sequences for CompStore. 
+		 *
+		 *  The class consists of two containers (based on std::vector):
+		 *  - the second one consists of concatenated sequences.
+		 *  - the first one is a sequence of integers where i-th number stands for the beginning index of i-th sequence. 
+		 *
+		 *  The class is designed to simplify operations of CompStore. It delivers method input that returns CompStore
+		 *  which may be used in any method requiring such structure.
+		 *  \tparam T the type of element.*/
 		template< class T > class CompStoreTool
 		{
 		private:
@@ -278,27 +300,43 @@ namespace Koala
 			typedef std::back_insert_iterator< std::vector< T > > VIterType;
 			typedef CompStore< std::back_insert_iterator< std::vector< int > >,std::back_insert_iterator< std::vector< T > > > InputType;
 
+			/**\brief Empty constructor.*/
 			CompStoreTool()
 				{ clear(); }
+			/**\brief Clear containers. */
 			void clear();
 			 // liczba zebranych ciagow
+			/**\brief The number of sequences.*/
 			int size() const;
 			 // dlugosc i-tego ciagu
+			/**\brief The number of elements in i-th sequence.*/
 			int size( int i ) const;
 			 // laczna dlugosc wszystkich ciagow
+			/**\brief The number of elements in all sequences. (size of container with elements). */
 			int length() const;
 			// wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
+			/**\brief Access i-th element. */
 			T *operator[]( int i );
 			// wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
+			/**\brief Get i-th element. */
 			const T *operator[]( int i ) const;
 			// umieszcza nowy ciag pusty na pozycji i.
+			/**\brief Insert new empty sequence on i-th position. */
 			void insert( int i );
 			// kasuje ciag na pozycji i
+			/**\brief Delete i-th sequence.*/
 			void del( int i );
 			// zmienia dlugosc i-tego ciagu.
+			/**\brief Resize i-th sequence
+			 *
+			 *  The method changes the size of i-th sequence to \a size.*/
 			void resize( int i, int asize );
 			//Umiesczamy wywolanie funkcji w miejsu compStore a pozniej przetwarzamy zebrane ciagi
 			// czysci kontener
+			/**\brief Generate CompStore
+			 *
+			 * The method generates CompStore object associated with current CompStoreTool. 
+			 * Such CompStore may be used by any method that requires it.*/
 			CompStore< std::back_insert_iterator< std::vector< int > >,std::back_insert_iterator< std::vector< T > > >
 				input();
 		};
@@ -656,7 +694,8 @@ namespace Koala
 	 *
 	 *  The general implementation of graph search strategies (DFS, BFS, LexBFS).
 	 *  \tparam SearchImpl the class should deliver a method visitBase, which decides about the order of visiting vertices.
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm WEN: to sie nawet jakos fachowo nazywa (polityka czy cecha?). Can be used to parametrize algorithms.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm WEN: to sie nawet jakos fachowo nazywa (polityka czy cecha?).
+	 *   Can be used to parametrize algorithms.
 	 *  \ingroup search */
 	template< class SearchImpl, class DefaultStructs > class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	{
@@ -674,10 +713,11 @@ namespace Koala
 
 	public:
 		typedef SearchImpl SearchStrategy;
+		
 		/** \brief Visit all vertices.
 		 *
 		 *  Visit all vertices in a graph in order given by the strategy SearchImpl
-		 *  @param[in] g the graph containing vertices to visit WEN: dowolny graf, tu i w kolejnych metodach takze
+		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
 		 *  @param[in] visited the container to store data (np. map PVertex -> VisitVertLabs), BlackHole forbidden.
 		 *   After the execution of the method, the associative container represent the search WEN: in-forest tree (forst)
 		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distance keeps the distance from the root.
@@ -698,7 +738,7 @@ namespace Koala
 		 * WEN: chyba kolejnosc parametrow jest inna
 		 *  Visit all vertices in the same component as a given vertex in order given by the strategy SearchImpl
 		 WEN: to nie musi byc skladowa, tylko zbior wierzholkow osiagalnych z danego przy przechodzeniu krawedzi zgodnie z maska (por. wyzej)
-		 *  @param[in] g the graph containing vertices to visit
+		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
 		 *  @param[in] src the given vertex
 		 *  @param[out] out the iterator to write visited vertices in order given by the strategy  SearchImpl.
 		 *  @param[in] dir the direction of edges to consider WEN: raczej podczas trawersacji krawedzie sa przechodzone zgodnie z maska, loops are ignored regardless of the mask.
@@ -714,12 +754,20 @@ namespace Koala
 		template< class GraphType, class VertContainer, class Iter > static int scanAttainable( const GraphType &,
 			typename GraphType::PVertex, VertContainer &, Iter, EdgeDirection dir = EdUndir | EdDirOut );
 
-		template< class GraphType, class Iter > static int scanAttainable( const GraphType &,
-			typename GraphType::PVertex, BlackHole, Iter, EdgeDirection dir = EdUndir | EdDirOut );
+		/* \brief Visit attainable.WEN: rozumiem, ze to wylatuje
+		*
+		*  Visit all vertices in the same component as a given vertex. Behaves similarlly previous method by uses own map PVertex -> VisitVertLabs.
+		*  @param[in] g the graph containing vertices to visit
+		*  @param[in] src the given vertex
+		*  @param[out] out the iterator to write vertices to, in order given by the strategy SearchImpl
+		*  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
+		*  @return the number of visited vertices. */
+		template< class GraphType, class Iter > static int scanAttainable( const GraphType &g,
+			typename GraphType::PVertex src, BlackHole, Iter out, EdgeDirection dir = EdUndir | EdDirOut );
         //NEW: zmiana naglowkow metod tej klasy (kolejnosc parametrow!) - teraz kontener asocjacyjny
         //dla wierzcholkow moze byc blackholizowany
 
-		/** \brief Visit attainable.WEN: rozumiem, ze to wylatuje
+		/* \brief Visit attainable.WEN: rozumiem, ze to wylatuje
 		 *
 		 *  Visit all vertices in the same component as a given vertex. Behaves similarlly previous method by uses own map PVertex -> VisitVertLabs.
 		 *  @param[in] g the graph containing vertices to visit
