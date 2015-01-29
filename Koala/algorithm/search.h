@@ -202,13 +202,16 @@ namespace Koala
 		// oraz na koniec sumaryczna dlugosc wszystkich ciagow
 		// (a wiec lacznie o 1 wiecej liczb, niz ilosc ciagow)
 		/** \brief Joined sequences container.
-		 *  WEN: rozumiem, ze w ebooku bedzie gdzies opis tego formatu, a tu link do niego
-		 *  The structure consist of two iterators  WEN: wyjsciowe. \a vertIter point to the concatenated sequenced of objects. \a compIter point to the container with integers such that each integer is a position of starting point of next sequence, the last integer represents the number of all elements in the \a vertIter.	 */
+		 *
+		 *  The structure consist of two insert iterators. 
+		 *  - \a vertIter point to the concatenated sequenced of objects. 
+		 *  - \a compIter point to the container with integers such that each integer is a position of starting point of associated sequence, 
+		 *  the first element is always 0 and the last integer represents the number of all elements in the \a vertIter. 
+		 *  \wikipath{Graph_search_algorithms#Sequence-of-sequences, See wiki page for CompStore. */
 		template< class CIter, class VIter > struct CompStore
 		{
-		    //WEN:bzdura! odwrotnie
-			CIter compIter;/**<\brief the iterator WEN: wstawiacz to the container with concatenated sequences.*/
-			VIter vertIter;/**< \brief the iterator WEN: wstawiacz  to the container with position of starting points of consecutive sequences.*/
+			CIter compIter;/**< \brief the insert iterator to the container with starting point positions of consecutive sequences.*/
+			VIter vertIter;/**< \brief the insert iterator to the container with concatenated sequences.*/
 
 			/**\brief Constructor*/
 			CompStore( CIter ac, VIter av ): compIter( ac ), vertIter( av )
@@ -218,14 +221,17 @@ namespace Koala
 		// Funkcja tworzaca, analogia make_pair
 		// Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
 		/** \brief Generating function for CompStore.
-		 *  //WEN:bzdura! odwrotnie
-		 *  \param ac the iterator WEN: wstawiacz to the container with concatenated sequences of entities.
-		 *  \param av the iterator WEN: wstawiacz to the container with integers representing the positions of first elements of consecutive sequences.
-		 *  \return the CompStore object associated with the sequence of sequences. */
+		 *  
+		 *  \param ac  the insert iterator to the container with integers representing the positions of first elements of consecutive sequences.
+		 *  \param av the insert iterator to the container with concatenated sequences of entities.
+		 *  \return the CompStore object associated with the sequence of sequences. 
+		 *  \related CompStore */
 		template< class CIter, class VIter > static CompStore< CIter,VIter > compStore( CIter ac, VIter av )
 			{ return CompStore< CIter,VIter >( ac,av ); }
 
-        //NEW:
+		/** \brief CompStore generating function for BlacHole
+		 *
+		 *  \related CompStore */
         inline static CompStore< BlackHole,BlackHole> compStore( BlackHole )
             { return CompStore< BlackHole,BlackHole>( blackHole,blackHole ); }
 
