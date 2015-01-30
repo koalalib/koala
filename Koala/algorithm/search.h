@@ -770,10 +770,10 @@ namespace Koala
 		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
 		 *  @param[out] out the iterator to write visited vertices to, in order given by the strategy SearchImpl
 		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask. WEN: por. wyzej
-		 *  @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole forbidden.
+		 *  @param[out] visited container to store data (map PVertex -> VisitVertLabs), BlackHole forbidden.
 		 *   After the execution of the method, the associative container represent the search tree (forest)
 		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distace keeps the distance from the root.
-		 *   finally field component keeps the index of the connected component of graph. WEN: [in]?
+		 *   finally field component keeps the index of the connected component of graph.
 		 *  @param[in] sym if true arcs are treated as undirected edges. WEN: nie bardzo, bo flaga EdUndir to co innego, niz Directed
 		 *  @return the number of components.
 		 *  \sa SearchStructs::VisitVertLabs */
