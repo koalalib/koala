@@ -748,8 +748,7 @@ namespace Koala
 		 *  @return the number of visited vertices.
 		 *  \sa SearchStructs::VisitVertLabs
 		 *
-		 * [See example](examples/search/search/search.html).
-		 */
+		 * [See example](examples/search/search/search.html). */
 		template< class GraphType, class VertContainer, class Iter > static int scanAttainable( const GraphType &g,
 			typename GraphType::PVertex src, VertContainer &visited, Iter out, EdgeDirection dir = EdUndir | EdDirOut );
 
@@ -759,7 +758,7 @@ namespace Koala
 		*  @param[in] g the graph containing vertices to visit. Any graph may be used.
 		*  @param[in] src the given vertex
 		*  @param[out] out the iterator to write vertices to, in order given by the strategy SearchImpl
-		*  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
+		*  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
 		*  @return the number of visited vertices. */
 		template< class GraphType, class Iter > static int scanAttainable( const GraphType &g,
 			typename GraphType::PVertex src, BlackHole, Iter out, EdgeDirection dir = EdUndir | EdDirOut );
@@ -768,13 +767,13 @@ namespace Koala
 		 *
 		 *  Visit all vertices in a graph
 		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
-		 *  @param[out] out the iterator to write visited vertices to, in order given by the strategy SearchImpl
-		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask. WEN: por. wyzej
 		 *  @param[out] visited container to store data (map PVertex -> VisitVertLabs), BlackHole forbidden.
 		 *   After the execution of the method, the associative container represent the search tree (forest)
-		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distace keeps the distance from the root.
+		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distance keeps the distance from the root.
 		 *   finally field component keeps the index of the connected component of graph.
-		 *  @param[in] sym if true arcs are treated as undirected edges. WEN: nie bardzo, bo flaga EdUndir to co innego, niz Directed
+		 *  @param[out] out the iterator to write visited vertices to, in order given by the strategy SearchImpl
+		 *  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
+		 *  @param[in] sym if true arcs are treated as undirected edges.
 		 *  @return the number of components.
 		 *  \sa SearchStructs::VisitVertLabs */
 		template< class GraphType, class VertContainer, class VertIter > static int scan( const GraphType &g,
@@ -783,42 +782,47 @@ namespace Koala
 		template< class GraphType, class VertIter > static int scan( const GraphType &g,
 			BlackHole,VertIter out, EdgeDirection dir= EdDirOut | EdUndir | EdDirIn, bool sym = true );
 
-
-		/** \brief Visit all vertices.
-		 *
-		 *  Visit all vertices in a graph.
-		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
-		 *  @param[out] out iterator to write vertices to, in order given by the strategy SearchImpl
-		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
-		 *  @return the number of components.*/
-//		template< class GraphType, class VertIter > static int scan( const GraphType &g, VertIter out,
-//			EdgeDirection dir = EdDirOut | EdUndir | EdDirIn );
-
 		/* Liczba cyklomatyczna podgrafu zlozonego z krawedzi zgodnych z maska */
 		/** \brief Cyclomatic number of graph.
 		 *
-		 *  The method gets the cyclomatic number of graph, concerning only edges congruent with \a mask.
-		 WEN: link do def. liczby cyklomat w ebooku + uwaga, ze search-strategia jest wykorzystana tylko do znalezienia in-forest spinajacego
+		 *  The method gets the \wikipath{Reachability#Cyclomatic-number,cyclomatic number} of graph, concerning only edges congruent with \a mask.
+		 *  The search method is used do find spanning in-forest (\wikipath{Spanning_tree,See spanning tree}. 
 		 *  \param g the considered graph.
-		 *  \param mask determines the types and direction WEN: tu tylko types, bo maska jest symetryzowana of edges to be considered.
+		 *  \param mask determines the types of edges to be considered. \wikipath{EdgeType, See EdgeType}.
 		 *  \return the cyclomatic number of graph.  */
 		template< class GraphType > static int cyclNo( const GraphType &g, EdgeDirection mask = EdAll )
 			{ return g.getEdgeNo( mask ) - g.getVertNo() + scan( g,blackHole,blackHole,mask ); }
 
-		/** \brief Get contected component. WEN: bzdura, osiagalne z src przy przechodzeniu krawedzi zgodnie z maska
+		/** \brief Get attainable vertices.
 		 *
-		 *  The method returns all vertices in the same component WEN: j.w. as a given vertex.
+		 *  The method returns all vertices attainable from vertex \a src.
 		 *  @param[in] g graph containing vertices to visit.
-		 *  @param[in] src the given vertex. WEN: no ... given ale po co???
-		 *  @param[in] dir the direction of edges to consider. Loops are ignored.
-		 *  @return the set of vertices in the component.  WEN: to nie jest zaden komponent */
+		 *  @param[in] src the root vertex.
+		 *  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
+		 *  @return the set of attainable vertices. */
 		template< class GraphType > static Set< typename GraphType::PVertex > getAttainableSet( const GraphType &g,
 			typename GraphType::PVertex src, EdgeDirection dir = EdDirOut | EdUndir );
 
 
-        //NEW: ponizsze 2 - przeglad podobny do ScanAttainable wybrana strategia, ale tylko na glebokosc radius w poddrzewie o korzeniu  src
-        // W kontenerze wpisuje (odwiedza) odwiedzone wierzcholki. Zwraca ich liczbe. WEN: tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania start sa ustawiane w tej mapie
-		template< class GraphType, class VertContainer> static int scanNear( const GraphType &,
+        // ponizsze 2 - przeglad podobny do ScanAttainable wybrana strategia, ale tylko na glebokosc radius w poddrzewie o korzeniu  src
+        // W kontenerze wpisuje (odwiedza) odwiedzone wierzcholki. Zwraca ich liczbe.tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania start sa ustawiane w tej mapie
+		/** \brief Visit near attainable.
+		*
+		*  Visit all vertices attainable from vertex \a src in distance \a radius.
+		*  Note that vertex is attainable if it is in the same connected component but also the direction of edges if included in mask \a dir may influence the relation.
+		*  @param[in] g the graph containing vertices to visit. Any graph may be used.
+		*  @param[in] src the vertex
+		*  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole allowed.
+		*   After the execution of the method, the associative container represent the search in-tree rooted in \a src.
+		*   where fields \p vPrev and \p ePrev keep the previous vertex and edge, and the field \p distance keeps the distance from the root.
+		*   finally \p field that indicates the in-tree in in-forest equals 0 as there may be only one in-tree. 
+		*   The vertices that are not attainable from \a src or distance is farer then \a radius are not keys in this map.
+		*  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
+		*  @return the number of visited vertices.
+		*  \sa SearchStructs::VisitVertLabs
+		*
+		* [See example](examples/search/search/search.html). */
+		template< class GraphType, class VertContainer> static int scanNear(const GraphType &,
 			typename GraphType::PVertex, int radius, VertContainer &, EdgeDirection dir = EdUndir | EdDirOut );
 
 		template< class GraphType > static int scanNear( const GraphType &,
@@ -826,21 +830,21 @@ namespace Koala
 
 		/** \brief Get path.
 		 *
-		 *  The method finds a path between vertices WEN: ale jaka? path w drzewie przeszukiwania zgodnie ze strategia, startujacym w src
+		 *  The method finds a path between vertices \a src and \a dest in the search tree returned by search algorithm (according to its strategy)
+		 *  The search tree is rooted in \a src.
 		 *  @param[in] g the graph to search path in.
 		 *  @param[in] src the starting vertex.
 		 *  @param[in] dest the target vertex.
-		 *  @param[out] path found path
-		 *  @param[in] dir the mask determining the direction of edges WEN: ale w kontekscie ich przechodzenia na sciezce to consider, loops are ignored.
-		 *  @return the length of the path, -1 if there is no connection.
+		 *  @param[out] path found path (BlackHole possible)
+		 *  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
+		 *  @return the length of the path or -1 if there is no connection.
 		 *  \sa PathStructs::OutPath
-		 *  \sa PathStructs::OutPathTool
-		 */
+		 *  \sa PathStructs::OutPathTool */
 		template< class GraphType, class VertIter, class EdgeIter > static int findPath( const GraphType &g,
 			typename GraphType::PVertex src, typename GraphType::PVertex dest, OutPath< VertIter,EdgeIter > path,
 			EdgeDirection dir = EdUndir | EdDirOut );
 
-        //NEW: wersja bez podawania iteratorow
+        // wersja bez podawania iteratorow
 		template< class GraphType > static int findPath( const GraphType &g,
 			typename GraphType::PVertex src, typename GraphType::PVertex dest, BlackHole=blackHole,
 			EdgeDirection dir = EdUndir | EdDirOut )
@@ -869,34 +873,23 @@ namespace Koala
 		 *
 		 *  The method splits graph into connected components.
 		 *  @param[in] g the graph to split.
-		 *  @param[out] out CompStore object that is a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator) WEN: OK i link do CompStora
-		 *  @param[in] dir direction of edges to consider, loops are ignored. WEN: maska jest automatycznie symetryzowana
-		 *  @param[out] visited container to store data (map PVertex -> VisitVertLabs), BlackHole forbidden. WEN: juz nie, bo sa 2 wersje
+		 *  @param[out] visited container to store data (map PVertex -> VisitVertLabs). BlackHole allowed.
 		 *   After the execution of the method, the associative container represent the search tree (forst)
 		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distance keeps the distance from the root.
 		 *   finally field component keeps the index of the connected component of graph.
+		 *  @param[out] out CompStore object that is a pair of output iterators. See CompStore, and \wikipath{Graph_search_algorithms#Sequence-of-sequences, Related wiki page.}
+		 *  @param[in] dir the types of edges to consider, loops are ignored.
 		 *  @return the number of components.
 		 *  \sa CompStore
 		 *  \sa Visitors
 		 *
-		 * [See example](examples/search/search/search.html).
-		 */
+		 * [See example](examples/search/search/search.html). */
 		template< class GraphType, class VertContainer, class CompIter, class VertIter > static int split(
 			const GraphType &g, VertContainer &visited, CompStore< CompIter,VertIter > out, EdgeDirection dir= EdUndir | EdDirOut | EdDirIn );
 
 		template< class GraphType, class CompIter, class VertIter > static int split(
 			const GraphType &g, BlackHole, CompStore< CompIter,VertIter > out, EdgeDirection dir= EdUndir | EdDirOut | EdDirIn );
 
-		/** \brief Split graph.
-		 *
-		 *  The method splits graph into connected components. The simpler version of the above method. It uses its own map for search tree.
-		 *  @param[in] g the graph to split.
-		 *  @param[out] out the CopmStore object that is a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
-		 *  @param[in] dir direction of edges to consider, loops are ignored.
-		 *  @return the number of components.
-		 *  \sa CompStore */
-//		template< class GraphType, class CompIter, class VertIter > static int split( const GraphType &g,
-//			CompStore< CompIter,VertIter > out, EdgeDirection dir = EdUndir | EdDirOut | EdDirIn );
 	};
 
 	/*
