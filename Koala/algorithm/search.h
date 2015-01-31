@@ -921,7 +921,7 @@ namespace Koala
 
 //	public:
 	protected:
-		/** \brief Visit all vertices in given component. WEN: jest protected, wiec lepiej nie wnikac :-)
+		/* \brief Visit all vertices in given component.
 		 *
 		 *  Visit all vertices in the same component as a given vertex
 		 *  @param[in] g graph containing vertices to visit
@@ -1191,7 +1191,7 @@ namespace Koala
 	/** \brief Cheriyan/Mehlhorn/Gabow algorithm (parametrized).
 	 *
 	 *  The algorithm for searching strongly connected components of directed graph.
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup search
 	 */
 	template< class DefaultStructs > class SCCPar: protected SearchStructs
@@ -1363,37 +1363,47 @@ namespace Koala
 	 *  \ingroup search    */
 	class DAGAlgs: public DAGAlgsPar< AlgsDefaultSettings > { };
 
-	//NEW: typy zagniezdzone przeniesione z BlocksPar
+	//WEN: typy zagniezdzone przeniesione z BlocksPar
+	/** \brief Auxiliary structure for BlockPar class */
 	struct BlocksStructs {
 		// wynikowa etykieta wierzcholka
 		/**\brief Vertex data used to represent blocks. */
 		struct VertData {
-			// w ilu blokach lezy ten wierzcholek
-			int blockNo; /**<\brief Number of blocks the vertex is in.*/
-			// pozycja pierwszego w sekwencji numerow blokow (por. viter nizej) bloku zawierajacego
+			
+			int blockNo; /**<\brief Number of blocks the vertex belongs to.*/
+			
 			/** \brief First block position.
 			 *
-			 *  The position of the first block the vertex belongs to in the sequence \a viter in \p split method. WEN:numeracja od 0 */
+			 *  The position of the first block the vertex belongs to in the sequence \a viter in \p split method. (indexes start with 0) */
 			int firstBlock;
 			// ten wierzcholek (jego pozostale bloki wystepuja kolejno za nim)
+			/**\brief Constructor
+			 *
+			 * The initialization of \a blockNo and \a firstBlock*/
 			VertData( int b = 0, int f = -1 ): blockNo( b ), firstBlock( f )
 				{ }
-			/** \brief Copy.*/
-			//WEN: opis?
+			/** \brief Copy.
+			 *
+			 * The method copies current structure to \a arg. */
 			template <class T> void copy(T& arg) const
 			{
 				arg.blockNo=blockNo;
 				arg.firstBlock=firstBlock;
 			}
-			/** \brief Copy.*/
+			/** \brief Copy for BlackHole.
+			 *
+			 * Overloaded version of copy for BlackHole. Does nothing.*/
 			void copy(BlackHole&) const
 				{ }
 		};
 	};
 
-	/** \brief Searching blocks = biconnected components.
+	/** \brief Searching blocks = biconnected components (parameterized).
 	 *
+	 *  The parameterized class that that delivers a set of methods for splitting graph into \wikipath{Blocks_in_a_graph,biconnected components (blocks)}.
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
+	 *  \sa Blocks
+	 *  \sa AlgsDefaultSettings
 	 *  \ingroup search    */
 	template< class DefaultStructs > class BlocksPar: public SearchStructs, public BlocksStructs
 	{
@@ -1465,63 +1475,71 @@ namespace Koala
 
 	public:
 
-		/** \brief Get blocks. WEN: znalezione bloki sa numerowane od 0
-		 * WEN: cos sie nazwy zmiennyhch nie zgadzaja ...
-		 *  The method splits graph into blocks. All the edges are treated as undirected. WEN: oprocz petli, rownoleglosci OK
+		/** \brief Get blocks. 
+		 * 
+		 *  The method splits graph into blocks. All the edges are treated as undirectedc 
 		 *  @param[in] g the graph to split.
-		 *  @param[out] vmap the map PVertex->VertData sqould be considered together with sequence viter (BlackHole possible).
-		 *  @param[out] emap the map PEdge->int associating each edge with a block number. (BlackHole possible)
+		 *  @param[out] vertMap the map PVertex->BlocksStructs::VertData should be considered together with sequence viter (BlackHole possible).
+		 *  @param[out] edgeMap the map PEdge->int associating each edge with a block number. (BlackHole possible)
 		 *  @param[out] out the CompStore object with a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
-		 *  @param[out] viter the iterator to the container WEN: na typ int with concatenated sequences of blocks to which the each vertex belongs to.
-		 *   For each vertex the starting point of sequence of blocks is given by \a vmap in the VertData field firstBlock.
+		 *  @param[out] viter the iterator to the container with concatenated sequences of blocks (integers) to which the each vertex belongs to.
+		 *   For each vertex the starting point of associated sequence of blocks is given by \a vertMap in the BlocksStructs::VertData field firstBlock.
 		 *  @return the number of biconnected components.
 		 *  \sa CompStore   */
 		template< class GraphType, class VertDataMap, class EdgeDataMap, class CompIter, class VertIter,
 			class VertBlockIter > static int split( const GraphType &g, VertDataMap & vertMap, EdgeDataMap & edgeMap,
 				CompStore< CompIter,VertIter > out, VertBlockIter viter );
 
-        //NEW: wersja bez out
-		template< class GraphType, class VertDataMap, class EdgeDataMap,
+			/** \brief Get blocks.
+			*
+			*  The method splits graph into blocks. All the edges are treated as undirected (except loops). Blocks are numbered from 0.
+			*  @param[in] g the graph to split.
+			*  @param[out] vertMap the map PVertex->BlocksStructs::VertData should be considered together with sequence viter (BlackHole possible).
+			*  @param[out] edgeMap the map PEdge->int associating each edge with a block number. (BlackHole possible)
+			*  @param[out] viter the iterator to the container with concatenated sequences of blocks (integers) to which the each vertex belongs to.
+			*   For each vertex the starting point of associated sequence of blocks is given by \a vertMap in the BlocksStructs::VertData field firstBlock.
+			*  @return the number of biconnected components.
+			*  \sa CompStore   */
+			template< class GraphType, class VertDataMap, class EdgeDataMap,
 			class VertBlockIter > static int split( const GraphType &g, VertDataMap & vertMap, EdgeDataMap & edgeMap,
 				BlackHole, VertBlockIter viter )
         {   return split(g,vertMap,edgeMap,CompStore< BlackHole,BlackHole>( blackHole,blackHole ), viter);  }
 
-		/** \brief Get blocks of connected component. WEN: zawierajacy dany wierzcholek. + uwagi j.w.
+		/** \brief Get blocks of connected component identified by vertex.
 		 *
-		 *  The method splits a component containing a given vertex into blocks. All the edges are treated as undirected. WEN: oprocz petli, rownoleglosci OK
+		 *  The method splits a component containing a given vertex into blocks. All the edges are treated as undirected (except loops). Blocks are numbered from 0.
 		 *  @param[in] g the graph to split.
 		 *  @param[in] src the reference vertex.
-		 *  @param[out] vmap the map PVertex->VertData sqould be considered together with sequence viter (BlackHole possible).
-		 *  @param[out] emap the map PEdge->int associating each edge with a block number. (BlackHole possible) WEN: tylko wartosci dla wierzcholkow ze skladowej start sa ustawiane w tej mapie
-		 *  @param[out] out the CompStore object with a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
+		 *  @param[out] vmap the map PVertex->BlocksStructs::VertData should be considered together with sequence \a viter (BlackHole possible).
+		 *   Vertices that are not in the considered connected component are not keys in this map.
+		 *  @param[out] emap the map PEdge->int associating each edge with a block number (BlackHole possible). Edges that are not in the considered connected component are not keys in this map.
+		 *  @param[out] out the CompStore object with a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator) (BlackHole possible).
 		 *  @param[out] viter the iterator to the container with concatenated sequences of blocks to which the each vertex belongs to.
-		 *   For each vertex the starting point of sequence of blocks is given by \a vmap in the VertData field firstBlock.
+		 *   For each vertex the starting point of sequence of blocks is given by \a vmap in the BlocksStructs::VertData field firstBlock.
 		 *  @return the number of biconnected components in the connected component given by vertex \a src.
 		 *  \sa CompStore
 		 *
-		 *  [See example](examples/search/blocks/blocks.html).
-		 */
+		 *  [See example](examples/search/blocks/blocks.html). */
 		template< class GraphType, class VertDataMap, class EdgeDataMap, class CompIter, class VertIter,
 			class VertBlockIter > static int splitComp( const GraphType &g, typename GraphType::PVertex src,
 			VertDataMap &vmap, EdgeDataMap &emap, CompStore< CompIter,VertIter > out, VertBlockIter viter );
 
-        //NEW: wersja bez out
+		/* Version with out == BlackHole*/
 		template< class GraphType, class VertDataMap, class EdgeDataMap,
 			class VertBlockIter > static int splitComp( const GraphType &g, typename GraphType::PVertex src,VertDataMap & vertMap,
             EdgeDataMap & edgeMap,BlackHole, VertBlockIter viter )
         {   return splitComp(g,src,vertMap,edgeMap,CompStore< BlackHole,BlackHole>( blackHole,blackHole ), viter);  }
 
 		// wyrzuca na iterator ciag wierzcholkow tworzacych rdzen grafu tj. podgraf pozostajacy po sukcesywnym
-		// usuwaniu wierzcholkow stopnia < 2. Zwraca dlugosc sekwencji
+		// usuwaniu wierzcholkow stopnia < 2. Zwraca dlugosc sekwencji. zatem  mozemy (dla grafu acyklicznego) dostac strukture pusta tj. n==0
 		/** \brief Get core.
 		 *
 		 *  The method writes to \a out a sequence of vertex that make a core of graph i.e. remains after recursive deletions of vertices of deg < 2.
-		 WEN: a zatem  mozemy (dla grafu acyklicznego) dostac strukture pusta tj. n==0
-		 *  \param g the considered graph WEN: oprocz petli ignorujemy rodzaj kraw (wszystkie jak undirected), rownoleglosci OK
+		 *  Edges that are not loops are treated as undirected. 
+		 *  Note that the function may return 0 as core is empty if graph is acyclic.
+		 *  \param g the considered graph.
 		 *  \param out the iterator to the container with vertices of the core of graph.
-		 *  \return the number of vertices in the core of graph.
-		 */
-		 //NEW: zmiana nazwy getCore -> core
+		 *  \return the number of vertices in the core of graph. */
 		template< class GraphType,class Iterator > static int core( const GraphType &g, Iterator out );
 	};
 
@@ -1529,14 +1547,23 @@ namespace Koala
 
 	/** \brief Searching blocks = biconnected components (default).
 	 *
-	 *  The simpler default  version of BlocksPar in which DefaultStructs = AlgsDefaultSettings.
+	 *  
 	 *  \ingroup search    */
-	class Blocks: public BlocksPar< AlgsDefaultSettings > { };
+	/** \brief Searching blocks = biconnected components (default).
+	*
+	*  The simpler default  version of BlocksPar in which DefaultStructs = AlgsDefaultSettings, 
+	*  that delivers a set of methods for splitting graph into \wikipath{Blocks_in_a_graph,biconnected components (blocks)}.
+	*  \sa BlocksPar
+	*  \sa AlgsDefaultSettings
+	*  \ingroup search    */
+	class Blocks : public BlocksPar< AlgsDefaultSettings > { };
 
+	//WEN?: jak z nazwą, dołączyć wiki link?
 	/** Algorithms for Eulerian cycle and path.
 	 *
+	 * The class delivers a suit of methods searching for Eulerian cycle or path. Tested graphs may by of any type. 
+	 * Various methods simply ignore some edge types (directed or undirected).
 	 * \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
-	 *  Warning: for graphs with overt 4000 edges you may need to increase the program stuck size. WEN: juz powinno byc dobrze
 	 *  \ingroup search */
 	template< class DefaultStructs > class EulerPar: public PathStructs, protected SearchStructs
 	{
@@ -1577,8 +1604,8 @@ namespace Koala
 		// para zawierajaca 2 rozne wierzcholki - konce nieskierowanej sciezki Eulera - jesli ta istnieje
 		// (NULL,NULL) w przciwnym razie
 		/** \brief Get Eulerian path end.
-		 *  WEN: we wszystkich metodach tej klasy graf moze byc dowolny, ale krawedzie niektorych rodzajow bywaja ignorowane
-		 *  The method gets the ends of Eulerian path and returns it as standard pair (u,v). If there exists an Eulerian cycle u == v WEN: - nalezace do cyklu.
+		 *  
+		 *  The method gets the ends of Eulerian path and returns it as standard pair (u,v) of vertices belonging to path. If there exists an Eulerian cycle u == v.
 		 *  If the Eulerian path doesn't exist pair (NULL,NULL) is returned.\n
 		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  \param g the considered graph.
@@ -1596,9 +1623,9 @@ namespace Koala
 		// (NULL,NULL) w przciwnym razie
 		/** \brief Get directed Eulerian path end.
 		 *
-		 *  The method gets the ends of an directed Eulerian path and returns it as standard pair (u,v). If there exists an Eulerian cycle u == v.WEN: - nalezace do cyklu.
+		 *  The method gets the ends of an directed Eulerian path and returns it as standard pair (u,v) of vertices belonging to path. If there exists an Eulerian cycle u == v.
 		 *  If the directed Eulerian path doesn't exist pair (NULL,NULL) is returned.
-		 WEN: The method considered only directed edges and loops, directed edges are ignored.
+		 *  The method considered only directed edges and loops, directed edges are ignored.
 		 *  \param g the considered graph.
 		 *  \return the standard pair of pointers to vertices that are the ends of the directed Euler path. If the Euler path does not exist the pair (NULL,NULL) is returned. */
 		template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
@@ -1609,110 +1636,107 @@ namespace Koala
 				return res;
 			}
 
-		/** \brief Test if Eulerian. WEN: The method considered only undirected edges and loops, directed edges are ignored.
+		/** \brief Test if Eulerian.
 		 *
-		 *  The method tests if the graph has an undirected Eulerian cycle.
+		 *  The method tests if the graph has an undirected Eulerian cycle. The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the tested graph.
 		 *  @return true if it has Eulerian cycle, false otherwise.
-		 *  \n
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 */
+		 *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType > static bool hasCycle( const GraphType &g );
 
-		/** \brief Test if directed Eulerian. WEN: The method considered only directed edges and loops, undirected edges are ignored.
+		/** \brief Test if directed Eulerian.
 		 *
-		 *  The method tests if the graph has a directed Eulerian cycle.
+		 *  The method tests if the graph has a directed Eulerian cycle. The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @return true if it has a directed Eulerian cycle, false otherwise.
-		 *  \n
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 *
-		 */
+		 *  [See example](examples/search/euler/euler.html).*/
 		template< class GraphType > static bool hasDirCycle( const GraphType &g );
 
-		/** \brief Test if semi-Eulerian. WEN: The method considered only unirected edges and loops, directed edges are ignored.
+		/** \brief Test if semi-Eulerian.
 
-		* The method tests if the graph \a g has an undirected Eulerian path.
+		* The method tests if the graph \a g has an undirected Eulerian path. The method considered only undirected edges and loops, directed edges are ignored.
 		* @param[in] g the considered graph.
 		* @return true if it has an undirected Eulerian path, false otherwise
-		* \n
 		*
-		* [See example](examples/search/euler/euler.html).
-		*/
+		* [See example](examples/search/euler/euler.html).*/
 		template< class GraphType > static bool hasPath( const GraphType &g );
 
-		/** \brief Test if directed semi-Eulerian. WEN: The method considered only directed edges and loops, undirected edges are ignored.
+		/** \brief Test if directed semi-Eulerian.
 		 *
-		 *  The method tests if graph has a directed Eulerian path
+		 *  The method tests if graph has a directed Eulerian path.
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g graph
 		 *  @return true if it has a directed Eulerian path, false otherwise.
-		 *  \n
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 */
+		 *  [See example](examples/search/euler/euler.html).*/
 		template< class GraphType > static bool hasDirPath( const GraphType &g );
 
-		/** \brief Test the beginning of  undirected Eulerian path. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Test the beginning of  undirected Eulerian path. 
 		 *
 		 *  The method tests if the graph \a g has an undirected Eulerian path starting at the vertex \a u.
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] u the starting vertex.
 		 *  @return true if it has an undirected Eulerian path starting at the vertex \a u, false otherwise.*/
 		template< class GraphType > static bool hasPath( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Test the beginning of directed Eulerian path. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Test the beginning of directed Eulerian path.
 		 *
 		 *  The method tests if the graph \a g has an directed Eulerian path starting at the vertex \a u.
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] u the starting vertex.
 		 *  @return true if it has an directed Eulerian path starting at the vertex \a u, false otherwise */
 		template< class GraphType > static bool hasDirPath( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Test if Eulerian cycle containing \a u. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Test if Eulerian cycle containing \a u.
 		 *
 		 *  The method tests if the graph \a g has an undirected Eulerian cycle containing the vertex \a u.
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] u the given vertex.
 		 *  @return true if it has an undirected Eulerian cycle containing the vertex \a u, false otherwise */
 		template< class GraphType > static bool hasCycle( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Test if directed Eulerian cycle containing \a u. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Test if directed Eulerian cycle containing \a u. 
 		 *
 		 *  The method tests if the graph \a g has an directed Eulerian cycle containing the vertex \a u.
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] u the given vertex.
 		 *  @return true if it has an directed Eulerian cycle containing the vertex \a u, false otherwise */
 		template< class GraphType > static bool hasDirCycle( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Get undirected Eulerian cycle WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get undirected Eulerian cycle.
 		 *
 		 *  The method gets an undirected Eulerian cycle of the graph \a g.
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[out] out the OutPath object with found cycle.
 		 *  @return true if the graph has an Eulerian cycle, false otherwise.
 		 *  \sa SearchStructs::OutPath
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 */
+		 *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getCycle( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
-		/** \brief Get directed Eulerian cycle. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get directed Eulerian cycle.
 		 *
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph
 		 *  @param[out] out the OutPath object with found cycle.
 		 *  @return true if the graph has an Eulerian cycle, false otherwise.
 		 *  \sa SearchStructs::OutPath
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 */
+		 *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getDirCycle( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
-		/** \brief Get undirected Eulerian cycle. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get undirected Eulerian cycle. 
 		 *
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] prefstart the preferred starting vertex, but if the Eulerian cycle does not contain this vertex it is ignored.
 		 *  @param[out] out the OutPath object with found cycle.
@@ -1721,8 +1745,9 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter > static bool
 			getCycle( const GraphType &g, typename GraphType::PVertex prefstart, OutPath< VertIter,EdgeIter> out );
 
-		/** \brief Get directed Eulerian cycle. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get directed Eulerian cycle.
 		 *
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] prefstart preferred starting vertex, but if the Eulerian cycle does not contain this vertex it is ignored.
 		 *  @param[out] out the OutPath object with found cycle.
@@ -1731,8 +1756,9 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter > static bool getDirCycle( const GraphType &g,
 			typename GraphType::PVertex prefstart, OutPath< VertIter,EdgeIter > out);
 
-		/** \brief Get undirected Eulerian path. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get undirected Eulerian path. 
 		 *
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph
 		 *  @param[out] out the OutPath object with found path.
 		 *  @return true if graph has an Eulerian path, false otherwise
@@ -1743,8 +1769,9 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getPath( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
-		/** \brief Get directed Eulerian path. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get directed Eulerian path. 
 		 *
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[out] out the OutPath object with found path.
 		 *  @return true if graph has an Eulerian path, false otherwise
@@ -1755,8 +1782,9 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getDirPath( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
-		/** \brief Get undirected Eulerian path. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get undirected Eulerian path.
 		 *
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] prefstart preferred starting vertex, but if the Eulerian path does not contain this vertex it is ignored.
 		 *  @param[out] out the OutPath object with found path.
@@ -1771,8 +1799,8 @@ namespace Koala
 
 	/** Algorithms for Eulerian cycle and path. (default)
 	 *
-	 *  The simpler default  version of EulerPar in which DefaultStructs = AlgsDefaultSettings.
-	 *  Warning: for graphs with overt 4000 edges you may need to increase the program stuck size.
+	 *  The simpler default  version of EulerPar in which DefaultStructs = AlgsDefaultSettings. Tested graphs may by of any type. 
+	 * Various methods simply ignore some edge types (directed or undirected).
 	 *  \ingroup search */
 	class Euler: public EulerPar< AlgsDefaultSettings > { };
 
@@ -1812,8 +1840,7 @@ namespace Koala
 	/** \brief Maximal strong modules decomposition (parametrized).
 	 *
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
-	 *  \ingroup search
-	 */
+	 *  \ingroup search */
 	template< class DefaultStructs > class ModulesPar: public SearchStructs, public ModulesStructs
 	{
 	public:
@@ -1833,14 +1860,12 @@ namespace Koala
 		 *  \param[out] avmap the associative table PVertex->int, where integers represent the index of module to which vertex belongs to. (BlackHole possible)
 		 *  \param skipifprine if true the modules with the outcome type mpPrime are skipped. WEN: tzn. ich znajdowanie jest skiped w tym przypadku
 		 *  \return a Partition object.
-		 *  \n
 		 *
-		 *  [See example](examples/search/modules/modules.html).
-		 */
+		 *  [See example](examples/search/modules/modules.html).*/
 		template< class GraphType, class CompIter, class VertIter, class CompMap > static Partition split(
 			const GraphType &g, CompStore< CompIter,VertIter > out, CompMap &avmap, bool skipifprime = false );
 
-        //NEW: wersja bez out
+        /* Version with blackHoled out */
 		template< class GraphType, class CompMap > static Partition split( const GraphType &g, BlackHole, CompMap &avmap, bool skipifprime = false )
         {   return split(g,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),avmap,skipifprime);   }
 
