@@ -11,9 +11,9 @@
 namespace Koala
 {
 
-	/* SearchStructs
+	/** \brief Path structures
 	 *
-	 */
+	 *  Some auxiliary structures used by various algorithms, for example shortest path.*/
 	struct PathStructs
 	{
 		// Do odczytu sciezki miedzy wierzcholkiem a korzeniem, gdy droga wyznaczona jest w postaci
@@ -120,9 +120,10 @@ namespace Koala
 		};
 	};
 
-	/* ShortPathStructs
+	/** \brief Output in-forest management.
 	 *
-	 */
+	 *  A number of functions return in-forest in format of associative container PVert -> SearchStructs::VisitVertLabs. 
+	 *  This class consist of methods that extract some useful data from such containers. */
 	struct ShortPathStructs: public PathStructs
 	{
 		// zwraca liczbe krawedzi sciezki
@@ -132,7 +133,14 @@ namespace Koala
 		// OutPath, miejsce gdzie sciezka zostanie zapisana
 		// sciezka prowadzi "pod prad" tj. od korzenia do tego wierzcholka
 		// ew. wczesniejszy punkt koncowy na sciezce miedzy end a korzeniem
-		//WEN: opis?
+		/** \brief Extract path from in-tree.
+		 *
+		 * \param[in] g the considered graph.
+		 * \param[in] vertTab the associative container PVert-> SearchStructs::VisitVertLabs (or own structure that has attributes ePrev and vPrev), that represents in-forest.
+		 * \param[out] iters OutPath structure with extracted path that finishes in \a end. And starts in \a start WEN?: 
+		 * \param[in] end the end of path.
+		 * \param[in] start the root of in-tree or part of in-tree.
+		 * \return the number of edges on path.*/
 		template< class GraphType, class VertContainer, class VIter, class EIter >
 			static int getOutPath( const GraphType &g, const VertContainer &vertTab, OutPath< VIter,EIter > iters,
 			typename GraphType::PVertex end, typename GraphType::PVertex start = 0 );
@@ -148,11 +156,20 @@ namespace Koala
 
 		// Zapisuje na podany iterator wszystkie krawedzie nalezace do drzewa (lasu) tj. uzyte jako wartosci pol ePrev
 		// Zwraca ich liczbe
-		//WEN: opis?
+		/** \brief Get edges in in-tree.
+		 *
+		 * \param[in] g the considered graph.
+		 * \param[in] vertTab the associative container PVert-> SearchStructs::VisitVertLabs (or own structure that has attributes ePrev and vPrev), that represents in-forest.
+		 * \param[out] iter the output iterator to the container with all the edges of in-forest represented by \a vertTab. 
+		 *  \return the number of edges.*/
 		template< class GraphType, class VertContainer, class Iter > static int getUsedEdges( const GraphType &g,
 			const VertContainer &vertTab, Iter iter );
 		// jw. ale zwraca zbior krawedzi
-		//WEN: opis?
+		/** \brief Get edges in in-tree.
+ 		 *
+		 * \param[in] g the considered graph.
+		 * \param[in] vertTab the associative container PVert-> SearchStructs::VisitVertLabs (or own structure that has attributes ePrev and vPrev), that represents in-forest.
+		 * \return the set with all the edges in the in-tree represented by the container \a vertTab.*/
 		template< class GraphType, class VertContainer > static Set< typename GraphType::PEdge >
 			getUsedEdgeSet( const GraphType &g, const VertContainer &vertTab );
 	};
@@ -1809,9 +1826,16 @@ namespace Koala
 	// graf spojny o niespojnym dopelnieniu
 	// graf niespojny
 	// strong modules rozpinaja graf pierwszy
+	/** \brief Enumeration type representing the type of highest node in graph modular decomposition
+	 *
+	 *  - mpTrivial - single vertex,
+	 *  - mpConnected - connected graph with disconnected complement,
+	 *  - mpDisconnected - disconnected,
+	 *  - mpPrime - prime graph.
+	 *  \related ModulesPar */
 	enum ModPartType { mpTrivial,mpConnected,mpDisconnected,mpPrime };
 
-	//NEW: wydzielone z ModulesPar
+	/**\brief Auxiliary modules structure.*/
 	struct ModulesStructs {
 		// opis najwyzszego wezla drzewa dekompozycji modulowej grafu
 		/** \brief The top node in modular decomposition tree.*/
@@ -1827,10 +1851,12 @@ namespace Koala
 			 * - mpTrivial = 0 - only one vertex,
 			 * - mpConnected = 1 - connected but with disconnected complement,
 			 * - mpDisconnected = 2 - disconnected,
-			 * - mpPrime = 3 - strong modules unfold prime graph.
-			 */
+			 * - mpPrime = 3 - strong modules unfold prime graph. */
 			ModPartType type;
 
+			/**\brief Constructor
+			 *
+			 * The constructor sets \a size and \a type up. */
 			Partition( int s, ModPartType t ): size( s ), type( t ) { }
 		};
 
@@ -1852,13 +1878,13 @@ namespace Koala
 		// avmap, wyjsciowa tablica asocjacyjna PVertex->int do ktorej zapisuje sie numery modulow,
 		// do ktorych naleza wierzcholki (lub BlackHole)
 		// skipifprime, pomija badanie modulow jesli wynik ma type=mpPrime???
-		/** \brief Get modular decomposithon of graph. WEN: znalezione moduly numerowane od 0
+		/** \brief Get modular decomposithon of graph. 
 		 *
-		 *  The method splits the vertices of \a g into maximal strong modules.
+		 *  The method splits the vertices of \a g into maximal strong modules. Modules are indexed from 0.
 		 *  \param g the teste graph, should be simple and undirected.
-		 *  \param[out] out an CompStore object storing the modular decomposition.
+		 *  \param[out] out an CompStore object storing the modular decomposition (BlackHole possible).
 		 *  \param[out] avmap the associative table PVertex->int, where integers represent the index of module to which vertex belongs to. (BlackHole possible)
-		 *  \param skipifprine if true the modules with the outcome type mpPrime are skipped. WEN: tzn. ich znajdowanie jest skiped w tym przypadku
+		 *  \param skipifprine if true the modules with the outcome type mpPrime are not searched.
 		 *  \return a Partition object.
 		 *
 		 *  [See example](examples/search/modules/modules.html).*/

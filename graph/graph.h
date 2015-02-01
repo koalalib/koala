@@ -1240,10 +1240,10 @@ namespace Koala
 		/** \brief Change to arcs.
 		 *
 		 *  All the undirected edges in the graph are converted into two arcs. 
-		 *  More precisely, each edge is changed to directed and a new arc with opposite direction and copied info attribute is added to the graph.
+		 *  More precisely, each edge is changed to directed and a new arc with opposite direction (with copied info attribute).
 		 *  \return the number of changed edges.
 		 *
-		 *  [See example](examples/graph/graph_ch2Arcs.html. */
+		 *  [See example](examples/graph/graph_ch2Arcs.html). */
 		int ch2Arcs();
 
 		// j.w. dla wszystkich nieskierowanych przy wierzcholku
