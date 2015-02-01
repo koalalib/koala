@@ -11,6 +11,10 @@ namespace Koala {
 
 namespace IO {
 
+//TODO: wyglada to na spora nadmiarowosc/duplikacje kodu. Czy nie powinno byc
+// ParSetVertRead=ParSetEdgeRead (niech to sie zwie np. ParSetRead), ParSetEdgeWrite=ParSetVertWrite (np. ParSetWrite)?
+//W obecnym ksztalcie oczywiscie wiaze sie to z koniecznoscia dorobienia mozliwosci czytania idkow krawedzi (z reszta dla konsekwencji powinno byc)
+
 struct ParSetVertRead {
 	ParSetVertRead(GraphML &g): m_gml(g), m_idkey(), m_readid(false)			{};
 	ParSetVertRead(GraphML &g, std::string ik): m_gml(g), m_idkey(ik), m_readid(true)	{};
