@@ -7,6 +7,38 @@ void SchedulingStructs::Schedule::clearMachines()
 	machines.resize( m );
 }
 
+int SchedulingStructs::Schedule::part( int machNo, int time )
+{
+    koalaAssert( machNo>=0 && machNo<machines.size(),ContExcOutpass );
+	Machine &m = machines[machNo];
+	Machine::const_iterator i = std::upper_bound(m.begin(), m.end(), TaskPart(-1, time, time), TaskPart::compareEndTime());
+	return i == m.end() ? -1 : (i - m.begin());
+}
+
+template< typename IntInserter, typename STDPairOfIntInserter >
+void SchedulingStructs::Schedule::taskPartList( SearchStructs::CompStore<IntInserter,STDPairOfIntInserter> out )
+{
+	int n = 0;
+	for( Type::const_iterator i = machines.begin(); i != machines.end(); ++i )
+		n += i->size();
+
+	TaskPart LOCALARRAY( tasks, n );
+
+	n = 0;
+	for( Type::const_iterator i = machines.begin(); i != machines.end(); ++i )
+		for( Machine::const_iterator j = i->begin(); j != i->end(); ++j, ++n )
+			tasks[n] = *j, tasks[n].end = (i - machines.begin()), tasks[n].part = (j - i->begin());
+	std::sort( tasks,tasks + n, TaskPart::compareIndexAndStartTime() );
+
+	for(int i = 0; i < n; i++)
+	{
+		if(i == 0 || tasks[i - 1].task != tasks[i].task)
+			*out.compIter = i, ++out.compIter;
+		*out.vertIter = std::make_pair(tasks[i].end, tasks[i].part), ++out.vertIter;
+	}
+	*out.compIter = n, ++out.compIter;
+}
+
 template< class DefaultStructs > template< typename Comp, typename TaskIterator, typename Iterator >
 	int SchedulingPar< DefaultStructs >::sortByComp( TaskIterator begin, TaskIterator end, Iterator out )
 {

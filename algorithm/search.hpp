@@ -1624,7 +1624,7 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
     SimplArrPool<typename ImageGraph::Edge> ealloc(n*(n-1)/2);
 	ImageGraph neg(&valloc,&ealloc);
 	typename ImageGraph::PVertex LOCALARRAY( tabvneg,n );
-    neg.copy(g,stdChoose(true)&stdChoose(true),stdCast(false)& stdCast(false),
+    neg.copy(g,stdChoose(true)&stdChoose(true),valCast()& valCast(),
                Std2Linker<Privates::Std1PtrLinker,Std1NoLinker>(Privates::Std1PtrLinker(),Std1NoLinker())
                &stdLink(false,false));
     neg.neg(Undirected);

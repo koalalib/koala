@@ -169,8 +169,8 @@ namespace Koala
 		 */
 		template< class Iterator > int getKeys( Iterator iter ) const;
 
-		// referencja do oryginalnego kontenera, na ktorym operuje wrapper 
-		/** \brief Reference to the original container. 
+		// referencja do oryginalnego kontenera, na ktorym operuje wrapper
+		/** \brief Reference to the original container.
 		 *
 		 *	The reference to the original container. The one the class wraps.
 		 *
@@ -215,7 +215,7 @@ namespace Koala
 		{ return AssocTabConstInterface< T >( cont ); }
 
 	// wrapper do kontenera asocjacyjnego nie-stalego, metody tworzone sa na podstawie metod chronionych z AssocTabConstInterface  AssocTabConstInterface. Nie trzeba go pisac dla kazdej mapy od zera. Por. np. koncowka hashcont.h
-	/** \brief Map container wrapper. 
+	/** \brief Map container wrapper.
 	 *
 	 *  This is the class of objects that wraps map objects (for example from STL).
 	 *  This interface delivers the standard not only constant  methods for containers in koala and
@@ -310,7 +310,7 @@ namespace Koala
 		 *
 		 *	The method gets the pointer to the value associated with the key \a arg.
 		 *  \param arg the key of the searched element.
-		 *  \return the pointer to the mapped value associated with the key \a arg. NULL if the key does not match the key of any element in the container. 
+		 *  \return the pointer to the mapped value associated with the key \a arg. NULL if the key does not match the key of any element in the container.
 		 *
 		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_valPtr.html">See example</a>.
 		 */
@@ -324,7 +324,7 @@ namespace Koala
 		 */
 		ValType operator[]( KeyType arg ) const { return AssocTabConstInterface< T >::operator[]( arg ); }
 
-		// w przypadku obiektu nie-stalego zwraca referencje do przypisanej kluczowi wartosci. Nowy klucz dostaje wartosc domyslna typu ValType 
+		// w przypadku obiektu nie-stalego zwraca referencje do przypisanej kluczowi wartosci. Nowy klucz dostaje wartosc domyslna typu ValType
 		/** \brief Access element.
 		 *
 		 *  If the key \a arg exists the reference to the mapped value is returned, otherwise a new element associated with the \a arg is created with default mapped value gained from the call of the empty constructor of ValType. The method works with non-constant objects.
@@ -405,8 +405,8 @@ namespace Koala
 		AssocTable< T > &operator=( const T &arg );
 		/** \brief Copy content of container.
 		 *
-		 *  Overloaded operator = copies the container \a arg of type \a T to the member \a cont. Hence, it is possible to copy associative type of other type as long as the keys match and the values may be copied. 
-		 *  \tparam AssocCont the type of copied associative container. 
+		 *  Overloaded operator = copies the container \a arg of type \a T to the member \a cont. Hence, it is possible to copy associative type of other type as long as the keys match and the values may be copied.
+		 *  \tparam AssocCont the type of copied associative container.
 		 *  \param arg  the copied container.
 		 *  \return the reference to the current container.
 		 *
@@ -503,7 +503,7 @@ namespace Koala
 		 *  <a href="examples/assoctab/assocTable/assocTable_size.html">See example</a>.
 		 */
 		unsigned size() const { return inter.size(); }
-		
+
 		/** \brief Test if empty.
 		 *
 		 *  \return the boolean value, true if the container has no elements, false otherwise.
@@ -581,7 +581,7 @@ namespace Koala
 	 *
 	 *  \tparam T the type of container.
 	 *  \param cont the reference to wrapped container.
-	 *  \return the AssocTable container wrapping \a cont. 
+	 *  \return the AssocTable container wrapping \a cont.
 	 *  \relates AssocTable
 	 *  \ingroup cont*/
 	template< class T > AssocTable< T > assocTab( const T &cont ) { return AssocTable< T >( cont ); }
@@ -671,10 +671,10 @@ namespace Koala
 
 	// Szybka tablica asocjacyjna np. dla wierz/kraw
 	// Wiekszosc interfejsu jak w innych tabl. assocjacyjnych
-	// wskazywany przez klucz obiekt musi miec pole AssocKeyContReg assocReg 
+	// wskazywany przez klucz obiekt musi miec pole AssocKeyContReg assocReg
 	/** \brief Fast associative container.
 	 *
-	 *  The fast associative container with interface similar to other containers. 
+	 *  The fast associative container with interface similar to other containers.
 	 *  Mapped value object must have attribute AssocKeyContReg assocReg.
 	 *  \tparam Klucz the type of key.
 	 *  \tparam Elem the type of mapped value.
@@ -726,14 +726,14 @@ namespace Koala
 		AssocArray< Klucz,Elem,Container > &operator=( const AssocArray< Klucz,Elem,Container > &X );
 
 		// roznica z poprzednim? Dopuszcza kopiowanie miedzy roznymi typami tablic
-		// czym sie rozni od poprzedniego? To jest unikatowe w Koali, ze mozesz np. przypisac 
+		// czym sie rozni od poprzedniego? To jest unikatowe w Koali, ze mozesz np. przypisac
 		// AssocArray<...> = 	AssocTable<...> jesli zgadzaja sie typy kluczy, a wartosci mapowane daja sie przepisac
 		/** \brief Copy content of container.
 		 *
-		 *  Overloaded operator= copies the content of a container AssocCont \a arg to the current container. 
+		 *  Overloaded operator= copies the content of a container AssocCont \a arg to the current container.
 		 *  The method allows to copy content of another associative container.
 		 *  \tparam AssocCont type of associative container copied. The types of keys must much and mapped values can be copied.
-		 *  \param arg  the copied container. 
+		 *  \param arg  the copied container.
 		 *  \return reference to current object.
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_operator_assignment.html">See example</a>.
@@ -806,7 +806,7 @@ namespace Koala
 		 *
 		 *  The method gets the pointer to the value associated with the key \a v.
 		 *  \param v the key of the searched element.
-		 *  \return the pointer to the mapped value associated with the key \a v or NULL if the key does not match the key of any element from array. 
+		 *  \return the pointer to the mapped value associated with the key \a v or NULL if the key does not match the key of any element from array.
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_valPtr.html">See example</a>.
 		 */
@@ -823,7 +823,7 @@ namespace Koala
 
 		/** \brief Delete element.
 		 *
-		 *  The method deletes the element associated with the key \a v. 
+		 *  The method deletes the element associated with the key \a v.
 		 *  \param v the key of the considered element.
 		 *  \return true if the element existed.
 		 *
@@ -859,7 +859,7 @@ namespace Koala
 		/** \brief Get previous key.
 		 *
 		 *  \param v the reference key.
-		 *  \return the key prior to \a v.  If \a v == 0, the last key is returned.  If \a v is the first element the method returns 0. 
+		 *  \return the key prior to \a v.  If \a v == 0, the last key is returned.  If \a v is the first element the method returns 0.
 		 *
 		 *  <a href="examples/assoctab/assocArray/assocArray_prevKey.html">See example</a>.
 		 */
@@ -917,7 +917,42 @@ namespace Koala
 			{ clear(); }
 	};
 
+    //NEW: powrot do czegos dawno usunietego: interfejsu do zewnetrznego AssocArray
+	template< class K, class V, class Cont > class AssocTabConstInterface< AssocArray< K,V,Cont > >: public Privates::AssocTabTag< K >
+	{
+	public:
+		// konstruktor pobiera oryginalna mape, ktorej sluzy za interfejs
+		AssocTabConstInterface( const AssocArray< K,V,Cont > &acont ): cont( acont ) {}
 
+		// typ klucza tablicy
+		typedef K KeyType; /**< \brief Type of key. */
+		// typ przypisywanych wartosci
+		typedef V ValType; /**< \brief Type of mapped value.*/
+		typedef AssocArray< K,V,Cont > OriginalType; /**< \brief Type of wrapped container.*/
+
+		bool hasKey( K arg ) const { return cont.hasKey( arg ); }
+		K firstKey() const { return cont.firstKey(); }
+		K lastKey() const { return cont.lastKey(); }
+		K prevKey( K arg ) const { return cont.prevKey( arg ); }
+		K nextKey( K arg ) const { return cont.nextKey( arg ); }
+		V operator[]( K arg ) const { return cont[arg]; }
+		unsigned size() const { return cont.size(); }
+		bool empty() const { return this->size() == 0; }
+		bool operator!() const { return empty(); }
+		template< class Iterator > int getKeys( Iterator iter ) const { return cont.getKeys(iter); }
+
+		const AssocArray< K,V,Cont > &cont;
+		int capacity () const { return cont.capacity(); }
+
+	protected:
+		AssocArray< K,V,Cont >& _cont() { return const_cast< AssocArray< K,V,Cont >& >( cont ); }
+
+		void reserve( int n) { _cont().reserve(n); }
+		void clear() { _cont().clear(); }
+		bool delKey( K arg ) { return _cont().delKey(arg); }
+		V &get( K arg ) { return (_cont())[arg]; }
+		ValType *valPtr( K arg ) { return _cont().valPtr(arg); }
+	};
 
 	namespace Privates {
 
@@ -1134,7 +1169,7 @@ namespace Koala
 	 *
 	 *  Two-dimensional associative container. That assigns an element to the pair of keys.
 	 *  \tparam aType decides over the type of matrix (AssocMatrixType).
-	 *  \tparam Container the type of internal container used to store mapped values. 
+	 *  \tparam Container the type of internal container used to store mapped values.
 	 *  \tparam IndexContainer the type of internal associative table used to assign various data (numbers) to single keys.
 	 WEN: uwaga - domyslnie jest to  AssocArray, ale wowczas WEN?: wskazywany przez klucz obiekt musi mieæ pole AssocKeyContReg assocReg
 	 Jesli tak nie jest, mozna zastapic AssocArray udajaca ja mapa PseudoAssocArray, ktora zapewnia podobna numeracje, lecz jest inaczej zorganizowana
@@ -1599,27 +1634,27 @@ namespace Koala
 	 * TODO: sprawdzic, czy dziala ze zwyklymi funkcjami C  pobierajacymi argument przez wartosc, referencje lub const ref
 	 */
 	 //WEN: opis?
-	template< class T, class Fun > class AssocFunktorInserter:
+	template< class T, class Fun > class AssocFunctorInserter:
 		public std::iterator< std::output_iterator_tag,void,void,void,void >
 	{
 	protected:
 		T* container;
-		mutable Fun funktor;
+		mutable Fun functor;
 
 	public:
 		typedef T container_type;
-		typedef Fun FunktorType;
-		AssocFunktorInserter( T &x, Fun f ): container( &x ), funktor( f ) { }
-		template< class K > AssocFunktorInserter< T,Fun > &operator=( const K & );
-		AssocFunktorInserter< T,Fun > &operator*() { return *this; }
-		AssocFunktorInserter< T,Fun > &operator++() { return *this; }
-		AssocFunktorInserter< T,Fun > operator++( int ) { return *this; }
+		typedef Fun FunctorType;
+		AssocFunctorInserter( T &x, Fun f ): container( &x ), functor( f ) { }
+		template< class K > AssocFunctorInserter< T,Fun > &operator=( const K & );
+		AssocFunctorInserter< T,Fun > &operator*() { return *this; }
+		AssocFunctorInserter< T,Fun > &operator++() { return *this; }
+		AssocFunctorInserter< T,Fun > operator++( int ) { return *this; }
 	};
 
 	// ... i jego funkcja tworzaca dla podanego kontenera i funktora (typu KeyType -> ValType)
 	//WEN: opis?
-	template< class T, class F > AssocFunktorInserter< T,F > assocInserter( T &x, F f )
-		{ return AssocFunktorInserter< T,F >( x,f ); }
+	template< class T, class F > AssocFunctorInserter< T,F > assocInserter( T &x, F f )
+		{ return AssocFunctorInserter< T,F >( x,f ); }
 
 
 

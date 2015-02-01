@@ -158,13 +158,13 @@ namespace Privates {
 		 *  where N<sub>1</sub> is the empty graph containing one vertex and P<sub>n-1</sub> is the path graph on n-1 vertices.
 		 *  The function generates an usual fan graph containing n vertices.
 		 *
-		 *  The central vertex is created as the first vertex.  
+		 *  The central vertex is created as the first vertex.
 		 *  The following connections are created:
 		 *  - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
 		 *  - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1).
 		 *
 		 *  where numbers represent vertices.
-		 * 
+		 *
 		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param n - the number of vertices to create,
@@ -183,13 +183,13 @@ namespace Privates {
 		 *  where N<sub>1</sub> is the empty graph containing one vertex and P<sub>n-1</sub> is the path graph on n-1 vertices.
 		 *  The function generates an usual fan graph containing n vertices.
 		 *
-		 *  The central vertex is created as the first vertex.  
+		 *  The central vertex is created as the first vertex.
 		 *  The following connections are created:
 		 *  - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
 		 *  - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1).
 		 *
 		 *  where numbers represent vertices.
-		 * 
+		 *
 		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param  n - number of vertices to create,
@@ -208,13 +208,13 @@ namespace Privates {
 		 *  where N<sub>1</sub> is the empty graph containing one vertex and P<sub>n-1</sub> is the path graph on n-1 vertices.
 		 *  The function generates an usual fan graph containing n vertices.
 		 *
-		 *  The central vertex is created as the first vertex.  
+		 *  The central vertex is created as the first vertex.
 		 *  The following connections are created:
 		 *  - connections of the central vertex: 0-1, 0-2, 0-(n-2), 0-(n-1),
 		 *  - connections of non-central vertices: 1-2, 2-3,..., (n-2)-(n-1).
 		 *
 		 *  where numbers represent vertices.
-		 * 
+		 *
 		 *  Additionally, if the mask contains a loop, then a loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
@@ -290,7 +290,7 @@ namespace Privates {
 
 		/** \brief Create complete bipartite graph.
 		 *
-		 *  The function generates a complete bipartite graph K<sub>n1,n2</sub>. 
+		 *  The function generates a complete bipartite graph K<sub>n1,n2</sub>.
 		 *  Vertices in the first partition are numbered form 0 to (n1-1), vertices from the second partition are numbered form n1 to (n1+n2-1).
 		 *  All vertices from the first partition are connected to all vertices from the second partition.
 		 *
@@ -309,7 +309,7 @@ namespace Privates {
 		/* It is a simpler version of the above function*/
 		/** \brief Create complete bipartite graph.
 		 *
-		 *  The function generates a complete bipartite graph K<sub>n1,n2</sub>. 
+		 *  The function generates a complete bipartite graph K<sub>n1,n2</sub>.
 		 *  Vertices in the first partition are numbered form 0 to (n1-1), vertices from the second partition are numbered form n1 to (n1+n2-1).
 		 *  All vertices from the first partition are connected to all vertices from the second partition.
 		 *
@@ -326,7 +326,7 @@ namespace Privates {
 		/** \brief Create complete K-partite graph.
 		 *
 		 *  The function generates a complete K-partite graph. Each of K partitions has the same number of vertices
-		 *  specified by the input parameter k. 
+		 *  specified by the input parameter k.
 		 *
 		 *  Vertices in the first partition are numbered form 0 to (k-1),\n
 		 *  vertices from the second partition are numbered form k to (2k-1),\n
@@ -351,7 +351,7 @@ namespace Privates {
 		/** \brief Create complete K-partite graph.
 		 *
 		 *  The function generates a complete K-partite graph. Each of K partitions has the same number of vertices
-		 *  specified by the input parameter k. 
+		 *  specified by the input parameter k.
 		 *
 		 *  Vertices in the first partition are numbered form 0 to (k-1),\n
 		 *  vertices from the second partition are numbered form k to (2k-1),\n
@@ -451,14 +451,14 @@ namespace Privates {
 		/** \brief Create regular tree.
 		 *
 		 *  The function generates a tree in which each non-leaf vertex has the same degree specified by the parameter \a deg.
-		 *  The height of the tree is defined by the parameter \a height. 
+		 *  The height of the tree is defined by the parameter \a height.
 		 *
 		 *  Vertices are created in order from the root through all vertices on a particular level to leaves, i.e.:
 		 *  - root has number 0,
 		 *  - children of the root are numbered from 1 to deg,
 		 *  - grandchildren are numbered from (deg+1) to (deg+deg^2),
 		 *  - vertices on next levels are numbered analogically.
-		 *  
+		 *
 		 *  Edges:
 		 *  - root is connected to vertices from 1 to deg,
 		 *  - vertex number 1 is connected to vertices from (deg+1) to (2*deg),
@@ -470,11 +470,11 @@ namespace Privates {
 		 *  - root vertex: 0,
 		 *  - vertices of heigh = 1: 1, 2, 3,
 		 *  - vertices of heigh = 2: 4, 5, 6, 7, 8, 9, 10, 11, 12.
-		 *  
+		 *
 		 *  Edges:
 		 *  - 0-1, 0-2, 0-3,
 		 *  - 1-4, 1-5, 1-6, 2-7, 2-8, 2-9, 3-10, 3-11, 3-12.
-		 *  
+		 *
 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param deg - degree of non-leaf vertices
@@ -491,14 +491,14 @@ namespace Privates {
 		/** \brief Create regular tree.
 		 *
 		 *  The function generates a tree in which each non-leaf vertex has the same degree specified by the parameter \a deg.
-		 *  The height of the tree is defined by the parameter \a height. 
+		 *  The height of the tree is defined by the parameter \a height.
 		 *
 		 *  Vertices are created in order from the root through all vertices on a particular level to leaves, i.e.:
 		 *  - root has number 0,
 		 *  - children of the root are numbered from 1 to deg,
 		 *  - grandchildren are numbered from (deg+1) to (deg+deg^2),
 		 *  - vertices on next levels are numbered analogically.
-		 *  
+		 *
 		 *  Edges:
 		 *  - root is connected to vertices from 1 to deg,
 		 *  - vertex number 1 is connected to vertices from (deg+1) to (2*deg),
@@ -510,11 +510,11 @@ namespace Privates {
 		 *  - root vertex: 0,
 		 *  - vertices of height = 1: 1, 2, 3,
 		 *  - vertices of height = 2: 4, 5, 6, 7, 8, 9, 10, 11, 12.
-		 *  
+		 *
 		 *  Edges:
 		 *  - 0-1, 0-2, 0-3,
 		 *  - 1-4, 1-5, 1-6, 2-7, 2-8, 2-9, 3-10, 3-11, 3-12.
-		 *  
+		 *
 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
 		 *  \param g - the input/output graph,
 		 *  \param deg - degree of non-leaf vertices
@@ -537,7 +537,7 @@ namespace Privates {
 		 *  - children of the root are numbered from 1 to deg_0,
 		 *  - grandchildren are numbered from (deg_0+1) to (deg_0+deg_0*deg_1), where deg_i is the degree of vertices of height i,
 		 *  - vertices on next levels are numbered analogically.
-		 *  
+		 *
 		 *  Edges:
 		 *  - root is connected to vertices from 1 to deg0,
 		 *  - vertex number 1 is connected to vertices from (deg0+1) to (deg0+deg1),
@@ -581,7 +581,7 @@ namespace Privates {
 		 *  - children of the root are numbered from 1 to deg_0,
 		 *  - grandchildren are numbered from (deg_0+1) to (deg_0+deg_0*deg_1), where deg_i is the degree of vertices of height i,
 		 *  - vertices on next levels are numbered analogically.
-		 *  
+		 *
 		 *  Edges:
 		 *  - root is connected to vertices from 1 to deg0,
 		 *  - vertex number 1 is connected to vertices from (deg0+1) to (deg0+deg1),
@@ -610,7 +610,7 @@ namespace Privates {
 			static typename GraphType::PVertex regTree( GraphType &g, Iter begin, Iter end, EdgeDirection dir = EdUndir );
 
 
-		
+
 		/** \brief Create caterpillar.
 		 *
 		 *  The function generates a caterpillar. "A caterpillar is a tree in which every graph vertex
@@ -633,7 +633,7 @@ namespace Privates {
 		 *  For example for caterpillar having pathVertNum = 3 and legNum = [2,3,4] the structure is as follows:
 		 *  - vertices on the central path: 0, 1, 2,
 		 *  - legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
-		 *  
+		 *
 		 *  Edges:
 		 *  - central path: 0-1, 1-2,
 		 *  - legs: 0-3, 0-4, 1-5, 1-6, 1-7, 2-8, 2-9, 2-10, 2-11.
@@ -650,7 +650,7 @@ namespace Privates {
 			static typename GraphType::PVertex caterpillar( GraphType &g, Iter begin, Iter end, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection pathDir, EdgeDirection legDir);
 
-		
+
 		/** \brief Create caterpillar.
 		 *
 		 *  The function generates a caterpillar. "A caterpillar is a tree in which every graph vertex
@@ -660,7 +660,7 @@ namespace Privates {
 		 *  (leaves or legs) are created and attached to vertices on the path. The number of legs for each vertex
 		 *  on the path is specified by the parameter \a legNnm.
 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
-		 *  
+		 *
 		 *  First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
 		 *  where pathVertNum is the number of vertices on the central path. Next, (pathVertNum*legNum) legs are created so that:
 		 *  - first alegNum legs that should be connected to the first vertex on the central path are created,
@@ -670,7 +670,7 @@ namespace Privates {
 		 *  For example for caterpillar having pathVertNum = 3 and legNum = 3 the structure is as follows:
 		 *  - vertices on the central path: 0, 1, 2,
 		 *  - legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
-		 *  
+		 *
 		 *  Edges:
 		 *  - central path: 0-1, 1-2,
 		 *  - legs: 0-3, 0-4, 0-5, 1-6, 1-7, 1-8, 2-9, 2-10, 2-11.
@@ -696,7 +696,7 @@ namespace Privates {
 		 *  (leaves or legs) are created and attached to vertices on the path. The number of legs for each vertex
 		 *  on the path is specified by the parameter \a legNnm.
 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
-		 *  
+		 *
 		 *  First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
 		 *  where pathVertNum is the number of vertices on the central path. Next, (pathVertNum*legNum) legs are created so that:
 		 *  - first alegNum legs that should be connected to the first vertex on the central path are created,
@@ -706,7 +706,7 @@ namespace Privates {
 		 *  For example for caterpillar having pathVertNum = 3 and legNum = 3 the structure is as follows:
 		 *  - vertices on the central path: 0, 1, 2,
 		 *  - legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
-		 *  
+		 *
 		 *  Edges:
 		 *  - central path: 0-1, 1-2,
 		 *  - legs: 0-3, 0-4, 0-5, 1-6, 1-7, 1-8, 2-9, 2-10, 2-11.
@@ -732,7 +732,7 @@ namespace Privates {
 		 *  (leaves or legs) are created and attached to vertices on the path. The number of legs for each vertex
 		 *  on the path is specified by the parameter \a legNnm.
 		 *  Additionally if the mask contains a loop then the loop is attached to each vertex.
-		 *  
+		 *
 		 *  First, vertices on the central path are created and numbered from 0 to (pathVertNum-1),
 		 *  where pathVertNum is the number of vertices on the central path. Next, (pathVertNum*legNum) legs are created so that:
 		 *  - first alegNum legs that should be connected to the first vertex on the central path are created,
@@ -742,7 +742,7 @@ namespace Privates {
 		 *  For example for caterpillar having pathVertNum = 3 and legNum = 3 the structure is as follows:
 		 *  - vertices on the central path: 0, 1, 2,
 		 *  - legs: 3, 4, 5, 6, 7, 8, 9, 10, 11.
-		 *  
+		 *
 		 *  Edges:
 		 *  - central path: 0-1, 1-2,
 		 *  - legs: 0-3, 0-4, 0-5, 1-6, 1-7, 1-8, 2-9, 2-10, 2-11.
@@ -761,7 +761,7 @@ namespace Privates {
 		 *  Each edge is included in the graph with probability \a p independent from every other edge.
 		 *  If the type of the graph is set to directed, then each of the two possible (opposite directed) edges
 		 *  between two particular vertices is drawn independently.
-		 *  \param rgen - the reference to the class that generates pseudo random numbers, 
+		 *  \param rgen - the reference to the class that generates pseudo random numbers,
 		 *   use C++11 <random> library or in lower standard Koala::StdRandGen or other with the same interface.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
@@ -781,7 +781,7 @@ namespace Privates {
 		 *  Each edge is included in the graph with probability \a p independent from every other edge.
 		 *  If the type of the graph is set to directed, then each of the two possible (opposite directed) edges
 		 *  between two particular vertices is drawn independently.
-		 *  \param rgen - the reference to the class that generates pseudo random numbers, 
+		 *  \param rgen - the reference to the class that generates pseudo random numbers,
 		 *   use C++11 <random> library or in lower standard Koala::StdRandGen or other with the same interface.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
@@ -798,7 +798,7 @@ namespace Privates {
 		 *   - in the case of undirected graphs the collection contains \a n(\a n-1)/2 edges,
 		 *   - in the case of directed graphs the collection contains \a n(\a n-1) edges.
 		 *
-		 *  \param rgen - the reference to the class that generates pseudo random numbers, 
+		 *  \param rgen - the reference to the class that generates pseudo random numbers,
 		 *   use C++11 <random> library or in lower standard Koala::StdRandGen or other with the same interface.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
@@ -819,7 +819,7 @@ namespace Privates {
 		 *   - in the case of undirected graphs the collection contains \a n(\a n-1)/2 edges,
 		 *   - in the case of directed graphs the collection contains \a n(\a n-1) edges.
 		 *
-		 *  \param rgen - the reference to the class that generates pseudo random numbers, 
+		 *  \param rgen - the reference to the class that generates pseudo random numbers,
 		 *   use C++11 <random> library or in lower standard Koala::StdRandGen or other with the same interface.
 		 *  \param g - the input/output graph,
 		 *  \param n - number of vertices to create,
@@ -895,7 +895,7 @@ namespace Privates {
 		static typename GraphType::PVertex barAlb(RndGen& rgen, GraphType &g, int n, int k, EdgeDirection type = Undirected, bool shuffle = false);
 
         // wytyczne dla modeli Watts–Strogatz - mozna zmienic wewnetrzne domyslne hashSet/Map (o kluczach int lub pair<int,int>) na stlowe
-        /** \brief Parameters for Watts–Strogatz model. 
+        /** \brief Parameters for Watts–Strogatz model.
 		 *
 		 *  The class parameterize internal structures in Watts–Strogatz random graph generation model. */
 		class WattStrogDefaultSettings
@@ -1036,7 +1036,7 @@ namespace Privates {
 		static typename GraphType::PVertex wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, EdgeType type = Undirected, bool shuffle = false);
 
 		/** \brief Random graph generator in Watts–Strogatz model (parameterized).
-		 * 
+		 *
 		 *  This is an optimized version of wattStrog1 method so that no retrials is performed while randomly rewiring edges.
 		 *
 		 *  This algorithm is based on the following concepts:
@@ -1681,7 +1681,7 @@ namespace Privates {
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return cart( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+				return cart( g1,g2,g,std::make_pair( valCast( ),valCast( ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
@@ -1732,7 +1732,7 @@ namespace Privates {
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex lex( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return lex( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+				return lex( g1,g2,g,std::make_pair( valCast( ),valCast( ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
@@ -1783,7 +1783,7 @@ namespace Privates {
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex tensor( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return tensor( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+				return tensor( g1,g2,g,std::make_pair( valCast( ),valCast( ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
@@ -1834,7 +1834,7 @@ namespace Privates {
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex strong( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
-				return strong( g1,g2,g,std::make_pair( stdCast( false ),stdCast( false ) ),
+				return strong( g1,g2,g,std::make_pair( valCast( ),valCast( ) ),
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 	};
