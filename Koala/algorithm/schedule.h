@@ -36,18 +36,38 @@ namespace Koala
 				length( _length ), release( _release ), duedate( _duedate ), vertex( _vertex )
 				{ }
 		};
+
+        class Schedule;
 		/** \brief Scheduled task part.
 		 *
 		 *  The structure represent the continuous time interval associated with part of task.
 		 WEN: w uszeregowaniu tj. stuktura wynikowa */
 		struct TaskPart
 		{
+		    friend class Schedule;
 		    //WEN: co to jest task i part?
 			int task/**\brief Task index*/,start/**\brief Starting time*/,end/**\brief Finishing time*/,part/**\brief Part index*/;
 			/**\brief Constructor*/
 			TaskPart( int _task = 0, int _start = 0, int _end = 0, int _part = 0):
 				task( _task ), start( _start ), end( _end ), part( _part )
 				{ }
+
+            protected:
+                struct compareEndTime
+                {
+                    bool operator() ( const TaskPart &first, const TaskPart &second )
+                    {
+                        return first.end < second.end;
+                    }
+                };
+
+                struct compareIndexAndStartTime
+                {
+                    bool operator() ( const TaskPart &first, const TaskPart &second )
+                    {
+                        return first.task < second.task ||  (first.task == second.task && first.start < second.start);
+                    }
+                };
 		};
 
 		/** \brief Task window.
@@ -107,6 +127,11 @@ namespace Koala
 				{ machines[m].clear(); }
 			/**\brief Clear all machines.*/
 			inline void clearMachines();
+
+			int part( int machNo, int time );
+
+			template< typename IntInserter, typename STDPairOfIntInserter >
+			void taskPartList( SearchStructs::CompStore<IntInserter,STDPairOfIntInserter> out );
 		};
 
 

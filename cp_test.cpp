@@ -251,7 +251,7 @@ void przec(Lapacz,...)
 
     Vertex<InfoV2,InfoE2>* A2=g2.addVert(),*B2=g2.addVert();
     g2.addArc(A2,B2);
-    g2.substitute(B2,g1,stdChoose(true)&stdChoose(true),stdCast(&vtrans)&valCast<InfoE2>()
+    g2.substitute(B2,g1,stdChoose(true)&stdChoose(true),stdCast(&vtrans)&valCast()
             , stdLink(am21,m12) & stdLink(an21,an12));
 
     g2p.copy(g1);

@@ -72,7 +72,7 @@ namespace Koala
 	 *  The empty structure often used as default value for info attributes in vertices.
 	 *  \ingroup DMdef*/
 	struct EmptyVertInfo { } ;
-	/**\brief Structures for empty edge info. 
+	/**\brief Structures for empty edge info.
 	 *
 	 *  The empty structure often used as default value for info attributes in edges.
 	 *  \ingroup DMdef*/
@@ -269,7 +269,7 @@ namespace Koala
 	 *
 	 *  The default function object can be used if method requires the object function, generating for example
 	 *   edge info, but the user does not need to specify it. The functor works with 0 to 6 arguments and always
-	 *   returns the value prespecified in constructor. 
+	 *   returns the value prespecified in constructor.
 	 *   \tparam T The type of returned object, the type have minimal requirements similar to STL objects. I.e. it must implement:
 	 *   - empty constructor
 	 *   - copy constructor
@@ -311,7 +311,7 @@ namespace Koala
 	};
 
 	// Funkcja tworząca powyższy funktor.
-	/** \brief Generating function for constant functor. 
+	/** \brief Generating function for constant functor.
 	 * \relates ConstFuctor
 	 * \ingroup def*/
 	template< class T > ConstFunctor< T > constFun( const T &a = T() )
@@ -324,7 +324,7 @@ namespace Koala
 	 */
 	/** \brief Black hole.
 	 *
-	 *  Sometimes method does more than the user wants. Than the class succor. It can supersede \wikipath{insert iterators, Output_iterator} 
+	 *  Sometimes method does more than the user wants. Than the class succor. It can supersede \wikipath{insert iterators, Output_iterator}
 	 *  of containers or associative tables as long as the result is never used by the user.
 	 *  \ingroup DMdef */
 	struct BlackHole: public std::iterator< std::output_iterator_tag,void,void,void,void >
@@ -386,8 +386,8 @@ namespace Koala
 	// Test na to, czy argument jest typu BlackHole.
 	/** \brief Test if black hole.
 	 *
-	 *  The	method tests if type \a T is BlackHole. Although it always returns false, 
-	 *  there is a specialization of it available for BlackHole type, which returns true. 
+	 *  The	method tests if type \a T is BlackHole. Although it always returns false,
+	 *  there is a specialization of it available for BlackHole type, which returns true.
 	 *  \return false unless the specialization for BlackHole is called.
 	 *  \related BlackHole */
 	template< class T > bool isBlackHole( const T & )
@@ -414,7 +414,7 @@ namespace Koala
 
 		/** \brief Get container.
 		 *
-		 *  
+		 *
 		 */
 		static Cont1 &get( Cont1 &a, Cont2 &b )
 			{ return a; }
@@ -445,16 +445,16 @@ namespace Koala
 	/** \brief Fixed chooser
 	 *
 	 *  Function object class that always returns value true or false, depending on the value set in constructor.
-	 *  This chooser should be used whenever each (or none) object is to be chosen. The chooser works with both edges and vertices. 
+	 *  This chooser should be used whenever each (or none) object is to be chosen. The chooser works with both edges and vertices.
 	 *  \wikipath{Chooser, See for more details about choosers.}
 	 *  \ingroup DMchooser */
-	struct BoolChooser 
+	struct BoolChooser
 	{
 		bool val;/**<\brief Logic value fixed in constructor returned by each call of function object. */
 
 		// Każdy chooser ma swój wlasny typ zdefiniowany jako ChoosersSelfType.
 		/** \brief Chooser obligatory type.
-		 *  
+		 *
 		 *  The type is obligatory for choosers in Koala. Logic operations (&&, ||, !, ^)  work properly as long as it is defined. */
 		typedef BoolChooser ChoosersSelfType;
 
@@ -466,7 +466,7 @@ namespace Koala
 		// Główny operator choosera, testujący prawdziwość jego predykatu.
 		/** \brief Overloaded operator()
 		 *
-		 *  Function call operator returning Boolean value \a val (the same in each call of operator). 
+		 *  Function call operator returning Boolean value \a val (the same in each call of operator).
 		 *  \param elem the considered object.
 		 *  \param gr reference to considered graph (not used in this chooser).
 		 *  \return the value \a val. */
@@ -481,7 +481,7 @@ namespace Koala
 	 *  The function generates BoolChooser function object, that returns value \a arg for each call of operator is called.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \param arg Boolean that will be returned by each call of the chooser.
-	 *  \ingroup DMchooser 
+	 *  \ingroup DMchooser
 	 *  \related BoolChooser */
 	inline BoolChooser stdChoose( bool arg ) { return BoolChooser( arg ); }
 
@@ -492,11 +492,11 @@ namespace Koala
 	 *
 	 *  Function object that compares the fixed value \a val defined in constructor to the one given by parameter \a elem in calls of overloaded operator().
 	 *  Chooser should be used whenever simple comparison to fixed value is necessary,
-	 *   for example only one object is to be chosen. The chooser works with both edges and vertices. 
+	 *   for example only one object is to be chosen. The chooser works with both edges and vertices.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Elem class of compared value.
 	 *  \ingroup DMchooser */
-	template< class Elem > struct ValChooser 
+	template< class Elem > struct ValChooser
 	{
 		Elem val; /**< \brief value fixed in constructor */
 
@@ -518,7 +518,7 @@ namespace Koala
 		 *  \return true if \a elem equals to \a val false otherwise.	 */
 		template< class Graph > bool operator()( Elem elem, const Graph &gr) const { return elem == val; }
 	};
-	
+
 	/** \brief Generating function of value chooser (ValCooser).
 	 *
 	 *  The function generates ValChooser function object that tests whether checked element equals \a arg. \wikipath{chooser, Get more information about choosers.}
@@ -534,7 +534,7 @@ namespace Koala
 	/** \brief Set chooser
 	 *
 	 *  Function object that checks if \a elem (the parameter in call of overloaded operator()) belongs to the set defined in constructor.
-	 *  Chooser should be used whenever elements from given set are to be chosen. It works with both edges and vertices. 
+	 *  Chooser should be used whenever elements from given set are to be chosen. It works with both edges and vertices.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Elem the class of compared value.
 	 *  \ingroup DMchooser*/
@@ -562,8 +562,8 @@ namespace Koala
 	};
 	/** \brief Generating function of set chooser (SetChooser).
 	 *
-	 *  The function generates SetChooser object function that for call of function call operator returns true as long as 
-	 *  element \a arg belong to Set. \wikipath{chooser, Get more information about choosers.}  
+	 *  The function generates SetChooser object function that for call of function call operator returns true as long as
+	 *  element \a arg belong to Set. \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Elem the type of tested elements.
 	 *  \param arg the set of elements (pointers) for which chooser function call returns true.
 	 *  \related SetChooser
@@ -577,10 +577,10 @@ namespace Koala
 	/** \brief Container element chooser
 	 *
 	 *  Function object that checks if parameter \a elem in call of overloaded operator() belongs to the container defined in constructor.
-	 *  The container is given be iterators to the first and to the past-the-last element. It should like STL containers serve std::find algorithm. 
+	 *  The container is given be iterators to the first and to the past-the-last element. It should like STL containers serve std::find algorithm.
 	 *  Since the container is not copied it is users prerogative to keep iterators up to date.
 	 *  The chooser should be used whenever elements from given container should be considered.
-	 *  It works with both edges and vertices. 
+	 *  It works with both edges and vertices.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Iter the iterator class used to access a container.
 	 *  \ingroup DMchooser*/
@@ -597,7 +597,7 @@ namespace Koala
 		/** \brief Constructor
 		 *
 		 *  Assigns value to iterators defining the container.
-		 *  \param abegin the iterator to the first element in the container with elements. 
+		 *  \param abegin the iterator to the first element in the container with elements.
 		 *  \param aend past-the-end element of the container with elements.*/
 		ContainerChooser( Iter abegin = Iter(), Iter aend = Iter() ): begin( abegin ), end( aend ) { }
 
@@ -636,7 +636,7 @@ namespace Koala
 	 *  \ingroup DMchooser */
 	template< class Obj > struct ObjChooser
 	{
-		mutable Obj funktor; /**< \brief Function object defined in constructor.*/
+		mutable Obj functor; /**< \brief Function object defined in constructor.*/
 
 		/** \brief Chooser obligatory type.
 		*
@@ -646,7 +646,7 @@ namespace Koala
 		/** \brief Constructor
 		 *
 		 *  Assigns function object to functor. */
-		ObjChooser( Obj arg = Obj() ): funktor( arg ) { }
+		ObjChooser( Obj arg = Obj() ): functor( arg ) { }
 
 		/** \brief Overloaded operator()
 		 *
@@ -655,13 +655,13 @@ namespace Koala
 		 *  \param graph the considered graph.
 		 *  \return the same vales (casted on bool) as functor \a arg. */
 		template< class Elem, class Graph >
-			bool operator()( Elem *elem, const Graph &graph ) const { return (bool)funktor( elem,graph ); }
+			bool operator()( Elem *elem, const Graph &graph ) const { return (bool)functor( elem,graph ); }
 	};
 
 	// liera F w nazwie - dla chooserow dzialajaych z funktorami
 	/** \brief Generating function of function object chooser (ObjChooser).
 	 *
-	 *  The function wraps object function \a arg and generates chooser object function. 
+	 *  The function wraps object function \a arg and generates chooser object function.
 	 *  \tparam Obj the type of wrapped object function.
 	 *  \param arg the wrapped object function.
 	 *  \wikipath{chooser, Get more information about choosers.}
@@ -682,7 +682,7 @@ namespace Koala
 	 *  \tparam T the type of compared field.
 	 *  \ingroup DMchooser */
 	template< class Info, class T > struct FieldValChooser
-	{ 
+	{
 		T Info:: *wsk; /**<\brief Pointer to member.*/
 		T val; /**< \brief Desired value. */
 
@@ -693,7 +693,7 @@ namespace Koala
 
 		/** \brief Constructor
 		 *
-		 *  Assigns values to \a val and pointer to member \a wsk i.e. decides which attribute of info are to be checked and what value are they to be equal to.	 
+		 *  Assigns values to \a val and pointer to member \a wsk i.e. decides which attribute of info are to be checked and what value are they to be equal to.
 		 *  \param arg pointer to member in Info object.
 		 *  \param arg2 the desired value of tested field.*/
 		FieldValChooser( T Info:: *arg = 0, T arg2 = T() ): wsk( arg ), val( arg2 ) { }
@@ -709,7 +709,7 @@ namespace Koala
 	};
 
 	/** \brief Generating function of field value chooser (FieldValChooser).
-	 * 
+	 *
 	 *  The function generates chooser elements in which info object filed pointed by \a wsk math \a arg.
 	 *  \tparam Info the type of Info object.
 	 *  \tparam T the type tested member.
@@ -726,7 +726,7 @@ namespace Koala
 	 */
 	/** \brief Less info field value chooser
 	 *
-	 *  Function object that chooses elements for which the attribute pointed by \a wsk in info object is 
+	 *  Function object that chooses elements for which the attribute pointed by \a wsk in info object is
 	 *  lower (operator< on type T is used) then  \a val (set in constructor).
 	 *  The chooser works for both edges and vertices. \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Info the class of object info.
@@ -763,7 +763,7 @@ namespace Koala
 	/** \brief Generating function of less field value chooser (FieldValChooserL).
 	 *
 	 *  The function generates FieldValChooserL chooser object function that returns true if and only if field pointed by \a wsk in \a Info object
-	 *  is lower then \a arg. 
+	 *  is lower then \a arg.
 	 *  \tparam Info the class of object info.
 	 *  \tparam T the type of compared field.
 	 *  \param wsk pointer to tested member in \a Info object.
@@ -784,7 +784,7 @@ namespace Koala
 	 *  \tparam Info the class of object info.
 	 *  \tparam T the type of compared field.
 	 *  \ingroup DMchooser */
-	template< class Info, class T > struct FieldValChooserG 
+	template< class Info, class T > struct FieldValChooserG
 	{
 		T Info:: *wsk;/**< \brief Pointer to member.*/
 		T val;/**< \brief Value to compare to fixed in constructor */
@@ -796,7 +796,7 @@ namespace Koala
 
 		/** \brief Constructor
 		 *
-		 *  Assigns values to \a val that is compared to proper info attribute 
+		 *  Assigns values to \a val that is compared to proper info attribute
 		 *  and pointer to member \a wsk that chooses the compared attribute.
 		 *  \param arg pointer to member
 		 *  \param arg2 the compared value */
@@ -816,7 +816,7 @@ namespace Koala
 	/** \brief Generating function of greater field value chooser (FieldValChooserG).
 	 *
 	 *  The function generates FieldValChooserG chooser object function that returns true if and only if field pointed by \a wsk in \a Info object
-	 *  greater than \a arg. \wikipath{chooser, Get more information about choosers.} 
+	 *  greater than \a arg. \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Info the class of object info.
 	 *  \tparam T the type of compared field.
 	 *  \param wsk pointer to tested member in \a Info object.
@@ -824,7 +824,7 @@ namespace Koala
 	 *  \related FieldValChooserG
 	 *  \ingroup DMchooser*/
 	template< class Info, class T > FieldValChooserG< Info,T >
-	
+
 		fieldChooseG( T Info:: *wsk, T arg ) { return FieldValChooserG< Info,T >( wsk,arg ); }
 
 	/* FielBoolChooser
@@ -838,7 +838,7 @@ namespace Koala
 	 *  \tparam Info class of object info.
 	 *  \tparam T type of compared field.
 	 *  \ingroup DMchooser */
-	template< class Info, class T > struct FieldBoolChooser 
+	template< class Info, class T > struct FieldBoolChooser
 	{
 		T Info:: *wsk;/**< \brief Pointer to tested member.*/
 
@@ -849,7 +849,7 @@ namespace Koala
 
 		/** \brief Constructor
 		 *
-		 *  Decides which members of info are to be checked. 
+		 *  Decides which members of info are to be checked.
 		 *  \param arg pointer to tested member.*/
 		FieldBoolChooser( T Info::*arg = 0): wsk( arg ) { }
 
@@ -885,12 +885,12 @@ namespace Koala
 	 *  The chooser works for both edges and vertices. \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Info the class of object info.
 	 *  \tparam T the type of compared field.
-	 *  \tparam Obj the function object class that provides function testing the field. The object function must work with type of pointed member. 
+	 *  \tparam Obj the function object class that provides function testing the field. The object function must work with type of pointed member.
 	 *  \ingroup DMchooser */
-	template< class Info, class T, class Obj > struct FieldObjChooser 
+	template< class Info, class T, class Obj > struct FieldObjChooser
 	{
 		T Info:: *wsk; /**< \brief the pointer to tested member.*/
-		mutable Obj funktor; /**< \brief functor testing the member. */
+		mutable Obj functor; /**< \brief functor testing the member. */
 
 		/** \brief Chooser obligatory type.
 		*
@@ -901,8 +901,8 @@ namespace Koala
 		 *
 		 *  \param awsk to pointer to tested member
 		 *  \param afun the wrapped object function */
-		FieldObjChooser( T Info:: *awsk = 0, Obj afun = Obj() ): wsk( awsk ), funktor( afun ) { }
-        
+		FieldObjChooser( T Info:: *awsk = 0, Obj afun = Obj() ): wsk( awsk ), functor( afun ) { }
+
 		/** \brief Overloaded operator()
 		*
 		*  Function call operator returning true if and only if wrapped function object returns true for filed pointed by \a wsk in \a elem info object.
@@ -910,7 +910,7 @@ namespace Koala
 		*  \param graph the considered graph.
 		*  \return the same value as wrapped objet. */
 		template< class Elem, class Graph >
-			bool operator()( Elem *elem, const Graph &graph ) const { return (bool)funktor( elem->info.*wsk ); }
+			bool operator()( Elem *elem, const Graph &graph ) const { return (bool)functor( elem->info.*wsk ); }
 	};
 
 	/** \brief Generating  function of FieldObjChooser.
@@ -920,7 +920,7 @@ namespace Koala
 	 *  \tparam T the type of compared field.
 	 *  \tparam Obj the type of wrapped function object.
 	 *  \param wsk pointer to tested member in \a Info object.
-	 *  \param obj the wrapped function object. Should implement overloaded function call operator for single parameter of pointed member type   
+	 *  \param obj the wrapped function object. Should implement overloaded function call operator for single parameter of pointed member type
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \related FieldObjChooser
 	 *  \ingroup DMchooser*/
@@ -938,7 +938,7 @@ namespace Koala
 	 *  \tparam T the type of compared field.
 	 *  \tparam Z the type of objects in set.
 	 *  \ingroup DMchooser */
-	template< class Info, class T, class Z > struct FieldSetChooser 
+	template< class Info, class T, class Z > struct FieldSetChooser
 	{
 		T Info:: *wsk; /**<\brief pointer to tested member in info object*/
 		Koala::Set< Z > set;/**<\brief the set of allowed values*/
@@ -953,7 +953,7 @@ namespace Koala
 		 * The constructor sets pointer to tested member \a awsk and initializes set of allowed values \a aset.*/
 		FieldSetChooser( T Info:: *awsk = 0, const Koala::Set< Z > &aset = Koala::Set< Z >() ):
 			wsk( awsk ), set( aset ) { }
-		
+
 		/** \brief Overloaded operator()
 		 *
 		 *  Function call operator returning true if and only if value pointed by \a wsk in info attribute of \a elem belongs to \a set.
@@ -965,7 +965,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of FieldSetChooser.
-	 * 
+	 *
 	 *  FieldSetChooser function object is generated. The functor test if field pointed by \a wsk
 	 *  in info object of tested element belongs to \a set.
 	 *  \wikipath{chooser, Get more information about choosers.}
@@ -984,15 +984,15 @@ namespace Koala
 	 */
 	/** \brief Info field value belong to container chooser.
 	 *
-	 *  Function object that checks if certain field of info object belongs to the container given by iterators. 
-	 *  Container should behave like stl one, function std::find must be applicable. 
+	 *  Function object that checks if certain field of info object belongs to the container given by iterators.
+	 *  Container should behave like stl one, function std::find must be applicable.
 	 *  The container is not copied and it is users prerogative to keep iterators valid.
 	 *  The chooser works for both edges and vertices. \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Info the class of object info.
 	 *  \tparam T the type of compared field.
 	 *  \tparam Iter the type of iterator for container with tested elements.
 	 *  \ingroup DMchooser */
-	template< class Info, class T, class Iter > struct FieldContainerChooser 
+	template< class Info, class T, class Iter > struct FieldContainerChooser
 	{
 		T Info:: *wsk;/**< \brief Pointer to tested member.*/
 		Iter begin/**< \brief The iterator to the first element of container.*/, end;/**< \brief The iterator to the past-the-end element of container.*/
@@ -1010,7 +1010,7 @@ namespace Koala
 		 *  \param b The iterator to the past-the-end element of container.*/
 		FieldContainerChooser( T Info:: *awsk = 0, Iter a = Iter(), Iter b = Iter() ):
 			wsk( awsk ), begin( a ), end( b ) {}
-        
+
 		/** \brief Overloaded operator()
 		*
 		*  Function call operator returning true if and only if value pointed by \a wsk in info attribute of \a elem belongs to container.
@@ -1022,7 +1022,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of FielContainerChooser.
-	 * 
+	 *
 	 *  FieldContainerChooser function object is generated. The functor test if field pointed by \a wsk
 	 *  in info object of tested element belongs to container given by iterators.
 	 *  \wikipath{chooser, Get more information about choosers.}
@@ -1041,17 +1041,17 @@ namespace Koala
 
 	/* AssocHasChooser
 	 * test, czy element jest kluczem znajdujacym sie w tablicy
-	 * kontener asocjacyjny jest kopiowany do choosera: zaleta - nie zalezy od dalszego stanu kontenera, 
+	 * kontener asocjacyjny jest kopiowany do choosera: zaleta - nie zalezy od dalszego stanu kontenera,
 	 * wada - oczywiscie czas i pamiec. Istniejaca dalej specjalizacja posluguje sie natomiast wskaznikiem do zewnetrzengo kont.
 	 */
-	/** \brief Is key in associative container chooser. 
+	/** \brief Is key in associative container chooser.
 	 *
 	 *  Function object that checks if the element (pointer) is  a key in associative container defined in constructor.
 	 *  Mind that associative container is copied, which is a waste of resources, however result is not influenced by further changes in container.
 	 *  The chooser works for both edges and vertices. \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Cont the type of associative container.
 	 *  \ingroup DMchooser */
-	template< class Cont > struct AssocHasChooser 
+	template< class Cont > struct AssocHasChooser
 	{
 		Cont cont;/**<\brief The container with approved elements.*/
 
@@ -1076,7 +1076,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of AssocHasChooser.
-	 * 
+	 *
 	 *  AssocHasChooser function object is generated. The functor test if element is a key in associative container.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Cont the type of associative container.
@@ -1096,7 +1096,7 @@ namespace Koala
 	 *  The chooser works for both edges and vertices. \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Cont the type of associative container.
 	 *  \ingroup DMchooser */
-	template< class Cont > struct AssocBoolChooser 
+	template< class Cont > struct AssocBoolChooser
 	{
 		Cont cont;/**<\brief The container with approved elements.*/
 
@@ -1121,8 +1121,8 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of AssocBoolChooser.
-	 * 
-	 *  AssocBoolChooser function object is generated. The functor test if element is a key in associative container 
+	 *
+	 *  AssocBoolChooser function object is generated. The functor test if element is a key in associative container
 	 *  and if the mapped value is convertible to true.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Cont the type of associative container.
@@ -1171,8 +1171,8 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of AssocValChooser.
-	 * 
-	 *  AssocValChooser function object is generated. The functor test if element is a key in associative container 
+	 *
+	 *  AssocValChooser function object is generated. The functor test if element is a key in associative container
 	 *  and if the mapped value equals \a val.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Cont the type of associative container.
@@ -1187,9 +1187,9 @@ namespace Koala
 	 */
 	/** \brief Choose elements for which mapped value less then common value.
 	 *
-	 *  The functor is equipped with associative container. Each call of function call operator tests if element mapped value is smaller then prespcified value. 
+	 *  The functor is equipped with associative container. Each call of function call operator tests if element mapped value is smaller then prespcified value.
 	 *  Furthermore, the element needs to be a key in the container. Both, the associative container and the value to compare are set up in constructor.
-	 *  The chooser works for both edges and vertices. Mind that mapped values in container must allow operator<. 
+	 *  The chooser works for both edges and vertices. Mind that mapped values in container must allow operator<.
 	 *  The associative container is copied. Hence, further change in container do not influence the effect.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Cont the type of associative container.
@@ -1294,8 +1294,8 @@ namespace Koala
 	 */
 	/** \brief Choose if mapped value belongs to set.
 	 *
-	 *  Function object that checks if the element mapped value belongs to the prespecified set. 
-	 *  Furthermore, the element needs to be a key in the associative container. 
+	 *  Function object that checks if the element mapped value belongs to the prespecified set.
+	 *  Furthermore, the element needs to be a key in the associative container.
 	 *  Both, the associative container and the set are defined in the constructor.
 	 *  They are copied. Hence, their further change do not influence the effect.
 	 *  The chooser works with both edges and vertices.
@@ -1350,9 +1350,9 @@ namespace Koala
 	 */
 	/** \brief Choose if mapped value belongs to container.
 	 *
-	 *  Function object that checks if the element mapped value belongs to the prespecified another container 
-	 *  (given with iterators \wikipath{iterator, Get more data about iterators). 
-	 *  Furthermore, the element needs to be a key in the associative container. 
+	 *  Function object that checks if the element mapped value belongs to the prespecified another container
+	 *  (given with iterators \wikipath{iterator, Get more data about iterators).
+	 *  Furthermore, the element needs to be a key in the associative container.
 	 *  Both, the associative container and the container are defined in the constructor.
 	 *  The associative array is copied. But the container with approved mapped values is not and it is user prerogative to keep it valid.
 	 *  The container should be stl-like and must allow stl::find algorithm.
@@ -1418,7 +1418,7 @@ namespace Koala
 	 *  \ingroup DMchooser */
 	template< class Cont, class Obj > struct AssocObjChooser
 	{
-		mutable Obj funktor;/**<\brief The function object.*/
+		mutable Obj functor;/**<\brief The function object.*/
 		Cont cont;/**<\brief The associative container.*/
 
 		/** \brief Chooser obligatory type.
@@ -1428,7 +1428,7 @@ namespace Koala
 		/**\brief Constructor
 		 *
 		 * The associative container and testing function object are set up. */
-		AssocObjChooser( const Cont &acont = Cont(), Obj arg = Obj() ): cont( acont ), funktor( arg ) { }
+		AssocObjChooser( const Cont &acont = Cont(), Obj arg = Obj() ): cont( acont ), functor( arg ) { }
 
 		/** \brief Overloaded operator()
 		 *
@@ -1437,7 +1437,7 @@ namespace Koala
 		 *  \param graph the considered graph.
 		 *  \return true if and only if \a elem is a key in the container and the functor returns true for mapped value. */
 		template< class Elem, class Graph > bool operator()(Elem *elem, const Graph &graph) const
-			{ return cont.hasKey( elem ) && (bool)funktor( cont[elem] ); }
+			{ return cont.hasKey( elem ) && (bool)functor( cont[elem] ); }
 	};
 
 	/** \brief Generating  function of AssocObjChooser.
@@ -1507,7 +1507,7 @@ namespace Koala
 	/** \brief Has true mapped value chooser.
 	 *
 	 *  Function object that checks if the element has a mapped value convertible to true in the associative container defined in constructor.
-	 *  The chooser works for both edges and vertices. 
+	 *  The chooser works for both edges and vertices.
 	 *  This is specialization of AssocBoolChooser for pointers and that associative container is not copied.
 	 *  It is users prerogative to keep the container up to date.
 	 *  \wikipath{chooser, Get more information about choosers.}
@@ -1538,8 +1538,8 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of AssocBoolChooser< Cont * >.
-	 * 
-	 *  AssocBoolChooser< Cont * > function object is generated. The functor test if element is a key in associative container 
+	 *
+	 *  AssocBoolChooser< Cont * > function object is generated. The functor test if element is a key in associative container
 	 *  and if the mapped value is convertible to true. The chooser is specialized version of AssocBoolChooser for pointers
 	 *  which do not copy the container.
 	 *  \wikipath{chooser, Get more information about choosers.}
@@ -1591,8 +1591,8 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of AssocValChooser< Cont * >.
-	 * 
-	 *  AssocValChooser< Cont * > function object is generated. The functor test if element is a key in associative container 
+	 *
+	 *  AssocValChooser< Cont * > function object is generated. The functor test if element is a key in associative container
 	 *  and if the mapped value equals \a val. This a specialization of AssocValChooser for pointers
 	 *  and the associative container is not copied.
 	 *  \wikipath{chooser, Get more information about choosers.}
@@ -1647,7 +1647,7 @@ namespace Koala
 	/** \brief Generating  function of AssocValChooserG< Cont * >.
 	*
 	*  AssocValChooserG< Cont * > function object is generated. The functor test if element is a key in associative container
-	*  and if the mapped value is greater then \a val. This is a specialized version of AssocValChooserG for pointers which 
+	*  and if the mapped value is greater then \a val. This is a specialized version of AssocValChooserG for pointers which
 	*  do not copy the associative container.
 	*  \wikipath{chooser, Get more information about choosers.}
 	*  \tparam Cont the type of associative container.
@@ -1662,9 +1662,9 @@ namespace Koala
 	 */
 	/** \brief Choose elements for which mapped value less then common value.
 	 *
-	 *  The functor is equipped with pointer to associative container. Each call of function call operator tests if element mapped value is smaller then prespcified value. 
+	 *  The functor is equipped with pointer to associative container. Each call of function call operator tests if element mapped value is smaller then prespcified value.
 	 *  Furthermore, the element needs to be a key in the container. Both, the associative container and the value to compare are set up in constructor.
-	 *  The chooser works for both edges and vertices. Mind that mapped values in container must allow operator<. 
+	 *  The chooser works for both edges and vertices. Mind that mapped values in container must allow operator<.
 	 *  This is specialization of AssocValChooserL for pointers and that associative container is not copied.
 	 *  It is users prerogative to keep the container up to date.
 	 *  \wikipath{chooser, Get more information about choosers.}
@@ -1713,8 +1713,8 @@ namespace Koala
 
 	/** \brief Choose if mapped value belongs to set.
 	 *
-	 *  Function object that checks if the element mapped value belongs to the prespecified set. 
-	 *  Furthermore, the element needs to be a key in the associative container. 
+	 *  Function object that checks if the element mapped value belongs to the prespecified set.
+	 *  Furthermore, the element needs to be a key in the associative container.
 	 *  Both, the associative container and the set are defined in the constructor.
 	 *  This is specialization of AssocSetChooser for pointers and that associative container is not copied.
 	 *  It is users prerogative to keep the container up to date. However, that the set is copied.
@@ -1752,7 +1752,7 @@ namespace Koala
 	/** \brief Generating  function of AssocSetChooser< Cont * >.
 	*
 	*  AssocSetChooser< Cont * > function object is generated. The functor test if element is a key in associative container
-	*  and if the mapped value belongs to the set. The chooser is a specialized version of AssocSetChooser for which only 
+	*  and if the mapped value belongs to the set. The chooser is a specialized version of AssocSetChooser for which only
 	*  the set is copied and the associative container is delivered by pointer.
 	*  \wikipath{chooser, Get more information about choosers.}
 	*  \tparam Cont the type of associative container.
@@ -1808,8 +1808,8 @@ namespace Koala
 	/** \brief Generating  function of AssocContainerChooser< Cont *,Iter >.
 	 *
 	 *  AssocContainerChooser< Cont *,Iter > function object is generated. The functor test if element is a key in associative container
-	 *  and if the mapped value is an element in contaier given by iterators \a begin \a end. 
-	 *  In this specialization of AssocContainerChooser the associative container \a cont is not copied. 
+	 *  and if the mapped value is an element in contaier given by iterators \a begin \a end.
+	 *  In this specialization of AssocContainerChooser the associative container \a cont is not copied.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Cont the type of associative container.
 	 *  \tparam Iter the iterator type.
@@ -1838,7 +1838,7 @@ namespace Koala
 	 *  \ingroup DMchooser */
 	template< class Cont, class Obj > struct AssocObjChooser< Cont *,Obj >
 	{
-		mutable Obj funktor;/**<\brief The function object.*/
+		mutable Obj functor;/**<\brief The function object.*/
 		const Cont *cont;/**<\brief The pointer to the associative container.*/
 
 		/** \brief Chooser obligatory type.
@@ -1849,7 +1849,7 @@ namespace Koala
 		/**\brief Constructor
 		*
 		* The associative container and testing function object are set up. */
-		AssocObjChooser(const Cont *acont = 0, Obj arg = Obj()) : cont(acont), funktor(arg) { }
+		AssocObjChooser(const Cont *acont = 0, Obj arg = Obj()) : cont(acont), functor(arg) { }
 
 		/** \brief Overloaded operator()
 		*
@@ -1858,7 +1858,7 @@ namespace Koala
 		*  \param graph the considered graph.
 		*  \return true if and only if \a elem is a key in the container and the functor returns true for mapped value. */
 		template< class Elem, class Graph > bool operator()(Elem *elem, const Graph &graph) const
-			{ return cont->hasKey( elem ) && (bool)funktor( cont->operator[]( elem ) ); }
+			{ return cont->hasKey( elem ) && (bool)functor( cont->operator[]( elem ) ); }
 	};
 
 	/** \brief Generating  function of AssocObjChooser< Cont *,Obj >.
@@ -1885,7 +1885,7 @@ namespace Koala
 	 *  \tparam Ch1 the first chooser class.
 	 *  \tparma Ch2 the second chooser class.
 	 *  \ingroup DMchooser */
-	template< class Ch1, class Ch2 > struct OrChooser 
+	template< class Ch1, class Ch2 > struct OrChooser
 	{
 		Ch1 ch1;/**<\brief The first chooser. */
 		Ch2 ch2;/**<\brief The second chooser. */
@@ -1911,7 +1911,7 @@ namespace Koala
 
 	/** \brief Generating  function of OrChooser.
 	*
-	*  OrChooser function object is generated. The functor chooses elements that are chosen for at least one of choosers \a ch1 or \a ch2.  
+	*  OrChooser function object is generated. The functor chooses elements that are chosen for at least one of choosers \a ch1 or \a ch2.
 	*  \wikipath{chooser, Get more information about choosers.}
 	*  \tparam Ch1 the type of the first chooser.
 	*  \tparam Ch2 the type of the second chooser.
@@ -1925,7 +1925,7 @@ namespace Koala
 	// w kodzie funkcje tworzace zlozonych chooserow mozna zastapic odpowiednimi operatorami logicznymi
 
 	/** \brief The overloaded operator||. Chooser alternative.
-	 * 
+	 *
 	 *  The operator calls the generating  function of OrChooser i.e. generate chooser that joins two choosers with logic or operator.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \related OrChooser
@@ -2107,10 +2107,10 @@ namespace Koala
 	/** \brief Choose vertices of given degree.
 	 *
 	 *  The function object that checks if the vertex degree equals given common value.
-	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection} mask like in method ConstGraphMethods::deg. 
+	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection} mask like in method ConstGraphMethods::deg.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
-	struct VertDegValChooser 
+	struct VertDegValChooser
 	{
 		int deg; /**< \brief the desired degree.*/
 		Koala::EdgeDirection type; /**< \brief the considered edge direction.*/
@@ -2141,7 +2141,7 @@ namespace Koala
 	 *
 	 *  \param adeg the defined degree.
 	 *  \param atype type of direction used for degree calculation.
-	 *  \return chooser of type VertDegValChooser, which chooses vertices of degree \a adag exclusively.  
+	 *  \return chooser of type VertDegValChooser, which chooses vertices of degree \a adag exclusively.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \related VertDegValChooser
 	 *  \ingroup DMchooser*/
@@ -2155,7 +2155,7 @@ namespace Koala
 	/** \brief Choose vertices of degree less then.
 	 *
 	 *  The function object that checks if the vertex degree is less then the prespecified value.
-	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection} mask like in method ConstGraphMethods::deg. 
+	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection} mask like in method ConstGraphMethods::deg.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
 	struct VertDegValChooserL
@@ -2301,9 +2301,9 @@ namespace Koala
 	 */
 	/** \brief Choose vertices of degree from container.
 	 *
-	 *  The function object that checks if the vertex degree is an element of the container prespecified in constructor. 
+	 *  The function object that checks if the vertex degree is an element of the container prespecified in constructor.
 	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection}) mask like in method ConstGraphMethods::deg.
-	 *  The container should be STL-like and it must allow std::fiend algorithm. The container is not copied and it is users prerogative to keep the container valid 
+	 *  The container should be STL-like and it must allow std::fiend algorithm. The container is not copied and it is users prerogative to keep the container valid
 	 *  and up to date. \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
 	template< class Iter > struct VertDegContainerChooser
@@ -2353,13 +2353,13 @@ namespace Koala
 	/** \brief Choose vertices of degree accepted by functor.
 	 *
 	 *  The function object that for a given vertex tests if the vertex degree satisfy the functor defined in the constructor.
-	 *  The functor must return value convertible to bool for various degree values. 
+	 *  The functor must return value convertible to bool for various degree values.
 	 *  The degree is calculated with respect to Koala::EdgeDirection (\wikipath{EdgeDirection, Read more about EdgeDirection}) mask like in method ConstGraphMethods::deg.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
 	template< class Obj > struct VertDegFunctorChooser
 	{
-		mutable Obj funktor;/**< \brief the object function qualifying degrees.*/
+		mutable Obj functor;/**< \brief the object function qualifying degrees.*/
 		Koala::EdgeDirection typ;/**< \brief the considered edge direction.*/
 
 		/** \brief Chooser obligatory type.
@@ -2373,7 +2373,7 @@ namespace Koala
 		 *  \param afun the object function qualifying degrees.
 		 *  \param atype the mask of considered edge directions.*/
 		VertDegFunctorChooser( Obj afun = Obj(), Koala::EdgeDirection atype = Koala::EdAll ):
-			funktor( afun ), typ( atype ) { }
+			functor( afun ), typ( atype ) { }
 
 		/** \brief Overloaded operator()
 		 *
@@ -2382,7 +2382,7 @@ namespace Koala
 		 *  \param g reference to considered graph.
 		 *  \return the value returned by \a funktor. */
 		template< class Graph > bool operator()( typename Graph::PVertex v, const Graph &g ) const
-			{ return (bool)funktor( g.deg( v,typ ) ); }
+			{ return (bool)functor( g.deg( v,typ ) ); }
 	};
 
 	/** \brief Generating  function of VertDegFunctorChooser.
@@ -2402,13 +2402,13 @@ namespace Koala
 	/* EdgeTypeChooser
 	 * testuje, czy typ krawedzi spelnia podana maske
 	 */
-	/** \brief Choose edges of given type. 
+	/** \brief Choose edges of given type.
 	 *
-	 *  The function object chooses the edges of type congruent with the Koala::EdgeType mask defined in constructor. 
+	 *  The function object chooses the edges of type congruent with the Koala::EdgeType mask defined in constructor.
 	 *  \wikipath{EdgeType,See possible values of EdgeType.}
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
-	struct EdgeTypeChooser 
+	struct EdgeTypeChooser
 	{
 		Koala::EdgeDirection mask;/**< \brief the considered edge direction.*/
 
@@ -2435,7 +2435,7 @@ namespace Koala
 	};
 
 	/** \brief Generating  function of EdgeTypeChooser.
-	 * 
+	 *
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \param mask the Koala::EdgeType mask that defines the types of edges to be taken. \wikipath{EdgeType, See wiki for EdgeType}.
 	 *  \return EdgeTypeChooser function object that chooses only edges with type congruent with \a mask.
@@ -2483,7 +2483,7 @@ namespace Koala
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \tparam Ch the type of vertex chooser.
 	 *  \param ch the vertex chooser.
-	 *  \return EdgeFirstEndChooser function object that chooses edges for which the first vertex satisfy chooser \a ch.  
+	 *  \return EdgeFirstEndChooser function object that chooses edges for which the first vertex satisfy chooser \a ch.
 	 *  \related EdgeFirstEndChooser
 	 *  \ingroup DMchooser*/
 	template< class Ch > EdgeFirstEndChooser< Ch >
@@ -2498,7 +2498,7 @@ namespace Koala
 	 *  \tparam Ch the type of vertex chooser. The class should implement function call operator for two parameters: PVertex and a reference to graph.
 	 *  \wikipath{chooser, Get more information about choosers.}
 	 *  \ingroup DMchooser */
-	template <class Ch> struct EdgeSecondEndChooser 
+	template <class Ch> struct EdgeSecondEndChooser
 	{
 		Ch ch;/**< \brief the function object that checks the second end of edge.*/
 
@@ -2619,7 +2619,7 @@ namespace Koala
 	*  \related Edge1EndChooser
 	*  \ingroup DMchooser*/
 	template< class Ch > Edge1EndChooser< Ch > edge1EndChoose(Ch ch) { return Edge1EndChooser< Ch >(ch); }
-    
+
 	/* Edge2EndChooser
 	 * test, czy oba konice spelniaja warunkek
 	 */
@@ -2731,12 +2731,12 @@ namespace Koala
 	 * caster zwyklego rzutowania miedzy dwoma strukturami
 	 */
 	/** \brief Standard caster.
-	 *  
-	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges) 
-	 *   in methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others. 
-	 *  
+	 *
+	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges)
+	 *   in methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others.
+	 *
 	 *  The structure overloads call function operator for two parameters. The first parameter is the reference to new-created info object.
-	 *  The second parameter is the source info. 
+	 *  The second parameter is the source info.
 	 *  Standard caster tries to simply cast source object on destination object or if this is not possible it calls destination default value (calls empty constructor).
 	 *  \wikipath{caster, Get more information about casters.}
 	 *  \ingroup DMcaster*/
@@ -2765,7 +2765,7 @@ namespace Koala
 	/** \brief Generating function for StdCaster.
 	 *
 	 *  \wikipath{caster, Get more information about casters.}
-	 *  \return StdCaster function object that implements overloaded template function call operator which 
+	 *  \return StdCaster function object that implements overloaded template function call operator which
 	 *  tries to cast source info object to destination info object or if it is impossible destination gets the default value.
 	 *  \related StdCaster
 	 *  \ingroup DMcaster*/
@@ -2824,8 +2824,8 @@ namespace Koala
 	 *   in methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others.
 	 *
 	 *  The structure overloads call function operator for two and three parameters. The first parameter is the reference to new-created info object.
-	 *  The remaining parameters are the source infos. However, NoCastCaster ignores the source infos and sets up the destination for its type 
-	 *  default value (empty constructor is called). 
+	 *  The remaining parameters are the source infos. However, NoCastCaster ignores the source infos and sets up the destination for its type
+	 *  default value (empty constructor is called).
 	 *  \wikipath{caster, Get more information about casters.}
 	 *  \ingroup DMcaster*/
 	struct NoCastCaster
@@ -2834,7 +2834,7 @@ namespace Koala
 
 		/** \brief Function call operator.
 		 *
-		 *  The template overloaded function call operator with two parameters. However, the second parameter is ignored and the destination 
+		 *  The template overloaded function call operator with two parameters. However, the second parameter is ignored and the destination
 		 *  gets its type default value.
 		 *  \tparam InfoDest the type of destination info object.
 		 *  \tparam InfoSour the type of source info object.
@@ -2845,13 +2845,13 @@ namespace Koala
 
 		/** \brief Function call operator.
 		 *
-		 *  The template overloaded function call operator with three parameters. However, the second and the third parameter are ignored and the destination 
+		 *  The template overloaded function call operator with three parameters. However, the second and the third parameter are ignored and the destination
 		 *  gets its type default value.
 		 *  \tparam InfoDest the type of destination info object.
 		 *  \tparam InfoSour1 the type of first source info object.
 		 *  \tparam InfoSour2 the type of second source info object.
 		 *  \param dest the reference to the destination new-created info object.
-	 	 *  \param sour1 the first source info object, ignored. 
+	 	 *  \param sour1 the first source info object, ignored.
 		 *  \param sour2 the second source info object, ignored. */
 		template< class InfoDest, class InfoSour1, class InfoSour2 >
 			void operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) { dest = InfoDest(); }
@@ -2867,6 +2867,8 @@ namespace Koala
 	 *  \related NoCastCaster
 	 *  \ingroup DMcaster*/
 	inline NoCastCaster stdCast( bool arg );
+	//NEW: alias dla powyzszego z arg=false
+	inline NoCastCaster valCast() { return NoCastCaster(); }
 
 	/* ObjCaster
 	 * wyliczenie wartosci nowego info poprzez podany funktor wspolpracuje z produktami grafow (stad takze operator
@@ -2878,35 +2880,35 @@ namespace Koala
 	 *   in methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others.
 	 *
 	 *  The structure overloads call function operator for two and three parameters. The first parameter is the reference to new-created info object.
-	 *  The remaining parameters are the source infos. Function object defined in constructor takes source info objects 
-	 *  and returns new info object that is casted on destination object type. 
+	 *  The remaining parameters are the source infos. Function object defined in constructor takes source info objects
+	 *  and returns new info object that is casted on destination object type.
 	 *  \wikipath{caster, Get more information about casters.}
 	 *  \ingroup DMcaster*/
 	template< class Fun > struct ObjCaster
 	{
 		typedef ObjCaster< Fun > CastersSelfType;/**<\brief Caster self type, the type defined for each caster.*/
 
-		mutable Fun funktor;/**< \brief the functor defined in constructor.*/
-		
+		mutable Fun functor;/**< \brief the functor defined in constructor.*/
+
 		/**\brief Constructor.
 		 *
 		 *  The constructor assigns the value to \a functor.*/
-		ObjCaster( Fun afun = Fun() ): funktor( afun ) { }
+		ObjCaster( Fun afun = Fun() ): functor( afun ) { }
 
 		/** \brief Function call operator.
 		 *
-		 *  The template overloaded function call operator with two parameters. Source info object is sent to function object \a funktor the result 
+		 *  The template overloaded function call operator with two parameters. Source info object is sent to function object \a funktor the result
 		 *  is casted on destination type and save in \a dest.
 		 *  \tparam InfoDest the type of destination info object.
 		 *  \tparam InfoSour the type of source info object.
 		 *  \param dest the reference to the destination new-created info object.
 		 *  \param sour the source info object, sent to \a funkotr. */
 		template< class InfoDest, class InfoSour >
-			void operator()( InfoDest &dest, InfoSour sour ) { dest = (InfoDest)funktor( sour ); }
+			void operator()( InfoDest &dest, InfoSour sour ) { dest = (InfoDest)functor( sour ); }
 
 		/** \brief Function call operator.
 		 *
-		 *  The template overloaded function call operator with three parameters. Source info objects are sent to function object \a funktor. The returned value 
+		 *  The template overloaded function call operator with three parameters. Source info objects are sent to function object \a funktor. The returned value
 		 *  is casted on destination type and save in \a dest.
 		 *  \tparam InfoDest the type of destination info object.
 		 *  \tparam InfoSour1 the type of the first source info object.
@@ -2915,7 +2917,7 @@ namespace Koala
 		 *  \param sour1 the first source info object, sent to \a funkotr.
 		 *  \param sour2 the second source info object, sent to \a funkotr.*/
 		template< class InfoDest, class InfoSour1, class InfoSour2 > void
-			operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) { dest = (InfoDest)funktor( sour1,sour2 ); }
+			operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) { dest = (InfoDest)functor( sour1,sour2 ); }
 	};
 
 	/** \brief Generating function for ObjCaster.
@@ -2947,7 +2949,7 @@ namespace Koala
 		typedef ValueCaster< T > CastersSelfType;/**<\brief Caster self type, the type defined for each caster.*/
 
 		T val;/**<\brief the fixed value set up in constructor, assigned to each new-created info object.*/
-		
+
 		/** \brief Constructor.
 		 *
 		 *  Sets value \a val up.*/
@@ -2982,7 +2984,7 @@ namespace Koala
 	 *  \return ValueCaster function object, that assigns constant value \a arg to each new-created info object.
 	 *  \related ValueCaster
 	 *  \ingroup DMcaster*/
-	template< class T > ValueCaster< T > valCast( T arg = T() ) { return ValueCaster< T >( arg ); }
+	template< class T > ValueCaster< T > valCast( T arg ) { return ValueCaster< T >( arg ); }
 
 	//Linkery dzialajace np. podczas kopiowania grafow, wiaza nowo tworzone wierzch/kraw. z ich oryginalami, przez co
 	// mozna latwo sprawdzic, ktory element odpowiada ktoremu
@@ -2993,11 +2995,11 @@ namespace Koala
 	 * tylko false jest dopuszczalne - brak polaczenia
 	 */
 	/** \brief No link.
-	 * 
-	 *  Methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others generate new elements like edges and vertices. 
+	 *
+	 *  Methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others generate new elements like edges and vertices.
 	 *  Sometimes user may want to preserve the information from where new elements origin. For such purposes linkers are designed.
-	 *  The linkers are object functions with overloaded call function operator. The first parameter of that function is destination object the second is 
-	 *  source object. 
+	 *  The linkers are object functions with overloaded call function operator. The first parameter of that function is destination object the second is
+	 *  source object.
 	 *  This is auxiliary single direction linker, that may be used in bidirectional linker Std2Linker.
 	 *  Std1NoLinker is a linker that makes no link. It should be used in cases when user doesn't need a link and doesn't want to create one but function in Koala require some.
 	 *
@@ -3008,7 +3010,7 @@ namespace Koala
 		 *
 		 * \param arg always false.*/
 		Std1NoLinker( bool arg = false ) { koalaAssert( !arg,ExcBase ); }
-		
+
 		/** \brief Function call operator.
 		 *
 		 *  Does nothing.
@@ -3022,9 +3024,9 @@ namespace Koala
 	 */
 	/** \brief Object info one direction linker.
 	 *
-	 *  Methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others generate new elements like edges and vertices. 
+	 *  Methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others generate new elements like edges and vertices.
 	 *  Sometimes user may want to preserve the information from where new elements origin. For such purposes linkers are designed.
-	 *  The linkers are object functions with overloaded call function operator. The first parameter of that function is destination object, the second is 
+	 *  The linkers are object functions with overloaded call function operator. The first parameter of that function is destination object, the second is
 	 *  source object.
 	 *
 	 *  Std1FieldLinker uses the member of the destination info object to point to object of origin.
@@ -3054,13 +3056,13 @@ namespace Koala
 	 */
 	/** \brief Associative array one direction linker.
 	 *
-	 *  Methods like Graph::copy, Graph::substitute or methods in classes LineGraph, Product and others generate new elements edges or vertices. 
+	 *  Methods like Graph::copy, Graph::substitute or methods in classes LineGraph, Product and others generate new elements edges or vertices.
 	 *  Sometimes user may want to preserve the information from where new elements origin. For such purposes linkers are designed.
-	 *  The linkers are object functions with overloaded call function operator. The first parameter of that function is pointer to destination object, the second is 
+	 *  The linkers are object functions with overloaded call function operator. The first parameter of that function is pointer to destination object, the second is
 	 *  pointer to source object.
 	 *
-	 *  Std1AssocLinker function object is equipped with external associative container, which keeps information about the link. If this linker is used 
-	 *  for each new-created element there is a new key (pointer to new element) inserted into associative array where the mapped value is the pointer to the origin. 
+	 *  Std1AssocLinker function object is equipped with external associative container, which keeps information about the link. If this linker is used
+	 *  for each new-created element there is a new key (pointer to new element) inserted into associative array where the mapped value is the pointer to the origin.
 	 *  Since the map is external and it is not copied, user should keep it valid and up to date.
 	 *  This is auxiliary single direction linker, that may be used in bidirectional linker Std2Linker.
 	 *  \wikipath{linker, Get more data about linkers.}
@@ -3123,7 +3125,7 @@ namespace Privates {
 
 		/** \brief Function call operator.
 		 *
-		 *  The function makes connection between the source \a w and the destination \a wsk and another way round. 
+		 *  The function makes connection between the source \a w and the destination \a wsk and another way round.
 		 *  The operator uses methods lining elements delivered by linkers set up in constructor.*/
 		template< class Dest, class Sour > void operator()( Dest *wsk, Sour *w );
 	};
@@ -3267,7 +3269,7 @@ namespace Privates {
 	// wygodne laczenie chooserow, casterow i linkerow w pary za pomoca &
 	/**\brief Make pair of choosers.
 	 *
-	 * Overloaded operator& allows to create easily a std::pair of choosers \a a and \a b.*  
+	 * Overloaded operator& allows to create easily a std::pair of choosers \a a and \a b.*
 	 * \ingroup DMchooser */
 	template <class  Ch1, class Ch2> std::pair< typename Ch1::ChoosersSelfType,typename Ch2::ChoosersSelfType >
 		operator&( Ch1 a, Ch2 b )
@@ -3279,12 +3281,12 @@ namespace Privates {
 	/**\brief Make pair of casters.
 	 *
 	 * Overloaded operator& allows to create easily a std::pair of casters \a a and \a b.
-	 *  
+	 *
 	 * \related NoCastCaster
 	 * \related ValueCaster
 	 * \related HardCaster
 	 * \related StdCaster
-	 * \related ObjCaster 
+	 * \related ObjCaster
 	 * \ingroup DMcaster */
 	template <class  Ch1, class Ch2> std::pair< typename Ch1::CastersSelfType,typename Ch2::CastersSelfType >
 		operator&( Ch1 a, Ch2 b )
@@ -3295,9 +3297,9 @@ namespace Privates {
 	/**\brief Make pair of linkers.
 	 *
 	 * Overloaded operator& allows to create easily a pair of std::linkers \a a and \a b.
-	 * \related Std1NoLinker 
-	 * \related Std1FieldLinker 
-	 * \related Std1AssocLinker 
+	 * \related Std1NoLinker
+	 * \related Std1FieldLinker
+	 * \related Std1AssocLinker
 	 * \ingroup DMlinker */
 	template <class  Ch1, class Ch2> std::pair< typename Ch1::LinkersSelfType,typename Ch2::LinkersSelfType >
 		operator&( Ch1 a, Ch2 b )

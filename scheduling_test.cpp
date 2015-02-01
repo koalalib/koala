@@ -93,6 +93,7 @@ void scheduling_coffman()
 	for(int m = 0; m < S.getMachNo(); m++)
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
 			cout << "Z" << T[i->task].vertex->info << " " << i->start << " " << i->end << endl;
+
     assert(Scheduling::test(T, T + N, G, S));
 }
 
@@ -167,6 +168,11 @@ void scheduling_liu()
 	for(int m = 0; m < S.getMachNo(); m++)
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
 			cout << "Z" << T[i->task].vertex->info << " " << i->part << " " << i->start << " " << i->end << endl;
+
+	int tabc[20];
+	pair<int, int> tabv[20];
+	S.taskPartList(SearchStructs::compStore(tabc, tabv));
+
     assert(Scheduling::test(T, T + N, G, S,false));
 }
 
@@ -274,9 +280,38 @@ void scheduling_list()
 	cout << Scheduling::CMax(T, T + N, S) << endl;
 
 	for(int m = 0; m < S.getMachNo(); m++)
+    {
+        cout << "m="<< m << endl;
 		for(std::vector<Scheduling::TaskPart>::iterator i = S.machines[m].begin(); i != S.machines[m].end(); ++i)
 			cout << "Z" << T[i->task].vertex->info << " " << i->start << " " << i->end << endl;
+    }
 
+	int t = 6, a = S.part(0, t);
+	if(a != - 1)
+		cout << "Pozycja " << a << " po czasie " << t << endl;
+	else
+		cout << "Maszyna pusta po czasie " << t << endl;
+
+	a = S.part(1, t);
+	if(a != - 1)
+		cout << "Pozycja " << a << " po czasie " << t << endl;
+	else
+		cout << "Maszyna pusta po czasie " << t << endl;
+
+
+	int tabc[10];
+	pair<int, int> tabv[10];
+	S.taskPartList(SearchStructs::compStore(tabc, tabv));
+	cout << endl;
+
+	for(int i=0;i<N;i++)
+    {
+        cout << "\nzadanie " << i+1 << " czesci " << tabc[i+1]-tabc[i] << " = ";
+        for(int j=tabc[i];j<tabc[i+1];j++)
+            cout << "(" << tabv[j].first << ',' << tabv[j].second<< ")";
+    }
+
+//    	exit(0);
     assert(Scheduling::test(T, T + N, G, S));
 }
 
@@ -324,6 +359,8 @@ void scheduling_critical()
 
 	scheduling_list();
 	scheduling_critical();
+
+
 
 	return 0;
 }

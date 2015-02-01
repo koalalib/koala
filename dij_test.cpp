@@ -296,6 +296,8 @@ template< class GraphType, class Iter > static void scanAttainable( const GraphT
         BellmanFord::PathLengths<int> recb;
         BellmanFordPar<MySetting>::PathLengths<int> recb2;
         recb2=recb;
+
+        Koala::stdCast();Koala::valCast();Koala::valCast(12.4);
     }
 
     return 0;

@@ -850,9 +850,9 @@ template< class T > template< class K, class V >
 }
 
 template< class T, class Fun > template< class K >
-	AssocFunktorInserter< T,Fun > &AssocFunktorInserter< T,Fun >::operator=( const K &arg )
+	AssocFunctorInserter< T,Fun > &AssocFunctorInserter< T,Fun >::operator=( const K &arg )
 {
-	(*container)[(typename T::KeyType)arg] = (typename T::ValType)funktor( arg );
+	(*container)[(typename T::KeyType)arg] = (typename T::ValType)functor( arg );
 	return *this;
 }
 

@@ -97,7 +97,7 @@ string fun(const Graph<char,string>& g,Vertex<char,string> *u,Vertex<char,string
 
     cout << "\n!!!!!!!!!!!!!!!!!\n";
 
-    gcopy.copy(g1,stdChoose(true)&stdChoose(true),stdCast(false)& stdCast(false),
+    gcopy.copy(g1,stdChoose(true)&stdChoose(true),valCast( )& valCast( ),
                Std2Linker<Privates::Std1PtrLinker,Std1NoLinker>(Privates::Std1PtrLinker(),Std1NoLinker())
                &
                stdLink(false,false)

@@ -343,6 +343,14 @@ int xxx=0;
         aa[B]="BB";
         aa2=inf;
         t(aa2);
+        cout << "\n\n";
+        t(assocTabInterf(aa2));
+        AssocTable<AssocArray<Vert*,std::string> > tabaa2;
+        tabaa2=assocTab(aa2);
+        AssocTabInterface<AssocArray<Vert*,std::string> > intaa2(aa2);
+        intaa2[A]="Ala_";
+        cout << "\n\n";
+        t(intaa2);
 
         AssocArrSwitch<AssocArray<Vert*,std::string> >::Type  hmp2;
         hmp2=aa;
