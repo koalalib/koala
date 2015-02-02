@@ -23,11 +23,12 @@ namespace Koala
 	/** \brief Test classes (parametrized).
 	 *
 	 *  The class delivers the range of methods which check if a graph belongs to various families of graphs. \n
-	 *  By default it is assumed that considered graphs are simple WEN: i undirected. But there are some families of graphs which make sense for WEN: grafow z krawedziami rownol. lub petlami. Then the flag \a allowmulti is available. \n
-	 *  In the class also some specialized algorithms which work only on certain families of graph are implemented.
-	 *  \tparam DefaultStructs the class used to parametrize algorithms. It decides about basic algorithms and structs that are used by algorithms.
-	 *  \ingroup detect
-	 */
+	 *  By default it is assumed that considered graphs are simple and undirected. But there are some families of graphs 
+	 *  which make sense for parallel edges and loops. Then the flag \a allowmulti is available. \n
+	 *  In the class also some specialized algorithms which work only on certain families of graph are implemented.\n
+	 *  All the methods (but the zero(GraphType &)) assume that vertex set is nonempty.
+	 *  \tparam DefaultStructs the class used to parametrize algorithms. It decides about basic algorithms and structures that are used by algorithms.
+	 *  \ingroup detect */
 	template< class DefaultStructs > class IsItPar: public SearchStructs
 	{
 	public:
@@ -35,8 +36,9 @@ namespace Koala
 		// Ta metoda jest wyjatkiem, sprawdza czy n=0
 		/** \brief Test if empty vertex set.
 		 *
-		 *  The method tests if the graph has the empty vertex set. WEN: pewnie gdzies trzeba zaznaczyc, ze wszedzie dalej zakladamy wejscie z !zero(g) - war. poprawnosci
-		 *  \param WEN: zapytanie ogolne (dot. calego Doxy), czemu czasami przy param jest [in|out], a czasami nie? g the considered graph.
+		 *  The method tests if the graph has the empty vertex set. This is the only one method in this class that allow empty vertex set.
+		 *  All the remaining methods need !zero(g) for proper operation.
+		 *  \param [in] g the considered graph.
 		 *  \return true if the graph has an empty vertex set, otherwise false. */
 		template< class GraphType > static bool zero( const GraphType &g )
 			{ return !g.getVertNo(); }
@@ -46,8 +48,8 @@ namespace Koala
 		 *
 		 *  The method tests if a graph has only unique undirected edges (simple graph). Or if \a allowmulti is true, the method tests if the graph is an undirected multigraph.
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: i loops.
-		 *  \return true if \a g is a simple graph (allowmulti false) or WEN: nie wiem, czy zdefiniujemy to slowo: multigraph (allowmulti true), otherwise false. */
+		 *  \param allowmulti the flag allowing or disabling multiple edges and loops.
+		 *  \return if \a allowmulti false returns true if and only if graph \a g is simple, if \a allowmulti set true returns true if and only if graph is undirected. */
 		template< class GraphType > static bool undir( const GraphType &g, bool allowmulti = false );
 
 		// czy spojny
@@ -55,7 +57,7 @@ namespace Koala
 		 *
 		 *  The method tests if the graph \a g is connected i.e. for each pair of vertices there exists a path between the vertices.
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: i petle.
+		 *  \param allowmulti the flag allowing or disabling multiple edges and loops.
 		 *  \return true if connected,  otherwise false. */
 		template< class GraphType > static bool connected( const GraphType &g, bool allowmulti = false );
 
@@ -80,7 +82,7 @@ namespace Koala
 		// las
 		/** \brief Test if forest.
 		 *
-		 *  The method tests if the graph \a g is a forest, in other words, is it a set of WEN: separate trees.
+		 *  The method tests if the graph \a g is a forest, in other words, is it a set of separate trees.
 		 *  \param g the considered graph.
 		 *  \return true if the graph is a forest, false otherwise. */
 		template< class GraphType > static bool forest( const GraphType &g )
@@ -107,7 +109,7 @@ namespace Koala
 		 *
 		 *  The method tests if each vertex of the graph has the same degree.
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: i petle.
+		 *  \param allowmulti the flag allowing or disabling multiple edges and loops.
 		 *  \return true if regular, otherwise false. */
 		template< class GraphType > static bool regular( const GraphType &g, bool allowmulti = false );
 
@@ -123,7 +125,7 @@ namespace Koala
 			 *
 			 *  The method gets the ends of the path.
 			 *  \param g the considered graph.
-			 *  \return the standard pair of vertices, which are the ends of path. If any error occur WEN: nie, po prostu gdy nie jest path pair (NULL,NULL) is returnd.*/
+			 *  \return the standard pair of vertices, which are the ends of path. If graph \a g is not a path pair (NULL,NULL) is returned.*/
 			template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 				ends( const GraphType &g );
 		};
@@ -149,7 +151,7 @@ namespace Koala
 			 *
 			 *  The method gets the ends of the central path of the caterpillar \a g.
 			 *  \param g the considered graph.
-			 *  \return the standard pair of vertices, which are the ends of the central path. If any error occur WEN: nie, po prostu gdy nie jest cater., a pair (NULL,NULL) is returnd.*/
+			 *  \return the standard pair of vertices, which are the ends of the central path. If graph \a g is not a caterpillar, a pair (NULL,NULL) is returned.*/
 			template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 				spineEnds( const GraphType &g );
 		};
@@ -159,7 +161,8 @@ namespace Koala
 		 *
 		 *  The method tests if the graph \a g is a caterpillar.
 		 *  \param g the tested graph.
-		 *  \return true if caterpillar, otherwise false. */
+		 *  \return true if caterpillar, otherwise false. 
+		 *  \related Caterpillar*/
 		template< class GraphType > static bool caterpillar( const GraphType &g )
 			{ return Caterpillar::spineEnds( g ).first; }
 
@@ -168,7 +171,7 @@ namespace Koala
 		 *
 		 *  The method tests if the considered graph \a g is a cycle.
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: lub petle tj. po prostu cykle dl 1 i 2 (K1 nigdy nie jest cyklem).
+		 *  \param allowmulti the flag allowing or disabling multiple edges or loops. WEN?: i.e. tj. po prostu cykle dl 1 i 2 (K1 nigdy nie jest cyklem).
 		 *  \return true if the graph \a g is a cycle, false  otherwise. */
 		template< class GraphType > static bool cycle( const GraphType &g, bool allowmulti = false )
 			{ return connected( g,allowmulti ) && g.deg( g.getVert() ) == 2 && regular( g,true ); }
@@ -176,7 +179,7 @@ namespace Koala
 		// zbior niezalezny krawedzi
 		/** \brief Test if matching.
 		 *
-		 *  The method tests if the considered graph \a g is a matching (is of degree WEN: <= 1).
+		 *  The method tests if the considered graph \a g is a matching (is of degree <= 1).
 		 *  \param g the considered graph.
 		 *  \param allowmulti the flag allowing or disabling multiple edges.
 		 *  \return true if the graph \a g is a matching, false  otherwise. */
@@ -188,7 +191,7 @@ namespace Koala
 		 *
 		 *  The method tests if the considered graph \a g is subcubic (the maximum degree is not grater then three).
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges. WEN: lub petle
+		 *  \param allowmulti the flag allowing or disabling multiple edges and loops.
 		 *  \return true if the graph \a g is subcubic, false  otherwise. */
 		template< class GraphType > static bool subcubic( const GraphType &g, bool allowmulti = false )
 			{ return undir( g,allowmulti ) && g.Delta() <= 3; }
@@ -198,7 +201,7 @@ namespace Koala
 		 *
 		 *  The method tests if the considered graph \a g is cubic (the degree of each vertex is exactly three).
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges WEN: lub petle
+		 *  \param allowmulti the flag allowing or disabling multiple edges and loops.
 		 *  \return true if the graph \a g is cubic, false  otherwise. */
 		template< class GraphType > static bool cubic( const GraphType &g, bool allowmulti = false )
 			{ return g.getVert() && g.deg( g.getVert() ) == 3 && regular( g,allowmulti ); }
@@ -211,13 +214,13 @@ namespace Koala
 		 *  \return true if the graph \a g is a block graph, false  otherwise. */
 		template< class GraphType > static bool block( const GraphType &g );
 
-        //NEW: teraz jest z allowmulti
-		// maks. liczba cyklomatyczna skladowej 2-spojnej grafu prostego. -1 w razie bledu.
+        // maks. liczba cyklomatyczna skladowej 2-spojnej grafu prostego. -1 w razie bledu.
 		/** \brief Test if almost K-tree.
 		 *
 		 *  The method checks for which smallest  \a K a graph is an almost K-tree.
 		 *  \param g the considered graph.
-		 *  \return the smallest \a K for which  the graph \a g is an almost K-tree.  If any error occurs WEN: "konkretnie gdy !undir( g,allowmulti )" -1 is returned.*/
+		 *  \param allowmulti the flag allowing or disabling multiple edges and loops.
+		 *  \return the smallest \a K for which  the graph \a g is an almost K-tree.  If graph is not undirected -1 is returned.*/
 		template< class GraphType > static int almostTree( const GraphType &g, bool allowmulti=false );
 
 		/* Bipartite
