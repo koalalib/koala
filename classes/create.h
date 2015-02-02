@@ -1235,12 +1235,12 @@ namespace Privates {
 	 */
 	/** \brief Binary relation operations (parameterized).
 	 *
-	 *  The set of methods which consider a graph as a binary relation on the set of vertices. Edge Info objects are not modified?.  
+	 *  The set of methods which consider a graph as a binary relation on the set of vertices.  
 	 *  \wikipath{Graph_and_relations}
 	 *  \tparam DefaultStructs parameter allows to adjust the settings for internal procedures.
 	 *  \ingroup detect */
 	template< class DefaultStructs > class RelDiagramPar
-	{ 	    //WEN?: cyt. z ebook: Krawędzie pozostające w wyniku nie są modyfikowane, w szczególności nie zmieniają swych inf. W każdej poniższych metod, jeśli wejściem był diagram, wyjściem też będzie diagram.
+	{ 	    
 	public:
 
 		// doprowadza diagram do zwyklej postaci, bez krawedzi nieskierowanych ani rownoleglych
@@ -1248,6 +1248,7 @@ namespace Privates {
 		 *
 		 *  Method allows to normalize graph i.e. it replaces undirected with arcs and deletes all the parallel edges.
 		 *  Graph is modified in a way to create a representation of relation.
+		 *  Infos of remaining arcs are left untouched.
 		 *  \param g the reference to modified graph. */
 		template< class Graph > static void repair( Graph &g );
 
@@ -1272,6 +1273,7 @@ namespace Privates {
 		/** \brief Inverse
 		 *
 		 *  Each arc in graph is inversed. In the effect, the graph represents inversed relation.
+		 *  Infos of arcs are left untouched.
 		 *  \param g the reference to the modified graph. */
 		template< class Graph > static void inv( Graph &g ) { g.rev(); }
 
@@ -1279,6 +1281,7 @@ namespace Privates {
 		/** \brief Reflexive closure.
 		 *
 		 *  The function adds the minimal number of loops in order to make the relation (represented by the graph \a g) reflexive.
+		 *  Infos of remaining arcs are left untouched.
 		 *  \param g the reference to the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
 		template< class Graph > static void
@@ -1288,7 +1291,7 @@ namespace Privates {
 		/** \brief Symmetric closure.
 		 *
 		 *  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) symmetric.
-		 *  Edge infos of new-created edges are set to its type default value.
+		 *  Edge infos of new-created edges are set to its type default value. Infos of remaining arcs are left untouched.
 		 *  \param g the modified graph. */
 		template< class Graph > static void
 			symmClousure( Graph &g)
@@ -1297,6 +1300,7 @@ namespace Privates {
 		/** \brief Symmetric closure.
 		*
 		*  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) symmetric.
+		*  Infos of remaining arcs are left untouched.
 		*  \param g the modified graph.
 		*  \param info the EdgeInfoType object copied to the info of each new-created edge.*/
 		template< class Graph > static void
@@ -1304,9 +1308,10 @@ namespace Privates {
 //			symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
 		// przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
-		/** \brief Transitiv clousure.
+		/** \brief Transitive closure.
 		 *
 		 *  The function adds the minimal number of arc and loops in order to make the relation (represented by the graph \a g) transitive.
+		 *  New-created arc infos are set to default info type value. Infos of initial arcs are left untouched.
 		 *  \param g the modified graph. */
 		template< class Graph > static void
 			transClousure( Graph &g)
@@ -1315,16 +1320,30 @@ namespace Privates {
 		/** \brief Transitive closure.
 		 *
 		 *  The function adds the minimal number of arc and loops in order to make the relation (represented by the graph \a g) transitive.
+		 *  New-created arc infos are set to \a einfo. Infos of initial arcs are left untouched.
 		 *  \param g the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
 		template< class Graph > static void
 			transClousure( Graph &g, const typename Graph::EdgeInfoType &einfo);
 
-        //NEW: potegowanie grafu (wykladnik wyk)
+		/**\brief Power of relation
+		 *
+		 * The function calculates the \a wyk power of relation represented by graph \a g. 
+		 * New edges get edge info of value \a einfo.
+		 * \param g the modified relation graph.
+		 * \param wyk the exponent of power.
+		 * \param einfo the info object copied to all new-created edge infos.
+		 * \param noNewDir WEN?:*/
         template< class Graph > static void
 			pow( Graph &g, int wyk, const typename Graph::EdgeInfoType &einfo, bool noNewDir=true);
 
-        template< class Graph > static void
+        /**\brief Power of relation
+		 *
+		 * The function calculates the \a wyk power of relation represented by graph \a g. 
+		 * Edge info of new edges is set to its type default value.
+		 * \param g the modified relation graph.
+		 * \param wyk the exponent of power.*/
+		template< class Graph > static void
 			pow( Graph &g, int wyk)
 			{ pow(g,wyk,typename Graph::EdgeInfoType(),true); }
 
@@ -1336,24 +1355,38 @@ namespace Privates {
 		//        operator(), iteratory podaja zakres przedzialu elementow
 		/** \brief Methods for matrix representation.
 		 *
-		 *  The same set of methods is offered for a matrix representation.\n
-		 *  Functions with 2 parameters are for a container that can be managed as a two dimensional table with values convertible to bool.\n
-		 *  Functions which take three parameters are for containers with access via overloaded operator() for two parameters. Iterators give the range of elements.
-		 */
+		 *  Matrix representation is another approach to relations and operation on them. 
+		 *  The following nested structure serves the set of methods for relation matrix representation.\n
+		 *  There each method is overloaded:
+		 *  - Functions with 2 parameters are for a container that can be managed as a two dimensional table with values convertible to bool.
+		 *  - Functions which take three parameters are for containers with access via overloaded operator() for two parameters. 
+		 *   The call function operator should return value convertible to bool. Iterators give the range of elements. */
 		struct MatrixForm
 		{
+			/**\brief Clear relation*/
 			template< class Cont > static void empty( Cont &cont, int size );
+			/**\brief Clear relation*/
 			template< class Cont, class Iter > static void empty( Cont &cont, Iter beg, Iter end );
+			/**\brief Make total relation.*/
 			template< class Cont > static void total( Cont &cont, int size );
+			/**\brief Make total relation.*/
 			template< class Cont, class Iter > static void total( Cont &cont, Iter beg, Iter end );
-			template< class Cont > static void inv( Cont &cont, int size );
+			/**\brief Invert relation.*/
+			template< class Cont > static void inv(Cont &cont, int size);
+			/**\brief Invert relation.*/
 			template< class Cont, class Iter > static void inv( Cont &cont, Iter beg, Iter end );
-			template< class Cont > static void reflClousure( Cont &cont, int size );
-			template< class Cont, class Iter > static void reflClousure( Cont &cont, Iter beg, Iter end );
-			template< class Cont > static void symmClousure( Cont &cont, int size );
-			template< class Cont, class Iter > static void symmClousure( Cont &cont, Iter beg, Iter end );
-			template< class Cont > static void transClousure( Cont &cont, int size );
-			template< class Cont, class Iter > static void transClousure( Cont &cont, Iter beg, Iter end );
+			/**\brief Reflexive closure.*/
+			template< class Cont > static void reflClousure(Cont &cont, int size);
+			/**\brief Reflexive closure.*/
+			template< class Cont, class Iter > static void reflClousure(Cont &cont, Iter beg, Iter end);
+			/**\brief Symmetric closure.*/
+			template< class Cont > static void symmClousure(Cont &cont, int size);
+			/**\brief Symmetric closure.*/
+			template< class Cont, class Iter > static void symmClousure(Cont &cont, Iter beg, Iter end);
+			/**\brief Transitive closure.*/
+			template< class Cont > static void transClousure(Cont &cont, int size);
+			/**\brief Transitive closure.*/
+			template< class Cont, class Iter > static void transClousure(Cont &cont, Iter beg, Iter end);
 		};
 	} ;
 
@@ -1563,7 +1596,16 @@ namespace Privates {
     //NEW: 4-ty argument szablonu. int=0 - jak bylo, int =1 to twoarg jest 3-argumentowy, a w wywolaniu
     // operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) rzutuje z sour1, int =2 tj. ale z sour2
     //Dzieki temu mozna tworzyc ComplexCaster poslugujac sie tylko casterami 2-argumentowymi
-    template< class TwoArg, class FirstArg, class SecondArg,int ver> struct ComplexCaster
+    /* \brief Complex caster for products.WEN?:
+	 *
+	 * Useful if some entities are generated from one source and other need two sources. 
+	 * Which is the case is some products of graphs for edges.
+	 *
+	 * The caster takes three casters as template parameters:
+	 * \tparam TwoArg the two arguments caster that generates info object from two source infos.
+	 * \tparam
+	 * \ingroup detect*/
+	template< class TwoArg, class FirstArg, class SecondArg,int ver> struct ComplexCaster
 	{
 
 	    typedef ComplexCaster< TwoArg, FirstArg, SecondArg, ver > CastersSelfType;
