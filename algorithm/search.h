@@ -11,9 +11,9 @@
 namespace Koala
 {
 
-	/* SearchStructs
+	/** \brief Path structures
 	 *
-	 */
+	 *  Some auxiliary structures used by various algorithms, for example shortest path.*/
 	struct PathStructs
 	{
 		// Do odczytu sciezki miedzy wierzcholkiem a korzeniem, gdy droga wyznaczona jest w postaci
@@ -120,9 +120,10 @@ namespace Koala
 		};
 	};
 
-	/* ShortPathStructs
+	/** \brief Output in-forest management.
 	 *
-	 */
+	 *  A number of functions return in-forest in format of associative container PVert -> SearchStructs::VisitVertLabs. 
+	 *  This class consist of methods that extract some useful data from such containers. */
 	struct ShortPathStructs: public PathStructs
 	{
 		// zwraca liczbe krawedzi sciezki
@@ -132,7 +133,14 @@ namespace Koala
 		// OutPath, miejsce gdzie sciezka zostanie zapisana
 		// sciezka prowadzi "pod prad" tj. od korzenia do tego wierzcholka
 		// ew. wczesniejszy punkt koncowy na sciezce miedzy end a korzeniem
-		//WEN: opis?
+		/** \brief Extract path from in-tree.
+		 *
+		 * \param[in] g the considered graph.
+		 * \param[in] vertTab the associative container PVert-> SearchStructs::VisitVertLabs (or own structure that has attributes ePrev and vPrev), that represents in-forest.
+		 * \param[out] iters OutPath structure with extracted path that finishes in \a end. And starts in \a start WEN?: 
+		 * \param[in] end the end of path.
+		 * \param[in] start the root of in-tree or part of in-tree.
+		 * \return the number of edges on path.*/
 		template< class GraphType, class VertContainer, class VIter, class EIter >
 			static int getOutPath( const GraphType &g, const VertContainer &vertTab, OutPath< VIter,EIter > iters,
 			typename GraphType::PVertex end, typename GraphType::PVertex start = 0 );
@@ -148,40 +156,56 @@ namespace Koala
 
 		// Zapisuje na podany iterator wszystkie krawedzie nalezace do drzewa (lasu) tj. uzyte jako wartosci pol ePrev
 		// Zwraca ich liczbe
-		//WEN: opis?
+		/** \brief Get edges in in-tree.
+		 *
+		 * \param[in] g the considered graph.
+		 * \param[in] vertTab the associative container PVert-> SearchStructs::VisitVertLabs (or own structure that has attributes ePrev and vPrev), that represents in-forest.
+		 * \param[out] iter the output iterator to the container with all the edges of in-forest represented by \a vertTab. 
+		 *  \return the number of edges.*/
 		template< class GraphType, class VertContainer, class Iter > static int getUsedEdges( const GraphType &g,
 			const VertContainer &vertTab, Iter iter );
 		// jw. ale zwraca zbior krawedzi
-		//WEN: opis?
+		/** \brief Get edges in in-tree.
+ 		 *
+		 * \param[in] g the considered graph.
+		 * \param[in] vertTab the associative container PVert-> SearchStructs::VisitVertLabs (or own structure that has attributes ePrev and vPrev), that represents in-forest.
+		 * \return the set with all the edges in the in-tree represented by the container \a vertTab.*/
 		template< class GraphType, class VertContainer > static Set< typename GraphType::PEdge >
 			getUsedEdgeSet( const GraphType &g, const VertContainer &vertTab );
 	};
 
 
-	/* SearchStructs
+	/** \brief Search structures
 	 *
-	 */
+	 *  Collection of auxiliary structures for search algorithms.*/
 	class SearchStructs
 	{
 	public:
 		// Struktura wartosci przypisywanej wierzcholkowi w procedurach przeszukiwania grafu
+		//chodzi o reprezentacje in-forest w grafie tj. etykieta przy wierzcholku pokazuje przejscie do rodzica
 		/** \brief Auxiliary visit vertex structure
-		 *  WEN: chodzi o reprezentacje in-forest w grafie tj. etykieta przy wierzcholku pokazuje przejscie do rodzica
-		 *  Structure used by search procedures. */
+		 * 
+		 *  Structure used by search procedures. To represent in-forest the structure keeps the pointer to parent vertex and PEdge leading to it.
+		 *
+		 *  For example, it may be used as mapped value in associative container associated with vertex (PVert -> VisitVertLabs). */
 		template< class GraphType > struct VisitVertLabs
 		{
 			// rodzic danego wierzcholka w drzewie (lesie), NULL dla korzenia
-			/** \brief Parent WEN: w czym parent? of vertex.*/
+			/** \brief Parent 
+			 *
+			 *  The parent vertex in in-forest or NULL if current vertex is root.*/
 			typename GraphType::PVertex vPrev;
 			// krawedz prowadzaca do rodzica
-			/** \brief Edge leading to parent of vertex WEN: tez w tym in-forest.*/
+			/** \brief Edge leading to parent of vertex in in-forest, or NULL if current vertex is root.*/
 			typename GraphType::PEdge ePrev;
 
 			// odleglosc od korzenia (liczba krawedzi) i numer skladowej spojnosci (od 0)
-			int distance;/**< \brief Distance (number of edges) from root WEN: w tym in-forest i chyba raczej to niz from.*/
-			int component;/**< \brief Index of connected component WEN: czy komponent ... numer in-treesa w in-forescie tak na prawde.*/
+			int distance;/**< \brief Distance (number of edges) to root in in-forest.*/
+			int component;/**< \brief Index of connected component (in-tree) in in-forest.*/
 
-            //WEN:opis
+			/** \brief Copy.
+			 *
+			 *  The method copies the current structer to arg*/
 			template <class T> void copy(T& arg) const
 			{
 				arg.vPrev=vPrev;
@@ -189,11 +213,19 @@ namespace Koala
 				arg.distance=distance;
 				arg.component=component;
 			}
-			/** \brief Copy.*/
+			/** \brief Copy for BlackHole.
+			 *
+			 *  Does nothing.*/
 			void copy(BlackHole&) const
 				{ }
 
-			/**\brief Constructor WEN: ma jakies parametry i jakies dzialanie domyslne, prawda? */
+			/**\brief Constructor
+			 *
+			 * The constructor sets all structure fields.
+			 * \param vp pointer to parent.
+			 * \param ep pointer to edge leading to parent.
+			 * \param dist the distance to root.
+			 * \param comp the indec of connected component in in-tree.*/
 			VisitVertLabs( typename GraphType::PVertex vp = 0, typename GraphType::PEdge ep = 0,
 				int dist = std::numeric_limits< int >::max(), int comp = -1 ):
 					vPrev( vp ), ePrev( ep ), distance( dist ), component( comp )
@@ -211,7 +243,7 @@ namespace Koala
 		 *  - \a vertIter point to the concatenated sequenced of objects. 
 		 *  - \a compIter point to the container with integers such that each integer is a position of starting point of associated sequence, 
 		 *  the first element is always 0 and the last integer represents the number of all elements in the \a vertIter. 
-		 *  \wikipath{Graph_search_algorithms#Sequence-of-sequences, See wiki page for CompStore. */
+		 *  \wikipath{Graph_search_algorithms#Sequence-of-sequences, See wiki page for CompStore.} */
 		template< class CIter, class VIter > struct CompStore
 		{
 			CIter compIter;/**< \brief the insert iterator to the container with starting point positions of consecutive sequences.*/
@@ -229,7 +261,7 @@ namespace Koala
 		 *  \param ac  the insert iterator to the container with integers representing the positions of first elements of consecutive sequences.
 		 *  \param av the insert iterator to the container with concatenated sequences of entities.
 		 *  \return the CompStore object associated with the sequence of sequences. 
-		 *  \related CompStore */
+		 *  \related CompStore*/
 		template< class CIter, class VIter > static CompStore< CIter,VIter > compStore( CIter ac, VIter av )
 			{ return CompStore< CIter,VIter >( ac,av ); }
 
@@ -266,6 +298,15 @@ namespace Koala
 		// ulatwia obrobke takich danych
 		// T typ elementu ciagow skladowych
 		//WEN: opis kontenera i metod?
+		/**\brief Sequence of sequences for CompStore. 
+		 *
+		 *  The class consists of two containers (based on std::vector):
+		 *  - the second one consists of concatenated sequences.
+		 *  - the first one is a sequence of integers where i-th number stands for the beginning index of i-th sequence. 
+		 *
+		 *  The class is designed to simplify operations of CompStore. It delivers method input that returns CompStore
+		 *  which may be used in any method requiring such structure.
+		 *  \tparam T the type of element.*/
 		template< class T > class CompStoreTool
 		{
 		private:
@@ -278,27 +319,43 @@ namespace Koala
 			typedef std::back_insert_iterator< std::vector< T > > VIterType;
 			typedef CompStore< std::back_insert_iterator< std::vector< int > >,std::back_insert_iterator< std::vector< T > > > InputType;
 
+			/**\brief Empty constructor.*/
 			CompStoreTool()
 				{ clear(); }
+			/**\brief Clear containers. */
 			void clear();
 			 // liczba zebranych ciagow
+			/**\brief The number of sequences.*/
 			int size() const;
 			 // dlugosc i-tego ciagu
+			/**\brief The number of elements in i-th sequence.*/
 			int size( int i ) const;
 			 // laczna dlugosc wszystkich ciagow
+			/**\brief The number of elements in all sequences. (size of container with elements). */
 			int length() const;
 			// wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
+			/**\brief Access i-th element. */
 			T *operator[]( int i );
 			// wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
+			/**\brief Get i-th element. */
 			const T *operator[]( int i ) const;
 			// umieszcza nowy ciag pusty na pozycji i.
+			/**\brief Insert new empty sequence on i-th position. */
 			void insert( int i );
 			// kasuje ciag na pozycji i
+			/**\brief Delete i-th sequence.*/
 			void del( int i );
 			// zmienia dlugosc i-tego ciagu.
+			/**\brief Resize i-th sequence
+			 *
+			 *  The method changes the size of i-th sequence to \a size.*/
 			void resize( int i, int asize );
 			//Umiesczamy wywolanie funkcji w miejsu compStore a pozniej przetwarzamy zebrane ciagi
 			// czysci kontener
+			/**\brief Generate CompStore
+			 *
+			 * The method generates CompStore object associated with current CompStoreTool. 
+			 * Such CompStore may be used by any method that requires it.*/
 			CompStore< std::back_insert_iterator< std::vector< int > >,std::back_insert_iterator< std::vector< T > > >
 				input();
 		};
@@ -656,7 +713,8 @@ namespace Koala
 	 *
 	 *  The general implementation of graph search strategies (DFS, BFS, LexBFS).
 	 *  \tparam SearchImpl the class should deliver a method visitBase, which decides about the order of visiting vertices.
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm WEN: to sie nawet jakos fachowo nazywa (polityka czy cecha?). Can be used to parametrize algorithms.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm WEN: to sie nawet jakos fachowo nazywa (polityka czy cecha?).
+	 *   Can be used to parametrize algorithms.
 	 *  \ingroup search */
 	template< class SearchImpl, class DefaultStructs > class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	{
@@ -674,20 +732,18 @@ namespace Koala
 
 	public:
 		typedef SearchImpl SearchStrategy;
+		
 		/** \brief Visit all vertices.
 		 *
 		 *  Visit all vertices in a graph in order given by the strategy SearchImpl
-		 *  @param[in] g the graph containing vertices to visit WEN: dowolny graf, tu i w kolejnych metodach takze
-		 *  @param[in] visited the container to store data (np. map PVertex -> VisitVertLabs), BlackHole forbidden.
-		 *   After the execution of the method, the associative container represent the search WEN: in-forest tree (forst)
-		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distance keeps the distance from the root.
-		 WEN: fajnie i wlasnie czegos takiego mi brakowalo przy VisitVertLabs.
-		 *   finally field component keeps the index of the connected component of graph.
-		 WEN: z tym component to jest bardziej zlozone w skierowanych - raczej numer in-treesa w in-forescie
-		 WEN: czy on na pewno jest [in]?
+		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
+		 *  @param[out] visited the container to store data (ex. map) in format PVertex -> VisitVertLabs. BlackHole is forbidden.
+		 *   After the execution of the method, the associative container represent the search in-forest or in-tree
+		 *   where fields vPrev and ePrev (in VisitVertLabs) keep the parent vertex and connecting edge. Field distance keeps the distance from the root.
+		 *   Finally attribute component keeps the index of the in-tree in in-forest.
 		 *  @param[in] visitor object that delivers a set of functions which are called for each vertex and for various stages of algorithm.
-		 *  @param[in] dir the direction of edges to consider. WEN: link do opisu co to znaczy przejsc krawedz danego rodzaju w sposob zgodny z maska (wiele razy tu sie przyda, nizej takze)
-		 *  @return the number of components WEN: ... components ??? .
+		 *  @param[in] dir the Koala::EdgeDirection mask representing direction of edges to consider. \wikipath{EdgeDirection}
+		 *  @return the number of in-trees in in-forest.
 		 *  \sa SearchStructs::VisitVertLabs
 		 *  \sa Visitors */
 		template< class GraphType, class VertContainer, class Visitor >
@@ -695,52 +751,46 @@ namespace Koala
 
 		//Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia, component=0
 		/** \brief Visit attainable.
-		 * WEN: chyba kolejnosc parametrow jest inna
-		 *  Visit all vertices in the same component as a given vertex in order given by the strategy SearchImpl
-		 WEN: to nie musi byc skladowa, tylko zbior wierzholkow osiagalnych z danego przy przechodzeniu krawedzi zgodnie z maska (por. wyzej)
-		 *  @param[in] g the graph containing vertices to visit
+		 * 
+		 *  Visit all vertices attainable from a given vertex in order given by the strategy SearchImpl.
+		 *  Note that vertex is attainable if it is in the same connected component but also the direction of edges if included in mask \a dir may influence the relation. 
+		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
 		 *  @param[in] src the given vertex
-		 *  @param[out] out the iterator to write visited vertices in order given by the strategy  SearchImpl.
-		 *  @param[in] dir the direction of edges to consider WEN: raczej podczas trawersacji krawedzie sa przechodzone zgodnie z maska, loops are ignored regardless of the mask.
-		 *  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole forbidden. WEN: tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania ze start sa ustawiane w tej mapie
-		 *   After the execution of the method, the associative container represent the search in-tree WEN: o korzeniu src
+		 *  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole allowed. 
+		 *   After the execution of the method, the associative container represent the search in-tree rooted in \a src.
 		 *   where fields \p vPrev and \p ePrev keep the previous vertex and edge, and the field \p distance keeps the distance from the root.
-		 *   finally \p field component = 0.
+		 *   finally \p field component = 0. The vertices that are not attainable from \a src are not keys in this map.
+		 *  @param[out] out the output iterator to write visited vertices in order given by the strategy  SearchImpl.
+		 *  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
 		 *  @return the number of visited vertices.
 		 *  \sa SearchStructs::VisitVertLabs
 		 *
-		 * [See example](examples/search/search/search.html).
-		 */
-		template< class GraphType, class VertContainer, class Iter > static int scanAttainable( const GraphType &,
-			typename GraphType::PVertex, VertContainer &, Iter, EdgeDirection dir = EdUndir | EdDirOut );
+		 * [See example](examples/search/search/search.html). */
+		template< class GraphType, class VertContainer, class Iter > static int scanAttainable( const GraphType &g,
+			typename GraphType::PVertex src, VertContainer &visited, Iter out, EdgeDirection dir = EdUndir | EdDirOut );
 
-		template< class GraphType, class Iter > static int scanAttainable( const GraphType &,
-			typename GraphType::PVertex, BlackHole, Iter, EdgeDirection dir = EdUndir | EdDirOut );
-        //NEW: zmiana naglowkow metod tej klasy (kolejnosc parametrow!) - teraz kontener asocjacyjny
-        //dla wierzcholkow moze byc blackholizowany
-
-		/** \brief Visit attainable.WEN: rozumiem, ze to wylatuje
-		 *
-		 *  Visit all vertices in the same component as a given vertex. Behaves similarlly previous method by uses own map PVertex -> VisitVertLabs.
-		 *  @param[in] g the graph containing vertices to visit
-		 *  @param[in] src the given vertex
-		 *  @param[out] out the iterator to write vertices to, in order given by the strategy SearchImpl
-		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
-		 *  @return the number of visited vertices. */
-//		template< class GraphType, class VertIter > static int scanAttainable( const GraphType &g,
-//			typename GraphType::PVertex src, VertIter out, EdgeDirection dir = EdUndir | EdDirOut );
-
+		/* \brief Visit attainable. (specialization for BlackHole) 
+		*
+		*  Visit all vertices in the same component as a given vertex. Behaves similarly previous method but uses own map PVertex -> VisitVertLabs.
+		*  @param[in] g the graph containing vertices to visit. Any graph may be used.
+		*  @param[in] src the given vertex
+		*  @param[out] out the iterator to write vertices to, in order given by the strategy SearchImpl
+		*  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
+		*  @return the number of visited vertices. */
+		template< class GraphType, class Iter > static int scanAttainable( const GraphType &g,
+			typename GraphType::PVertex src, BlackHole, Iter out, EdgeDirection dir = EdUndir | EdDirOut );
+        
 		/** \brief Visit all vertices.
 		 *
 		 *  Visit all vertices in a graph
-		 *  @param[in] g the graph containing vertices to visit
-		 *  @param[out] out the iterator to write visited vertices to, in order given by the strategy SearchImpl
-		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask. WEN: por. wyzej
-		 *  @param[in] visited container to store data (map PVertex -> VisitVertLabs), BlackHole forbidden.
+		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
+		 *  @param[out] visited container to store data (map PVertex -> VisitVertLabs), BlackHole forbidden.
 		 *   After the execution of the method, the associative container represent the search tree (forest)
-		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distace keeps the distance from the root.
-		 *   finally field component keeps the index of the connected component of graph. WEN: [in]?
-		 *  @param[in] sym if true arcs are treated as undirected edges. WEN: nie bardzo, bo flaga EdUndir to co innego, niz Directed
+		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distance keeps the distance from the root.
+		 *   finally field component keeps the index of the connected component of graph.
+		 *  @param[out] out the iterator to write visited vertices to, in order given by the strategy SearchImpl
+		 *  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
+		 *  @param[in] sym if true arcs are treated as undirected edges.
 		 *  @return the number of components.
 		 *  \sa SearchStructs::VisitVertLabs */
 		template< class GraphType, class VertContainer, class VertIter > static int scan( const GraphType &g,
@@ -749,42 +799,47 @@ namespace Koala
 		template< class GraphType, class VertIter > static int scan( const GraphType &g,
 			BlackHole,VertIter out, EdgeDirection dir= EdDirOut | EdUndir | EdDirIn, bool sym = true );
 
-
-		/** \brief Visit all vertices.
-		 *
-		 *  Visit all vertices in a graph.
-		 *  @param[in] g the graph containing vertices to visit
-		 *  @param[out] out iterator to write vertices to, in order given by the strategy SearchImpl
-		 *  @param[in] dir the direction of edges to consider, loops are ignored regardless of the mask.
-		 *  @return the number of components.*/
-//		template< class GraphType, class VertIter > static int scan( const GraphType &g, VertIter out,
-//			EdgeDirection dir = EdDirOut | EdUndir | EdDirIn );
-
 		/* Liczba cyklomatyczna podgrafu zlozonego z krawedzi zgodnych z maska */
 		/** \brief Cyclomatic number of graph.
 		 *
-		 *  The method gets the cyclomatic number of graph, concerning only edges congruent with \a mask.
-		 WEN: link do def. liczby cyklomat w ebooku + uwaga, ze search-strategia jest wykorzystana tylko do znalezienia in-forest spinajacego
+		 *  The method gets the \wikipath{Reachability#Cyclomatic-number,cyclomatic number} of graph, concerning only edges congruent with \a mask.
+		 *  The search method is used do find spanning in-forest (\wikipath{Spanning_tree,See spanning tree}. 
 		 *  \param g the considered graph.
-		 *  \param mask determines the types and direction WEN: tu tylko types, bo maska jest symetryzowana of edges to be considered.
+		 *  \param mask determines the types of edges to be considered. \wikipath{EdgeType, See EdgeType}.
 		 *  \return the cyclomatic number of graph.  */
 		template< class GraphType > static int cyclNo( const GraphType &g, EdgeDirection mask = EdAll )
 			{ return g.getEdgeNo( mask ) - g.getVertNo() + scan( g,blackHole,blackHole,mask ); }
 
-		/** \brief Get contected component. WEN: bzdura, osiagalne z src przy przechodzeniu krawedzi zgodnie z maska
+		/** \brief Get attainable vertices.
 		 *
-		 *  The method returns all vertices in the same component WEN: j.w. as a given vertex.
+		 *  The method returns all vertices attainable from vertex \a src.
 		 *  @param[in] g graph containing vertices to visit.
-		 *  @param[in] src the given vertex. WEN: no ... given ale po co???
-		 *  @param[in] dir the direction of edges to consider. Loops are ignored.
-		 *  @return the set of vertices in the component.  WEN: to nie jest zaden komponent */
+		 *  @param[in] src the root vertex.
+		 *  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
+		 *  @return the set of attainable vertices. */
 		template< class GraphType > static Set< typename GraphType::PVertex > getAttainableSet( const GraphType &g,
 			typename GraphType::PVertex src, EdgeDirection dir = EdDirOut | EdUndir );
 
 
-        //NEW: ponizsze 2 - przeglad podobny do ScanAttainable wybrana strategia, ale tylko na glebokosc radius w poddrzewie o korzeniu  src
-        // W kontenerze wpisuje (odwiedza) odwiedzone wierzcholki. Zwraca ich liczbe. WEN: tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania start sa ustawiane w tej mapie
-		template< class GraphType, class VertContainer> static int scanNear( const GraphType &,
+        // ponizsze 2 - przeglad podobny do ScanAttainable wybrana strategia, ale tylko na glebokosc radius w poddrzewie o korzeniu  src
+        // W kontenerze wpisuje (odwiedza) odwiedzone wierzcholki. Zwraca ich liczbe.tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania start sa ustawiane w tej mapie
+		/** \brief Visit near attainable.
+		*
+		*  Visit all vertices attainable from vertex \a src in distance \a radius.
+		*  Note that vertex is attainable if it is in the same connected component but also the direction of edges if included in mask \a dir may influence the relation.
+		*  @param[in] g the graph containing vertices to visit. Any graph may be used.
+		*  @param[in] src the vertex
+		*  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole allowed.
+		*   After the execution of the method, the associative container represent the search in-tree rooted in \a src.
+		*   where fields \p vPrev and \p ePrev keep the previous vertex and edge, and the field \p distance keeps the distance from the root.
+		*   finally \p field that indicates the in-tree in in-forest equals 0 as there may be only one in-tree. 
+		*   The vertices that are not attainable from \a src or distance is farer then \a radius are not keys in this map.
+		*  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
+		*  @return the number of visited vertices.
+		*  \sa SearchStructs::VisitVertLabs
+		*
+		* [See example](examples/search/search/search.html). */
+		template< class GraphType, class VertContainer> static int scanNear(const GraphType &,
 			typename GraphType::PVertex, int radius, VertContainer &, EdgeDirection dir = EdUndir | EdDirOut );
 
 		template< class GraphType > static int scanNear( const GraphType &,
@@ -792,21 +847,21 @@ namespace Koala
 
 		/** \brief Get path.
 		 *
-		 *  The method finds a path between vertices WEN: ale jaka? path w drzewie przeszukiwania zgodnie ze strategia, startujacym w src
+		 *  The method finds a path between vertices \a src and \a dest in the search tree returned by search algorithm (according to its strategy)
+		 *  The search tree is rooted in \a src.
 		 *  @param[in] g the graph to search path in.
 		 *  @param[in] src the starting vertex.
 		 *  @param[in] dest the target vertex.
-		 *  @param[out] path found path
-		 *  @param[in] dir the mask determining the direction of edges WEN: ale w kontekscie ich przechodzenia na sciezce to consider, loops are ignored.
-		 *  @return the length of the path, -1 if there is no connection.
+		 *  @param[out] path found path (BlackHole possible)
+		 *  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
+		 *  @return the length of the path or -1 if there is no connection.
 		 *  \sa PathStructs::OutPath
-		 *  \sa PathStructs::OutPathTool
-		 */
+		 *  \sa PathStructs::OutPathTool */
 		template< class GraphType, class VertIter, class EdgeIter > static int findPath( const GraphType &g,
 			typename GraphType::PVertex src, typename GraphType::PVertex dest, OutPath< VertIter,EdgeIter > path,
 			EdgeDirection dir = EdUndir | EdDirOut );
 
-        //NEW: wersja bez podawania iteratorow
+        // wersja bez podawania iteratorow
 		template< class GraphType > static int findPath( const GraphType &g,
 			typename GraphType::PVertex src, typename GraphType::PVertex dest, BlackHole=blackHole,
 			EdgeDirection dir = EdUndir | EdDirOut )
@@ -835,34 +890,23 @@ namespace Koala
 		 *
 		 *  The method splits graph into connected components.
 		 *  @param[in] g the graph to split.
-		 *  @param[out] out CompStore object that is a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator) WEN: OK i link do CompStora
-		 *  @param[in] dir direction of edges to consider, loops are ignored. WEN: maska jest automatycznie symetryzowana
-		 *  @param[out] visited container to store data (map PVertex -> VisitVertLabs), BlackHole forbidden. WEN: juz nie, bo sa 2 wersje
+		 *  @param[out] visited container to store data (map PVertex -> VisitVertLabs). BlackHole allowed.
 		 *   After the execution of the method, the associative container represent the search tree (forst)
 		 *   where fields vPrev and ePrev keep the previous vertex and edge, and field distance keeps the distance from the root.
 		 *   finally field component keeps the index of the connected component of graph.
+		 *  @param[out] out CompStore object that is a pair of output iterators. See CompStore, and \wikipath{Graph_search_algorithms#Sequence-of-sequences, Related wiki page.}
+		 *  @param[in] dir the types of edges to consider, loops are ignored.
 		 *  @return the number of components.
 		 *  \sa CompStore
 		 *  \sa Visitors
 		 *
-		 * [See example](examples/search/search/search.html).
-		 */
+		 * [See example](examples/search/search/search.html). */
 		template< class GraphType, class VertContainer, class CompIter, class VertIter > static int split(
 			const GraphType &g, VertContainer &visited, CompStore< CompIter,VertIter > out, EdgeDirection dir= EdUndir | EdDirOut | EdDirIn );
 
 		template< class GraphType, class CompIter, class VertIter > static int split(
 			const GraphType &g, BlackHole, CompStore< CompIter,VertIter > out, EdgeDirection dir= EdUndir | EdDirOut | EdDirIn );
 
-		/** \brief Split graph.
-		 *
-		 *  The method splits graph into connected components. The simpler version of the above method. It uses its own map for search tree.
-		 *  @param[in] g the graph to split.
-		 *  @param[out] out the CopmStore object that is a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
-		 *  @param[in] dir direction of edges to consider, loops are ignored.
-		 *  @return the number of components.
-		 *  \sa CompStore */
-//		template< class GraphType, class CompIter, class VertIter > static int split( const GraphType &g,
-//			CompStore< CompIter,VertIter > out, EdgeDirection dir = EdUndir | EdDirOut | EdDirIn );
 	};
 
 	/*
@@ -894,7 +938,7 @@ namespace Koala
 
 //	public:
 	protected:
-		/** \brief Visit all vertices in given component. WEN: jest protected, wiec lepiej nie wnikac :-)
+		/* \brief Visit all vertices in given component.
 		 *
 		 *  Visit all vertices in the same component as a given vertex
 		 *  @param[in] g graph containing vertices to visit
@@ -1164,7 +1208,7 @@ namespace Koala
 	/** \brief Cheriyan/Mehlhorn/Gabow algorithm (parametrized).
 	 *
 	 *  The algorithm for searching strongly connected components of directed graph.
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup search
 	 */
 	template< class DefaultStructs > class SCCPar: protected SearchStructs
@@ -1336,37 +1380,47 @@ namespace Koala
 	 *  \ingroup search    */
 	class DAGAlgs: public DAGAlgsPar< AlgsDefaultSettings > { };
 
-	//NEW: typy zagniezdzone przeniesione z BlocksPar
+	//WEN: typy zagniezdzone przeniesione z BlocksPar
+	/** \brief Auxiliary structure for BlockPar class */
 	struct BlocksStructs {
 		// wynikowa etykieta wierzcholka
 		/**\brief Vertex data used to represent blocks. */
 		struct VertData {
-			// w ilu blokach lezy ten wierzcholek
-			int blockNo; /**<\brief Number of blocks the vertex is in.*/
-			// pozycja pierwszego w sekwencji numerow blokow (por. viter nizej) bloku zawierajacego
+			
+			int blockNo; /**<\brief Number of blocks the vertex belongs to.*/
+			
 			/** \brief First block position.
 			 *
-			 *  The position of the first block the vertex belongs to in the sequence \a viter in \p split method. WEN:numeracja od 0 */
+			 *  The position of the first block the vertex belongs to in the sequence \a viter in \p split method. (indexes start with 0) */
 			int firstBlock;
 			// ten wierzcholek (jego pozostale bloki wystepuja kolejno za nim)
+			/**\brief Constructor
+			 *
+			 * The initialization of \a blockNo and \a firstBlock*/
 			VertData( int b = 0, int f = -1 ): blockNo( b ), firstBlock( f )
 				{ }
-			/** \brief Copy.*/
-			//WEN: opis?
+			/** \brief Copy.
+			 *
+			 * The method copies current structure to \a arg. */
 			template <class T> void copy(T& arg) const
 			{
 				arg.blockNo=blockNo;
 				arg.firstBlock=firstBlock;
 			}
-			/** \brief Copy.*/
+			/** \brief Copy for BlackHole.
+			 *
+			 * Overloaded version of copy for BlackHole. Does nothing.*/
 			void copy(BlackHole&) const
 				{ }
 		};
 	};
 
-	/** \brief Searching blocks = biconnected components.
+	/** \brief Searching blocks = biconnected components (parameterized).
 	 *
+	 *  The parameterized class that that delivers a set of methods for splitting graph into \wikipath{Blocks_in_a_graph,biconnected components (blocks)}.
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
+	 *  \sa Blocks
+	 *  \sa AlgsDefaultSettings
 	 *  \ingroup search    */
 	template< class DefaultStructs > class BlocksPar: public SearchStructs, public BlocksStructs
 	{
@@ -1438,63 +1492,71 @@ namespace Koala
 
 	public:
 
-		/** \brief Get blocks. WEN: znalezione bloki sa numerowane od 0
-		 * WEN: cos sie nazwy zmiennyhch nie zgadzaja ...
-		 *  The method splits graph into blocks. All the edges are treated as undirected. WEN: oprocz petli, rownoleglosci OK
+		/** \brief Get blocks. 
+		 * 
+		 *  The method splits graph into blocks. All the edges are treated as undirectedc 
 		 *  @param[in] g the graph to split.
-		 *  @param[out] vmap the map PVertex->VertData sqould be considered together with sequence viter (BlackHole possible).
-		 *  @param[out] emap the map PEdge->int associating each edge with a block number. (BlackHole possible)
+		 *  @param[out] vertMap the map PVertex->BlocksStructs::VertData should be considered together with sequence viter (BlackHole possible).
+		 *  @param[out] edgeMap the map PEdge->int associating each edge with a block number. (BlackHole possible)
 		 *  @param[out] out the CompStore object with a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
-		 *  @param[out] viter the iterator to the container WEN: na typ int with concatenated sequences of blocks to which the each vertex belongs to.
-		 *   For each vertex the starting point of sequence of blocks is given by \a vmap in the VertData field firstBlock.
+		 *  @param[out] viter the iterator to the container with concatenated sequences of blocks (integers) to which the each vertex belongs to.
+		 *   For each vertex the starting point of associated sequence of blocks is given by \a vertMap in the BlocksStructs::VertData field firstBlock.
 		 *  @return the number of biconnected components.
 		 *  \sa CompStore   */
 		template< class GraphType, class VertDataMap, class EdgeDataMap, class CompIter, class VertIter,
 			class VertBlockIter > static int split( const GraphType &g, VertDataMap & vertMap, EdgeDataMap & edgeMap,
 				CompStore< CompIter,VertIter > out, VertBlockIter viter );
 
-        //NEW: wersja bez out
-		template< class GraphType, class VertDataMap, class EdgeDataMap,
+			/** \brief Get blocks.
+			*
+			*  The method splits graph into blocks. All the edges are treated as undirected (except loops). Blocks are numbered from 0.
+			*  @param[in] g the graph to split.
+			*  @param[out] vertMap the map PVertex->BlocksStructs::VertData should be considered together with sequence viter (BlackHole possible).
+			*  @param[out] edgeMap the map PEdge->int associating each edge with a block number. (BlackHole possible)
+			*  @param[out] viter the iterator to the container with concatenated sequences of blocks (integers) to which the each vertex belongs to.
+			*   For each vertex the starting point of associated sequence of blocks is given by \a vertMap in the BlocksStructs::VertData field firstBlock.
+			*  @return the number of biconnected components.
+			*  \sa CompStore   */
+			template< class GraphType, class VertDataMap, class EdgeDataMap,
 			class VertBlockIter > static int split( const GraphType &g, VertDataMap & vertMap, EdgeDataMap & edgeMap,
 				BlackHole, VertBlockIter viter )
         {   return split(g,vertMap,edgeMap,CompStore< BlackHole,BlackHole>( blackHole,blackHole ), viter);  }
 
-		/** \brief Get blocks of connected component. WEN: zawierajacy dany wierzcholek. + uwagi j.w.
+		/** \brief Get blocks of connected component identified by vertex.
 		 *
-		 *  The method splits a component containing a given vertex into blocks. All the edges are treated as undirected. WEN: oprocz petli, rownoleglosci OK
+		 *  The method splits a component containing a given vertex into blocks. All the edges are treated as undirected (except loops). Blocks are numbered from 0.
 		 *  @param[in] g the graph to split.
 		 *  @param[in] src the reference vertex.
-		 *  @param[out] vmap the map PVertex->VertData sqould be considered together with sequence viter (BlackHole possible).
-		 *  @param[out] emap the map PEdge->int associating each edge with a block number. (BlackHole possible) WEN: tylko wartosci dla wierzcholkow ze skladowej start sa ustawiane w tej mapie
-		 *  @param[out] out the CompStore object with a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator)
+		 *  @param[out] vmap the map PVertex->BlocksStructs::VertData should be considered together with sequence \a viter (BlackHole possible).
+		 *   Vertices that are not in the considered connected component are not keys in this map.
+		 *  @param[out] emap the map PEdge->int associating each edge with a block number (BlackHole possible). Edges that are not in the considered connected component are not keys in this map.
+		 *  @param[out] out the CompStore object with a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator) (BlackHole possible).
 		 *  @param[out] viter the iterator to the container with concatenated sequences of blocks to which the each vertex belongs to.
-		 *   For each vertex the starting point of sequence of blocks is given by \a vmap in the VertData field firstBlock.
+		 *   For each vertex the starting point of sequence of blocks is given by \a vmap in the BlocksStructs::VertData field firstBlock.
 		 *  @return the number of biconnected components in the connected component given by vertex \a src.
 		 *  \sa CompStore
 		 *
-		 *  [See example](examples/search/blocks/blocks.html).
-		 */
+		 *  [See example](examples/search/blocks/blocks.html). */
 		template< class GraphType, class VertDataMap, class EdgeDataMap, class CompIter, class VertIter,
 			class VertBlockIter > static int splitComp( const GraphType &g, typename GraphType::PVertex src,
 			VertDataMap &vmap, EdgeDataMap &emap, CompStore< CompIter,VertIter > out, VertBlockIter viter );
 
-        //NEW: wersja bez out
+		/* Version with out == BlackHole*/
 		template< class GraphType, class VertDataMap, class EdgeDataMap,
 			class VertBlockIter > static int splitComp( const GraphType &g, typename GraphType::PVertex src,VertDataMap & vertMap,
             EdgeDataMap & edgeMap,BlackHole, VertBlockIter viter )
         {   return splitComp(g,src,vertMap,edgeMap,CompStore< BlackHole,BlackHole>( blackHole,blackHole ), viter);  }
 
 		// wyrzuca na iterator ciag wierzcholkow tworzacych rdzen grafu tj. podgraf pozostajacy po sukcesywnym
-		// usuwaniu wierzcholkow stopnia < 2. Zwraca dlugosc sekwencji
+		// usuwaniu wierzcholkow stopnia < 2. Zwraca dlugosc sekwencji. zatem  mozemy (dla grafu acyklicznego) dostac strukture pusta tj. n==0
 		/** \brief Get core.
 		 *
 		 *  The method writes to \a out a sequence of vertex that make a core of graph i.e. remains after recursive deletions of vertices of deg < 2.
-		 WEN: a zatem  mozemy (dla grafu acyklicznego) dostac strukture pusta tj. n==0
-		 *  \param g the considered graph WEN: oprocz petli ignorujemy rodzaj kraw (wszystkie jak undirected), rownoleglosci OK
+		 *  Edges that are not loops are treated as undirected. 
+		 *  Note that the function may return 0 as core is empty if graph is acyclic.
+		 *  \param g the considered graph.
 		 *  \param out the iterator to the container with vertices of the core of graph.
-		 *  \return the number of vertices in the core of graph.
-		 */
-		 //NEW: zmiana nazwy getCore -> core
+		 *  \return the number of vertices in the core of graph. */
 		template< class GraphType,class Iterator > static int core( const GraphType &g, Iterator out );
 	};
 
@@ -1502,14 +1564,23 @@ namespace Koala
 
 	/** \brief Searching blocks = biconnected components (default).
 	 *
-	 *  The simpler default  version of BlocksPar in which DefaultStructs = AlgsDefaultSettings.
+	 *  
 	 *  \ingroup search    */
-	class Blocks: public BlocksPar< AlgsDefaultSettings > { };
+	/** \brief Searching blocks = biconnected components (default).
+	*
+	*  The simpler default  version of BlocksPar in which DefaultStructs = AlgsDefaultSettings, 
+	*  that delivers a set of methods for splitting graph into \wikipath{Blocks_in_a_graph,biconnected components (blocks)}.
+	*  \sa BlocksPar
+	*  \sa AlgsDefaultSettings
+	*  \ingroup search    */
+	class Blocks : public BlocksPar< AlgsDefaultSettings > { };
 
+	//WEN?: jak z nazwą, dołączyć wiki link?
 	/** Algorithms for Eulerian cycle and path.
 	 *
+	 * The class delivers a suit of methods searching for Eulerian cycle or path. Tested graphs may by of any type. 
+	 * Various methods simply ignore some edge types (directed or undirected).
 	 * \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
-	 *  Warning: for graphs with overt 4000 edges you may need to increase the program stuck size. WEN: juz powinno byc dobrze
 	 *  \ingroup search */
 	template< class DefaultStructs > class EulerPar: public PathStructs, protected SearchStructs
 	{
@@ -1550,8 +1621,8 @@ namespace Koala
 		// para zawierajaca 2 rozne wierzcholki - konce nieskierowanej sciezki Eulera - jesli ta istnieje
 		// (NULL,NULL) w przciwnym razie
 		/** \brief Get Eulerian path end.
-		 *  WEN: we wszystkich metodach tej klasy graf moze byc dowolny, ale krawedzie niektorych rodzajow bywaja ignorowane
-		 *  The method gets the ends of Eulerian path and returns it as standard pair (u,v). If there exists an Eulerian cycle u == v WEN: - nalezace do cyklu.
+		 *  
+		 *  The method gets the ends of Eulerian path and returns it as standard pair (u,v) of vertices belonging to path. If there exists an Eulerian cycle u == v.
 		 *  If the Eulerian path doesn't exist pair (NULL,NULL) is returned.\n
 		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  \param g the considered graph.
@@ -1569,9 +1640,9 @@ namespace Koala
 		// (NULL,NULL) w przciwnym razie
 		/** \brief Get directed Eulerian path end.
 		 *
-		 *  The method gets the ends of an directed Eulerian path and returns it as standard pair (u,v). If there exists an Eulerian cycle u == v.WEN: - nalezace do cyklu.
+		 *  The method gets the ends of an directed Eulerian path and returns it as standard pair (u,v) of vertices belonging to path. If there exists an Eulerian cycle u == v.
 		 *  If the directed Eulerian path doesn't exist pair (NULL,NULL) is returned.
-		 WEN: The method considered only directed edges and loops, directed edges are ignored.
+		 *  The method considered only directed edges and loops, directed edges are ignored.
 		 *  \param g the considered graph.
 		 *  \return the standard pair of pointers to vertices that are the ends of the directed Euler path. If the Euler path does not exist the pair (NULL,NULL) is returned. */
 		template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
@@ -1582,110 +1653,107 @@ namespace Koala
 				return res;
 			}
 
-		/** \brief Test if Eulerian. WEN: The method considered only undirected edges and loops, directed edges are ignored.
+		/** \brief Test if Eulerian.
 		 *
-		 *  The method tests if the graph has an undirected Eulerian cycle.
+		 *  The method tests if the graph has an undirected Eulerian cycle. The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the tested graph.
 		 *  @return true if it has Eulerian cycle, false otherwise.
-		 *  \n
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 */
+		 *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType > static bool hasCycle( const GraphType &g );
 
-		/** \brief Test if directed Eulerian. WEN: The method considered only directed edges and loops, undirected edges are ignored.
+		/** \brief Test if directed Eulerian.
 		 *
-		 *  The method tests if the graph has a directed Eulerian cycle.
+		 *  The method tests if the graph has a directed Eulerian cycle. The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @return true if it has a directed Eulerian cycle, false otherwise.
-		 *  \n
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 *
-		 */
+		 *  [See example](examples/search/euler/euler.html).*/
 		template< class GraphType > static bool hasDirCycle( const GraphType &g );
 
-		/** \brief Test if semi-Eulerian. WEN: The method considered only unirected edges and loops, directed edges are ignored.
+		/** \brief Test if semi-Eulerian.
 
-		* The method tests if the graph \a g has an undirected Eulerian path.
+		* The method tests if the graph \a g has an undirected Eulerian path. The method considered only undirected edges and loops, directed edges are ignored.
 		* @param[in] g the considered graph.
 		* @return true if it has an undirected Eulerian path, false otherwise
-		* \n
 		*
-		* [See example](examples/search/euler/euler.html).
-		*/
+		* [See example](examples/search/euler/euler.html).*/
 		template< class GraphType > static bool hasPath( const GraphType &g );
 
-		/** \brief Test if directed semi-Eulerian. WEN: The method considered only directed edges and loops, undirected edges are ignored.
+		/** \brief Test if directed semi-Eulerian.
 		 *
-		 *  The method tests if graph has a directed Eulerian path
+		 *  The method tests if graph has a directed Eulerian path.
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g graph
 		 *  @return true if it has a directed Eulerian path, false otherwise.
-		 *  \n
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 */
+		 *  [See example](examples/search/euler/euler.html).*/
 		template< class GraphType > static bool hasDirPath( const GraphType &g );
 
-		/** \brief Test the beginning of  undirected Eulerian path. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Test the beginning of  undirected Eulerian path. 
 		 *
 		 *  The method tests if the graph \a g has an undirected Eulerian path starting at the vertex \a u.
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] u the starting vertex.
 		 *  @return true if it has an undirected Eulerian path starting at the vertex \a u, false otherwise.*/
 		template< class GraphType > static bool hasPath( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Test the beginning of directed Eulerian path. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Test the beginning of directed Eulerian path.
 		 *
 		 *  The method tests if the graph \a g has an directed Eulerian path starting at the vertex \a u.
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] u the starting vertex.
 		 *  @return true if it has an directed Eulerian path starting at the vertex \a u, false otherwise */
 		template< class GraphType > static bool hasDirPath( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Test if Eulerian cycle containing \a u. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Test if Eulerian cycle containing \a u.
 		 *
 		 *  The method tests if the graph \a g has an undirected Eulerian cycle containing the vertex \a u.
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] u the given vertex.
 		 *  @return true if it has an undirected Eulerian cycle containing the vertex \a u, false otherwise */
 		template< class GraphType > static bool hasCycle( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Test if directed Eulerian cycle containing \a u. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Test if directed Eulerian cycle containing \a u. 
 		 *
 		 *  The method tests if the graph \a g has an directed Eulerian cycle containing the vertex \a u.
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] u the given vertex.
 		 *  @return true if it has an directed Eulerian cycle containing the vertex \a u, false otherwise */
 		template< class GraphType > static bool hasDirCycle( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Get undirected Eulerian cycle WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get undirected Eulerian cycle.
 		 *
 		 *  The method gets an undirected Eulerian cycle of the graph \a g.
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[out] out the OutPath object with found cycle.
 		 *  @return true if the graph has an Eulerian cycle, false otherwise.
 		 *  \sa SearchStructs::OutPath
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 */
+		 *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getCycle( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
-		/** \brief Get directed Eulerian cycle. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get directed Eulerian cycle.
 		 *
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph
 		 *  @param[out] out the OutPath object with found cycle.
 		 *  @return true if the graph has an Eulerian cycle, false otherwise.
 		 *  \sa SearchStructs::OutPath
 		 *
-		 *  [See example](examples/search/euler/euler.html).
-		 */
+		 *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getDirCycle( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
-		/** \brief Get undirected Eulerian cycle. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get undirected Eulerian cycle. 
 		 *
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] prefstart the preferred starting vertex, but if the Eulerian cycle does not contain this vertex it is ignored.
 		 *  @param[out] out the OutPath object with found cycle.
@@ -1694,8 +1762,9 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter > static bool
 			getCycle( const GraphType &g, typename GraphType::PVertex prefstart, OutPath< VertIter,EdgeIter> out );
 
-		/** \brief Get directed Eulerian cycle. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get directed Eulerian cycle.
 		 *
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] prefstart preferred starting vertex, but if the Eulerian cycle does not contain this vertex it is ignored.
 		 *  @param[out] out the OutPath object with found cycle.
@@ -1704,8 +1773,9 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter > static bool getDirCycle( const GraphType &g,
 			typename GraphType::PVertex prefstart, OutPath< VertIter,EdgeIter > out);
 
-		/** \brief Get undirected Eulerian path. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get undirected Eulerian path. 
 		 *
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph
 		 *  @param[out] out the OutPath object with found path.
 		 *  @return true if graph has an Eulerian path, false otherwise
@@ -1716,8 +1786,9 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getPath( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
-		/** \brief Get directed Eulerian path. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get directed Eulerian path. 
 		 *
+		 *  The method considered only directed edges and loops, undirected edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[out] out the OutPath object with found path.
 		 *  @return true if graph has an Eulerian path, false otherwise
@@ -1728,8 +1799,9 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getDirPath( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
-		/** \brief Get undirected Eulerian path. WEN: ignorowane krawedzie - por. wyzej
+		/** \brief Get undirected Eulerian path.
 		 *
+		 *  The method considered only undirected edges and loops, directed edges are ignored.
 		 *  @param[in] g the considered graph.
 		 *  @param[in] prefstart preferred starting vertex, but if the Eulerian path does not contain this vertex it is ignored.
 		 *  @param[out] out the OutPath object with found path.
@@ -1744,8 +1816,8 @@ namespace Koala
 
 	/** Algorithms for Eulerian cycle and path. (default)
 	 *
-	 *  The simpler default  version of EulerPar in which DefaultStructs = AlgsDefaultSettings.
-	 *  Warning: for graphs with overt 4000 edges you may need to increase the program stuck size.
+	 *  The simpler default  version of EulerPar in which DefaultStructs = AlgsDefaultSettings. Tested graphs may by of any type. 
+	 * Various methods simply ignore some edge types (directed or undirected).
 	 *  \ingroup search */
 	class Euler: public EulerPar< AlgsDefaultSettings > { };
 
@@ -1754,9 +1826,16 @@ namespace Koala
 	// graf spojny o niespojnym dopelnieniu
 	// graf niespojny
 	// strong modules rozpinaja graf pierwszy
+	/** \brief Enumeration type representing the type of highest node in graph modular decomposition
+	 *
+	 *  - mpTrivial - single vertex,
+	 *  - mpConnected - connected graph with disconnected complement,
+	 *  - mpDisconnected - disconnected,
+	 *  - mpPrime - prime graph.
+	 *  \related ModulesPar */
 	enum ModPartType { mpTrivial,mpConnected,mpDisconnected,mpPrime };
 
-	//NEW: wydzielone z ModulesPar
+	/**\brief Auxiliary modules structure.*/
 	struct ModulesStructs {
 		// opis najwyzszego wezla drzewa dekompozycji modulowej grafu
 		/** \brief The top node in modular decomposition tree.*/
@@ -1772,10 +1851,12 @@ namespace Koala
 			 * - mpTrivial = 0 - only one vertex,
 			 * - mpConnected = 1 - connected but with disconnected complement,
 			 * - mpDisconnected = 2 - disconnected,
-			 * - mpPrime = 3 - strong modules unfold prime graph.
-			 */
+			 * - mpPrime = 3 - strong modules unfold prime graph. */
 			ModPartType type;
 
+			/**\brief Constructor
+			 *
+			 * The constructor sets \a size and \a type up. */
 			Partition( int s, ModPartType t ): size( s ), type( t ) { }
 		};
 
@@ -1785,8 +1866,7 @@ namespace Koala
 	/** \brief Maximal strong modules decomposition (parametrized).
 	 *
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
-	 *  \ingroup search
-	 */
+	 *  \ingroup search */
 	template< class DefaultStructs > class ModulesPar: public SearchStructs, public ModulesStructs
 	{
 	public:
@@ -1798,22 +1878,20 @@ namespace Koala
 		// avmap, wyjsciowa tablica asocjacyjna PVertex->int do ktorej zapisuje sie numery modulow,
 		// do ktorych naleza wierzcholki (lub BlackHole)
 		// skipifprime, pomija badanie modulow jesli wynik ma type=mpPrime???
-		/** \brief Get modular decomposithon of graph. WEN: znalezione moduly numerowane od 0
+		/** \brief Get modular decomposithon of graph. 
 		 *
-		 *  The method splits the vertices of \a g into maximal strong modules.
+		 *  The method splits the vertices of \a g into maximal strong modules. Modules are indexed from 0.
 		 *  \param g the teste graph, should be simple and undirected.
-		 *  \param[out] out an CompStore object storing the modular decomposition.
+		 *  \param[out] out an CompStore object storing the modular decomposition (BlackHole possible).
 		 *  \param[out] avmap the associative table PVertex->int, where integers represent the index of module to which vertex belongs to. (BlackHole possible)
-		 *  \param skipifprine if true the modules with the outcome type mpPrime are skipped. WEN: tzn. ich znajdowanie jest skiped w tym przypadku
+		 *  \param skipifprine if true the modules with the outcome type mpPrime are not searched.
 		 *  \return a Partition object.
-		 *  \n
 		 *
-		 *  [See example](examples/search/modules/modules.html).
-		 */
+		 *  [See example](examples/search/modules/modules.html).*/
 		template< class GraphType, class CompIter, class VertIter, class CompMap > static Partition split(
 			const GraphType &g, CompStore< CompIter,VertIter > out, CompMap &avmap, bool skipifprime = false );
 
-        //NEW: wersja bez out
+        /* Version with blackHoled out */
 		template< class GraphType, class CompMap > static Partition split( const GraphType &g, BlackHole, CompMap &avmap, bool skipifprime = false )
         {   return split(g,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),avmap,skipifprime);   }
 
