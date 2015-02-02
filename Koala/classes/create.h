@@ -1235,70 +1235,70 @@ namespace Privates {
 	 */
 	/** \brief Binary relation operations (parameterized).
 	 *
-	 *  The set of methods which consider a graph as a binary relation on the set of vertices.
+	 *  The set of methods which consider a graph as a binary relation on the set of vertices. Edge Info objects are not modified?.  
 	 *  \wikipath{Graph_and_relations}
 	 *  \tparam DefaultStructs parameter allows to adjust the settings for internal procedures.
 	 *  \ingroup detect */
 	template< class DefaultStructs > class RelDiagramPar
-	{ 	    //WEN: cyt. z ebook: Krawędzie pozostające w wyniku nie są modyfikowane, w szczególności nie zmieniają swych inf. W każdej poniższych metod, jeśli wejściem był diagram, wyjściem też będzie diagram.
+	{ 	    //WEN?: cyt. z ebook: Krawędzie pozostające w wyniku nie są modyfikowane, w szczególności nie zmieniają swych inf. W każdej poniższych metod, jeśli wejściem był diagram, wyjściem też będzie diagram.
 	public:
 
 		// doprowadza diagram do zwyklej postaci, bez krawedzi nieskierowanych ani rownoleglych
 		/** \brief Normalize.
 		 *
-		 *  Method allows to normalize graph i.e. it deletes all the undirected and parallel edges.
-		 *  Graph is modified in a way to create a digraph WEN: nie wiem, czy to slowo bedzie definiowane, ale w ebooku jest
-		 rozroznienie miedzy diagramem i reprezentowaniem relacji of relation.
-		 *  \param g the modified graph.
-		 */
+		 *  Method allows to normalize graph i.e. it replaces undirected with arcs and deletes all the parallel edges.
+		 *  Graph is modified in a way to create a representation of relation.
+		 *  \param g the reference to modified graph. */
 		template< class Graph > static void repair( Graph &g );
 
 		// wpisz relacje pusta na istniejacych wierzcholkach
 		/** \brief Create empty relation.
 		 *
 		 *  All the edges are deleted from graph in order to create empty relation.
-		 *  \param g the modified graph.
-		 */
+		 *  \param g the modified graph. */
 		template< class Graph > static void empty( Graph &g ) { g.clearEdges(); }
 
 		// wpisz relacje kazdy z kazdym na istniejacych wierzcholkach. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Create total relation.
 		 *
-		 *  A graph which represents (WEN: a moze diagam? por. z ebook) the total relation is created on the same set of vertexes. The final graph consists each possible directed pair between the vertices of graph. (edges in initial graph if existed are deleted)
-		 WEN: graf nie zawiera par :-) terminologia!
+		 *  A directed graph which represents the total relation is created on the same set of vertexes. 
+		 *  The final graph consists each possible arc between the vertices of graph. (edges in initial graph if existed are deleted)
 		 *  \param g the modified graph.
-		 *  \param info the EdgeInfoType object copied to the info of each new-created edge.
-		 */
+		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
 		template< class Graph > static void
 			total( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
 		// zamienia w relacje odwrotna
 		/** \brief Inverse
 		 *
-		 *  Each arc in graph is inversed. WEN: czyli zmiana repr. relacji na repr. relacji odwrotnej
-		 *  \param g the modified graph.
-		 */
+		 *  Each arc in graph is inversed. In the effect, the graph represents inversed relation.
+		 *  \param g the reference to the modified graph. */
 		template< class Graph > static void inv( Graph &g ) { g.rev(); }
 
 		// przeprowadza domkniecie zwrotne. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Reflexive closure.
 		 *
-		 *  The function adds the minimal number of arc WEN: chyba loops in order to make the relation (represented by the graph \a g) reflexive.
-		 *  \param g the modified graph.
+		 *  The function adds the minimal number of loops in order to make the relation (represented by the graph \a g) reflexive.
+		 *  \param g the reference to the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
 		template< class Graph > static void
 			reflClousure( Graph &g, const typename Graph::EdgeInfoType &einfo= typename Graph::EdgeInfoType() );
 
 		// przeprowadza domkniecie symetryczne. Mozna podac pole info wprowadzanych krawedzi
-		/** \brief Symmetric closure. WEN: tu sie cos nie zgadza (2 wersje metody). I nizej tez
+		/** \brief Symmetric closure.
 		 *
 		 *  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) symmetric.
-		 *  \param g the modified graph.
-		 *  \param info the EdgeInfoType object copied to the info of each new-created edge.*/
+		 *  Edge infos of new-created edges are set to its type default value.
+		 *  \param g the modified graph. */
 		template< class Graph > static void
 			symmClousure( Graph &g)
 			{ symmClousure(g, typename Graph::EdgeInfoType()); };
 
+		/** \brief Symmetric closure.
+		*
+		*  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) symmetric.
+		*  \param g the modified graph.
+		*  \param info the EdgeInfoType object copied to the info of each new-created edge.*/
 		template< class Graph > static void
 			symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo);
 //			symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
@@ -1306,16 +1306,15 @@ namespace Privates {
 		// przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Transitiv clousure.
 		 *
-		 *  The function adds the minimal number of arc WEN: i loops in order to make the relation (represented by the graph \a g) transitive.
-		 *  \param g the modified graph.
-		 */
+		 *  The function adds the minimal number of arc and loops in order to make the relation (represented by the graph \a g) transitive.
+		 *  \param g the modified graph. */
 		template< class Graph > static void
 			transClousure( Graph &g)
 			{ transClousure(g, typename Graph::EdgeInfoType()); };
 
 		/** \brief Transitive closure.
 		 *
-		 *  The function adds the minimal number of arc WEN: i loops in order to make the relation (represented by the graph \a g) transitive.
+		 *  The function adds the minimal number of arc and loops in order to make the relation (represented by the graph \a g) transitive.
 		 *  \param g the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
 		template< class Graph > static void
@@ -1372,10 +1371,10 @@ namespace Privates {
 	 */
 	/** \brief Linegraph creator (parametrized).
 	 *
-	 *  The class allows to generate the line graph WEN: oraz skierowany of a graph.
-	 *  To change options of used algorithms class \a DefaultStructs should be modified.
-	 *  \ingroup detect
-	 */
+	 *  The class allows to generate the line graph of directed and undirected a graph.
+	 *  In order to change options of used algorithms class \a DefaultStructs should be modified.
+	 *  \wikipath{Graph_transformations#Line-graph}
+	 *  \ingroup detect  */
 	template< class DefaultStructs > class LineGraphPar
 	{
 	protected:
@@ -1393,47 +1392,55 @@ namespace Privates {
 		//      Zwraca pierwszy utworzony wierzcholek
 		/** \brief Create undirected linegraph.
 		 *
-		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
+		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.) \n
+		 *  \wikipath{Graph_transformations#Line-graph}
 		 *  \param g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
-		 *  \param casters a standard pair of casters. \n
-		 *    The first one create information for the linegraph vertices basing on edges WEN: tej z ktorej sie wywodzi of \a g.\n
-		 *    The second caster generates information for the linegraph edges basing on vertices of \a g. WEN: odsylacz do ebooka - ktory wierzcholek g jest utozsamiany z ktora kraw. linegrafu
-		 *  \param linkers a standard pair of linkers. \n
-		 *    The first one links the edges of \a g with the vertices of \a lg. WEN: ale dotychczasowe wierzcholki lg sa linkowane z NULL\n
-		 WEN: sprawdzic z ksiazka, czy aby nie odwrotnie (spojnosc okreslen), to nizej tez
-		 *    The second on links the vertices of \a g with the edges of \a lg. WEN: odsylacz do ebooka - ktory wierzcholek g jest wiazany z ktora kraw. lg. Nie uwzglednione tu wierzcholki linkuje sie do NULL
-		 *  \return the first created vertex of \a lg.
-		 */
+		 *  \param casters a standard pair of casters. \wikipath{caster, See wiki page for casters} \n
+		 *  - The first one create information for the linegraph vertices basing on edges of origin in \a g.\n
+		 *  - The second caster generates information for the linegraph edges basing on one of vertices of origin in \a g. 
+		 *  \param linkers a standard pair of linkers. \wikipath{linker, See wiki page for linkers.} \n
+		 *  - The first one links the edges of \a g with the vertices of \a lg. Vertices of \a lg that were there before the operation are linked with NULL.
+		 *  - The second on links the vertices of \a g with the edges of \a lg. Edges of \a lg that were there before the operation are linked with NULL.
+		 *  \return the first created vertex of \a lg. */
 		template< class GraphIn, class GraphOut, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg, std::pair< VCaster,ECaster > casters,
 				std::pair< VLinker,ELinker > linkers );
 		// jw. bez linkerow
 		/** \brief Create undirected linegraph.
-		 *  WEN: te same co wyzej (jesli sie lapia)
-		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
+		 *
+		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.) \n
+		 *  \wikipath{Graph_transformations#Line-graph}
 		 *  \param g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
-		 *  \param casters a standard pair of casters. \n
-		 *    The first one create information for the linegraph vertices basing on edges of \a g.\n
-		 *    The second caster generates information for the linegraph edges basing on vertices of \a g.
-		 *  \return the first created vertex of \a lg.
-		 */
+		 *  \param casters a standard pair of casters. \wikipath{caster, See wiki page for casters} \n
+		 *  - The first one create information for the linegraph vertices basing on edges of origin in \a g.\n
+		 *  - The second caster generates information for the linegraph edges basing on one of vertices of origin in \a g. 
+		 *  \return the first created vertex of \a lg. */
 		template< class GraphIn, class GraphOut, class VCaster, class ECaster >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg, std::pair< VCaster,ECaster > casters );
 
 		// jw. ale tylko tworzy linegraph
 		/** \brief Create undirected linegraph.
 		 *
-		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
+		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.) \n
+		 *  The info objects of \a g are casted and copied to related elements infos in \a lg. If it is impossible, the new info object get default value.
+		 *  \wikipath{Graph_transformations#Line-graph}
 		 *  \param g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
-		 *  \return the first created vertex of \a lg.
-		 */
+		 *  \return the first created vertex of \a lg. */
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg );
 
-		//NEW: to samo z hardCast
+		//to samo z hardCast
+		/** \brief Create undirected linegraph.
+		 *
+		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.) \n
+		 *  The info objects of \a g are casted and copied to related elements infos in \a lg. If it is impossible, the method may cause compilation error.
+		 *  \wikipath{Graph_transformations#Line-graph}
+		 *  \param g an initial graph.
+		 *  \param[out] lg the linegraph of \a g is added here.
+		 *  \return the first created vertex of \a lg. */
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex undir2( const GraphIn &g, GraphOut &lg );
 
@@ -1446,32 +1453,30 @@ namespace Privates {
 		//         Drugi laczy wierzcholki g z polaczeniami wierzcholkow w lg (ktore zachodza w tych wierzcholkach)
 		//      Zwraca pierwszy utworzony wierzcholek
 		/** \brief Create directed linegraph.
-		 *  WEN: to samo, co w undir
+		 *  
 		 *  A directed linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
-		 *  \param g an initial graph.
+		 *  \param[in] g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
-		 *  \param casters a standard pair of casters. \n
-		 *    The first one create information for the linegraph vertices basing on edges of \a g.\n
-		 *    The second caster generates information for the linegraph edges basing on vertices of \a g.
-		 *  \param linkers a standard pair of linkers. \n
-		 *    The first one links the edges of \a g with the vertices of \a lg.\n
-		 *    The second on links the vertices of \a g with the edges of \a lg.
-		 *  \return the first created vertex of \a lg.
-		 */
+		 *  \param[in] casters a standard pair of casters. \wikipath{caster, See wiki page for casters} \n
+		 *  - The first one create information for the linegraph vertices basing on edges of origin in \a g.\n
+		 *  - The second caster generates information for the linegraph edges basing on vertices of origin in \a g.
+		 *  \param[in] linkers a standard pair of linkers. \wikipath{linker, See wiki page for linkers.}\n
+		 *  - The first one links the edges of \a g with the vertices of \a lg. Vertices of \a lg that were there before the operation are linked with NULL.
+		 *  - The second on links the vertices of \a g with the edges of \a lg. Edges of \a lg that were there before the operation are linked with NULL.
+		 *  \return the first created vertex of \a lg. */
 		template< class GraphIn, class GraphOut, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename GraphOut::PVertex dir( const GraphIn &g, GraphOut &lg, std::pair< VCaster,ECaster > casters,
 				std::pair< VLinker,ELinker > linkers );
 		// jw. bez linkerow
 		/** \brief Create directed linegraph.
-		 *  WEN: to samo, co w undir
+		 *  
 		 *  A directed linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
-		 *  \param g an initial graph.
+		 *  \param[in] g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
-		 *  \param casters a standard pair of casters. \n
-		 *     The first one create information for the linegraph vertices basing on edges of \a g.\n
-		 *     The second caster generates information for the linegraph edges basing on vertices of \a g.
-		 *  \return the first created vertex of \a lg.
-		 */
+		 *  \param[in] casters a standard pair of casters. \wikipath{caster, See wiki page for casters} \n
+		 *  - The first one create information for the linegraph vertices basing on edges of origin in \a g.\n
+		 *  - The second caster generates information for the linegraph edges basing on vertices of origin in \a g.
+		 *  \return the first created vertex of \a lg. */
 		template< class GraphIn, class GraphOut, class VCaster, class ECaster >
 			static typename GraphOut::PVertex dir( const GraphIn &g, GraphOut &lg, std::pair< VCaster,ECaster > casters )
 			{
@@ -1479,12 +1484,12 @@ namespace Privates {
 			}
 		// jw. ale tylko tworzy linegraph
 		/** \brief Create directed linegraph.
-		 *
+		 *  
 		 *  A directed linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
-		 *  \param g an initial graph.
+		 *  The info objects of \a g are casted and copied to related elements infos in \a lg. If it is impossible, new info gets its type default value.
+		 *  \param[in] g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
-		 *  \return the first created vertex of \a lg.
-		 */
+		 *  \return the first created vertex of \a lg. */
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex dir( const GraphIn &g, GraphOut &lg )
 			{
@@ -1492,7 +1497,14 @@ namespace Privates {
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
-        //NEW: to samo z hardCast
+        //to samo z hardCast
+		/** \brief Create directed linegraph.
+		 *  
+		 *  A directed linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
+		 *  The info objects of \a g are casted and copied to related elements infos in \a lg. If it is impossible, the method may cause compilation error.
+		 *  \param[in] g an initial graph.
+		 *  \param[out] lg the linegraph of \a g is added here.
+		 *  \return the first created vertex of \a lg. */
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex dir2( const GraphIn &g, GraphOut &lg )
 			{
@@ -1507,10 +1519,10 @@ namespace Privates {
 	 *
 	 *  The class allows to generate the line graph of a graph.
 	 *  Works like \a LineGraphPar but the without the possibility of parameterizing. The class \a AlgsDefaultSettings is used.
+	 *  \wikipath{Graph_transformations#Line-graph}
 	 *  \ingroup detect
 	 *
-	 *  [See example](examples/create/example_LineGraph.html).
-	 */
+	 *  [See example](examples/create/example_LineGraph.html). */
 	class LineGraph: public LineGraphPar< AlgsDefaultSettings > { };
 
 	/* ComplexCaster
@@ -1556,9 +1568,9 @@ namespace Privates {
 
 	    typedef ComplexCaster< TwoArg, FirstArg, SecondArg, ver > CastersSelfType;
 
-		mutable TwoArg twoarg;/**\brief Two argument caster function object.*/
-		mutable FirstArg firstarg;/**\brief First argument caster function object.*/
-		mutable SecondArg secondarg;/**\brief Second argument caster function object.*/
+		mutable TwoArg twoarg;/**<\brief Two argument caster function object.*/
+		mutable FirstArg firstarg;/**<\brief First argument caster function object.*/
+		mutable SecondArg secondarg;/**<\brief Second argument caster function object.*/
 		/**\brief Constructor*/
 		ComplexCaster( TwoArg t = TwoArg(), FirstArg f = FirstArg(), SecondArg s = SecondArg() ):
 			twoarg( t ), firstarg( f ), secondarg( s )
@@ -1618,8 +1630,9 @@ namespace Privates {
 	 *
 	 *  The class allows to generate different versions of the product of two graphs.
 	 *  Parametrization of algorithms and structures may be introduced via the template parameter class \a DefaultStructs.
-	 *  \ingroup detect
-	 */
+	 *  \sa Product
+	 *  \sa AlgDegaultStructs
+	 *  \ingroup detect	 */
 	template< class DefaultStructs > class ProductPar
 	{
 	public:
@@ -1634,35 +1647,35 @@ namespace Privates {
 		//    link.second.first - przywiazuje do krawedzi wynikowej krawedz pierwszego grafu lub NULL w razie braku
 		//    link.second.second - przywiazuje do krawedzi wynikowej krawedz drugiego grafu lub NULL w razie braku
 
-		//WEN: OK, ale zdajemy sobie sprawe, ze opis dzialania casterow i inkerow wszedzie nizej jest do d... Opisalem to w schemacie
-		// i gdzies (np. w ebooku) to sie musi pojawic, a jesli nie tu, to stad przynajmniej musi byc inteligentnie tamze polinkowane
 		/** \brief Generate Cartesian product.
 		 *
 		 *  The Cartesian product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \param cast a standard pair of casters used for generating info members.
-		 *     The first caster creates \a info for a new vertex basing on the two original vertices.
-		 *     The second caster creates \a info for an edge basing on two initial edges.
-		 *  \param link the standard pair of linkers which connect the entities of the initial graphs with the target entities.
-		 *  \return the first created vertex.
-		 */
+		 *  \param cast a standard pair of casters used for generating info members. \wikipath{caster, See wiki page for casters}
+		 *  - The first caster creates \a info for a new vertex basing on the two original vertices.
+		 *  - The second caster creates \a info for an edge basing on two initial edges.
+		 *  \param link the standard pair of linkers which connect the entities of the initial graphs with the target entities. \wikipath{linker, See wiki page for linkers.}
+		 *  - link.first.first - links vertex of output graph with related vertex of the first input graph or with NULL in case of absence. 
+		 *  - link.first.second - links vertex of output graph with related vertex of the second input graph or with NULL in case of absence.
+		 *  - link.second.first - links edge of output graph with related edge of the first input graph or with NULL in case of absence.
+		 *  - link.second.second - links edge of output graph with related edge of the second input graph or with NULL in case of absence.
+		 *  \return the first created vertex. */
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link );
 		// j.w. ale bez linkerow
-			/** \brief Generate Cartesian product.
+		/** \brief Generate Cartesian product.
 		 *
 		 *  The Cartesian product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \param cast a standard pair of casters used for generating info members.
-		 *     The first caster creates \a info for a new vertex basing on the two original vertices.
-		 *     The second caster creates \a info for an edge basing on two initial edges.
-		 *  \return the first created vertex.
-		 */
+		 *  \param cast a standard pair of casters used for generating info members. \wikipath{caster, See wiki page for casters}
+		 *  - The first caster creates \a info for a new vertex basing on the two original vertices.
+		 *  - The second caster creates \a info for an edge basing on two initial edges.
+		 *  \return the first created vertex. */
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster >
 			static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast )
@@ -1673,11 +1686,10 @@ namespace Privates {
 		/** \brief Generate Cartesian product.
 		 *
 		 *  The Cartesian product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
-		 *  \param g1 the first reference graph.
-		 *  \param g2 the second reference graph.
+		 *  \param[in] g1 the first reference graph.
+		 *  \param[in] g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \return the first created vertex.
-		 */
+		 *  \return the first created vertex. */
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
@@ -1693,12 +1705,15 @@ namespace Privates {
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \param cast a standard pair of casters used for generating info members.
-		 *     The first caster creates \a info for a new vertex basing on the two original vertices.
-		 *     The second caster creates \a info for an edge basing on two initial edges.
-		 *  \param link the standard pair of linkers which connect the entities of the initial graphs with the target entities.
-		 *  \return the first created vertex.
-		 */
+		 *  \param cast a standard pair of casters used for generating info members. \wikipath{caster, See wiki page for casters}
+		 *  - The first caster creates \a info for a new vertex basing on the two original vertices.
+		 *  - The second caster creates \a info for an edge basing on two initial edges.
+		 *  \param link the standard pair of linkers which connect the entities of the initial graphs with the target entities. \wikipath{linker, See wiki page for linkers.}
+		 *  - link.first.first - links vertex of output graph with related vertex of the first input graph or with NULL in case of absence. 
+		 *  - link.first.second - links vertex of output graph with related vertex of the second input graph or with NULL in case of absence.
+		 *  - link.second.first - links edge of output graph with related edge of the first input graph or with NULL in case of absence.
+		 *  - link.second.second - links edge of output graph with related edge of the second input graph or with NULL in case of absence.
+		 *  \return the first created vertex. */
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename Graph::PVertex lex( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link );
@@ -1709,11 +1724,10 @@ namespace Privates {
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \param cast a standard pair of casters used for generating info members.
-		 *     The first caster creates \a info for a new vertex basing on the two original vertices.
-		 *     The second caster creates \a info for an edge basing on two initial edges.
-		 *  \return the first created vertex.
-		 */
+		 *  \param cast a standard pair of casters used for generating info members. \wikipath{caster, See wiki page for casters}
+		 *  - The first caster creates \a info for a new vertex basing on the two original vertices.
+		 *  - The second caster creates \a info for an edge basing on two initial edges.
+		 *  \return the first created vertex. */
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster >
 			static typename Graph::PVertex lex( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast )
@@ -1727,8 +1741,7 @@ namespace Privates {
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \return the first created vertex.
-		 */
+		 *  \return the first created vertex. */
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex lex( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
@@ -1744,12 +1757,15 @@ namespace Privates {
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \param cast a standard pair of casters used for generating info members.
-		 *     The first caster creates \a info for a new vertex basing on the two original vertices.
-		 *     The second caster creates \a info for an edge basing on two initial edges.
-		 *  \param link the standard pair of linkers which connect the entities of the initial graphs with the target entities.
-		 *  \return the first created vertex.
-		 */
+		 *  \param cast a standard pair of casters used for generating info members. \wikipath{caster, See wiki page for casters}
+		 *  - The first caster creates \a info for a new vertex basing on the two original vertices.
+		 *  - The second caster creates \a info for an edge basing on two initial edges.
+		 *  \param link the standard pair of linkers which connect the entities of the initial graphs with the target entities. \wikipath{linker, See wiki page for linkers.}
+		 *  - link.first.first - links vertex of output graph with related vertex of the first input graph or with NULL in case of absence. 
+		 *  - link.first.second - links vertex of output graph with related vertex of the second input graph or with NULL in case of absence.
+		 *  - link.second.first - links edge of output graph with related edge of the first input graph or with NULL in case of absence.
+		 *  - link.second.second - links edge of output graph with related edge of the second input graph or with NULL in case of absence.
+		 *  \return the first created vertex.*/
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename Graph::PVertex tensor( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link );
@@ -1760,11 +1776,10 @@ namespace Privates {
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \param cast a standard pair of casters used for generating info members.
+		 *  \param cast a standard pair of casters used for generating info members. \wikipath{caster, See wiki page for casters}
 		 *     The first caster creates \a info for a new vertex basing on the two original vertices.
 		 *     The second caster creates \a info for an edge basing on two initial edges.
-		 *  \return the first created vertex.
-		 */
+		 *  \return the first created vertex. */
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster >
 			static typename Graph::PVertex tensor( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast )
@@ -1778,8 +1793,7 @@ namespace Privates {
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \return the first created vertex.
-		 */
+		 *  \return the first created vertex. */
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex tensor( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
@@ -1795,12 +1809,15 @@ namespace Privates {
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \param cast a standard pair of casters used for generating info members.
-		 *     The first caster creates \a info for a new vertex basing on the two original vertices.
-		 *     The second caster creates \a info for an edge basing on two initial edges.
-		 *  \param link the standard pair of linkers which connect the entities of the initial graphs with the target entities.
-		 *  \return the first created vertex.
-		 */
+		 *  \param cast a standard pair of casters used for generating info members. \wikipath{caster, See wiki page for casters}
+		 *  - The first caster creates \a info for a new vertex basing on the two original vertices.
+		 *  - The second caster creates \a info for an edge basing on two initial edges.
+		 *  \param link the standard pair of linkers which connect the entities of the initial graphs with the target entities. \wikipath{linker, See wiki page for linkers.}
+		 *  - link.first.first - links vertex of output graph with related vertex of the first input graph or with NULL in case of absence. 
+		 *  - link.first.second - links vertex of output graph with related vertex of the second input graph or with NULL in case of absence.
+		 *  - link.second.first - links edge of output graph with related edge of the first input graph or with NULL in case of absence.
+		 *  - link.second.second - links edge of output graph with related edge of the second input graph or with NULL in case of absence.
+		 *  \return the first created vertex.*/
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename Graph::PVertex strong( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link );
@@ -1811,11 +1828,10 @@ namespace Privates {
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \param cast a standard pair of casters used for generating info members.
+		 *  \param cast a standard pair of casters used for generating info members. \wikipath{caster, See wiki page for casters}
 		 *     The first caster creates \a info for a new vertex basing on the two original vertices.
 		 *     The second caster creates \a info for an edge basing on two initial edges.
-		 *  \return the first created vertex.
-		 */
+		 *  \return the first created vertex. */
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster >
 			static typename Graph::PVertex strong( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast )
@@ -1829,8 +1845,7 @@ namespace Privates {
 		 *  \param g1 the first reference graph.
 		 *  \param g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \return the first created vertex.
-		 */
+		 *  \return the first created vertex. */
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex strong( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
@@ -1844,10 +1859,11 @@ namespace Privates {
 	 *
 	 *  The class allows to generate different versions of the product of two graphs.
 	 *  The version with the default options.
+	 *  \sa AlgsDefaultSettings
+	 *  \sa Product
 	 *  \ingroup detect
 	 *
-	 *  [See example](examples/create/example_Product.html).
-	 */
+	 *  [See example](examples/create/example_Product.html).*/
 	class Product: public ProductPar< AlgsDefaultSettings > { };
 
 #include "create.hpp"
