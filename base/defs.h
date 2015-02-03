@@ -216,8 +216,8 @@ namespace Koala
 		};
 
 		// Czy dostosowywać rozmiar pamięci wyjściowych tablic asocjacyjnych?
-		/** \brief Should the out associative container be allocated at the beginning?*/
-		enum { ReserveOutAssocCont = true };
+		
+		enum { ReserveOutAssocCont /**< \brief Should the out associative container be allocated at the beginning?*/ = true };
 
 		// Wybrany do użytku wewnętrznego algorytm sortowania tablic.
 		/**  \brief Container sorting algorithm
