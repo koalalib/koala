@@ -41,25 +41,25 @@ namespace Koala
 	 */
 	/** \brief The default settings for flow algorithms.
 	 *
+	 *  The class called as a template parameter decided which algorithm and in which version should be used for calculating flow in weighted network.
 	 *  \tparam FF if true the Fulkerson-Ford algorithm will be used, otherwise the MKM algorithm is chosen.
 	 *  \tparam costFF if true the augmenting paths are used for calculating the smallest cost of flow (pseudopolynomial),
 	 *    otherwise the cycles with minimal average length are used (polynomial).
-	 //WEN: to oczywiscie dot. bezposrednio uzywanych procedur na przeplyw oraz ich wewnetrznych wywolan w innych procedurach klas z tego pliku
 	 *  \ingroup DMflow*/
 	template< bool FF = false, bool costFF = true  > class FlowAlgsDefaultSettings: public AlgsDefaultSettings
 	{
 	public:
-	    //WEN: opis znaczenia tych nazw i skad sie pojawiaja
-		enum { useFulkersonFord = FF };
-		enum { useCostAugmPath = costFF };
+		enum { useFulkersonFord /**<\brief FF if true the Fulkerson-Ford algorithm will be used, otherwise the MKM algorithm is chosen*/ = FF };
+		enum { useCostAugmPath /**<\brief use the augmenting paths it true, otherwise the cycles with minimal average length.*/ = costFF };
 	};
 
 
-    //NEW: wydzielone z FlowPar
+    //wydzielone z FlowPar
+	/**\brief Auxiliary structures for Flow algorithm*/
     struct FlowStructs {
 
 		// rekord z danymi (in-out) opisujacy krawedz
-		/** \brief Edge information for flow WEN: i ogolniej transship. problems algorithms.*/
+		/** \brief Edge information for flow and transship problems and algorithms.*/
 		template< class DType, class CType = DType > struct EdgeLabs
 		{
 			// typ liczbowy przepustowosci luku i objetosci przeplywu
@@ -68,12 +68,13 @@ namespace Koala
 			typedef CType CostType;/**<\brief Type of cost variables.*/
 
 			// przepustowosc (dana wejsciowa), wartosc znalezionego przeplywu w kierunku getEdgeEnd1->getEdgeEnd2
-			CapacType capac/**\brief Capacity of edge. WEN: pole wejsciowe, musi miec wartosc >=0 inaczej leci wyjatek z procedury*/,
-                    flow/** \brief Actual flow through edge WEN: pole wynikowe, interpetacja: prawdziwy przeplyw
-                    przez krawedz (a wiec nieujemny) to jego wartosc bezwzgledna, bo dla Undirected znak flow okresla kierunek
-                    + -> od End1 do End2 - -> odwr. */;
+			CapacType capac /**<\brief Capacity of edge (input data). Must be nonnegative, otherwise exception is called.*/,
+                       flow /**< \brief Actual flow through edge (output data). 
+						     *
+						     * For arcs flow is nonnegative and its absolute value is taken. 
+						     * For undirected edges the siegen deterines direction + form End1 to End2, - from End2 to End1. */;
 			// koszt jednostkowy przeplywu przez luk (dana wejsciowa)
-			CostType cost;/**<\brief Cost of unit size flow. WEN: pole wejsciowe ignorowane dla zagadnien niekosztowych */
+			CostType cost;/**<\brief Cost of unit size flow (input data, ignored for non-cost problems). */
 
 			// agrs: przepustowosc i koszt krawedzi
 			/** \brief Empty constructor.*/
@@ -99,27 +100,32 @@ namespace Koala
 		};
 
 		// j.w. ale nadaje domyslne jednostkowe przepustowosci i koszty
-		/** \brief Edge information for unit capacity  flow problems algorithms.
-		WEN: wszystko jak w poprzedniej, tyle ze capac==1 jest domyslny */
+		/** \brief Edge information for flow and transship problems and algorithms with unit capacity.
+		 *
+		 *  The class is almost the same as EdgeLabs but for the \a capac which is by default unit.*/
 		template< class DType, class CType = DType > struct UnitEdgeLabs
 		{
 			// typ liczbowy przepustowosci luku i objetosci przeplywu
-			typedef DType CapacType;/**<\brief Type of capacity variables.*/
+			typedef DType CapacType;/**<\copydoc EdgeLabs::CapacType */
 			// typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
-			typedef CType CostType;/**<\brief Type of cost variables.*/
+			typedef CType CostType;/**<\copydoc EdgeLabs::CostType */
 
 			// przepustowosc (dana wejsciowa), wartosc znalezionego przeplywu w kierunku getEdgeEnd1->getEdgeEnd2
-			CapacType capac/**\brief Capacity of edge.*/,flow/** \brief Actual flow through edge*/;
+			CapacType capac/**< \brief Capacity of edge (input data). 
+						    *
+							* Must be nonnegative, otherwise exception is called. By default attribute is set to 1.*/,
+				flow/**\copydoc EdgeLabs::flow */;
 			// koszt jednostkowy przeplywu przez luk (dana wejsciowa)
-			CostType cost;/**<\brief Cost of unit size flow.*/
+			CostType cost;/**<\copydoc EdgeLabs::cost*/
 
 			// agrs: przepustowosc i koszt krawedzi
-			/**\brief Constructor.*/
+			/**\brief Empty constructor.*/
 			UnitEdgeLabs():
 					capac(NumberTypeBounds< CapacType >::one() ),
 					flow( NumberTypeBounds< CapacType >::zero() ),
 					cost( NumberTypeBounds< CostType >::one() )
 				{ }
+			/**\brief Constructor.*/
 			UnitEdgeLabs( CapacType arg):
 					capac( arg ), flow( NumberTypeBounds< CapacType >::zero() ),
 					cost(NumberTypeBounds< CostType >::one())
@@ -139,22 +145,22 @@ namespace Koala
 		/** \brief Output structure for problem of cut-set between two vertices.*/
 		template< class CapacType > struct EdgeCut
 		{
-			// typ liczbowy przepustowosci luku i objetosci przeplywu
-			CapacType capac;/**< \brief Capacity type. WEN: type??? nie, objetosc znalezionego rozciecia */
+			// typ liczbowy przepustowosci luku i objetosci przeplywu WEN?: nie, objetosc znalezionego rozciecia 
+			CapacType capac;/**< \brief The capacity of achieved cut. */
 			// liczba wierzcholkow osiagalnych z poczatkowego po usunieciu rozciecia
-			int vertNo;/**< \brief Number of vertices reachable WEN: from source! bo cut jest zawsze miedzy pewnymi vers
+			int vertNo;/**< \brief Number of vertices reachable from source.
 			 start!=end after deletion of the cut-set.*/
 			// liczba krawedzi rozciecia
 			int edgeNo;/**<\brief Number of edges in the cut set.*/
 
-			/** \brief Constructor.*/
+			/** \brief Empty constructor.*/
 			EdgeCut(): capac( NumberTypeBounds< CapacType >::zero() ),
 						vertNo( 0 ), edgeNo( 0 )
 				{ }
 		};
 
 		// j.w. ale podaje rowniez 2 wierzcholki - z obu czesci rozcietego grafu
-		/** \brief Output structure for cut-set problem. WEN: w przypadku gdy szukamy po wszystkich parach start!=end w grafie*/
+		/** \brief Output structure for cut-set problem in the variant searching all the pairs (star,end) where start!=end.*/
 		template< class GraphType, class CapacType > struct EdgeCut2: public EdgeCut< CapacType >
 		{
 			typename GraphType::PVertex first/**\brief Starting vertex*/,second/**\brief Terminal vertex*/;
@@ -167,11 +173,11 @@ namespace Koala
 		// Uzytkownik podaje, pare iteratorow, gdzie wpisac krawedzie znalezionego rozciecia
 		// i wierzcholki osiagalne ze startowego po usunieciu krawedzi rozciecia
 
-		/** \brief Auxiliary class to represent the edge cut. WEN: przejmuje wyniki */
+		/** \brief Auxiliary class to represent the edge cut. (output structure) */
 		template< class VIter, class EIter > struct OutCut
 		{
-			VIter vertIter;/**<\brief Iterator WEN: inserter to the container with vertexes (accessible WEN: ale skad after the cut)*/
-			EIter edgeIter;/**<\brief Iterator WEN: inserter to the container with edges of the cat.*/
+			VIter vertIter;/**<\brief Insert iterator  to the container with vertexes (accessible from starting vertex after the cut)*/
+			EIter edgeIter;/**<\brief Insert iterator to the container with edges of the cat.*/
 			/**\brief Constructor*/
 			OutCut( VIter av, EIter ei ): vertIter( av ), edgeIter( ei ) { }
 		};
@@ -179,14 +185,17 @@ namespace Koala
 		// funkcja tworzaca, analogia make_pair
 		// Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
 		/**\brief Generating function for the OutCut object.
-		 *  WEN: a opis argumentow
-		 *  [See example](examples/flow/example_Flow.html).
-		 */
+		 *  
+		 *  \tparam VIter the type of insert iterator to container with vertices.
+		 *  \tparam EIter the type of insert iterator to container with edges.
+		 *  \param av the insert iterator to container with vertices.
+		 *  \tparam ei the insert iterator to container with edges.
+		 *  [See example](examples/flow/example_Flow.html). */
 		template< class VIter, class EIter > static OutCut< VIter,EIter > outCut( VIter av, EIter ei )
 			{ return OutCut< VIter,EIter >( av,ei ); }
 
 		// "krawedz" drzewa Gomory-Hu
-		/** \brief Auxiliary edge structure for Gomory-Hu trees. WEN: wynikowa*/
+		/** \brief Auxiliary output edge structure for Gomory-Hu trees.*/
 		template< class GraphType, class CType > struct GHTreeEdge
 		{
 			// typ liczbowy przepustowosci luku
@@ -215,7 +224,7 @@ namespace Koala
 
 		// Transshipment - uogolnienie przeplywu (por. Schrijver)
 		// rekord wejsciowy opisujacy wierzcholek dla wyszukiwania transhipmentow
-		/** \brief The input structure for vertex in transhipment problem. WEN: to jest etykieta przypisywana wierzcholkom na wejsciu */
+		/** \brief The input structure for vertex in transhipment problem. */
 		template< class DType > struct TrsVertLoss
 		{
 			// typ liczbowy przepustowosci luku i objetosci przeplywu
@@ -224,10 +233,10 @@ namespace Koala
 			//WEN: ponizszy opis jest bez sensu, trans. to uogolnienie przeplywu, w ktorym ten przeplyw moze sie
 			//nie bilansowac przy kazdym wierzcholku tj. podajemy max. i min. dopuszczalny bilans wierzcholka
 			//(np. w przeplywie wszedzie sa 0 z wyjatkiem start i end.)
-			CapacType hi/**\brief Possible exes in vertex*/,lo/**\brief possible deficit in vertex*/;
+			CapacType hi/**\brief Possible excess in vertex*/,lo/**\brief possible deficit in vertex*/;
 
 			//(dopuszczalne dodatnie i ujemne np. przeplyw to trans. z hi=lo=0 wszedzie poza zrodlem i ujsciem)
-			/**\brief Constructor.*/
+			/**\brief Empty constructor.*/
 			TrsVertLoss():
 				hi(NumberTypeBounds< CapacType >::zero()),
 				lo(NumberTypeBounds< CapacType >::zero())
@@ -243,7 +252,7 @@ namespace Koala
 		};
 
 		// rekord  opisujacy krawedz dla wyszukiwania transhipmentow
-		/**\brief The input WEN: output tez structure for edge in transhipment problem. WEN: to jest etykieta przypisywana krawedziom na wejsciu*/
+		/**\brief The input/output structure for edge in transhipment problem. WEN: to jest etykieta przypisywana krawedziom na wejsciu*/
 		template< class DType, class CType = DType > struct TrsEdgeLabs
 		{
 			// typ liczbowy przepustowosci luku i objetosci przeplywu

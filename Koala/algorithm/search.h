@@ -137,16 +137,16 @@ namespace Koala
 		 *
 		 * \param[in] g the considered graph.
 		 * \param[in] vertTab the associative container PVert-> SearchStructs::VisitVertLabs (or own structure that has attributes ePrev and vPrev), that represents in-forest.
-		 * \param[out] iters OutPath structure with extracted path that finishes in \a end. And starts in \a start WEN?: 
+		 * \param[out] iters OutPath structure with extracted path that finishes in \a end. And starts in \a start that should be root or on the path to root. WEN?: (blackHole possible) 
 		 * \param[in] end the end of path.
-		 * \param[in] start the root of in-tree or part of in-tree.
+		 * \param[in] start the root of in-tree or vertex on the path from \a end to root.
 		 * \return the number of edges on path.*/
 		template< class GraphType, class VertContainer, class VIter, class EIter >
 			static int getOutPath( const GraphType &g, const VertContainer &vertTab, OutPath< VIter,EIter > iters,
 			typename GraphType::PVertex end, typename GraphType::PVertex start = 0 );
 
-        //NEW: jak wyzej, bez podawania OutPath (wynik jest zwracany tylko przez return ...)
-        //WEN: opis?
+        // jak wyzej, bez podawania OutPath (wynik jest zwracany tylko przez return ...)
+        // specjalization for blackHole instead of OutPath iters
         template< class GraphType, class VertContainer >
 			static int getOutPath( const GraphType &g, const VertContainer &vertTab, BlackHole,
 			typename GraphType::PVertex end, typename GraphType::PVertex start = 0 )
@@ -280,13 +280,40 @@ namespace Koala
 		// eout, iterator wyjsciowy na wszystkie elementy w wystepujace ciagach (kazdy jeden raz)
 		// zwraca ilosc elementow wystepujacych w ciagach (kazdy jeden raz) tj. dlugosc sekwencji poslanej na eout
 		// uwaga: przy wywolaniach nie dedukuje typu elementow ciagow T (tzreba podac jawnie)
-		//WEN: opis?
+		/**\brief Reverse CompStore.
+		 *
+		 * Each CompStore is a sequence of sequences. Some elements may appear in many sequences.
+		 * This method reverse CompStore in such a way that for each element there is a sequence of integers 
+		 * (starting with 0) representing the input sequences in which the element appears.
+		 * The output CompStore is saved in \a out. 
+		 * While the order of elements is saved in container pointed by iterator \a eout.
+		 * \warning type T is not be deduced.
+		 * \param[in] begin iterator to container with starting points (integers) of consecutive sequences.
+		 * \param[in] sbegin the iterator to container with concatenated sequences of elements.
+		 * \param[in] size the number of sequences.
+		 * \param[out] out the CompStore with reversed CompStore.
+		 * \param[out] eout the output iterator to the container with all the elements without repetitions. 
+		 * \return the number of sequences in \a out and the number of elements in \a eout.*/
 		template< class T, class InputIter, class VertInputIter, class CIter, class IntIter, class ElemIter >
 			static int revCompStore( InputIter begin, VertInputIter sbegin, int size, CompStore< CIter,IntIter > out,
 				ElemIter eout );
 		// j.w., ale zakladamy, ze elementy ciagow (a wiec sbegin) sa przechowywane w tablicy, ktorej wskaznik
 		// poczatku dostarczamy do procedury (wowczas typ T jest dedukowany).
-		//WEN: opis?
+		/**\brief Reverse CompStore.
+		 *
+		 * Each CompStore is a sequence of sequences. Some elements may appear in many sequences.
+		 * This method reverse CompStore in such a way that for each element there is a sequence of integers 
+		 * (starting with 0) representing the input sequences in which the element appears.
+		 * The output CompStore is saved in \a out. 
+		 * While the order of elements is saved in container pointed by iterator \a eout.
+		 *
+		 * This method differs from the above method as it takes array \a sbegin instead iterator, which allows deducing the type T.
+		 * \param[in] begin iterator to container with starting points (integers) of consecutive sequences.
+		 * \param[in] sbegin the pointer to array with concatenated sequences of elements.
+		 * \param[in] size the number of sequences.
+		 * \param[out] out the CompStore with reversed CompStore.
+		 * \param[out] eout the output iterator to the container with all the elements without repetitions. 
+		 * \return the number of sequences in \a out and the number of elements in \a eout.*/
 		template< class T, class InputIter, class CIter, class IntIter, class ElemIter >
 			static int revCompStore( InputIter begin, const T *sbegin, int size, CompStore< CIter,IntIter > out,
 				ElemIter eout )
@@ -297,15 +324,16 @@ namespace Koala
 		// CompStore moze wspolpracowac z dowolnymi sekwencyjnymi kontenerami, ale ponizsza struktura
 		// ulatwia obrobke takich danych
 		// T typ elementu ciagow skladowych
-		//WEN: opis kontenera i metod?
-		/**\brief Sequence of sequences for CompStore. 
+		/**\brief Sequence of sequences managing class. 
+		 *
+		 *  The class is designed to simplify operations of CompStore. It delivers method input that returns CompStore
+		 *  which may be used in any method requiring such structure. On the other hand some methods for manipulation of that 
+		 *  CompStore are implemented.
 		 *
 		 *  The class consists of two containers (based on std::vector):
 		 *  - the second one consists of concatenated sequences.
 		 *  - the first one is a sequence of integers where i-th number stands for the beginning index of i-th sequence. 
 		 *
-		 *  The class is designed to simplify operations of CompStore. It delivers method input that returns CompStore
-		 *  which may be used in any method requiring such structure.
 		 *  \tparam T the type of element.*/
 		template< class T > class CompStoreTool
 		{
@@ -331,13 +359,17 @@ namespace Koala
 			/**\brief The number of elements in i-th sequence.*/
 			int size( int i ) const;
 			 // laczna dlugosc wszystkich ciagow
-			/**\brief The number of elements in all sequences. (size of container with elements). */
+			/**\brief The number of elements in all sequences (size of container with elements). */
 			int length() const;
 			// wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
-			/**\brief Access i-th element. */
+			/**\brief Access i-th element. 
+			 *
+			 * \return the pointer to beginning of i-th sequence or 0 if the sequence is empty. */
 			T *operator[]( int i );
 			// wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
-			/**\brief Get i-th element. */
+			/**\brief Get i-th sequence beginning.
+			 *
+			 * \return the pointer to beginning of i-th sequence or 0 if the sequence is empty. */
 			const T *operator[]( int i ) const;
 			// umieszcza nowy ciag pusty na pozycji i.
 			/**\brief Insert new empty sequence on i-th position. */
@@ -711,15 +743,17 @@ namespace Koala
 	 */
 	/** \brief Basic graph search algorithms (parameterized).
 	 *
-	 *  The general implementation of graph search strategies (DFS, BFS, LexBFS).
+	 *  The general implementation of graph search strategies (DFS, BFS, LexBFS). 
+	 *  The method visitBase from SearchImpl decides about the strategy of visits.
+	 *  Typically searching algorithms use map PVertex -> VisitVertLabs< GraphType >
 	 *  \tparam SearchImpl the class should deliver a method visitBase, which decides about the order of visiting vertices.
-	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm WEN: to sie nawet jakos fachowo nazywa (polityka czy cecha?).
+	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm.
 	 *   Can be used to parametrize algorithms.
 	 *  \ingroup search */
 	template< class SearchImpl, class DefaultStructs > class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	{
 	protected:
-		// Typowy kontener dla wierzcholkow uzyteczny w tych procedurach
+		// Typowy kontener dla wsierzcholkow uzyteczny w tych procedurach
 		// mapa PVertex -> VisitVertLabs< GraphType >
 		template< class GraphType > class VisitedMap: public DefaultStructs:: template AssocCont<
 			typename GraphType::PVertex,VisitVertLabs< GraphType > >::Type
@@ -829,6 +863,7 @@ namespace Koala
 		*  Note that vertex is attainable if it is in the same connected component but also the direction of edges if included in mask \a dir may influence the relation.
 		*  @param[in] g the graph containing vertices to visit. Any graph may be used.
 		*  @param[in] src the vertex
+		*  @param[in] radius the distance from \a src to search.
 		*  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole allowed.
 		*   After the execution of the method, the associative container represent the search in-tree rooted in \a src.
 		*   where fields \p vPrev and \p ePrev keep the previous vertex and edge, and the field \p distance keeps the distance from the root.
@@ -960,8 +995,7 @@ namespace Koala
 	/** \brief Preorder Depth-First-Search (parametrized)
 	 *
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
-	 *  \ingroup search
-	 */
+	 *  \ingroup search */
 	template< class DefaultStructs > class DFSPreorderPar: public DFSBase< DFSPreorderPar< DefaultStructs >,DefaultStructs >
 	{
 	protected:
@@ -1261,19 +1295,19 @@ namespace Koala
 	public:
 		/** \brief Get the strongly connected components of graph.
 		 *
-		 *  The method splits graph into strongly connected components, all types of edges are considered. WEN: i w metodach nizej rowniez, podobnie rownoleglosc dozwolona
+		 *  The method splits graph into strongly connected components, all types of edges are considered. Parallel edges are allowed.
 		 *  @param[in] g the graph to split
-		 *  @param[out] out strongly connected components of the graph \a g in the CompStore object that keeps a  pair of output iterators (elements of first iterator will point to first vertex in component in second iterator). WEN: link do ogolnego opisu CompStora
+		 *  @param[out] out the CompStore object that keeps strongly connected components of the graph \a g. (blackHole possible) 
+		 *   \wikipath{Graph search algorithms#Sequence of sequences, See wiki for CompStore}
 		 *  @param[out] vtoc map (PVertex -> int indexOfItsComponent(zero based)), or BlackHole.
 		 *  @return the number of components.
 		 *  \sa CompStore
 		 *
-		 *  [See example](examples/search/scc/scc.html).
-		 */
+		 *  [See example](examples/search/scc/scc.html). */
 		template< class GraphType, class CompIter, class VertIter, class CompMap > static int
 			split( const GraphType &g, CompStore< CompIter,VertIter > out, CompMap & vtoc );
 
-        //NEW: wersja bez out
+        //wersja bez out
 		template< class GraphType, class CompMap > static int
 			split( const GraphType &g,BlackHole, CompMap & vtoc )
         {   return split(g,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),vtoc);  }
@@ -1283,12 +1317,12 @@ namespace Koala
 		//    ciagu wynikowego
 		/** \brief Get connections between components.
 		 *
-		 *  The method gets connections WEN: directed between strongly connected components and writes it down to the container \a iter
-		 *    as pairs of indexes of components in \a comp.
+		 *  The method gets directed connections between strongly connected components and writes it down to the container \a iter
+		 *    as pairs of indexes of components in \a comp. Parallel edges are allowed.
 		 *  \param g the considered graph
 		 *  \param comp the map achieved by the above \p split method.
-		 *  \param[out] iter the iterator WEN: wstawiacz to the container with pairs of integers WEN: piszmy po ludzku std::pair<int,int> that represent the numbers of components in
-		 *   \a comp that share a vertex. WEN: nawet jesli miedzy komponentami jest kilka lukow, dana para pojawia sie raz
+		 *  \param[out] iter the insert iterator to the container with unique std::pair<int,int> that represent the numbers of components in
+		 *   \a comp that share a vertex. 
 		 *  \return the number of pairs in \a iter.	 */
 		template< class GraphType, class CompMap, class PairIter >
 			static int connections(const GraphType &g, CompMap &comp, PairIter iter );
@@ -1315,47 +1349,41 @@ namespace Koala
 		// wyrzuca na iterator wierzcholki grafu w porzadku topologicznym
 		/** \brief Get topological order.
 		 *
-		 *  The method searches the graph \a g in postorder DFS WEN: tak, ale z maska EdDirIn. The result is written to out iterator WEN: zawsze wszystkie wierzcholki.
-		 WEN: najwazniejsze, jesli g jest DAG, to na out wychodzi permutacja wierzcholkow bedaca top. order.
-		 *  \param g the considered graph. WEN: dowolny w senise rodzaje kraw. i rownoleglosci
+		 *  The method searches the graph \a g in postorder DFS with mask EdDirIn. The result is written to iterator out. The container consists of all vertices.
+		 *  If \a g is DAG permutation \a out represents topological order.
+		 *  \param g the considered graph. Parallel and all types of edges are allowed.
 		 *  \param out the iterator of container with output sequence of vertices.
-		 *  \n
 		 *
-		 *  [See example](examples/search/dagalgs/dagalgs.html).
-		 */
+		 *  [See example](examples/search/dagalgs/dagalgs.html). */
 		template< class GraphType, class VertIter > static void topOrd( const GraphType &g, VertIter out );
 
 		// sprawdza, czy graf jest DAGiem korzystajac z podanego para iteratorow ciagu wierzcholkow z wyjscia poprzedniej procedury
 		/** \brief Test if directed acyclic graph.
 		 *
 		 *  The method uses the sequence of vertices achieved by the above topOrd function to test if the graph \a g is a directed acyclic graph.
-		 *  \param g the tested graph. WEN: dowolny w senise rodzaje kraw. i rownoleglosci
-		 *  \param beg the iterator to the first element of the container with topological order. WEN: nie wiemy, jeszczxe, czy to top. ord.
-		 *  \param end the iterator to the past-the-end element of the container with topological order. WEN: nie wiemy, jeszczxe, czy to top. ord.
+		 *  \param g the tested graph. Parallel and all types of edges are allowed.
+		 *  \param beg the iterator to the first element of the container delivered by topOrd.
+		 *  \param end the iterator to the past-the-end element of the container delivered by topOrd.
 		 *  \return true if \a g is directed acyclic graph, false otherwise.
-		 *  \n
 		 *
-		 *  [See example](examples/search/dagalgs/dagalgs.html).
-		 */
+		 *  [See example](examples/search/dagalgs/dagalgs.html). */
 		template< class GraphType, class Iter > static bool isDAG( const GraphType &g, Iter beg, Iter end );
 
 		// sprawdza, czy graf jest DAGiem, samodzielna
 		/** \brief Test if directed acyclic graph.
 		 *
 		 *  The method test if the graph \a g is a directed acyclic graph.
-		 *  \param g the tested graph.WEN: dowolny w senise rodzaje kraw. i rownoleglosci
+		 *  \param g the tested graph. Parallel and all types of edges are allowed.
 		 *  \return true if \a g is directed acyclic graph, false otherwise.
-		 *  \n
 		 *
-		 *  [See example](examples/search/dagalgs/dagalgs.html).
-		 */
+		 *  [See example](examples/search/dagalgs/dagalgs.html). */
 		template< class GraphType > static bool isDAG( const GraphType &g );
 
 		// wyrzuca na iterator wszystkie luki przechodnie DAGa, zwraca dlugosc ciagu
 		/** \brief Get transitive edges.
 		 *
 		 *  The method gets all transitive edges WEN: a co to takiego? and saves them to the iterator \a out.
-		 *  \param g the considered graph. WEN: musi to byc DAG, rownoleglosci dozwolone
+		 *  \param g the considered graph. Must be DAG. Parallel edges are allowed.
 		 *  \param out the iterator to the container with transitive edges.
 		 *  \return the number of transitive edges.*/
 		template< class GraphType, class Iter > static int transEdges(const GraphType &g, Iter out);
@@ -1364,7 +1392,7 @@ namespace Koala
 		/** \brief Make Hasse diagram.
 		 *
 		 *  The method deletes all the transitive edges WEN: a co to takiego? from graph.
-		 *  \param g the considered graph. WEN: musi to byc DAG, rownoleglosci dozwolone
+		 *  \param g the considered graph. Must be DAG. Parallel edges are allowed.
 		 *  \n
 		 *
 		 *  [See example](examples/search/dagalgs/dagalgs.html).
@@ -1380,7 +1408,7 @@ namespace Koala
 	 *  \ingroup search    */
 	class DAGAlgs: public DAGAlgsPar< AlgsDefaultSettings > { };
 
-	//WEN: typy zagniezdzone przeniesione z BlocksPar
+	//typy zagniezdzone przeniesione z BlocksPar
 	/** \brief Auxiliary structure for BlockPar class */
 	struct BlocksStructs {
 		// wynikowa etykieta wierzcholka
