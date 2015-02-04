@@ -1172,19 +1172,18 @@ namespace Koala
 		template< class T > static void StableRadixSort( T *data, int n, int nb, int T::*field, T *out );
 
 	public:
-	    //WEN: uwaga - Lex
 		/** Get LexBFS sequence.
 		 *
-		 *  WEN: od KO: The method arranges vertices with LexBFS order, processing them in order
+		 *  The method arranges vertices with LexBFS order, processing them in order
             given by a sequence (given a choice between two vertices, the one that
-            appears eariler in the sequence is the one that will be processed first)
+            appears earlier in the sequence is the one that will be processed first)
             and writes it down to the \a out container.
 		 *  @param[in] g the considered graph,
-		 *  @param[in] in the number of vertices in table \a tab. WEN: to powinna byc permutacja wszystkich wierzcholkow
-		 *  @param[in] tab table containing initial order of vertices
+		 *  @param[in] in the number of vertices in array \a tab.
+		 *  @param[in] tab table containing initial order of vertices, permutation of all vertices.
 		 *  @param[in] mask the direction of edges to consider, LexBFS only symmetric masks are allowed.
-		 *  @param[out] out the iterator WEN: wstawiacz to write the output ordered vertices sequence.
-		 *  @return the number of vertices written to \a out. WEN: po prostu g.n */
+		 *  @param[out] out the input iterator to write the output ordered vertices sequence.
+		 *  @return the number of vertices written to \a out. (the number of vertices in \a g). */
 		template< class GraphType, class OutVertIter > static int order2( const GraphType & g, size_t in,
 			typename GraphType::PVertex *tab, EdgeDirection mask, OutVertIter out );
 
