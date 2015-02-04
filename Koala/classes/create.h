@@ -1326,20 +1326,21 @@ namespace Privates {
 		template< class Graph > static void
 			transClousure( Graph &g, const typename Graph::EdgeInfoType &einfo);
 
-		/**\brief Power of relation
+		/**\brief Power of relation and graph
 		 *
-		 * The function calculates the \a wyk power of relation represented by graph \a g. 
+		 * The function calculates the \a wyk power of relation represented by graph \a g and adds it to graph \a g. 
+		 * Or if graph is undirected the method calculates the power of graph as long as the mask noNewDir is set true.
 		 * New edges get edge info of value \a einfo.
 		 * \param g the modified relation graph.
 		 * \param wyk the exponent of power.
 		 * \param einfo the info object copied to all new-created edge infos.
-		 * \param noNewDir WEN?:*/
+		 * \param noNewDir the Boolean mask, if set true each pair of arcs in opposite direction spanned on the same pair of vertices is replaced with undirected edge. */
         template< class Graph > static void
 			pow( Graph &g, int wyk, const typename Graph::EdgeInfoType &einfo, bool noNewDir=true);
 
-        /**\brief Power of relation
+        /**\brief Power of graph
 		 *
-		 * The function calculates the \a wyk power of relation represented by graph \a g. 
+		 * The function calculates the \a wyk power of graph \a g. New edges are added to \a g.
 		 * Edge info of new edges is set to its type default value.
 		 * \param g the modified relation graph.
 		 * \param wyk the exponent of power.*/
@@ -1603,7 +1604,8 @@ namespace Privates {
 	 *
 	 * The caster takes three casters as template parameters:
 	 * \tparam TwoArg the two arguments caster that generates info object from two source infos.
-	 * \tparam
+	 * \tparam FirstArg the caster is called if info is generated from the first element and the second is ignored.
+	 * \tparam SecondArg the caster is called if info is generated from the second element and the first is ignored.
 	 * \ingroup detect*/
 	template< class TwoArg, class FirstArg, class SecondArg,int ver> struct ComplexCaster
 	{
