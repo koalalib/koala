@@ -723,7 +723,7 @@ namespace Koala
 				}
 		// szuka transship. w grafie o podanych warunkach na wierzcholki i krawedzie
 		// zwraca false w razie braku
-		/** \brief Solve transshipment problem WEN: tzn?
+		/** \brief Solve transshipment problem tzn?
 		 *
 		 *  \param[in] g the considered graph.
 		 *  \param[out] edgeTab the associative array (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge. Both input and output data are sent via this array.
