@@ -135,9 +135,11 @@ namespace Koala
 		// ew. wczesniejszy punkt koncowy na sciezce miedzy end a korzeniem
 		/** \brief Extract path from in-tree.
 		 *
+		 * The method gets path from root of in-tree (\a stort) to vertex \a end. The path is saved in OutPath container.
+		 * \a start do not have to be a root in in-tree, however it must lay on the path from root to \a end. If start is set 0, the method gets path form root to \a end.
 		 * \param[in] g the considered graph.
 		 * \param[in] vertTab the associative container PVert-> SearchStructs::VisitVertLabs (or own structure that has attributes ePrev and vPrev), that represents in-forest.
-		 * \param[out] iters OutPath structure with extracted path that finishes in \a end. And starts in \a start that should be root or on the path to root. WEN?: (blackHole possible) 
+		 * \param[out] iters OutPath structure with extracted path that finishes in \a end. And starts in \a start that should be root or on the path to root. (blackHole possible) 
 		 * \param[in] end the end of path.
 		 * \param[in] start the root of in-tree or vertex on the path from \a end to root.
 		 * \return the number of edges on path.*/
@@ -1013,22 +1015,26 @@ namespace Koala
         //coś w stylu "zastosuj visitor do każdego wierzchołka i krawędzi w kolejności
         //zdefiniowanej przez algorytm przeszukiwania; zwraca liczbę wierzchołków
         //dla których zostało wywołane visitVertexPost".
-		/** \brief Visit all vertexes from component WEN: nie, por. wyzej.
+		/** \brief Visit all vertexes connected to \a src.
 		*
-		*  The method visits all the vertices in the same component WEN: nie, por. wyzej as a given vertex.
+		*  The method visits all the vertices connected to \a src.
+		* Note that method calls the visitor for vertex and determines the order of visiting vertices.
+		* It is sent to class GraphSearchBase together with the class as template parameter. 
+		* Though it must be implemented if user wants to implement own visiting order (advanced users) 
 		* @param[in] g the graph containing vertices to visit
 		* @param[in] src the given vertex
-		* @param[in] visited the container to store data (map PVertex -> VisitVertLabs), (BlackHole forbidden). The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
-            WEN: [in]? WEN: tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania ze start sa ustawiane w tej mapie
+		* @param visited the container to store data (map PVertex -> VisitVertLabs), (BlackHole forbidden). 
+		*  The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
+        *  The method updates the values of visited vertices. 
 		* @param[in] visitor visitor called for each vertex
 		* @param[in] dir direction of edges to consider
 		 * - EdDirOut arcs are traversed according to their direction,
 		 * - EdDirIn arcs are traversed upstream,
 		 * - Directed arcs may be traversed in both directions.
-		 WEN: jeszcze Undirected no i ich | sa dopuszcalne
-		* @param[in] compid component identifier (give 0 if don't know) WEN: po prostu ta wartosc jest wpisywana do pola component etykiet odwiedzonych wierzcholkow
-		* @return number of visited vertices or -number if the visitor interrupted the search.
-		*/
+		 * - Undirected undirected edges are traversed in any direction. 
+		 * - Combinations of all the above may be achieved wiht operator|.
+		* @param[in] compid component identifier (give 0 if don't know), the value is saved in attribute component of visited vertices labels.
+		* @return number of visited vertices or -number if the visitor interrupted the search. */
 		template< class GraphType, class VertContainer, class Visitor > static int visitBase( const GraphType &g,
 			typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
 	} ;
@@ -1037,15 +1043,13 @@ namespace Koala
 	/** \brief Preorder Depth-First-Search (default).
 	 *
 	 *  By default DefaultStructs = AlgsDefaultSettings.
-	 *  \ingroup search
-	 */
+	 *  \ingroup search */
 	class DFSPreorder: public DFSPreorderPar< AlgsDefaultSettings > { };
 
 	/** \brief Postorder Depth-First-Search (parametrized)
 	 *
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algoritms.
-	 *  \ingroup search
-	 */
+	 *  \ingroup search  */
 	template< class DefaultStructs > class DFSPostorderPar: public DFSBase< DFSPostorderPar< DefaultStructs >,DefaultStructs >
 	{
 	protected:
@@ -1057,20 +1061,7 @@ namespace Koala
 			typename GraphType::PVertex, VertContainer &, Visitor, EdgeDirection, int, Visitors::simple_visitor_tag & );
 
 	public:
-		/** \brief Visit all vertexes of component. WEN: por. wyzej (powtorzenie czegos, co powinno byc raz)
-		*
-		* Visit all vertices in the same component as a given vertex.
-		* @param[in] g graph containing vertices to visit
-		* @param[in] src given vertex
-		* @param[in] visited container to store data (map PVertex -> VisitVertLabs),  (BlackHole forbidden). The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
-		* @param[in] visitor visitor called for each vertex
-		* @param[in] dir direction of edges to consider.
-		 * - EdDirOut arcs are traversed according to their direction,
-		 * - EdDirIn arcs are traversed upstream,
-		 * - Directed arcs may be traversed in both directions.
-		* @param[in] compid component identifier (give 0 if don't know)
-		* @return number of visited vertices of -number if the visitor interrupted the search.
-		*/
+		/**\copydoc DFSPreorderPar::visitBase*/
 		template< class GraphType, class VertContainer, class Visitor > static int visitBase( const GraphType &g,
 			typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
 	};
@@ -1095,21 +1086,8 @@ namespace Koala
 			typename GraphType::PVertex, VertContainer &, Visitor, EdgeDirection, int );
 
 	public:
-		/** \brief Visit all vertexes from component. WEN: por. wyzej (powtorzenie czegos, co powinno byc raz)
-		*
-		* visit all vertices in the same component as a given vertex.
-		* @param[in] g graph containing vertices to visit
-		* @param[in] src given vertex
-		* @param[in] visited container to store data (map PVertex -> VisitVertLabs), (BlackHole forbidden). The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
-		* @param[in] visitor visitor called for each vertex
-		* @param[in] dir direction of edges to consider.
-		 * - EdDirOut arcs are traversed according to their direction,
-		 * - EdDirIn arcs are traversed upstream,
-		 * - Directed arcs may be traversed in both directions.
-		* @param[in] compid component identifier (give 0 if don't know)
-		* @return number of visited vertices of -number if the visitor interrupted the search.
-		*/
-		template< class GraphType, class VertContainer, class Visitor > static int visitBase( const GraphType &g,
+		/**\copydoc DFSPreorderPar::visitBase*/
+		template< class GraphType, class VertContainer, class Visitor > static int visitBase(const GraphType &g,
 			typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
 	};
 
@@ -1211,18 +1189,8 @@ namespace Koala
 			typename GraphType::PVertex *tab, EdgeDirection mask, OutVertIter out );
 
 
-		/** \brief Visit all vertexes of component. WEN: por. wyzej (powtorzenie czegos, co powinno byc raz), tylko tu uwaga "only symmetric-cokolwiek to znaczy??? masks are acceptable".
-		*
-		* Visit all vertices in the same component as a given vertex.
-		* @param[in] g graph containing vertices to visit
-		* @param[in] src given vertex
-		* @param[in] visited container to store data (map PVertex -> VisitVertLabs),  (BlackHole forbidden). The search tree may be reconstructed from fields vPrev and ePrev in VisitVertLabs, also distance from the root and number of component (compid) is kept there.
-		* @param[in] visitor visitor called for each vertex
-		* @param[in] dir direction of edges to consider, only symmetric masks are acceptable.
-		* @param[in] compid component identifier (give 0 if don't know)
-		* @return number of visited vertices or -number if the visitor interrupted the search.
-		*/
-		template< class GraphType, class VertContainer, class Visitor > static int visitBase( const GraphType & g,
+		/**\copydoc DFSPreorderPar::visitBase*/
+		template< class GraphType, class VertContainer, class Visitor > static int visitBase(const GraphType & g,
 			typename GraphType::PVertex start, VertContainer &visited, Visitor visit, EdgeDirection mask,
 				int component );
 

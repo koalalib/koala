@@ -821,7 +821,7 @@ namespace Koala
 	 *
 	 *  The class consists of some methods calculating and testing connectivity.
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
-	 *  \sa AlgsDefaultSettings.
+	 *  \sa FlowAlgsDefaultSettings.
 	 *  \ingroup DMconnect */
 	template< class DefaultStructs > class ConnectPar: public SearchStructs, public ConnectStructs
 	//WEN: oczywiscie slowa path skas gdzies w dokumentacji do jej metod rozumiemy jako marszruty bez powtorzen uwzgledniajace orientacje przechodzonych krawedzi
@@ -970,7 +970,8 @@ namespace Koala
 	/** \brief Connectivity testing algorithms (default).
 	 *
 	 *  The class consists of some methods calculating connectivity.
-	 *  Simpler version of the class ConnectPar in which MKM and augmenting paths algorithms are used by default. WEN: a druga flaga wyboru procedury jest true
+	 *  Simpler version of the class ConnectPar in which MKM and augmenting paths algorithms are used.
+	 *  \sa FlowAlgsDefaultSettings
 	 *  \ingroup DMconnect */
 	class Connect: public ConnectPar< FlowAlgsDefaultSettings< false > > { };
 
