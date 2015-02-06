@@ -1594,25 +1594,31 @@ namespace Privates {
 
 	 }
 
-    //NEW: 4-ty argument szablonu. int=0 - jak bylo, int =1 to twoarg jest 3-argumentowy, a w wywolaniu
+    // 4-ty argument szablonu. int=0 - jak bylo, int =1 to twoarg jest 3-argumentowy, a w wywolaniu
     // operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) rzutuje z sour1, int =2 tj. ale z sour2
     //Dzieki temu mozna tworzyc ComplexCaster poslugujac sie tylko casterami 2-argumentowymi
-    /* \brief Complex caster for products.WEN?:
+    /** \brief Complex caster for products.
 	 *
 	 * Useful if some entities are generated from one source and other need two sources. 
-	 * Which is the case is some products of graphs for edges.
+	 * Which is the case for example for edges is some products of graphs.
 	 *
 	 * The caster takes three casters as template parameters:
-	 * \tparam TwoArg the two arguments caster that generates info object from two source infos.
-	 * \tparam FirstArg the caster is called if info is generated from the first element and the second is ignored.
-	 * \tparam SecondArg the caster is called if info is generated from the second element and the first is ignored.
+	 * - TwoArg the three arguments (dest, sour1, sour2) function object. The caster generates info object from two source infos.
+	 * - FirstArg the caster is called if info is generated from the first element and the second is ignored.
+	 * - SecondArg the caster is called if info is generated from the second element and the first is ignored.
+	 *
+	 * However, there is also forth template parameter ver which allows to supersede TwoArg caster with one of the remaining casters.
+	 * This are the possible options:
+	 * - 0 - the original TwoArg caster is used whenever needed.
+	 * - 1 - the TwoArg caster is replaced with FirstArg caster.
+	 * - 2 - the TwoArg caster is replaced wiht SecondArg caster.
 	 * \ingroup detect*/
 	template< class TwoArg, class FirstArg, class SecondArg,int ver> struct ComplexCaster
 	{
 
 	    typedef ComplexCaster< TwoArg, FirstArg, SecondArg, ver > CastersSelfType;
 
-		mutable TwoArg twoarg;/**<\brief Two argument caster function object.*/
+		mutable TwoArg twoarg;/**<\brief Two sources caster function object.*/
 		mutable FirstArg firstarg;/**<\brief First argument caster function object.*/
 		mutable SecondArg secondarg;/**<\brief Second argument caster function object.*/
 		/**\brief Constructor*/
@@ -1621,7 +1627,7 @@ namespace Privates {
 			{ }
 
 		// jesli podano oba argumenty, zastosuj twoarg
-		/**\brief Cast two sources to one destination.*/
+		/**\brief Cast two sources to one destination. */
 		template< class InfoDest, class InfoSour1, class InfoSour2 >
 			void operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 )
 			{ Privates::ComplexCastTwoArgCaster<TwoArg,ver>().cast(twoarg, dest,sour1,sour2 ); }
@@ -1642,24 +1648,36 @@ namespace Privates {
 
 	// funkcja tworzaca - podajemy castery skladowe
 	/**\brief Generating function for ComplexCaster
+	 *
+	 * The function generates ComplexCaster with ver == 0.
+	 * \sa ComplexCaster
+	 * \related ComplexCaster
 	 * \ingroup detect*/
 	template< class TwoArg, class FirstArg, class SecondArg > ComplexCaster< TwoArg, FirstArg,SecondArg,0 >
 		complexCast( TwoArg t, FirstArg f, SecondArg s )
 		{ return ComplexCaster< TwoArg,FirstArg,SecondArg,0 >( t,f,s ); }
 
 
-    //NEW: ale dla int=1
+    //for ver=1
 	// funkcja tworzaca - podajemy castery skladowe
 	/**\brief Generating function for ComplexCaster
+	 *
+	 * The function generates ComplexCaster with ver == 1. In this version TwoArg caster is replaced with FiersArg caster.
+	 * \sa ComplexCaster
+	 * \related ComplexCaster
 	 * \ingroup detect*/
 	template< class TwoArg, class FirstArg, class SecondArg > ComplexCaster< TwoArg, FirstArg,SecondArg,1 >
 		complexCast1( TwoArg t, FirstArg f, SecondArg s )
 		{ return ComplexCaster< TwoArg,FirstArg,SecondArg,1 >( t,f,s ); }
 
 
-    //NEW: ale dla int=2
+    //for ver=2
 	// funkcja tworzaca - podajemy castery skladowe
 	/**\brief Generating function for ComplexCaster
+	 *
+	 * The function generates ComplexCaster with ver == 2. In this version TwoArg caster is replaced with SecondArg caster.
+	 * \sa ComplexCaster
+	 * \related ComplexCaster
 	 * \ingroup detect*/
 	template< class TwoArg, class FirstArg, class SecondArg > ComplexCaster< TwoArg, FirstArg,SecondArg,2 >
 		complexCast2( TwoArg t, FirstArg f, SecondArg s )

@@ -458,13 +458,16 @@ namespace Koala
 
 		public:
 
-			//WEN: kolorowania optymalnego nie ma, ale trzeba tu odeslac, ze dla chordali zapewnia je kolorowanie sekwen. (odsylacz do procedury) zgodne z wynikiem gettopOrd
+			// kolorowania optymalnego nie ma, ale trzeba tu odeslac, ze dla chordali zapewnia je kolorowanie sekwen. (odsylacz do procedury) zgodne z wynikiem gettopOrd
 			// wyrzuca na iterator odwrotny perf. ellimination order chordal grafu tj. porzadek doklejania nowych wierzcholkow za podkliki
 			// false gdy graf nie byl chordal
-			/** \brief Get perfect WEN: ustalic w koncu, reversed czy nie? elimination order.
+			/** \brief Get reversed perfect elimination order.
 			 *
 			 *  The method gets the reversed perfect elimination order of \a g, which exist if and only if \a g is chordal.
 			 *  That is why the method returns false if the graph is not chordal.
+			 *  
+			 *  Note that for chordals sequential coloring with reversed perfect elimination order gives optimal coloring. 
+			 *  Hence, this class lacks separate method for coloring.
 			 *  \param g the considered graph.
 			 *  \param riter the iterator of a container with the reversed perfect elimination order.
 			 *  \return true if sucesfull, false if \a g is not a chordal graph.*/
@@ -476,8 +479,8 @@ namespace Koala
 			 *
 			 *  The method gets the maximum cliques tree representation basing on the perfect elimination order of \a g.
 			 *  \param g the considered graph. It is assumed that \a g is chordal.
-			 *  \param begin the iterator to the first element of the container with prefect elimination order of \a g. WEN: czy moze rev? anyway - tak samo, jak w wyjsciu z getOrder
-			 *  \param end the iterator to the past-the-last element of the container with prefect elimination order of \a g. WEN: czy moze rev? anyway - tak samo, jak w wyjsciu z getOrder
+			 *  \param begin the iterator to the first element of the container with reversed prefect elimination order of \a g. 
+			 *  \param end the iterator to the past-the-last element of the container with reversed prefect elimination order of \a g.
 			 *  \param[out] out the CompStore object that keeps maximal cliques.
 			 *  \param[out] qte the iterator of the container with pairs of integers std::pair<int,int>.
 			 The pair (\a i , \a j ) stands for the connection between \a i-th and \a j-th clique. \a i and \a j are the positions of clique in  \a out. Indexes starts with 0.
@@ -491,7 +494,9 @@ namespace Koala
 			 *  The method gets the maximum cliques tree representation.
 			 *  \param g the considered graph.
 			 *  \param[out] out the CompStore object that keeps maximal cliques.
-			 *  \param[out] qte the iterator of the container with pairs of integers. The pair (\a i , \a j ) stands for the connection between \a i-th and \a j-th clique. \a i and \a j are the positions of clique in  \a out.  WEN: numeracja klik od 0
+			 *  \param[out] qte the iterator of the container with pairs of integers. 
+			 *   The pair (\a i , \a j ) stands for the connection between \a i-th and \a j-th clique. 
+			 *   \a i and \a j are the positions of clique in \a out.  Note that cliques indexes start with 0.
 			 *  \return the number of cliques or -1 if \a g is not chordal.*/
 			template< class Graph, class VIterOut, class QIter, class QTEIter >
 				static int maxCliques( const Graph &g, CompStore< QIter,VIterOut > out, QTEIter qte );
@@ -501,8 +506,8 @@ namespace Koala
 			 *
 			 *  The method gets the maximal clique of \a g basing on the perfect elimination order.
 			 *  \param g the considered graph, it is assumed that the graph is chordal.
-			 *  \param begin the iterator to the first element of the container with prefect elimination order. WEN: czy moze rev? anyway - tak samo, jak w wyjsciu z getOrder
-			 *  \param end the iterator to the past-the-last element of the container with prefect elimination order. WEN: czy moze rev? anyway - tak samo, jak w wyjsciu z getOrder
+			 *  \param begin the iterator to the first element of the container with reversed prefect elimination order. 
+			 *  \param end the iterator to the past-the-last element of the container with reversed prefect elimination order. 
 			 *  \param out the iterator of a container with all the vertices of clique.
 			 *  \return the maximal clique size.*/
 			template< class Graph, class VIter, class VIterOut >
@@ -743,7 +748,7 @@ namespace Koala
 		class Interval: protected LexBFSPar< DefaultStructs >
 		{
 		public:
-		    //NEW: Segment i touch wylecialy do simple.h
+		    // Segment i touch wylecialy do simple.h
 
 			// konwersja zbior przedzialow-> interval graph
 			// pobiera spomiedzy 2 iteratorow ciag przedzialow (struktur typu segment)
@@ -927,7 +932,7 @@ namespace Koala
 			 *  \return the number of element in the output set \a out i.e. the cardinality of the vertex cover of \a g.*/
 			template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
 
-            //WEN: kolorowania optymalnego nie ma, ale trzeba tu odeslac, ze dla chordali zapewnia je kolorowanie sekwen. (odsylacz do procedury) zgodne z dowolna permut. wierzcholkow
+            //WEN?: kolorowania optymalnego nie ma, ale trzeba tu odeslac, ze dla chordali zapewnia je kolorowanie sekwen. (odsylacz do procedury) zgodne z dowolna permut. wierzcholkow
 
 		protected:
 			template< class GraphType, class Assoc > static bool cograph( const GraphType &ag, Assoc &subset );
