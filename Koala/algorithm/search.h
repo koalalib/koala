@@ -746,7 +746,8 @@ namespace Koala
 	/** \brief Basic graph search algorithms (parameterized).
 	 *
 	 *  The general implementation of graph search strategies (DFS, BFS, LexBFS). 
-	 *  The method visitBase from SearchImpl decides about the strategy of visits.
+	 *  The method visitBase from SearchImpl decides about the strategy of visits. 
+	 *  Own classes must implement visitBase method that behaves analogically to DFSPreorderPar::visitBase.
 	 *  Typically searching algorithms use map PVertex -> VisitVertLabs< GraphType >
 	 *  \tparam SearchImpl the class should deliver a method visitBase, which decides about the order of visiting vertices.
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm.
@@ -1010,8 +1011,8 @@ namespace Koala
 			Visitors::simple_visitor_tag & );
 
 	public:
-	    //WEN: opis tej nieistniejacej metody powinien znalezc sie przy GraphSearchBase (jako wymog dla kazdej stategii), a tu  link do niego
-	    //WEN: ale uwaga KO: W zasadzie dokumentacja do visitBase jest trochę myląca. Powinno być to
+	    //opis tej nieistniejacej metody powinien znalezc sie przy GraphSearchBase (jako wymog dla kazdej stategii), a tu  link do niego
+	    //ale uwaga KO: W zasadzie dokumentacja do visitBase jest trochę myląca. Powinno być to
         //coś w stylu "zastosuj visitor do każdego wierzchołka i krawędzi w kolejności
         //zdefiniowanej przez algorytm przeszukiwania; zwraca liczbę wierzchołków
         //dla których zostało wywołane visitVertexPost".
@@ -1349,7 +1350,7 @@ namespace Koala
 		// wyrzuca na iterator wszystkie luki przechodnie DAGa, zwraca dlugosc ciagu
 		/** \brief Get transitive edges.
 		 *
-		 *  The method gets all transitive edges WEN: a co to takiego? and saves them to the iterator \a out.
+		 *  The method gets all transitive edges (arc for which there is a directed path from the first vertex to the second vertex that skips the arc) and saves them to the iterator \a out.
 		 *  \param g the considered graph. Must be DAG. Parallel edges are allowed.
 		 *  \param out the iterator to the container with transitive edges.
 		 *  \return the number of transitive edges.*/
@@ -1358,7 +1359,7 @@ namespace Koala
 		// usuwa luki przechodnie DAGa
 		/** \brief Make Hasse diagram.
 		 *
-		 *  The method deletes all the transitive edges WEN: a co to takiego? from graph.
+		 *  The method deletes all the transitive edges (arc for which there is a directed path from the first vertex to the second vertex that skips the arc) from graph.
 		 *  \param g the considered graph. Must be DAG. Parallel edges are allowed.
 		 *  \n
 		 *

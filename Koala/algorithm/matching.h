@@ -325,8 +325,7 @@ private:
 	 *  @param[in] matchSize the desired size of a matching, leave out, set -1 or big (greater then maximal) for a maximum.
 	 *  @return the actual number of edges in found matching
 	 *
-	 *  [See example](examples/matching/matching_findMax.html).
-	 */
+	 *  [See example](examples/matching/matching_findMax.html). */
 	template< class GraphType, class VertContainer, class EIterOut >
 	static int findMax( const GraphType &g,
 				VertContainer &vertTab,
@@ -377,8 +376,8 @@ private:
 	}
 
 	/** \brief Greedy matching.
-	 *  WEN: to samo co w met. nizej i dopisac, ze to jest tamten greedy z ustalona sekwencja krawedzi
-	 *  Fast but inaccurate procedure searches greedily for a maximum (in the sense of inclusion) matching.
+	 *  
+	 *  Fast but inaccurate procedure searches greedily for a maximum (in the sense of inclusion) matching. May be used for example as a first for augmenting paths algorithm.
 	 *  \param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
 	 *  \param[out] avertTab an associative container from PVertex to VertLabs which keeps matched edges and vertices. It is assumed that unmatched vertices match NULLs. (BlackHole possible).
 	 *  @param[out] edgeIterOut the insert iterator to the container with the edges of found matching.
@@ -395,8 +394,8 @@ private:
 	 *  The method searches greedily for a matching in the graph \a g. The edges are taken form the sequence given by iterators \a edgeIterInBegin and \a edgesiIterInEnd.
 	 *  \param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
 	 *  \param[out] avertTab an associative container from PVertex to VertLabs which keeps matched edges and vertices. It is assumed that unmatched vertices match NULLs. (BlackHole possible).
-	 *  \param edgeIterInBegin the iterator to the first element of the edge sequence used by the greedy algorithm.
-	 *  \param edgeIterInEnd the iterator to the past-the-end element of the edge sequence used by the greedy algorithm.
+	 *  \param[in] edgeIterInBegin the iterator to the first element of the edge sequence used by the greedy algorithm.
+	 *  \param[in] edgeIterInEnd the iterator to the past-the-end element of the edge sequence used by the greedy algorithm.
 	 *  @param[out] edgeIterOut the insert iterator to the container with the edges of found matching.
 	 *  @param[in] matchSize the desired size of a matching, leave out or set to -1 for a maximum.
 	 *  @return  the size of found matching.
@@ -437,6 +436,7 @@ private:
 	/** \brief Stable matching (parametrized).
 	 *
 	 *  The set of structures and methods allowing to find stable maximal matching in bipartite graph. For other graph classes the class only tests stability.
+	 *  \wikipath{matching#stable_matching, Get definition of stable matching.}
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup DMmatch */
 	template< class DefaultStructs > class StableMatchingPar : public MatchingStructs
@@ -459,7 +459,7 @@ private:
         //podawanie porzadkow (preferencji) krawedzi przy wierzcholkach
 		/**\brief Function object comparing edges.
 		 *
-		 * The auxiliary functor comparing edges incident to common vertex. WEN?: */
+		 * The auxiliary functor comparing edges incident to common vertex. */
 		template <class GraphType>
 		class CompEdgeCont {
 
@@ -468,6 +468,10 @@ private:
                 const GraphType* graph;
 
 		    public:
+				/**\brief Constructor
+				 *
+				 * \param g the tested graph.
+				 * \param cont the associative array PEdge->std::pair<int,int> that assigns to each edge priority value for each vertex. */
                 template <class ECont>
                 CompEdgeCont(const GraphType& g,const ECont& cont) : graph(&g)
                 {
@@ -485,12 +489,12 @@ private:
                 {
                     if(!(--wsk->second)) delete wsk;
                 }
-
+				/**\brief Constructor.*/
                 CompEdgeCont(const CompEdgeCont& x): graph(x.graph), wsk(x.wsk)
                 {
                     wsk->second++;
                 }
-
+				/** \brief Copy content operator.*/
                 CompEdgeCont& operator=(const CompEdgeCont& x)
                 {
                     if (&x==this) return *this;
@@ -499,7 +503,10 @@ private:
                     wsk->second++;
                     return *this;
                 }
-
+				/**\brief Function call operator
+				 *
+				 * \return true if and only if \a e2 has greater weight than \a e2 with respect to \a v.
+				 *  If \a v is not \a e1 and \a e2 end the exception is thrown.*/
                 bool operator()(typename GraphType::PVertex v, typename GraphType::PEdge e1,typename GraphType::PEdge e2)
                 {
                     koalaAssert(graph->isEdgeEnd(e1,v) && graph->isEdgeEnd(e2,v),ContExcWrongArg);
@@ -510,17 +517,27 @@ private:
 
 		};
 
-        //NEW: ...i jego funkcja tworzaca - na podstawie podanej tablicy asocjacyjnej PEdge->std::pair<int,int>
+        // ...i jego funkcja tworzaca - na podstawie podanej tablicy asocjacyjnej PEdge->std::pair<int,int>
         //tj. priorytety danej krawedzi przy koncowce getEdgeEnd1/2
+		/**\brief CompEdgeCont generating function.
+		 *
+		 * \param g the investigated graph.
+		 * \param ECont the associative array PEdge->std::pair<int,int> that assigns a pair of weights to each edge.
+		 *	The first weight concerns first edge end, the second the second.*/
         template <class GraphType,class ECont>
         static CompEdgeCont<GraphType> compEdgeCont(const GraphType& g,const ECont& cont)
         {
             return CompEdgeCont<GraphType>(g,cont);
         }
 
-        //NEW: ...i jego funkcja tworzaca - na podstawie podanej tablicy asocjacyjnej PVertex->std::pair<Iterator,Iterator>
+        // ...i jego funkcja tworzaca - na podstawie podanej tablicy asocjacyjnej PVertex->std::pair<Iterator,Iterator>
         //tj. przedzial miedzy iteratorami to krawedzie incydentne do wierzcholka posortowane wg. rosnacego priorytetu
-        template <class GraphType,class VCont>
+		/**\brief CompEdgeCont generating function.
+		 *
+		 * \param g the investigated graph.
+		 * \param VCont the associative array PVertex->std::pair<Iterator,Iterator> that assigns to each vertex a pair of iterators
+		 *  which determine container with edges ordered according to its priorities concerning the vertex.*/
+		template <class GraphType, class VCont>
         static CompEdgeCont<GraphType> compEdgeIters(const GraphType& g,const VCont& cont)
         {
             typename DefaultStructs:: template AssocCont< typename GraphType::PEdge, std::pair<int,int > >
@@ -549,14 +566,16 @@ private:
 		// bool compare(v,e1,e2) jest true jesli e2 jest lepsze od e1 z punktu widzenia ich koncowki v
 		/** \brief Test if stable matching.
 		 *
-		 *  The method tests if the given set of edges is a stable matching in a graph.
+		 *  The method tests if the given set of edges is a stable matching in a graph. 
+		 *  \wikipath{matching#stable_matching,The definition of stable matching may be found here.} 
 		 *  \param g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges and loops are allowed.
-		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view. <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.
-            WEN: tj. dla kazdego wierzcholka porzadek liniowy krawedzi sasiednich
+		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view. 
+		 *   <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.
+         *   Note that for each vertex this function sets linear order of incident edges.
 		 *  \param edgeIterInBegin the iterator to the first element of the container with the edges of tested set.
 		 *  \param edgeIterInEnd the iterator to the past-the-end element of the container with the edges of tested set.
-		 *  \return the standard pair consisting of the bool value (pair true if the edge set form a stable matching, false otherwise) and the breaking edge WEN: lub NULL jesli to nawet nie byl matching.
-		 */
+		 *  \return the standard pair consisting of the bool value (pair true if the edge set form a stable matching, false otherwise) 
+		 *  and the the pointer to breaking edge or NULL if it was not a matching. */
 		template< class GraphType, class EIterIn, class Comp > static std::pair< bool,typename GraphType::PEdge >
 			test( const GraphType &g, Comp compare, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd );
 		/** \brief Find stable matching in bipartite graph.
@@ -566,12 +585,12 @@ private:
 		 *  \param begin the iterator to the first element of the container with vertexes. WEN: jakich? - z wybranej partycji dwudzielnosci!
 		 *  \param end the iterator to the past-the-end element of the container with vertexes.
 		 WEN: jakich? - z wybranej partycji dwudzielnosci! Tu link do IsItPar<...>::Bipartite::getPart (detect.h)
-		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view. <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.
-		 WEN: tj. dla kazdego wierzcholka porzadek liniowy krawedzi sasiednich
+		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view.
+		 *  <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.
+		 *   Note that for each vertex this function sets linear order of incident edges.
 		 *  \param verttab an associative container from PVertex to VertLabs, which keeps matched edges and vertices WEN: dla zmachowanych wierzcholkow a dla innych NULLe  (BlackHole possible).
 		 *  \param out the insert iterator to the container with edges of found matching.
-		 *  \return the number of edges in found strong WEN: strong??? matching.
-		 */
+		 *  \return the number of edges in found stable matching. */
 		template< class GraphType, class VIterIn, class Comp, class vertCont, class EIterOut >
 			static int bipartFind( const GraphType &g, VIterIn begin, VIterIn end, Comp compare, vertCont &verttab,
 				EIterOut out );

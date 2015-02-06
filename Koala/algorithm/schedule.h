@@ -15,7 +15,7 @@
 
 namespace Koala
 {
-    //NEW: typy zagniezszone przeniesione z SchedulingPar
+	/**\brief Auxiliary structures for scheduling.*/
     struct SchedulingStructs {
 
 		/** \brief Single task.
@@ -26,12 +26,20 @@ namespace Koala
 			int length/**\brief Length*/,release/**\brief Release time*/,duedate/**\brief Due date*/;
 			typename GraphType::PVertex vertex;/**<\brief Pointer to vertex in graph of conflicts or digraph of precedence constraints.*/
 
-			/** \brief Constructor WEN: opis argumentow */
+			/** \brief Constructor 
+			 *
+			 * \param _vertex the value for vertex, i.e. the corresponding vertex in graph of conflicts.
+			 * \param _length the length of new-created task.*/
 			Task( typename GraphType::PVertex _vertex = 0,int _length =1): length( _length ), release( 0 ),
 				duedate(std::numeric_limits< int >::max()), vertex(_vertex)
 				{ }
 
-			/** \brief Constructor WEN: opis argumentow*/
+			/** \brief Constructor
+			 *
+			 * \param _length the length of new-created task.
+			 * \param _release the task release date.
+			 * \param _duedate the due date of task.
+			 * \param _vertex the value for vertex, i.e. the corresponding vertex in graph of conflicts.*/
 			Task( int _length, int _release, int _duedate, typename GraphType::PVertex _vertex = 0 ):
 				length( _length ), release( _release ), duedate( _duedate ), vertex( _vertex )
 				{ }
@@ -41,12 +49,12 @@ namespace Koala
 		/** \brief Scheduled task part.
 		 *
 		 *  The structure represent the continuous time interval associated with part of task.
-		 WEN: w uszeregowaniu tj. stuktura wynikowa */
+		 *  This is an output structure. */
 		struct TaskPart
 		{
 		    friend class Schedule;
 		    //WEN: co to jest task i part?
-			int task/**\brief Task index*/,start/**\brief Starting time*/,end/**\brief Finishing time*/,part/**\brief Part index*/;
+			int task/**\brief Task index*/,start/**\brief Starting time*/,end/**\brief Finishing time*/,part/**\brief Index of task part (preemptive tasks) */;
 			/**\brief Constructor*/
 			TaskPart( int _task = 0, int _start = 0, int _end = 0, int _part = 0):
 				task( _task ), start( _start ), end( _end ), part( _part )
