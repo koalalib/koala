@@ -581,14 +581,13 @@ private:
 		/** \brief Find stable matching in bipartite graph.
 		 *
 		 *  The method finds the stable matching in bipartite graph.
-		 *  \param g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
-		 *  \param begin the iterator to the first element of the container with vertexes. WEN: jakich? - z wybranej partycji dwudzielnosci!
-		 *  \param end the iterator to the past-the-end element of the container with vertexes.
-		 WEN: jakich? - z wybranej partycji dwudzielnosci! Tu link do IsItPar<...>::Bipartite::getPart (detect.h)
+		 *  \param g the considered bipartite graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
+		 *  \param begin the iterator to the first element of the container with vertexes of the chosen partition.
+		 *  \param end the iterator to the past-the-end element of the container with vertexes of the chosen partition. Refer to IsItPar<...>::Bipartite::getPart in (detect.h)
 		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view.
 		 *  <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.
 		 *   Note that for each vertex this function sets linear order of incident edges.
-		 *  \param verttab an associative container from PVertex to VertLabs, which keeps matched edges and vertices WEN: dla zmachowanych wierzcholkow a dla innych NULLe  (BlackHole possible).
+		 *  \param verttab an associative container from PVertex to VertLabs, which keeps matching  edge and vertex. Unmatched vertices get NULLs there.  (BlackHole possible).
 		 *  \param out the insert iterator to the container with edges of found matching.
 		 *  \return the number of edges in found stable matching. */
 		template< class GraphType, class VIterIn, class Comp, class vertCont, class EIterOut >
