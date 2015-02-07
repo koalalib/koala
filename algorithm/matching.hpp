@@ -388,7 +388,7 @@ int MatchingPar<DefaultStructs>::matchingTool(const GraphType &g,
 	if(makeCover) {
 		for(u = g.getVert(); u != NULL; u = g.getVertNext(u)) {
 			if(data[u].mate != KOALA_MATCHING_MZERO) continue;
-			e = g.getEdge( u, mask );
+			e = g.getEdge( u, mask | EdLoop );
 			if(e == NULL) continue;
 			v = g.getEdgeEnd(e, u);
 			*matching = e;

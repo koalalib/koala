@@ -513,10 +513,10 @@ template< class DefaultStructs > template< class Graph, class VIterOut, class QI
 template< class DefaultStructs > template< class Graph, class VIter, class VIterOut >
 	int IsItPar< DefaultStructs >::Chordal::maxClique( const Graph &g, VIter begin, VIter end, VIterOut out )
 {
-	int maxsize = 1;
+	int maxsize = 1,n;
 	typename Graph::PVertex u;
 	typename Graph::PVertex maxv = *begin;
-	typename DefaultStructs:: template AssocCont< typename Graph::PVertex,EmptyVertInfo >::Type tabf( g.getVertNo() );
+	typename DefaultStructs:: template AssocCont< typename Graph::PVertex,EmptyVertInfo >::Type tabf( n=g.getVertNo() );
 	VIter vi = begin;
 	tabf[maxv] = EmptyVertInfo();
 	for( ++vi; vi != end; ++vi )
@@ -531,7 +531,7 @@ template< class DefaultStructs > template< class Graph, class VIter, class VIter
 			maxv = *vi;
 		}
 	}
-	tabf.clear();
+	tabf.clear();tabf.reserve(n);
 	for( vi = begin; *vi != maxv; ++vi ) tabf[*vi] = EmptyVertInfo();
 	int licz = 0;
 	for( typename Graph::PEdge e = g.getEdge( maxv,EdUndir ); e; e = g.getEdgeNext( maxv,e,EdUndir ) )
@@ -1431,7 +1431,7 @@ template< class DefaultStructs > template< class GraphType, class Assoc >
 	if (parts.type == mpPrime) return false;
 	for( int i = 0; i < parts.size; i++ )
 	{
-		subset.clear();
+		subset.clear(); subset.reserve(tabc[i + 1]-tabc[i]);
 		for( int j = tabc[i]; j <tabc[i + 1]; j++ ) subset[tabv[j]];
 		if (!cograph( ag,subset )) return false;
 	}
@@ -1459,14 +1459,14 @@ template< class DefaultStructs > template< class GraphType, class Assoc, class I
 	koalaAssert( parts.type != mpPrime,AlgExcWrongArg );
 	if (parts.type == mpConnected)
 		for( int i = 0; i < parts.size; i++ )
-		{   subset.clear();
+		{   subset.clear(); subset.reserve(tabc[i + 1]-tabc[i]);
 			for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
 			res+= maxClique2( ag,subset,out );
 		}
 	else
 		for( int i = 0; i < parts.size; i++ )
 		{
-			subset.clear();
+			subset.clear(); subset.reserve(tabc[i + 1]-tabc[i]);
 			for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
 			typename GraphType::PVertex *ptr=restab+tabc[i];
 			tmp= maxClique2( ag,subset,ptr );
@@ -1507,14 +1507,14 @@ template< class DefaultStructs > template< class GraphType, class Assoc, class I
 	koalaAssert( parts.type != mpPrime,AlgExcWrongArg );
 	if (parts.type == mpDisconnected)
 		for( int i = 0; i < parts.size; i++ )
-		{   subset.clear();
+		{   subset.clear(); subset.reserve(tabc[i + 1]-tabc[i]);
 			for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
 			res+= maxStable2( ag,subset,out );
 		}
 	else
 		for( int i = 0; i < parts.size; i++ )
 		{
-			subset.clear();
+			subset.clear(); subset.reserve(tabc[i + 1]-tabc[i]);
 			for( int j = tabc[i]; j < tabc[i + 1]; j++ ) subset[tabv[j]];
 			typename GraphType::PVertex *ptr=restab+tabc[i];
 			tmp= maxStable2( ag,subset,ptr );

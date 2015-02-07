@@ -363,7 +363,7 @@ private:
 	}
 
 	/** \brief Find minimal edge cover.
-	 *
+	 *  WEN: tylko tu w tym module w wyniku moga tez pojawic sie petle
 	 *  The method finds a minimal edge cover of a given \a g.
 	 *  @param[in] g the considered graph. WEN: dowolny (np. z kraw. rownoleglymi, petlami),  luki  krawedzie sa traktowane jak undir
 	 *  @param[out] cover the list of edges in found cover. WEN: nie, inserter na krawedzie

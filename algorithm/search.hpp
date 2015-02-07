@@ -1713,7 +1713,7 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
 	}
 	assert( ccomp > 0 && ccomp <= comp );
 
-	adjmatr.clear();
+	adjmatr.clear(); adjmatr.reserve( n );
 	makeSubgraph( g,std::make_pair( stdChoose( true ),extAssocChoose( &visited,ccomp ) ),
                                     std::make_pair(true,true)).getAdj( adjmatr,EdUndir );
 
