@@ -351,7 +351,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 		for( int i = 0; i < vertTab[end].distance; i++ )
 			addFlow( g,edgeTab,eTab[i],vTab[i],delta,true );
 		res += delta;
-		vertTab.clear();
+		vertTab.clear(); vertTab.reserve(n);
 	}
 	return res;
 }
@@ -599,7 +599,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 			delta = std::min( delta,usedCapCost( g,edgeTab,eTab[i],vTab[i] ) );
 		for( int i = 0; i < len; i++ ) addFlow( g,edgeTab,eTab[i],vTab[i],delta,true );
 		if ((res += delta) == val) break;
-		vertTab.clear();
+		vertTab.clear(); vertTab.reserve( n );
 	}
 	return res;
 }

@@ -127,7 +127,7 @@ int ListVertColoringPar<DefaultStructs>::color2ElemLists(
 	{
 		Vert vv = *it;
 		bool isInMap = colors.hasKey(vv);
-		if (!isInMap || (isInMap && colors[vv] < 0))
+		if (!isInMap) //KG: bylo: if (!isInMap || (isInMap && colors[vv] < 0))
 		{
 			//found uncolored element
 			koalaAssert(colLists.hasKey(vv), AlgExcWrongArg);
@@ -212,7 +212,7 @@ int ListVertColoringPar<DefaultStructs>::color2ElemLists(
 			}
 			else
 			{
-				if (colors.hasKey(u) && colors[u] >= 0)
+				if (colors.hasKey(u)) //KG: bylo: if (colors.hasKey(u) && colors[u] >= 0)
 				{
 					//u - colored vertex
 					int usedCol = colors[u];
@@ -619,7 +619,7 @@ int ListEdgeColoringPar<DefaultStructs>::color2ElemLists(
 		koalaAssert(graph.getEdgeType(edge) != EdLoop, AlgExcWrongArg);
 
 		bool isInMap = colors.hasKey(edge);
-		if (!isInMap || (isInMap && colors[edge] < 0))
+		if (!isInMap) //KG: bylo: if (!isInMap || (isInMap && colors[edge] < 0))
 		{
 			//found uncolored element
 			koalaAssert(colLists.hasKey(edge), AlgExcWrongArg);
@@ -654,7 +654,7 @@ int ListEdgeColoringPar<DefaultStructs>::color2ElemLists(
 		Vert vv = graph.getEdgeEnd1(edge);
 		for (Edge ee = graph.getEdge(vv, Mask); ee; ee = graph.getEdgeNext(vv, ee, Mask))
 		{
-			bool isColored = (colors.hasKey(ee) && colors[ee] >= 0);
+			bool isColored = (colors.hasKey(ee) /* KG: bylo: && colors[ee] >= 0*/);
 			if (ee == edge || (!isColored && !edgeToVarsMap.hasKey(ee))) continue;
 			if (ee < edge) 	neighEdges[ne++] = std::make_pair(ee, edge);
 			else neighEdges[ne++] = (std::make_pair(edge, ee));
@@ -663,7 +663,7 @@ int ListEdgeColoringPar<DefaultStructs>::color2ElemLists(
 		vv = graph.getEdgeEnd2(edge);
 		for (Edge ee = graph.getEdge(vv, Mask); ee; ee = graph.getEdgeNext(vv, ee, Mask))
 		{
-			bool isColored = (colors.hasKey(ee) && colors[ee] >= 0);
+			bool isColored = (colors.hasKey(ee) /* KG: bylo: && colors[ee] >= 0*/);
 			if (ee == edge || (!isColored && !edgeToVarsMap.hasKey(ee))) continue;
 			if (ee < edge) 	neighEdges[ne++] = std::make_pair(ee, edge);
 			else neighEdges[ne++] = std::make_pair(edge, ee);

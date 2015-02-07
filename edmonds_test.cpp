@@ -105,10 +105,13 @@ void edmTest2()
     J=g.addVert(OpisV("J"));K=g.addVert(OpisV("K"));L=g.addVert(OpisV("L"));
     M=g.addVert(OpisV("M"));N=g.addVert(OpisV("N"));O=g.addVert(OpisV("O"));
 
+    P=g.addVert(OpisV("P"));
+
     g.addEdge(A,B);g.addEdge(A,C);g.addEdge(B,D);g.addEdge(B,J);
     g.addEdge(C,E);g.addEdge(D,F);g.addEdge(D,G);g.addEdge(E,I);
     g.addEdge(F,G);g.addEdge(G,H);g.addEdge(G,I);g.addEdge(H,I);
     g.addEdge(K,B);g.addEdge(L,G);g.addEdge(M,G);g.addEdge(N,I);
+    g.addLoop(P);
 
 //    g.addEdge(A,B);g.addEdge(A,C);g.addEdge(B,D);g.addEdge(B,J);
 //    g.addEdge(C,E);g.addEdge(D,F);g.addEdge(D,G);g.addEdge(E,I);
@@ -313,6 +316,8 @@ void HKTest()
     std::cout<< "Minimalne pokrycie krawedziowe-strumien krawedzi nalezacych do skojarzenia" << std::endl;
     for(int i=0;i<edgeCoverSize;i++) std::cout<< "{"<< g.getEdgeEnds(tabE[i]).first->info.name <<
                             "," << g.getEdgeEnds(tabE[i]).second->info.name << "}\n";
+
+//    return 0;
 
     edmTest2();
     std::cout<< "\n3. To samo, ale na wyjsciu tylko rozmiar.\n";

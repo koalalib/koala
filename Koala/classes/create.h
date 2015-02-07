@@ -1287,7 +1287,7 @@ namespace Privates {
 		 *  \param g the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
 		template< class Graph > static void
-			reflClousure( Graph &g, const typename Graph::EdgeInfoType &einfo= typename Graph::EdgeInfoType() );
+			reflClosure( Graph &g, const typename Graph::EdgeInfoType &einfo= typename Graph::EdgeInfoType() );
 
 		// przeprowadza domkniecie symetryczne. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Symmetric closure. WEN: tu sie cos nie zgadza (2 wersje metody). I nizej tez
@@ -1296,22 +1296,22 @@ namespace Privates {
 		 *  \param g the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge.*/
 		template< class Graph > static void
-			symmClousure( Graph &g)
-			{ symmClousure(g, typename Graph::EdgeInfoType()); };
+			symmClosure( Graph &g)
+			{ symmClosure(g, typename Graph::EdgeInfoType()); };
 
 		template< class Graph > static void
-			symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo);
-//			symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
+			symmClosure( Graph &g, const typename Graph::EdgeInfoType &einfo);
+//			symmClosure( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
 		// przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
-		/** \brief Transitiv clousure.
+		/** \brief Transitiv closure.
 		 *
 		 *  The function adds the minimal number of arc WEN: i loops in order to make the relation (represented by the graph \a g) transitive.
 		 *  \param g the modified graph.
 		 */
 		template< class Graph > static void
-			transClousure( Graph &g)
-			{ transClousure(g, typename Graph::EdgeInfoType()); };
+			transClosure( Graph &g)
+			{ transClosure(g, typename Graph::EdgeInfoType()); };
 
 		/** \brief Transitive closure.
 		 *
@@ -1319,7 +1319,7 @@ namespace Privates {
 		 *  \param g the modified graph.
 		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
 		template< class Graph > static void
-			transClousure( Graph &g, const typename Graph::EdgeInfoType &einfo);
+			transClosure( Graph &g, const typename Graph::EdgeInfoType &einfo);
 
         //NEW: potegowanie grafu (wykladnik wyk)
         template< class Graph > static void
@@ -1349,12 +1349,12 @@ namespace Privates {
 			template< class Cont, class Iter > static void total( Cont &cont, Iter beg, Iter end );
 			template< class Cont > static void inv( Cont &cont, int size );
 			template< class Cont, class Iter > static void inv( Cont &cont, Iter beg, Iter end );
-			template< class Cont > static void reflClousure( Cont &cont, int size );
-			template< class Cont, class Iter > static void reflClousure( Cont &cont, Iter beg, Iter end );
-			template< class Cont > static void symmClousure( Cont &cont, int size );
-			template< class Cont, class Iter > static void symmClousure( Cont &cont, Iter beg, Iter end );
-			template< class Cont > static void transClousure( Cont &cont, int size );
-			template< class Cont, class Iter > static void transClousure( Cont &cont, Iter beg, Iter end );
+			template< class Cont > static void reflClosure( Cont &cont, int size );
+			template< class Cont, class Iter > static void reflClosure( Cont &cont, Iter beg, Iter end );
+			template< class Cont > static void symmClosure( Cont &cont, int size );
+			template< class Cont, class Iter > static void symmClosure( Cont &cont, Iter beg, Iter end );
+			template< class Cont > static void transClosure( Cont &cont, int size );
+			template< class Cont, class Iter > static void transClosure( Cont &cont, Iter beg, Iter end );
 		};
 	} ;
 

@@ -66,7 +66,7 @@ int& f(int i,int j)
 
 
 
-    RelDiagram::transClousure(g1,"N");
+    RelDiagram::transClosure(g1,"N");
 
     IO::writeGraphText(g1,cout,IO::RG_EdgeList);
 

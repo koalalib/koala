@@ -151,15 +151,16 @@ int SeqVertColoringPar<DefaultStructs>::colorInterchange(const Graph &graph,
 
 	int oldColor = colors[ vert ];
 	colors.delKey( vert );
+	int n;
 
 	typename DefaultStructs::template
-		AssocCont<Vert, int>::Type compMap(graph.getVertNo());
+		AssocCont<Vert, int>::Type compMap(n=graph.getVertNo());
 	bool LOCALARRAY(matchedColors, graph.getVertNo());
 
 	for(int c1 = 0; c1<oldColor; c1++) {
 		for(int c2 = c1+1; c2<oldColor; c2++)
 		{
-			compMap.clear();
+			compMap.clear();compMap.reserve(n);
 			int cntMapCol = interchangeComponents(graph, colors, vert,
 					compMap, c1, c2);
 
