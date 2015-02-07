@@ -27,15 +27,15 @@ namespace Koala
 		 *  Mind that edges and vertices may be repeated, though from theoretical point of view it is a walk.
 		 *  The sequences of vertices and of edges must be arrange in proper order.
 		 *  If the vertex container consists of sequence of vertices (v_0, v_1, v_2, ..., v_{n-1}) then obviously
-		 *  edges are stored in edge container in the order ({v_0,v_1},{v_1,v_2},...{v_{n-2},v_{n-1}}). 
-		 *  \wikipath{Graph_search_algorithms#Search-path-structure, For wider outlook see wiki.} 
+		 *  edges are stored in edge container in the order ({v_0,v_1},{v_1,v_2},...{v_{n-2},v_{n-1}}).
+		 *  \wikipath{Graph_search_algorithms#Search-path-structure, For wider outlook see wiki.}
 		 *
 		 *  [See example](examples/search/euler/euler.html). */
 		template< class VIter, class EIter > struct OutPath
 		{
 			VIter vertIter;/**<\brief the insert iterator to the container with vertices. */
 			EIter edgeIter;/**<\brief the insert iterator to the container with edges. */
-			
+
 			/** \brief Constructor.*/
 			OutPath( VIter av, EIter ei ): vertIter( av ), edgeIter( ei ) { }
 		};
@@ -49,7 +49,7 @@ namespace Koala
 		template< class VIter, class EIter > static OutPath< VIter,EIter > outPath( VIter av, EIter ei )
 			{ return OutPath< VIter,EIter >( av,ei ); }
 
-		/** \brief OutPath specialization for blackHole generating function. 
+		/** \brief OutPath specialization for blackHole generating function.
 		 *
 		 *  The function generates dummy OutPath for cases in which this output structure is not needed.
 		 *  \wikipath{BlackHole, See wiki for blackHole}
@@ -66,7 +66,7 @@ namespace Koala
 		 *  Mind that the class consists of two containers one for pointer to vertices and one for pointers to edges.
 		 *  The process of filling up the container is served by OutPath returned by method input().
 		 *
-		 *  Mind that path is understood as a sequence of vertices and a sequence of edges. As both vertices and edges may be repeated in those sequences, 
+		 *  Mind that path is understood as a sequence of vertices and a sequence of edges. As both vertices and edges may be repeated in those sequences,
 		 *  from theoretical point of view it is walk.
 		 *  \wikipath{Graph_search_algorithms#Search-path-structure-management, Refer here for wider perspective.}
 		 *  \tparam Graph the type of served graph.
@@ -103,15 +103,15 @@ namespace Koala
 			 *  \return the pointer to i-th edge in path. Indexes start with 0. If the index excides the range exception is thrown.*/
 			PEdge edge( int i ) const;
 			// i-ta wierzcholek
-			/** \brief Get i-th vertex 
-			 *  
+			/** \brief Get i-th vertex
+			 *
 			 *  \param i the index of vertex on the path.
 			 *  \return the pointer to i-th vertex in path. Indexes start with 0. If the index excides the range exception is thrown.*/
 			PVertex vertex( int i) const;
 			//Umiesczamy wywolanie funkcji w miejsu outPath a pozniej przetwarzamy zebrane ciagi
 			// czysci kontener
 			/** \brief Prepare OutPath.
-			 * 
+			 *
 			 *  The method clears container and creates input for a function that requires OutPath.
 			 *  Mind that there is no possibility of partial clearing or filling of path.
 			 *  \return OutPath object associated with current object.*/
@@ -207,10 +207,10 @@ namespace Koala
 		// (a wiec lacznie o 1 wiecej liczb, niz ilosc ciagow)
 		/** \brief Joined sequences container.
 		 *
-		 *  The structure consist of two insert iterators. 
-		 *  - \a vertIter point to the concatenated sequenced of objects. 
-		 *  - \a compIter point to the container with integers such that each integer is a position of starting point of associated sequence, 
-		 *  the first element is always 0 and the last integer represents the number of all elements in the \a vertIter. 
+		 *  The structure consist of two insert iterators.
+		 *  - \a vertIter point to the concatenated sequenced of objects.
+		 *  - \a compIter point to the container with integers such that each integer is a position of starting point of associated sequence,
+		 *  the first element is always 0 and the last integer represents the number of all elements in the \a vertIter.
 		 *  \wikipath{Graph_search_algorithms#Sequence-of-sequences, See wiki page for CompStore. */
 		template< class CIter, class VIter > struct CompStore
 		{
@@ -225,10 +225,10 @@ namespace Koala
 		// Funkcja tworzaca, analogia make_pair
 		// Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
 		/** \brief Generating function for CompStore.
-		 *  
+		 *
 		 *  \param ac  the insert iterator to the container with integers representing the positions of first elements of consecutive sequences.
 		 *  \param av the insert iterator to the container with concatenated sequences of entities.
-		 *  \return the CompStore object associated with the sequence of sequences. 
+		 *  \return the CompStore object associated with the sequence of sequences.
 		 *  \related CompStore */
 		template< class CIter, class VIter > static CompStore< CIter,VIter > compStore( CIter ac, VIter av )
 			{ return CompStore< CIter,VIter >( ac,av ); }
@@ -865,22 +865,6 @@ namespace Koala
 //			CompStore< CompIter,VertIter > out, EdgeDirection dir = EdUndir | EdDirOut | EdDirIn );
 	};
 
-	/*
-	* DFSParamBlock
-	*/
-	template< class GraphType, class VertContainer, class Visitor > struct DFSParamBlock: public SearchStructs
-	{
-		const GraphType &g;
-		VertContainer &visited;
-		Visitor &visit;
-		EdgeDirection mask;
-		int component;
-
-		DFSParamBlock( const GraphType &_g, VertContainer &_v, Visitor &_vis, EdgeDirection _m, int _c ):
-			g( _g ), visited( _v ), visit( _vis ), mask( _m ), component( _c )
-			{ }
-	};
-
 
 	/*
 	* DFSBase
@@ -888,11 +872,7 @@ namespace Koala
 	*/
 	template< class SearchImpl, class DefaultStructs > class DFSBase: public GraphSearchBase< SearchImpl,DefaultStructs >
 	{
-	protected:
-		template< class GraphType, class VertContainer, class Visitor > static int dfsDoVisit(
-			DFSParamBlock< GraphType,VertContainer,Visitor > &, typename GraphType::PVertex, unsigned );
 
-//	public:
 	protected:
 		/** \brief Visit all vertices in given component. WEN: jest protected, wiec lepiej nie wnikac :-)
 		 *
