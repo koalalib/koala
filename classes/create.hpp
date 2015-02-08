@@ -1071,14 +1071,14 @@ template< class DefaultStructs > template< class Graph > void
 }
 
 template< class DefaultStructs > template< class Graph > void
-	RelDiagramPar< DefaultStructs >::reflClousure( Graph &g, const typename Graph::EdgeInfoType &einfo )
+	RelDiagramPar< DefaultStructs >::reflClosure( Graph &g, const typename Graph::EdgeInfoType &einfo )
 {
 	for( typename Graph::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
 		if (!g.getEdge( u,EdLoop )) g.addLoop( u,einfo );
 }
 
 template< class DefaultStructs > template< class Graph > void
-	RelDiagramPar< DefaultStructs >::symmClousure( Graph &g, const typename Graph::EdgeInfoType &einfo )
+	RelDiagramPar< DefaultStructs >::symmClosure( Graph &g, const typename Graph::EdgeInfoType &einfo )
 {
 	typename DefaultStructs::template TwoDimAssocCont< typename Graph::PVertex,bool,AMatrNoDiag >::Type
 		matr;
@@ -1103,7 +1103,7 @@ template< class DefaultStructs > template< class Graph > void
 }
 
 template< class DefaultStructs > template< class Graph > void
-	RelDiagramPar< DefaultStructs >::transClousure( Graph &g, const typename Graph::EdgeInfoType &einfo )
+	RelDiagramPar< DefaultStructs >::transClosure( Graph &g, const typename Graph::EdgeInfoType &einfo )
 {
     int n;
 	typename DefaultStructs::template TwoDimAssocCont< typename Graph::PVertex,char,AMatrNoDiag >::Type mat( n=g.getVertNo() );
@@ -1112,7 +1112,7 @@ template< class DefaultStructs > template< class Graph > void
     typename Graph::PVertex LOCALARRAY(buf,g.getVertNo());
     for( typename Graph::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
     {
-        vertCont.clear();
+        vertCont.clear(); vertCont.reserve(n);
         int res=BFSPar<DefaultStructs>::scanAttainable(g,u,vertCont,buf,EdDirOut|EdUndir);
         for(int i=0;i<res;i++) if (buf[i]!=u) mat(u,buf[i])=1;
     }
@@ -1151,7 +1151,7 @@ template< class DefaultStructs > template< class Graph > void
 
     for( typename Graph::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
     {
-        vertCont.clear();
+        vertCont.clear(); vertCont.reserve(n);
         int res=BFSPar<DefaultStructs>::scanAttainable(g,u,vertCont,buf,EdDirOut | EdUndir);
         for(int i=0;i<res;i++) if (u!=buf[i] && vertCont[buf[i]].distance<=wyk)
             mat(u,buf[i])=true;
@@ -1235,19 +1235,19 @@ template< class DefaultStructs > template< class Cont, class Iter > void
 }
 
 template< class DefaultStructs > template< class Cont > void
-	RelDiagramPar< DefaultStructs >::MatrixForm::reflClousure( Cont& cont, int size )
+	RelDiagramPar< DefaultStructs >::MatrixForm::reflClosure( Cont& cont, int size )
 {
 	for( int i = 0; i < size; ++i ) cont[i][i] = true;
 }
 
 template< class DefaultStructs > template< class Cont, class Iter > void
-	RelDiagramPar< DefaultStructs >::MatrixForm::reflClousure( Cont &cont, Iter beg, Iter end )
+	RelDiagramPar< DefaultStructs >::MatrixForm::reflClosure( Cont &cont, Iter beg, Iter end )
 {
 	for( Iter i = beg; i != end; ++i ) cont( *i,*i ) = true;
 }
 
 template< class DefaultStructs > template< class Cont > void
-	RelDiagramPar< DefaultStructs >::MatrixForm::symmClousure( Cont &cont, int size )
+	RelDiagramPar< DefaultStructs >::MatrixForm::symmClosure( Cont &cont, int size )
 {
 	for( int i = 0; i < size - 1; ++i )
 		for( int j = i + 1; j < size; ++j )
@@ -1259,7 +1259,7 @@ template< class DefaultStructs > template< class Cont > void
 }
 
 template< class DefaultStructs > template< class Cont,class Iter > void
-	RelDiagramPar< DefaultStructs >::MatrixForm::symmClousure( Cont &cont, Iter beg, Iter end )
+	RelDiagramPar< DefaultStructs >::MatrixForm::symmClosure( Cont &cont, Iter beg, Iter end )
 {
 	for( Iter i = beg; i != end; ++i )
 		for( Iter j = i; j != end; ++j )
@@ -1272,7 +1272,7 @@ template< class DefaultStructs > template< class Cont,class Iter > void
 }
 
 template< class DefaultStructs > template< class Cont > void
-	RelDiagramPar< DefaultStructs >::MatrixForm::transClousure( Cont &cont, int size )
+	RelDiagramPar< DefaultStructs >::MatrixForm::transClosure( Cont &cont, int size )
 {
 	for( int k = 0; k < size; ++k )
 		for( int i = 0; i < size; ++i )
@@ -1281,7 +1281,7 @@ template< class DefaultStructs > template< class Cont > void
 }
 
 template< class DefaultStructs > template< class Cont, class Iter > void
-	RelDiagramPar< DefaultStructs >::MatrixForm::transClousure( Cont &cont, Iter beg, Iter end )
+	RelDiagramPar< DefaultStructs >::MatrixForm::transClosure( Cont &cont, Iter beg, Iter end )
 {
 	for( Iter k = beg; k != end; ++k )
 		for( Iter i = beg; i != end; ++i )
