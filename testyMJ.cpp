@@ -340,7 +340,7 @@ bool comparabilityRepr(const char* g6)
         lg.makeAdjMatrix();
         lg.copy(g);
         assert(IsItPar< Settings >::Comparability::getDirs(lg));
-        RelDiagramPar< Settings >:: transClousure(lg);
+        RelDiagramPar< Settings >:: transClosure(lg);
         assert(!lg.getEdgeNo(EdLoop));
         assert(DAGAlgsPar< Settings >::isDAG(lg));
     }

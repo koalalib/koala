@@ -1,27 +1,53 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
-    <key id="liczint" attr.type="int" for="node" />
-    <key id="liczdouble" attr.type="double" for="edge" />
-    <key id="elitera" attr.type="int" for="edge" />
-    <key id="vlitera" attr.type="int" for="node" />
+    <key id="kolorV" attr.type="int" for="node" />
+    <key id="kolorE" attr.type="int" for="edge" />
+    <key id="graphType" attr.type="int" for="graph" />
+    <key id="graphML" attr.type="int" for="graphml" />
     <graph id="first" edgedefault="undirected">
-        <node id="n00778DF8">
-            <data key="liczint">1</data>
-            <data key="vlitera">65</data>
+        <node id="n007F2888">
+            <data key="kolorV">0</data>
         </node>
-        <node id="n00778E48">
-            <data key="liczint">2</data>
+        <node id="n007F28D8">
+            <data key="kolorV">1</data>
         </node>
-        <edge id="e00778E98" source="n00778DF8" target="n00778E48">
-            <data key="elitera">101</data>
-            <data key="liczdouble">0.000000</data>
+        <node id="n007F2928">
+            <data key="kolorV">2</data>
+        </node>
+        <node id="n007F2978">
+            <data key="kolorV">3</data>
+        </node>
+        <node id="n007F29C8">
+            <data key="kolorV">4</data>
+        </node>
+        <node id="n007F2A18">
+            <data key="kolorV">5</data>
+        </node>
+        <node id="n007F2A68">
+            <data key="kolorV">6</data>
+        </node>
+        <node id="n007F2AB8">
+            <data key="kolorV">7</data>
+        </node>
+        <node id="n007F2B08">
+            <data key="kolorV">8</data>
+        </node>
+        <node id="n007F2B58">
+            <data key="kolorV">9</data>
+        </node>
+        <edge id="e007F2BA8" source="n007F2888" target="n007F28D8">
+            <data key="kolorE">1</data>
         </edge>
-        <edge id="e00778EE8" source="n00778E48" target="n00778DF8" directed="true">
-            <data key="liczdouble">0.500000</data>
+        <edge id="e007F2BE8" source="n007F2888" target="n007F2A68">
+            <data key="kolorE">6</data>
         </edge>
-        <edge id="e00778F38" source="n00778E48" target="n00778E48">
-            <data key="elitera">102</data>
-            <data key="liczdouble">1.500000</data>
+        <edge id="e007F2C28" source="n007F2888" target="n007F2B58">
+            <data key="kolorE">9</data>
         </edge>
+        <edge id="e007F2C68" source="n007F2928" target="n007F2AB8">
+            <data key="kolorE">9</data>
+        </edge>
+        <data key="graphType">2</data>
     </graph>
+    <data key="graphML">4</data>
 </graphml>

@@ -380,51 +380,53 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 
 // DFSBase
 
-template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer, class Visitor >
-	int DFSBase< SearchImpl, DefaultStructs >::dfsDoVisit( DFSParamBlock< GraphType,VertContainer,Visitor > &params,
-		typename GraphType::PVertex u, unsigned depth )
-{
-	int t, retVal = 0;
-	typename GraphType::PEdge e;
-	typename GraphType::PVertex v;
-
-	if (!Visitors::visitVertexPre( params.g,params.visit,u,params.visited[u],params.visit )) return 1;
-	retVal++;
-
-	e = params.g.getEdge( u,params.mask );
-	for( ; e != NULL; e = params.g.getEdgeNext( u,e,params.mask ) )
-	{
-		if (!Visitors::visitEdgePre( params.g,params.visit,e,u,params.visit ))
-			continue;
-
-		v = params.g.getEdgeEnd( e,u );
-		if(params.visited.hasKey( v )) continue;
-
-		SearchStructs::VisitVertLabs< GraphType >( u,e,depth + 1,params.component ).copy(params.visited[v]);
-		t = dfsDoVisit< GraphType,VertContainer,Visitor >( params,v,depth + 1 );
-		if (t < 0)
-		{
-			retVal += -t;
-			return -retVal;
-		}
-		retVal += t;
-		if (!Visitors::visitEdgePost( params.g,params.visit,e,u,params.visit ))
-			return -retVal;
-	};
-
-	if(!Visitors::visitVertexPost( params.g,params.visit,u,params.visited[u],params.visit )) return -retVal;
-	return retVal;
-}
 
 template< class SearchImpl, class DefaultStructs > template< class GraphType, class VertContainer, class Visitor >
 	int DFSBase< SearchImpl, DefaultStructs >::dfsVisitBase( const GraphType &g, typename GraphType::PVertex first,
-		VertContainer &visited, Visitor visit, EdgeDirection mask, int component )
+		VertContainer &visited, Visitor visitor, EdgeDirection mask, int component )
 {
-	DFSParamBlock< GraphType,VertContainer,Visitor > params( g,visited,visit,mask,component );
 	if (g.getVertNo() == 0) return 0;
 	if (first == NULL) first = g.getVert();
-	SearchStructs::VisitVertLabs< GraphType >( NULL,NULL,0,component ).copy(visited[first]);
-	return DFSBase< SearchImpl,DefaultStructs >:: template dfsDoVisit< GraphType,VertContainer,Visitor>( params,first,0 );
+
+	int t, retVal = 0;
+	typename GraphType::PEdge e;
+	typename GraphType::PVertex u, v;
+	std::pair<typename GraphType::PVertex,
+		  typename GraphType::PEdge> LOCALARRAY(stk, g.getVertNo() + 1);
+	int sp = -1;
+
+	SearchStructs::VisitVertLabs<GraphType>(NULL, NULL, 0, component).copy(visited[first]);
+	if(!Visitors::visitVertexPre(g, visitor, first, visited[first], visitor)) return 0;
+	retVal++;
+
+	stk[++sp] = std::make_pair(first, g.getEdge(first, mask));
+
+	while(sp >= 0) {
+		u = stk[sp].first;
+		if(stk[sp].second == NULL) {
+			sp--;
+			if(!Visitors::visitVertexPost(g, visitor, u, visited[u], visitor)) return -retVal;
+			continue;
+			};
+
+		e = stk[sp].second;
+		stk[sp].second = g.getEdgeNext(u, e, mask);
+
+		if(!Visitors::visitEdgePre(g, visitor, e, u, visitor)) continue;
+
+		v = g.getEdgeEnd(e, u);
+
+		if(!visited.hasKey(v)) {
+			SearchStructs::VisitVertLabs<GraphType>(u, e, visited[u].distance + 1, component).copy(visited[v]);
+			if(!Visitors::visitVertexPre(g, visitor, v, visited[v], visitor)) continue;
+			stk[++sp] = std::make_pair(v, g.getEdge(v, mask));
+			retVal++;
+			};
+
+		if(!Visitors::visitEdgePost(g, visitor, e, u, visitor)) return -retVal;
+		}; // while(!stk.empty()
+
+	return retVal;
 }
 
 
@@ -1713,7 +1715,7 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
 	}
 	assert( ccomp > 0 && ccomp <= comp );
 
-	adjmatr.clear();
+	adjmatr.clear(); adjmatr.reserve( n );
 	makeSubgraph( g,std::make_pair( stdChoose( true ),extAssocChoose( &visited,ccomp ) ),
                                     std::make_pair(true,true)).getAdj( adjmatr,EdUndir );
 

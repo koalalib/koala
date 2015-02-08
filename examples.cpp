@@ -1072,14 +1072,14 @@ void repairMain()
 }
 
 
-bool reflClousureExamp( MyGraph& g)
+bool reflClosureExamp( MyGraph& g)
 {
     if (!g.getVert()) return false;
-    RelDiagram::reflClousure(g,"nowa");
+    RelDiagram::reflClosure(g,"nowa");
     return true;
 }
 
-void reflClousureMain()
+void reflClosureMain()
 {
             MyGraph g;
        PVertex A,B,C,D,E,F,G,H;
@@ -1088,17 +1088,17 @@ void reflClousureMain()
     g.addEdge(B,D,"bd");
    writeGraphText(g, cout, RG_VertexLists|RG_Info);
    cout << "\n****\n";
-   if (reflClousureExamp(g)) writeGraphText(g, cout, RG_VertexLists|RG_Info);
+   if (reflClosureExamp(g)) writeGraphText(g, cout, RG_VertexLists|RG_Info);
 }
 
-bool symmClousureExamp( MyGraph& g)
+bool symmClosureExamp( MyGraph& g)
 {
     if (!g.getVert()) return false;
-    RelDiagram::symmClousure(g,"nowa");
+    RelDiagram::symmClosure(g,"nowa");
     return true;
 }
 
-void symmClousureMain()
+void symmClosureMain()
 {
             MyGraph g;
        PVertex A,B,C,D,E,F,G,H;
@@ -1107,17 +1107,17 @@ void symmClousureMain()
     g.addEdge(B,D,"bd");
    writeGraphText(g, cout, RG_VertexLists|RG_Info);
    cout << "\n****\n";
-   if (symmClousureExamp(g)) writeGraphText(g, cout, RG_VertexLists|RG_Info);
+   if (symmClosureExamp(g)) writeGraphText(g, cout, RG_VertexLists|RG_Info);
 }
 
-bool transClousureExamp( MyGraph& g)
+bool transClosureExamp( MyGraph& g)
 {
     if (!g.getVert()) return false;
-    RelDiagram::symmClousure(g,"nowa");
+    RelDiagram::symmClosure(g,"nowa");
     return true;
 }
 
-void transClousureMain()
+void transClosureMain()
 {
             MyGraph g;
        PVertex A,B,C,D,E,F,G,H;
@@ -1126,7 +1126,7 @@ void transClousureMain()
     g.addEdge(B,D,"bd");
    writeGraphText(g, cout, RG_VertexLists|RG_Info);
    cout << "\n****\n";
-   if (transClousureExamp(g)) writeGraphText(g, cout, RG_VertexLists|RG_Info);
+   if (transClosureExamp(g)) writeGraphText(g, cout, RG_VertexLists|RG_Info);
 }
 
 bool undirExamp( const MyGraph &g, bool allowmulti)

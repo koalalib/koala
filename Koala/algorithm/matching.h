@@ -361,7 +361,7 @@ private:
 	}
 
 	/** \brief Find minimal edge cover.
-	 *
+	 *  WEN: tylko tu w tym module w wyniku moga tez pojawic sie petle
 	 *  The method finds a minimal edge cover of a given \a g.
 	 *  @param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
 	 *  @param[out] cover the insert iterator to the container with the list of edges of found cover.

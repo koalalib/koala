@@ -197,7 +197,7 @@ int main() {
 	gml.readFile("xyz.xml");
 	gmlg = gml.getGraph("first");
 	printf("%d %d\n", gml.getInt("graphML"), gmlg->getInt("graphType"));
-	gmlg->readGraph(g1, VertRead(), EdgeRead());
+	gmlg->readGraph(g1, VertRead(), EdgeRead()); //KG: blad
 	for(Vert vv = g1.getVert(); vv; vv = g1.getVertNext(vv)) {
 		printf("%d : ", vv->info);
 		for(Edge ee = g1.getEdge(vv); ee; ee = g1.getEdgeNext(vv, ee)) {
