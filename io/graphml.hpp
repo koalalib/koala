@@ -1049,7 +1049,7 @@ bool GraphMLGraph::readGraph(Graph &graph, BlackHole, InfoEdge infoEdge)
 			gmlData.set(keyId, val);
 			xmlKey = xmlKey->NextSiblingElement( "data" );
 		}
-		const char *id = xmlVert->Attribute( "id" );
+		const char *id = xmlEdge->Attribute( "id" );
 		if (id!=NULL) gmlData.setId(id);
 
 		const char *source = xmlEdge->Attribute( "source" );
@@ -1123,7 +1123,7 @@ bool GraphMLGraph::readGraph(Graph &graph, InfoVertex infoVert, InfoEdge infoEdg
 			gmlData.set(keyId, val);
 			xmlKey = xmlKey->NextSiblingElement( "data" );
 		}
-		const char *id = xmlVert->Attribute( "id" );
+		const char *id = xmlEdge->Attribute( "id" );
 		if (id!=NULL) gmlData.setId(id);
 
 		const char *source = xmlEdge->Attribute( "source" );
