@@ -13,7 +13,7 @@
 namespace Koala {
 
 //WEN: Uwaga! globalna! Wszedzie widze takie cudo: "If \t colors[v] < 0 we should assume that the e is not colored."
-//Nie wiem czy to prawda i g. mnie to obchodzi. Jesli jest taki ficzer, to mam wrazenie, ze samo pisanie o tym jest mylace.
+//Jesli jest taki ficzer, to mam wrazenie, ze samo pisanie o tym jest mylace.
 //Przede wszystkim: kolory - liczby int >=0, mapa kolorow - czesciowe (lub calkowite - one z reszta jest szczegolnym przypadkiem czesciowego) pokolorowanie.
 //Tzn. pokolorowane (na wej/wyj) sa te krawedzie, ktore sa kluczami w mapie, reszta nie.
 //Dalej, rozwazane sa krawedzie typow Directed|Undirected - ich rodzaj jest ignorowany (po prostu krawedzie),
@@ -37,32 +37,30 @@ public:
 	//for all methods @param colors is a map(AssocTabInterface) Graph::PEdge->int
 	//if for any edge e of the graph colors[e]<0 then we assume that e is not colored
 	/** \brief Get maximal color.
-	 * WEN: te same, co w VertColoringTest::maxColor
-	 *  The method checks what is the maximal used color.
+
+	 *  The method finds the maximal used color.
 	 *  \param graph the tested graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	 *   If <tt>colors[e] < 0</tt> we should assume that the edge \a e is not colored.
-	 *  \return the maximal used color.	 */
+	 *  \param colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
+	 *  \return the maximal used color or -1 for empty coloring. */
 	template<typename Graph, typename ColorMap>
 	static int maxColor(const Graph &graph, const ColorMap &colors);
 
 	/** \brief Test partial edge coloring.
 	 *
-	 *  The method checks if the map given by the associative container \a colors is a partial coloring of the graph. WEN: raczej podgrafu indukowanego przez pokolorowane krawedzie
-	 *  \param graph the tested graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	 *   If <tt>colors[e] < 0</tt> we should assume that the edge \a e is not colored. WEN: wiadomo co
-	 *  \return true it the partial coloring is proper, false otherwise.	 */
+	 *  The method test of the partial coloring given by the map \a colors is proper for the graph.
+	 *  \param g the considered graph
+	 *  \param colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
+	 *  \return true if the partial coloring is proper, false otherwise.
+	 */
 	template <typename Graph, typename ColorMap>
-	static bool testPart(const Graph &graph, const ColorMap &colors);
+	static bool testPart(const Graph &g, const ColorMap &colors);
 
 	/** \brief Test edge coloring.
 	 *
-	 *  The method checks if the map given by the associative container \a colors is a proper coloring of the graph.
-	 *  \param graph the tested graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	 *   If <tt>colors[e] < 0</tt> we should assume that the edge \a e is not colored. WEN: wiadomo co - - i dalej juz o tym nie pisze, licze ze bedzie posprzatane
-	 *  \return true it the coloring is proper, false otherwise.
+	 *  The method test of the coloring given by the map \a colors is proper and complete for the graph.
+	 *  \param g the considered graph
+	 *  \param colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
+	 *  \return true if the coloring is proper and complete, false otherwise.
 	 *
 	 *  [See example](examples/coloring/edgeColorGreedy.html).
 	 */
@@ -81,17 +79,19 @@ protected:
 		const int delta;
 		ColorMap &colors;
 		int maxColor;
-		const int notColored;
+		const int notColored; //color>=0 && color<notColored
 		typename DefaultStructs::template
 			AssocCont<typename Graph::PVertex, int>::Type vertToTab;
 		typename DefaultStructs::template
 			AssocCont<typename Graph::PEdge, int>::Type edgeToList;
+		//subgraph induced by 2 colors
 		int colSubgraph[2];
 		struct TabVert {
-			int vc[2];
-			typename Graph::PEdge ec[2];
-			int freeColor;
+			int vc[2]; //2 neighbors
+			typename Graph::PEdge ec[2]; //2 incident edges; ec[i] edge colored by color colSubgraph[i]
+			int freeColor; //used only in vizingSimple (for simple graphs)
 		} *tabVert;
+		//to quick create a subgraph induced by a coloring we need lists:
 		int *colorToList; //colorToList[notColored] is a list of uncolored edges
 		struct ListEdgeCol {
 			int next, prev;
@@ -109,10 +109,10 @@ protected:
 	};
 	template<typename Graph, typename ColorMap>
 	static void vizingSimple(VizingState<Graph, ColorMap> &vState,
-		typename Graph::PEdge edge);
+		typename Graph::PEdge edge, typename Graph::PVertex vert);
 	template<typename Graph, typename ColorMap>
 	static void vizing(VizingState<Graph, ColorMap> &vState,
-		typename Graph::PEdge edge);
+		typename Graph::PEdge edge, typename Graph::PVertex vert);
 
 	template< typename Graph, typename ColorMap >
 	static int colorInterchange(const Graph &graph, ColorMap &colors,
@@ -124,18 +124,15 @@ public:
 	// Vizing method for edge coloring - complexity O(nm) - n=|V|, m=|E|
 	/** \brief Vizing method for simple graphs.
 	 *
-	 *  The method colors the edges of a simple graph using the Vizing method. The complexity of the algorithm is O(nm), where n = |V| and m = |E|.
-	 *  \param graph the considered graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	 WEN: wartosci poczatkowe ignorowane, ale jeszcze dopytac AJ czy jego procedura miala wspomagac sie ew. niepustym pokolorowaniem poczatkow.ego
-	 - por. wykomentowane TODO z kodu tej procedury
-	 *   If <tt>colors[e] < 0</tt> we should assume that the edge \a e is not colored.
-	 *  \return the number of the highest used color.
+	 *  The method colors uncolored edges of a simple graph using the Vizing method. The complexity of the algorithm is O(nm), where n = |V| and m = |E|.
+	 *  \param g the considered graph.
+	 *  \param colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
+	 *  \return the maximal assigned color or -1 if the edges were already colored.
 	 *
 	 *  [See example](examples/coloring/edgeColorVizing.html).
 	 */
 	template<typename Graph, typename ColorMap>
-	static int vizingSimple(const Graph &graph, ColorMap &colors);
+	static int vizingSimple(const Graph &g, ColorMap &colors);
 
 	// Vizing method for edge coloring of multigraphs - complexity O(m(n+d^2)) - n=|V|, m=|V|, d=degree
 	/** \brief Vizing method for multigraphs.
@@ -159,11 +156,36 @@ public:
 	 *  \param graph the considered graph.
 	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
 	 *  \param edge the colored edge.
+	 *  \param vert the vertex from which it can make fan recoloring
+	 *  \return the number of used color or  -1 if \a edge was colored. WEN: i wtedy color sie nie zmienia*/
+	template <typename Graph, typename ColorMap>
+	static int vizing(const Graph &graph, ColorMap &colors,
+		typename Graph::PEdge edge, typename Graph::PVertex vert);
+
+	/** \brief Coloring of edge (Vizing method for multigraphs).
+	 *
+	 *  The method colors the edge \a edge of a multigraph \a graph using the Vizing method.
+	 *  \param graph the considered graph.
+	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
+	 *  \param edge the colored edge.
 	 *   If<tt>colors[e] < 0</tt> we should assume that the edge \a e is not colored.
 	 *  \return the number of used color or  -1 if \a edge was colored. WEN: i wtedy color sie nie zmienia*/
 	template <typename Graph, typename ColorMap>
 	static int vizing(const Graph &graph, ColorMap &colors,
 		typename Graph::PEdge edge);
+
+	/** \brief Coloring of edge (Vizing method for multigraphs).
+	 *
+	 *  The method colors the edge \a edge of a multigraph \a graph using the Vizing method. The method tries to use color not greater then \a maxCol  if necessary method recolors other edges.
+	 *  \param graph the considered graph.
+	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
+	 *  \param edge the colored edge.
+	 *  \param vert the vertex from which it can make fan recoloring
+	 *  \param maxCol the maximal color expected. WEN: belkot, o co tu chodzi?
+	 *  \return the number of used color or -1 if \a edge was colored. WEN: i wtedy color sie nie zmienia */
+	template <typename Graph, typename ColorMap>
+	static int vizing(const Graph &graph, ColorMap &colors,
+		typename Graph::PEdge edge, typename Graph::PVertex vert, int maxCol);
 
 	/** \brief Coloring of edge (Vizing method for multigraphs).
 	 *
@@ -177,112 +199,135 @@ public:
 	static int vizing(const Graph &graph, ColorMap &colors,
 		typename Graph::PEdge edge, int maxCol);
 
-	/** \brief Greedy coloring of edge.
+	/** \brief Greedy coloring of an edge.
 	 *
-	 *  The method assigns the minimal (concerning already colored edges) color to \a edge.
-	 *  \param graph the considered graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	  WEN: pok. czesciowe in/out
+	 *  The method colors uncolored \a edge with the smallest possible color (concerning colors of other edges).
+	 *  \param g the considered graph.
+	 *  \param[in,out] colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
 	 *  \param edge the colored edge.
-	 *  \return the color of colored edge or -1 if \a edge was colored. WEN: i wtedy pokolorowanie sie nie zmienia
+	 *  \return the assigned color or -1 if the edge was already colored.
 	 *
 	 *  [See example](examples/coloring/edgeColorGreedy.html).
 	 */
 	template< typename Graph, typename ColorMap >
-	static int greedy(const Graph &graph, ColorMap &colors,
+	static int greedy(const Graph &g, ColorMap &colors,
 		typename Graph::PEdge edge);
 
-	/** \brief Greedy coloring of edge.
-	 *  WEN: te same co w SeqVertColoringPar::greedyInter(const Graph &graph, ColorMap &colors,typename Graph::PVertex);
-	 *  The method assigns the minimal (concerning already colored edges) color to \a edge. It attempts not to use color greater than maximal already used. If it is not possible, other edges are tried to be recolored.
-	 *  \param graph the considered graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
+	/** \brief Greedy coloring of an edge (with interchanges).
+	 *
+	 *  The method colors uncolored edge with the smallest possible color (concerning colors of other edges).
+	 *  The method tries to assign only colors from the set of already used colors.
+	 *  If not possible, recolorings are introduced.
+	 *  If recolorings fail i.e. each color lower or equal than the maximal is forbidden then a new color will set to the edge.
+	 *  \param g the considered graph
+	 *  \param[in,out] colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
 	 *  \param edge the colored edge.
-	 *  \return the color of colored edge or -1 if \a edge was colored.*/
+	 *  \return the assigned color or -1 if the edge was already colored.
+	 */
 	template<typename Graph, typename ColorMap>
 	static int greedyInter(const Graph &graph, ColorMap &colors,
 		typename Graph::PEdge edge);
 
-	/** \brief Greedy coloring of edge.
-	 * WEN: te same co w SeqVertColoringPar::greedyInter(const Graph &graph, ColorMap &colors,typename Graph::PVertex,int);
-	 *  The method assigns the minimal (concerning already colored edges) color to \a edge. If attempts not to use color greater than \a maxCol.  If not possible the method tries to recolor other edges as long as the assigned color is greater then the maximal one already used on other edge.
-	 *  \param graph the considered graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer numbers) to edges.
+	/** \brief Greedy coloring of an edge (with interchanges).
+	 *
+	 *  The method colors uncolored edge with the smallest possible color (concerning colors of other edges).
+	 *  The method tries to assign only colors smaller or equal than \a maxCol.
+	 *  If not possible, recolorings are introduced.
+	 *  If recolorings fail i.e. each color lower or equal than \a maxCol is forbidden then a new color will set to the edge.
+	 *  \param g the considered graph
+	 *  \param[in,out] colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
 	 *  \param edge the colored edge.
-	 *  \param maxCol the maximal expected color.
-	 *  \return the color of the colored edge or -1 if \a edge was colored.*/
+	 *  \param maxCol threshold for the interchange feature.
+	 *  \return the assigned color or -1 if the edge was already colored.
+	 */
 	template< typename Graph, typename ColorMap >
 	static int greedyInter(const Graph &graph, ColorMap &colors,
 		typename Graph::PEdge edge, int maxCol);
 
 	/** \brief Greedy coloring of edges.
-	 * WEN: te same co w SeqVertColoringPar::greedy(const Graph &graph, ColorMap &colors, beg, end);
-	 *  The method assigns the minimal (concerning already colored edges) colors to the edge sequence given by iterators \a beg and \a end.
-	 *  \param graph the considered graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	 *  \param beg the iterator of the first element in the container with edges to be colored.
-	 *  \param end the iterator of the past-the-end element in the container with edges to be colored.
-	 *  \return the maximal used color or -1 if all edges from container were colored.
-	 *  WEN: Metoda odporna na powtorzenia elementow zakresu (kolejne wystapienia ignorowane) oraz elementy pokolorowane wstepnie jeszcze przed jej uruchomieniem (takie wystapienia ignorowane)
+	 *
+	 *  The method colors uncolored edges from the sequence with the smallest possible color (concerning colors of other edges).
+	 *  \param g the considered graph
+	 *  \param[in,out] colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
+	 *  \param beg the first element in the sequence of edges.
+	 *  \param end the past-the-end element in the sequence of edges.
+	 *  \return the maximal assigned color or -1 if the edges were already colored. WEN: dla przedzialu pustego po prostu
+	 jw* WEN: Metoda odporna na powtorzenia elementow zakresu (kolejne wystapienia ignorowane) oraz elementy pokolorowane wstepnie jeszcze przed jej uruchomieniem (takie wystapienia ignorowane)
 	 *  [See example](examples/coloring/edgeColorGreedy.html).
 	 */
 	template< typename Graph, typename ColorMap, typename EInIter >
-	static int greedy(const Graph &graph, ColorMap &colors,
+	static int greedy(const Graph &g, ColorMap &colors,
 		EInIter beg, EInIter end);
 
-	/** \brief Greedy coloring of edges.
-	 *  WEN: te same co w SeqVertColoringPar::greedyInter(const Graph &graph, ColorMap &colors,beg, end);
-	 * The method assigns the minimal (concerning already colored edges) colors to edge from the sequence given by the iterators \a beg and \a end. It attempts not to use color greater than the maximal already used one.  If it is not possible already colored edges are tried to be recolored.
-	 *  \param graph the considered graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer numbers) to edges.
-	 *  \param beg the iterator of the first element in the container with edges to be colored.
-	 *  \param end the iterator of the past-the-end element in the container with edges to be colored.
-	 *  \return the maximal used color or -1 if all edges from container were colored.  */
+	/** \brief Greedy coloring of edges (with interchanges).
+
+	 *  The method colors uncolored edges from the sequence with the smallest possible color (concerning colors of other edges).
+	 *  The method tries to assign only colors from the set of already used colors.
+	 *  Each time if it is not possible, recolorings are introduced.
+	 *  If recolorings don't create a free color lower or equal than the maximal a new color is set to the edge.
+	 *  \param g the considered graph
+	 *  \param[in,out] colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
+	 *  \param beg the first element in the sequence of edges.
+	 *  \param end the past-the-end element in the sequence of edges.
+	 *  \return the maximal assigned color or -1 if the edges were already colored.
+	 */
 	template< typename Graph, typename ColorMap, typename EInIter >
 	static int greedyInter(const Graph &graph, ColorMap &colors,
 		EInIter beg, EInIter end);
 
-	/** \brief Greedy coloring of edges.
-	 * WEN: te same co w SeqVertColoringPar::greedyInter(const Graph &graph, ColorMap &colors,beg, end,int);
-	 * The method assigns the minimal (concerning already colored edges) colors to the edge sequence given by iterators \a beg and \a end. It attempts not to use color greater than \a maxCol. If not possible the method try to recolor other edges as long as the color assigned to \a edge is greater than the maximal color of already colored edges.
-	 *  \param graph the considered graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	 *  \param beg the iterator of the first element in the container with edges to be colored.
-	 *  \param end the iterator of the past-the-end element in the container with edges to be colored.
-	 *  \param maxCol the maximal expected color.
-	 *  \return the maximal used color or -1 if all the edges from container were colored.  */
+	/** \brief Greedy coloring of edges (with interchanges).
+
+	 *  The method colors uncolored edges from the sequence with the smallest possible color (concerning colors of other edges).
+	 *  The method tries to assign only colors not greater than \a maxCol.
+	 *  Each time if it is not possible, recolorings are introduced.
+	 *  If recolorings don't create a free color lower or equal than \a maxCol a new color is set to the edge.
+	 *  \param g the considered graph
+	 *  \param[in,out] colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
+	 *  \param beg the first element in the sequence of edges.
+	 *  \param end the past-the-end element in the sequence of edges.
+	 *  \param maxCol threshold for the interchange feature.
+	 *  \return the maximal assigned color or -1 if the edges were already colored.
+	 */
 	template< typename Graph, typename ColorMap, typename EInIter >
 	static int greedyInter(const Graph &graph, ColorMap &colors,
 		EInIter beg, EInIter end, int maxCol);
 
-	/** \brief Greedy edge coloring.
-	 *  WEN: przedluza podane pokolorowanie czesciowe (lub puste) na caly graf
-	 *  The method assigns the minimal (concerning already colored edges) colors to the edges.
-	 *  \param graph the considered graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	 *  \return the maximal used color or -1 if all edges from container were colored.
+	/** \brief Greedy coloring of edges.
+
+	 *  The method colors uncolored edges from the graph with the smallest possible color (concerning colors of other edges).
+	 *  \param g the considered graph
+	 *  \param[in,out] colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
+	 *  \return the maximal assigned color or -1 if the edges were already colored.
 	 *
 	 *  [See example](examples/coloring/edgeColorGreedy.html).
 	 */
 	template< typename Graph, typename ColorMap >
 	static int greedy(const Graph &graph, ColorMap &colors);
 
-	/** \brief Greedy edge coloring with interchange.
-	 * WEN: te same co w SeqVertColoringPar::greedyInter(const Graph &graph, ColorMap &colors);
-	 *  The method assigns the minimal (concerning already colored edges) colors to the edges. The method tries not to use a color greater than the already used one if not possible recoloring is introduced.
-	 *  \param graph the considered graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	 *  \return the maximal used color or -1 if all the edges were colored. */
+	/** \brief Greedy coloring of edges (with interchanges).
+	 *
+	 *  The method colors uncolored edges from the graph with the smallest possible color (concerning colors of other edges).
+	 *  The method tries to assign only colors from the set of already used colors.
+	 *  Each time if it is not possible, recolorings are introduced.
+	 *  If recolorings don't create a free color lower or equal than the maximal a new color is set to the edge.
+	 *  \param g the considered graph
+	 *  \param[in,out] colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
+	 *  \return the maximal assigned color or -1 if the edges were already colored.
+	 */
 	template< typename Graph, typename ColorMap >
 	static int greedyInter(const Graph &graph, ColorMap &colors);
 
-	/** \brief Greedy edge coloring with interchange.
-	 *  WEN: te same co w SeqVertColoringPar::greedyInter(const Graph &graph, ColorMap &colors,int);
-	 *  The method assigns the minimal (concerning already colored edges) colors to all edges. It tries not to use a color greater than maxCol if it is not possible recoloring is introduced.
-	 *  \param graph the considered graph.
-	 *  \param colors the associative table (PEdge->int) that associates colors (integer nonnegative numbers) to edges.
-	 *  \param maxCol the maximal color.
-	 *  \return the maximal used color or -1 if all the edges were colored. */
+	/** \brief Greedy coloring of edges (with interchanges).
+	 *
+	 *  The method colors uncolored edges from the graph with the smallest possible color (concerning colors of other edges).
+	 *  The method tries to assign only colors not greater than \a maxCol.
+	 *  Each time if it is not possible, recolorings are introduced.
+	 *  If recolorings don't create a free color lower or equal than \a maxCol a new color is set to the edge.
+	 *  \param g the considered graph
+	 *  \param[in,out] colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
+	 *  \param maxCol threshold for the interchange feature.
+	 *  \return the maximal assigned color or -1 if the edges were already colored.
+	 */
 	template< typename Graph, typename ColorMap >
 	static int greedyInter(const Graph &graph, ColorMap &colors,
 		int maxCol);
