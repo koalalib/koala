@@ -97,7 +97,7 @@ VizingState(const Graph &g, ColorMap &c, int maxCol):
 	for(int i=0; i<notColored; i++)
 		colorToList[i] = 0;
 	colorToList[notColored] = 1;
-	ii=1; //we assume that colors are not set to any edge
+	ii = 1; //we assume that colors are not set to any edge
 	for(Edge ee = graph.getEdge(Mask); ee;
 		ee = graph.getEdgeNext(ee, Mask), ii++)
 	{
@@ -107,6 +107,8 @@ VizingState(const Graph &g, ColorMap &c, int maxCol):
 		listEdgeCol[ii].edge = ee;
 	}
 	listEdgeCol[ii-1].next = 0;
+	if(ii==1) //if the graph is empty
+		colorToList[notColored] = 0;
 	if(colors.size()<=0) return;
 
 	for(Edge ee = graph.getEdge(Mask); ee;
@@ -137,7 +139,7 @@ setColor(typename Graph::PEdge edge, int color)
 {
 	int oldColor = notColored;
 	if(colors.hasKey(edge)) {
-		oldColor = colors[edge];
+		oldColor = colors[edge]; //jendrek: niepoprawne, gdy oldColor>=notColored
 		if(oldColor<0 || notColored<=oldColor)
 			oldColor = notColored;
 	}
@@ -148,6 +150,7 @@ template <class DefaultStructs> template<typename Graph, typename ColorMap>
 void SeqEdgeColoringPar<DefaultStructs>::VizingState<Graph,ColorMap>::
 changeColor(typename Graph::PEdge edge, int oldColor, int newColor)
 {
+	//assert(color[edge]==oldColor); //jendrek
 	int id = edgeToList[edge];
 	int next = listEdgeCol[id].next;
 	int prev = listEdgeCol[id].prev;
@@ -208,7 +211,7 @@ altPathRecoloring(int ivert, int col)
 	typedef typename Graph::PEdge Edge;
 	int iCol = (col==colSubgraph[0]) ? 0 : 1;
 	assert(colSubgraph[iCol]==col);
-	assert(tabVert[ivert].vc[iCol^1]<0); //it's a begining of the alternating path
+	assert(tabVert[ivert].vc[iCol^1]<0); //it's a beginning of the alternating path
 
 	tabVert[ivert].freeColor = colSubgraph[iCol];
 	if(tabVert[ivert].vc[iCol]>=0) {
@@ -231,7 +234,7 @@ template<class DefaultStructs>
 template<typename Graph, typename ColorMap>
 void SeqEdgeColoringPar<DefaultStructs>::vizingSimple(
 	VizingState<Graph, ColorMap> &vState,
-	typename Graph::PEdge edge)
+	typename Graph::PEdge edge, typename Graph::PVertex vert1)
 {
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
@@ -244,8 +247,7 @@ void SeqEdgeColoringPar<DefaultStructs>::vizingSimple(
 	Edge LOCALARRAY(colorsToEdge2, vState.notColored);
 	Edge LOCALARRAY(fan, degree); //as in Vizing's proof (colors that are used in fan)
 
-	Vert vert1 = vState.graph.getEdgeEnd1(edge);
-	Vert vert2 = vState.graph.getEdgeEnd2(edge);
+	Vert vert2 = edge->getEnd(vert1);
 	int idVert1 = vState.vertToTab[vert1];
 	int idVert2 = vState.vertToTab[vert2];
 
@@ -385,7 +387,7 @@ template<class DefaultStructs>
 template<typename Graph, typename ColorMap>
 void SeqEdgeColoringPar<DefaultStructs>::vizing(
 	VizingState<Graph, ColorMap> &vState,
-	typename Graph::PEdge edge)
+	typename Graph::PEdge edge, typename Graph::PVertex vertX)
 {
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
@@ -401,8 +403,7 @@ void SeqEdgeColoringPar<DefaultStructs>::vizing(
 	Edge LOCALARRAY(fan, degree); //as in Vizing's proof (edges that are used in fan)
 	int fanLen, ii;
 
-	Vert vertX = vState.graph.getEdgeEnd1(edge);
-	Vert vertY = vState.graph.getEdgeEnd2(edge);
+	Vert vertY = edge->getEnd(vertX);
 	int idVertX = vState.vertToTab[vertX];
 
 	for(ii=0; ii<=vState.maxColor; ii++)
@@ -529,7 +530,7 @@ int SeqEdgeColoringPar<DefaultStructs>::colorInterchange(const Graph &graph, Col
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 
-	int oldColor = colors[ edge ];
+	int oldColor = colors[ edge ]; //oldColor is maximal color in the graph
 	colors.delKey( edge );
 
 	Vert vert1 = graph.getEdgeEnd1(edge);
@@ -606,7 +607,6 @@ int SeqEdgeColoringPar<DefaultStructs>::vizingSimple(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	colors.clear();
 	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 
 	int degree = graph.Delta(Mask);
@@ -614,43 +614,25 @@ int SeqEdgeColoringPar<DefaultStructs>::vizingSimple(const Graph &graph,
 
 	int LOCALARRAY(tmpTab, vState.notColored);
 
-	//freeColor set
-
-//TODO: AJ: wykomentowalem, ale po co to bylo?
-//	if(colors.size()>0) { //tmpTab - is used to checking free color availability
-//
-//		for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
-//
-//			for(int i=0; i<vState.notColored; i++)
-//
-//				tmpTab[i] = 0;
-//
-//			for(Edge ee=graph.getEdge(vv, Mask); ee;
-//
-//				ee = graph.getEdgeNext(vv, ee, Mask))
-//
-//			{
-//
-//				if(!colors.hasKey(ee)) continue;
-//
-//				int tmpCol = colors[ee];
-//
-//				if(tmpCol<0 || tmpCol>=vState.notColored) continue;
-//
-//				tmpTab[ tmpCol ] = 1;
-//
-//			}
-//
-//			int i=0;
-//
-//			while(i<vState.notColored && tmpTab[i]==1) i++;
-//
-//			vState.tabVert[ vState.vertToTab[vv] ].freeColor = i;
-//
-//		}
-//
-//	}
-
+	//tmpTab - is used for checking free color availability
+	if(colors.size()>0) {
+		//for each vertex checks the free color availability (freeColor)
+		for(Vert vv = graph.getVert(); vv; vv = graph.getVertNext(vv)) {
+			for(int i=0; i<vState.notColored; i++)
+				tmpTab[i] = 0;
+			for(Edge ee=graph.getEdge(vv, Mask); ee;
+				ee = graph.getEdgeNext(vv, ee, Mask))
+			{
+				if(!colors.hasKey(ee)) continue;
+				int tmpCol = colors[ee];
+				if(tmpCol<0 || tmpCol>=vState.notColored) continue;
+				tmpTab[ tmpCol ] = 1;
+			}
+			int i=0;
+			while(i<vState.notColored && tmpTab[i]==1) i++;
+			vState.tabVert[ vState.vertToTab[vv] ].freeColor = i;
+		}
+	}
 
 	//init edges by degree colors
 	int ii;
@@ -703,7 +685,7 @@ int SeqEdgeColoringPar<DefaultStructs>::vizingSimple(const Graph &graph,
 	int idFree;
 	while( (idFree=vState.colorToList[vState.notColored])>0 ) {
 		Edge ee = vState.listEdgeCol[idFree].edge;
-		vizingSimple(vState, ee);
+		vizingSimple(vState, ee, ee->getEnd1());
 	}
 	return vState.maxColor;
 }
@@ -716,7 +698,7 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 	typedef typename Graph::PVertex Vert;
 	typedef typename Graph::PEdge Edge;
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
-	colors.clear(); colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
+	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int degree = graph.Delta(Mask);
 	int mu = makeSubgraph(graph, std::make_pair(stdChoose(true), !edgeTypeChoose(Loop))).mu();
 	VizingState<Graph, ColorMap> vState(graph, colors, degree+mu);
@@ -727,7 +709,7 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 	int idFree;
 	while( (idFree=vState.colorToList[vState.notColored])>0 ) {
 		Edge ee = vState.listEdgeCol[idFree].edge;
-		vizing(vState, ee);
+		vizing(vState, ee, ee->getEnd1());
 	}
 	return vState.maxColor;
 }
@@ -735,7 +717,7 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 template<class DefaultStructs>
 template<typename Graph, typename ColorMap>
 int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
-	ColorMap &colors, typename Graph::PEdge edge)
+	ColorMap &colors, typename Graph::PEdge edge, typename Graph::PVertex vert)
 {
 	if(colors.hasKey(edge)&&colors[edge]>=0)
 		return -1;
@@ -750,14 +732,23 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 		vState.maxColor = degree-1;
 
 	//edge coloring
-	vizing(vState, edge);
+	vizing(vState, edge, vert);
 	return colors[edge];
 }
 
 template<class DefaultStructs>
 template<typename Graph, typename ColorMap>
 int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
-	ColorMap &colors, typename Graph::PEdge edge, int maxCol)
+	ColorMap &colors, typename Graph::PEdge edge)
+{
+	return vizing(graph, colors, edge, edge->getEnd1());
+}
+
+template<class DefaultStructs>
+template<typename Graph, typename ColorMap>
+int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
+	ColorMap &colors, typename Graph::PEdge edge,
+	typename Graph::PVertex vert, int maxCol)
 {
 	if(colors.hasKey(edge)&&colors[edge]>=0)
 		return -1;
@@ -771,8 +762,16 @@ int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
 	vState.maxColor = maxCol;
 
 	//edge coloring
-	vizing(vState, edge);
+	vizing(vState, edge, vert);
 	return colors[edge];
+}
+
+template<class DefaultStructs>
+template<typename Graph, typename ColorMap>
+int SeqEdgeColoringPar<DefaultStructs>::vizing(const Graph &graph,
+	ColorMap &colors, typename Graph::PEdge edge, int maxCol)
+{
+	return vizing(graph, colors, edge, edge->getEnd1(), maxCol);
 }
 
 template<class DefaultStructs>
@@ -840,7 +839,7 @@ template< typename Graph, typename ColorMap, typename EInIter >
 int SeqEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph, ColorMap &colors,
 	EInIter beg, EInIter end)
 {
-    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int locMax = -1;
 	while (beg != end) {
 		int col = greedy(graph, colors, *beg++);
@@ -855,7 +854,7 @@ template< typename Graph, typename ColorMap, typename EInIter >
 int SeqEdgeColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors,
 	EInIter beg, EInIter end)
 {
-    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int locMax = -1, maxCol = SeqEdgeColoringPar<DefaultStructs>::maxColor(graph, colors);
 	while(beg != end) {
 		int col = greedyInter(graph , colors, *beg++, maxCol);
@@ -870,7 +869,7 @@ template< typename Graph, typename ColorMap, typename EInIter >
 int SeqEdgeColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors,
 	EInIter beg, EInIter end, int maxCol)
 {
-    if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
+	if (DefaultStructs::ReserveOutAssocCont) colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	int locMax = -1;
 	while(beg != end) {
 		int col = greedyInter(graph, colors, *beg++, maxCol);
@@ -884,7 +883,7 @@ template<class DefaultStructs>
 template< typename Graph, typename ColorMap >
 int SeqEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph, ColorMap &colors)
 {
-    colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
+	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int locMax = -1;
 	for(typename Graph::PEdge ee = graph.getEdge(Mask); ee;
@@ -900,7 +899,7 @@ template<class DefaultStructs>
 template< typename Graph, typename ColorMap >
 int SeqEdgeColoringPar<DefaultStructs>::greedyInter(const Graph &graph, ColorMap &colors)
 {
-    colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
+	colors.reserve(graph.getEdgeNo(EdDirIn|EdDirOut|EdUndir));
 	const EdgeDirection Mask = EdDirIn|EdDirOut|EdUndir;
 	int locMax = -1, maxCol = SeqEdgeColoringPar<DefaultStructs>::maxColor(graph, colors);
 	for(typename Graph::PEdge ee = graph.getEdge(Mask); ee;
