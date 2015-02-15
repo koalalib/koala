@@ -131,6 +131,8 @@ int xxx=0;
 
     AssocTable< BiDiHashMap<Vert*,std::string> > ha(10);
 
+ AssocTable< BiDiHashMap<Vert*,std::string> > hha;
+ hha.reserve(5);
 
 
     t(ha);
