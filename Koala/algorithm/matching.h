@@ -319,7 +319,7 @@ private:
 	 *
 	 *  In graph \a g the matching of given size is found. If \a matchSize greater then maximal or default value (-1) the maximum matching is found.
 	 *  @param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
-	 *  @param[out] vertTab an associative container from PVertex to VertLabs, which keeps matched edges and vertices. 
+	 *  @param[out] vertTab an associative container from PVertex to VertLabs, which keep matched edges and vertices. 
 	 *  If vertex is unmatched it is assumed that it is matched with NULLs. (BlackHole possible).
 	 *  @param[out] matching the insert iterator to the container with list of edges in found matching.
 	 *  @param[in] matchSize the desired size of a matching, leave out, set -1 or big (greater then maximal) for a maximum.
@@ -336,12 +336,13 @@ private:
 		return matchingTool(g, vertTab, edges, edges, matching, matchSize, false);
 	}
 
-	/** \brief Find matching.
+	/** \brief Find (extend to) maximum matching.
 	 *
 	 *  The method finds matching extending the given on. The matching is of size \a matchSize or maximum (is smaller or for default \a matchSize) 
 	 *  The initial matching is passed to function via iterators \a initialBegin and \a initialEnd (past-the-last). 
 	 *  \param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
-	 *  \param[out] vertTab an associative container from PVertex to VertLabs which keeps matched edges and vertices. If vertex is unmatched it is assumed that it is matched with NULLs. (BlackHole possible).
+	 *  \param[out] vertTab an associative container from PVertex to VertLabs which keep matched edges and vertices. 
+	 *  If vertex is unmatched it is assumed that it is matched with NULLs. (BlackHole possible).
 	 *  @param[in] initialBegin the iterator to the beginning of given initial matching  (list of edges).
 	 *  @param[in] initialEnd the iterator to the past-the-end element of given initial matching  (list of edges).
 	 *  @param[out] matching the insert iterator to container with the list of edges in found matching.
@@ -379,13 +380,12 @@ private:
 	 *  
 	 *  Fast but inaccurate procedure searches greedily for a maximum (in the sense of inclusion) matching. May be used for example as a first for augmenting paths algorithm.
 	 *  \param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
-	 *  \param[out] avertTab an associative container from PVertex to VertLabs which keeps matched edges and vertices. It is assumed that unmatched vertices match NULLs. (BlackHole possible).
+	 *  \param[out] avertTab an associative container from PVertex to VertLabs which keep matched edges and vertices. It is assumed that unmatched vertices match NULLs. (BlackHole possible).
 	 *  @param[out] edgeIterOut the insert iterator to the container with the edges of found matching.
 	 *  @param[in] matchSize the desired size of a matching, leave out or -1 for a maximum.
 	 *  @return  the size of found matching.
 	 *
-	 *  [See example](examples/matching/matching_greedy.html).
-	 */
+	 *  [See example](examples/matching/matching_greedy.html). */
 	template< class GraphType, class VertContainer, class EIterOut > static int greedy( const GraphType &g,
 		VertContainer &avertTab, EIterOut edgeIterOut, int matchSize = -1 );
 	// wlasciwa procedura - zachlannie szuka skojarzenia, rozwarzajac krawedzie podane na wejsciu
@@ -393,15 +393,14 @@ private:
 	 *
 	 *  The method searches greedily for a matching in the graph \a g. The edges are taken form the sequence given by iterators \a edgeIterInBegin and \a edgesiIterInEnd.
 	 *  \param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
-	 *  \param[out] avertTab an associative container from PVertex to VertLabs which keeps matched edges and vertices. It is assumed that unmatched vertices match NULLs. (BlackHole possible).
+	 *  \param[out] avertTab an associative container from PVertex to VertLabs which keep matched edges and vertices. It is assumed that unmatched vertices match NULLs. (BlackHole possible).
 	 *  \param[in] edgeIterInBegin the iterator to the first element of the edge sequence used by the greedy algorithm.
 	 *  \param[in] edgeIterInEnd the iterator to the past-the-end element of the edge sequence used by the greedy algorithm.
 	 *  @param[out] edgeIterOut the insert iterator to the container with the edges of found matching.
 	 *  @param[in] matchSize the desired size of a matching, leave out or set to -1 for a maximum.
 	 *  @return  the size of found matching.
 	 *
-	 *  [See example](examples/matching/matching_greedy.html).
-	 */
+	 *  [See example](examples/matching/matching_greedy.html). */
 	template< class GraphType, class VertContainer, class EIterIn, class EIterOut > static int greedy(
 		const GraphType &g, VertContainer &avertTab, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd,
 		EIterOut edgeIterOut, int matchSize = -1 );
@@ -415,8 +414,7 @@ private:
 	 *  \param edgeIterInEnd the iterator to the past-the-end element of the container with the edges of tested set.
 	 *  \return true if the edge set form a matching, false otherwise.
 	 *
-	 *  [See example](examples/matching/matching_test.html).
-	 */
+	 *  [See example](examples/matching/matching_test.html). */
 	template< class GraphType, class EIterIn > static bool test( const GraphType &g, EIterIn edgeIterInBegin,
 		EIterIn edgeIterInEnd );
 };
@@ -459,7 +457,7 @@ private:
         //podawanie porzadkow (preferencji) krawedzi przy wierzcholkach
 		/**\brief Function object comparing edges.
 		 *
-		 * The auxiliary functor comparing edges incident to common vertex. */
+		 * The auxiliary functor comparing edges incident to common vertex. It compares integers associated with each edge end.*/
 		template <class GraphType>
 		class CompEdgeCont {
 
