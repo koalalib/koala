@@ -416,9 +416,6 @@ namespace Koala
 				const VertContainer &vertTab );
 	};
 
-	/*
-	* Max independent set.
-	*/
 	/** \brief Maximal independent set heuristics (default).
 	 *
 	 *  Class for max independent set.
@@ -429,16 +426,6 @@ namespace Koala
 	 *
 	 *  \ingroup DMmis */
 	class MaxStableHeur: public MaxStableHeurPar< Koala::AlgsDefaultSettings > {};
-
-    /*
-    * Class for maximum independent set - exact algorithm.
-    *
-    * Based on:
-    * F. V. Fomin, F. Grandoni i D. Kratsch.
-    * Measure & conquer: A simple O(2^0.288n) independent set algorithm.
-    * ACM-SIAM Symposium on Discrete Algorithms (SODA), 18–25, 2006.
-    *
-    */
 
     class LocalGrAdjMatrSettings : public AlgsDefaultSettings
 	{
@@ -452,9 +439,12 @@ namespace Koala
 
 	};
 
-	/**\brief Maximum stable set.
+	/**\brief Maximum stable set exact algorithm.
 	 *
-	 * The class provides some non-polynomial time algorithm for stable (independent) set problem. */
+	 * The class provides some non-polynomial time exact algorithm for stable (independent) set problem.
+	 *
+	 *  Based on: F. V. Fomin, F. Grandoni, D. Kratsch: Measure & conquer: A simple O(2^0.288n) independent set algorithm.
+     *  ACM-SIAM Symposium on Discrete Algorithms (SODA), 18–25, 2006.*/
     template< class DefaultStructs > class MaxStablePar : private MaxStableHeurPar<DefaultStructs>
     {
       public:
@@ -504,28 +494,75 @@ namespace Koala
 			isFoldable( const GraphType &g, typename GraphType::PVertex v );
     };
 
-    /**\brief Maximum stable set.
+    /**\brief Maximum stable set exact algorithm (default settings).
 	 *
-	 * The class provides some non-polynomial time algorithm for stable (independent) set problem. */
+	 * The class provides some non-polynomial time exact algorithm for stable (independent) set problem.
+	 *
+	 *  Based on: F. V. Fomin, F. Grandoni, D. Kratsch: Measure & conquer: A simple O(2^0.288n) independent set algorithm.
+     *  ACM-SIAM Symposium on Discrete Algorithms (SODA), 18–25, 2006.
+	 * \sa MaxStablePar */
     class MaxStable: public MaxStablePar< Koala::LocalGrAdjMatrSettings > {};
     //class MaxStable: public MaxStablePar< Koala::AlgsDefaultSettings > {};
 
 
-    template< class DefaultStructs > class MaxCliqueHeurPar
+    /** \brief Maximum clique heuristics (parametrized).
+	 *
+	 *  Class provides heuristic approach to maximum clique problem.
+	 *
+	 *  Contains methods for two main templates: WMIN and WMAX.
+	 *  
+	 *  \ingroup DMmis */
+	template< class DefaultStructs > class MaxCliqueHeurPar
 	{
 	public:
 
+		/** \brief Search maximum clique (WMin technique).
+		 *
+		 *  The method searches for maximum clique by searching maximal independent set with method MaxStablePar::getWMin in negated graph. 
+		 *  \param g the considered graph. Any type of graph is allowed. 
+		 *   Mind that arcs are treated as undirected edges and loops are ignored. 
+		 *  \param out the iterator to the container with the output set of vertices (clique).
+		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
+		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
+		 *  \return the number of vertices in the output set \a out.*/
 		template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
 			static unsigned getWMin( const GraphType &g, OutputIterator out, ChoiceFunction choose,
 				const VertContainer & vertTab );
-
+		
+		/** \brief Search maximum clique (WMin technique).
+		 *
+		 *  The method searches for maximum clique by searching maximal independent set with method MaxStablePar::getWMax in negated graph. 
+		 *  \param g the considered graph. Any type of graph is allowed. 
+		 *   Mind that arcs are treated as undirected edges and loops are ignored. 
+		 *  \param out the iterator to the container with the output set of vertices (clique).
+		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
+		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
+		 *  \return the number of vertices in the output set \a out.*/
 		template< class GraphType, class OutputIterator, class ChoiceFunction, class VertContainer >
 			static unsigned getWMax( const GraphType &g, OutputIterator out, ChoiceFunction choose,
 				const VertContainer &vertTab );
 
+		/** \brief Test if clique
+		 *
+		 * The method tests if the vertices from container given by iterators \a first and \a last form a clique.
+		 *  \param g     - graph to process
+		 *  \param first - first vertex from the potential clique
+		 *  \param last  - past-the-last vertex from the potential clique
+		 *  \return true is the given set is a clique, false otherwise. */
 		template< class GraphType, typename Iterator >
 			static bool test( const GraphType &g, Iterator first, Iterator last );
 
+		/** \brief Test if maximal clique.
+		 *
+		 *  The method tests if the vertices form container given by iterators \a first and \a last are maximal clique. 
+		 *  I.e. if there exists a vertex outside the container that is incident with all vertices from container.
+		 *  If \a stabilitytest is set false, it is assumed that vertices form container  form clique and the method only test if that set 
+		 *  can be extended.
+		 *  \param g     - graph to process
+		 *  \param first - first vertex from the container 
+		 *  \param last  - past-the-last element of the container.
+		 *  \param stablilitytest - Boolean flag that decides if vertices form container are tested for being clique.
+		 *  \return true is the given set is a maximal clique, false otherwise. */
 		template< class GraphType, typename Iterator >
 			static bool testMax( const GraphType &g, Iterator first, Iterator last, bool stabilitytest=true );
 
@@ -550,25 +587,56 @@ namespace Koala
 	};
 
 //	class MaxCliqueHeur: public MaxCliqueHeurPar< Koala::AlgsDefaultSettings > {};
+	/** \brief Maximum clique heuristics (default algorithms settings).
+	 *
+	 *  Class provides heuristic approach to maximum clique problem.
+	 *
+	 *  Contains methods for two main templates: WMIN and WMAX.
+	 *  
+	 *  \ingroup DMmis */
 	class MaxCliqueHeur: public MaxCliqueHeurPar< Koala::LocalGrAdjMatrSettings > {};
 
-    //NEW:
+	/**\brief Maximum clique exact algorithm (parameterized).
+	 *
+	 * The class provides non-polynomial exact algorithm for maximum clique problem.  
+	 * The used approach searches maximum stable set (See MaxStablePar) in negated graph.
+	 * \sa MaxStablePar*/
     template< class DefaultStructs > class MaxCliquePar : private MaxCliqueHeurPar<DefaultStructs>
     {
       public:
 
-        //NEW: zmiana nazwy get    -> findMax
-        template< class GraphType, class OutputIterator > static int
+		/**\brief Find maximum clique.
+		 *
+		 * The method determines maximum clique by searching independent set in negated graph. 
+		 * Maximum stable set is found with method MaxStablePar::findMax. Mind that method is non-polynomial.
+		 *  \param g  graph to process
+		 *  \param out insert iterator to the output clique.
+		 *  \param minSize the method stops and returns -1 if it recognizes that minSize is unachievable.
+		 *  \return the number of vertices in the maximum independent set or -1 if there is no clique of size \a minSize.*/
+		template< class GraphType, class OutputIterator > static int
             findMax( GraphType & g, OutputIterator out, int minSize = 0);
-        //NEW: zmiana nazwy getSome    -> findSome
-        template< class GraphType, class OutputIterator > static int
+
+		/** \brief Find clique of size at least \a minSize.
+		 *
+		 *  The method finds clique not smaller then \a minSize, however it is non-polynomial.
+		 *  \param g  graph to process
+		 *  \param out insert iterator to the output clique.
+		 *  \param minSize the method stops and returns -1 if it recognizes that minSize is unachievable.
+		 *  \return the number of vertices in the found clique or -1 if there is no clique of size  \a minSize.*/
+		template< class GraphType, class OutputIterator > static int
             findSome( GraphType & g, OutputIterator out, int minSize);
 
             using MaxCliqueHeurPar<DefaultStructs>::test;
             using MaxCliqueHeurPar<DefaultStructs>::testMax;
     };
 
-    class MaxClique: public MaxCliquePar< Koala::LocalGrAdjMatrSettings > {};
+    
+	/**\brief Maximum clique exact algorithm (default algorithm settings).
+	 *
+	 * The class provides non-polynomial exact algorithm for maximum clique problem.  
+	 * The used approach searches maximum stable set (See MaxStablePar) in negated graph.
+	 * \sa MaxStablePar*/
+	class MaxClique: public MaxCliquePar< Koala::LocalGrAdjMatrSettings > {};
     //class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
 
     //NEW:
