@@ -254,7 +254,6 @@ namespace Koala
 		/** \brief Solve -|prec|C<sub>max</sub>.
 		 *
 		 *  For a given sequence of task and precenence constraints (directed acyclic graph) the method finds the schedule using critical path method.
-		 *  \tparam 
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned vertex
