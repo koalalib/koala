@@ -258,7 +258,7 @@ namespace Koala
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned vertex
 		 *  and precedence is determined by arcs. 
-		 *  \param[out] schedule the iterator to the container with TaskWindow, that gives output schedule i.e. 
+		 *  \param[out] schedule the iterator to the container with SchedulingStructs::TaskWindow, that gives output schedule i.e. 
 		 *  The container on i-th position stores i-th task possible time of execution.
 		 *  \return the makespan.
 		 *
