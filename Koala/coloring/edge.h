@@ -29,8 +29,7 @@ namespace Koala {
 /** \brief Test edge coloring.
  *
  *  The class collects methods that test edge coloring.
- *  \ingroup color
- */
+ *  \ingroup color */
 template<class DefaultStructs>
 class EdgeColoringTest {
 public:

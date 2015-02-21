@@ -45,29 +45,27 @@ public:
 	/** \brief Get maximal color.
 	 *
 	 *  The method finds the maximal used color.
-	 *  \param graph the tested graph.
-	 *  \param colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
+	 *  \param[in] graph the tested graph.
+	 *  \param[in] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal used color or -1 for empty coloring*/
 	template< typename Graph, typename ColorMap >
 	static int maxColor(const Graph &graph, const ColorMap &colors);
 
 	/** \brief Test partial coloring.
 	 *
-	 *  The method test of the partial coloring given by the map \a colors is proper for the graph \a g. WEN: raczej podgrafu indukowanego przez pokolorowane wierzcholki
-	 *  \param g the considered graph
-	 *  \param colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
-	 *  \return true if the partial coloring is proper, false otherwise.
-	 */
+	 *  The method tests if the partial coloring given by the map \a colors is proper for the subgraph graph induced by colored vertices.\a g.
+	 *  \param[in] g the considered graph
+	 *  \param[in] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
+	 *  \return true if the partial coloring is proper, false otherwise. */
 	template<typename Graph, typename ColorMap>
 	static bool testPart(const Graph &g, const ColorMap &colors);
 
 	/** \brief Test coloring.
 	 *
 	 *  The method test of the coloring given by the map \a colors is proper and complete for the graph \a g.
-	 *  \param g the considered graph
-	 *  \param colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
-	 *  \return true if the coloring is proper and complete, false otherwise.
-	 */
+	 *  \param[in] g the considered graph
+	 *  \param[in] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
+	 *  \return true if the coloring is proper and complete, false otherwise. */
 	template<typename Graph, typename ColorMap>
 	static bool test(const Graph &g, const ColorMap &colors);
 };
@@ -177,14 +175,14 @@ public:
 	// greedy vertex coloring
 	/** \brief Greedy coloring of the vertex.
 	 *
-	 *  The method colors uncolored \a vert with the smallest possible color (concerning colors of other vertices).
-	 *  \param g the considered graph
+	 *  The method colors uncolored \a vert with the smallest possible color (concerning colors of other vertices). 
+	 *  If the vertex was colored (was a key in associative array \a colors) it is left untouched.
+	 *  \param[in] g the colored graph
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
-	 *  \param vert the colored vertex.
-	 *  \return the assigned color or -1 if the vertex was already colored. WEN: i wtedy pokolorowanie sie nie zmienia jendrek: oczywiste?
+	 *  \param[in] vert the vertex to color.
+	 *  \return the assigned color or -1 if the vertex was already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_greedy.html).
-	 */
+	 *  [See example](examples/coloring/coloring_greedy.html).*/
 	template< typename Graph, typename ColorMap >
 	static int greedy(const Graph &g, ColorMap &colors,
 		typename Graph::PVertex vert);
@@ -192,16 +190,16 @@ public:
 	/** \brief Greedy coloring of vertex (with interchanges).
 	 *
 	 *  The method colors uncolored \a vert with the smallest possible color (concerning colors of other vertices).
+	 *  If the vertex was colored (was a key in associative array \a colors) it is left untouched.
 	 *  The method tries to assign only colors from the set of already used colors.
 	 *  If not possible, recolorings are introduced.
-	 *  If recolorings fail i.e. each color lower or equal than the maximal is forbidden then a new color will set to the vertex.
-	 *  \param g the considered graph
+	 *  If recolorings fail i.e. each color lower or equal than the maximal is forbidden then a new color will be set to the vertex.
+	 *  \param[in] g the graph to color.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
-	 *  \param vert the colored vertex.
-	 *  \return the assigned color or -1 if the vertex was already colored. WEN: i wtedy pokolorowanie sie nie zmienia
+	 *  \param[in] vert the vertex to color.
+	 *  \return the assigned color or -1 if the vertex was already colored. 
 	 *
-	 *  [See example](examples/coloring/coloring_greedyinter.html).
-	 */
+	 *  [See example](examples/coloring/coloring_greedyinter.html). */
 	template<typename Graph, typename ColorMap>
 	static int greedyInter(const Graph &g, ColorMap &colors,
 		typename Graph::PVertex vert);
@@ -211,17 +209,17 @@ public:
 	/** \brief Greedy coloring of vertex (with interchanges).
 	 *
 	 *  The method colors uncolored \a vert with the smallest possible color (concerning colors of other vertices).
+	 *  If the vertex was colored (was a key in associative array \a colors) it is left untouched.
 	 *  The method tries to assign only colors smaller or equal than \a maxCol.
 	 *  If not possible, recolorings are introduced.
-	 *  If recolorings fail i.e. each color lower or equal than \a maxCol is forbidden then a new color will set to the vertex.
+	 *  If recolorings fail i.e. each color lower or equal than \a maxCol is forbidden then a new color will be set to the vertex.
 	 *  \param g the considered graph
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
-	 *  \param vert the colored vertex.
+	 *  \param vert the vertex to color.
 	 *  \param maxCol threshold for the interchange feature.
-	 *  \return the assigned color or -1 if the vertex was already colored. WEN: i wtedy pokolorowanie sie nie zmienia
+	 *  \return the assigned color or -1 if the vertex was already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_greedyinter.html).
-	 */
+	 *  [See example](examples/coloring/coloring_greedyinter.html).*/
 	template< typename Graph, typename ColorMap >
 	static int greedyInter(const Graph &g, ColorMap &colors,
 		typename Graph::PVertex vert, int maxCol);
@@ -229,15 +227,15 @@ public:
 	// greedy vertices range coloring
 	/** \brief Greedy coloring of vertices.
 	 *
-	 *  The method colors uncolored vertices from the sequence with the smallest possible color (concerning colors of other vertices).
+	 *  The method colors uncolored vertices from the sequence with the smallest possible color (concerning colors of other vertices). 
+	 *  It is resistant to repetitions in input sequence which are ignored. Elements already colored are left untouched.
 	 *  \param g the considered graph
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
-	 *  \return the maximal assigned color or -1 if the vertices were already colored. jendrek?WEN: dla przedzialu pustego po prostu
-	 jw* WEN: Metoda odporna na powtorzenia elementow zakresu (kolejne wystapienia ignorowane) oraz elementy pokolorowane wstepnie jeszcze przed jej uruchomieniem (takie wystapienia ignorowane)
-	 *  [See example](examples/coloring/coloring_greedy.html).
-	 */
+	 *  \return the maximal assigned color or -1 if all the vertices in sequence were already colored or the sequence was empty.
+	 *
+	 *  [See example](examples/coloring/coloring_greedy.html). */
 	template< typename Graph, typename ColorMap, typename VInIter >
 	static int greedy(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -328,12 +326,11 @@ public:
 	static int greedyInter(const Graph &g, ColorMap &colors,
 		int maxCol);
 
-	//WEN: we wszystkich nizej az do brooksa (o brooksie sam nie wiem) dodatkowe zalozenie - graf jest prosty (bo te strategie uzywaja stopni wierzcholkow)
 	// graph coloring - Largest First method
 	/** \brief Largest First coloring.
 	 *
 	 *  The method colors uncolored vertices of the graph with the largest first algorithm.
-	 *  \param g the considered simple graph
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
@@ -349,7 +346,7 @@ public:
 	 *  The method tries to assign only colors from the set of already used colors.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than the maximal a new color is set to the vertex.
-	 *  \param g the considered graph
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
@@ -366,7 +363,7 @@ public:
 	 *  The method tries to assign only colors not greater than \a maxCol.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than \a maxCol a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
@@ -381,7 +378,7 @@ public:
 	/** \brief Largest First coloring.
 
 	 *  The method colors uncolored vertices from the sequence with the largest first algorithm.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
@@ -400,14 +397,13 @@ public:
 	 *  The method tries to assign only colors from the set of already used colors.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than the maximal a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_LFI.html).
-	 */
+	 *  [See example](examples/coloring/coloring_LFI.html).*/
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int lfInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -420,15 +416,14 @@ public:
 	 *  The method tries to assign only colors not greater than \a maxCol.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than \a maxCol a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_LFI.html).
-	 */
+	 *  [See example](examples/coloring/coloring_LFI.html).*/
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int lfInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end, int maxCol);
@@ -438,12 +433,11 @@ public:
 	 *
 	 *  For vertices from the sequence, the method writes down to the output a sequence congruent with LF method.
 	 *  The output vertices are pairwise different.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param beg the first element in the input sequence of vertices.
 	 *  \param end the past-the-end element in the input sequence of vertices.
 	 *  \param out inserter to the output sequence of vertices.
-	 *  \return the number of vertices in the output sequence.
-	  */
+	 *  \return the number of vertices in the output sequence.*/
 	template<typename Graph, typename VInIter, typename VOutIter>
 	static int lfSort(const Graph &g, VInIter beg, VInIter end,
 		VOutIter out);
@@ -452,81 +446,76 @@ public:
 	/** \brief Smallest Last coloring (with interchange).
 
 	 *  The method colors uncolored vertices of the graph with the smallest last algorithm.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color of -1 it the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SL.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SL.html). */
 	template<typename Graph, typename ColorMap>
 	static int sl(const Graph &g, ColorMap &colors);
 
 	// graph coloring - Smallest Last method (with colors interchange)
 	/** \brief Smallest Last coloring (with interchange).
-
+	 *
 	 *  The method colors uncolored vertices of the graph with the smallest last algorithm.
 	 *  The method tries to assign only colors from the set of already used colors.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than the maximal a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLI.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SLI.html). */
 	template< typename Graph, typename ColorMap >
 	static int slInter(const Graph &g, ColorMap &colors);
 
 	// graph coloring - Smallest Last method
 	//  (with colors interchange after exceeding maxCol)
 	/** \brief Smallest Last coloring (with interchange).
-
+	 *
 	 *  The method colors uncolored vertices of the graph with the smallest last algorithm.
 	 *  The method tries to assign only colors not greater than \a maxCol.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than \a maxCol a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLI.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SLI.html).*/
 	template< typename Graph, typename ColorMap >
 	static int slInter(const Graph &g,
 		ColorMap &colors, int maxCol);
 
 	// vertices range coloring - Smallest Last method
 	/** \brief Smallest Last coloring.
-
+	 *
 	 *  The method colors uncolored vertices from the sequence with the smallest last algorithm.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
-
-	 *  [See example](examples/coloring/coloring_SL.html).
-	 */
+	 *
+	 *  [See example](examples/coloring/coloring_SL.html).*/
 	template<typename Graph, typename ColorMap, typename VInIter>
 	static int sl(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
 
 	// vertices range coloring - Smallest Last method (with colors interchange)
 	/** \brief Smallest Last coloring (with interchange).
-
+	 *
 	 *  The method colors uncolored vertices from the sequence with the smallest last algorithm.
 	 *  The method tries to assign only colors from the set of already used colors.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than the maximal a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLI.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SLI.html). */
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int slInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -534,20 +523,19 @@ public:
 	// vertices range coloring - Smallest Last method
 	//  (with colors interchange after exceeding maxCol)
 	/** \brief Smallest Last coloring (with interchange).
-
+	 *
 	 *  The method colors uncolored vertices from the sequenced with the smallest last algorithm.
 	 *  The method tries to assign only colors not greater than \a maxCol.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than \a maxCol a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \param maxCol the maximal expected color.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLI.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SLI.html). */
 	template< typename Graph, typename ColorMap, typename VInIter >
 	static int slInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end, int maxCol);
@@ -556,14 +544,12 @@ public:
 	/** \brief Get SL order.
 
 	 *  For vertices from the sequence, the method writes down to the output a sequence congruent with SL method.
-	 *  The output vertices are pairwise different.
-	 *  \param g the considered graph.
+	 *  The output vertices are pairwise different. The method is resistant to repetitions in input sequence. Simply repetitions are ignored.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \param out inserter to the output sequence of vertices.
-	 *  \return the number of vertices in the output sequence.
-	 WEN: Metoda odporna na powtorzenia elementow zakresu (kolejne wystapienia ignorowane)
- */
+	 *  \return the number of vertices in the output sequence.  */
 	template<typename Graph, typename VInIter, typename VOutIter>
 	static int slSort(const Graph &g, VInIter beg, VInIter end,
 		VOutIter out);
@@ -572,46 +558,43 @@ public:
 	/** \brief Saturation Largest First coloring.
 
 	 *  The method colors uncolored vertices of the graph with the saturation largest first algorithm.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLF.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SLF.html).*/
 	template< typename Graph, typename ColorMap >
 	static int slf(const Graph &g, ColorMap &colors);
 
 	// graph coloring - Saturation Largest First method (with colors interchange)
 	/** \brief Saturation Largest First coloring (with interchange).
-
+	 *
 	 *  The method colors uncolored vertices of the graph with the saturation largest first algorithm.
 	 *  The method tries to assign only colors from the set of already used colors.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than the maximal a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLFI.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SLFI.html). */
 	template< typename Graph, typename ColorMap >
 	static int slfInter(const Graph &g, ColorMap &colors);
 
 	// graph coloring - Saturation Largest First method
 	//  (with colors interchange after exceeding maxCol)
 	/** \brief Saturation Largest First coloring (with interchange).
-
+	 *
 	 *  The method colors uncolored vertices of the graph with the saturation largest first algorithm.
 	 *  The method tries to assign only colors not greater than \a maxCol.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than \a maxCol a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLFI.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SLFI.html). */
 	template< typename Graph, typename ColorMap >
 	static int slfInter(const Graph &g, ColorMap &colors, int maxCol);
 
@@ -619,14 +602,13 @@ public:
 	/** \brief Saturation Largest First coloring.
 
 	 *  The method colors uncolored vertices from the sequence with the saturation largest first algorithm.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 
-	 *  [See example](examples/coloring/coloring_SLF.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SLF.html). */
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int slf(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -639,14 +621,13 @@ public:
 	 *  The method tries to assign only colors from the set of already used colors.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than the maximal a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLFI.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SLFI.html). */
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int slfInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -659,15 +640,14 @@ public:
 	 *  The method tries to assign only colors not greater than \a maxCol.
 	 *  Each time if it is not possible, recolorings are introduced.
 	 *  If recolorings don't create a free color lower or equal than \a maxCol a new color is set to the vertex.
-	 *  \param g the considered graph.
+	 *  \param g the considered graph. Assumed to be simple.
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLFI.html).
-	 */
+	 *  [See example](examples/coloring/coloring_SLFI.html).*/
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int slfInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end, int maxCol);
@@ -680,13 +660,13 @@ public:
 	 *  \param[out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color.
 	 *
-	 *  [See example](examples/coloring/coloring_brooks.html).
-	 */
+	 *  [See example](examples/coloring/coloring_brooks.html).*/
 	template<typename Graph, typename ColorMap>
 	static int brooks(const Graph &g, ColorMap &colors);
 };
 
 //WEN: domyslne wytyczne dla SeqVertColoringPar - jesli AJ zaakceptuje, o co juz rok pytam, dopytac AJ
+/**\brief The default algorithm setting for coloring algorithms.*/
 class SeqVertColDefaultSettings: public AlgsDefaultSettings
 {
 	public:
@@ -707,38 +687,37 @@ class SeqVertColoring: public SeqVertColoringPar<SeqVertColDefaultSettings> {};
 
 /** \brief Coloring methods using maximal independent set (parametrized).
  *
- *  \ingroup color
- */
+ *  \ingroup color */
 template<class DefaultStructs>
 class GisVertColoringPar: public VertColoringTest {
 public:
 	//for all methods @param colors is a map(AssocTabInterface) Graph::PVertex->int
 	//if for any vertex v of the graph colors[v]<0 then we assume that v is not colored
 	//methods recolor colored vertices
-	/** \brief Color vertices of graph using maximal independent set. WEN: ale w sensie inkluzji jendrek oczywistość?
+	/** \brief Color vertices of graph using maximal independent set.
 	 *
-	 *  The method colors vertices from the sequence. Repetitions of the vertices are ignored.
+	 *  The method colors vertices from the sequence. It takes consecutive maximal (in sense of inclusion) independent sets.
+	 *  Repetitions of the vertices are ignored.
 	 *  The partial coloring given by the map \a colors is also ignored.
-	 *  \param g the considered graph.
+	 *  \param g the graph (of any type) to color.
 	 *  \param[out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \param beg the first element in the sequence of vertices.
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color.
-
-	 *  [See example](examples/coloring/coloring_GIS.html).
-	 */
+	 *
+	 *  [See example](examples/coloring/coloring_GIS.html). */
 	template<typename Graph, typename ColorMap, typename VIter>
 	static int color(const Graph &g, ColorMap &colors, VIter beg, VIter end);
 
 	/** \brief Color vertices of graph using maximal independent set.
 	 *
-	 *  The method colors vertices of the graph. The partial coloring given by the map \a colors is ignored.
-	 *  \param g the colored graph. WEN: graf dowolny, nie koniecznie prosty. jendrek - nie
+	 *  The method colors vertices of the graph.  It takes consecutive maximal (in sense of inclusion) independent sets.
+	 *  The partial coloring given by the map \a colors is ignored.
+	 *  \param g the graph (of any type) to color. 
 	 *  \param[out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color.
 	 *
-	 *  [See example](examples/coloring/coloring_GIS.html).
-	 */
+	 *  [See example](examples/coloring/coloring_GIS.html).*/
 	template<typename Graph, typename ColorMap>
 	static int color(const Graph &g, ColorMap &colors);
 };
@@ -749,6 +728,7 @@ public:
 class GisVertColoring: public GisVertColoringPar<AlgsDefaultSettings> {};
 
 //NEW: kolorowanie wierzcholkowe klasyczne - procedury niewielomianowe
+/**\brief */
 template<class DefaultStructs>
 class VertColoringPar: public VertColoringTest {
 	public:
