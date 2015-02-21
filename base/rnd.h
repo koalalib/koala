@@ -18,8 +18,8 @@ namespace Koala
 /** \brief Random numbers generator
   *
   *  Methods that involve randomness take random numbers generator (like this) as a parameter. 
-  *  C++ standard 2011 gives such generator in header <random>. However KOALA is consistent with standard 2003, for this reason we implement this class.
-  *  \tparam Int integer type returned by generator. The type shouldn't be greater then int. */
+  *  C++ standard 2011 gives such generator in header <random>. However KOALA is consistent with standard 2003, for this reason we implement the following class.
+  *  \tparam Int integer type returned by generator. The type shouldn't be greater then int.*/
 template <class Int = int>
 class StdRandGen {
 
