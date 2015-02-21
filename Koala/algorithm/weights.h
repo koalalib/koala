@@ -14,20 +14,23 @@
 namespace Koala
 {
 
-//WEN: Uwaga globalna do calego pliku: wszystkie procedury tutaj uwzgledniaja krawedzie (z przypisanymi length) wszystkich rodzajow
-//WEN: rownoleglosci dozwolone zawsze
+// Uwaga globalna do calego pliku: wszystkie procedury tutaj uwzgledniaja krawedzie (z przypisanymi length) wszystkich rodzajow
+// rownoleglosci dozwolone zawsze
 //Obowiazuje do konca pliku
 
-    //NEW: Labele vers/edges we wszystkich algorytmach na wazone sciezki wygladaja tak samo, wiec zostaly wyciagniete do wspolnej klasy
+    // Labele vers/edges we wszystkich algorytmach na wazone sciezki wygladaja tak samo, wiec zostaly wyciagniete do wspolnej klasy
+	/**\brief Auxiliary label structures for weighted paths algorithms.*/
     struct WeightPathStructs {
-        //WEN: OK, ale gdzies trzeba zaznaczyc, ze tu jest podobna struktura jak VisitVertLabs (search.h) i dlatego
+        // OK, ale gdzies trzeba zaznaczyc, ze tu jest podobna struktura jak VisitVertLabs (search.h) i dlatego
         //klasy algorytmow sciezkowych w weights.h dziedzicza po ShortPathStructs (mozna uzywac tamtych metod dla kontenera wierzcholkowego)
 
-        //WEN: w klasach algorytmow sciezkowych, ich procedurach mozna
+        // w klasach algorytmow sciezkowych, ich procedurach mozna
         //bezposrednio uzywac tutejszych struktur jako labelsow dla verts/edges
 		// rekord wejsciowy opisujacy krawedz
-		//NEW: przeniesione i uwspolnione z dalszych klas algorytmow sciezkowych
-		/** \brief The input information for edges.*/
+		//przeniesione i uwspolnione z dalszych klas algorytmow sciezkowych
+		/** \brief Edge label.
+		 *
+		 *  The input edge length or weight.*/
 		template< class DType > struct EdgeLabs
 		{
 			// typ wagi liczbowej na krawedzi
@@ -37,7 +40,9 @@ namespace Koala
 		};
 
 		// rekord wyjsciowy opisujacy wierzcholek
-		/** \brief The input/output information for vertices. WEN: nie dziala z DAGCritPathPar, bo tam inicjacja distance jest inna */
+		/** \brief Vertex label.
+		 *
+		 * The input/output information for vertices. The structure is not valid for DAGCritPathPar, as distances are initialized in other way. */
 		template< class DType, class GraphType> struct VertLabs
 		{
 			// typ wagi liczbowej na krawedzi
@@ -48,7 +53,9 @@ namespace Koala
 			typename GraphType::PVertex vPrev;/**<\brief Previous vertex on the path from the source.*/
 			typename GraphType::PEdge ePrev;/**<\brief Previous edge on the path from the source.*/
 
-			/**\brief Constructor.*/
+			/**\brief Empty constructor.
+			 *
+			 *  Initializes distance with maxima DType value.*/
 			VertLabs():
 				distance(NumberTypeBounds< DType >::plusInfty()),
 				vPrev( 0 ), ePrev( 0 )
@@ -57,23 +64,29 @@ namespace Koala
 			template< class Rec > void copy( Rec &rec ) const;
 		};
 
-        //WEN: opis
-		//NEW: przeniesione i uwspolnione z dalszych klas algorytmow sciezkowych
+        // przeniesione i uwspolnione z dalszych klas algorytmow sciezkowych
 		// Rekord wyjsciowy zawierajacy od razu dlugosc najkr. sciezki i jej liczbe krawedzi
-		/** \brief Structure auxiliary for the method findPath.*/
+		/** \brief Structure auxiliary for the method findPath.
+		 *
+		 *  Structure keeps length of path and the number of edges it consists of.*/
 		template< class DistType > struct PathLengths
 		{
-			DistType length;
-			int edgeNo;
+			DistType length;/**<\brief Length of path.*/
+			int edgeNo;/**<\brief Number of edges in path.*/
 
+			/**\brief Constructor.*/
 			PathLengths( DistType alen, int ano ): length( alen ), edgeNo( ano )
 				{ }
+			/**\brief Constructor.*/
 			PathLengths()
 				{ }
 		};
 		// mozna stosowac jako kontener opisujacy krawedz w przypadkach, gdy chcemy wsystkim krawedziom nadac wagi jednostkowe
-		//WEN: opis
-		//NEW: przeniesione i uwspolnione z All2AllDistsPar i DAGCritPathPar
+		// przeniesione i uwspolnione z All2AllDistsPar i DAGCritPathPar
+		/**\brief Associative container dummy for unit labels.
+		 *
+		 *  The class may be used instead of associative container i case where labels (ex. edge lengths) are units.
+		 *  The overloaded operator[] always returns one (unit of the \a DType)*/
 		template< class DType > struct UnitLengthEdges
 		{
 			struct  ValType
@@ -81,7 +94,9 @@ namespace Koala
 				typedef DType DistType;
 				DistType length;
 			};
-
+			/**\brief Overloaded operator[].
+			 *
+			 * Always returns one (unit in type \a DType).*/
 			template< class T > ValType operator[]( T e ) const;
 		};
 
@@ -101,12 +116,13 @@ namespace Koala
 		// edgeTab, wejsciowa tablica asocjacyjna PEdge->EdgeLabs dlugosci krawedzi
 		/** \brief Get distance.
 		 *
-		 *  The method calculates the distance between two vertices using the Dijkstra algorithm. If \a end is set to NULL all the paths from \a start to other vertices are calculated.
-		 *  \param g the considered graph, WEN: wszystkie krawedzie niezaleznie od rodzaju sa rozwazane.
-		 *  \param[out] avertTab the associative container \a vert -> \a VertLabs, which for a vertex keeps the distance form the source and the previous vertex on the shortest path form \a start to \a vert.
-            WEN: tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania drogi ze start sa ustawiane w tej mapie
-            To jednak nie przeszkadza - wartosc domyslna odleglosci w VertLabs to infty
-            Wolno BlackHolizowac
+		 *  The method calculates the distance between two vertices using the Dijkstra algorithm. 
+		 *  If \a end is set to NULL the paths from \a start to all the other vertices are calculated.
+		 *  \param g the considered graph, all the edges regardless of their type are taken into account.
+		 *  \param[out] avertTab the associative container \a vert -> \a VertLabs, which for a vertex keeps the distance 
+		 *  form the source and the previous vertex on the shortest path form \a start to \a vert.
+		 *  Only vertices visited during the search from \a start are set in array. However, mind that default value for distance in VertLabs is infinity.
+         *  (BlackHole allowed).
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the information (weights) about edges.
 		 *  \param start the starting vertex of the searched path.
 		 *  \param end the terminal  vertex of the searched path.
@@ -122,8 +138,9 @@ namespace Koala
 		// zwraca liczbe krawedzi sciezki lub -1 gdy  wierzcholek end jest nieosiagalny
 		/** \brief Extract path.
 		 *
-		 *  The method extracts the path to vertex \a end from the structure \a vertTab obtained in method \p distance. The result is saved in the object \a iters (ShortPathStructs::OutPath).
-		 *  \param g the considered graph WEN: wszystkie krawedzie niezaleznie od rodzaju sa rozwazane..
+		 *  The method extracts the path to vertex \a end from the structure \a vertTab obtained in method \a distance. 
+		 *  The result is saved in the object \a iters (ShortPathStructs::OutPath).
+		 *  \param g the considered graph, all the edges regardless of their type are taken into account.
 		 *  \param vertTab the associative container vert->VertLabs, which for a vertex keeps the distance form the source and the shortest path.
 		 *  \param end the terminal  vertex of the searched path.
 		 *  \param[out] iters an 	ShortPathStructs::OutPath object that keeps the output path.
@@ -176,10 +193,14 @@ namespace Koala
 	{
 	public:
 		/** \brief Get distance.
-		 * WEN: te same uwagi, co w tej metodzie w DijkstraBasePar
-		 *  The method calculates the distance between two vertices using the Dijkstra algorithm based on heap. If \a end is set to NULL all the paths from \a start to other vertices are calculated.
-		 *  \param g the considered graph WEN: wszystkie krawedzie niezaleznie od rodzaju sa rozwazane.
-		 *  \param avertTab[out] the associative container \a vert -> \a VertLabs, which for a vertex keeps the distance form the source and the previous vertex on the shortest path form \a start to \a vert.
+		 * 
+		 *  The method calculates the distance between two vertices using the Dijkstra algorithm based on heap. 
+		 *  If \a end is set to NULL all the paths from \a start to other vertices are calculated.
+		 *  \param g the considered graph, all the edges regardless of their type are taken into account.
+		 *  \param avertTab[out] the associative container \a vert -> \a VertLabs, which for a vertex keeps the distance
+		 *  form the source and the previous vertex on the shortest path form \a start to \a vert.
+		 *  Only vertices visited during the search from \a start are set in array. However, mind that default value for distance in VertLabs is infinity.
+         *  (BlackHole allowed).
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the information (weights) about edges.
 		 *  \param start the starting vertex of the searched path.
 		 *  \param end the terminal  vertex of the searched path.
@@ -210,13 +231,13 @@ namespace Koala
 		/** \brief Get path.
 		 *
 		 *  The method calculates the distance between two vertices and writes the shortest path directly to OutPath object.
-		 *  \param g the considered graph WEN: wszystkie krawedzie niezaleznie od rodzaju sa rozwazane..
-		 *  \param WEN: przecie tego nie ma! avertTab[out] the associative container \a vert -> \a VertLabs, which for a vertex keeps the distance form the source and the previous vertex on the shortest path from \a start to \a vert.
+		 *  \param g the considered graph, all the edges regardless of their type are taken into account.
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the length (weights) of edges.
 		 *  \param start the starting vertex of the searched path.
 		 *  \param end the terminal  vertex of the searched path.
 		 *  \param[out] iters an OutPath object that keeps the output path.
-		 *  \return the PathLengths object that keeps both the length and the edge number of path. WEN: a co przy braku polaczenia?*/
+		 *  \return the PathLengths object that keeps both the length and the edge number of path. 
+		 *  If there is no connection the length gets maximal value of numeric type and the number of edges is -1.*/
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
 			typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType& g,
 				const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
@@ -234,7 +255,7 @@ namespace Koala
 					dist = DijBase::distances( g,vertTab,edgeTab,start,end );
 
 					if (PlusInfty == dist)
-					return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
+					return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end unachievable
 
 					int len = DijBase::getPath( g,vertTab,end,iters );
 					return typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
@@ -267,26 +288,28 @@ namespace Koala
 	// wersje dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Dijkstra algorithm with table (default).
 	 *
-	 *  The class implements the Dijkstra algorithm using simple table. See DijkstraHeap for algorithm using heap.
-	 *  \ingroup DMweight
-	 */
+	 *  The class implements the Dijkstra algorithm using simple table for keeping achievable vertices. 
+	 *  There is also another approach in DijkstraHeap that uses heap.
+	 *  \ingroup DMweight */
 	class Dijkstra: public DijkstraPar< AlgsDefaultSettings > { };
 
 	/** \brief Dijkstra algorithm (heap) (default).
 	 *
-	 *  The class implements the Dijkstra algorithm using simple heap. See Dijkstra for algorithm using table.
-	 *  \ingroup DMweight
+	 *  The class implements the Dijkstra algorithm using simple heap for keeping achievable vertices. 
+	 *  There is also another approach in Dijkstra that uses simple table.
 	 *
-	 *\n
-	 *  [See example](examples/weights/dijkstra_h/dijkstra_h.html)
-	 */
+	 *  [See example](examples/weights/dijkstra_h/dijkstra_h.html) 
+	 *  \ingroup DMweight */
 	class DijkstraHeap: public DijkstraHeapPar< AlgsDefaultSettings > { };
 
-
+	/**\brief Auxiliary structures for DAGCritPath*/
 	struct DAGCritPathStructs : public WeightPathStructs
 	{
 
-        //NEW: Poprawna etykieta wierzcholka dla DAGCritPathPar
+		/**\brief Vertex labels for DAGCritPath
+		 *
+		 * The structure keeps labels for vertices that is the distance from starting vertex and the previous vertex and edge on the path from starting vertex.
+		 * In this structure the default value of distance is the minimum value of its type in contrary to WeightPathStructs::VertLabs where it was maximum.*/
 		template< class DType, class GraphType> struct VertLabs
 		{
 			// typ wagi liczbowej na krawedzi
@@ -297,7 +320,9 @@ namespace Koala
 			typename GraphType::PVertex vPrev;/**<\brief Previous vertex on the path from the source.*/
 			typename GraphType::PEdge ePrev;/**<\brief Previous edge on the path from the source.*/
 
-			/**\brief Constructor.*/
+			/**\brief Empty constructor.
+			 *
+			 *  The constructor initializes the distance with minimum value of its type, and previous vertices and edges with NULL.*/
 			VertLabs():
 				distance(NumberTypeBounds< DType >::minusInfty()),
 				vPrev( 0 ), ePrev( 0 )
@@ -320,15 +345,14 @@ namespace Koala
 		// przy end=NULL zwraca 0
 		/** \brief Get critical path length.
 		 *
-		 *  The method calculates the the maximal WEN: length path between two vertices \a begin and \a end.
-		 If <tt>end == NULL</tt> or default the maximal paths from \a start to all the other WEN: osiagalnych ze start vertices are calculated, nieosiagalne dostaja -infty
-		 If <tt> start == NULL </tt> the maximal WEN: lenght paths WEN: w grafie prowadzace do each vertex,
-		 chyba ze end!=NULL, wtedy wyznaczenie najdluzszej sciezki do end przerywa prace.
-		 WEN: dopuszczalne sa takze dwa NULLe,
-		 *  \param g the considered graph, WEN: z zalozenia ma byc DAGiem.
+		 *  The method calculates:
+		 *  - the maximal length path between two vertices \a begin and \a end.
+		 *  - If <tt>end == NULL</tt> or default the maximal paths from \a start to all the other reachable vertices are calculated, unreachable vertices get -infty
+		 *  - If <tt> start == NULL </tt> the maximal length paths leading to \a start (setting the longest path stops the algorithm)
+		 *  - If <tt>start == NULL</tt> and <tt>end == NULL</tt> the maximal length path in graph.
+		 *  \param g the considered graph, should be DAG.
 		 *  \param[out] avertTab the associative container vert->VertLabs, which for a vertex keeps the distance form the source and the previous vertex on the longest path.
-		 WEN: dla start!=NULL do mapy sa wprowadzane tylko wierzcholki osiagalne ze start, a dla start==end==NULL wszystkie
-		 Wolno BlackHolizowac
+		 *   If start!=NULL only achievable vertices are introduced, if start==NULL && end==NULL all. (blackHole allowed)
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the information (weights) about edges.
 		 *  \param start the starting vertex of the searched path.
 		 *  \param end the terminal  vertex of the searched path.
@@ -342,25 +366,26 @@ namespace Koala
 		 *
 		 *  The method extracts the path between two vertices from the structure vertTab obtained in method \p critPathLength. The result is saved in object \a iters (OutPath).
 		 *  \param g the considered graph.
-		 *  \param vertTab the associative container vert->VertLabs, which for a vertex keeps the distance form the source and the previous vertex on the longest path. WEN: po prostu wynik dzialania poprzedniej metody
+		 *  \param vertTab the associative container vert->VertLabs, which for a vertex keeps the distance form the source and the previous vertex on the longest path.
+		 *   The container should be filled by method critPathLength.
 		 *  \param end the terminal  vertex of the searched path.
 		 *  \param[out] iters an OutPath object that keeps the output path.
-		 *  \return the number of edges on the output path from source to \a end or -1 if \a end is inaccessible WEN: po prostu gdy nie ma takiej informacji.*/
+		 *  \return the number of edges on the output path from source to \a end or -1 if \a vertTab does no  consist such path.*/
 		template< class GraphType, class VertContainer, class VIter, class EIter > static int getPath(
 			GraphType &g, const VertContainer &vertTab, typename GraphType::PVertex end,
 			ShortPathStructs::OutPath< VIter,EIter > iters );
 
 		// zapisuje od razu sciezke krytyczna (wierzcholki i krawedzie) pod pare podanych iteratorow
 		// Znajduje wszystko w jedym etapie
-		 /** \brief Get critical path.
+		/** \brief Get critical path.
 		 *
-		 *  The method finds the longest path between two vertices and writes writes it to the OutPath object \a iters.
-		 *  \param g the considered graph, WEN: z zalozenia ma byc DAGiem..
+		 *  The method finds the longest path between two vertices and writes it to the OutPath object \a iters.
+		 *  \param g the considered graph, should be DAG.
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the length (weight) edges.
 		 *  \param start the starting vertex of the searched path.
 		 *  \param end the terminal  vertex of the searched path.
 		 *  \param[out] iters an OutPath object that keeps the output path.
-		 *  \return the PathLenghts object that keeps both the length and the edge number of path WEN: dla nieosiogalnego (-infty,-1).*/
+		 *  \return the PathLenghts object that keeps both the length and the edge number of path. For unachievable vertex (-infty,-1).*/
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
 			PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
 				const EdgeContainer& edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
@@ -389,7 +414,15 @@ namespace Koala
 					return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
 				}
 
-        //NEW: jw. ale start=0 tzn. najdluzsza sciezka do end w calym grafie, domyslnie - w ogle w calym
+        // jw. ale start=0 tzn. najdluzsza sciezka do end w calym grafie, domyslnie - w ogle w calym
+		/** \brief Get critical path.
+		 *
+		 *  The method finds the longest path leading to \a end and writes it to the OutPath object \a iters.
+		 *  \param g the considered graph, should be DAG.
+		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the length (weight) edges.
+		 *  \param end the terminal  vertex of the searched path.
+		 *  \param[out] iters an OutPath object that keeps the output path.
+		 *  \return the PathLenghts object that keeps both the length and the edge number of path. For unachievable vertex (-infty,-1).*/
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
 			typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
 				const EdgeContainer& edgeTab, ShortPathStructs::OutPath< VIter,EIter > iters, typename GraphType::PVertex end=0 )
@@ -400,12 +433,11 @@ namespace Koala
 	};
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
-	/**\brief Get the longest path in directed acyclic graph (default)
+	/**\brief Longest path in directed acyclic graph (default)
 	 *  \ingroup DMweight
 	 *
 	 *  \n
-	 *  [See example](examples/weights/dagcrit/dagcritpath.html)
-	 */
+	 *  [See example](examples/weights/dagcrit/dagcritpath.html) */
 	class DAGCritPath: public DAGCritPathPar< AlgsDefaultSettings > { };
 
 	/* BellmanFordPar
@@ -424,18 +456,16 @@ namespace Koala
 		/** \brief Get distance.
 		 *
 		 *  The method calculates the distance between two vertices. If <tt>end == NULL</tt> the paths form the \a begin to all vertices are calculated.
-		 *  \param g the considered graph WEN: wszystkie krawedzie niezaleznie od rodzaju sa rozwazane...
-		 *  \param[out] avertTab the associative container vert->VertLabs, which for a vertex keeps the distance form the source and the previous vertex on the shortest path.
-		             WEN: tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania drogi ze start sa ustawiane w tej mapie
-            To jednak nie przeszkadza - wartosc domyslna odleglosci w VertLabs to infty
-            Wolno BlackHolizowac
+		 *  \param g the considered graph, all the edges regardless of their type are taken into account.
+		 *  \param[out] avertTab the associative container vert->VertLabs, which for a visited (during the search) vertex keeps the distance form the source and the previous vertex on the shortest path.
+		 *  Even though omitted vertices are not keys in associative array, their default value (infty) is returned.
+         *  (BlackHole available)
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the information about (weights) edges.
 		 *  \param start the starting vertex of the searched path.
 		 *  \param end the terminal  vertex of the searched path.
 		 *  \return the distance from \a start to \a end or infinity if such path doesn't exist. If <tt>end == NULL</tt>, the method returns 0.
-            If  the negative cycle was discovered -infinity is returned.
-            WEN: OK ale uwaga, metoda nie nadaje sie do testowania czy graf ma ujemny cykl - jesli cykl nie przeszkadza w wyznaczeniu
-            odleglosci, nie bedzie znaleziony */
+            If  the negative cycle was discovered -infinity is returned. Mind that negative cycle may be omitted by method, 
+			hence it is not suitable for testing the existence of negative cycle. */
 		template< class GraphType, class VertContainer, class EdgeContainer > static
 			typename EdgeContainer::ValType::DistType distances( const GraphType &g, VertContainer &avertTab,
 			const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end = 0);
@@ -447,7 +477,8 @@ namespace Koala
 		 *
 		 *  The method extracts the path between two vertices from the structure \a vertTab obtained in method \p distance. The result is saved in object \a iters (OutPath).
 		 *  \param g the considered graph.
-		 *  \param vertTab the associative container vert->VertLabs, which for a vertex keeps the distance form the source and the shortest path. WEN: wynik z poprzedniej metody
+		 *  \param vertTab the associative container vert->VertLabs, which for a vertex keeps the distance form the source and the shortest path.
+		 *   It is the output of method distances.
 		 *  \param end the terminal  vertex of the searched path.
 		 *  \param[out] iters an OutPath object that keeps the output path.
 		 *  \return the number of edges from source to \a end or -1 if \a end is inaccessible or -2 if a negative cycle was found.*/
@@ -462,13 +493,13 @@ namespace Koala
 		/** \brief Get path.
 		 *
 		 *  The method calculates the distance between two vertices and writes the shortest path directly to the OutPath object \a iters.
-		 *  \param g the considered graph. WEN: wszystkie krawedzie niezaleznie od rodzaju sa rozwazane...
+		 *  \param g the considered graph, all the edges regardless of their type are taken into account.
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the length (weights) of edges.
 		 *  \param start the starting vertex of the searched path.
 		 *  \param end the terminal  vertex of the searched path.
 		 *  \param[out] iters an OutPath object that keeps the output path.
 		 *  \return the PathLenghts object that keeps both the length and the edge number of path.
-		 WEN: ( infty,-1 )- end nieosiagalny, ( -infty,-2 ) - ujemny cykl przeszkodzil w wyliczeniu0, */
+		 *  if unachievable ( infty,-1 ), if negative cycle was found ( -infty,-2 ). */
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
 			typename WeightPathStructs::template PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
 				const EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
@@ -498,19 +529,18 @@ namespace Koala
 	 *  \ingroup DMweight
 	 *
 	 *  \n
-	 *  [See example](examples/weights/bellman_ford/bellman_ford.html)
-	 */
+	 *  [See example](examples/weights/bellman_ford/bellman_ford.html) */
 	class BellmanFord: public BellmanFordPar< AlgsDefaultSettings > { };
 
 
-    //NEW: duza zmiana nazewnictwa: zamiast klasy FloydPar mamy klase wyliczajaca odleglosci i sciezki miedzy wszystkimi wierzcholkami
+    // duza zmiana nazewnictwa: zamiast klasy FloydPar mamy klase wyliczajaca odleglosci i sciezki miedzy wszystkimi wierzcholkami
     //dwoma metodami: Floyda i Johnsona. Obie metody (od nazw. autorow) zastepuja dawna metode distances
 	/* FloydPar
 	 * algorytm liczy najkrotsza sciezke pomiedzy kazda para wierzcholków zostal zaproponowany przez Floyda i oparty na twierdzeniu Warshalla)
 	 */
-	/** \brief Floyd shortest path algorithm (parametrized).
+	/** \brief Shortest paths all to all (parametrized).
 	 *
-	 *  The Floyd algorithm for shortest path, based on the Warshall theorem.
+	 *  The class consists of Floyd and Johnsona algorithms for shortest paths between any two vertices in graph.
 	 *  \ingroup DMweight */
 	template< class DefaultStructs > class All2AllDistsPar : public WeightPathStructs, public PathStructs
 	{
@@ -523,11 +553,11 @@ namespace Koala
 
 		// wlasciwa procedura Floyda: odleglosc miedzy kazda para wierzcholkow
 		// false - wykryto ujemny cykl, wowczas wyniki z vertMatrix nie nadaja sie do uzytku
-		/** \brief Get distances.
+		/** \brief Get distances, Floyd.
 		 *
-		 *  The method calculates the distances between any two vertices.
-            WEN: takze nadaje sie do testowania czy graf ma ujemny cykl
-		 *  \param g the considered graph WEN: wszystkie krawedzie niezaleznie od rodzaju sa rozwazane....
+		 *  The method calculates the distances between any two vertices. Floyd algorithm, based on the Warshall theorem, is used. 
+         *  The algorithm may be used for testing if graph contains negative cycles.
+		 *  \param g the considered graph, all the edges regardless of their type are taken into account.
 		 *  \param[out] vertMatrix the two-dimensional associative container (verts,vertd)->VertLabs, which for a pair of vertices  keeps the distance between them and the vertex previous to \a vertd on the path between \a verts and \a vertd.
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the information (weights) about edges.
 		 *  \return true if the distances are successfully calculated, false if a negative cycle was found, then \a vertMatrix shouldn't be used. */
@@ -536,11 +566,11 @@ namespace Koala
 
 		// wlasciwa procedura Johnsona: odleglosc miedzy kazda para wierzcholkow
 		// false - wykryto ujemny cykl, wowczas vertMatrix jest puste
-		/** \brief Get distances.
+		/** \brief Get distances, Johnsona.
 		 *
 		 *  The method calculates the distances between any two vertices.
-		 WEN: takze nadaje sie do testowania czy graf ma ujemny cykl
-		 *  \param g the considered graph.
+		 *  The algorithm may be used for testing if graph contains negative cycles.
+		 *  \param g the considered graph, all the edges regardless of their type are taken into account.
 		 *  \param[out] vertMatrix the two-dimensional associative container (verts,vertd)->VertLabs, which for a pair of vertices  keeps the distance between them and the vertex previous to \a vertd on the path between \a verts and \a vertd.
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the information (weights) about edges.
 		 *  \return true if the distances are successfully calculated, false if a negative cycle was found, then \a vertMatrix shouldn't be used. */
@@ -551,32 +581,33 @@ namespace Koala
 		// zwraca liczbe krawedzi najkrotszej sciezki lub -1 gdy end jest nieosiagalny. Korzysta z kontenera vertMatrix z danymi z poprzedniej funkcji
 		/** \brief Extract path.
 		 *
-		 *  The method extracts the path between two vertices from the structure \a vertTab obtained in method \p distances. The result is saved in the object \a iters (OutPath).
+		 *  The method extracts the path between two vertices from the structure \a vertTab obtained in method \p distances. 
+		 *  The result is saved in the object \a iters (OutPath).
+		 *
+		 *  The method may not be used if graph contains negative cycle.
 		 *  \param[in] g the considered graph.
-		 *  \param[in] vertMatrix  the two-dimensional associative container (verts,vertd)->VertLabs, which for a pair of vertices  keeps the distance between them and the vertex previous to \a vertd on the path between \a verts and \a vertd. WEN: po prostu wynik z poprzednich metod
+		 *  \param[in] vertMatrix  the two-dimensional associative container (verts,vertd)->VertLabs, 
+		 *  which for a pair of vertices  keeps the distance between them and the vertex previous to \a vertd on the path between \a verts and \a vertd. 
+		 *  The array is a result of All2AllDistsPar::johnson or All2AllDistsPar::floyd methods.
 		 *  \param[in] start the starting  vertex of the searched path.
 		 *  \param[in] end the terminal  vertex of the searched path.
 		 *  \param[out] iters an OutPath object that keeps the output path.
-		 *  \return the number of edges from \a start to \a end or -1 if \a end is inaccessible
-		 WEN: bzdura, jesli "negative cycle was found" to w ogole nie wolno uzyc tej metody.*/
+		 *  \return the number of edges from \a start to \a end.*/
 		template< class GraphType, class TwoDimVertContainer, class VIter, class EIter > static int getPath(
 			const GraphType &g, const TwoDimVertContainer &vertMatrix, typename GraphType::PVertex start,
 			typename GraphType::PVertex end, PathStructs::OutPath< VIter,EIter > iters );
 	};
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
-	/** \brief Floyd shortest path algorithm (default).
+	/** \brief Shortest paths all to all (default).
 	 *
-	 *  The Floyd algorithm for shortest path based on the Warshall theorem.
-	 *  \ingroup DMweight
-	 *
-	 *  \n
+	 *  The class consists of Floyd and Johnsona algorithms for shortest paths between any two vertices in graph.
 	 *  [See example](examples/weights/floyd/floyd.html)
-	 */
+	 *  \ingroup DMweight */
 	class All2AllDists : public All2AllDistsPar< AlgsDefaultSettings > { };
 
 
-	//NEW: przeniesienie defs z KruskalPar
+	/**\biref Auxiliary structures for Kruskal algorithm.*/
 	struct KruskalStructs {
 		// rekord wejsciowy opisujacy krawedz
 		/** \brief The input information for edges.*/
@@ -588,7 +619,7 @@ namespace Koala
 			WeightType weight; /**< \brief Length (weight) of edge.*/
 		};
 
-		/** \brief Structure returned by \a getMinForest and \a getMaxForest. WEN: ale zmiana nazwy*/
+		/** \brief Structure returned by \a findMin and \a findMax. */
 		template< class DType > struct Result
 		{
 			// waga znalezionego lasu
@@ -602,9 +633,9 @@ namespace Koala
 	/* KruskalPar
 	 * najlzejsze lub najciezsze lasy w grafie
 	 */
-	/** \brief Spanning forest algorithm for weighted graphs (parametrized).
-	 *  WEN: tu jest nieco ogolniej, znajdujemy minimum/maximum weight forest o podanej liczbie krawedzi, a domyslnie spanning
-	 *  The class solves minimum/maximum spanning forest problem using the Kruskal technique.
+	/** \brief Minimum/maximum weight spanning forest algorithm (parametrized).
+	 *  
+	 *  Using Kruskal technique, the class solves minimum/maximum weight spanning forest problem or forest of given number of edges.
 	 *  \ingroup DMweight */
 	template< class DefaultStructs > class KruskalPar : public 	KruskalStructs
 	{
@@ -672,16 +703,16 @@ namespace Koala
 		// asets, wynikowa struktura JoinableSets<PVertex> ze skladowymi spojnosci znalezionego lasu (lub BlackHole)
 		// edgeNo, limit liczby krawedzi - znaleziony las bedzie mial najwieksza mozliwa liczbe krawedzi nie przekraczajaca tego parametru
 		// pominiecie parametru - znaleziony las bedzie mial najwieksza mozliwa liczbe krawedzi
-		//NEW: zmiana nazwy getMinForest -> jn.
-		/** \brief Get minimum spanning WEN: nie bardzo, por. wyzej forest.
+		// zmiana nazwy getMinForest -> jn.
+		/** \brief Get minimum weight spanning forest or forest of given edge number.
 		 *
-		 *  The method finds minimum spanning forest using the Kruskal algorithm.
-		 *  \param g the considered graph. WEN: wszystkie krawedzie niezaleznie od rodzaju sa rozwazane, ale ew. orientacja ignorowana
+		 *  The method finds minimum weight spanning forest using the Kruskal algorithm.
+		 *  If the number of edges in forest is restricted, the procedure stops after reaching that number. In such cases returned forest may not be spanning.
+		 *  \param g the considered graph. All the edges are taken into account. The direction is ignored. 
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the information (weights) about edges.
-		 *  \param[out] out the iterator of the container with all the edges of WEN: nieprawda spanning forest.
-		 *  \param[out] asets the output JoinableSets<PVertex> set with connected components WEN: tak, ale czego skladowe ? - znalezionego lasu
-            (uniwersum sa wszystkie wierzcholki grafu) or BlackHole.
-		 *  \param edgeNo the maximal WEN: nie - zadana number of edges in the forest. If it is default or -1 WEN: lub wieksza od l. kraw. lasu spinajacego, the maximal spanning forest is found.
+		 *  \param[out] out the iterator of the container with all the edges of returned forest. 
+		 *  \param[out] asets the output JoinableSets<PVertex> set (whole set of graph vertices is universe) with connected components of found forest (blackHole available).
+		 *  \param edgeNo the desired number of edges in the forest. If it is default, -1 or not lest then the number of edges in spanning forest, the spanning forest is found.
 		 *  \return the KruskalPar::Result object that keeps the weight of the found forest and the number of edges there.       */
 		template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
 			Result< typename EdgeContainer::ValType::WeightType > findMin( const GraphType &g,
@@ -690,16 +721,16 @@ namespace Koala
 				return getForest( g,edgeTab,out,asets,edgeNo,true );
 			}
 
-        //NEW: zmiana nazwy getMaxForest -> jn.
-		// znajduje najciezszy las
-		/** \brief Get maximum spanning WEN: nie bardzo spanning forest.
-		 *  WEN: wszystkie uwagi j.w.
+        // znajduje najciezszy las
+		/** \brief Get maximum weight spanning spanning forest or forest of given size.
+		 *  
 		 *  The method finds maximum spanning forest using the Kruskal approach.
-		 *  \param g the considered graph,
+		 *  If the number of edges in forest is restricted, the procedure stops after reaching that number. In such cases returned forest may not be spanning.
+		 *  \param g the considered graph. All the edges are taken into account. The direction is ignored. 
 		 *  \param edgeTab the associative container edge->EdgeLabs, keeping the information (weights) about edges.
-		 *  \param[out] out the iterator of the container with all the edges of spanning forest.
-		 *  \param[out] asets the output JoinableSets<PVertex> set with connected components or BlackHole.
-		 *  \param edgeNo the maximal number of edges in the spanning forest. If it is default or -1 the forest with maximal number of edges is found.
+		 *  \param[out] out the iterator of the container with all the edges of returned forest.
+		 *  \param[out] asets the output JoinableSets<PVertex> set (whole set of graph vertices is universe) with connected components of found forest (blackHole available).
+		 *  \param edgeNo the desired number of edges in the spanning forest. If it is default, -1 or not lest then the number of edges in spanning forest, the spanning forest is found.
 		 *  \return the KruskalPar::Result object that keeps the weight of the found forest and the number of edges there.       */
 		template< class GraphType, class EdgeContainer, class Iter, class VertCompContainer > static
 			Result< typename EdgeContainer::ValType::WeightType > findMax( const GraphType &g,
@@ -729,14 +760,11 @@ namespace Koala
 	};
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
-	/** \brief Spanning tree (forest) algorithm for weighted graphs (default).
-	 *
-	 *  The class solves minimum/maximum spanning tree (forest) problem using the Kruskal technique.
-	 *  \ingroup DMweight
-	 *
-	 *  \n
-	 *  [See example](examples/weights/kruskal/kruskal.html)
-	 */
+	/** \brief Minimum/maximum weight spanning forest algorithm (default).
+	 *  
+	 *  Using Kruskal technique, the class solves minimum/maximum weight spanning forest problem or forest of given number of edges.
+	 *  \ingroup DMweight 
+	 *  [See example](examples/weights/kruskal/kruskal.html)*/
 	class Kruskal: public KruskalPar< AlgsDefaultSettings > { };
 #include "weights.hpp"
 }
