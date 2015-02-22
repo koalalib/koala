@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+//#include <unordered_set>
+
 
 #include "Koala/container/hashcont.h"
 #include "Koala/container/assoctab.h"
@@ -400,6 +402,10 @@ int xxx=0;
         m.slice1(C,vec);
         t(vec);
     }
+//    unordered_set<std::string> haset;
+//    haset.insert("ala");
+//    unordered_set<std::string>::iterator hait=haset.begin();
+//    ++hait;--hait;
 
     return 0;
 }
