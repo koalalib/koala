@@ -73,13 +73,14 @@ namespace Koala
 		class Rand : public Privates::Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 
 		    //WEN: opis?
 		    Rand(RndGen& rg) : rgen(&rg) {}
 
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -98,12 +99,13 @@ namespace Koala
 		class GMin : public Privates::WMin_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 		    //WEN: opis? - to samo nizej w konstruktorach funktorow
 		    GMin(RndGen& rg) : rgen(&rg) {}
 
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -120,11 +122,12 @@ namespace Koala
 		class GWMin: public Privates::WMin_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 		    GWMin(RndGen& rg) : rgen(&rg) {}
 
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -142,11 +145,12 @@ namespace Koala
 		class GGWMin : public Privates::WMin_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 		    GGWMin(RndGen& rg) : rgen(&rg) {}
 
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -163,11 +167,12 @@ namespace Koala
 		class GWMin2 : public Privates::WMin_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 		    GWMin2(RndGen& rg) : rgen(&rg) {}
 
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -186,11 +191,12 @@ namespace Koala
 		class GMax : public Privates::WMax_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 		    GMax(RndGen& rg) : rgen(&rg) {}
 
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -207,11 +213,12 @@ namespace Koala
 		class GWMax: public Privates::WMax_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 		    GWMax(RndGen& rg) : rgen(&rg) {}
 
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -229,11 +236,12 @@ namespace Koala
 		class GGWMax: public Privates::WMax_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 		    GGWMax(RndGen& rg) : rgen(&rg) {}
 
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 	}
 
