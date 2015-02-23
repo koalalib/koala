@@ -614,6 +614,7 @@ private:
 
         //Dopuszczalny zakres stopni przy danym vert oraz informacja, czy ma on byc liczba z tego zakresu: dowolna/odd/even
         //Domyslnie dowolna
+        //Przedzial obustronnie domkniety liczb calowitych o podanych koncach lewy, prawy. Z zalozenia niepusty tj. left>right rzuca wyjatek
         struct DegRange : public Segment //por. simple.h
         {
             DegParity parity;
@@ -629,6 +630,7 @@ private:
     };
 
     //NEW: Wyszukiwanie faktorow czyli podgrafow w danym grafie o zadanych stopniach przy wierzcholkach
+    //Pojecia maja sens dla grafow bez lukow (petle i undir dozwolone), ale luki nie sa ignorowane, tylko trakotowane jak undir
     template< class DefaultStructs > class FactorPar: public FactorStructs {
 
     public:
@@ -713,7 +715,7 @@ private:
                 {
                     imdegs[images[v].first=ig.addVert()]=vtab[v].right;
                     imdegs[images[v].second=ig.addVert()]=vtab[v].right;
-                    if (vtab[v].parity==DegAll)
+                    if (vtab[v].parity!=DegOdd && vtab[v].parity!=DegEven)
                         for(int i=0;i<vtab[v].right-vtab[v].left;i++) ig.addLink(images[v].first,images[v].second,0);
                     else
                         for(int i=0;i<(vtab[v].right-vtab[v].left)/2;i++)
@@ -748,8 +750,8 @@ private:
             template< class GraphType, class VertCont, class EIterOut >
             static int segFind(GraphType &g, const VertCont& avtab,Segment mrange, EIterOut out)
             {
-                int n=g.getVertNo(), m=g.getEdgeNo(),sum2=0;
-                mrange.left=std::max(0,mrange.left);mrange.right=std::min(m,mrange.right);
+                int n=g.getVertNo(), sum2=0;
+                mrange.left=std::max(0,mrange.left);mrange.right=std::min(g.getEdgeNo(),mrange.right);
                 if (mrange.left>mrange.right) return -1;
                 typename GraphType::PVertex vnew=g.addVert();
                 typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,DegRange >::Type vtab(n+1);
