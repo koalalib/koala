@@ -29,7 +29,7 @@ namespace Koala {
 template<class DefaultStructs>
 class IntervalVertColoringPar {
 public:
-	//Weights: Graph::PVertex -> int (length of interval) WEN: raczej size
+	//Weights: Graph::PVertex -> int (size of interval)
 	//ColorMap: Graph::PVertex -> Segment
 
 	typedef Segment Color;
@@ -41,7 +41,7 @@ public:
 	 * WEN: po prostu przedluza kolorowanie na jeden wierzcholek
 	 *  The method colors greedily the uncolored vertex with a set of consecutive nonnegative integers.
 	 *  The set cardinality equals weights[vert]. The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the associative container (PVert->int),
 	 *     which assigns the expected size of interval to the vertex.
 	 *  \param colors the associative container (PVert->Segment)
@@ -57,7 +57,7 @@ public:
 	 * WEN: po prostu przedluza kolorowanie na nowe wierzcholki
 	 *  The method colors greedily the uncolored vertices, given by the sequence \a beg and \a end, with sets of consecutive nonnegative integers.
 	 *  Each set cardinality equals respectively weights[vert]. The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the associative container (PVert->int),
 	 *     which assigns the expected size of interval to the vertex.
 	 *  \param colors the associative container (PVert->Segment)
@@ -74,7 +74,7 @@ public:
 	 * WEN: po prostu przedluza kolorowanie na caly graf
 	 *  The method colors greedily  the uncolored vertices of graph with sets of consecutive nonnegative integers.
 	 *  Each set cardinality equals respectively weights[vert]. The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the associative container (PVert->int),
 	 *     which assigns the expected size of interval to the vertex.
 	 *  \param colors the associative container (PVert->Segment)
@@ -87,7 +87,7 @@ public:
 	/** \brief Heuristic LI
 	 *  WEN: przedluza pokolorowanie na podane niepokolorowane wierzcholki
 	 *  The method intervally colors all  the uncolored vertices from the container given by the iterators \a beg and \a end. The heuristic LI is used.  The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PVertex->int) which assigns the expected length of interval to vertex.
 	 *  \param beg the iterator to the first element in the container of vertices that are to be colored. WEN: powinny byc poczatkowo niepokolor.
 	 *  \param end the iterator to the past-the-end element in the container of vertices that are to be colored.
@@ -101,7 +101,7 @@ public:
 	/** \brief Heuristic LI
 	 *
 	 *  The method intervally colors all  the uncolored vertices of \a graph. The heuristic LI is used.  The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PVertex->int) which assigns the expected length of interval to vertex.
 	 *  \param colors the associative container (PVert->Segment) WEN: powinna byc poczatkowo pusta (ale dopytac AJ, bo moze to jednak przedluzenie kolorowania)
 	 *     which assigns a structure \a Segment to the vertex.
@@ -114,7 +114,7 @@ public:
 	/** \brief Test partial coloring
 	 *
 	 *  The method tests if the partial coloring from the associative table \a colors is a prober interval coloring of \a graph. WEN: raczej podgrafu indukowanego przez pokolorowane wierzcholki
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PVertex->int) which assigns the  expected length of interval.
 	 *  \param colors the associative container (PVert->Segment)
 	 *     which assigns a structure \a Segment to the vertex.
@@ -126,7 +126,7 @@ public:
 	/** \brief Test coloring
 	 *
 	 *  The method tests if the coloring form associative table \a colors is a proper and complete interval coloring of \a graph.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PVertex->int) which assigns the expected length of interval.
 	 *  \param colors the associative container (PVert->Segment)
 	 *     which assigns a structure \a Segment to the vertex.
@@ -138,7 +138,7 @@ public:
 	/** \brief Get maximal color.
 	 *
 	 *  The method the maximal color used in coloring represented by the map \a colors. WEN: pokolorowanie czesciowe
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PVertex->int) which assigns the expected length of interval. WEN: niby gdzie?
 	 *  \param colors the associative container (PVert->color)
 	 *     which assigns a structure \a Segment to the vertex.
@@ -170,7 +170,7 @@ public:
 	 * WEN: to samo, co w IntervalVeertColoringPar:: greedy(const Graph &graph, const Weights &weights,ColorMap &colors, typename Graph::PVertex)
 	 *  The method colors greedily the \a edge with a set of consecutive nonnegative integers as long as it haven't been already colored.
 	 *  The set cardinality equals weights[edge]. The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the associative container (PEdge->int),
 	 *     which assigns the expected size of interval to the edge.
 	 *  \param colors the associative container (PEdge->Segment)
@@ -186,7 +186,7 @@ public:
 	 * WEN: to samo, co w IntervalVeertColoringPar::greedy(const Graph &graph, const Weights &weights,ColorMap &colors, beg, end);
 	 *  The method colors greedily the uncolored edges, given by the sequence \a beg and \a end, with sets of consecutive nonnegative integers.
 	 *  Each set cardinality equals respectively weights[edge]. The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the associative container (PEdge->int),
 	 *     which assigns the expected size of interval to the edge.
 	 *  \param colors the associative container (PEdge->Segment)
@@ -203,7 +203,7 @@ public:
 	 *  WEN: to samo, co w IntervalVeertColoringPar::greedy(const Graph &graph, const Weights &weights, ColorMap &colors)
 	 *  The method colors greedily the uncolored edges of graph with sets of consecutive nonnegative integers.
 	 *  Each set cardinality equals respectively weights[edge]. The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the associative container (PEdge->int),
 	 *     which assigns the expected size of interval to the edge.
 	 *  \param colors the associative container (PEdge->Segment)
@@ -222,7 +222,7 @@ public:
 	 *  Each set cardinality equals respectively weights[edge].
 	 *  The edges are arranged in order of non-increasing weights. Then edges are colored in the given sequence.
 	 *  The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the associative container (PEdge->int),
 	 *     which assigns the expected size of interval to the edge.
 	 *  \param colors the associative container (PEdge->Segment)
@@ -241,7 +241,7 @@ public:
 	 *  Each set cardinality equals respectively weights[edge].
 	 *  The edges are arranged in order of non-increasing weights. Then edges are colored in the given sequence.
 	 *  The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the associative container (PEdge->int),
 	 *     which assigns the expected size of interval to the edge.
 	 *  \param colors the associative container (PEdge->Segment)
@@ -256,7 +256,7 @@ public:
 	/** \brief Heuristic LI
 	 *  WEN: te same, co w IntervalVertColoringPar::li(const Graph &graph, const Weights &weights,ColorMap &colors, beg, end);
 	 *  The method intervally colors all the uncolored edges from the container given by the iterators \a beg and \a end. The heuristic LI is used.  The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PEdge->int) which assigns the expected length of interval to edge.
 	 *  \param colors the associative container (PEdge->Segment)
 	 *     which assigns a structure \a Segment to the edge.
@@ -270,7 +270,7 @@ public:
 	/** \brief Heuristic LI
 	 *  WEN: te same, co w IntervalVertColoringPar::li(const Graph &graph, const Weights &weights, ColorMap &colors);
 	 *  The method intervally colors all the uncolored edges of the graph. The heuristic LI is used.  The result is stored up in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PEdge->int) which assigns the expected length of interval to edge.
 	 *  \param colors the associative container (PEdge->Segment)
 	 *     which assigns a structure \a Segment to the edge.
@@ -285,7 +285,7 @@ public:
 	/** \brief Test partial interval edge coloring.
 	 *
 	 *  The method tests if the partial edge coloring form associative table \a colors is a prober interval edge coloring of \a graph. WEN: raczej podgrafu zlozonego z pokolorowane krawedzi
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PEdge->int) which assigns the expected length of interval.
 	 *  \param colors the associative container (PEdge->Segment)
 	 *     which assigns a structure \a Segment to the edge.
@@ -296,7 +296,7 @@ public:
 	/** \brief Test interval edge coloring.
 	 *
 	 *  The method tests if the edge coloring form associative table \a colors is a proper interval edge coloring of \a graph.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PEdge->int) which assigns the expected length of interval.
 	 *  \param colors the associative container (PEdge->Segment)
 	 *     which assigns a structure \a Segment to the edge.
@@ -307,7 +307,7 @@ public:
 	/** \brief Get maximal color.
 	 * WEN: te same co w IntervalVeertColoringPar::maxColor
 	 *  The method the maximal color used in edge coloring represented by the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colors the associative container (PEdge->Segment)
 	 *     which assigns a structure \a Segment to the edge.
 	 *  \return the maximal color used or -1 if none of vertices is colored.	 */
@@ -318,7 +318,7 @@ public:
 	/** \brief Get weighted degree.
 	 *
 	 *  The method the maximal weighted degree of graph. The weighted degree of a vertex is the sum of all the weights of edges incident to the vertex.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PEdge->int) which assigns the  expected length of interval.
 	 *  \return the maximal weighted degree.	 */
 	template<typename Graph, typename Weights>
