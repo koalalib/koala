@@ -22,8 +22,6 @@ namespace Koala {
 //Tzn. pokolorowane (na wej/wyj) sa te krawedzie, ktore sa kluczami w mapie, reszta nie.
 //Listy dopuszczalnych kolorow colLists: zaklada sie,ze na wejsciu przypisuja wszystkim vert/edge (poza petlami) niepuste podzbiory int
 //a poczatkowe pokolorowania czesciowe (oraz wynikowe rzecz jasna) tez respektuja te listy
-//Dalej, rozwazane sa krawedzie typow Directed|Undirected - ich rodzaj jest ignorowany (po prostu krawedzie),
-//Loopy sa ignorowane i nie powinny wystapic w wejsciowych przedzialach iteratorow. Rownoleglosci dozwolone
 //Wejsciowe przedzialy iteratorow na krawedzie nie powinny zawierac petli ani powtorzen (ostatnie takze dla verts)
 //(precyzyjniej: powtorzenie zostanie zignorowane przy kolorowaniu, ale zawyzy wynik return funkcji, podobnie z elementami prekolorowanymi
 //   - nie przebarwia sie, ale beda zliczone do ret).
@@ -49,7 +47,7 @@ public:
 	 *
 	 *  The method chooses proper color (concerning the partial coloring in map \a colors) for the vertex \a vert from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors. The object function \a chooser decides which color from the list should be taken.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     which assigns a color (nonnegative integer number) to the vertex.
@@ -66,7 +64,7 @@ public:
 	 *  WEN: j.w.
 	 *  The method chooses proper color (concerning the partial coloring in map \a colors) for the vertex \a vert from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors. The color from the list \t colList[vert] is chosen by the FirstFit method.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     which assigns a color (nonnegative integer number) to the vertex.
@@ -81,7 +79,7 @@ public:
 	 *
 	 *  For vertices from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors. The object function \a chooser decides which color from the list should be taken.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     which assigns a color (nonnegative integer number) to the vertex.
@@ -101,7 +99,7 @@ public:
 	 *  WEN: j.w.
 	 *  For all uncolored vertices from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors. The colors from the lists \t colList[vert] are chosen by the FirstFit method.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     which assigns a color (nonnegative integer number) to the vertex.
@@ -118,7 +116,7 @@ public:
 	 *  For all uncolored vertices from \a graph, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
             WEN:  przedluza podane pokolorowanie czesciowe (lub puste) na caly graf
 	 *  The result is saved in the map \a colors. The object function \a chooser decides which color from the list should be taken.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     which assigns a color (nonnegative integer number) to the vertex.
@@ -135,7 +133,7 @@ public:
 	 *  WEN: jw.
 	 *  For all uncolored vertices from \a graph, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors. The colors from the lists \t colList[vert] are chosen by the FirstFit method.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int),
 	 *     which assigns a color (nonnegative integer number) to the vertex.
@@ -155,7 +153,7 @@ public:
 	 *
 	 *  For all uncolored vertices from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     which assigns a color (nonnegative integer number) to the vertex.
@@ -175,7 +173,7 @@ public:
 	 *
 	 * For all uncolored vertices from \a graph, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     which assigns a color (nonnegative integer number) to the vertex.
@@ -188,7 +186,7 @@ public:
 	/** \brief Test partial coloring.
 	 *
 	 *  The method tests if the partial coloring from the associative array \a colors is a proper list coloring of \a graph.  WEN: raczej podgrafu indukowanego przez pokolorowane wierzcholki
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     that assigns a color (nonnegative integer number) to the vertex.
@@ -199,7 +197,7 @@ public:
 	/** \brief Test coloring.
 	 *
 	 *  The method tests if the coloring from the associative array \a colors is a proper list coloring of \a graph.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int)
 	 *     that assigns a color (nonnegative integer number) to the vertex.
@@ -211,7 +209,7 @@ public:
 	/** \brief Get extremal colors in lists.
 	 *
 	 *  The method gets the extremal colors in all lists of available colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \return the standard pair of integers that represent the minimal and the maximal color in the union of all available sets. */
 	template<typename Graph, typename ColLists>
@@ -221,7 +219,7 @@ public:
 	//@return the sequence length
 	/** \brief Union of available colors sets.
 	 *
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param out the iterator to the output container with the WEN: nie musi byc sorted! union of all lists of colors. WEN: inserter na inty
 	 *  \return the lenght of the union of colors lists. */
@@ -231,7 +229,7 @@ public:
 	//@return set with the numbers used in the lists elements
 	/** \brief Union of available colors sets.
 	 *
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \return the set equal to the lists of colors union. */
 	template<typename Graph, typename ColLists>
@@ -245,6 +243,7 @@ protected:
 		/** \brief Overloaded call function operator.
 		 *
 		 *  The operator is obligatory if list coloring of graph algorithms are concerned
+		 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 		 *  \param colList the set of available colors of the vertex \a vert.
 		 *  \param colors the associative container (PVert->int)
 		 *     which assigns colors (nonnegative integers) to the vertices.
@@ -278,7 +277,7 @@ public:
 	 *  WEN: jak w ListVertColoringPar::(const Graph &graph, const ColLists &colLists, ColorMap &colors, typename Graph::PVertex, ColorChooser chooser)
 	 *  The method chooses proper color (concerning the partial coloring in map \a colors) for the edge \a edge from the list of colors \t colList[edge].
 	 *  The result is saved in the map \a colors. The object function \a chooser decides which color from the list should be taken.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
@@ -295,7 +294,7 @@ public:
 	 *  WEN: jak w ListVertColoringPar::color(const Graph &graph, const ColLists &colLists,ColorMap &colors, typename Graph::Vertex);
 	 *  The method chooses proper color (concerning the partial coloring in map \a colors) for the edge \a edge from the list of colors \t colList[edge].
 	 *  The result is saved in the map \a colors. The FirstFit method for choosing the proper color from the list \p colLists[edge] is implemented.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
@@ -311,7 +310,7 @@ public:
 	 *
 	 *  The method chooses proper colors (concerning the partial coloring in map \a colors) for the edges in the container given by the iterators \a beg and \a end, from the lists of colors respectively \t colList[edge].
 	 *  The result is saved in the map \a colors. The object function \a chooser decides which color from the list should be taken.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
@@ -331,7 +330,7 @@ public:
 	 *
 	 *  The method chooses proper colors (concerning the partial coloring in map \a colors) for the edges in the container given by the iterators \a beg, \a end, from the lists of colors respectively \t colList[edge].
 	 *  The result is saved in the map \a colors. The FirstFit method for choosing the proper color from the list \p colLists[edge] is used here.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
@@ -348,7 +347,7 @@ public:
 	 *
 	 *  The method colors  properly (concerning the partial coloring in map \a colors)  all the uncolored edges of \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].
 	 *  The result is saved in the map \a colors. The object function \a chooser decides which color from the list should be taken.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
@@ -367,7 +366,7 @@ public:
 			ColorMap &colors, ColorChooser chooser)
 	 *  The method colors  properly (concerning the partial coloring in map \a colors)  all the uncolored edges of \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].
 	 *  The result is saved in the map \a colors. The FirstFit method for choosing the proper color from the list \p colLists[edge] is used here.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
@@ -387,7 +386,7 @@ public:
 
 	 *  For all vertices the number of available colors is greater or equal the graph degree.
 
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
@@ -406,7 +405,7 @@ public:
 	 *
 	 *  For all uncolored edges from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
 	 *  The result is saved in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
@@ -426,7 +425,7 @@ public:
 	 *
 	 *  The method colors  properly (concerning the partial coloring in map \a colors)  all the uncolored edges of \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].
 	 *  The result is saved in the map \a colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (nonnegative integers) to the edges.
@@ -438,7 +437,7 @@ public:
 	/** \brief Test partial coloring.
 	 *
 	 *  The method tests if the partial coloring from the associative array \a colors is a proper list edge coloring of \a graph. WEN: raczej podgrafu zlozonego przez pokolorowane krawedzie
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     that assigns a color (nonnegative integer number) to the edge.
@@ -449,7 +448,7 @@ public:
 	/** \brief Test coloring.
 	 *
 	 *  The method tests if the coloring from the associative array \a colors is a proper and complete list edge coloring of \a graph.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     that assigns a color (nonnegative integer number) to the edge.
@@ -461,7 +460,7 @@ public:
 	/** \brief Get extremal colors in lists.
 	 *
 	 *  The method gets the extremal colors in all lists of available colors.
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \return the standard pair of integers that represent the minimal and the maximal color in the union of all available sets. */
 	template<typename Graph, typename ColLists>
@@ -471,7 +470,7 @@ public:
 	//@return the sequence length
 	/** \brief Union of available colors sets.
 	 *  WEN: to samo, co w ListVertColoringPar::listColors
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param out the iterator to the output container with the sorted union of all lists of colors.
 	 *  \return the length of the union of lists of colors. */
@@ -481,7 +480,7 @@ public:
 	//set of the numbers used in the lists elements
 	/** \brief Union of available colors sets.
 	 *
-	 *  \param graph the considered graph.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \return the set equal to the lists of colors union. */
 	template<typename Graph, typename ColLists>
@@ -494,6 +493,7 @@ public:
 		/** \brief Overloaded call function operator.
 		 *
 		 *  The operator is obligatory if list coloring of graph algorithms are concerned
+		 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 		 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 		 *  \param colors the associative container (PEdge->int)
 		 *     which assigns a color (nonnegative integer number) to the edge.
