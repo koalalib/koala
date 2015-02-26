@@ -562,6 +562,7 @@ void ghTest2()
     cout << "\ntestMinCost=" << Koala::Flow::testMinCost(g,edgeCont) << "\n\n";
 
 
+
     Koala::Flow::clearFlow(g,edgeCont);
     pres=Koala::Flow::minCostFlow(g,edgeCont,S,T,6);
     assert(Koala::Flow::testFlow(g,edgeCont,S,T));
@@ -577,6 +578,7 @@ void ghTest2()
     for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
     cout << "\ntestMinCost=" << Koala::Flow::testMinCost(g,edgeCont) << "\n\n";
+
 
 
 //    Koala::Flow::clearFlow(g,edgeCont);

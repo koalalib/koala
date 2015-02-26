@@ -95,8 +95,8 @@ void test0()
 
 void test1()
 {
-    for(int k=0;k<5000;k++)
-    {   const double P=0.03;
+    for(int k=0;k<300;k++)
+    {   const double P=0.08;
 
         g.clear();
         for(int i=0;i<N;i++) g.addVert(i);
@@ -142,14 +142,18 @@ void test1()
         assert((fres==cres2)&& (fres==cres.capac)&&!BFS::getAttainableSet(makeSubgraph(g,stdChoose(true)&stdChoose(eset)),u).isElement(v));
 
         copydata();
+        MyFlow::clearFlow(g,edgeCont);
         std::pair<int,int> cfres=MyFlow::minCostFlow(g,edgeCont,u,v);
         assert(cfres.second==fres);
+        assert(MyFlow::testMinCost(g,edgeCont));
         int cost=0;
         for(Graph<int,Koala::IO::ParSet>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) cost+=mod(edgeCont[e].flow)*edgeCont[e].cost;
         assert(cfres.first==cost);
 
         copydata();
+        MyFlow::clearFlow(g,edgeCont);
         std::pair<int,int> cfres2=MyFlow2::minCostFlow(g,edgeCont,u,v);
+        assert(MyFlow::testMinCost(g,edgeCont));
         cost=0;
         for(Graph<int,Koala::IO::ParSet>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) cost+=mod(edgeCont[e].flow)*edgeCont[e].cost;
 //        assert(cfres.first==cost);

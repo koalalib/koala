@@ -250,6 +250,7 @@ void tdijTest3()
     cout << "\n\n**********\n\n" << boolalpha << (flag=Koala::Flow::transship(g,tedgeCont,tvertCont, t2vertCont)) ;
 
     if (flag){
+        assert(Koala::Flow::testTransship(g,tedgeCont,tvertCont, t2vertCont));
         for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
             {   char buf[20];
                 cout << endl << ePt->getEnds().first->info << ePt->getEnds().second->info << ":" <<tedgeCont[ePt].flow;
@@ -267,7 +268,12 @@ void tdijTest3()
         for(Koala::Graph<char,OpisE>::PVertex ePt=g.getVert();ePt;ePt=g.getVertNext(ePt))
                 t2vertCont[ePt].flow=0;
     }
+
+
     cout << "\n\n**********\n\n" << Koala::Flow::minCostTransship(g,tedgeCont,tvertCont, t2vertCont) <<endl;
+//    tedgeCont[g.getEdge()].flow+=100;
+    assert(Koala::Flow::testTransship(g,tedgeCont,tvertCont, t2vertCont));
+
        for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
             {   char buf[20];
                 cout << endl << ePt->getEnds().first->info << ePt->getEnds().second->info << ":" <<tedgeCont[ePt].flow;

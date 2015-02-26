@@ -775,6 +775,11 @@ namespace Koala
             static bool transship(const GraphType &g,
 			EdgeContainer &edgeTab, const VertContainer &vertTab,  VertContainer2 &vertTab2);
 
+        //NEW:
+        template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2  >
+            static bool testTransship(const GraphType &g,
+			EdgeContainer &edgeTab, const VertContainer &vertTab,  const VertContainer2 &vertTab2);
+
 
 		// szuka najtanszego transship. w grafie o podanych warunkach na wierzcholki i krawedzie
 		// zwraca jego koszt lub nieskonczonosc w razie braku
@@ -817,6 +822,8 @@ namespace Koala
                 There is exactly n-1 of them.*/
 		template< class GraphType, class EdgeContainer, class IterOut > static void gHTree( GraphType &g,
 			EdgeContainer& edgeTab, IterOut out );
+
+
 	};
 
 	// wersja dzialajaca na DefaultStructs=FlowAlgsDefaultSettings
