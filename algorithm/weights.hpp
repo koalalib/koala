@@ -144,22 +144,22 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
 // DAGCritPathPar
 
-template< class DefaultStructs > template< class GraphType, class VertContainer, class EdgeContainer >
-	typename EdgeContainer::ValType::DistType DAGCritPathPar< DefaultStructs >::critPathLength(
+template< class DefaultStructs,bool longest > template< class GraphType, class VertContainer, class EdgeContainer >
+	typename EdgeContainer::ValType::DistType DAGCritPathPar< DefaultStructs,longest >::critPathLength(
 		const GraphType &g, VertContainer &avertTab, const EdgeContainer &edgeTab,
 		typename GraphType::PVertex start, typename GraphType::PVertex end )
 {
 	const typename EdgeContainer::ValType::DistType Zero =
 		NumberTypeBounds< typename EdgeContainer::ValType::DistType >::zero();
 	const typename EdgeContainer::ValType::DistType MinusInfty =
-		NumberTypeBounds< typename EdgeContainer::ValType::DistType >::minusInfty();
+        DAGCritPathPar< DefaultStructs,longest >::template minInf<typename EdgeContainer::ValType::DistType>();
 
 	typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
-		VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type localvertTab;
+		typename DAGCritPathPar< DefaultStructs,longest >:: template VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type localvertTab;
 	typename BlackHoleSwitch< VertContainer,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
-		VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type >::Type &vertTab =
+		typename DAGCritPathPar< DefaultStructs,longest >:: template VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type >::Type &vertTab =
 			BlackHoleSwitch< VertContainer,typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
-			VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type >::get( avertTab,localvertTab );
+			typename DAGCritPathPar< DefaultStructs,longest >:: template VertLabs< typename EdgeContainer::ValType::DistType,GraphType > >::Type >::get( avertTab,localvertTab );
 
 	typename GraphType::PVertex U,V;
 	typename EdgeContainer::ValType::DistType nd;
@@ -206,7 +206,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 			if ((!start) || followers.hasKey( V ))
 			{
 				nd = vertTab[V].distance + edgeTab[E].length;
-				if (nd > vertTab[U].distance)
+				if (DAGCritPathPar< DefaultStructs,longest >::template less(vertTab[U].distance,nd))
 				{
 					vertTab[U].distance = nd;
 					vertTab[U].ePrev = E;
@@ -219,13 +219,13 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 	return end ? MinusInfty : Zero;
 }
 
-template< class DefaultStructs > template< class GraphType, class VertContainer, class VIter, class EIter > int
-	DAGCritPathPar< DefaultStructs >::getPath( GraphType &g, const VertContainer &vertTab,
+template< class DefaultStructs,bool longest > template< class GraphType, class VertContainer, class VIter, class EIter > int
+	DAGCritPathPar< DefaultStructs, longest >::getPath( GraphType &g, const VertContainer &vertTab,
 		typename GraphType::PVertex end, ShortPathStructs::OutPath< VIter,EIter > iters )
 {
 	koalaAssert( end,AlgExcNullVert );
-	if (NumberTypeBounds< typename VertContainer::ValType::DistType >
-		::isMinusInfty( vertTab[end].distance )) return -1;
+	if (vertTab[end].distance==DAGCritPathPar< DefaultStructs,longest >:: template minInf<typename  VertContainer::ValType::DistType>())
+		return -1;
 	return ShortPathStructs::getOutPath( g,vertTab,iters,end );
 }
 
