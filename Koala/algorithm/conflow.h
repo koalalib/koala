@@ -476,7 +476,7 @@ namespace Koala
 
 	public:
 
-	    //NEW:
+	    //NEW: wiadomo co, wpisuje wszystkim krawedziom flow=0
         template< class GraphType, class EdgeContainer > static void
 			clearFlow( const GraphType &g, EdgeContainer &edgeTab);
 
@@ -514,7 +514,8 @@ namespace Koala
 		template< class GraphType, class EdgeContainer > static bool testFlow( const GraphType &g,
 			const EdgeContainer &edgeTab, typename GraphType::PVertex S, typename GraphType::PVertex T );
 
-        //NEW:
+        //NEW: to jest podstawowa wersja transshipm. tzn edgeTab:PEdge -> TrsEdgeLabs, vertCont:PVert -> TrsVertLoss
+        //sprawdzamy, czy w edgeTab jest transshipment wpisany spelniajacy ograniczenia w verts/edge
 		template< class GraphType, class EdgeContainer, class VertContainer > static bool testTransship( const GraphType &g,
 			const EdgeContainer &edgeTab, const VertContainer &vertCont );
 
@@ -606,7 +607,8 @@ namespace Koala
 			minCostFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
 				typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val);
 
-        //NEW:
+        //NEW: edgeTab:PEdge->EdgeLabs, sprawdza czy wpisany flow jest najtanszy sposrod wszystkich
+        //flowow o tym samym: (start,end) oraz objetosci. Poprawnosc flowa nie jest testowana: to zalozenie wejsciowe.
         template< class GraphType, class EdgeContainer > static bool
             testMinCost(const GraphType &g, const EdgeContainer &edgeTab);
 
@@ -757,6 +759,11 @@ namespace Koala
 
         // wersja ogolniejsza, dla wierzcholkow o bilansie 0 mozna definiowac wymagania odnosnie przeplywu przez
         // ten wierzcholek, analogicznie jak dla krawedzi tj. vertTab2: PVertex ->TrsEdgeLabs
+        //WEN: to jest rozszerzona wersja transhipment:  dla wierzcholkow posiadajacych w vertTab
+        //lo=hi=0 (czyli wierzch. nie gubiace i nie produkujace) w vertTab2 mozna podac lo i hi niezerowe
+        //tj. dolne i gorne ograniczenie przeplywu przez wierzcholek. Ale sa tez dodatkowe ograniczenia:
+//            - w grafie krawedzie nieskierowane sa niedopuszczalne
+//            - dla wierzcholkow w vertTab musi byc hi>=lo>=0 lub 0>=hi>=lo
         //Podobnie jest z minCostTraship
 		/** \brief Solve transshipment problem
 		 *
@@ -775,7 +782,8 @@ namespace Koala
             static bool transship(const GraphType &g,
 			EdgeContainer &edgeTab, const VertContainer &vertTab,  VertContainer2 &vertTab2);
 
-        //NEW:
+        //NEW: test czy podany przeplyw jest rozwiazaniem transshipmentu w wersji rozszerzonej.
+        //Def. i ograniczenia (zalozenia) co do wejscia - jw.
         template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2  >
             static bool testTransship(const GraphType &g,
 			EdgeContainer &edgeTab, const VertContainer &vertTab,  const VertContainer2 &vertTab2);
@@ -784,7 +792,7 @@ namespace Koala
 		// szuka najtanszego transship. w grafie o podanych warunkach na wierzcholki i krawedzie
 		// zwraca jego koszt lub nieskonczonosc w razie braku
 		/** \brief Solve cost transshipment problem.
-		 * WEN: por. pierwszy transship
+		 * WEN: por. pierwszy transship tj. w wersji podstawowej
 		 *  The method finds minimum cost transshipment problem for a given graph and initial constraints (on edges and vertices).
 		 *  \wikipath{Flow_problems#transshipment, See transshipment definition.}
 		 *  \param[in] g the considered graph.
@@ -797,14 +805,15 @@ namespace Koala
 				const VertContainer &vertTab );
 
         /** \brief Solve cost transshipment problem.
-		 *  WEN: por. drugi transship
+		 *  WEN: por. drugi transship tj. uogolniony  te same def. i ograniczenia/zalozenia + niezerowy koszt
+		 *  w wierzcholku ma sens tylko dla wierzcholkow nie gubiacych i nie produkujacych, a wiec hi=lo=0 w vertTab
 		 *  The method finds minimum cost transshipment problem for a given graph and initial constraints (on edges and vertices).
 		 *  \wikipath{Flow_problems#transshipment, See transshipment definition.}
 		 *  \param[in] g the considered graph.
 		 *  \param edgeTab the associative array (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge.
 		 *  Both input and output data are saved in this array.
 		 *  \param[in] vertTab the associative array (PVert -> TrsVertLoss) which assigns TrsVertLoss structure (keeping: maximal excess and deficit) to each vertex.
-		 *  \param[in] vertTab2 the associative array (PVert -> TrsVertLoss) which assigns TrsVertLoss structure to each vertex.
+		 *  \param[in] vertTab2 the associative array (PVert -> TrsEdgeLabs) WEN: no wlasnie dalej zly typ labela w vertTab2 which assigns TrsVertLoss structure to each vertex.
 		 *   However, this time TrsVertLoss represent minimal and maximal possible flow through vertex.
 		 *  \return the cost of achieved transshipment or infinity if there isn't any.*/
 		template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2 > static

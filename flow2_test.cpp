@@ -388,11 +388,11 @@ void costCostTest()
     S=g.addVert('S');T=g.addVert('T');
 //    F=g.addVert('F');
 
-    (edgeCont[g.addArc(S,A,OpisE(0))]=EdgeLabs<int16_t,int>(2,-3)).flow=2;
-    (edgeCont[g.addArc(S,A,OpisE(0))]=EdgeLabs<int16_t,int>(2,-4)).flow=0;
+    (edgeCont[g.addArc(S,A,OpisE(0))]=EdgeLabs<int16_t,int>(2,-3)).flow=0;
+    (edgeCont[g.addArc(S,A,OpisE(0))]=EdgeLabs<int16_t,int>(2,-4)).flow=2;
     (edgeCont[g.addEdge(A,T,OpisE(50))]=EdgeLabs<int16_t,int>(2,3)).flow=2;
     (edgeCont[g.addEdge(A,T,OpisE(10))]=EdgeLabs<int16_t,int>(2,4)).flow=0;
-    (edgeCont[g.addLoop(A,OpisE(10))]=EdgeLabs<int16_t,int>(0,-1)).flow=0;
+    (edgeCont[g.addLoop(A,OpisE(10))]=EdgeLabs<int16_t,int>(1,0)).flow=1;
 }
 
 void costTest3()

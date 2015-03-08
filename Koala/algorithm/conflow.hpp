@@ -839,19 +839,15 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
     typename DefaultStructs:: template AssocCont< typename Image::PEdge,
         typename WeightPathStructs::
             template EdgeLabs<typename EdgeContainer::ValType::CostType> > ::Type
-                imageLen( 2*mdir+4*mun );
-
-    typename DefaultStructs::template TwoDimAssocCont< typename Image::PVertex,
-        typename WeightPathStructs::
-            template VertLabs<typename EdgeContainer::ValType::CostType,Image>,AMatrFull >::Type matr(n);
+                imageLen( 2*mdir+4*mun +n );
 
     typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
         typename Image::PVertex > ::Type images(n);
 
     typename GraphType::PVertex u,v;
     typename EdgeContainer::ValType::CapacType flow;
-    SimplArrPool<typename Image::Vertex> valloc(n);
-    SimplArrPool<typename Image::Edge> ealloc(2*mdir+4*mun);
+    SimplArrPool<typename Image::Vertex> valloc(n+1);
+    SimplArrPool<typename Image::Edge> ealloc(2*mdir+4*mun+n);
 
     Image ig(&valloc,&ealloc);
     for(v = g.getVert(); v; v = g.getVertNext( v ) )
@@ -878,7 +874,12 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
             imageLen[ig.addArc(images[v],images[u])].length=-edgeTab[e].cost;
     }
 
-    return All2AllDistsPar<DefaultStructs>::floyd(ig,matr,imageLen);
+    typename Image::PVertex start=ig.addVert();
+    for(typename Image::PVertex v=ig.getVert();v;v=ig.getVertNext(v)) if (v!=start)
+        imageLen[ig.addArc(start,v)].length=NumberTypeBounds< typename EdgeContainer::ValType::CostType >::zero();
+
+
+    return BellmanFordPar<DefaultStructs>::distances(ig,blackHole,imageLen,start)==NumberTypeBounds< typename EdgeContainer::ValType::CostType >::zero();
 }
 
 
