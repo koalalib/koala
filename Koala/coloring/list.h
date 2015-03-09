@@ -25,8 +25,6 @@ namespace Koala {
 //Wejsciowe przedzialy iteratorow na krawedzie nie powinny zawierac petli ani powtorzen (ostatnie takze dla verts)
 //(precyzyjniej: powtorzenie zostanie zignorowane przy kolorowaniu, ale zawyzy wynik return funkcji, podobnie z elementami prekolorowanymi
 //   - nie przebarwia sie, ale beda zliczone do ret).
-//Uwaga: teraz listy barw i same kolory moga byc dowolnymi intami, takze ujemnymi (dla listowego zalozenie o dodatnich barwach
-//nie ma sensu, wiec usunalem) - trzeba wiec usunac z doxy stare zastrzezenia.
 
 
 /** \brief Methods for list coloring of graphs (parameterized).
