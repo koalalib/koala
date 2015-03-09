@@ -44,10 +44,11 @@ namespace Koala
      */
     struct Segment
     {
-        int left, right; //WEN: min. i max. element przedzialu calkowitego
+        int left/**\brief minimal value in segment.*/, right/**\brief Maximal value in segment*/; // min. i max. element przedzialu calkowitego
+		/**\brief Constructor*/
         Segment( int l = 0, int r = 1 ): left( l ), right( r )
         { koalaAssert(l<=r,ContExcWrongArg);  }
-
+		/**\brief Length of segment*/
 		int size() const {return right - left + 1;}
 
     };

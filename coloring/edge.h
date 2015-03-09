@@ -46,8 +46,7 @@ public:
 	 *  \param colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
 	 *  \return true if the coloring is proper and complete, false otherwise.
 	 *
-	 *  [See example](examples/coloring/edgeColorGreedy.html).
-	 */
+	 *  [See example](examples/coloring/edgeColorGreedy.html).*/
 	template <typename Graph, typename ColorMap>
 	static bool test(const Graph &graph, const ColorMap &colors);
 };
@@ -113,8 +112,7 @@ public:
 	 *  \param colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the edges were already colored.
 	 *
-	 *  [See example](examples/coloring/edgeColorVizing.html).
-	 */
+	 *  [See example](examples/coloring/edgeColorVizing.html). */
 	template<typename Graph, typename ColorMap>
 	static int vizingSimple(const Graph &g, ColorMap &colors);
 

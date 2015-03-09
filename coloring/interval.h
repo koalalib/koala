@@ -304,7 +304,7 @@ public:
 	// - ekstremalne wartosci wazonego stopnia w grafie z wagami na krawedziach
 	/** \brief Get weighted degree.
 	 *
-	 *  The method the maximal weighted degree of graph. The weighted degree of a vertex is the sum of all the weights of edges incident to the vertex.
+	 *  The method gets the maximal weighted degree of graph. The weighted degree of a vertex is the sum of all the weights of edges incident to the vertex.
 	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PEdge->int) which assigns the  expected size of interval.
 	 *  \return the maximal weighted degree.	 */

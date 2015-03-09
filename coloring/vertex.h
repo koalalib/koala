@@ -717,13 +717,12 @@ public:
 	static int color(const Graph &g, ColorMap &colors);
 };
 /** \brief Coloring methods using maximal independent set (default).
- *
- *  \ingroup color
- */
+ *  \ingroup color*/
 class GisVertColoring: public GisVertColoringPar<AlgsDefaultSettings> {};
 
 //NEW: kolorowanie wierzcholkowe klasyczne - procedury niewielomianowe
-/**\brief Optimla (non-polynomial) vertex coloring.*/
+/**\brief Optimla (non-polynomial) vertex coloring.
+ *  \ingroup color*/
 template<class DefaultStructs>
 class VertColoringPar: public VertColoringTest {
 	public:
