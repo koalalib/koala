@@ -338,8 +338,8 @@ private:
 
 	/** \brief Find (extend to) maximum matching.
 	 *
-	 *  The method finds matching extending the given on. The matching is of size \a matchSize or maximum (is smaller or for default \a matchSize) 
-	 *  The initial matching is passed to function via iterators \a initialBegin and \a initialEnd (past-the-last). 
+	 *  The method finds matching extending the given on. The matching is of size \a matchSize or maximum (is smaller or for default \a matchSize)
+	 *  The initial matching is passed to function via iterators \a initialBegin and \a initialEnd (past-the-last).
 	 *  \param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
 	 *  \param[out] vertTab an associative container from PVertex to VertLabs which keep matched edges and vertices. 
 	 *  If vertex is unmatched it is assumed that it is matched with NULLs. (BlackHole possible).
@@ -347,7 +347,7 @@ private:
 	 *  @param[in] initialEnd the iterator to the past-the-end element of given initial matching  (list of edges).
 	 *  @param[out] matching the insert iterator to container with the list of edges in found matching.
 	 *  @param[in] matchSize the desired size of a matching, leave out, set to -1 or big number (greater then maximal) for a maximum.
-	 *  If mathSize>=0, it should be greater or equal to the size of initial matching. 
+	 *  If mathSize>=0, it should be greater or equal to the size of initial matching.
 	 *  @return  the actual number of edges in found matching. Additionally, the method can return -1 if initial matching is invalid.
 	 *
 	 *  [See example](examples/matching/matching_findMax.html). */
@@ -377,7 +377,7 @@ private:
 	}
 
 	/** \brief Greedy matching.
-	 *  
+	 *
 	 *  Fast but inaccurate procedure searches greedily for a maximum (in the sense of inclusion) matching. May be used for example as a first for augmenting paths algorithm.
 	 *  \param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
 	 *  \param[out] avertTab an associative container from PVertex to VertLabs which keep matched edges and vertices. It is assumed that unmatched vertices match NULLs. (BlackHole possible).
@@ -564,15 +564,15 @@ private:
 		// bool compare(v,e1,e2) jest true jesli e2 jest lepsze od e1 z punktu widzenia ich koncowki v
 		/** \brief Test if stable matching.
 		 *
-		 *  The method tests if the given set of edges is a stable matching in a graph. 
-		 *  \wikipath{matching#stable_matching,The definition of stable matching may be found here.} 
+		 *  The method tests if the given set of edges is a stable matching in a graph.
+		 *  \wikipath{matching#stable_matching,The definition of stable matching may be found here.}
 		 *  \param g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges and loops are allowed.
-		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view. 
+		 *  \param compare the object function compares edges and gets preferable edge from the vertex point of view.
 		 *   <tt> bool compare(v,e1,e2)</tt> returns true if \p e2 is better then \p e1 looking from \p v.
          *   Note that for each vertex this function sets linear order of incident edges.
 		 *  \param edgeIterInBegin the iterator to the first element of the container with the edges of tested set.
 		 *  \param edgeIterInEnd the iterator to the past-the-end element of the container with the edges of tested set.
-		 *  \return the standard pair consisting of the bool value (pair true if the edge set form a stable matching, false otherwise) 
+		 *  \return the standard pair consisting of the bool value (pair true if the edge set form a stable matching, false otherwise)
 		 *  and the the pointer to breaking edge or NULL if it was not a matching. */
 		template< class GraphType, class EIterIn, class Comp > static std::pair< bool,typename GraphType::PEdge >
 			test( const GraphType &g, Comp compare, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd );
@@ -604,6 +604,180 @@ private:
 	 *  \sa AlgsDefaultSettings
 	 *  \ingroup DMmatch	 */
 	class StableMatching: public StableMatchingPar< AlgsDefaultSettings > { };
+
+
+    //NEW:
+    struct FactorStructs {
+        enum DegParity {DegAll=0,DegOdd,DegEven};
+
+        //Dopuszczalny zakres stopni przy danym vert oraz informacja, czy ma on byc liczba z tego zakresu: dowolna/odd/even
+        //Domyslnie dowolna
+        //Przedzial obustronnie domkniety liczb calowitych o podanych koncach lewy, prawy. Z zalozenia niepusty tj. left>right rzuca wyjatek
+        struct DegRange : public Segment //por. simple.h
+        {
+            DegParity parity;
+
+
+            DegRange() : parity(DegAll) {}
+            DegRange(int r): Segment(r,r), parity(DegAll) {}
+            DegRange(int l,int r): Segment(l,r), parity(DegAll) {}
+            DegRange(Segment s) : Segment(s.left,s.right), parity(DegAll) {}
+            DegRange(int l,int r, DegParity p ): Segment(l,r), parity(p) {}
+        };
+
+    };
+
+    //NEW: Wyszukiwanie faktorow czyli podgrafow w danym grafie o zadanych stopniach przy wierzcholkach
+    //Pojecia maja sens dla grafow bez lukow (petle i undir dozwolone), ale luki nie sa ignorowane, tylko trakotowane jak undir
+    template< class DefaultStructs > class FactorPar: public FactorStructs {
+
+    public:
+
+        template< class GraphType, class VertCont, class EIterOut >
+        // vtab - mapa PVertex->int - jaki stopien ma miec podgraf przy konkretnych wierzcholkach
+        // zwraca liczbe krawedzi podgrafu (krawedzi ida na out) lub -1 gdy podgrafu nie ma
+			static int find( const GraphType &g, const VertCont& vtab,EIterOut out)
+			{
+			    int n=g.getVertNo(), m=g.getEdgeNo(),sum =0,sum2=0;
+			    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,int >::Type impos(n);
+			    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+                {
+                     impos[v]=sum;
+                     if (vtab[v]<0 || vtab[v]>g.deg(v,EdAll)) return -1;
+                     sum+=vtab[v];
+                     sum2+=vtab[v]*g.deg(v,EdAll);
+                }
+                typedef typename DefaultStructs::template LocalGraph< EmptyVertInfo,typename GraphType::PEdge,Undirected>::Type
+                    ImageGraph;
+                SimplArrPool<typename ImageGraph::Vertex> valloc(sum+2*m);
+                SimplArrPool<typename ImageGraph::Edge> ealloc(sum2+m);
+                ImageGraph ig(&valloc,&ealloc);
+                typename ImageGraph::PVertex LOCALARRAY(images,sum);
+                for( int l=0;l<sum;l++ ) images[l]=ig.addVert();
+                for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ))
+                {
+                    typename GraphType::PVertex u=g.getEdgeEnd1(e), v=g.getEdgeEnd2(e);
+                    typename ImageGraph::PVertex iu=ig.addVert(),iv=ig.addVert();
+                    ig.addLink(iu,iv,e);
+                    for(int i=0;i<vtab[u];i++) ig.addLink(iu,images[impos[u]+i],0);
+                    for(int i=0;i<vtab[v];i++) ig.addLink(iv,images[impos[v]+i],0);
+                }
+                typename DefaultStructs:: template AssocCont< typename ImageGraph::PVertex,
+                    typename MatchingPar<DefaultStructs>::template VertLabs<ImageGraph> >::Type match(ig.getVertNo());
+                int matchm=MatchingPar<DefaultStructs>::findMax(ig,match,blackHole);
+                if (2*matchm!=ig.getVertNo()) return -1;
+                int res=0;
+                for( typename ImageGraph::PEdge e = ig.getEdge(); e; e = ig.getEdgeNext( e ) )
+                    if (e->info && match[ig.getEdgeEnd1(e)].eMatch!=e)
+                    {
+                        *out=e->info;++out;
+                        res++;
+                    }
+                return res;
+			}
+
+            // avtab - mapa PVertex->DegRange - jaki stopien (dopuszczalny zakres, parzystosc) ma miec podgraf przy konkretnych wierzcholkach
+            // zwraca liczbe krawedzi podgrafu (krawedzi ida na out) lub -1 gdy podgrafu nie ma
+            template< class GraphType, class VertCont, class EIterOut >
+			static int segFind( const GraphType &g, const VertCont& avtab,EIterOut out)
+			{
+			    int n=g.getVertNo(), m=g.getEdgeNo(),sum =0;
+			    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,DegRange >::Type vtab(n);
+
+			    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+                {
+                    vtab[v].left=std::max(0,avtab[v].left);
+                    vtab[v].right=std::min(g.deg(v,EdAll),avtab[v].right);
+                    vtab[v].parity=avtab[v].parity;
+                    if (vtab[v].parity==DegOdd)
+                    {
+                        if ((vtab[v].left&1)==0) vtab[v].left++;
+                        if ((vtab[v].right&1)==0) vtab[v].right--;
+                    } else if (vtab[v].parity==DegEven)
+                    {
+                        if (vtab[v].left&1) vtab[v].left++;
+                        if (vtab[v].right&1) vtab[v].right--;
+                    }
+                    if (vtab[v].left>vtab[v].right) return -1;
+                    sum+=vtab[v].right-vtab[v].left;
+                }
+                typedef typename DefaultStructs::template LocalGraph< EmptyVertInfo,typename GraphType::PEdge,Undirected|Loop>::Type
+                    ImageGraph;
+                SimplArrPool<typename ImageGraph::Vertex> valloc(2*n);
+                SimplArrPool<typename ImageGraph::Edge> ealloc(sum+2*m);
+                ImageGraph ig(&valloc,&ealloc);
+                typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
+                    std::pair<typename ImageGraph::PVertex,typename ImageGraph::PVertex> >::Type images(n);
+                typename DefaultStructs:: template AssocCont< typename ImageGraph::PVertex,int>::Type imdegs(2*n);
+                for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+                {
+                    imdegs[images[v].first=ig.addVert()]=vtab[v].right;
+                    imdegs[images[v].second=ig.addVert()]=vtab[v].right;
+                    if (vtab[v].parity!=DegOdd && vtab[v].parity!=DegEven)
+                        for(int i=0;i<vtab[v].right-vtab[v].left;i++) ig.addLink(images[v].first,images[v].second,0);
+                    else
+                        for(int i=0;i<(vtab[v].right-vtab[v].left)/2;i++)
+                        {
+                            ig.addLoop(images[v].first,0); ig.addLoop(images[v].second,0);
+                        }
+                }
+                for( typename GraphType::PEdge e = g.getEdge(Directed|Undirected); e; e = g.getEdgeNext( e,Directed|Undirected ) )
+                {
+                    ig.addLink(images[g.getEdgeEnd1(e)].first,images[g.getEdgeEnd2(e)].first,e);
+                    ig.addLink(images[g.getEdgeEnd1(e)].second,images[g.getEdgeEnd2(e)].second,0);
+                }
+                for( typename GraphType::PEdge e = g.getEdge(Loop); e; e = g.getEdgeNext( e,Loop ) )
+                {
+                    ig.addLoop(images[g.getEdgeEnd1(e)].first,e);
+                    ig.addLoop(images[g.getEdgeEnd1(e)].second,0);
+                }
+                typename ImageGraph::PEdge LOCALARRAY(imfact,ig.getEdgeNo());
+                int res=0,resim=0;
+                if ((resim=find(ig,imdegs,imfact))==-1) return -1;
+                for(int i=0;i<resim;i++) if (imfact[i]->info)
+                   {
+                        *out=imfact[i]->info;++out;
+                        res++;
+                    }
+                return res;
+			}
+
+            // avtab - mapa PVertex->Segment - jaki stopien (dopuszczalny zakres) ma miec podgraf przy konkretnych wierzcholkach
+            // mrange - dopuszczalny zakres liczby krawedzi podgrafu
+            // zwraca liczbe krawedzi podgrafu (krawedzi ida na out) lub -1 gdy podgrafu nie ma
+            template< class GraphType, class VertCont, class EIterOut >
+            static int segFind(GraphType &g, const VertCont& avtab,Segment mrange, EIterOut out)
+            {
+                int n=g.getVertNo(), sum2=0;
+                mrange.left=std::max(0,mrange.left);mrange.right=std::min(g.getEdgeNo(),mrange.right);
+                if (mrange.left>mrange.right) return -1;
+                typename GraphType::PVertex vnew=g.addVert();
+                typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,DegRange >::Type vtab(n+1);
+			    for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) ) if (v!=vnew)
+                {
+                    vtab[v].left=std::max(0,avtab[v].left);
+                    vtab[v].right=std::min(g.deg(v,EdAll),avtab[v].right);
+                    vtab[v].parity=DegAll;
+                    if (vtab[v].left>vtab[v].right) return -1;
+                    for(int i=0;i<vtab[v].right-vtab[v].left;++i) g.addLink(v,vnew);
+                    sum2+=vtab[v].left=vtab[v].right;
+                }
+
+                vtab[vnew]=DegRange(sum2-2*mrange.right,sum2-2*mrange.left,DegAll);
+                typename GraphType::PEdge LOCALARRAY(tabe,g.getEdgeNo());
+                int res=0,resall=segFind(g,vtab,tabe);
+                if (resall==-1) { g.delVert(vnew); return -1; }
+                for(int i=0;i<resall;i++)
+                    if (!g.isEdgeEnd(tabe[i],vnew))
+                    {
+                        *out=tabe[i];++out;
+                        res++;
+                    }
+                g.delVert(vnew); return res;
+            }
+    };
+
+    class Factor: public FactorPar< AlgsDefaultSettings > { };
 
 #include "matching.hpp"
 }

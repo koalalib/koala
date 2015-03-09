@@ -303,6 +303,7 @@ namespace Koala
 	class DijkstraHeap: public DijkstraHeapPar< AlgsDefaultSettings > { };
 
 	/**\brief Auxiliary structures for DAGCritPath*/
+    template <bool longest>
 	struct DAGCritPathStructs : public WeightPathStructs
 	{
 
@@ -328,14 +329,39 @@ namespace Koala
 				vPrev( 0 ), ePrev( 0 )
 				{ }
 		};
+
+        protected:
+
+            template<class T>
+            static inline bool less(T a, T b) { return a< b; }
+
+            template<class T>
+            static inline T minInf() { return NumberTypeBounds< T >::minusInfty(); }
+
     };
 
+    template <>
+	struct DAGCritPathStructs<false> : public WeightPathStructs
+	{
+        protected:
+
+            template<class T>
+            static inline bool less(T a, T b) { return a> b; }
+
+            template<class T>
+            static inline T minInf() { return NumberTypeBounds< T >::plusInfty(); }
+
+	};
+
+    //NEW: metoda sciezki krytycznej domyslnie szuka najdluzszych drog w DAGu, ale rownie dobrze mozna ja stosowac dla najkrotszych w DAG
+    //Stad nowy paramtetr bool longest=true. Dla false szuka najkrotszych sciezek, a w razie bledow, nieosiagalnosci itp.
+    //sytuacjach, gdy przy longest=true pojawialo sie -infty, tym razem bedzie +infty. Reszta bez zmian.
 	/* DAGCritPathPar
 	 * najdluzsze sciezki w DAGu z wagami na krawedziach
 	 */
 	/** \brief Get the longest path in directed acyclic graph (parametrized)
 	 *  \ingroup DMweight */
-	template< class DefaultStructs > class DAGCritPathPar: public DAGCritPathStructs, public ShortPathStructs
+	template< class DefaultStructs,bool longest=true > class DAGCritPathPar: public DAGCritPathStructs<longest>, public ShortPathStructs
 	{
 	public:
 
@@ -387,31 +413,33 @@ namespace Koala
 		 *  \param[out] iters an OutPath object that keeps the output path.
 		 *  \return the PathLenghts object that keeps both the length and the edge number of path. For unachievable vertex (-infty,-1).*/
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
-			PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
+			typename DAGCritPathPar< DefaultStructs,longest >:: template PathLengths< typename EdgeContainer::ValType::DistType > findPath( const GraphType &g,
 				const EdgeContainer& edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
 				ShortPathStructs::OutPath< VIter,EIter > iters )
 				// Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
 				{
 					const typename EdgeContainer::ValType::DistType MinusInfty =
-					NumberTypeBounds< typename EdgeContainer::ValType::DistType >::minusInfty();
+                        DAGCritPathPar< DefaultStructs,longest >::template minInf<typename EdgeContainer::ValType::DistType>();
 
 					typename EdgeContainer::ValType::DistType dist;
-					typename DefaultStructs::template AssocCont< typename GraphType::PVertex,VertLabs< typename
+					typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
+                        typename DAGCritPathPar< DefaultStructs,longest >:: template VertLabs< typename
 					EdgeContainer::ValType::DistType,GraphType > >::Type vertTab( g.getVertNo() );
 
 					if (MinusInfty == (dist = critPathLength( g,vertTab,edgeTab,start,end )))
-					return PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
+					return typename DAGCritPathPar< DefaultStructs,longest >:: template PathLengths< typename EdgeContainer::ValType::DistType >( dist,-1 ); // end nieosiagalny
 
                     if (start==0 && end==0)
                     {
                         dist=MinusInfty;
                         for(typename GraphType::PVertex v=g.getVert();v;v=g.getVertNext(v))
-                            if (vertTab[v].distance>dist)
+                            if (DAGCritPathPar< DefaultStructs,longest >::template less(dist,vertTab[v].distance))
+//                            if ((longest && vertTab[v].distance>dist)||((!longest && vertTab[v].distance<dist)))
                             {   end=v; dist=vertTab[v].distance;    }
                     }
 
 					int len = getPath( g,vertTab,end,iters );
-					return PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
+					return typename DAGCritPathPar< DefaultStructs,longest >:: template PathLengths< typename EdgeContainer::ValType::DistType >( dist,len );
 				}
 
         // jw. ale start=0 tzn. najdluzsza sciezka do end w calym grafie, domyslnie - w ogle w calym
@@ -431,6 +459,10 @@ namespace Koala
             }
 
 	};
+
+	//NEW: dziala na domyslnych wytycznych, ale z mozliwoscia wyboru najdl/najkr. sciezka
+	template<bool longest>
+	class DAGCritPathPar2: public DAGCritPathPar< AlgsDefaultSettings, longest> { };
 
 	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/**\brief Longest path in directed acyclic graph (default)

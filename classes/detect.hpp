@@ -885,71 +885,73 @@ template< class DefaultStructs > template< class Graph >
 template< class DefaultStructs > template< class GraphType, class VIterOut >
 	int IsItPar< DefaultStructs >::Comparability::maxStable( const GraphType &g, VIterOut out )
 {
-	typedef typename DefaultStructs::template LocalGraph< EmptyVertInfo,typename GraphType::PVertex,Directed >::Type
+    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
 		ImageGraph;
 	int n = g.getVertNo(), m = g.getEdgeNo();
-    SimplArrPool<typename ImageGraph::Vertex> valloc(2*n+5);
-    SimplArrPool<typename ImageGraph::Edge> ealloc(m+7*n+6);
-	ImageGraph cg(&valloc,&ealloc);
-	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,typename ImageGraph::PEdge >::Type mapa( n );
-	typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,EdgeDirection >::Type dirs( m );
-	typename DefaultStructs:: template AssocCont< typename ImageGraph::PVertex,
-		typename FlowPar< FlowDefaultStructs >::template TrsVertLoss< int > >::Type vertcont( 2 + 2 * n );
-	typename DefaultStructs:: template AssocCont< typename ImageGraph::PEdge,
-		typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int > >::Type edgecont( 3 * n + m );
-	typename ImageGraph::PVertex start = cg.addVert(), end = cg.addVert();
-	for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
-	{
-		typename ImageGraph::PVertex x = cg.addVert();
-		typename ImageGraph::PVertex y = cg.addVert();
-		vertcont[x] = vertcont[y] = typename FlowPar< FlowDefaultStructs >::template TrsVertLoss< int >();
-		edgecont[mapa[u] = cg.addArc( x,y,u )] = typename FlowPar< FlowDefaultStructs >::template
-			TrsEdgeLabs< int >( 1,1 );
-		edgecont[cg.addArc( start,x,(typename GraphType::PVertex)0 )] =
-			edgecont[cg.addArc( y,end,(typename GraphType::PVertex)0 )] =
-			typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int >( 0,1 );
-	}
-	getDirs( g,dirs );
-	for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
-	{
-		typename GraphType::PVertex u,v;
-		if (dirs[e] == EdDirOut)
-		{
-			u = g.getEdgeEnd1( e );
-			v = g.getEdgeEnd2( e );
-		}
-		else
-		{
-			u = g.getEdgeEnd2( e );
-			v = g.getEdgeEnd1( e );
-		}
-		edgecont[cg.addArc( cg.getEdgeEnd2( mapa[u] ),cg.getEdgeEnd1( mapa[v] ),(typename GraphType::PVertex)0 )] =
-			typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int >( 0,1 );
-	}
-	int a = 0, b = n, c;
-	while (b - a > 1)
-	{
+    SimplArrPool<typename ImageGraph::Vertex> valloc(2*n);
+    SimplArrPool<typename ImageGraph::Edge> ealloc(m);
+	ImageGraph ig(&valloc,&ealloc);
+    typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,EdgeDirection >::Type dirs( m );
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
+            std::pair<typename ImageGraph::PVertex,typename ImageGraph::PVertex> >::Type images( n );
+    typename DefaultStructs:: template AssocCont< typename ImageGraph::PVertex,EmptyEdgeInfo >::Type cover(2*n);
+    for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
+    {
+        images[u].first=ig.addVert(u);images[u].second=ig.addVert(u);
+    }
+    getDirs( g,dirs );
+    for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
+        if (dirs[e]==EdDirOut) ig.addLink(images[g.getEdgeEnd1(e)].second,images[g.getEdgeEnd2(e)].first);
+        else ig.addLink(images[g.getEdgeEnd2(e)].second,images[g.getEdgeEnd1(e)].first);
+    IsItPar< DefaultStructs >::Bipartite::minVertCover(ig,assocInserter( cover, ConstFunctor<EmptyEdgeInfo>(EmptyEdgeInfo()) ));
+    int res=0;
+    for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
+        if (!cover.hasKey(images[u].first) && !cover.hasKey(images[u].second))
+    {
+        *out=u; ++out;
+        res++;
+    }
+	return res;
+}
 
-		c = (a + b) / 2;
-		vertcont[end] = typename FlowPar< FlowDefaultStructs >::template TrsVertLoss< int >( 0,c );
-		vertcont[start] = typename FlowPar< FlowDefaultStructs >::template TrsVertLoss< int >( -c,0 );
-		if (FlowPar< FlowDefaultStructs >::transship( cg,edgecont,vertcont )) b = c;
-		else a = c;
-	}
-	vertcont[end] = typename FlowPar< FlowDefaultStructs >::template TrsVertLoss< int >( 0,b - 1 );
-	vertcont[start] = typename FlowPar< FlowDefaultStructs >::template TrsVertLoss< int >( -b + 1,0 );
-	if (!isBlackHole( out ))
-		for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
-		{
-			edgecont[mapa[u]] = typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int >( 0,0 );
-			if (FlowPar< FlowDefaultStructs >::transship( cg,edgecont,vertcont ))
-			{
-				*out = u;
-				++out;
-				edgecont[mapa[u]] = typename FlowPar< FlowDefaultStructs >::template TrsEdgeLabs< int >( 1,1 );
-			}
-		}
-	return b;
+template< class DefaultStructs > template< class GraphType, class OutMap >
+	int IsItPar< DefaultStructs >::Comparability::coChi( const GraphType &g, OutMap &avmap )
+{
+    typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
+		ImageGraph;
+	int n = g.getVertNo(), m = g.getEdgeNo();
+    typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,EdgeDirection >::Type dirs( m );
+    if (!getDirs( g,dirs )) return -1;
+
+    SimplArrPool<typename ImageGraph::Vertex> valloc(2*n);
+    SimplArrPool<typename ImageGraph::Edge> ealloc(n+m);
+	ImageGraph ig(&valloc,&ealloc);
+    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
+            std::pair<typename ImageGraph::PVertex,typename ImageGraph::PVertex> >::Type images( n );
+    for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
+    {
+        images[u].first=ig.addVert(u);images[u].second=ig.addVert(u);
+    }
+    for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
+        if (dirs[e]==EdDirOut) ig.addLink(images[g.getEdgeEnd1(e)].second,images[g.getEdgeEnd2(e)].first);
+        else ig.addLink(images[g.getEdgeEnd2(e)].second,images[g.getEdgeEnd1(e)].first);
+
+    typename DefaultStructs:: template AssocCont< typename ImageGraph::PVertex,
+            typename MatchingPar<DefaultStructs>::template VertLabs<ImageGraph> >::Type match(2*n);
+    MatchingPar< DefaultStructs >::findMax( ig,match,blackHole);
+    for( typename ImageGraph::PEdge enext,e = ig.getEdge(); e; e = enext )
+    {
+        enext = ig.getEdgeNext( e );
+        if (match[ig.getEdgeEnd1(e)].eMatch!=e) ig.del(e);
+    }
+    for( typename GraphType::PVertex u = g.getVert(); u; u = g.getVertNext( u ) )
+        ig.addLink(images[u].first,images[u].second);
+    typename DefaultStructs:: template AssocCont< typename ImageGraph::PVertex,
+		SearchStructs::VisitVertLabs< ImageGraph > >::Type comps( 2*n );
+	int res=BFSPar< DefaultStructs >::split( ig,comps,Koala::SearchStructs::compStore(blackHole,blackHole),EdUndir );
+	if (!isBlackHole(avmap))
+        for( typename ImageGraph::PVertex u = ig.getVert(); u; u = ig.getVertNext( u ) ) avmap[u->info]=comps[u].component;
+    return res;
 }
 
 template< class DefaultStructs > template< class GraphType, class Iter >

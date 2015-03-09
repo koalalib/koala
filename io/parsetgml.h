@@ -11,13 +11,12 @@ namespace Koala {
 
 namespace IO {
 
-//TODO: wyglada to na spora nadmiarowosc/duplikacje kodu. Czy nie powinno byc
-// ParSetVertRead=ParSetEdgeRead (niech to sie zwie np. ParSetRead), ParSetEdgeWrite=ParSetVertWrite (np. ParSetWrite)?
-//W obecnym ksztalcie oczywiscie wiaze sie to z koniecznoscia dorobienia mozliwosci czytania idkow krawedzi (z reszta dla konsekwencji powinno byc)
+//NEW: zmiana nazw i redukcja duplikacji kodu
+// ParSetVertRead=ParSetEdgeRead->ParSetRead, ParSetEdgeWrite=ParSetVertWrite->ParSetWrite
 
-struct ParSetVertRead {
-	ParSetVertRead(GraphML &g): m_gml(g), m_idkey(), m_readid(false)			{};
-	ParSetVertRead(GraphML &g, std::string ik): m_gml(g), m_idkey(ik), m_readid(true)	{};
+struct ParSetRead {
+	ParSetRead(GraphML &g): m_gml(g), m_idkey(), m_readid(false)			{};
+	ParSetRead(GraphML &g, std::string ik): m_gml(g), m_idkey(ik), m_readid(true)	{};
 	ParSet operator()(GraphMLKeysRead *gmlkr) {
 		std::map<std::string, GraphMLKeyTypes::Type> keys;
 		std::map<std::string, GraphMLKeyTypes::Type>::iterator it;
@@ -44,38 +43,14 @@ private:
 	GraphML &m_gml;
 	std::string m_idkey;
 	bool m_readid;
-	};
+};
 
-struct ParSetEdgeRead {
-	ParSetEdgeRead(GraphML &g): m_gml(g)	{};
-	ParSet operator()(GraphMLKeysRead *gmlkr) {
-		std::map<std::string, GraphMLKeyTypes::Type> keys;
-		std::map<std::string, GraphMLKeyTypes::Type>::iterator it;
-		std::string name;
-		ParSet p;
-		gmlkr->getKeys(keys);
-		for(it = keys.begin(); it != keys.end(); ++it) {
-			name = m_gml.getKeyAttrName(it->first.c_str());
-			if(name == "") name = it->first;
-			switch(it->second) {
-				case GraphMLKeyTypes::Bool: p.set(name.c_str(), gmlkr->getBool(it->first.c_str())); break;
-				case GraphMLKeyTypes::Int:
-				case GraphMLKeyTypes::Long: p.set(name.c_str(), gmlkr->getInt(it->first.c_str())); break;
-				case GraphMLKeyTypes::Float:
-				case GraphMLKeyTypes::Double: p.set(name.c_str(), gmlkr->getDouble(it->first.c_str())); break;
-				case GraphMLKeyTypes::String: p.set(name.c_str(), gmlkr->getString(it->first.c_str())); break;
-				default: assert(0);
-				};
-			};
-		return p;
-		};
-private:
-	GraphML &m_gml;
-	};
 
 template<class Graph>
-struct ParSetVertWrite {
-	void operator()(typename Graph::PVertex vert,
+struct ParSetWrite {
+
+    template <class VertOrEdge>
+	void operator()(VertOrEdge vert,
 			GraphMLKeysWrite *gmlkw) {
 		std::vector<std::string> keys;
 		vert->info.getKeys(keys);
@@ -91,23 +66,7 @@ struct ParSetVertWrite {
 		}
 	};
 
-template<class Graph>
-struct ParSetEdgeWrite {
-	void operator()(typename Graph::PEdge edge,
-			GraphMLKeysWrite *gmlkw) {
-		std::vector<std::string> keys;
-		edge->info.getKeys(keys);
-		for(int i = 0; i < keys.size(); i++) {
-			switch(edge->info.getType(keys[i])) {
-				case PST_Bool: gmlkw->setBool(keys[i].c_str(), edge->info.template get<bool>(keys[i])); break;
-				case PST_Int: gmlkw->setInt(keys[i].c_str(), edge->info.template get<int>(keys[i])); break;
-				case PST_Double: gmlkw->setDouble(keys[i].c_str(), edge->info.template get<double>(keys[i])); break;
-				case PST_String: gmlkw->setString(keys[i].c_str(), edge->info.template get<std::string>(keys[i])); break;
-				default: ;
-				};
-			};
-		}
-	};
+
 
 }; // namespace IO
 

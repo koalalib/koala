@@ -7,7 +7,7 @@
 #include "../algorithm/search.h"
 #include "../algorithm/weights.h"
 #include "../algorithm/matching.h"
-#include "../algorithm/conflow.h"
+
 
 namespace Koala
 {
@@ -23,7 +23,7 @@ namespace Koala
 	/** \brief Test classes (parametrized).
 	 *
 	 *  The class delivers the range of methods which check if a graph belongs to various families of graphs. \n
-	 *  By default it is assumed that considered graphs are simple and undirected. But there are some families of graphs 
+	 *  By default it is assumed that considered graphs are simple and undirected. But there are some families of graphs
 	 *  which make sense for parallel edges and loops. Then the flag \a allowmulti is available. \n
 	 *  In the class also some specialized algorithms which work only on certain families of graph are implemented.\n
 	 *  All the methods (but the zero(GraphType &)) assume that vertex set is nonempty.
@@ -161,7 +161,7 @@ namespace Koala
 		 *
 		 *  The method tests if the graph \a g is a caterpillar.
 		 *  \param g the tested graph.
-		 *  \return true if caterpillar, otherwise false. 
+		 *  \return true if caterpillar, otherwise false.
 		 *  \related Caterpillar*/
 		template< class GraphType > static bool caterpillar( const GraphType &g )
 			{ return Caterpillar::spineEnds( g ).first; }
@@ -171,7 +171,7 @@ namespace Koala
 		 *
 		 *  The method tests if the considered graph \a g is a cycle.
 		 *  \param g the considered graph.
-		 *  \param allowmulti the flag allowing or disabling multiple edges or loops. 
+		 *  \param allowmulti the flag allowing or disabling multiple edges or loops.
 		 *   If set true also single vertex with loop and two vertices with two parallel edges are recognized as cycles.
 		 *  \return true if the graph \a g is a cycle, false  otherwise. */
 		template< class GraphType > static bool cycle( const GraphType &g, bool allowmulti = false )
@@ -238,14 +238,14 @@ namespace Koala
 			/** \brief Get partition.
 			 *
 			 *  The method gets a partition of \a g  and stores up in the container represented by output iterator \a out.
-			 *  Note that the method gives optimal vertex coloring of bipartite graph. On the other hand optimal coloring may be achieved by 
+			 *  Note that the method gives optimal vertex coloring of bipartite graph. On the other hand optimal coloring may be achieved by
 			 *  Koala::SeqVertColoringPar< DefaultStructs >::slf.
 			 *  The returnd partition consists of all isolated vertices.
 			 *  \param g the considered graph.
 			 *  \param out the iterator of the container keeping the output partition.
 			 *  \param allowmulti the flag allowing or disabling multiple edges
 			 *  \return
-			 *  - number of vertices in set \a out  
+			 *  - number of vertices in set \a out
 			 *  - -1 if graph is not bipartite or if \a allowmulti is false and graph \a g is not simple*/
 			template< class GraphType, class Iter >
 				static int getPart( const GraphType &g, Iter out, bool allowmulti = false );
@@ -465,8 +465,8 @@ namespace Koala
 			 *
 			 *  The method gets the reversed perfect elimination order of \a g, which exist if and only if \a g is chordal.
 			 *  That is why the method returns false if the graph is not chordal.
-			 *  
-			 *  Note that for chordals sequential coloring with reversed perfect elimination order gives optimal coloring. 
+			 *
+			 *  Note that for chordals sequential coloring with reversed perfect elimination order gives optimal coloring.
 			 *  Hence, this class lacks separate method for coloring.
 			 *  \param g the considered graph.
 			 *  \param riter the iterator of a container with the reversed perfect elimination order.
@@ -479,7 +479,7 @@ namespace Koala
 			 *
 			 *  The method gets the maximum cliques tree representation basing on the perfect elimination order of \a g.
 			 *  \param g the considered graph. It is assumed that \a g is chordal.
-			 *  \param begin the iterator to the first element of the container with reversed prefect elimination order of \a g. 
+			 *  \param begin the iterator to the first element of the container with reversed prefect elimination order of \a g.
 			 *  \param end the iterator to the past-the-last element of the container with reversed prefect elimination order of \a g.
 			 *  \param[out] out the CompStore object that keeps maximal cliques.
 			 *  \param[out] qte the iterator of the container with pairs of integers std::pair<int,int>.
@@ -494,8 +494,8 @@ namespace Koala
 			 *  The method gets the maximum cliques tree representation.
 			 *  \param g the considered graph.
 			 *  \param[out] out the CompStore object that keeps maximal cliques.
-			 *  \param[out] qte the iterator of the container with pairs of integers. 
-			 *   The pair (\a i , \a j ) stands for the connection between \a i-th and \a j-th clique. 
+			 *  \param[out] qte the iterator of the container with pairs of integers.
+			 *   The pair (\a i , \a j ) stands for the connection between \a i-th and \a j-th clique.
 			 *   \a i and \a j are the positions of clique in \a out.  Note that cliques indexes start with 0.
 			 *  \return the number of cliques or -1 if \a g is not chordal.*/
 			template< class Graph, class VIterOut, class QIter, class QTEIter >
@@ -506,8 +506,8 @@ namespace Koala
 			 *
 			 *  The method gets the maximal clique of \a g basing on the perfect elimination order.
 			 *  \param g the considered graph, it is assumed that the graph is chordal.
-			 *  \param begin the iterator to the first element of the container with reversed prefect elimination order. 
-			 *  \param end the iterator to the past-the-last element of the container with reversed prefect elimination order. 
+			 *  \param begin the iterator to the first element of the container with reversed prefect elimination order.
+			 *  \param end the iterator to the past-the-last element of the container with reversed prefect elimination order.
 			 *  \param out the iterator of a container with all the vertices of clique.
 			 *  \return the maximal clique size.*/
 			template< class Graph, class VIter, class VIterOut >
@@ -530,7 +530,7 @@ namespace Koala
 			 *  The method uses the maximum clique tree representation.
 			 *  \param g the considered graph. It is assumed that the graph is chordal.
 			 *  \param gn the number of cliques in the clique tree representation.
-			 *  \param begin the iterator of the container with the positions of first elements of cliques in the concatenated sequences kept in \a vbegin. 
+			 *  \param begin the iterator of the container with the positions of first elements of cliques in the concatenated sequences kept in \a vbegin.
 			 *  \param vbegin the iterator of the container with the concatenated sequence of vertices that are the maximum clique representation.
 			 *  \a vbegin together with \a begin make the maximal clique representation returned by method maxClique.
 			 *  \param ebegin iterator of container with pairs of integers (i,j) which represent the connection between i-th and j-th clique in the clique tree representation.
@@ -547,7 +547,7 @@ namespace Koala
 			 *  \param g the considered graph.
 			 *  \param gn the number of cliques in the clique tree representation.
 			 *  \param begin the iterator of the container with the positions of first elements of cliques in the concatenated sequences kept in \a vbegin.
-			 *  \param vbegin the iterator of the container with the concatenated sequence of vertices that are the maximum clique representation.  
+			 *  \param vbegin the iterator of the container with the concatenated sequence of vertices that are the maximum clique representation.
 			 *  \a vbegin together with \a begin make the maximal clique representation returned by method maxClique.
 			 *  \param ebegin iterator of container with pairs of integers (i,j) which represent the connection between i-th and j-th clique in the clique tree representation.
 			 *  \param out the iterator of a container with all the vertices of the cover.
@@ -625,11 +625,11 @@ namespace Koala
 				}
 			};
 
-			class FlowDefaultStructs: public DefaultStructs
-			{
-			public:
-				enum { useFulkersonFord = false };
-			};
+//			class FlowDefaultStructs: public DefaultStructs
+//			{
+//			public:
+//				enum { useFulkersonFord = false };
+//			};
 
 
 		public:
@@ -648,8 +648,8 @@ namespace Koala
 			 *  The method bases on <em> M.C. Golumbic, The Complexity of Comparability Graph Recognition and Coloring Computing 18, 199-208 (1977)\n
 			 *  It finds and exemplary orientation of edges, optimal coloring and maximal clique.
 			 *  \param g the considered graph.
-			 *  \param[out] dirmap an associative container (PEdge  -> EdgeDirection) which determines an exemplary partial order in the vertex set. 
-			 *  The map together with graph represent relation (transitive and irreflexive). (blackHole possible)  
+			 *  \param[out] dirmap an associative container (PEdge  -> EdgeDirection) which determines an exemplary partial order in the vertex set.
+			 *  The map together with graph represent relation (transitive and irreflexive). (blackHole possible)
 			 *  \param[out] aheightmap an associative container (PVertex -> int) with an exemplary optimal coloring. Colors start with 0. (blackHole possible)
 			 *  \param[out] cliqueiter the iterator of the container with the vertices of the maximal clique.
 			 *  \return the chromatic number of \a g or -1 if graph was not comparability.*/
@@ -661,11 +661,11 @@ namespace Koala
 			// (kierunek krawedzi miedzy getEdgeEnd1 a getEdgeEnd2). Lub BlackHole
 			/** \brief Test if comparability.
 			 *
-			 *  The method tests if the graph \a g is a comparability graph and finds the orientation of edges. 
+			 *  The method tests if the graph \a g is a comparability graph and finds the orientation of edges.
 			 *  The method calls explore( const Graph &, DirMap &, OutMap &, OutIter), however it saves only the orientation.
 			 *  \param g the considered graph.
-			 *  \param[out] dirmap an associative container (PEdge  -> EdgeDirection) which determines an exemplary partial order in the vertex set. 
-			 *  The map together with graph represent relation (transitive and irreflexive). (blackHole possible)  
+			 *  \param[out] dirmap an associative container (PEdge  -> EdgeDirection) which determines an exemplary partial order in the vertex set.
+			 *  The map together with graph represent relation (transitive and irreflexive). (blackHole possible)
 			 *  \return true if \a g is a comparability graph, false otherwise.*/
 			template< class Graph, class DirMap > static bool getDirs( const Graph &g, DirMap& adirmap )
 				{ return explore( g,adirmap,blackHole,blackHole ) != -1; }
@@ -698,6 +698,13 @@ namespace Koala
                 return chi(g,avmap);
             }
 
+            //NEW: Dilworth's theorem - rozbicie wierzcholkow comparability na najmniejsza liczbe podzbiorow bedacych klikami
+            // czyli liczba chromat. negacji. Dla comparability jest rowna maxStable.
+            // avmap - mapa PVertex->numer kliki (int) liczac od 0, wolno blacholizowac
+            //zwraca moc maxStable tj. liczbe klik lub -1 dla niecomparability
+			template< class Graph, class OutMap > static int coChi( const Graph &g, OutMap &avmap );
+
+
 			/** \brief Get maximal clique.
 			 *  The method finds a largest clique in a comparability graph
 			 *  @param[in] g the considered graph
@@ -728,7 +735,7 @@ namespace Koala
 		/** \brief Test if comparability graph.
 		 *
 		 *  @param[in] g the graph to test.
-		 *  @return true if the graph is a comparability graph, false otherwise. 
+		 *  @return true if the graph is a comparability graph, false otherwise.
 		 *  \related Comparability */
 		template< class GraphType > static bool comparability( const GraphType &g )
 			{ return Comparability::explore( g,blackHole,blackHole,blackHole ) != -1; }
@@ -763,7 +770,7 @@ namespace Koala
 			 *  \param[in] begin the iterator to the first element of the container with the line segments represented by structures Segment (simple.h).
 			 *  \param[in] end the second iterator of the line segments set. It represents past-the-end element.  Segment (simple.h).
 			 *  \param[out] out the iterator of a container with all the new-created vertices (the same order as the line segments).
-			 *  \param[in] vinfo the function object automatically generating the info for vertex. Should allow to call vinfo(int), 
+			 *  \param[in] vinfo the function object automatically generating the info for vertex. Should allow to call vinfo(int),
 			 *   where the parameter are the position of the line segment in the container \a begin, \a end.
 			 *  \param[in] einfo the function object automatically generating the info for edge. Should allow to call vinfo(int, int),
 			 *   where the integers are the position of the corresponding line segments in the container \a begin, \a end.
