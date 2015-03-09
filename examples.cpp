@@ -9,6 +9,7 @@
 #include "Koala/algorithm/search.h"
 #include "Koala/algorithm/weights.h"
 #include "Koala/algorithm/matching.h"
+#include "Koala/algorithm/schedule.h"
 #include "Koala/coloring/vertex.h"
 #include "Koala/coloring/edge.h"
 #include "Koala/classes/detect.h"
@@ -1787,10 +1788,59 @@ void minVertCut2Main()
     for(int i=0;i<res;i++) cout << tabV[i]-> info << ' ';
 }
 
+int critPathScheduleExamp(const MyGraph& g, const AssocArray<PVertex,std::pair<int,int> >& tasks, // w parze first=pi zadania, second=ri zadania
+                   AssocArray<PVertex,Scheduling::Scheduling::TaskWindow > & result)
+//oryginalnie w klasie Scheduling zadania sa podawane i wyniki pobierane z ciagu iteratorow, ale mysle ze w serwisie
+// i zgredzie latwiej pobierac dane i wizualizowac wyniki w wierzcholkach/zadaniach (reprezentacja siec AV)
+{
+    Scheduling::Task<MyGraph> LOCALARRAY(tasktab,g.getVertNo());
+    Scheduling::TaskWindow LOCALARRAY(restab,g.getVertNo());
+    int l=0;
+    if (!DAGAlgs::isDAG(g)) return -1; //bledne dane
+    for(MyGraph::PVertex v=g.getVert();v;v=g.getVertNext(v),l++)
+    {
+        if (tasks[v].second<0 || tasks[v].first<=0) return -1;//bledne dane
+        tasktab[l]=Scheduling::Task<MyGraph>(tasks[v].first,tasks[v].second,0,v);
+        // podawane w konstruktorze kolejno parametry zadania to pi, ri, di - w tym zagadnieniu ignorowane, wierzcholek w grafie
+    }
+    int res=Scheduling::critPath(tasktab,tasktab+g.getVertNo(),g,restab);
+    for(l=0;l<g.getVertNo();l++) result[tasktab[l].vertex]=restab[l];
+    return res;
+}
+
+void critPathScheduleMain()
+{
+    MyGraph g;
+    PVertex A,B,C,D,E,F,G;
+    A=g.addVert('A');B=g.addVert('B');C=g.addVert('C');D=g.addVert('D'); E=g.addVert('E');
+    F=g.addVert('F'); G=g.addVert('G');
+    g.addArc(F,E,"fe");g.addArc(F,G,"fg");g.addArc(G,D,"gd");g.addArc(E,D,"ed");
+    g.addArc(D,B,"db");g.addArc(D,C,"dc");g.addArc(C,A,"ca");
+    //g.addArc(A,E,"ae");
+    writeGraphText(g, cout, RG_VertexLists|RG_Info);
+    cout <<"\n******\n";
+    AssocArray<PVertex,std::pair<int,int> > tasks(g.getVertNo());
+    AssocArray<PVertex,Scheduling::TaskWindow > results(g.getVertNo());
+    tasks[A]=std::make_pair(2,0);// podawane kolejno parametry zadania pi, ri,
+    tasks[B]=std::make_pair(1,2);
+    tasks[C]=std::make_pair(2,0);
+    tasks[D]=std::make_pair(2,0);
+    tasks[E]=std::make_pair(5,0);
+    tasks[F]=std::make_pair(2,1);
+    tasks[G]=std::make_pair(2,1);
+    int cmax=critPathScheduleExamp(g,tasks,results);
+    if (cmax==-1) { cout << "Bledne dane"; return; }
+    cout << "Cmax optymalny harmonogram ma dlugosc " << cmax << "\n";
+    for(MyGraph::PVertex v=g.getVert();v;v=g.getVertNext(v))
+        cout << "Zadanie z wierzcholka " << v->info <<':' << "Najwczesniejszy poczatek: " << results[v].earliestStart
+        << " i koniec " << results[v].earliestFinish<< " Najpozn. poczatek: " << results[v].latestStart
+        << " i koniec " << results[v].latestFinish << "\n";
+}
+
 
 #include "main.hpp"
 
-    minVertCut2Main();
+    critPathScheduleMain();
 
     return 0;
 }

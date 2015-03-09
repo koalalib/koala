@@ -9,6 +9,7 @@
 #include <iterator>
 #include <cassert>
 #include <limits>
+#include <cmath>
 
 #include "../base/exception.h"
 
@@ -347,7 +348,7 @@ namespace Koala
 		 *  enlarged by a factor of two.
 		 *  Set threshold equal to zero to disable automatic resizing.
 		 *  \param value threshold*/
-		void set_threshold( double value ) { if( value <= 0 ) m_resizeFactor = value <= 0 ? 0 : value * 256 + 0.5; };
+		void set_threshold( double value ) { m_resizeFactor = value <= 0 ? 0 : value * 256 + 0.5; };
 		/** Get current threshold.
 		 *
 		 *  \return the current resize threshold */
@@ -666,7 +667,7 @@ namespace Koala
 		 *  If \t size() exceeds \a value * \t slots(), the size of hashtable is
 		 *  enlarged by a factor of two
 		 *  set threshold equal to zero to disable automatic resizing */
-		void set_threshold( double value ) { if( value <= 0 ) m_resizeFactor = value <= 0 ? 0 : value * 256 + 0.5; };
+		void set_threshold( double value ) { m_resizeFactor = value <= 0 ? 0 : value * 256 + 0.5; };
 		/** \brief Get the current resize threshold */
 		double get_threshold() { return (double)m_resizeFactor / 256.0; };
 
@@ -713,14 +714,18 @@ namespace Koala
 		bool empty() const
 			{ return this->size() == 0; }
 		template< class Iterator > int getKeys( Iterator ) const;
-		int capacity () const
-			{ return std::numeric_limits< int >::max(); }
+//		int capacity () const
+//			{ return std::numeric_limits< int >::max(); }
 
 		const BiDiHashMap< K,V > &cont;
 
 	protected:
 		BiDiHashMap< K,V > &_cont() { return const_cast< BiDiHashMap< K,V > & >( cont ); }
-		void reserve( int n ) { _cont().reserve(n); }
+		void reserve( int n ) //{ _cont().reserve(n); _cont().set_threshold(1.1); }
+		{
+		    if (n==0 || _cont().get_threshold()==0) _cont().reserve(n);
+		    else _cont().reserve(std::ceil((double)(n+1)/_cont().get_threshold()));
+		}
 		void clear() { _cont().clear(); }
 		bool delKey( K );
 		ValType *valPtr( K arg );
@@ -750,8 +755,8 @@ namespace Koala
 			{ return cont.size(); }
 		bool empty() const
 			{ return this->size() == 0; }
-		int capacity () const
-			{ return std::numeric_limits< int >::max(); }
+//		int capacity () const
+//			{ return std::numeric_limits< int >::max(); }
 		template< class Iterator > int getKeys( Iterator ) const;
 
 		const HashMap< K,V > &cont;
@@ -759,7 +764,11 @@ namespace Koala
 	protected:
 		HashMap< K,V > &_cont() { return const_cast< HashMap< K,V > & >( cont ); }
 		ValType *valPtr( K arg );
-		void reserve( int n ) { _cont().reserve( n ); }
+		void reserve( int n ) //{ _cont().reserve( n ); _cont().set_threshold(1.1); }
+		{
+		    if (n==0 || _cont().get_threshold()==0) _cont().reserve(n);
+		    else _cont().reserve(std::ceil((double)(n+1)/_cont().get_threshold()));
+		}
 		bool delKey( K );
 		void clear() { _cont().clear(); }
 		V &get( K arg ) { return (_cont())[arg]; }

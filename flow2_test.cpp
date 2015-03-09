@@ -319,9 +319,9 @@ void costTest()
     S=g.addVert('S');T=g.addVert('T');
     F=g.addVert('F');
 
-    edgeCont[g.addArc(S,A,OpisE(0))]=EdgeLabs<int16_t,int>(18,3);
+    edgeCont[g.addArc(S,A,OpisE(0))]=EdgeLabs<int16_t,int>(18,-3);
     edgeCont[g.addArc(S,C,OpisE(50))]=EdgeLabs<int16_t,int>(20,8);
-    edgeCont[g.addArc(A,C,OpisE(10))]=EdgeLabs<int16_t,int>(15,4);
+    edgeCont[g.addArc(A,C,OpisE(10))]=EdgeLabs<int16_t,int>(15,-4);
     edgeCont[g.addArc(B,A,OpisE(50))]=EdgeLabs<int16_t,int>(20,5);
     edgeCont[g.addArc(C,B,OpisE(60))]=EdgeLabs<int16_t,int>(12,8);
     edgeCont[g.addArc(B,T,OpisE(30))]=EdgeLabs<int16_t,int>(14,5);
@@ -379,6 +379,21 @@ void costTest2()
     tabVit=tabV;
 }
 
+
+void costCostTest()
+{   g.clear();edgeCont.clear();
+//    vertCont.clear();
+
+    A=g.addVert('A');//B=g.addVert('B');C=g.addVert('C');
+    S=g.addVert('S');T=g.addVert('T');
+//    F=g.addVert('F');
+
+    (edgeCont[g.addArc(S,A,OpisE(0))]=EdgeLabs<int16_t,int>(2,-3)).flow=0;
+    (edgeCont[g.addArc(S,A,OpisE(0))]=EdgeLabs<int16_t,int>(2,-4)).flow=2;
+    (edgeCont[g.addEdge(A,T,OpisE(50))]=EdgeLabs<int16_t,int>(2,3)).flow=2;
+    (edgeCont[g.addEdge(A,T,OpisE(10))]=EdgeLabs<int16_t,int>(2,4)).flow=0;
+    (edgeCont[g.addLoop(A,OpisE(10))]=EdgeLabs<int16_t,int>(1,0)).flow=1;
+}
 
 void costTest3()
 {   g.clear();edgeCont.clear();
@@ -535,13 +550,53 @@ void ghTest2()
     costTest2();
     cout << "\n\n-----------\n\n"<< Koala::Flow::maxFlow(g,edgeCont,S,T) << "\n";
     assert(Koala::Flow::testFlow(g,edgeCont,S,T));
+    cout << "cost=" << Koala::Flow::flowCost(g,edgeCont) << "\n";
+    cout << "\ntestMinCost=" << Koala::Flow::testMinCost(g,edgeCont) << "\n\n";
 
-    std::pair<int,int> pres=Koala::Flow::minCostFlow(g,edgeCont,S,T,25);
+    Koala::Flow::clearFlow(g,edgeCont);
+    std::pair<int,int>  pres=Koala::Flow::minCostFlow(g,edgeCont,S,T);
     assert(Koala::Flow::testFlow(g,edgeCont,S,T));
     cout << "vol: " << pres.second << " cost: " << pres.first << "\n\n";
     for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
+    cout << "\ntestMinCost=" << Koala::Flow::testMinCost(g,edgeCont) << "\n\n";
 
+
+
+    Koala::Flow::clearFlow(g,edgeCont);
+    pres=Koala::Flow::minCostFlow(g,edgeCont,S,T,6);
+    assert(Koala::Flow::testFlow(g,edgeCont,S,T));
+    cout << "vol: " << pres.second << " cost: " << pres.first << "\n\n";
+    for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+        cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
+    cout << "\ntestMinCost=" << Koala::Flow::testMinCost(g,edgeCont) << "\n\n";
+
+
+    pres=Koala::Flow::minCostFlow(g,edgeCont,S,T,26);
+    assert(Koala::Flow::testFlow(g,edgeCont,S,T));
+    cout << "vol: " << pres.second << " cost: " << pres.first << "\n\n";
+    for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+        cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
+    cout << "\ntestMinCost=" << Koala::Flow::testMinCost(g,edgeCont) << "\n\n";
+
+
+
+//    Koala::Flow::clearFlow(g,edgeCont);
+    pres=Koala::Flow::minCostFlow(g,edgeCont,S,T);
+    assert(Koala::Flow::testFlow(g,edgeCont,S,T));
+    cout << "vol: " << pres.second << " cost: " << pres.first << "\n\n";
+    for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+        cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
+    cout << "\ntestMinCost=" << Koala::Flow::testMinCost(g,edgeCont) << "\n\n";
+
+
+    Koala::Flow::clearFlow(g,edgeCont);
+    pres=Koala::Flow::minCostFlow(g,edgeCont,S,T);
+    assert(Koala::Flow::testFlow(g,edgeCont,S,T));
+    cout << "vol: " << pres.second << " cost: " << pres.first << "\n\n";
+    for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+        cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
+    cout << "\ntestMinCost=" << Koala::Flow::testMinCost(g,edgeCont) << "\n\n";
 
     transTest();
     cout << "\n\ntttttttttt\n\n"<< Koala::Flow::transship(g,tedgeCont,tvertCont) << "\n";
@@ -553,9 +608,11 @@ void ghTest2()
     dijTest();
     int a=Koala::Flow::maxFlow(g,edgeCont,S,T);
     assert(Koala::Flow::testFlow(g,edgeCont,S,T));
+    Koala::Flow::clearFlow(g,edgeCont);
     cout << "maxf=" << a << '\n';
     for(int i=0;i<=a+1;i++)
     {
+        Koala::Flow::clearFlow(g,edgeCont);
         int b=Koala::Flow::maxFlow(g,edgeCont,S,T,i);
         assert(Koala::Flow::testFlow(g,edgeCont,S,T));
         cout << (b==i) << '\n';
@@ -568,6 +625,7 @@ void ghTest2()
     cout << "maxf=" << a << '\n';
     for(int i=0;i<=a+1;i++)
     {   int last=-10;
+        Koala::Flow::clearFlow(g,edgeCont);
         std::pair<int,int> b=Koala::Flow::minCostFlow(g,edgeCont,S,T,i);
         assert(Koala::Flow::testFlow(g,edgeCont,S,T));
         for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeCont[e].flow=0;
@@ -638,6 +696,12 @@ void ghTest2()
     }
 
     cout << g.getVertNo() << ' ' << g.getEdgeNo();
+
+    costCostTest();
+    assert(Koala::Flow::testFlow(g,edgeCont,S,T));
+    cout << "\ncost=" << Koala::Flow::flowCost(g,edgeCont) << "\n";
+    cout << "\ntestMinCost=" << Koala::Flow::testMinCost(g,edgeCont) << "\n\n";
+
 
     return 0;
 }

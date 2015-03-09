@@ -7,16 +7,18 @@
 #include<map>
 
 #include"Koala/graph/graph.h"
+#include"Koala/graph/view.h"
 #include "Koala/io/text.h"
 #include "Koala/classes/detect.h"
 #include "Koala/classes/create.h"
+#include "Koala/algorithm/mis.h"
 
 
 using namespace Koala;
 using namespace Koala::IO;
 using namespace std;
 
-#define TEST_2
+#define TEST_1
 // TEST_ 1-3
 
 /*
@@ -25,7 +27,7 @@ using namespace std;
 #include "main.hpp"
 	bool rv;
 	Graph<int, int> g;
-	Graph<int, int>::PVertex v;
+	Graph<int, int>::PVertex v,A,B,C;
 
 	readGraphText(g,
 #if defined(TEST_1)
@@ -57,6 +59,9 @@ using namespace std;
 
 //	rv = TestsPar<AlgorithmsDefaultSettings>::IsChordal(g);
 //	rv = Comparability<AlgorithmsDefaultSettings>::IsComparabilityGraph(g);
+    //g.clearEdges();//g.neg(EdUndir);
+    A=g.getVert();B=g.getVertLast();C=g.getVertNext(A);
+    //g.addLink(A,B);//g.addLink(C,B);//g.addLink(C,A);
 	rv = IsIt::comparability(g);
 	printf("RESULT: ");
 	if(rv) {
@@ -79,7 +84,14 @@ using namespace std;
 			printf("%p: %d  ", ci->first, ci->second);
 			};
 		printf("\n");
-		cout << "maxstable: "<< IsIt::Comparability::maxStable(g,clq) << "\n";
+		int x,xx;
+		cout << "maxstable: "<< (x=IsIt::Comparability::maxStable(g,clq)) << "\n";
+		assert(MaxStableHeur::testMax(g,clq,clq+x));
+		colors.clear();
+		cout << (xx=IsIt::Comparability::coChi(g,colors));
+		assert(x==xx);
+		for(v=g.getVert();v;v=g.getVertNext(v)) assert( colors[v]>=0 && colors[v]<xx);
+		for(int i=0;i<xx;i++) assert(IsIt::clique(makeSubgraph(g,assocChoose(colors,i)& stdChoose(true))));
 	} else printf("false");
 
 	cout << "\n ----------\n";

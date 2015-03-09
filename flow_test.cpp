@@ -250,6 +250,7 @@ void tdijTest3()
     cout << "\n\n**********\n\n" << boolalpha << (flag=Koala::Flow::transship(g,tedgeCont,tvertCont, t2vertCont)) ;
 
     if (flag){
+        assert(Koala::Flow::testTransship(g,tedgeCont,tvertCont, t2vertCont));
         for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
             {   char buf[20];
                 cout << endl << ePt->getEnds().first->info << ePt->getEnds().second->info << ":" <<tedgeCont[ePt].flow;
@@ -267,7 +268,12 @@ void tdijTest3()
         for(Koala::Graph<char,OpisE>::PVertex ePt=g.getVert();ePt;ePt=g.getVertNext(ePt))
                 t2vertCont[ePt].flow=0;
     }
+
+
     cout << "\n\n**********\n\n" << Koala::Flow::minCostTransship(g,tedgeCont,tvertCont, t2vertCont) <<endl;
+//    tedgeCont[g.getEdge()].flow+=100;
+    assert(Koala::Flow::testTransship(g,tedgeCont,tvertCont, t2vertCont));
+
        for(Koala::Graph<char,OpisE>::PEdge ePt=g.getEdge();ePt;ePt=g.getEdgeNext(ePt))
             {   char buf[20];
                 cout << endl << ePt->getEnds().first->info << ePt->getEnds().second->info << ":" <<tedgeCont[ePt].flow;
@@ -327,11 +333,33 @@ void conTest()
     Koala::IO::writeGraphText(g, cout, Koala::IO::RG_VertexLists|Koala::IO::RG_Info);
 
     cout << "\n***\n" << boolalpha;
-    cout << Koala::Flow::maxFlow(g,edgeCont,S,T) << '\n';
+    cout << Koala::Flow::maxFlow(g,edgeCont,S,T,12) << '=';
+    cout << Koala::Flow::vertFlow(g,edgeCont,S) << '\n';
     assert(Koala::Flow::testFlow(g,edgeCont,S,T));
     for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
         cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
     cout << "\n\n-----------\n\n";
+
+    cout << Koala::Flow::maxFlow(g,edgeCont,S,T,59) << '=';
+    cout << Koala::Flow::vertFlow(g,edgeCont,S) << '\n';
+    for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+        cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
+    cout << "\n\n-----------\n\n";
+
+    cout << Koala::Flow::maxFlow(g,edgeCont,S,T,59) << '=';
+    cout << Koala::Flow::vertFlow(g,edgeCont,S) << '\n';
+    for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+        cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
+    cout << "\n\n-----------\n\n";
+
+    cout << Koala::Flow::maxFlow(g,edgeCont,S,T) << '=';
+    cout << Koala::Flow::vertFlow(g,edgeCont,S) << '\n';
+    assert(Koala::Flow::testFlow(g,edgeCont,S,T));
+    for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e))
+        cout << e->info << ": flow=" << edgeCont[e].flow << '\n';
+    cout << "\n\n-----------\n\n";
+
+//    return 0;
     dijTest3();
         for(Koala::Graph<char,OpisE>::PEdge e=g.getEdge();e;e=g.getEdgeNext(e)) edgeCont[e].capac=1;
     Koala::Flow::EdgeCut<CapType> res=Koala::Flow::minEdgeCut(g,edgeCont,S,T,Koala::Flow::outCut(tabV,tabE));
@@ -369,6 +397,8 @@ void conTest()
     cout << "S " << Koala::Flow::vertFlow(g,tedgeCont,S) << "T " << Koala::Flow::vertFlow(g,tedgeCont,T);
 
     cout << "\n\ncon con con con\n\n";
+//    tedgeCont[g.getEdge()].flow+=100;
+    cout <<  Koala::Flow::testTransship(g,tedgeCont,tvertCont) << endl;
 
     conTest();
     int ires=Koala::Connect::minEdgeCut(g,A,B,tabE);

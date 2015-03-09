@@ -80,7 +80,6 @@ namespace Koala
 		class Rand : public Privates::Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 
 			/** \brief Constructor
 			 *
@@ -94,6 +93,8 @@ namespace Koala
 			 *  \param vertTab the associative array that assigns weights to vertices (ignored).*/
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -112,7 +113,6 @@ namespace Koala
 		class GMin : public Privates::WMin_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 			/** \brief Constructor
 			*
 			* Constructor that initializes random numbers generator.
@@ -125,6 +125,8 @@ namespace Koala
 			 *  \param vertTab the associative array that assigns weights to vertices.(ignored)*/
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -141,12 +143,11 @@ namespace Koala
 		class GWMin: public Privates::WMin_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 			/** \brief Constructor
 			*
 			* Constructor that initializes random numbers generator.
 			* Use one of generators from header random or Koala::StdRandGen for lower c++ standards.*/
-			GWMin(RndGen& rg) : rgen(&rg) {}
+		    GWMin(RndGen& rg) : rgen(&rg) {}
 
 			/* \brief Call function operator.
 			 *
@@ -154,6 +155,8 @@ namespace Koala
 			 *  \param vertTab the associative array that assigns weights to vertices.*/
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -171,12 +174,11 @@ namespace Koala
 		class GGWMin : public Privates::WMin_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 			/** \brief Constructor
 			 *
 			 * Constructor that initializes random numbers generator.
 			 * Use one of generators from header random or Koala::StdRandGen for lower c++ standards.*/
-			GGWMin(RndGen& rg) : rgen(&rg) {}
+		    GGWMin(RndGen& rg) : rgen(&rg) {}
 
 			/* \brief Call function operator.
 			 *
@@ -184,6 +186,8 @@ namespace Koala
 			 *  \param vertTab the associative array that assigns weights to vertices.*/
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -200,7 +204,6 @@ namespace Koala
 		class GWMin2 : public Privates::WMin_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 		    /** \brief Constructor
 			 *
 			 * Constructor that initializes random numbers generator. 
@@ -213,6 +216,8 @@ namespace Koala
 			 *  \param vertTab the associative array that assigns weights to vertices.*/
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -231,7 +236,6 @@ namespace Koala
 		class GMax : public Privates::WMax_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 		    /** \brief Constructor
 			 *
 			 * Constructor that initializes random numbers generator. 
@@ -244,6 +248,8 @@ namespace Koala
 			 *  \param vertTab the associative array that assigns weights to vertices (ignored).*/
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -260,7 +266,6 @@ namespace Koala
 		class GWMax: public Privates::WMax_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 			/** \brief Constructor
 			*
 			* Constructor that initializes random numbers generator.
@@ -273,6 +278,8 @@ namespace Koala
 			 *  \param vertTab the associative array that assigns weights to vertices.*/
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 
 		/* ----------------------------------------------------------------------
@@ -290,7 +297,6 @@ namespace Koala
 		class GGWMax: public Privates::WMax_Strategy_tag
 		{
 		public:
-		    RndGen* rgen;
 		    /** \brief Constructor
 			 *
 			 * Constructor that initializes random numbers generator. 
@@ -303,6 +309,8 @@ namespace Koala
 			 *  \param vertTab the associative array that assigns weights to vertices.*/
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
+
+            private: RndGen* rgen;
 		};
 	}
 

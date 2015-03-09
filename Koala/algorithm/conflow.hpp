@@ -33,12 +33,23 @@ namespace Privates {
 // FlowPar
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
+	void FlowPar< DefaultStructs >::clearFlow( const GraphType & g,
+		EdgeContainer& edgeTab)
+{
+	const typename EdgeContainer::ValType::CapacType Zero = NumberTypeBounds
+		< typename EdgeContainer::ValType::CapacType >::zero();
+    edgeTab.reserve(g.getEdgeNo());
+    for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) ) edgeTab[e].flow = Zero;
+}
+
+template< class DefaultStructs > template< class GraphType, class EdgeContainer >
 	typename EdgeContainer::ValType::CapacType FlowPar< DefaultStructs >::usedCap( const GraphType &g,
 		EdgeContainer &edgeTab, typename GraphType::PEdge e, typename GraphType::PVertex v, bool out )
 {
+
+	assert(g.isEdgeEnd(e,v) && g.getEdgeType(e) != EdLoop );
+	if (!out) v=g.getEdgeEnd( e,v );
 	EdgeDirection dir = g.getEdgeDir( e,v );
-	assert( dir != EdNone && dir != EdLoop );
-	if (out)
 		switch (dir)
 		{
 			case EdDirOut: return edgeTab[e].capac - edgeTab[e].flow;
@@ -47,16 +58,15 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 				if (g.getEdgeEnd1(e) == v) return edgeTab[e].capac - edgeTab[e].flow;
 				else return edgeTab[e].capac + edgeTab[e].flow;
 		}
-	else return usedCap( g,edgeTab,e,g.getEdgeEnd( e,v ),true );
 }
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
 	void FlowPar< DefaultStructs >::addFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PEdge e,
 		typename GraphType::PVertex v, typename EdgeContainer::ValType::CapacType delta, bool out )
 {
+	assert(g.isEdgeEnd(e,v) && g.getEdgeType(e) != EdLoop );
+	if (!out) v=g.getEdgeEnd( e,v );
 	EdgeDirection dir = g.getEdgeDir( e,v );
-	assert( dir != EdNone && dir != EdLoop );
-	if (out)
 		switch (dir)
 		{
 			case EdDirOut:
@@ -74,7 +84,6 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 				assert( edgeTab[e].flow <= edgeTab[e].capac && edgeTab[e].flow >= -edgeTab[e].capac );
 				break;
 		}
-	else addFlow( g,edgeTab,e,g.getEdgeEnd( e,v ),delta,true );
 }
 
 template< class DefaultStructs > template< class GraphType, class VertContainer, class EdgeContainer, class Iter > bool
@@ -90,14 +99,18 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 
 	visited[first].vPrev = 0;
 	visited[first].ePrev = 0;
-	if (out) visited[first].distance = 0;
-	else visited[first].backdist = 0;
 	cont.push( first );
+
+	int  VertContainer::ValType:: *distPtr;
+	if (out) distPtr=&VertContainer::ValType::distance;
+	else distPtr=&VertContainer::ValType::backdist;
+	visited[first].*distPtr = 0;
+//	else visited[first].backdist = 0;
 
 	while (!cont.empty())
 	{
 		u = cont.top();
-		depth = (out) ? visited[u].distance : visited[u].backdist;
+		depth = visited[u].*distPtr;// (out) ? visited[u].distance : visited[u].backdist;
 		cont.pop();
 
 		for( e = g.getEdge( u,mask ); e != NULL; e = g.getEdgeNext( u,e,mask ) )
@@ -105,17 +118,21 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 					::isZero( usedCap( g,edgeTab,e,u,out ) ))
 			{
 				v = g.getEdgeEnd( e,u );
-				if (!NumberTypeBounds< int >::isPlusInfty(
-										(out) ? visited[v].distance : visited[v].backdist ))
+				if (!NumberTypeBounds< int >::isPlusInfty( visited[v].*distPtr))
+										//(out) ? visited[v].distance : visited[v].backdist ))
 					continue;
 				visited[v].vPrev = u;
 				visited[v].ePrev = e;
-				if (out) visited[v].distance = depth + 1;
-				else visited[v].backdist = depth + 1;
+//				if (out) visited[v].distance = depth + 1;
+//				else visited[v].backdist = depth + 1;
+                visited[v].*distPtr = depth + 1;
 				cont.push( v );
 			}
-		*iter = u;
-		++iter;
+        if (!isBlackHole(iter)){
+            *iter = u;
+            ++iter;
+        }
+
 		if (u == last) return true;
 	}
 	return false;
@@ -222,7 +239,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 		< typename EdgeContainer::ValType::CapacType >::zero();
 	const EdgeDirection mask = EdDirIn | EdDirOut | EdUndir;
 
-	typename EdgeContainer::ValType::CapacType minpot = PlusInfty;
+	typename EdgeContainer::ValType::CapacType minpot = PlusInfty, minInOut;
 	typename GraphType::PVertex u;
 	int minpos = -1;
 
@@ -230,9 +247,9 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 		if (vertTab[tab[i]].used)
 		{
 			vertTab[tab[i]].mass = Zero;
-			if (minpot > std::min( vertTab[tab[i]].inPot,vertTab[tab[i]].outPot ))
+			if (minpot > (minInOut=std::min( vertTab[tab[i]].inPot,vertTab[tab[i]].outPot )))
 			{
-				minpot = std::min( vertTab[tab[i]].inPot,vertTab[tab[i]].outPot );
+				minpot = minInOut;
 				minpos = i;
 			}
 		}
@@ -306,7 +323,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 
 	for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
 	{
-		edgeTab[e].flow = Zero;
+		//edgeTab[e].flow = Zero; //TODO: koment?
 		koalaAssert( edgeTab[e].capac >= Zero,AlgExcWrongArg );
 	}
 	if (limit == Zero) return Zero;
@@ -338,7 +355,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 
 	for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
 	{
-		edgeTab[e].flow = Zero;
+		//edgeTab[e].flow = Zero; //TODO: koment?
 		koalaAssert( edgeTab[e].capac >= Zero,AlgExcWrongArg );
 	}
 
@@ -587,7 +604,8 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 	int n;
 	typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
 		VertLabsCost< GraphType,typename EdgeContainer::ValType::CostType > >::Type vertTab( n = g.getVertNo() );
-	typename EdgeContainer::ValType::CapacType res = Zero;
+	typename EdgeContainer::ValType::CapacType res = vertFlow(g,edgeTab,start);// Zero;
+	koalaAssert( val >= res,AlgExcWrongArg );
 	typename GraphType::PVertex LOCALARRAY( vTab,n );
 	typename GraphType::PEdge LOCALARRAY( eTab,n );
 
@@ -621,6 +639,7 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 
 
 	int len;
+//	clearFlow(g,edgeTab);
 	res = maxFlow( g,edgeTab,start,end,val );
 	while ((len = minMeanCycle( g,edgeTab,outPath( vTab,eTab ) )) != 0)
 	{
@@ -753,16 +772,41 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 	return true;
 }
 
+template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VertContainer > bool
+	FlowPar< DefaultStructs >::testTransship( const GraphType &g,
+			const EdgeContainer &edgeTab, const VertContainer &vertCont )
+{
+	const typename EdgeContainer::ValType::CapacType Zero = NumberTypeBounds
+		< typename EdgeContainer::ValType::CapacType >::zero();
+	for( typename GraphType::PEdge e = g.getEdge( EdUndir ); e; e = g.getEdgeNext( e,EdUndir ) )
+    {
+        if (std::max( +edgeTab[e].flow,-edgeTab[e].flow ) > edgeTab[e].hi) return false;
+        koalaAssert( NumberTypeBounds< typename EdgeContainer::ValType::CapacType >
+					::isZero(edgeTab[e].lo ),AlgExcWrongArg );
+    }
+	for( typename GraphType::PEdge e = g.getEdge( Directed | Loop ); e; e = g.getEdgeNext( e,Directed | Loop ) )
+		if (edgeTab[e].flow < edgeTab[e].lo || edgeTab[e].flow > edgeTab[e].hi) return false;
+	for( typename GraphType::PVertex v = g.getVert(); v; v = g.getVertNext( v ) )
+		if (-vertFlow( g,edgeTab,v ) >vertCont[v].hi || -vertFlow( g,edgeTab,v ) <vertCont[v].lo) return false;
+	return true;
+}
+
+
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
 	typename EdgeContainer::ValType::CapacType FlowPar< DefaultStructs >::maxFlow( const GraphType &g,
 		EdgeContainer &edgeTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
 		typename EdgeContainer::ValType::CapacType limit )
 {
 	koalaAssert( start && end,AlgExcNullVert );
-	koalaAssert( limit >= NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::zero(),
+	typename EdgeContainer::ValType::CapacType startFlow=vertFlow(g,edgeTab,start);
+//	koalaAssert( limit >= NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::zero(),
+//		AlgExcWrongArg );
+	koalaAssert( startFlow >= NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::zero() && limit>=startFlow,
 		AlgExcWrongArg );
-	if (DefaultStructs::useFulkersonFord) return maxFlowFF( g,edgeTab,start,end,limit );
-	else return maxFlowMKM( g,edgeTab,start,end,limit );
+	if (DefaultStructs::useFulkersonFord)  { //std::cout << "\n!!FF!!\n";
+                        return startFlow+maxFlowFF( g,edgeTab,start,end,limit-startFlow ); }
+	else { //std::cout << "\n!!MKM!!\n";
+            return startFlow+maxFlowMKM( g,edgeTab,start,end,limit-startFlow ); }
 }
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
@@ -779,6 +823,67 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 }
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer >
+	bool FlowPar< DefaultStructs >::testMinCost( const GraphType &g, const EdgeContainer &edgeTab)
+{
+    for( typename GraphType::PEdge e = g.getEdge(Loop); e; e = g.getEdgeNext( e, Loop ) )
+        if (!NumberTypeBounds< typename EdgeContainer::ValType::CostType >::isZero(edgeTab[e].cost))
+    {
+        if (NumberTypeBounds< typename EdgeContainer::ValType::CostType >::zero()<edgeTab[e].cost &&
+            !NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::isZero(edgeTab[e].flow)) return false;
+        if (NumberTypeBounds< typename EdgeContainer::ValType::CostType >::zero()>edgeTab[e].cost &&
+            edgeTab[e].flow<edgeTab[e].capac) return false;
+    }
+
+    int mdir=g.getEdgeNo(Directed), mun=g.getEdgeNo(Undirected),n=g.getVertNo();
+    typedef typename DefaultStructs::template LocalGraph< EmptyVertInfo, EmptyEdgeInfo ,Directed >::Type Image;
+    typename DefaultStructs:: template AssocCont< typename Image::PEdge,
+        typename WeightPathStructs::
+            template EdgeLabs<typename EdgeContainer::ValType::CostType> > ::Type
+                imageLen( 2*mdir+4*mun +n );
+
+    typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
+        typename Image::PVertex > ::Type images(n);
+
+    typename GraphType::PVertex u,v;
+    typename EdgeContainer::ValType::CapacType flow;
+    SimplArrPool<typename Image::Vertex> valloc(n+1);
+    SimplArrPool<typename Image::Edge> ealloc(2*mdir+4*mun+n);
+
+    Image ig(&valloc,&ealloc);
+    for(v = g.getVert(); v; v = g.getVertNext( v ) )
+        images[v]=ig.addVert();
+    for( typename GraphType::PEdge e = g.getEdge(Directed); e; e = g.getEdgeNext( e, Directed ) )
+    {
+        u=g.getEdgeEnd1(e); v=g.getEdgeEnd2(e); flow=edgeTab[e].flow;
+        if (flow<edgeTab[e].capac) imageLen[ig.addArc(images[u],images[v])].length=edgeTab[e].cost;
+        if (!NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::isZero(flow))
+            imageLen[ig.addArc(images[v],images[u])].length=-edgeTab[e].cost;
+    }
+    for( typename GraphType::PEdge e = g.getEdge(Undirected); e; e = g.getEdgeNext( e, Undirected ) )
+    {
+        u=g.getEdgeEnd1(e); v=g.getEdgeEnd2(e); flow=std::max(+edgeTab[e].flow,
+                                            +NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::zero());
+        if (flow<edgeTab[e].capac) imageLen[ig.addArc(images[u],images[v])].length=edgeTab[e].cost;
+        if (!NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::isZero(flow))
+            imageLen[ig.addArc(images[v],images[u])].length=-edgeTab[e].cost;
+
+        u=g.getEdgeEnd2(e); v=g.getEdgeEnd1(e); flow=std::max(-edgeTab[e].flow,
+                                            +NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::zero());
+        if (flow<edgeTab[e].capac) imageLen[ig.addArc(images[u],images[v])].length=edgeTab[e].cost;
+        if (!NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::isZero(flow))
+            imageLen[ig.addArc(images[v],images[u])].length=-edgeTab[e].cost;
+    }
+
+    typename Image::PVertex start=ig.addVert();
+    for(typename Image::PVertex v=ig.getVert();v;v=ig.getVertNext(v)) if (v!=start)
+        imageLen[ig.addArc(start,v)].length=NumberTypeBounds< typename EdgeContainer::ValType::CostType >::zero();
+
+
+    return BellmanFordPar<DefaultStructs>::distances(ig,blackHole,imageLen,start)==NumberTypeBounds< typename EdgeContainer::ValType::CostType >::zero();
+}
+
+
+template< class DefaultStructs > template< class GraphType, class EdgeContainer >
 	std::pair< typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType >
 	FlowPar< DefaultStructs >::minCostFlow( const GraphType &g, EdgeContainer &edgeTab,
 		typename GraphType::PVertex start, typename GraphType::PVertex end,
@@ -793,11 +898,11 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 
 	for( typename GraphType::PEdge e = g.getEdge(); e; e = g.getEdgeNext( e ) )
 	{
-		edgeTab[e].flow = Zero;
+//		edgeTab[e].flow = Zero;
 		koalaAssert( edgeTab[e].capac >= Zero,AlgExcWrongArg );
 	}
-	for( typename GraphType::PEdge E = g.getEdge( EdDirIn | EdDirOut | EdUndir ); E;
-		E = g.getEdgeNext( E,EdDirIn | EdDirOut | EdUndir ) )
+	for( typename GraphType::PEdge E = g.getEdge( (DefaultStructs::useCostAugmPath) ? (EdDirIn | EdDirOut | EdUndir): EdUndir ); E;
+		E = g.getEdgeNext( E,(DefaultStructs::useCostAugmPath) ? (EdDirIn | EdDirOut | EdUndir): EdUndir ) )
 		koalaAssert( edgeTab[E].cost >= NumberTypeBounds
 			< typename EdgeContainer::ValType::CostType >::zero(),AlgExcWrongArg );
 
@@ -937,6 +1042,58 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer,
 
     return true;
 }
+
+template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2 >
+	bool FlowPar< DefaultStructs >::testTransship( const GraphType &g, EdgeContainer &edgeTab, const VertContainer &vertTab,
+        const VertContainer2 &vertTab2)
+{
+    int n=g.getVertNo(),m=g.getEdgeNo(Directed|Loop);
+	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,
+		std::pair< typename GraphType::PVertex,typename GraphType::PEdge >,Directed >::Type Image;
+
+	typename DefaultStructs::template AssocCont< typename GraphType::PVertex,
+		std::pair< typename Image::PVertex,typename Image::PVertex > >::Type images(n);
+    SimplArrPool<typename Image::Vertex> valloc(2*n+3);
+    SimplArrPool<typename Image::Edge> ealloc(5*n+m+2);
+	Image ig(&valloc,&ealloc);
+	Privates::flowsMakeImage( g,ig,images, Directed|Loop );
+	images.clear();
+
+	typename DefaultStructs:: template AssocCont< typename Image::PVertex,
+		typename FlowPar< DefaultStructs >:: template TrsVertLoss< typename EdgeContainer::ValType::CapacType > >
+            ::Type imageVLabs(n=ig.getVertNo());
+	typename DefaultStructs:: template AssocCont< typename Image::PEdge,
+		typename FlowPar< DefaultStructs >:: template TrsEdgeLabs< typename EdgeContainer::ValType::CapacType > >
+            ::Type imageELabs(n+ig.getEdgeNo());
+
+	for(typename Image::PEdge e=ig.getEdge();e;e=ig.getEdgeNext(e))
+        if (e->info.second)
+        {
+            imageELabs[e]=TrsEdgeLabs< typename EdgeContainer::ValType::CapacType >
+                (edgeTab[e->info.second].lo,edgeTab[e->info.second].hi);
+            imageELabs[e].flow=edgeTab[e->info.second].flow;
+        }
+        else
+        {
+            imageELabs[e]=TrsEdgeLabs< typename EdgeContainer::ValType::CapacType >
+                    (vertTab2[e->info.first].lo,vertTab2[e->info.first].hi);
+            imageELabs[e].flow=vertTab2[e->info.first].flow;
+            if (vertTab[e->info.first].hi>=vertTab[e->info.first].lo &&
+                vertTab[e->info.first].lo>=NumberTypeBounds< typename EdgeContainer::ValType::CapacType >
+                    ::zero())
+                imageVLabs[ig.getEdgeEnd1(e)]=TrsVertLoss< typename EdgeContainer::ValType::CapacType >
+                                            (vertTab[e->info.first].lo,vertTab[e->info.first].hi);
+            else if (vertTab[e->info.first].hi>=vertTab[e->info.first].lo &&
+                vertTab[e->info.first].hi<=NumberTypeBounds< typename EdgeContainer::ValType::CapacType >
+                    ::zero())
+                imageVLabs[ig.getEdgeEnd2(e)]=TrsVertLoss< typename EdgeContainer::ValType::CapacType >
+                                            (vertTab[e->info.first].lo,vertTab[e->info.first].hi);
+            else koalaAssert( false,AlgExcWrongArg );
+        }
+
+        return testTransship(ig,imageELabs, imageVLabs);
+}
+
 
 template< class DefaultStructs > template< class GraphType, class EdgeContainer, class VertContainer >
 	typename EdgeContainer::ValType::CostType FlowPar< DefaultStructs >::minCostTransship( GraphType &g,
