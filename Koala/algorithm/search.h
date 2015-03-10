@@ -606,7 +606,6 @@ namespace Koala
 		};
 
         //NEW: wyzytor przegladajacy graf tylko na podana glebokosc
-		/** \brief  */
 		class NearVertsVisitor: public complex_visitor_tag, public no_component_visitor_tag
 		{
 		public:
@@ -1551,10 +1550,9 @@ namespace Koala
 	*  \ingroup search    */
 	class Blocks : public BlocksPar< AlgsDefaultSettings > { };
 
-	//WEN?: jak z nazwą, dołączyć wiki link?
-	/** Algorithms for Eulerian cycle and path.
+	/** Algorithms for Eulerian cycle and walk.
 	 *
-	 * The class delivers a suit of methods searching for Eulerian cycle or path. Tested graphs may by of any type. 
+	 * The class delivers a suit of methods searching for Eulerian cycle or walk. Tested graphs may by of any type. 
 	 * Various methods simply ignore some edge types (directed or undirected).
 	 * \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
 	 *  \ingroup search */

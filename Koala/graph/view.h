@@ -41,7 +41,7 @@ namespace Koala
             }
         };
 
-        //NEW: sprywatyzowano, podobnie w dalszych widokach
+        // sprywatyzowano, podobnie w dalszych widokach
         template< class GraphType > struct GraphInternalTypes;
 
         template< class Graph, class VChooser, class EChooser >
@@ -56,7 +56,7 @@ namespace Koala
             typedef typename Graph::GraphSettings GraphSettings;
         };
 
-        //NEW: widok nie moze tworzyc/usuwac macierzy sasiedztwa grafu podstawowego, ale musi miec metody, by kompilowaly sie kody algorytmow grafowych dla wejsciowego widoku
+        // widok nie moze tworzyc/usuwac macierzy sasiedztwa grafu podstawowego, ale musi miec metody, by kompilowaly sie kody algorytmow grafowych dla wejsciowego widoku
         struct ViewAdjMatrixTool {
 
             bool makeAdjMatrix()
@@ -881,10 +881,10 @@ namespace Koala
 			{ if (deep) return up().good( vert,true ); else return true; }
 		/** \brief Check edge presence.
 		 *
-		 *  The method tests if the edge form ancestor belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph WEN: nie jestesmy w subgrafie, jaki chooser? and both ends satisfy \a vchoose. If the flag \a deep is set to true all the ancestors choosers are tested.
+		 *  The method tests if the edge from ancestor belongs to the current view. If the flag \a deep is set to true all the ancestors are tested.
 		 * \param edge the tested edge.
 		 * \param deep the flag determining if all choosers of ancestors are checked.
-		 *  \return true if edge belongs to subgraph, false otherwise.*/
+		 * \return true if edge belongs to view, false otherwise.*/
         bool good( PEdge edge, bool deep = false ) const
 			{ if (deep) return up().good( edge,true ); else return true; }
 		// na uzytek ConstGraphMethods

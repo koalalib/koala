@@ -9,7 +9,7 @@
 namespace Koala
 {
 
-    //NEW: generalna zmiana nazw: MIS(Heuristic)(Par) -> MaxStable(Heur)(Par) oraz MISStrategy->MaxStableStrategy
+    // generalna zmiana nazw: MIS(Heuristic)(Par) -> MaxStable(Heur)(Par) oraz MISStrategy->MaxStableStrategy
 	/** \brief Vertex choosing strategies for maximal stable set, vertex cover and maximum clique heuristics. 
 	 *
 	 *  The namespace contains functors
@@ -29,7 +29,6 @@ namespace Koala
 	 *  - associative container \a vertTab, which assigns integer weight to each vertex. However some strategies (First, Rand, GMin, GMax) ignore this parameter.
 	 *
 	 *  The functor returns one chosen vertex. 
-	 WEN?: tu lub w ebooku nalezy podac publikacje P. Borowieckiego z tymi heurezami (od wielkiej biedy - mgr TK).
 	 *  \ingroup DMmis */
 	namespace MaxStableStrategy
 	{
@@ -63,7 +62,7 @@ namespace Koala
 				}
 		};
 
-//NEW: w ponizszych stragegiach Rand GMin GWMin GGWMin GWMin2 GMax GWMax GGWMax nowy parametr
+//w ponizszych stragegiach Rand GMin GWMin GGWMin GWMin2 GMax GWMax GGWMax nowy parametr
 //szablonu klasy - typ wybranego generatora liczb losowych. Zewnetrzny obiekt uzywanego generatora
 // podaje sie w konstruktorze strategii
 		/* ----------------------------------------------------------------------
@@ -75,7 +74,8 @@ namespace Koala
 		*/
 		/** \brief Get random vertex functor.
 		 *
-		 *  The for a graph functor returns random vertex.  Functor can be used in both approaches.*/
+		 *  The for a graph functor returns random vertex.  Functor can be used in both approaches.
+		 *  \tparam RndGen numbers generator class.*/
 		template <class RndGen=Koala::StdRandGen<> >
 		class Rand : public Privates::Strategy_tag
 		{
@@ -108,7 +108,8 @@ namespace Koala
 		 */
 		/** \brief Get minimum degree vertex functor.
 		 *
-		 *  The for a graph (weights are ignored) functor returns vertex with minimal degree. It is advised to use with method \a getWMin.*/
+		 *  The for a graph (weights are ignored) functor returns vertex with minimal degree. It is advised to use with method \a getWMin.
+		 *  \tparam RndGen numbers generator class.*/
 		template <class RndGen=Koala::StdRandGen<> >
 		class GMin : public Privates::WMin_Strategy_tag
 		{
@@ -137,8 +138,9 @@ namespace Koala
 		 *
 		 */
 		/** \brief Get minimum degree and maximum weight vertex functor.
-		*
-		*  The for a graph and weights functor returns vertex for which W(v)/( deg(v) +1) is maximal. It is advised to use with method \a getWMin.*/
+		 *
+		 *  The for a graph and weights functor returns vertex for which W(v)/( deg(v) +1) is maximal. It is advised to use with method \a getWMin.
+		 *  \tparam RndGen numbers generator class.*/
 		template <class RndGen=Koala::StdRandGen<> >
 		class GWMin: public Privates::WMin_Strategy_tag
 		{
@@ -169,7 +171,8 @@ namespace Koala
 		 */
 		/** \brief Get minimum degree vertex with weight functor.
 		 *
-		 *  The for a graph and weights functor returns vertices \a v for which Σ<sub>u ∈ N[v]</sub>W(u)/( deg(u) +1) ≤ W(v) . It is advised to use with method \a getWMin.*/
+		 *  The for a graph and weights functor returns vertices \a v for which Σ<sub>u ∈ N[v]</sub>W(u)/( deg(u) +1) ≤ W(v) . It is advised to use with method \a getWMin.
+		 *  \tparam RndGen numbers generator class.*/
 		template <class RndGen=Koala::StdRandGen<> >
 		class GGWMin : public Privates::WMin_Strategy_tag
 		{
@@ -199,7 +202,8 @@ namespace Koala
 		*/
 		/** \brief Get maximum weight and minimum sum of neighbors weights vertex functor.
 		 *
-		 *  The for a graph and weights functor returns vertex for which W(v)/Σ<sub>u ∈ N[v]</sub>W(u) is maximal. It is advised to use with method \a getWMin.*/
+		 *  The for a graph and weights functor returns vertex for which W(v)/Σ<sub>u ∈ N[v]</sub>W(u) is maximal. It is advised to use with method \a getWMin.
+		 *  \tparam RndGen numbers generator class.*/
 		template <class RndGen=Koala::StdRandGen<> >
 		class GWMin2 : public Privates::WMin_Strategy_tag
 		{
@@ -231,7 +235,8 @@ namespace Koala
 		*/
 		/** \brief Get maximum degree vertex functor.
 		 *
-		 *  The for a graph gets the vertex with maximum degree. It is advised to use this functor with function \a getWMax.*/
+		 *  The for a graph gets the vertex with maximum degree. It is advised to use this functor with function \a getWMax.
+		 *  \tparam RndGen numbers generator class.*/
 		template <class RndGen=Koala::StdRandGen<> >
 		class GMax : public Privates::WMax_Strategy_tag
 		{
@@ -261,7 +266,8 @@ namespace Koala
 		*/
 		/** \brief Get maximum degree and minimal weight vertex functor.
 		 *
-		 *  The for a graph gets the vertex for which the function W(v) / (deg(v)*(deg(v)-1)) is minimal. It is advised to use this functor with function \a getWMax.*/
+		 *  The for a graph gets the vertex for which the function W(v) / (deg(v)*(deg(v)-1)) is minimal. It is advised to use this functor with function \a getWMax.
+		 *  \tparam RndGen numbers generator class.*/
 		template <class RndGen=Koala::StdRandGen<> >
 		class GWMax: public Privates::WMax_Strategy_tag
 		{
@@ -292,7 +298,8 @@ namespace Koala
 		*/
 		/** \brief Get maximum degree and minimal weight vertex functor.
 		 *
-		 *  The for a graph and weights gets the vertices v that satisfy  Σ<sub>u ∈ N[v]</sub> W(u) / (deg(u)*(deg(u)-1)) ≥ W(v) /( deg(v) + 1 ). It is advised to use this functor with function \a getWMax.*/
+		 *  The for a graph and weights gets the vertices v that satisfy  Σ<sub>u ∈ N[v]</sub> W(u) / (deg(u)*(deg(u)-1)) ≥ W(v) /( deg(v) + 1 ). It is advised to use this functor with function \a getWMax.
+		 *  \tparam RndGen numbers generator class.*/
 		template <class RndGen=Koala::StdRandGen<> >
 		class GGWMax: public Privates::WMax_Strategy_tag
 		{
@@ -313,7 +320,10 @@ namespace Koala
             private: RndGen* rgen;
 		};
 	}
-
+	//skierowane sa traktowane jak nieskierowane, 
+	// petle : w zbiorze niezaleznym nie moze byc wierzcholka z petla
+	//         w pokryciu vert.musza byc wszystkie wierzcholki z petlami
+	//         dla kliki petle sa ignorowane tj.zbior vert jest klika, jesli jego podgraf indukowany zawiera klike o tych wszystkich wierzcholkach.
 	/** \brief Maximal independent set heuristics (parametrized).
 	 *
 	 *  Class for max independent set.
@@ -337,13 +347,6 @@ namespace Koala
 		 *  Since only heuristic is applied here the result may be suboptimal.
 		 *  \param g the considered graph. Any type of graph is allowed. 
 		 *   Mind that arcs are treated as undirected edges and vertices with loops may not belong to stable set. 
-		 WEN: sposob traktowania grafu (obowiazuje tu i w dalszych metodach/klasach) graf dowolny tj. dopuszczalne kraw. rownolegle
-		 reszte wklejam z maila:
-		 > Roma locuta, causa finita.
-        - po namysle nie zgadzam sie z ta wykladnia. Teraz skierowane sa traktowane jak nieskierowane, a petle:
-        * w zbiorze niezaleznym nie moze byc wierzcholka z petla
-        * w pokryciu vert. musza byc wszystkie wierzcholki z petlami
-        * dla kliki petle sa ignorowane tj. zbior vert jest klika, jesli jego podgraf indukowany zawiera klike o tych wszystkich wierzcholkach.
 		 *  \param out the iterator to the container with the output set of vertices.
 		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.

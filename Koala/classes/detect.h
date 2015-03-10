@@ -698,10 +698,17 @@ namespace Koala
                 return chi(g,avmap);
             }
 
-            //NEW: Dilworth's theorem - rozbicie wierzcholkow comparability na najmniejsza liczbe podzbiorow bedacych klikami
+            //Dilworth's theorem - rozbicie wierzcholkow comparability na najmniejsza liczbe podzbiorow bedacych klikami
             // czyli liczba chromat. negacji. Dla comparability jest rowna maxStable.
             // avmap - mapa PVertex->numer kliki (int) liczac od 0, wolno blacholizowac
             //zwraca moc maxStable tj. liczbe klik lub -1 dla niecomparability
+			/**\brief Split vertex set into cliques. 
+			 *
+			 * According to Dilworth's theorem, the method splits the vertex set of comparability graph into minimum number of cliques. 
+			 * Not that it gives maximal stable set of \a g and the chromatic number of graph \a g complement.
+			 * \param g the considered graph.
+			 * \param avmap output associative array PVerte->(clique index). Cliques are indexed from 0. BlackHole available. 
+			 * \return the number of cliques or -1 if the graph was not comparability.*/
 			template< class Graph, class OutMap > static int coChi( const Graph &g, OutMap &avmap );
 
 
