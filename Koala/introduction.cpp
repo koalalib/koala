@@ -3,7 +3,7 @@
  *  
  *  \ref wiki
  *
- * <bf> <a href = "../koala.zip"> KOALA sources </a> </bf>
+ * <a href = "../koala.zip"> KOALA sources </a> 
  *
  * <a href = "modules.html">Documentation</a> of the KOALA library and <a href = "examples/index.html">examples</a> of the codes using it
  *
