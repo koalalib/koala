@@ -1,7 +1,7 @@
 #ifndef KOALA_EXCEPTION_H
 #define KOALA_EXCEPTION_H
 
-/* exception.h
+/** \file exception.h
  *
  */
 
@@ -9,20 +9,30 @@
 #include <cstdlib>
 #include <cstring>
 
-//WEN: czy makra tez mozna zdokumentowac?
 // dlugosc bufora wewnatrz wyjatku przeznaczonego na jego tekstowy opis
+/**\def KOALA_EXCEPTION_BUF_SIZE 
+ * \brief Size of exception text buffer. 
+ *  \ingroup DMexception */
 #ifndef KOALA_EXCEPTION_BUF_SIZE
 	#define KOALA_EXCEPTION_BUF_SIZE 150
 #endif
 
 // Stała KOALA_DONT_CHECK_ERRORS wyłącza sprawdzanie błędów i rzucanie wyjątków przez Koalę.
 // Wylaczenie standardowego assert przez NDEBUG automatycznie wylacza koalowa kontrole
+/** \def KOALA_DONT_CHECK_ERRORS 
+ *  \brief Macro switching of exception testing.
+ *  \ingroup DMexception */
 #if defined(NDEBUG)
 	#define KOALA_DONT_CHECK_ERRORS
 #endif
 
 // Makro koalaAssert() - pierwszy argument sprawdzany warunek, drugi typ rzucanego wyjątku. Automatycznie rzuca wyjatek z podanym w konstr. opisem zwracajacym jego typ i polozenie
 //To wlasnie to makro jest ew. wylaczane stala czasu kompilacji KOALA_DONT_CHECK_ERRORS
+/** \def koalaAssert( descr,type )
+ *  \brief Koala macro for throwing exceptions.
+ *  
+ *  The macro takes token \a descr as parameter and type of Error \a type. Macro also uses information about from where (file name and line number) the exception is thrown.
+ *  \ingroup DMexception */
 #if defined(KOALA_DONT_CHECK_ERRORS)
 	#define koalaAssert( descr,type ) {}
 #else
@@ -34,8 +44,7 @@ namespace Koala
 	/** \brief Exceptions */
 	namespace Error
 	{
-	    //WEN: wszedzie brak opisu metod i konstruktora
-	    //WEN: w opisie warto zwrocic uwage na 2-wymiarowa hierarchie klas wyjatkow Koali: sam typ wyjatku pokazuje, czy polecialo z metody kontenera, metody grafu, czy algorytmu
+	    //w opisie warto zwrocic uwage na 2-wymiarowa hierarchie klas wyjatkow Koali: sam typ wyjatku pokazuje, czy polecialo z metody kontenera, metody grafu, czy algorytmu
 		// Klasa bazowa dla wyjątków Koali.
 		/** \brief Exception base.
 		 *
@@ -50,19 +59,23 @@ namespace Koala
 			// Parametry konstruktora określają, co mają zwracać metody line, descr i file.
 			/** \brief Constructor
 			 *
-			 * \param adesc WEN?:*/
+			 * \param adesc Error description
+			 * \param afile file name where the exception is thrown.
+			 * \param aline the line number of the exception occurrence.*/
 			inline ExcBase( const char *adesc = "", const char *afile = "", int aline = -1);
 
-			// Wiersz w kodzie, gdzie wystapił błąd.
+			/**\brief Get exception occurrence line number.*/
 			inline int line() const
 				{ return _line; }
-			// Opis wyjątku.
+			/**\brief Get exception description.*/
 			inline const char *descr() const
 				{ return buf; }
 			// Plik źrodłowy, w którym wystąpił błąd.
+			/**\brief Get source file name where the exception is thrown.*/
 			inline const char *file() const
 				{ return buf + std::strlen( buf ) + 1; }
 			// Nazwa typu wyjątku.
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ExcBase"; }
 		};
@@ -76,9 +89,11 @@ namespace Koala
 		class ExcWrongArg: virtual public ExcBase
 		{
 		public:
+			/**\copydoc ExcBase::ExcBase*/
 			inline ExcWrongArg( const char *adesc = "", const char *afile = "", int aline = -1):
 				ExcBase( adesc,afile,aline )
 					{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ExcWrongArg"; }
 		};
@@ -92,9 +107,11 @@ namespace Koala
 		class ExcNullVert: public ExcWrongArg
 		{
 		public:
-			inline ExcNullVert( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline ExcNullVert(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ExcNullVert"; }
 		};
@@ -108,9 +125,11 @@ namespace Koala
 		class ExcNullEdge: public ExcWrongArg
 		{
 		public:
-			inline ExcNullEdge( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline ExcNullEdge(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ExcNullEdge"; }
 		};
@@ -124,9 +143,11 @@ namespace Koala
 		class ExcWrongConn: public ExcWrongArg
 		{
 		public:
-			inline ExcWrongConn( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline ExcWrongConn(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ExcWrongConn"; }
 		};
@@ -140,9 +161,11 @@ namespace Koala
 		class ExcWrongMask: public ExcWrongArg
 		{
 		public:
-			inline ExcWrongMask( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline ExcWrongMask(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ExcWrongMask"; }
 		};
@@ -156,9 +179,11 @@ namespace Koala
 		class ContExc: virtual public ExcBase
 		{
 		public:
-			inline ContExc( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline ContExc(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ContExc"; }
 		};
@@ -172,9 +197,11 @@ namespace Koala
 		class ContExcWrongArg: public ContExc, public ExcWrongArg
 		{
 		public:
-			inline ContExcWrongArg( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline ContExcWrongArg(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ContExcWrongArg"; }
 		};
@@ -188,9 +215,11 @@ namespace Koala
 		class ContExcFull: public ContExc
 		{
 		public:
-			inline ContExcFull( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline ContExcFull(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ContExcFull"; }
 		};
@@ -201,9 +230,11 @@ namespace Koala
 		class ContExcPoolNotEmpty: public ContExc
 		{
 		public:
-			inline ContExcPoolNotEmpty( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline ContExcPoolNotEmpty(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ContExcPoolNotEmpty"; }
 		};
@@ -218,9 +249,11 @@ namespace Koala
 		class ContExcOutpass: public ContExcWrongArg
 		{
 		public:
-			inline ContExcOutpass( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline ContExcOutpass(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ContExcOutpass"; }
 		};
@@ -234,9 +267,11 @@ namespace Koala
 		class GraphExc: virtual public ExcBase
 		{
 		public:
-			inline GraphExc( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline GraphExc(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "GraphExc"; }
 		};
@@ -250,9 +285,11 @@ namespace Koala
 		class GraphExcWrongArg: public GraphExc, public ExcWrongArg
 		{
 		public:
-			inline GraphExcWrongArg( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline GraphExcWrongArg(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "GraphExcWrongArg"; }
 		};
@@ -266,9 +303,11 @@ namespace Koala
 		class GraphExcWrongConn: public GraphExc, public ExcWrongConn
 		{
 		public:
-			inline GraphExcWrongConn( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline GraphExcWrongConn(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "GraphExcWrongConn"; }
 		};
@@ -282,9 +321,11 @@ namespace Koala
 		class GraphExcNullVert: public GraphExc, public ExcNullVert
 		{
 		public:
-			inline GraphExcNullVert( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline GraphExcNullVert(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "GraphExcNullVert"; }
 		};
@@ -298,9 +339,11 @@ namespace Koala
 		class GraphExcNullEdge: public GraphExc, public ExcNullEdge
 		{
 		public:
-			inline GraphExcNullEdge( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline GraphExcNullEdge(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "GraphExcNullEdge"; }
 		};
@@ -314,9 +357,11 @@ namespace Koala
 		class GraphExcWrongMask: public GraphExc, public ExcWrongMask
 		{
 		public:
-			inline GraphExcWrongMask( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline GraphExcWrongMask(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "GraphExcWrongMask"; }
 		};
@@ -330,9 +375,11 @@ namespace Koala
 		class AlgExc: virtual public ExcBase
 		{
 		public:
-			inline AlgExc( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline AlgExc(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "AlgExc"; }
 		};
@@ -346,9 +393,11 @@ namespace Koala
 		class AlgExcWrongArg: public AlgExc, public ExcWrongArg
 		{
 		public:
-			inline AlgExcWrongArg( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline AlgExcWrongArg(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "AlgExcWrongArg"; }
 		};
@@ -362,9 +411,11 @@ namespace Koala
 		class AlgExcNullVert: public AlgExc, public ExcNullVert
 		{
 		public:
-			inline AlgExcNullVert( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline AlgExcNullVert(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "AlgExcNullVert"; }
 		};
@@ -378,9 +429,11 @@ namespace Koala
 		class AlgExcNullEdge: public AlgExc, public ExcNullEdge
 		{
 		public:
-			inline AlgExcNullEdge( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline AlgExcNullEdge(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "AlgExcNullEdge"; }
 		};
@@ -394,9 +447,11 @@ namespace Koala
 		class AlgExcWrongMask: public AlgExc, public ExcWrongMask
 		{
 		public:
-			inline AlgExcWrongMask( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline AlgExcWrongMask(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "AlgExcWrongMask"; }
 		};
@@ -410,9 +465,11 @@ namespace Koala
 		class AlgExcWrongConn: public AlgExc, public ExcWrongConn
 		{
 		public:
-			inline AlgExcWrongConn( const char *adesc = "", const char *afile = "", int aline = -1):
+			/**\copydoc ExcBase::ExcBase*/
+			inline AlgExcWrongConn(const char *adesc = "", const char *afile = "", int aline = -1) :
 				ExcBase( adesc,afile,aline )
 				{ }
+			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "GraphExcWrongConn"; }
 		};
