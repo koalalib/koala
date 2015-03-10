@@ -152,12 +152,11 @@ namespace Koala
 		};
 
 		// typ macierzy sasiedztwa dla krawedzi skierowanych - zbedne przy edAllow=false
-		//WEN: opis
 		/** \brief The type of container for adjacency matrix for directed edges.
 		 *
 		 *  The class is unnecessary if adAllow is false.
-		 *  \tparam K WEN?:
-		 *  \tparam V WEN?:*/
+		 *  \tparam K key type.
+		 *  \tparam V mapped value type.*/
 		template< class K, class V > class AdjMatrixDirEdges
 		{
 		public:
@@ -184,8 +183,8 @@ namespace Koala
 		/** \brief The type of container for adjacency matrix for undirected edges.
 		 *
 		 *  The class is unnecessary if adAllow is false.
-		 *  \tparam K WEN?:
-		 *  \tparam V WEN?:*/
+		 *  \tparam K key type.
+		 *  \tparam V mapped value type.*/
 		template< class K, class V > class AdjMatrixUndirEdges
 		{
 		public:
@@ -261,11 +260,11 @@ namespace Koala
 //            std::sort( first,last,comp );
 //       }
 
-        //NEW: klasa usuwajaca ew. powtorzenia i wartosci zerowe z ciagow wejsciowych podanych miedzy iteratorami - filtruje
+        // klasa usuwajaca ew. powtorzenia i wartosci zerowe z ciagow wejsciowych podanych miedzy iteratorami - filtruje
         // wejscie w roznych metodach
 		/** \brief Class deleting repetitions.
 		 *
-		 *  The class delivers algorithm that remove multiple elements. WEN?:*/
+		 *  The class delivers algorithm that remove multiple elements.*/
         template <class T,class Settings> class RepsDeleter
             : public AssocRepsDeleterBase<T, Settings>
         //Inna mozliwosc
@@ -501,15 +500,16 @@ namespace Koala
 		typedef Graph< VertInfo,EdgeInfo,Settings > RootGrType; /**< \brief Current graph type (used with subgraphs). */
 
 
-        //NEW: umozliwia oddelegowanie alokowania wierzcholkow/krawedzi do pul SimplArrPool o ograniczonej
+        // umozliwia oddelegowanie alokowania wierzcholkow/krawedzi do pul SimplArrPool o ograniczonej
         //pojemnosci - na uzytek grafow lokalnych w procedurach
 		// Konstruktory
 		// Tworzy pusty graf, bez krawędzi i wierzchołków.
 		/** \brief Constructor
 		 *
 		 *  Creates a new graph without any edges or vertices. Also adjacency matrix is not created yet. It is created after using method makeAdjMatrix().
-		 *  \param valloc WEN?:
-		 *  \param ealloc WEN?:
+		 *  Allow to define own limited allocation space for vertices and edges. 
+		 *  \param valloc allocation pool for vertices
+		 *  \param ealloc allocation pool for edges.
 		 *
 		 *  [See example](examples/graph/graph_clear.html). */
 		Graph(SimplArrPool<Koala::Vertex< VertInfo,EdgeInfo,Settings > > *valloc=0,
@@ -588,7 +588,7 @@ namespace Koala
 		//przenosi do naszego grafu wierzcholki z grafu gr podane w przedziale iteratorw. Wraz z nimi przenoszone
 		//sa krawedzie podgrafu indukowanego w gr przez te wierzcholki o typie zgodnym z mask. Inne krawedzie
 		//styczne z tymi wierzcholkami w gr sa kasowane. gr musi byc rozny od naszego grafu. Zwraca liczby
-		//wierz/kraw. WEN?: ktore ulegly przeniesieniu.
+		//wierz/kraw. ktore ulegly przeniesieniu.
 		/** \biref Move induced subgraph.
 		 *
 		 *  
@@ -658,7 +658,7 @@ namespace Koala
 		 *  The method allows to see through all the edges of the type congruent with the mask \a direct. The method gets the pointer to the edge next to \a e.
 		 *  If parameter e is set to NULL then the first edge on the list is taken.
 		 *  \param e the reference edge.
-		 *  \param direct the mask representing all the types of considered edges. WEN?: tzn. krawedzie ktorych typ & mask!= sa taken into account
+		 *  \param direct the Koala::EdgeType mask representing all the types of considered edges. \wikipath{EdgeType}
 		 *  \returns pointer to the next edge or if \a e is the last edge then NULL.
 		 *
 		 *  [See example](examples/graph/graph_getEdgeNext.html).	 */
@@ -669,19 +669,18 @@ namespace Koala
 		 *  The method allows to see through all the edges of the type congruent with the mask direct. The method gets the pointer to the edge previous to \a edge.
 		 *  If parameter \a edge is set to NULL then the last edge on the list will be taken.
 		 *  \param edge the reference edge.
-		 *  \param direct the mask representing all the types of considered edges. WEN?: tzn. krawedzie ktorych typ & mask!= sa taken into account
+		 *  \param direct the Koala::EdgeType mask representing all the types of considered edges. \wikipath{EdgeType}
 		 *  \returns pointer to the previous edge or if edge is the first edge then NULL.
 		 *
 		 *  [See example](examples/graph/graph_getEdgePrev.html).	 */
 		inline typename GraphType::PEdge getEdgePrev( PEdge edge, EdgeType direct = EdAll ) const;
 
 		/* \brief Get vertex degree.
-		 *  WEN: por. koment. w grconst.h
+		 * 
 		 *  Gets the number of edges incident to the vertex of direction (with respect to the vertex \a vert) prespecified by the mask direct.
-		 *  \param vert the pointer to the reference vertex.
-		 *  \param direct the mask representing the direction of considered edges.
-		 *  \returns the number of edges directed as required in \a direct.
-		 */
+		 *  \param vert the pointer to the considered vertex.
+		 *  \param direct  determines the direction of edges concerned. \wikipath{EdgeType,See more details about EdgeType.}
+		 *  \returns the number of edges directed as required in \a direct. */
 		inline int getEdgeNo( PVertex vert, EdgeDirection direct = EdAll ) const;
 
 		/* \brief Get next edge.
@@ -691,7 +690,7 @@ namespace Koala
 		 *  If the parameter \a e is set to NULL then the first edge on the list is taken.
 		 *  \param vert only the edges incident to \a vert are considered.
 		 *  \param e the reference edge.
-		 *  \param direct the mask representing the types of edges. WEN: no wlasnie nie bardzo type od edge tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
+		 *  \param direct the mask decides which edges are considered as adjacent. \wikipath{EdgeDirection, Get more information about EdgeDirection.}
 		 *  \returns the pointer to the next edge or if the edge is the last edge then NULL.
 		 *
 		 *  [See example](examples/graph/graph_getEdgeNext.html).	 */
@@ -703,7 +702,7 @@ namespace Koala
 		 *  If the parameter \a ed is set to NULL then the last edge on the list will be returned.
 		 *  \param vert the reference vertex.
 		 *  \param ed the reference edge.
-		 *  \param direct the mask representing the types of edges. WEN: no wlasnie nie bardzo type od edge tzn. krawedzie ktorych sposob sasiadowania z v & mask!= sa taken into account
+		 *  \param direct the mask decides which edges are considered as adjacent. \wikipath{EdgeDirection, Get more information about EdgeDirection.}
 		 *  \returns Pointer to the previous edge or if the edge is the first then NULL.
 		 *
 		 *  [See example](examples/graph/graph_getEdgePrev.html).	 */
@@ -714,7 +713,7 @@ namespace Koala
 		 *  The method counts the number of edges between two vertices. Only edges directed in the way consistent with the mask \a direct are considered.
 		 *  \param vert1 the first vertex
 		 *  \param vert2 the second vertex
-		 *  \param direct the mask representing the direction of considered edges. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
+		 *  \param direct the mask representing the type and direction of edges taken into account.
 		 *  \returns the number of edges between \a vert1 and \a vert2. */
 		int getEdgeNo( PVertex vert1, PVertex vert2, EdgeDirection direct = EdAll ) const;
 
@@ -725,11 +724,11 @@ namespace Koala
 		 *  \param vert1 the first vertex.
 		 *  \param vert2 the second vertex.
 		 *  \param ed the reference edge
-		 *  \param direct the mask representing the direction of considered edges. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
+		 *  \param direct the mask representing the type and direction (for directed) of edges taken into account.
 		 *  \returns the pointer to the next parallel edge or NULL if \a ed is the last.
 		 *
 		 *  [See example](examples/graph/graph_getEdgeNext.html).	 */
-		typename GraphType::PEdge getEdgeNext( PVertex vert1, PVertex vert2, PEdge ed, EdgeDirection diretction = EdAll ) const;
+		typfename GraphType::PEdge getEdgeNext( PVertex vert1, PVertex vert2, PEdge ed, EdgeDirection diretction = EdAll ) const;
 
 		/* \brief Get previous parallel edges.
 		 *
@@ -738,7 +737,7 @@ namespace Koala
 		 *  \param vert1 the first vertex.
 		 *  \param vert2 the second vertex.
 		 *  \param ed the reference edge.
-		 *  \param direct the mask representing direction of the considered edges. WEN: maska okresla i typ interesujacych krawedzi i (dla skierowanych) ich orientacje
+		 *  \param direct the mask representing the type and direction (for directed) of edges taken into account.
 		 *  \returns the pointer to the previous parallel edge or NULL if \a ed is the first edge.
 		 *
 		 *  [See example](examples/graph/graph_getEdgePrev.html).	 */
@@ -748,7 +747,6 @@ namespace Koala
 		 *
 		 *  \param e the pointer to considered edge.
 		 *  \return the EdgeType value which is a mask representing the type of edge.
-		 *  - Detached   = 0x0 WEN: wywal, bo ta wartosc nie moze sie pojawic
 		 *  - Loop       = 0x1
 		 *  - Undirected = 0x2
 		 *  - Directed   = 0xC
@@ -758,8 +756,9 @@ namespace Koala
 		inline EdgeType getEdgeType( PEdge e ) const;
 
 		/* \brief Get edge ends
-		 *  WEN: tj. pierwsza koncowa w .first, druga w .second - krawedz ma ponumerowane konce
-		 *  The method gets the pair of vertices on which the edge \a ed is spanned.
+		 *
+		 *  The method gets the pair of vertices on which the edge \a ed is spanned. As the vertices in edge are ordered 
+		 *  the first edge end goes to the first pair element and the second goes to the second.
 		 *  \param ed the considered edge.
 		 *  \returns the pair of the vertices that are the ends of the edge \a ed.	 */
 		inline std::pair< typename GraphType::PVertex,typename GraphType::PVertex > getEdgeEnds( PEdge ed ) const;
@@ -781,15 +780,13 @@ namespace Koala
 		/* \brief Get arc direction
 		 *
 		 *  The method gets the edge direction. Possible values of EdgeDirection are:
-		 *  - EdNone   = 0x00 if ed is NULL WEN: to v,
-		 *  - EdLoop   = 0x01 if ed is a loop, WEN: connected to v,
+		 *  - EdLoop   = 0x01 if ed is a loop,
 		 *  - EdUndir  = 0x02 if ed is undirected,
 		 *  - EdDirIn  = 0x04 if ed is directed and vert is the second vertex of ed,
 		 *  - EdDirOut = 0x08 if ed is directed and vert is the first vertex of ed.
 		 *  \param ed considered edge.
 		 *  \param vert reference vertex.
-		 *  \returns direction of edge \a ed.
-		 */
+		 *  \returns direction of edge \a ed.*/
 		inline EdgeDirection getEdgeDir( PEdge ed ,PVertex vert ) const;
 
 		// ustawianie pol info

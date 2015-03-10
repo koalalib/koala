@@ -86,26 +86,33 @@ namespace Koala
 
 	// Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych w
 		// algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda.
-		/** \brief Numeric types specialization.
-		 *  WEN?: to jest taka wersja std::numeric_limits ograniczona do potrzeb algorytmow Koali
-		 *  Class allows to choose own numeric types for data in internal Koala algorithms.*/
+	/** \brief Numeric types specialization.
+	 * 
+	 *  Class allows to choose own numeric types for data in internal Koala algorithms.
+	 *  This is a Koala version of std::numeric_limits.*/
     template< class T > class NumberTypeBounds
     {
     public:
-        //WEN: opisy
+		/**\brief Get type maximal value.*/
         static T plusInfty()
             { return std::numeric_limits< T >::max(); }
-        static bool isPlusInfty( T arg )
+		/**\brief Test if type maximal value.*/
+		static bool isPlusInfty(T arg)
             { return arg == plusInfty(); }
-        static T minusInfty()
+		/**\brief */
+		static T minusInfty()
             { return std::numeric_limits< T >::min(); }
-        static bool isMinusInfty( T arg )
+		/**\brief */
+		static bool isMinusInfty(T arg)
             { return arg == minusInfty(); }
-        static T zero()
+		/**\brief Get zero value.*/
+		static T zero()
             { return (T)0; }
-        static T one()
+		/**\brief */
+		static T one()
             { return (T)1; }
-        static bool isZero( T arg )
+		/**\brief */
+		static bool isZero(T arg)
             { return arg == zero(); }
     };
 
@@ -190,20 +197,20 @@ namespace Koala
 			class HeapCont
 		{
 		public:
-			typedef FibonHeap< Key,Compare > Type;/**<\brief Define own if intend to change.WEN?:*/
-                    typedef FibonHeapNode< Key > NodeType;/**<\brief Define own if intend to change.???*/
+			typedef FibonHeap< Key,Compare > Type;/**<\brief Define own if intend to change.*/
+            typedef FibonHeapNode< Key > NodeType;/**<\brief Define own if intend to change.*/
 
 			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
-            //typedef BinomHeap< Key,Compare > Type;/**<\brief Define own if intend to change.???*/
-                    //typedef BinomHeapNode< Key > NodeType;/**<\brief Define own if intend to change.???*/
+            //typedef BinomHeap< Key,Compare > Type;/**<\brief Define own if intend to change.*/
+                    //typedef BinomHeapNode< Key > NodeType;/**<\brief Define own if intend to change.*/
 
-            //typedef PairHeap< Key,Compare > Type;/**<\brief Define own if intend to change.???*/
-                    //typedef PairHeapNode< Key > NodeType;/**<\brief Define own if intend to change.???*/
+            //typedef PairHeap< Key,Compare > Type;/**<\brief Define own if intend to change.*/
+                    //typedef PairHeapNode< Key > NodeType;/**<\brief Define own if intend to change.*/
 		};
 
 		// Typ grafu pomocniczego stosowanego wewnątrz procedury.
 		/** \brief Auxiliary graph.
-		 *  WEN: opis parametrow szablonu (podobnie jak w grafie glownym)
+		 *  
 		 *  The structure is used for internal purposes in various procedures.
 		 *  \tparam A VertInfo type.
 		 *  \tparam B EdgeInfo type
@@ -375,12 +382,13 @@ namespace Koala
 
 	};
 
-
 	// Makra blackHole można używać jak zmiennej globalnej typu BlackHole.
-	/** \brief BlackHole macro.
+	/** \def blackHole 
+	 *  \brief BlackHole macro.
 	 *
-	 *  The macro inserts BlackHole object \wikipath{blackhole}.
-	 *  \related BlackHole */
+	 *  The macro inserts BlackHole object \wikipath{blackHole}.
+	 *  \related BlackHole 
+	 *  \ingroup DMdef */
 	#define blackHole ((*((Koala::BlackHole*)( &std::cout ))))
 
 	// Test na to, czy argument jest typu BlackHole.
@@ -389,13 +397,15 @@ namespace Koala
 	 *  The	method tests if type \a T is BlackHole. Although it always returns false,
 	 *  there is a specialization of it available for BlackHole type, which returns true.
 	 *  \return false unless the specialization for BlackHole is called.
-	 *  \related BlackHole */
+	 *  \related BlackHole
+	 *  \ingroup DMdef */
 	template< class T > bool isBlackHole( const T & )
 		{ return false; }
 	/* \brief Test if black hole.
 	 *
 	 *  \return true if the tested type is BlackHole.
-	 *  \related BlackHole*/
+	 *  \related BlackHole
+	 *  \ingroup DMdef */
 	inline bool isBlackHole( const BlackHole & )
 		{ return true; }
 
@@ -406,7 +416,8 @@ namespace Koala
 	 */
 	/** \brief Switch blackHole to local container
 	 *
-	 *  If Cont1 is BlackHole method get delivers container of type Cont2 otherwise it returns object of type Cont1. */
+	 *  If Cont1 is BlackHole method get delivers container of type Cont2 otherwise it returns object of type Cont1.
+	 *  \ingroup DMdef */
 	template< class Cont1, class Cont2 > struct BlackHoleSwitch
 	{
 		// Typ kontenera, na którym będziemy działać.
@@ -2867,7 +2878,15 @@ namespace Koala
 	 *  \related NoCastCaster
 	 *  \ingroup DMcaster*/
 	inline NoCastCaster stdCast( bool arg );
-	//NEW: alias dla powyzszego z arg=false
+
+	//alias dla powyzszego z arg=false
+	/** \brief Generating function for NoCastCaster.
+	 *
+	 *  \wikipath{caster, Get more information about casters.}
+	 *  \return NoCastCaster function object that implements overloaded template function call operator for two and three parameters which
+	 *  ignores source info objects and sets destination into object with its type default empty value (the empty constructor is called).
+	 *  \related NoCastCaster
+	 *  \ingroup DMcaster*/
 	inline NoCastCaster valCast() { return NoCastCaster(); }
 
 	/* ObjCaster

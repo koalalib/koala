@@ -362,8 +362,9 @@ private:
 	}
 
 	/** \brief Find minimal edge cover.
-	 *  WEN: tylko tu w tym module w wyniku moga tez pojawic sie petle
-	 *  The method finds a minimal edge cover of a given \a g.
+	 * 
+	 *  The method finds a minimal edge cover of a given \a g. 
+	 *  This the only functon from this module that allows loops in output.
 	 *  @param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
 	 *  @param[out] cover the insert iterator to the container with the list of edges of found cover.
 	 *  @return the actual number of edges in found cover.
@@ -605,38 +606,70 @@ private:
 	 *  \ingroup DMmatch	 */
 	class StableMatching: public StableMatchingPar< AlgsDefaultSettings > { };
 
-
-    //NEW:
+	/**\brief Auxiliary factor structures.
+	 *
+	 *  \ingroup DMmatch */
     struct FactorStructs {
-        enum DegParity {DegAll=0,DegOdd,DegEven};
+		/**\brief Degree parity type*/
+		enum DegParity { DegAll /**\brief All*/ = 0, DegOdd/**\brief Odd*/, DegEven /**\brief Even*/ };
 
         //Dopuszczalny zakres stopni przy danym vert oraz informacja, czy ma on byc liczba z tego zakresu: dowolna/odd/even
         //Domyslnie dowolna
         //Przedzial obustronnie domkniety liczb calowitych o podanych koncach lewy, prawy. Z zalozenia niepusty tj. left>right rzuca wyjatek
+		/**\brief Degree range structure.
+		 *
+		 * The structure keeps degree range for vertex (Segment) and the parity type DegParity.*/
         struct DegRange : public Segment //por. simple.h
         {
-            DegParity parity;
+			DegParity parity;/**<\brief Degrees parity type. */
 
-
+			/**\brief Empty constructor.
+			 *
+			 * Allows any type of parity and do not define the segment.*/
             DegRange() : parity(DegAll) {}
-            DegRange(int r): Segment(r,r), parity(DegAll) {}
+			/**\brief Constructor.
+			 *
+			 * Allows any type of parity and sets degrees to single value \a r.*/
+			DegRange(int r) : Segment(r, r), parity(DegAll) {}
+			/**\brief Constructor.
+			 *
+			 * Allows any type of parity and sets degree range to [l;r], if l>r exception is thrown.*/
             DegRange(int l,int r): Segment(l,r), parity(DegAll) {}
+            /**\brief Constructor.
+			 *
+			 * Allows any type of parity and sets the degree range to values from \a s, if left>right exception is thrown.*/
             DegRange(Segment s) : Segment(s.left,s.right), parity(DegAll) {}
-            DegRange(int l,int r, DegParity p ): Segment(l,r), parity(p) {}
+			/**\brief Constructor.
+			*
+			* The constructor sets type of parity to \a p and the degree range to [l;r], if l>r exception is thrown.*/
+			DegRange(int l, int r, DegParity p) : Segment(l, r), parity(p) {}
         };
 
     };
 
-    //NEW: Wyszukiwanie faktorow czyli podgrafow w danym grafie o zadanych stopniach przy wierzcholkach
+    // Wyszukiwanie faktorow czyli podgrafow w danym grafie o zadanych stopniach przy wierzcholkach
     //Pojecia maja sens dla grafow bez lukow (petle i undir dozwolone), ale luki nie sa ignorowane, tylko trakotowane jak undir
+	/**\brief Factor.
+	 *
+	 *  The class delivers methods that calculate graph factors. I.e. the class searches for subgraph in which particular vertices have predefined degrees.
+	 *  \sa Factor
+	 *  \sa AlgsDefaultSettings
+	 *  \ingroup DMmatch*/
     template< class DefaultStructs > class FactorPar: public FactorStructs {
 
     public:
 
-        template< class GraphType, class VertCont, class EIterOut >
-        // vtab - mapa PVertex->int - jaki stopien ma miec podgraf przy konkretnych wierzcholkach
-        // zwraca liczbe krawedzi podgrafu (krawedzi ida na out) lub -1 gdy podgrafu nie ma
-			static int find( const GraphType &g, const VertCont& vtab,EIterOut out)
+		// vtab - mapa PVertex->int - jaki stopien ma miec podgraf przy konkretnych wierzcholkach
+		// zwraca liczbe krawedzi podgrafu (krawedzi ida na out) lub -1 gdy podgrafu nie ma
+		/**\brief Find factor.
+		 *
+		 * The method calculates factor for vertices degrees given by associative array PVertex->int.
+		 * \param g the considered graph.
+		 * \param vtab associative array PVertex -> int that keeps vertices degrees in searched graph.
+		 * \param out the output iterator to the container with edges of found subgraph. 
+		 * \return the number of edges in the subgraph or -1 if the subgraph does not exist.*/
+		template< class GraphType, class VertCont, class EIterOut >
+        	static int find( const GraphType &g, const VertCont& vtab,EIterOut out)
 			{
 			    int n=g.getVertNo(), m=g.getEdgeNo(),sum =0,sum2=0;
 			    typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,int >::Type impos(n);
@@ -676,9 +709,16 @@ private:
                 return res;
 			}
 
-            // avtab - mapa PVertex->DegRange - jaki stopien (dopuszczalny zakres, parzystosc) ma miec podgraf przy konkretnych wierzcholkach
-            // zwraca liczbe krawedzi podgrafu (krawedzi ida na out) lub -1 gdy podgrafu nie ma
-            template< class GraphType, class VertCont, class EIterOut >
+        // avtab - mapa PVertex->DegRange - jaki stopien (dopuszczalny zakres, parzystosc) ma miec podgraf przy konkretnych wierzcholkach
+        // zwraca liczbe krawedzi podgrafu (krawedzi ida na out) lub -1 gdy podgrafu nie ma
+		/**\brief Find factor for degrees ranges.
+		 *
+		 * The method finds factor in graph for degrees range given by associative array PVertex->DegRange.
+		 * \param g the considered graph.
+		 * \param avtab the associative array PVertex->DegRange, that keeps allowed range of degrees.
+		 * \param out the output iterator to the container with chosen edges.
+		 * \return the number of edges in \a out or -1 if the subgraph does not exist.*/
+        template< class GraphType, class VertCont, class EIterOut >
 			static int segFind( const GraphType &g, const VertCont& avtab,EIterOut out)
 			{
 			    int n=g.getVertNo(), m=g.getEdgeNo(),sum =0;
@@ -745,7 +785,15 @@ private:
             // avtab - mapa PVertex->Segment - jaki stopien (dopuszczalny zakres) ma miec podgraf przy konkretnych wierzcholkach
             // mrange - dopuszczalny zakres liczby krawedzi podgrafu
             // zwraca liczbe krawedzi podgrafu (krawedzi ida na out) lub -1 gdy podgrafu nie ma
-            template< class GraphType, class VertCont, class EIterOut >
+        /**\brief Find factor for degrees ranges.
+		 *
+		 * The method finds factor in graph for degrees range given by associative array PVertex->Segment.
+		 * \param g the considered graph.
+		 * \param avtab the associative array PVertex->Segment, that keeps allowed range of degrees.
+		 * \param mrange the Segment defining allowed cardinalities of edge set in searched subgraph.
+		 * \param out the output iterator to the container with chosen edges.
+		 * \return the number of edges in \a out or -1 if the subgraph does not exist.*/
+        template< class GraphType, class VertCont, class EIterOut >
             static int segFind(GraphType &g, const VertCont& avtab,Segment mrange, EIterOut out)
             {
                 int n=g.getVertNo(), sum2=0;
@@ -777,7 +825,13 @@ private:
             }
     };
 
-    class Factor: public FactorPar< AlgsDefaultSettings > { };
+	/**\brief Factor.
+	*
+	*  The class delivers methods that calculate graph factors. I.e. the class searches for subgraph in which particular vertices have predefined degrees.
+	*  \sa FactorPar
+	*  \sa AlgsDefaultSettings
+	*  \ingroup DMmatch*/
+	class Factor : public FactorPar< AlgsDefaultSettings > { };
 
 #include "matching.hpp"
 }
