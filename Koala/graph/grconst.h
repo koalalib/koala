@@ -186,7 +186,9 @@ public:
 	 *  The method allows to see through all vertices in the graph. It gets the vertex next to \a v.
 	 *  \param v the reference vertex, the next vertex is taken.
 	 *  \return the pointer to the vertex next to \a v on the list of vertices. 
-	 *   If \a v is the last vertex, then NULL is returned. If \a v is NULL, then the first vertex is returned. */
+	 *   If \a v is the last vertex, then NULL is returned. If \a v is NULL, then the first vertex is returned.
+	 *
+	 *  [See example](examples/graph/graph_getVertNext.html). */
 	inline PVertex getVertNext( PVertex v ) const
 		{ return self.getVertNext( v ); }
 
@@ -196,7 +198,9 @@ public:
 	 *  The method allows to see through all vertices in the graph. It gets the vertex prior to \a v.
 	 *  \param v the pointer to the reference vertex, the previous vertex is taken.
 	 *  \return pointer to the vertex prior to \a v on the list of vertices. If \a v is the first vertex, then NULL is returned.
-	 *   If \a v is NULL, then the last vertex on the list is returned. */
+	 *   If \a v is NULL, then the last vertex on the list is returned.
+	 *
+	 *  [See example](examples/graph/graph_getVertPrev.html). */
 	inline PVertex getVertPrev( PVertex v ) const
 		{ return self.getVertPrev( v ); }
 
@@ -204,7 +208,9 @@ public:
 	 *
 	 *  Graph class is organized on list structures. Also the list of vertices is available. 
 	 *  The method allows to get the first vertices in the graph.
-	 *  \return pointer to the the first vertex on the list of vertices or NULL if the graph is empty. */
+	 *  \return pointer to the the first vertex on the list of vertices or NULL if the graph is empty.
+	 *
+	 *  [See example](examples/graph/graph_getVertNext.html). */
 	PVertex getVert() const
 		{ return self.getVertNext( (PVertex)0 ); }
 
@@ -212,7 +218,9 @@ public:
 	 *
 	 *  The graph is organized on list structures. Also the list of vertices is available. 
 	 *  The method allows to get to the last vertices in the graph on the list of vertices.
-	 *  \return the pointer to the the last vertex on the list of vertices or NULL if the graph is empty.*/
+	 *  \return the pointer to the the last vertex on the list of vertices or NULL if the graph is empty.
+	 *
+	 *  [See example](examples/graph/graph_getVertPrev.html). */
 	PVertex getVertLast() const
 		{ return self.getVertPrev( (PVertex)0 ); }
 
@@ -222,13 +230,17 @@ public:
 	 *  Any container with a defined output iterator (ex. table) can be used.
 	 *  \tparam OutputIterator Iterator type to the container in which the method stores up vertices.
 	 *  \param[out] iter the iterator of the container to which the pointers to all vertices form the graph are written.
-	 *  \return the number of vertices. */
+	 *  \return the number of vertices.
+	 *
+	 *  [See example](examples/graph/graph_getVerts.html). */
 	template< class OutputIterator > int getVerts( OutputIterator iter) const;
 
 	/** \brief Get vertex set.
 	 *
 	 *  The method gets and returns the vertex set.
-	 *  \return the set of pointers to all vertices of the graph. */
+	 *  \return the set of pointers to all vertices of the graph.
+	 *
+	 *  [See example](examples/graph/graph_getVertSet.html). */
 	Set< PVertex > getVertSet() const;
 
 	// Liczba krawêdzi typu zawartego w podanej masce
@@ -275,7 +287,9 @@ public:
 	 *
 	 *  All the edges in graph, which are consistent  with \a mask, are stored in the set.
 	 *  \param mask determines the types of edges that are concerned. \wikipath{EdgeType,See more details about EdgeType.}
-	 *  \return the set of edges. */
+	 *  \return the set of edges.
+	 *
+	 *  [See example](examples/graph/graph_getEdgeSet.html). */
 	Set< PEdge > getEdgeSet( EdgeType mask = EdAll ) const;
 
 	/** \brief Get first edge.
@@ -368,7 +382,9 @@ public:
 	 *  The method returns the set of all edges incident to \a v with direction consistent with mask \a direct.
 	 *  \param v the reference vertex.
 	 *  \param direct the mask defining the returned edges direction (with respect to \a v). \wikipath{EdgeDirection,See more details about EdgeDirection.}
-	 *  \return the set of edges incident to \a v. */
+	 *  \return the set of edges incident to \a v.
+	 *
+	 *  [See example](examples/graph/graph_getEdgeSet.html). */
 	Set< PEdge > getEdgeSet( PVertex v, EdgeDirection direct = EdAll ) const;
 
     // Poniewaz nie da sie latwo bez iteratorow przegladac listy kolejnych sasiadow wierzcholka w multigrafie
@@ -520,7 +536,9 @@ public:
 	 *  \param vert1 the first reference vertex.
 	 *  \param vert2 the second reference vertex.
 	 *  \param direct mask representing the considered edges types and direction. \wikipath{EdgeDirection,See more details about EdgeDirection.}
-	 *  \return the set of edges spanned on vert1 and vert2. */
+	 *  \return the set of edges spanned on vert1 and vert2.
+	 *
+	 *  [See example](examples/graph/graph_getEdgeSet.html). */
 	Set< PEdge > getEdgeSet( PVertex vert1, PVertex vert2, EdgeDirection direct = EdAll ) const;
 
 	/** \brief Get set of parallel edges.
@@ -543,7 +561,9 @@ public:
 	 *  \tparam VChooser2 Class allowing to choose vertices automatically.
 	 *  \param out the iterator of the container used to store up the pointers to vertices chosen by the chooser \a ch.
 	 *  \param ch the chooser object allowing to choose vertices automatically. \wikipath{chooser}.
-	 *  \return the number of vertices in the output container. */
+	 *  \return the number of vertices in the output container.
+	 *
+	 *  [See example](examples/graph/graph_getVerts.html). */
 	template< class OutputIterator, class VChooser2 > int getVerts( OutputIterator out, VChooser2 ch ) const;
 
 	/** \brief Get set of vertices.
@@ -551,7 +571,9 @@ public:
 	 *  The method returns the set of vertices defined by the chooser class.
 	 *  \tparam VChooser2 the class allowing to choose vertices automatically.
 	 *  \param ch the chooser object allowing to choose vertices automatically. \wikipath{chooser}.
-	 *  \return the set of vertices.	 */
+	 *  \return the set of vertices.
+	 *
+	 *  [See example](examples/graph/graph_getVertSet.html). */
 	template< class VChooser2 > Set< PVertex > getVertSet( VChooser2 ch ) const;
 
 	/** \brief Get set of edges.
@@ -570,7 +592,9 @@ public:
 	 *  The method gets the set of edges defined by the chooser object \a ch.
 	 *  \tparam EChooser2 the class allowing to choose edges automatically.
 	 *  \param ch the chooser object allowing to choose edges automatically. \wikipath{chooser}.
-	 *  \return the set of pointers to edges congruent with the chooser object \a ch.	 */
+	 *  \return the set of pointers to edges congruent with the chooser object \a ch.
+	 *
+	 *  [See example](examples/graph/graph_getEdgeSet.html). */
 	template< class EChooser2 >
 	typename Privates::SecondTypeTest<typename EChooser2::ChoosersSelfType, Set< PEdge > >::Type getEdgeSet( EChooser2 ch ) const;
 
@@ -586,7 +610,9 @@ public:
 	 *  \param out the standard pair of iterators used to return the containers of vertices and edges.
 	 *  \param chs the pair of chooser objects allowing to choose vertices and edges automatically. \wikipath{chooser}.
 	 *  \param chooseends if true for each edge not only the edge chooser must be satisfied but also both ends need to satisfy the vertex chooser.
-	 *  \return the standard pair of integers that are respectively the number of chosen vertices and the number of edges. */
+	 *  \return the standard pair of integers that are respectively the number of chosen vertices and the number of edges.
+	 *
+	 *  [See example](examples/graph/graph_getChosen.html). */
 	template< class OutputV, class OutputE, class VChooser2, class EChooser2 >
 		std::pair< int,int > getChosen( std::pair< OutputV,OutputE > out,std::pair< VChooser2,EChooser2 > chs, bool chooseends = true) const;
 
@@ -597,7 +623,9 @@ public:
 	 *  \tparam VChooser2 the class allowing to choose vertices automatically.
 	 *  \param chs the pair of chooser objects allowing to choose vertices and edges automatically. \wikipath{chooser}.
 	 *  \param chosenends if true for each edge, not only edge chooser must be satisfied but also both ends need to satisfy vertex chooser.
-	 *  \return the standard pair of sets in which the first element is the set of vertices and the second the set of edges. */
+	 *  \return the standard pair of sets in which the first element is the set of vertices and the second the set of edges.
+	 *
+	 *  [See example](examples/graph/graph_getChosenSets.html). */
 	template<class VChooser2,class EChooser2 >
 		std::pair< Set< PVertex >,Set< PEdge > > getChosenSets( std::pair< VChooser2,EChooser2 > chs, bool chosenends = true) const;
 
@@ -607,7 +635,9 @@ public:
 	 *  The method returns the pointer of idx-th vertex on the list of vertices. We start indexing with 0.
 	 *  Since list of vertices in the graph is searched through, the method is slow.
 	 *  \param idx the index of the returned vertex.
-	 *  \return the pointer to the \a idx-th vertex.	*/
+	 *  \return the pointer to the \a idx-th vertex.
+	 *
+	 *  [See example](examples/graph/graph_vertByNo.html). */
 	PVertex vertByNo( int idx ) const;
 
 	/** \brief Get edge by number
@@ -615,7 +645,9 @@ public:
 	 *  The method returns the pointer of idx-th edge on the list of edges. We start indexing with 0.
 	 *  Since the list of edges in the graph is searched through, the method is slow. 
 	 *  \param idx the index of the returned edge.
-	 *  \return the pointer to the \a idx-th edge. */
+	 *  \return the pointer to the \a idx-th edge.
+	 *
+	 *  [See example](examples/graph/graph_edgeByNo.html).	 */
 	PEdge edgeByNo( int idx ) const;
 
 	// Numer wierzcho³ka/krawedzi, -1 w razie braku
@@ -624,7 +656,9 @@ public:
 	 *  The method returns the position (on the list) of vertex given by its pointer. We start indexing with 0.
 	 *  Since the list of vertices in the graph is searched through, the method is slow.
 	 *  \param vert the index of the vertex \a vert is returned.
-	 *  \return the position of \a vert on the list of vertices in the graph. If there is no such vertex -1 is returned. */
+	 *  \return the position of \a vert on the list of vertices in the graph. If there is no such vertex -1 is returned.
+	 *
+	 *  [See example](examples/graph/graph_vertPos.html).	 */
 	int vertPos( PVertex vert ) const;
 
 	/** \brief Get index of edge.
@@ -632,7 +666,9 @@ public:
 	 *  The method returns the position (on the list) of edge given by its pointer. We start indexing with 0.
 	 *  Since the list of edges in the graph is searched through the method is slow.
 	 *  \param edge the index of this edge is returned.
-	 *  \return the position of edge on the list of edges in the graph. If there is no such edge -1 is returned. */
+	 *  \return the position of edge on the list of edges in the graph. If there is no such edge -1 is returned.
+	 *
+	 *  [See example](examples/graph/graph_edgePos.html).	 */
 	int edgePos( PEdge edge ) const;
 
 	// czy graf zawiera dany element
@@ -658,7 +694,9 @@ public:
 	 *  - Loop       = 0x1
 	 *  - Undirected = 0x2
 	 *  - Directed   = 0xC
-	 *  \sa EdgeType or \wikipath{EdgeType,EdgeType}.*/
+	 *  \sa EdgeType or \wikipath{EdgeType,EdgeType}.
+	 *
+	 *  [See example](examples/graph/graph_getEdgeType.html).	 */
 	inline EdgeType getEdgeType( PEdge e ) const
 		{ return self.getEdgeType( e ); }
 	// synonim poprzedniej
@@ -669,7 +707,9 @@ public:
 	 *  - Loop       = 0x1
 	 *  - Undirected = 0x2
 	 *  - Directed   = 0xC
-	 *  \sa EdgeType or \wikipath{EdgeType,EdgeType}*/
+	 *  \sa EdgeType or \wikipath{EdgeType,EdgeType}
+	 *
+	 *  [See example](examples/graph/graph_getEdgeType.html).	 */
 	EdgeType getType( PEdge e ) const
 		{ return self.getEdgeType( e ); }
 
@@ -678,26 +718,34 @@ public:
 	 *
 	 *  The method gets the pair of vertices on which \a edge is spanned.
 	 *  \param edge the pointer to the considered edge.
-	 *  \returns the pair of vertices that are the ends of \a edge. The first one on the first position the second on second. */
+	 *  \returns the pair of vertices that are the ends of \a edge. The first one on the first position the second on second.
+	 *
+	 *  [See example](examples/graph/graph_getEdgeEnds.html). */
 	inline std::pair< PVertex,PVertex > getEdgeEnds( PEdge edge ) const
 		{ return self.getEdgeEnds( edge ); }
 	
 	// synonim poprzedniej
-	/** \copydoc getEdgeEnds(PEdge) const*/
+	/** \copydoc getEdgeEnds(PEdge) const
+	 *
+	 *  [See example](examples/graph/graph_getEdgeEnds.html). */
 	std::pair< PVertex,PVertex > getEnds( PEdge edge ) const
 		{ return self.getEdgeEnds( edge ); }
 
 	/** \brief Get first vertex.
 	 *
 	 *  \param edge the considered edge.
-	 *  \returns the pointer to the first vertex of \a edge.  */
+	 *  \returns the pointer to the first vertex of \a edge.
+	 *
+	 *  [See example](examples/graph/graph_getEdgeEnds.html). */
 	inline PVertex getEdgeEnd1( PEdge edge ) const
 		{ return self.getEdgeEnd1( edge ); }
 
 	/** \brief Get second vertex.
 	 *
 	 *  \param edge the considered edge
-	 *  \returns the pointer to the second vertex of \a edge. */
+	 *  \returns the pointer to the second vertex of \a edge.
+	 *
+	 *  [See example](examples/graph/graph_getEdgeEnds.html). */
 	inline PVertex getEdgeEnd2( PEdge edge ) const
 		{ return self.getEdgeEnd2( edge ); }
 
@@ -711,7 +759,9 @@ public:
 	 *  - EdDirOut = 0x08 if \a edge is directed and \a v is the first vertex of edge.
 	 *  \param edge the considered edge.
 	 *  \param v the reference vertex.
-	 *  \returns the edge direction. \wikipath{EdgeDirection} */
+	 *  \returns the edge direction. \wikipath{EdgeDirection}
+	 *
+	 *  [See example](examples/graph/graph_getEdgeDir.html). */
 	inline EdgeDirection getEdgeDir( PEdge edge, PVertex v ) const
 		{ return self.getEdgeDir( edge,v ); }
 
@@ -733,10 +783,14 @@ public:
 	 *  For \a edge, the method returns the other (than \a vert) vertex.
 	 *  \param edge the considered edge.
 	 *  \param vert the reference vertex.
-	 *  \return the pointer to other vertex in \a edge or \a vert it \a edge is a loop or NULL if \a vert do not belong to \a edge. */
+	 *  \return the pointer to other vertex in \a edge or \a vert it \a edge is a loop or NULL if \a vert do not belong to \a edge.
+	 *
+	 *  [See example](examples/graph/graph_getEdgeEnd.html). */
 	PVertex getEdgeEnd( PEdge edge, PVertex vert) const;
 	// synonim
-	/** \copydoc  getEdgeEnd( PEdge, PVertex) const */
+	/** \copydoc  getEdgeEnd( PEdge, PVertex) const
+	 *
+	 *  [See example](examples/graph/graph_getEnd.html). */
 	PVertex getEnd( PEdge edge, PVertex vert) const;
 
 	// czy krawedzie sa incydentne
@@ -843,7 +897,9 @@ public:
 	 *
 	 *  The method calculates the maximum degree over all vertices in the graph.
 	 *  \param direct the mask determining the types and direction of edges. \wikipath{EdgeDirection}.
-	 *  \return the maximum degree of graph.	 */
+	 *  \return the maximum degree of graph.
+	 *
+	 *  [See example](examples/graph/graph_Delta.html). */
 	inline int Delta( EdgeDirection direct = EdAll ) const
 		{ return std::max( 0,this->maxDeg( direct ).second ); }
 
@@ -852,7 +908,8 @@ public:
 	 *  The minimum degree over all vertices in the graph is returned.
 	 *  \param direct the mask determining the types and direction of considered edges. \wikipath{EdgeDirection}.
 	 *  \return the minimum degree of graph.
-	 */
+	 *
+	 *  [See example](examples/graph/graph_Delta.html). */
 	inline int delta( EdgeDirection direct = EdAll ) const
 		{ return std::max( 0,this->minDeg( direct ).second );  }
 	// j.w. ale zwracany jest takze wierzcholek realizujacy ekstremum. (NULL,-1) przy braku wierzcholkow
@@ -869,7 +926,9 @@ public:
 	 *  The method gets the maximum degree over all vertices in the graph and one vertex of such degree.
 	 *  \param direct the mask determining the types and direction of considered edges. \wikipath{EdgeDirection}.
 	 *  \return the standard pair: maximum vertex and the maximum degree of graph.
-	 *  If graph has no vertices pair (NULL,-1) is returned. */
+	 *  If graph has no vertices pair (NULL,-1) is returned.
+	 *
+	 *  [See example](examples/graph/graph_maxDeg.html). */
 	std::pair< PVertex,int > maxDeg( EdgeDirection direct = EdAll ) const;
 
 	// zapis "macierzy sasiedztwa" z uwglednieniem krawedzi typu zawartego w masce do 2-wym. tablicy assocjacyjnej
@@ -880,7 +939,9 @@ public:
 	 *  A key of \a cont is a pair of vertices, and mapped value is of any type convertible to bool.
 	 *  A mapped value is true if there is a connection between the vertices in the pair.
 	 *  \param cont the reference to an associative container in which keys are pairs of vertices and mapped values are convertible to bool type.
-	 *  \param mask determines the types of edges to be stored in cont. \wikipath{EdgeType}*/
+	 *  \param mask determines the types of edges to be stored in cont. \wikipath{EdgeType}
+	 *
+	 *  [See example](examples/graph/graph_getAdj.html). */
 	template< class Cont > void getAdj( Cont &cont, EdgeType mask = EdAll ) const;
 
 	// Informacja o tym, czy krawedzie sa rownolegle.
@@ -900,7 +961,9 @@ public:
 	 *  \param ed1 the first considered edge.
 	 *  \param ed2 the second considered edge.
 	 *  \param reltype determines the type of parallelism.
-	 *  \return true if edges are parallel, false otherwise. */
+	 *  \return true if edges are parallel, false otherwise.
+	 *
+	 *  [See example](examples/graph/graph_areParallel.html).	 */
 	bool areParallel( PEdge ed1, PEdge ed2, EdgeDirection reltype = EdUndir ) const;
 
 	// zbior krawedzi rownoleglych do zadanej z wykluczeniem jej samej
@@ -916,7 +979,9 @@ public:
 	 *  \param[out] iter the iterator of container used to store output edges.
 	 *  \param ed the considered edge.
 	 *  \param reltype determines the type of parallelism.
-	 *  \return the number of parallel edges stored in the container. */
+	 *  \return the number of parallel edges stored in the container.
+	 *
+	 *  [See example](examples/graph/graph_getParals.html). */
 	template< class OutputIterator > int getParals( OutputIterator iter, PEdge ed, EdgeDirection reltype = EdUndir ) const;
 
 	/** \brief Get set of parallel edges.
@@ -928,7 +993,9 @@ public:
 	 *
 	 *  \param ed the considered edge.
 	 *  \param reltype determines the type of parallelism.
-	 *  \return the set of parallel edges. */
+	 *  \return the set of parallel edges.
+	 *
+	 *  [See example](examples/graph/graph_getParalSet.html). */
 	Set< PEdge > getParalSet( PEdge ed, EdgeDirection reltype = EdUndir ) const;
 
 	// liczba krawedzi rownoleglych do danej wliczajac ja sama
@@ -941,7 +1008,9 @@ public:
 	 *
 	 *  \param edge the reference edge.
 	 *  \param reltype determines the type of parallelism.
-	 *  \return the number of parallel edges. */
+	 *  \return the number of parallel edges.
+	 *
+	 *  [See example](examples/graph/graph_mu.html). */
 	int mu( PEdge edge, EdgeDirection reltype = EdUndir ) const
 		{ return this->getParals( blackHole,edge,reltype ) + 1; }
 
@@ -968,7 +1037,9 @@ public:
 	 *  - EdUndir - edges are considered to be parallel if they are spanned on the same vertices.
 	 *
 	 *  \param reltype determines the type of parallelism.
-	 *  \return the standard pair consisting of a pointer to the maximal edge and the maximum number of parallel edges. */
+	 *  \return the standard pair consisting of a pointer to the maximal edge and the maximum number of parallel edges.
+	 *
+	 *  [See example](examples/graph/graph_maxMu.html). */
 	std::pair< PEdge,int > maxMu( EdgeDirection reltype = EdUndir ) const;
 
 	// rozdziela dany zbior krawedzi na dwa. W pierwszym jest po jednym reprezentancie z kazdej klasy relacji
@@ -992,7 +1063,9 @@ public:
 	 *  \param begin iterator to the first element of the input container.
 	 *  \param end iterator to past the last element of the input container.
 	 *  \param reltype determines the type of parallelism.
-	 *  \return the standard pair of integers, which corresponds with the size of the first and second output container. */
+	 *  \return the standard pair of integers, which corresponds with the size of the first and second output container.
+	 *
+	 *  [See example](examples/graph/graph_findParals.html). */
 	template< class IterOut1, class IterOut2, class Iterator >
 		std::pair< int,int > findParals( std::pair< IterOut1,IterOut2 > out, Iterator begin, Iterator end, EdgeType reltype = EdUndir ) const;
 
@@ -1120,7 +1193,9 @@ public:
 	 *  \param end the iterator of the past the last vertex of the vertex set.
 	 *  \param type the mask determining the type of direction (with respect to vertex inside input set) of considered edges.
 	 *  \param kind determines the mode.
-	 *  \return the number of incident edges returned via the parameter \a out. */
+	 *  \return the number of incident edges returned via the parameter \a out.
+	 *
+	 *  [See example](examples/graph/graph_getIncEdges.html). */
 	template< class Iterator,class OutIter >
 		int getIncEdges( OutIter out, Iterator beg, Iterator end, EdgeDirection type = EdAll, EdgeType kind = Loop ) const;
 
@@ -1154,7 +1229,9 @@ public:
 	 *  \param vset the set of vertices.
 	 *  \param type the mask determining the type of direction (with respect to vertex inside input set) of considered edges.
 	 *  \param kind determines the mode.
-	 *  \return the number of incident edges returned in parameter \a out. */
+	 *  \return the number of incident edges returned in parameter \a out.
+	 *
+	 *  [See example](examples/graph/graph_getIncEdges.html). */
 	template< class OutIter >
 		int getIncEdges( OutIter out, const Set< PVertex > &vset, EdgeDirection type = EdAll, EdgeType kind = Loop ) const
 		{ return this->getIncEdges( out,vset.begin(),vset.end(),type,kind ); }
