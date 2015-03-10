@@ -36,7 +36,6 @@ namespace Koala
 	template< class T > std::pair< T,T > pairMaxMin( std::pair< T,T > arg )
 		{ return pairMaxMin( arg.first,arg.second ); }
 
-    //NEW: przeniesiony wspolny dublujacy sie fragment: z detect.h (interval) i kolorowania (interval.h, struct Color).
     // Struktura reprezentujaca przedzial domkniety na prostej o koncach calkowitych (dopuszczalna dlugosc 0)
     /** \brief Line segment.
      *
@@ -45,10 +44,12 @@ namespace Koala
     struct Segment
     {
         int left/**\brief minimal value in segment.*/, right/**\brief Maximal value in segment*/; // min. i max. element przedzialu calkowitego
-		/**\brief Constructor*/
+		/**\brief Constructor.
+		 *
+		 * The constructor sets the segment ending points. If r<l the exception is thrown.*/
         Segment( int l = 0, int r = 1 ): left( l ), right( r )
         { koalaAssert(l<=r,ContExcWrongArg);  }
-		/**\brief Length of segment*/
+		/**\brief Length of segment.*/
 		int size() const {return right - left + 1;}
 
     };
@@ -68,9 +69,6 @@ namespace Koala
      *  or if they are equal if max field of a is smaller then max field of \a b. 	 */
 	inline bool operator<(const Segment &a, const Segment &b)
 	{	return a.left<b.left || (a.left==b.left && a.right<b.right); }
-
-
-    //NEW: wylecial VectorInterface
 
 	/* StackInterface
 	 *
@@ -195,8 +193,8 @@ namespace Koala
 		 *  \return the reference to the first element in the queue. However, the container must be nonempty.*/
 		T &front();
 		/**\brief Access first element.
-		 * WEN: kontener musi byc niepusty
-		 *  \return the reference to the first element in the queue.*/
+		 * 
+		 *  \return the reference to the first element in the queue. However, the container must be nonempty.*/
 		T &top();
 		/**\brief Access last element.
 		 *
@@ -224,7 +222,7 @@ namespace Koala
 	};
 
 
-    //NEW:  wspolna tablicowa pula pamieci dla lokalnych kontenerow, ktore posluguja sie wieloma alokowanymi
+    // wspolna tablicowa pula pamieci dla lokalnych kontenerow, ktore posluguja sie wieloma alokowanymi
     //skladnikami tj. LocalGraph (wierzcholki/krawedzie), List, Heaps.
     /** \brief Common storage pool.
 	 *
@@ -294,7 +292,7 @@ namespace Koala
         // zwraca adres z puli na uzytek placement new (nie tworzy obiektu!)
 		/** \brief Get element from pool.
 		 *
-		 *  \return the pointer from the pull for an new locally allocated element.*/
+		 *  \return the pointer from the pool for an new locally allocated element.*/
         void* alloc()
         {
             koalaAssert(used<siz || !throwIfFull,ContExcFull);
