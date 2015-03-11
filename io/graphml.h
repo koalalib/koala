@@ -395,11 +395,10 @@ public:
 	 *
 	 *  The method sets the [attr.name](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key attr.name='...'")
 	 *  of the [key name](http://graphml.graphdrawing.org/primer/graphml-primer.html#AttributesDefinition "see <key id='...'").
+	 *  Any initial name is overridden.
 	 *  \param name the considered key.
 	 *  \param attrName the name for attr.name.
 	 *  \return true if the name was successfully set, false otherwise.*/
-	//WEN: czy ustawinie attrName ponowne dla danego name nadpisuje stary attr.name, czy tez jest bledem?
-	//jendrek: nadpisuje i nie jest to błąd
 	inline bool setKeyAttrName(const char *name, const char *attrName);
 
 	/** \brief Get attr.name associated with key.

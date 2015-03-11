@@ -4,12 +4,12 @@
  * readGraphText(graph, text, format, [vertexmap, [edgemap]])
  *  read graph from text in a given format
  *  graph	- graph to read to (will not be cleared before reading)
- *  text	- descrioption of graph (const char *, string or std::istream)
+ *  text	- description of graph (const char *, string or std::istream)
  *  format	- combination of RG_* constants
  *  vertexmap	- place to store selected vertices (with output-id), usually
- *		  table or map (need to implement "writable" operator[](unsigned int)
+ *		  array or map (need to implement "writable" operator[](unsigned int)
  *  edgemap	- place to store selected edges (with output-id), usually
- *		  table or map (need to implement "writable" operator[](unsigned int)
+ *		  array or map (need to implement "writable" operator[](unsigned int)
  *
  * writeGraphText(graph, text, format)
  *  write graph in a given format (RG_*) to text
@@ -36,7 +36,7 @@
  *  first line defines number of vertices
  *  each other line descibes edges adjecent to vertex-i
  *
- *  Each edge should appear exactly once (since parallel edges are allowed).
+ *  Each edge should appear exactly one list (since parallel edges are allowed).
  *  To describe P2 use:
  *  2
  *  0 1 -1
@@ -94,7 +94,7 @@
  *  <vertex-id-ia>, <vertex-id-ib>	- identifiers of edge ends (integers from range 0..n-1)
  *  <direction>				- "<", ">" (directed edge, < means edge ib to ia, > means edge from ia to ib)
  *   					  "-" (undirected edge)
- *   					  "@" (loop)    // WEN: nieprawda, teraz to tez jest "*"
+ *   					  "*" (loop)    
  *
  *  examples:
  *  1 - 2		- undirected edge between 1 to 2
@@ -103,7 +103,7 @@
  *  1 - 2 (edge-0) @3	- undirected edge between 1 to 2 to be remembered under key 3 with info "edge-0"
  *  1 > 2		- directed edge from 1 to 2
  *  1 < 2		- directed edge from 2 to 1
- *  1 @ 1		- loop attached to vertex 1 // WEN: nieprawda, 1 * 1 - por. wyzej
+ *  1 * 1		- loop attached to vertex 1 
  *
  * writeGraph* functions allow you to specify, whether the vertex and edge info
  * should be written, eg.:
@@ -136,7 +136,14 @@
 namespace Koala {
 namespace IO {
 
-//WEN: opis flag, w procedurach laczymy je bitowym |
+/**\brief Reed graph formats.
+ *
+ * Bit flags (may be joined by bitwise |) decide about graph format ( \ref DMiotxtformat ) and which data are parsed.  Possible values:
+ * - RG_VertexLists=0 - vertex list read graph type
+ * - RG_EdgeList=1 - edge list read graph type,
+ * - RG_VInfo = 2 - should vertex info be read, 
+ * - RG_EInfo = 4 - should edge info be read,
+ * - RG_Info = 6 - should infos be read. */
 enum RG_Format {
 	RG_VertexLists=0, //podstawowe 2 rodzaje formatu
 	RG_EdgeList=1,
@@ -144,8 +151,6 @@ enum RG_Format {
 	RG_EInfo = 4,
 	RG_Info = 6
 	};
-
-
 
 namespace Privates {
 
@@ -167,51 +172,41 @@ public:
 
 }
 
+//TODO: To chyba nie dobrze .... ¿e return true
 /** \brief Read graph from stream.
  *
  *  The template method reads graph from text in a given format.
  *  \param g	- graph to read to (not be cleared before reading).
  *  \param s	- std::stream with encoded graph.
  *  \param format	- RG_Format, see \ref DMiotxtformat.
- WEN: ale: przy zgaszonej fladze RG_VInfo lub jesli typ VertInfoType nie obsluguje odczytu z std::istream operatorem stream>>info:
-    Wowczas ew. informacje o infach wierzcholkow zawarte w s beda ignorowne (wprowadzane wierzcholki maja infa domyslne)
-    W przeciwnym razie: jesli w s sa zapisane dane o infach wierzcholkow, zostana one uzyte w tworzonych wierzcholkach
-    (jesli zas w s nie ma tych informacji, wprowadzane wierzcholki maja infa domyslne).
- WEN: i analogicznie w temacie inf powstajacych krawedzi
- odnosnie flagi RG_Info, typu EdgeInfoType, wpisach w s o infach krawedzi.
- *  \param vertexMap	- a place to store selected vertices (<output-id>->PVertex), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
-        WEN: tj. dla verts, dla ktorych w s byly podane wartosci int - zostanie kazdy taki vert wpisany do pola vertexMap[jego int]
-        BlackHolizowalna
- *  \param edgeMap	- place to store selected edges (<output-id>->PEdge), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
-        WEN: tj. dla edges, dla ktorych w s byly podane wartosci int - zostanie kazda taka edge wpisana do pola edgeMap[jej int]
-        BlackHolizowalna
- *  \return true if graph is properly read. WEN: problem ze teraz to zawsze zwraca true, ciekawe czemu?
- //TODO: To chyba nie dobrze ....
+ *  If flag RG_VInfo is turned of or if VertInfoType in not capable of reading from std::istream via operator>>
+ *  infos from \a s are ignored and vertices get default info values. Also if vertices lacks of infos in \a s vertex infos get default value.
+ *  For edges the situation is analogical.
+ *  \param vertexMap - associative array int -> PVertex that keeps vertex under its index derived from \a s (as long as such index exist). blackHole available.
+ *  \param edgeMap	- associative array int -> PEdge that keeps edge under its index derived from \a s (as long as such index exist). blackHole available.
+ *  \return true.
  *  \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html)*/
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, std::istream &s, int format,
 		   VMap &vertexMap, EMap &edgeMap);
 
 /** \brief Read graph from string.
- * WEN: j.w.
+ * 
  *  The template method reads graph from text in a given format.
  *  \param g	- graph to read to (not be cleared before reading).
  *  \param s	- std::string with encoded graph.
  *  \param format	- RG_Format, see \ref DMiotxtformat.
- *  \param vertexMap	- a place to store selected vertices (<output-id>->PVertex), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
- *  \param edgeMap	- place to store selected edges (<output-id>->PEdge), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
- *  \return true if graph is properly read.
+ *  If flag RG_VInfo is turned of or if VertInfoType in not capable of reading from std::istream via operator>>
+ *  infos from \a s are ignored and vertices get default info values. Also if vertices lacks of infos in \a s vertex infos get default value.
+ *  For edges the situation is analogical.
+ *  \param vertexMap	- associative array int -> PVertex that writes vertex to its index derived from \a s (as long as such index exist). blackHole available.
+ *  \param edgeMap	- associative array int -> PEdge that keeps edge under its index derived from \a s (as long as such index exist). blackHole available.
+ *  \return true.
  *  \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html) */
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, const std::string &desc, int format,
 		   VMap &vertexMap, EMap &edgeMap) {
@@ -221,20 +216,20 @@ bool readGraphText(Graph &g, const std::string &desc, int format,
 	};
 
 /** \brief Read graph from table of chars.
- *  WEN: jw.
+ * 
  *  The template method reads graph from text in a given format.
  *  \param g	- graph to read to (not be cleared before reading).
  *  \param s	- table of chars with encoded graph.
  *  \param format	- RG_Format, see \ref DMiotxtformat.
- *  \param vertexMap	- a place to store selected vertices (<output-id>->PVertex), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
- *  \param edgeMap	- place to store selected edges (<output-id>->PEdge), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
- *  \return true if graph is properly read.
+ *  If flag RG_VInfo is turned of or if VertInfoType in not capable of reading from std::istream via operator>>
+ *  infos from \a s are ignored and vertices get default info values. Also if vertices lacks of infos in \a s vertex infos get default value.
+ *  For edges the situation is analogical.
+ *  \param vertexMap	- associative array int -> PVertex that writes vertex to its index derived from \a s (as long as such index exist). blackHole available.
+ *  \param edgeMap	- associative array int -> PEdge that keeps edge under its index derived from \a s (as long as such index exist). blackHole available.
+ *  \return true.
  *  \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html)*/
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, const char *desc, int format,
 		   VMap &vertexMap, EMap &edgeMap) {
@@ -249,17 +244,13 @@ bool readGraphText(Graph &g, const char *desc, int format,
  *  \param g	- graph to read to (not be cleared before reading).
  *  \param s	- std::stream with encoded graph.
  *  \param format	- RG_Format, see \ref DMiotxtformat.
- WEN: ale: przy zgaszonej fladze RG_VInfo lub jesli typ VertInfoType nie obsluguje odczytu z std::istream operatorem stream>>info:
-    Wowczas ew. informacje o infach wierzcholkow zawarte w s beda ignorowne (wprowadzane wierzcholki maja infa domyslne)
-    W przeciwnym razie: jesli w s sa zapisane dane o infach wierzcholkow, zostana one uzyte w tworzonych wierzcholkach
-    (jesli zas w s nie ma tych informacji, wprowadzane wierzcholki maja infa domyslne).
- WEN: i analogicznie w temacie inf powstajacych krawedzi
-    odnosnie flagi RG_Info, typu EdgeInfoType, wpisach w s o infach krawedzi.
- *  \return true if graph is properly read. WEN: teraz zawsze true To chyba nie dobrze ....
+ *  If flag RG_VInfo is turned of or if VertInfoType in not capable of reading from std::istream via operator>>
+ *  infos from \a s are ignored and vertices get default info values. Also if vertices lacks of infos in \a s vertex infos get default value.
+ *  For edges the situation is analogical.
+ *  \return true.
  *  \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html) */
 template<class Graph>
 bool readGraphText(Graph &g, std::istream &s, int format) {
 	Privates::EmptyMap<typename Graph::PVertex> tv;
@@ -268,16 +259,18 @@ bool readGraphText(Graph &g, std::istream &s, int format) {
 	};
 
 /** \brief Read graph from string.
- *  WEN: jw.
+ *  
  *  The template method reads graph from text in a given format.
  *  \param g	- graph to read to (not be cleared before reading).
  *  \param s	- std::string with encoded graph.
  *  \param format	- RG_Format, see \ref DMiotxtformat.
- *  \return true if graph is properly read.
+ *  If flag RG_VInfo is turned of or if VertInfoType in not capable of reading from std::istream via operator>>
+ *  infos from \a s are ignored and vertices get default info values. Also if vertices lacks of infos in \a s vertex infos get default value.
+ *  For edges the situation is analogical.
+ *  \return true.
  *  \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html)*/
 template<class Graph>
 bool readGraphText(Graph &g, const std::string &desc, int format) {
 	std::istringstream s;
@@ -286,16 +279,18 @@ bool readGraphText(Graph &g, const std::string &desc, int format) {
 	};
 
 /** \brief Read graph from table of chars.
- *  WEN: jw.
+ *  
  *  The template method reads graph from text in a given format.
  *  \param g	- graph to read to (not be cleared before reading).
  *  \param s	- table of chars with encoded graph.
  *  \param format	- RG_Format, see \ref DMiotxtformat.
- *  \return true if graph is properly read.
+ *  If flag RG_VInfo is turned of or if VertInfoType in not capable of reading from std::istream via operator>>
+ *  infos from \a s are ignored and vertices get default info values. Also if vertices lacks of infos in \a s vertex infos get default value.
+ *  For edges the situation is analogical.
+ *  \return true.
  *  \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html) */
 template<class Graph>
 bool readGraphText(Graph &g, const char *desc, int format) {
 	std::istringstream s;
@@ -309,22 +304,15 @@ bool readGraphText(Graph &g, const char *desc, int format) {
  *  \param graph	- graph to write
  *  \param out - output buffer (std::ostream)
  *  \param format	- see \ref DMiotxtformat.
-    WEN: ale bit RG_VInfo jest ignorowany, jesli typ VertInfoType nie umie wypisac sie na std::ostream tj. nie obsluguje operatora stream << info
-         ale bit RG_EInfo jest ignorowany, jesli typ EdgeInfoType nie umie wypisac sie na std::ostream tj. nie obsluguje operatora stream << info
- *  \param vertexMap	- a place with stored selected vertices (<output-id>->PVertex), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
-        WEN: wlasnie odwrotnie, koalowa mapa PVertex->int, w ktorej mozna umieszczac wartosci do zapisu dla wybranych verts
-        BlackHolizowalna
- *  \param edgeMap	- place with stored selected edges (<output-id>->PEdge), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
-        WEN: wlasnie odwrotnie, koalowa mapa PEdge->int, w ktorej mozna umieszczac wartosci do zapisu dla wybranych edges
-        BlackHolizowalna
- *  \return true if everything worked as planed. WEN: tu akurat zawsze true To chyba nie dobrze ....
+ *   - bit RG_VInfo is ignored if VertInfoType is not capable of writing on std::ostream via operator<<.
+ *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
+ *  \param vertexMap - associative array PVertex->int which keeps vertex indexes (for chosen elements) that are printed in output. (blackHole available)
+ *  \param edgeMap	-  associative array PEdge->int which keeps edge indexes (for chosen elements) that are printed in output. (blackHole available)
+ *  \return true.
   //TODO: To chyba nie dobrze ....
  *  \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html)*/
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vmap,const EMap& emap);
 
@@ -333,12 +321,13 @@ bool writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vm
  *  The method writes graph in a given format (RG_*) to text.
  *  \param graph	- graph to write
  *  \param out - output buffer (std::ostream)
- *  \param format	- see \ref DMiotxtformat. WEN: j.w. w polu format
- *  \return true if everything worked as planed. WEN: tu akurat zawsze true To chyba nie dobrze ....
+ *  \param format	- see \ref DMiotxtformat. 
+ *   - bit RG_VInfo is ignored if VertInfoType is not capable of writing on std::ostream via operator<<.
+ *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
+ *  \return true.
  *  \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html) */
 template<class Graph>
 bool writeGraphText(const Graph &g, std::ostream &out, int format)
 {
@@ -348,20 +337,19 @@ bool writeGraphText(const Graph &g, std::ostream &out, int format)
 
 
 /** \brief Write graph as text to std::string.
- * WEN: weny jak wyzej w writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vmap,const EMap& emap);
+ * 
  *  The method writes graph in a given format (RG_*) to text.
  *  \param graph	- graph to write
  *  \param out - output buffer (std::string)
  *  \param format	- see \ref DMiotxtformat.
- *  \param vmap	- a place with stored selected vertices (<output-id>->PVertex), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
- *  \param emap	- place with stored selected edges (<output-id>->PEdge), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
- *  \return true if everything worked as planed.
+ *   - bit RG_VInfo is ignored if VertInfoType is not capable of writing on std::ostream via operator<<.
+ *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
+ *  \param vmap	-  associative array PVertex->int which keeps vertex indexes (for chosen elements) that are printed in output. (blackHole available)
+ *  \param emap	-  associative array PEdge->int which keeps edge indexes (for chosen elements) that are printed in output. (blackHole available)
+ *  \return true.
  *  \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html)*/
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::string &out, int format,
 					const VMap& vmap,const EMap& emap) {
@@ -377,12 +365,13 @@ bool writeGraphText(const Graph &g, std::string &out, int format,
  *  The method writes graph in a given format (RG_*) to text.
  *  \param graph	- graph to write
  *  \param out - output buffer (std::string)
- *  \param format	- see \ref DMiotxtformat. WEN: j.w. w polu format
- *  \return true if everything worked as planed. WEN: tu akurat zawsze true To chyba nie dobrze ....
+ *  \param format	- see \ref DMiotxtformat. 
+ *   - bit RG_VInfo is ignored if VertInfoType is not capable of writing on std::ostream via operator<<.
+ *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
+ *  \return true.
  *  \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html) */
 template<class Graph>
 bool writeGraphText(const Graph &g, std::string &out, int format)
 {
@@ -393,26 +382,19 @@ bool writeGraphText(const Graph &g, std::string &out, int format)
 
 /** \brief Write graph as text to table of chars.
  *
- *  The method writes graph in a given format (RG_*) to text. WEN: jako C-String tj. null terminated
+ *  The method writes graph in a given format (RG_*) to text as C-String (null terminated).
  *  \param graph	- graph to write
  *  \param out - output buffer (table of chars)
- *  \param maxlength - maximal size of buffer. WEN: raczej: tylko tyle znakow moze zostac wpisane do bufora, reszta ucinana jesli sie nie zmiesci
+ *  \param maxlength - maximal number of characters that may be written to buffer. The residue is cut of.
  *  \param format	- see \ref DMiotxtformat.
-    WEN: ale bit RG_VInfo jest ignorowany, jesli typ VertInfoType nie umie wypisac sie na std::ostream tj. nie obsluguje operatora stream << info
-         ale bit RG_EInfo jest ignorowany, jesli typ EdgeInfoType nie umie wypisac sie na std::ostream tj. nie obsluguje operatora stream << info
- *  \param vertexMap	- a place with stored selected vertices (<output-id>->PVertex), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
-        WEN: wlasnie odwrotnie, koalowa mapa PVertex->int, w ktorej mozna umieszczac wartosci do zapisu dla wybranych verts
-        BlackHolizowalna
- *  \param edgeMap	- place with stored selected edges (<output-id>->PEdge), usually
- *     table or map (need to implement "writable" operator[](unsigned int)
-        WEN: wlasnie odwrotnie, koalowa mapa PEdge->int, w ktorej mozna umieszczac wartosci do zapisu dla wybranych edges
-        BlackHolizowalna
- *  \return true if everything worked as planed. WEN: false tylko gdy out=0 lub maxlength=0
+ *   - bit RG_VInfo is ignored if VertInfoType is not capable of writing on std::ostream via operator<<.
+ *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
+ *  \param vertexMap -  associative array PVertex->int which keeps vertex indexes (for chosen elements) that are printed in output. (blackHole available)a
+ *  \param edgeMap	-  associative array PEdge->int which keeps edge indexes (for chosen elements) that are printed in output. (blackHole available)
+ *  \return true if everything worked as planed. False if out=0 or maxlength=0
  * \ingroup iotxt
  *
- *  [See example](examples/text/text.html)
- */
+ *  [See example](examples/text/text.html)*/
 template<class Graph,class VMap, class EMap>
 bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int format,
 					const VMap& vmap,const EMap& emap)
@@ -438,14 +420,14 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int forma
 
 /** \brief Write graph as text to table of chars.
  *
- *  The method writes graph in a given format (RG_*) to text. WEN: jako C-String tj. null terminated
+ *  The method writes graph in a given format (RG_*) to text as C-String.
  *  \param graph	- graph to write
  *  \param out - output buffer (table of chars)
- *  \param maxlength - maximal size of buffer. WEN: raczej: tylko tyle znakow moze zostac wpisane do bufora, reszta ucinana jesli sie nie zmiesci
+ *  \param maxlength - maximal number of characters that may be written to buffer. The residue is cut of.
  *  \param format	- see \ref DMiotxtformat.
-    WEN: ale bit RG_VInfo jest ignorowany, jesli typ VertInfoType nie umie wypisac sie na std::ostream tj. nie obsluguje operatora stream << info
-         ale bit RG_EInfo jest ignorowany, jesli typ EdgeInfoType nie umie wypisac sie na std::ostream tj. nie obsluguje operatora stream << info
- *  \return true if everything worked as planed. WEN: false tylko gdy out=0 lub maxlength=0
+ *   - bit RG_VInfo is ignored if VertInfoType is not capable of writing on std::ostream via operator<<.
+ *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
+ *  \return true if everything worked as planed. False if out=0 or maxlength=0
  *  \ingroup iotxt
  *
  *  [See example](examples/text/text.html)
@@ -457,11 +439,16 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int forma
 	return writeGraphText(g,out,maxlength,format,em,em);
 }
 
-
-// WEN: ParSet - Wygodna mapa paramterow roznych wlasnosci, przydatna np. jako typ VertexInfo, EdgeInfo grafu
-// wypisywanego/wczytywanego w formatach tekstowych
-//DOCUMENT
-enum PSType { //WEN: numeracja typow wartosci przypisywanych kluczom w ParSet - opisac.
+/**\brief Type numbers for ParSet.
+ *
+ * Possible values:
+ * - PST_NoType = -1,
+ * - PST_Bool = 0,
+ * - PST_Int = 1,
+ * - PST_Double = 2,
+ * - PST_String = 3
+ *  \ingroup iotxt*/
+enum PSType {
 	PST_NoType = -1,
 	PST_Bool = 0,
 	PST_Int,
@@ -503,15 +490,16 @@ template<>  inline std::string PSCast<std::string, double>(const double &val)
 
 }
 
-
+// ParSet robil za typ inf wierzcholkow i krawedzi grafow latwo wymienialnych miedzy aplikacjiami
+//(serializacja do forat.teksotowych).Jest to taka tablica asocjacyjna, ktora pod roznymi kluczami(typ std::string) przechowuje
+//wartosci roznych typow ... rozwinac, przyklad
 /** \brief Parameter set.
  *
- * The class designed to keep properties of graph entities. May be used for communication with zgred. WEN: no nie tylko, aczkolwiek
- generalnie pomysl jest taki by ParSet robil za typ inf wierzcholkow i krawedzi grafow latwo wymienialnych miedzy aplikacjiami
- (serializacja do forat. teksotowych). Jest to taka tablica asocjacyjna, ktora pod roznymi kluczami (typ std::string) przechowuje
- wartosci roznych typow ... rozwinac, przyklad.
- * \ingroup iotxt
- */
+ * The class designed to keep properties of graph entities. It is an kind of associative array that under varius keys keeps various types.
+ * It is designed to be an element info type easily exchanged between various applications.
+ *  Is be used for communication with zgred for example.
+ *  
+ * \ingroup iotxt*/
 class ParSet {
 private:
 	struct ParSetValue {
@@ -545,21 +533,22 @@ public:
 		return Privates::PSIsType<T>(it->second.first);
 		};
 
-    //WEN: w ponizszych isXXX jesli klucza nie ma, tez zwracaja false
-	/**\brief Test if key named \a k is of type boolean.*/
+    /**\brief Test key \a k existence and if it is associated with Boolean type.*/
 	bool isBool(const std::string &k)	const
 			{ return is<bool>(k); };
-	/**\brief Test if key named \a k is of type integer.*/
+	/**\brief Test key \a k existence and if it is associated with integer.*/
 	bool isInt(const std::string &k)	const
 			{ return is<int>(k); };
-	/**\brief Test if key named \a k is of type double.*/
+	/**\brief Test key \a k is existence and if it is associated with double.*/
 	bool isDouble(const std::string &k)	const
 			{ return is<double>(k); };
-	/**\brief Test if key named \a k is of type string.*/
+	/**\brief Test key \a k existence and if it is associated with string.*/
 	bool isString(const std::string &k)	const
 			{ return is<std::string>(k); };
 
-	/**\brief Get type of key named \a k.WEN: lub PST_NoType==-1 przy braku */
+	/**\brief Get associated element type.
+	 *
+	 * Gets mapped value type or PST_NoType==-1 for key absence. */
 	PSType getType(const std::string &k) const {
 		const_iterator it;
 		it = m_params.find(k);
@@ -567,36 +556,50 @@ public:
 		return it->second.first;
 	};
 
-    // WEN: wszystkie sety zwracaja refern. do samego kontenera, jesli klucz byl obecny - kasuja i nadpsuja (nie wazne, czy zmieniamy typ)
-	/**\brief Set value under the key named \a k to v.*/
+    /**\brief Set value under the key \a k to v.
+	 *
+	 * The method creates new element for key or overrides the previous value.
+	 * \return the reference to the current container.*/
 	ParSet &set(const std::string &k, bool v) {
 		m_params[k].first = PST_Bool;
 		m_params[k].second.bval = v;
 		return *this;
 	};
 
-	/**\brief Set value under the key named \a k to v.*/
+	/**\brief Set value under the key \a k to v.
+	 *
+	 * The method creates new element for key or overrides the previous value.
+	 * \return the reference to the current container.*/
 	ParSet &set(const std::string &k, int v) {
 		m_params[k].first = PST_Int;
 		m_params[k].second.ival = v;
 		return *this;
 	};
 
-	/**\brief Set value under the key named \a k to v.*/
+	/**\brief Set value under the key \a k to v.
+	 *
+	 * The method creates new element for key or overrides the previous value.
+	 * \return the reference to the current container.*/
 	ParSet &set(const std::string &k, double v) {
 		m_params[k].first = PST_Double;
 		m_params[k].second.dval = v;
 		return *this;
 	};
 
-	/**\brief Set value under the key named \a k to v.*/
+	/**\brief Set value under the key \a k to v.
+	 *
+	 * The method creates new element for key or overrides the previous value.
+	 * \return the reference to the current container.*/
 	ParSet &set(const std::string &k, const std::string &v) {
 		m_params[k].first = PST_String;
 		m_params[k].second.sval = v;
 		return *this;
 	};
 
-	/**\brief Set value under the key named \a k to v.*/
+	/**\brief Set value under the key \a k to v.
+	 *
+	 * The method creates new element for key or overrides the previous value.
+	 * \return the reference to the current container.*/
 	ParSet &set(const std::string &k, const char *v) {
 		m_params[k].first = PST_String;
 		m_params[k].second.sval = v;
@@ -604,9 +607,9 @@ public:
 	};
 
 	/** \brief Get mapped value of key.
-	 * WEN: rzecz w tym, ze docelowy typ T moze byc inny, niz wpisany do mapy i wtedy zwracana wartosc
-	 ... Parset stara sie ja przekonwertowac pewnymi wewnetrznymi sposobami. To samo dot. ponizszych metod getNazwaTypu
-	 * Get mapped value of key named \a k. In case of lack of the key def is returned. */
+	 * 
+	 * Get mapped value of key named \a k. In case of lack of the key \a def is returned.
+	 * If the type \a T differs from the mapped value type, the method tries to covert it.*/
 	template<class T>
 	T get(const std::string &k, const T &def = T()) const {
 		const_iterator it;
@@ -624,31 +627,40 @@ public:
 
 	/** \brief Get mapped value of key.
 	 *
-	 * Get mapped value of key named \a k. In case of lack of the key def is returned. */
+	 * Get mapped value of key named \a k. In case of lack of the key def is returned. 
+	 * If the type \a T differs from the mapped value type, the method tries to covert it.*/
 	bool getBool(const std::string &k, bool def = false) const
 			{ return get<bool>(k, def); };
 	/** \brief Get mapped value of key.
 	 *
-	 * Get mapped value of key named \a k. In case of lack of the key def is returned. */
+	 * Get mapped value of key named \a k. In case of lack of the key def is returned. 
+	 * If the type \a T differs from the mapped value type, the method tries to covert it.*/
 	int getInt(const std::string &k, int def = 0) const
 			{ return get<int>(k, def); };
 	/** \brief Get mapped value of key.
 	 *
-	 * Get mapped value of key named \a k. In case of lack of the key def is returned. */
+	 * Get mapped value of key named \a k. In case of lack of the key def is returned. 
+	 * If the type \a T differs from the mapped value type, the method tries to covert it.*/
 	double getDouble(const std::string &k, double def = 0) const
 			{ return get<double>(k, def); };
 	/** \brief Get mapped value of key.
 	 *
-	 * Get mapped value of key named \a k. In case of lack of the key def is returned. */
+	 * Get mapped value of key named \a k. In case of lack of the key def is returned. 
+	 * If the type \a T differs from the mapped value type, the method tries to covert it.*/
 	std::string getString(const std::string &k, const std::string &def = "") const
 			{ return get<std::string>(k, def); };
 
-	/** \brief Delete element with key \a p. WEN: i nic nie robi, gdy klucza nie bylo */
+	/** \brief Delete element with key \a p.
+	 *
+	 * The method does nothing in case of key \a p absence.*/
 	void del(const std::string &p)
 			{ m_params.erase(p); };
 
-	/** \brief Save all keys to vector \a keys.*/
-	//NEW: nie koniecznie vector, kontener na std::string-i obslugujacy push_back. Brak czyszczenia wstepnego
+	/** \brief Save all keys to container \a keys.
+	 *
+	 * The method does not clear the container.
+	 * \tparam Container the container type for std::string, should implement push_bask.
+	 * \param keys the reference to the output container with keys.*/
 	template <class Container>
 	void getKeys(Container &keys) const {
 		const_iterator it;
@@ -656,7 +668,10 @@ public:
 			keys.push_back(it->first);
 	};
 
-    //NEW: jw. ale  tablica std::string-ow
+    /** \brief Save all keys to array \a keys.
+	 *
+	 * The method does not clear the array.
+	 * \param keys the output array with keys.*/
 	void getKeys(std::string* keys) const {
 		const_iterator it;
 		for(it = m_params.begin(); it != m_params.end(); ++it)
@@ -723,7 +738,9 @@ inline std::string addDot(double d)
 
 }
 
-//WEN: odczyt/zapis ze stand. strumieniami tekstowymi. Krotki opis formatu tekstowego, przyklad.
+/**\brief Overloaded bitwise shift for std::istream.
+ *
+ * \related ParSet*/
 inline std::istream &operator >>(std::istream &sin, ParSet &p) {
 	char comma, colon;
 	bool bv;
@@ -753,6 +770,9 @@ inline std::istream &operator >>(std::istream &sin, ParSet &p) {
 };
 
 
+/**\brief Overloaded bitwise shift for std::ostream.
+*
+* \related ParSet*/
 inline std::ostream &operator <<(std::ostream &sout, const ParSet &p) {
 	bool first = true;
 	ParSet::const_iterator it, e;
