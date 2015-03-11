@@ -255,7 +255,7 @@ namespace Koala
         bool throwIfFull; /**<\brief Flag decides if throw exception (or return 0) if the array was full.*/
 		bool throwIfNotEmpty; /**<\brief Flag decides if throw exception if not everything was deallocated.*/
 		
-		/** \breif Constructor
+		/** \brief Constructor
 		 *
 		 *  The constructor allocates array of \a n elements.
 		 *  \param n the number of allocated elements.*/
