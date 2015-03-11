@@ -1,4 +1,3 @@
-//WEN: z tego co tu skomentowal KO mozna garsciami brac do ebooka w rozdziale: opis formatow tekstowych
 /* functions:
  *
  * readGraphText(graph, text, format, [vertexmap, [edgemap]])
