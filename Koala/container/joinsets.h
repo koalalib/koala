@@ -17,12 +17,11 @@ namespace Koala
 
 
 	/* JSPartDesrc
-	 * struktura pomocnicza dla zbiorow zlaczalnych o elementach typu Klucz WEN?: element ? zbiór? oba?
+	 * struktura pomocnicza dla zbiorow zlaczalnych o elementach typu Klucz
 	 */
-	/** \brief Auxiliary structure for joinable sets.
+	/**\brief Auxiliary structure for joinable sets.
 	 *
-	 *  
-	 */
+	 * The structure represents joinable set. */
 	template< class Klucz > class JSPartDesrc
 	{
 		template< class K,class Cont > friend class JoinableSets;
@@ -99,7 +98,8 @@ namespace Koala
 	 *  In other words JoinableSets class can by used to represent various partitions of set with fast union.
 	 *  The structure is used for example in the implementation of Kruskal algorithm for minimal weight spanning tree.
 	 *  \tparam ITEM class of stored element.
-	 *  \tparam AssocContainer type of internal associative table. <tt>ITEM->JSPartDesrc< ITEM > *</tt>. If it is AssocArray then the key should point at object witch includes field AssocKeyContReg \a assocReg. 
+	 *  \tparam AssocContainer type of internal associative array. <tt>ITEM->JSPartDesrc< ITEM > *</tt>. 
+	 *  If it is AssocArray then the key should point at object witch includes field AssocKeyContReg \a assocReg. 
 	 *  \ingroup cont*/
 //	template< class ITEM, class AssocContainer = AssocArray< ITEM,JSPartDesrc< ITEM > * > >
     template< class ITEM, class AssocContainer = typename Privates::JoinSetsAssocContSwitch<ITEM>::Type >
@@ -112,15 +112,14 @@ namespace Koala
 
 	public:
 		// typ reprezentanta pojedynczego zbioru
-		typedef JSPartDesrc< ITEM > *Repr; /**<\brief Identifier of set. */ 
+		typedef JSPartDesrc< ITEM > *Repr; /**<\brief Identifier of set.*/ 
 		// typ elementow zbiorow
-		typedef ITEM ElemType; /**< \brief Element of set.*/
+		typedef ITEM ElemType; /**<\brief Element of set.*/
 
 		// pierwszy argument - maks. liczba elementow wszystkich zbiorow, pozostale arg. ignorowane
 		/** \brief Constructor.
 		 *
-		 *  \param n the minimal capacity of the set of all elements. 
-		 */
+		 *  \param n the minimal capacity of the set of all elements.*/
 		JoinableSets( unsigned int n = 0 );
 		/** \brief Copy constructor.*/
 		JoinableSets( const JoinableSets< ITEM,AssocContainer > & );
@@ -128,9 +127,7 @@ namespace Koala
 		JoinableSets &operator=( const JoinableSets< ITEM,AssocContainer > & );
 		~JoinableSets() { resize( 0 ); }
 
-        //NEW: rezygnacja z tworzenia kontenera zewnetrzna tablica pamieci (podobnie jak w mapach)
-
-		// czysci kontener i zmienia maks. liczbe elementow wszystkich zbiorow
+        // czysci kontener i zmienia maks. liczbe elementow wszystkich zbiorow
 		/** \brief Resize.
 		 *
 		 *  The method clears the set and change the maximal number of elements.
@@ -177,8 +174,8 @@ namespace Koala
 		/** \brief Get elements.
 		 *
 		 *  The method gets all the elements from and writes them down in \a iter.
-		 *  \param[out] iter the iterator to the container with all elements WEN?: czyli na elementy typu ITEM.
-		 *  \tparam Iter WEN?:
+		 *  \param[out] iter the output iterator to the container with all elements.
+		 *  \tparam Iter the type of iterator.
 		 *  \return the number of elements.*/
 		template< class Iter > int getElements( Iter iter ) const;
 
@@ -186,8 +183,8 @@ namespace Koala
 		/** \brief Get identifiers.
 		 *
 		 *  The method puts the identifiers of sets to \a iter.
-		 *  \param[out] iter the iterator to the container with identifiers WEN?: czyli na elementy typu JSPartDesrc< ITEM > *.
-		 *  \tparam Iter WEN?:
+		 *  \param[out] iter the iterator to the container with sets identifiers JSPartDesrc< ITEM > *.
+		 *  \tparam Iter the type of iterator
 		 *  \return the number of parts.*/
 		template< class Iter > int getSetIds( Iter iter) const;
 		// wypisuje na podany iterator elementy zbioru o podanym reprezencie
@@ -196,7 +193,7 @@ namespace Koala
 		 *  The method gets all the elements of part identifier \a s. The result is kept in container \a iter.
 		 *  \param s the identifier (representative) of set part (subset).
 		 *  \param[out] iter the iterator to the container with all the elements of part \a s.
-		 *  \tparam Iter WEN?:
+		 *  \tparam Iter the type of iterator.
 		 *  \return the number of elements in the part.*/
 		template< class Iter > int getSet( typename JoinableSets< ITEM >::Repr s, Iter iter ) const;
 		// wypisuje na podany iterator elementy zbioru zawierajaccego podany element
@@ -205,7 +202,7 @@ namespace Koala
 		 *  The method gets all the elements of part containing the element \a i. The result is kept in container \a iter.
 		 *  \param i the reference element that identifies the considered set.
 		 *  \param[out] iter the iterator to the container with all the elements of set \a i is included.
-		 *  \tparam Iter WEN?:
+		 *  \tparam Iter the type of iterator.
 		 *  \return the number of elements in the part.*/
 		template< class Iter > int getSet( const ITEM &i, Iter iter ) const { return getSet( getSetId( i ),iter ); }
 
@@ -267,11 +264,10 @@ namespace Koala
 	};
 
 	// wypisywanie zawartosci zbiorow zlaczalnych do strumienia
-	//WEN?: opis? friend?
 	/** \brief Overloaded output operator.
 	 *
 	 *  The overloaded shift operator for std::ostream and JoinableSets. Allows to print easily all the elements of JoinalbeSets .
-	 */
+	 *  \related JoinableSets */
 	template< typename Element, typename Cont >
 		std::ostream &operator<<( std::ostream &,const JoinableSets< Element,Cont > & );
 
