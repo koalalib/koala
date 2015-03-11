@@ -23,20 +23,20 @@ namespace IO {
 /** \brief Read graph.
  *
  *  The method reads graph from C string and adds it to the graph.
- *  \param graph the place to writhe. WEN: powinien byc poczatkowo pusty
+ *  \param graph the place to write. Should be empty on entrance.
  *  \param str the C string with graph.
- *  \return true if graph was properly read, false if any error occur. WEN: i wtedy graf moze zachowac jakies resztki nieudanego odczytu
+ *  \return true if graph was properly read, false if any error occur (graph may consist of some residues of unsuccessful read).
  *  \ingroup DMiog6
  *
  *  [See example](examples/g6/g6.html).
  */
 template< class Graph > bool readG6( Graph &graph, const char *str );
 /** \brief Read graph.
- *  WEN: jw.
+ * 
  *  The method reads graph from string and adds it to the graph.
- *  \param graph the place to writhe.
+ *  \param graph the place to write. Should be empty on entrance.
  *  \param str the string with graph.
- *  \return true if graph was properly read, false if any error occur.
+ *  \return true if graph was properly read, false if any error occur (graph may consist of some residues of unsuccessful read).
  *  \ingroup DMiog6
  *
  *  [See example](examples/g6/g6.html).
@@ -48,7 +48,7 @@ template< class Graph > bool readG6( Graph &graph, std::string str);
  *
  *  The method writes graph to string.
  *  \param graph the considered graph.
- *  \param str the string in which the graph is stored. WEN: zawartosc sprzed zapisu jest kasowana
+ *  \param str the output string in which the graph is stored. Previous content is deleted.
  *  \ingroup DMiog6
  *
  *  [See example](examples/g6/g6.html).
@@ -59,12 +59,11 @@ template< class Graph > void writeG6( const Graph &graph, std::string &str );
  *  The method writes graph to C string.
  *  \param graph the considered graph.
  *  \param str the C string in which the graph is stored.
- *  \param maxlength the size of buffer.
- *  \return the number of written chars. WEN: lacznie z ew. konczacym C-napis wynikowy bajtem 0 (jesli maxlength jest za male wyjscie jest ucinane)
+ *  \param maxlength the size of buffer. Characters behind this border are cut of.
+ *  \return the number of written chars (together with the ending '\0').
  *  \ingroup DMiog6
  *
- *  [See example](examples/g6/g6.html).
- */
+ *  [See example](examples/g6/g6.html). */
 template< class Graph > int writeG6( const Graph &graph, char *str, int maxlength); //@return number of used chars
 
 #include "g6.hpp"
