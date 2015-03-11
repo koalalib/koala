@@ -214,7 +214,7 @@
  *  - <vertex-id-ia>, <vertex-id-ib>	- identifiers of edge ends (integers from range 0..n-1)
  *  - <direction>				- "<", ">" (directed edge, < means edge ib to ia, > means edge from ia to ib)
  *   					  "-" (undirected edge)
- *   					  "@" (loop)
+ *   					  "*" (loop)
  *
  *  examples:\n
  *  Code                  |  Description                                                                      |
@@ -225,7 +225,7 @@
  *  1 - 2 (edge-0) @3	  | undirected edge between 1 to 2 to be remembered under key 3 with info "edge-0"    |
  *  1 > 2		          | directed edge from 1 to 2                                                         |
  *  1 < 2		          | directed edge from 2 to 1                                                         |
- *  1 @ 1		          | loop attached to vertex 1                                                         |
+ *  1 * 1		          | loop attached to vertex 1                                                         |
  *
  */
 
