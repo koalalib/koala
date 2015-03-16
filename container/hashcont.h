@@ -667,41 +667,86 @@ namespace Koala
 		size_t m_resizeFactor;
 	};
 
-    //WEN: opis? por. AssocTabConstInterface < std::map<..> > z assoctab.h  przerabia hashcont do tablicy assocjacyjnej skopiowaæ metody.
-	template< class T > class AssocTabConstInterface;
+    template< class T > class AssocTabConstInterface;
 	namespace Privates
 	{
 		template< class T > class AssocTabTag;
 		template< class Key> struct ZeroAssocKey;
 	}
-
+	/**\brief Associative array based on BiDiHashMap 
+	 *
+	 *  This interface delivers the standard constant methods for containers in Koala.
+	 *  \tparam K the class for keys, usually pointers to objects.
+	 *  \tparam V the class for matched values.
+	 *  \ingroup cont */
 	template< class K, class V > class AssocTabConstInterface< BiDiHashMap< K,V > >: public Privates::AssocTabTag< K >
 	{
 	public:
-		AssocTabConstInterface( const BiDiHashMap< K,V > &acont ): cont( acont ) { }
+		/** \brief Constructor
+		*
+		*  Assigns BiDiHashMap< K, V > \a acont to the member \a cont.
+		*  \param acont the original container.*/
+		AssocTabConstInterface(const BiDiHashMap< K, V > &acont) : cont(acont) { }
 
-		typedef K KeyType;
-		typedef V ValType;
+		typedef K KeyType;/**< \brief Type of key. */
+		typedef V ValType;/**< \brief Type of mapped value.*/
+		typedef BiDiHashMap< K,V > OriginalType;/**< \brief Type of wrapped container.*/
 
-		typedef BiDiHashMap< K,V > OriginalType;
-
-		bool hasKey( K arg ) const
+		/** \brief Test existence of key.
+		 *
+		 *  \param arg the tested key.
+		 *  \return true if the key exists in the container, false otherwise.*/
+		bool hasKey(K arg) const
 			{ return cont.find( arg ) != cont.end(); }
 
+		/** \brief Get the first key.
+		*
+		*  \return the key of the first element in the container or 0 if empty.*/
 		K firstKey() const;
+		/** \brief Get the last key.
+		*
+		*  \return the key of the last element in the container or 0 if empty.*/
 		K lastKey() const;
+		/** \brief Get previous key.
+		*
+		*  \param arg the reference key.
+		*  \return the key prior to \a arg.  If \a arg == 0, the last key is returned.*/
 		K prevKey( K )const ;
+		/** \brief Get next key.
+		 *
+		 *  \param arg the reference key.
+		 *  \return the key next to \a arg. If \a arg == 0, the first key is returned.*/
 		K nextKey( K )const ;
 
+		/** \brief Get element.
+		 *
+		 *	If \a arg matches any key in the container, the matched value is returned, otherwise the empty constructor of \a ValType is called.
+		 *  \param arg the searched key.
+		 *  \return the mapped value associated with key \a arg.*/
 		inline V operator[]( K arg );
+		/** \brief Get size.
+		 *
+		 *	\return the number of elements in the container.*/
 		unsigned size() const
 			{ return cont.size(); }
+		/** \brief Test if empty.
+		*
+		*  \return the boolean value, true if the container has no elements, false otherwise.*/
 		bool empty() const
 			{ return this->size() == 0; }
+		/** \brief Get keys.
+		*
+		*  All the keys in the container are stored in another container with a defined iterator.
+		*  \tparam Iterator the class of iterator for the container storing the output set keys.
+		*  \param[out] iter the iterator connected with the container of output keys.
+		*  \return the number of keys.*/
 		template< class Iterator > int getKeys( Iterator ) const;
 //		int capacity () const
 //			{ return std::numeric_limits< int >::max(); }
 
+		/** \brief Reference to the original container.
+		 *
+		 *	The reference to the original container. The one the class wraps.*/
 		const BiDiHashMap< K,V > &cont;
 
 	protected:
@@ -717,33 +762,80 @@ namespace Koala
 		V &get( K arg ) { return (_cont())[arg]; }
 	};
 
-    //WEN: opis? por. AssocTabConstInterface < std::map<..> > z assoctab.h skopowiaæ interface tak jak ni¿e !
+    /** \brief Associative container based on Kolas::HashMap< K,V >
+	 *
+	 *  This is the class of the constant object that wraps an HashMap< K,V >.
+	 *  This interface delivers the standard constant methods for containers in Koala.
+	 *  \tparam K the class for keys, usually pointers to objects.
+	 *  \tparam V the class for matched values.
+	 *  \ingroup cont */
 	template< class K, class V > class AssocTabConstInterface< HashMap< K,V > >: public Privates::AssocTabTag< K >
 	{
 	public:
+		/** \brief Constructor
+		 *
+		 *  Assigns STL map container \a acont to the member \a cont.
+		 *  \param acont the original container.*/
 		AssocTabConstInterface( HashMap< K,V > &acont ): cont( acont ) { }
 
-		typedef K KeyType;
-		typedef V ValType;
+		typedef K KeyType;/**< \brief Type of key. */
+		typedef V ValType;/**< \brief Type of mapped value.*/
+		typedef HashMap< K,V > OriginalType;/**< \brief Type of wrapped container.*/
 
-		typedef HashMap< K,V > OriginalType;
-
+		/** \brief Test existence of key.
+		*
+		*  \param arg the tested key.
+		*  \return true if the key exists in the container, false otherwise.*/
 		bool hasKey( K arg ) const { return cont.find( arg ) != cont.end(); }
 
+		/** \brief Get the first key.
+		 *
+		 *  \return the key of the first element in the container or 0 if empty.*/
 		K firstKey() const;
+		/** \brief Get the last key.
+		 *
+		 *  \return the key of the last element in the container or 0 if empty.*/
 		K lastKey() const;
+		/** \brief Get previous key.
+		 *
+		 *  \param arg the reference key.
+		 *  \return the key prior to \a arg.  If \a arg == 0, the last key is returned.*/
 		K prevKey( K ) const;
+		/** \brief Get next key.
+		 *
+		 *  \param arg the reference key.
+		 *  \return the key next to \a arg. If \a arg == 0, the first key is returned.*/
 		K nextKey( K ) const;
 
+		/** \brief Get element.
+		 *
+		 *	If \a arg matches any key in the container, the matched value is returned, otherwise the empty constructor of \a ValType is called.
+		 *  \param arg the searched key.
+		 *  \return the mapped value associated with key \a arg.*/
 		inline V operator[]( K arg );
+		/** \brief Get size.
+		 *
+		 *	\return the number of elements in the container.*/
 		unsigned size() const
 			{ return cont.size(); }
+		/** \brief Test if empty.
+		*
+		*  \return the boolean value, true if the container has no elements, false otherwise.*/
 		bool empty() const
 			{ return this->size() == 0; }
 //		int capacity () const
 //			{ return std::numeric_limits< int >::max(); }
+		/** \brief Get keys.
+		 *
+		 *  All the keys in the container are stored in another container with a defined iterator.
+		 *  \tparam Iterator the class of iterator for the container storing the output set keys.
+		 *  \param[out] iter the iterator connected with the container of output keys.
+		 *  \return the number of keys.*/
 		template< class Iterator > int getKeys( Iterator ) const;
 
+		/** \brief Reference to the original container.
+		 *
+		 *	The reference to the original container. The one the class wraps.*/
 		const HashMap< K,V > &cont;
 
 	protected:

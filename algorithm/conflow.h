@@ -20,12 +20,6 @@
 namespace Koala
 {
 
-//WEN: Uwaga globalna do calego pliku: wszystkie procedury tutaj uwzgledniaja krawedzie (z przypisanymi przepustowosciami) wszystkich rodzajow
-// rownoleglosci dozwolone. Jesli gdzies w wejsciu do proc. podajemy wyroznione wierzcholki start end, musza byc rozne, bo poleci wyjatek
-// - to powinno byc w opisach metod (chyba ze przy procedurze juz teraz jawnie napisano inaczej).
-//Zwracam uwage, ze edgeTab czesto nie jest ani tylko [in] ani [out] np. dostarcza przepustowosci lukow i zbiera znaleziony flow.
-//Obowiazuje do konca pliku
-
     namespace Privates {
 
 		// creates in ig auxiliary graph using g
@@ -62,7 +56,7 @@ namespace Koala
                        flow /**< \brief Actual flow through edge (output data).
 						     *
 						     * For arcs flow is nonnegative and its absolute value is taken.
-						     * For undirected edges the siegen deterines direction + form End1 to End2, - from End2 to End1. */;
+						     * For undirected edges the sign determines direction + from End1 to End2, - from End2 to End1. */;
 			CostType cost;/**<\brief Cost of unit size flow (input data, ignored for non-cost problems). */
 
 			/** \brief Empty constructor.*/
@@ -126,8 +120,8 @@ namespace Koala
 		/** \brief Output structure for problem of cut-set between two vertices.*/
 		template< class CapacType > struct EdgeCut
 		{
-			// typ liczbowy przepustowosci luku i objetosci przeplywu WEN?: nie, objetosc znalezionego rozciecia
-			CapacType capac;/**< \brief The capacity of achieved cut. */
+			// typ liczbowy przepustowosci luku i objetosci przeplywu
+			CapacType capac;/**< \brief The capacity of arc or achieved cut. */
 			int vertNo;/**< \brief Number of vertices reachable from source.
 			 start!=end after deletion of the cut-set.*/
 			int edgeNo;/**<\brief Number of edges in the cut set.*/
@@ -406,7 +400,9 @@ namespace Koala
 
 	public:
 
-	    //NEW: wiadomo co, wpisuje wszystkim krawedziom flow=0
+		/**\brief Clear flow.
+		 *
+		 * The method sets flows = 0 for all edges from container \a edgeTab. */
         template< class GraphType, class EdgeContainer > static void
 			clearFlow( const GraphType &g, EdgeContainer &edgeTab);
 
@@ -441,11 +437,14 @@ namespace Koala
 		template< class GraphType, class EdgeContainer > static bool testFlow( const GraphType &g,
 			const EdgeContainer &edgeTab, typename GraphType::PVertex S, typename GraphType::PVertex T );
 
-        //NEW: to jest podstawowa wersja transshipm. tzn edgeTab:PEdge -> TrsEdgeLabs, vertCont:PVert -> TrsVertLoss
-        //sprawdzamy, czy w edgeTab jest transshipment wpisany spelniajacy ograniczenia w verts/edge
+        /**\brief Test transshipment.
+		 *
+		 * The method tests if associative arrays \a edgeTab and \a vertCont give proper transshipment.
+		 * \param edgeTab associative array PEdge -> TrsEdgeLabs
+		 * \param vertCont associative array PVert->TrsVertLoss
+		 * \return true if array give transshipment false otherwise.  */
 		template< class GraphType, class EdgeContainer, class VertContainer > static bool testTransship( const GraphType &g,
 			const EdgeContainer &edgeTab, const VertContainer &vertCont );
-
 
 		/** \brief Get maximal flow.
 		 *
@@ -667,7 +666,7 @@ namespace Koala
 		 *  The definition of Transshipment problem implemented in Koala may be found \wikipath{Flow_problems#transshipment, here}.
 		 *  Not that this model generalizes the one stated in A. Schrijver's Combinatorial Optimization.
 		 *  \param[in] g the considered graph.
-		 *  \param edgeTab the associative array (PEdge -> TrsEdgeLabs) WEN: no i dalej bzdura which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge.
+		 *  \param edgeTab the associative array (PEdge -> TrsEdgeLabs).
 		 *  This is both input and output data structure.
 		 *  \param[in] vertTab the associative array (PVert -> TrsVertLoss) which assigns TrsVertLoss structure (keeping: maximal and minimal imbalance) to each vertex.
 		 *  \return true if transshipment was found, false otherwise.
@@ -675,21 +674,21 @@ namespace Koala
 		template< class GraphType, class EdgeContainer, class VertContainer > static bool transship( GraphType &g,
 			EdgeContainer &edgeTab, const VertContainer &vertTab );
 
-        //WEN: to jest rozszerzona wersja transhipment:  dla wierzcholkow posiadajacych w vertTab
+        //to jest rozszerzona wersja transhipment:  dla wierzcholkow posiadajacych w vertTab
         //lo=hi=0 (czyli wierzch. nie gubiace i nie produkujace) w vertTab2 mozna podac lo i hi niezerowe
         //tj. dolne i gorne ograniczenie przeplywu przez wierzcholek. Ale sa tez dodatkowe ograniczenia:
 //            - w grafie krawedzie nieskierowane sa niedopuszczalne
 //            - dla wierzcholkow w vertTab musi byc hi>=lo>=0 lub 0>=hi>=lo
-		/** \brief Solve transshipment problem
+		/** \brief Solve extended transshipment problem
 		 *
 		 *  The definition of Transshipment problem implemented in Koala may be found \wikipath{Flow_problems#transshipment, here}.
 		 *  This version of transshipment generalizes transship( GraphType &, EdgeContainer &, const VertContainer & ) by adding to each vertex
 		 *  minimal and maximal flow through vertex.
 		 *  \param[in] g the considered graph.
-		 *  \param edgeTab the associative array (PEdge -> TrsEdgeLabs) WEN: i jak wyzej which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge.
+		 *  \param edgeTab the associative array (PEdge -> TrsEdgeLabs).
 		 *  This is both input and output data structure.
 		 *  \param[in] vertTab the associative array (PVert -> TrsVertLoss) which assigns TrsVertLoss structure (keeping: maximal and minimal imbalance) to each vertex.
-		 *  \param[in] vertTab2 the associative array (PVert -> TrsEdgeLabs) WEN: no wlasnie inny label ...which assigns TrsVertLoss structure to each vertex.
+		 *  \param[in] vertTab2 the associative array (PVert -> TrsEdgeLabs), that keeps minimal and maximal flow through.
 		 *   However, this time TrsVertLoss represent minimal and maximal possible flow through vertex.
 		 *  \return true if transshipment was found, false otherwise.
 		 *  \sa FlowAlgsDefaultSettings */
@@ -705,7 +704,7 @@ namespace Koala
 
 
 		/** \brief Solve cost transshipment problem.
-		 * WEN: por. pierwszy transship tj. w wersji podstawowej
+		 * 
 		 *  The method finds minimum cost transshipment problem for a given graph and initial constraints (on edges and vertices).
 		 *  \wikipath{Flow_problems#transshipment, See transshipment definition.}
 		 *  \param[in] g the considered graph.
@@ -718,15 +717,16 @@ namespace Koala
 				const VertContainer &vertTab );
 
         /** \brief Solve cost transshipment problem.
-		 *  WEN: por. drugi transship tj. uogolniony  te same def. i ograniczenia/zalozenia + niezerowy koszt
-		 *  w wierzcholku ma sens tylko dla wierzcholkow nie gubiacych i nie produkujacych, a wiec hi=lo=0 w vertTab
+		 *  
 		 *  The method finds minimum cost transshipment problem for a given graph and initial constraints (on edges and vertices).
+		 *  This version of transshipment generalizes transship( GraphType &, EdgeContainer &, const VertContainer & ) by adding to each vertex
+		 *  minimal and maximal flow through vertex.
 		 *  \wikipath{Flow_problems#transshipment, See transshipment definition.}
 		 *  \param[in] g the considered graph.
 		 *  \param edgeTab the associative array (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge.
 		 *  Both input and output data are saved in this array.
 		 *  \param[in] vertTab the associative array (PVert -> TrsVertLoss) which assigns TrsVertLoss structure (keeping: maximal excess and deficit) to each vertex.
-		 *  \param[in] vertTab2 the associative array (PVert -> TrsEdgeLabs) WEN: no wlasnie dalej zly typ labela w vertTab2 which assigns TrsVertLoss structure to each vertex.
+		 *  \param[in] vertTab2 the associative array (PVert -> TrsEdgeLabs), that keeps minimal and maximal flow through vertex.
 		 *   However, this time TrsVertLoss represent minimal and maximal possible flow through vertex.
 		 *  \return the cost of achieved transshipment or infinity if there isn't any.*/
 		template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2 > static
@@ -840,8 +840,8 @@ namespace Koala
 		 *  \param[in] g the considered graph.
 		 *  \param[in] start the first (starting) reference vertex.
 		 *  \param[in] end the second (terminal) reference vertex.
-		 *  \param[out] voutiter a SearchStructs::CompStore object that keeps the output paths in the form of vertex sequences.
-		 *  \param[out] eoutiter a SearchStructs::CompStore object that keeps the output paths in the form of edge sequences.
+		 *  \param[out] voutiter a SearchStructs::CompStore object that keeps the output paths in the form of vertex sequences. (\wikipath{blackHole, BlackHole} available)
+		 *  \param[out] eoutiter a SearchStructs::CompStore object that keeps the output paths in the form of edge sequences. (\wikipath{blackHole, BlackHole} available)
 		 *  \return the number of edge disjont paths between \a start and \a end. */
 		template< class GraphType, class VIter, class EIter, class LenIterV, class LenIterE > static int
 			edgeDisjPaths( GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end,
@@ -885,15 +885,15 @@ namespace Koala
 		template< class GraphType, class VIter > static int minVertCut( const GraphType &g, VIter iter );
 
 		/** \brief Get set of vertex disjointed paths.
-		 * WEN: naruszamy tw. Mengele (czy jak mu tam bylo): tu zezwanamy na bezposrednie krawedzie start->end typu EdUndir|EdDirOut i kazda z nich rowniez zaliczamy
-		 jako wynikowa sciezke
+		 * 
 		 *  The method gets the maximal set of vertex internally disjoint paths between vertices \a start and \a end
 		 *    (obviously vertices \a start and \a end are shared for all paths).
+		 *  In this version we allow arcs start->end which also give a proper path (which violates Menger's theorem). 
 		 *  \param[in] g the considered graph.
 		 *  \param[in] start the first (starting) reference vertex.
 		 *  \param[in] end the second (terminal) reference vertex.
-		 *  \param[out] voutiter a SearchStructs::CompStore object that keeps the output path in the form of vertex sequences.
-		 *  \param[out] eoutiter a SearchStructs::CompStore object that keeps the output path in the form of edge sequences.
+		 *  \param[out] voutiter a SearchStructs::CompStore object that keeps the output path in the form of vertex sequences. (\wikipath{blackHole, BlackHole} available)
+		 *  \param[out] eoutiter a SearchStructs::CompStore object that keeps the output path in the form of edge sequences. (\wikipath{blackHole, BlackHole} available)
 		 *  \return the number of vertex disjont paths between \a start and \a end.*/
 		template< class GraphType, class VIter, class EIter, class LenIterV, class LenIterE > static int
 			vertDisjPaths( const GraphType &g, typename GraphType::PVertex start, typename GraphType::PVertex end,

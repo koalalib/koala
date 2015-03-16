@@ -58,7 +58,7 @@ namespace Koala
 	public:
 		/** \brief Constructor
 		 *
-		 *  Assigns the STL map container \a acont to the member \a cont.
+		 *  Assigns STL map container \a acont to the member \a cont.
 		 *  \param acont the original container.
 		 *
 		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_constructor.html">See example</a>.

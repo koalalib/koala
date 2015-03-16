@@ -11,9 +11,8 @@ namespace Koala {
 
 namespace IO {
 
-//NEW: zmiana nazw i redukcja duplikacji kodu
 // ParSetVertRead=ParSetEdgeRead->ParSetRead, ParSetEdgeWrite=ParSetVertWrite->ParSetWrite
-
+/**\brief Function object that reads GraphML to ParSet.*/
 struct ParSetRead {
 	ParSetRead(GraphML &g): m_gml(g), m_idkey(), m_readid(false)			{};
 	ParSetRead(GraphML &g, std::string ik): m_gml(g), m_idkey(ik), m_readid(true)	{};

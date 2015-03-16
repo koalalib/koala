@@ -135,8 +135,7 @@ namespace Koala
 		 *
 		 *  The method tests if the graph \a g is a caterpillar.
 		 *  \param g the tested graph.
-		 *  \return true if caterpillar, otherwise false.
-		 *  \related Caterpillar*/
+		 *  \return true if caterpillar, otherwise false.*/
 		template< class GraphType > static bool caterpillar( const GraphType &g )
 			{ return Caterpillar::spineEnds( g ).first; }
 
@@ -639,16 +638,14 @@ namespace Koala
 		/** \brief Test if comparability graph.
 		 *
 		 *  @param[in] g the graph to test.
-		 *  @return true if the graph is a comparability graph, false otherwise.
-		 *  \related Comparability */
+		 *  @return true if the graph is a comparability graph, false otherwise. */
 		template< class GraphType > static bool comparability( const GraphType &g )
 			{ return Comparability::explore( g,blackHole,blackHole,blackHole ) != -1; }
 
 		/** \brief Test if complement of comparability graph.
 		 *
 		 *  \param g the considered graph.
-		 *  \return true if the graph \a g is a comparability graph complement,  false  otherwise.
-		 *  \related Comparability */
+		 *  \return true if the graph \a g is a comparability graph complement,  false  otherwise. */
 		template< class GraphType > static bool cocomparability( const GraphType &g );
 
 		/** \brief Methods for interval graphs.*/
@@ -824,8 +821,6 @@ namespace Koala
 			 *  \param out the iterator of the output container with all the vertices of the vertex cover.
 			 *  \return the number of element in the output set \a out i.e. the cardinality of the vertex cover of \a g.*/
 			template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
-
-            //WEN?: kolorowania optymalnego nie ma, ale trzeba tu odeslac, ze dla chordali zapewnia je kolorowanie sekwen. (odsylacz do procedury) zgodne z dowolna permut. wierzcholkow
 
 		protected:
 			template< class GraphType, class Assoc > static bool cograph( const GraphType &ag, Assoc &subset );
