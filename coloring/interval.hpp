@@ -45,12 +45,11 @@ int IntervalVertColoringPar<DefaultStructs>::greedy(const Graph &graph,
 	return maxCol;
 }
 
-//Regula LI:
-//1. Znajdź jeszcze niepokolorowany wierzchołek v o najmniejszej możliwej liczbie c,
-//takiej że nadanie v przedziału {c,...,c+w(v)–1} nie spowoduje konfliktu z wierzchołkami już pokolorowanymi.
-//Przypisz v ten przedział. Remisy rozstrzygaj wybierajac wierzcholek o większej wadze.
-//2. Powtarzaj punkt 1 aż do wyczerpania się niepokolorowanych wierzchołków.
-//- dane jest pokolorowanie czesciowe, badamy zakres niepokolorowanych wierzcholkow
+// LI rule:
+//1. Find uncolored vertex v with minimal c such that assigning of {c,...,c+w(v)–1} won't make any conflict with already
+// colored vertices. Assign this interval to v. Break ties by choosing vertices with bigger weight.
+//2. Repeat 1 as long as there are uncolored vertices.
+// start with given partial coloring
 template<class DefaultStructs>
 template<typename Graph, typename Weights, typename ColorMap, typename VIter>
 int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
@@ -115,7 +114,7 @@ int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
 	return maxCol;
 }
 
-//- badamy wszystkie niepokolorowane wierzcholki
+// we test all uncolored vertices
 template<class DefaultStructs>
 template<typename Graph, typename Weights, typename ColorMap>
 int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
@@ -178,7 +177,7 @@ int IntervalVertColoringPar<DefaultStructs>::li(const Graph &graph,
 	return maxCol;
 }
 
-//- test poprawnosci podanego kolorowania
+// tests if a given coloring is legal
 template<class DefaultStructs>
 template<typename Graph, typename Weights, typename ColorMap>
 bool IntervalVertColoringPar<DefaultStructs>::testPart(const Graph &graph,
@@ -204,7 +203,7 @@ bool IntervalVertColoringPar<DefaultStructs>::testPart(const Graph &graph,
 	return true;
 }
 
-//- test poprawnosci podanego kolorowania
+// test if a given coloring is legal
 template<class DefaultStructs>
 template<typename Graph, typename Weights, typename ColorMap>
 bool IntervalVertColoringPar<DefaultStructs>::test(const Graph &graph,
@@ -286,8 +285,8 @@ Segment IntervalVertColoringPar<DefaultStructs>::simulColor(const Graph &graph,
 //Weights: Graph::PEdge -> int (length of interval)
 //ColorMap: Graph::PEdge -> IntervalEdgeColoringPar::Color
 
-//Kolorowanie sekwencyjne krawedzi przedzialami liczb calkowitych nieujemnych,
-//funkcja wagi krawedzi (liczby naturalne) podaje moc jej przedzialu.
+//Sequential coloring of edges with intervals containing nonnegative integers,
+//weights of edges define cardinality of its interval
 template<class DefaultStructs>
 template<typename Graph, typename Weights, typename ColorMap>
 int IntervalEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph,
@@ -333,7 +332,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::greedy(const Graph &graph,
 	return maxCol;
 }
 
-//regula LF: podany zakres lub wszystkie niepokolorowane wierzcholki koloruj zachlannie wg. sekwencji nierosnacych wag
+//LF rule: color greedily all uncolored vertices in order of nonincreasing weights
 template<class DefaultStructs>
 template<typename Graph, typename Weights, typename ColorMap, typename EIter>
 int IntervalEdgeColoringPar<DefaultStructs>::lf(const Graph &graph,
@@ -554,7 +553,7 @@ int IntervalEdgeColoringPar<DefaultStructs>::li(const Graph &graph,
 	return maxCol;
 }
 
-//- test poprawnosci podanego kolorowania
+// tests if a given coloring is legal
 template<class DefaultStructs>
 template<typename Graph, typename Weights, typename ColorMap>
 bool IntervalEdgeColoringPar<DefaultStructs>::testPart(const Graph &graph,

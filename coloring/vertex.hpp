@@ -392,7 +392,8 @@ void SeqVertColoringPar<DefaultStructs>::brooksBiconnected(
 		TwoDimAssocCont< Vert,EmptyVertInfo,AMatrTriangle >::Type simple(bState.graph.getVertNo());
 
 	SimplArrPool<typename Subgraph::Vertex> valloc(bState.graph.getVertNo());
-	SimplArrPool<typename Subgraph::Edge> ealloc(bState.graph.getEdgeNo()); //TODO: add edge direction?
+	SimplArrPool<typename Subgraph::Edge> ealloc(bState.graph.getEdgeNo());
+    //TODO: add edge direction?
 	Subgraph subgraph(&valloc, &ealloc); //subgraph is biconnected
 	while(bState.begVert!=bState.endVert) {
 		//make a subgraph

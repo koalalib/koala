@@ -45,10 +45,8 @@ namespace Koala
             void moveGrPtr(const T* arg)
             { }
 	    };
-		/* NormalParalLink
-		 *
-		 */
-		template< class VertInfo, class EdgeInfo, class Settings > class NormalParalLink
+
+        template< class VertInfo, class EdgeInfo, class Settings > class NormalParalLink
 		{
 		protected:
 			Edge< VertInfo,EdgeInfo,Settings > *n,*p;
@@ -63,9 +61,6 @@ namespace Koala
 				{ return p; }
 		};
 
-		/* EmptyParalLink
-		 *
-		 */
 		template< class VertInfo, class EdgeInfo, class Settings > struct EmptyParalLink
 		{
 			EmptyParalLink() { }
@@ -76,9 +71,6 @@ namespace Koala
 				{ return DummyVar< Edge< VertInfo,EdgeInfo,Settings > * >(); }
 		};
 
-		/* ParalLink
-		 *
-		 */
 		template< class VertInfo, class EdgeInfo, class Settings, bool Present > struct ParalLink;
 		template< class VertInfo, class EdgeInfo, class Settings > struct ParalLink< VertInfo,EdgeInfo,Settings,true >:
 			public NormalParalLink< VertInfo,EdgeInfo,Settings > { };
@@ -86,9 +78,6 @@ namespace Koala
 			public EmptyParalLink< VertInfo,EdgeInfo,Settings > { };
 	}
 
-	/* Edge
-	 * Klasa krawedzi glownej struktury grafu
-	 */
 	/**\brief Edge of graph.
 	 *
 	 *  The main structure of a graph representing an edge. 
@@ -121,7 +110,6 @@ namespace Koala
 		// Additional user information in the edge.
 		EdgeInfo info; /**< \brief Additional user information stored in edge.*/
 
-		// zwracaja wierzcholki koncowe krawedzi
 		/** \brief Get edge ends.
 		 *
 		 *  The method gets pointers to vertices constituting the edge. 
@@ -148,14 +136,12 @@ namespace Koala
 		 *  \returns the pointers to the second end of the edge. */
 		Vertex< VertInfo,EdgeInfo,Settings > *getEnd2()
 			{ return vert[1].vert; }
-		// czy podany wierzcholek jest koncem krawedzi
 		/** \brief Test if edge end.
 		 *
 		 *  \param v the tested vertex.
 		 *  \returns true if the vertex \a v is an end of the edge, false otherwise. */
 		bool isEnd(Vertex<VertInfo,EdgeInfo,Settings>* v);
 
-		// zwroc drugi koniec krawedzi
 		/** \brief Access another vertex of edge
 		 *
 		 *  For a given vertex \a v in the edge, the method returns the other vertex that is also an end of the edge.
@@ -163,7 +149,6 @@ namespace Koala
 		 *  \returns the other vertex of the edge, the same vertex if the edge is a loop or NULL if unsuccessful. */
 		Vertex< VertInfo,EdgeInfo,Settings > *getEnd( Vertex< VertInfo,EdgeInfo,Settings > *v );
 
-		// sposob orientacji krawedzi wzgledem jej podanego konca
 		/** \brief Get edge direction.
 		 *
 		 *  The method gets the direction of the edge with respect to the vertex \a v.The order established by methods addEdge and related is kept.  
@@ -200,7 +185,7 @@ namespace Koala
 			{ this->info=info; }
 
 	private:
-		// powiazania do list krawedzi tego samego rodzaju przy wierzcholku koncowym tej krawedzi
+		// links to lists od edges of the same type incident to the same vertex
 		//0==U==out; 1==V==in;
 		struct EdgeLink {
 			Vertex< VertInfo,EdgeInfo,Settings > *vert;
@@ -210,7 +195,7 @@ namespace Koala
 				{ }
 		} vert[2];
 
-		// klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
+		// class is non-copyable
 		/* Standard constructor. */
 		Edge(const Graph< VertInfo,EdgeInfo,Settings >* wsk):
 		    Privates::MainGraphPtr<Graph< VertInfo,EdgeInfo,Settings >, Settings::VertEdgeGraphPtr>(wsk),
@@ -222,7 +207,6 @@ namespace Koala
 		    info( infoExt ), next( NULL ), prev( NULL ), type( Detached )
 			{ }
 
-		// klasa niekopiowalna
 		Edge( const Edge &X )
 			{ }
 		Edge &operator=( const Edge &X )
@@ -230,9 +214,9 @@ namespace Koala
 		~Edge()
 			{ }
 
-		// powiazania na liscie wszystkich krawedzi grafu
+		// links to list of all edges of a graph
 		Edge *next,*prev;
-		// typ krawedzi
+		// type of edges
 		EdgeType type;
 	};
 

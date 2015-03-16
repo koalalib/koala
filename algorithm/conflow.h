@@ -28,18 +28,12 @@ namespace Koala
 
     namespace Privates {
 
-		// tworzy w ig pomocnicza siec na podstawie g. Mapa images laczy wierzcholki g z parami odpowiednich krawedzi w ig
+		// creates in ig auxiliary graph using g
 		template< class GraphType, class ImageType, class Linker >
 			static void flowsMakeImage( const GraphType &g, ImageType &ig, Linker &images, EdgeType mask );
 
     }
 
-	/* FlowAlgsDefaultSettings
-	 * Domyslne wytyczne dla procedur przeplywowych:
-	 * czy do wyznaczania maks. przeplywu uzywac FulkersonaForda, czy MKM
-	 * czy do wyznaczania najtanszego przeplywu uzywac sciezek powiekszajacych (pseudowielomianowa), czy
-	 * cykli z min. srednia dlugoscia (wielomianowa)
-	 */
 	/** \brief The default settings for flow algorithms.
 	 *
 	 *  The class called as a template parameter decided which algorithm and in which version should be used for calculating flow in weighted network.
@@ -55,29 +49,22 @@ namespace Koala
 	};
 
 
-    //wydzielone z FlowPar
 	/**\brief Auxiliary structures for Flow algorithm*/
     struct FlowStructs {
 
-		// rekord z danymi (in-out) opisujacy krawedz
 		/** \brief Edge information for flow and transshipment problems and algorithms.*/
 		template< class DType, class CType = DType > struct EdgeLabs
 		{
-			// typ liczbowy przepustowosci luku i objetosci przeplywu
 			typedef DType CapacType;/**<\brief Type of capacity and flow variables. */
-			// typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
 			typedef CType CostType;/**<\brief Type of cost variables.*/
 
-			// przepustowosc (dana wejsciowa), wartosc znalezionego przeplywu w kierunku getEdgeEnd1->getEdgeEnd2
 			CapacType capac /**<\brief Capacity of edge (input data). Must be nonnegative, otherwise exception is called.*/,
                        flow /**< \brief Actual flow through edge (output data).
 						     *
 						     * For arcs flow is nonnegative and its absolute value is taken.
 						     * For undirected edges the siegen deterines direction + form End1 to End2, - from End2 to End1. */;
-			// koszt jednostkowy przeplywu przez luk (dana wejsciowa)
 			CostType cost;/**<\brief Cost of unit size flow (input data, ignored for non-cost problems). */
 
-			// agrs: przepustowosc i koszt krawedzi
 			/** \brief Empty constructor.*/
 			EdgeLabs():
 					capac(NumberTypeBounds< CapacType >::zero() ),
@@ -100,26 +87,20 @@ namespace Koala
 				{ }
 		};
 
-		// j.w. ale nadaje domyslne jednostkowe przepustowosci i koszty
 		/** \brief Edge information for flow and transshipment problems and algorithms with unit capacity.
 		 *
 		 *  The class is almost the same as EdgeLabs but for the \a capac which is by default unit.*/
 		template< class DType, class CType = DType > struct UnitEdgeLabs
 		{
-			// typ liczbowy przepustowosci luku i objetosci przeplywu
 			typedef DType CapacType;/**<\copydoc EdgeLabs::CapacType */
-			// typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
 			typedef CType CostType;/**<\copydoc EdgeLabs::CostType */
 
-			// przepustowosc (dana wejsciowa), wartosc znalezionego przeplywu w kierunku getEdgeEnd1->getEdgeEnd2
 			CapacType capac/**< \brief Capacity of edge (input data).
 						    *
 							* Must be nonnegative, otherwise exception is called. By default attribute is set to 1.*/,
 				flow/**\copydoc EdgeLabs::flow */;
-			// koszt jednostkowy przeplywu przez luk (dana wejsciowa)
 			CostType cost;/**<\copydoc EdgeLabs::cost*/
 
-			// agrs: przepustowosc i koszt krawedzi
 			/**\brief Empty constructor.*/
 			UnitEdgeLabs():
 					capac(NumberTypeBounds< CapacType >::one() ),
@@ -142,16 +123,13 @@ namespace Koala
 				{ }
 		};
 
-		// rekord wynikowy opisujacy rozciecie krawedziowe w grafie miedzy para wierzcholkow
 		/** \brief Output structure for problem of cut-set between two vertices.*/
 		template< class CapacType > struct EdgeCut
 		{
 			// typ liczbowy przepustowosci luku i objetosci przeplywu WEN?: nie, objetosc znalezionego rozciecia
 			CapacType capac;/**< \brief The capacity of achieved cut. */
-			// liczba wierzcholkow osiagalnych z poczatkowego po usunieciu rozciecia
 			int vertNo;/**< \brief Number of vertices reachable from source.
 			 start!=end after deletion of the cut-set.*/
-			// liczba krawedzi rozciecia
 			int edgeNo;/**<\brief Number of edges in the cut set.*/
 
 			/** \brief Empty constructor.*/
@@ -160,7 +138,6 @@ namespace Koala
 				{ }
 		};
 
-		// j.w. ale podaje rowniez 2 wierzcholki - z obu czesci rozcietego grafu
 		/** \brief Output structure for cut-set problem in the variant searching all the pairs (star,end) where start!=end.*/
 		template< class GraphType, class CapacType > struct EdgeCut2: public EdgeCut< CapacType >
 		{
@@ -169,10 +146,6 @@ namespace Koala
 			EdgeCut2() : first(0), second(0)
 			{}
 		};
-
-		// Do odczytu rozciecia krawedziowego miedzy para wierzcholkow
-		// Uzytkownik podaje, pare iteratorow, gdzie wpisac krawedzie znalezionego rozciecia
-		// i wierzcholki osiagalne ze startowego po usunieciu krawedzi rozciecia
 
 		/** \brief Auxiliary class to represent the edge cut. (output structure) */
 		template< class VIter, class EIter > struct OutCut
@@ -183,8 +156,6 @@ namespace Koala
 			OutCut( VIter av, EIter ei ): vertIter( av ), edgeIter( ei ) { }
 		};
 
-		// funkcja tworzaca, analogia make_pair
-		// Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
 		/**\brief Generating function for the OutCut object.
 		 *
 		 *  \tparam VIter the type of insert iterator to container with vertices.
@@ -195,18 +166,13 @@ namespace Koala
 		template< class VIter, class EIter > static OutCut< VIter,EIter > outCut( VIter av, EIter ei )
 			{ return OutCut< VIter,EIter >( av,ei ); }
 
-		// "krawedz" drzewa Gomory-Hu
 		/** \brief Auxiliary output edge structure for Gomory-Hu trees.*/
 		template< class GraphType, class CType > struct GHTreeEdge
 		{
-			// typ liczbowy przepustowosci luku
 			typedef CType CapacType;/**<\brief Capacity type*/
-			// koncowki krawedzi
 			typename GraphType::PVertex first/**\brief First vertex of GHTree edge*/,second/**\brief Second vertex of GHTree edge*/;
-			// przepustowosc "krawedzi"
 			CapacType capac;/**< \brief Capacity.*/
 
-			// args: oba wierzcholki koncowe i przepustowosc
 			/**\brief Constructor.*/
 			GHTreeEdge( ): first( 0 ), second( 0 ),
 				capac( NumberTypeBounds< CapacType >::zero() )
@@ -223,22 +189,14 @@ namespace Koala
 
 		};
 
-		// Transshipment - uogolnienie przeplywu (por. Schrijver)
-		// rekord wejsciowy opisujacy wierzcholek dla wyszukiwania transhipmentow
 		/** \brief The input structure for vertex in transhipment problem.
 		 *
 		 *  Note that our approach generalizes version from Schrijver's Combinatorial Optimization.*/
 		template< class DType > struct TrsVertLoss
 		{
-			// typ liczbowy przepustowosci luku i objetosci przeplywu
 			typedef DType CapacType;/**<\brief Capacity type.*/
-			// maksymalny i minimalny dopuszczalny przy danym wierzcholku laczny wplyw (tj. bilans wierzcholka na plus)
-			// trans. to uogolnienie przeplywu, w ktorym ten przeplyw moze sie
-			//nie bilansowac przy kazdym wierzcholku tj. podajemy max. i min. dopuszczalny bilans wierzcholka
-			//(np. w przeplywie wszedzie sa 0 z wyjatkiem start i end.)
 			CapacType hi/**\brief Maximal possible imbalance in vertex*/,lo/**\brief Minimal possible imbalance in vertex*/;
 
-			//(dopuszczalne dodatnie i ujemne np. przeplyw to trans. z hi=lo=0 wszedzie poza zrodlem i ujsciem)
 			/**\brief Empty constructor.*/
 			TrsVertLoss():
 				hi(NumberTypeBounds< CapacType >::zero()),
@@ -254,25 +212,17 @@ namespace Koala
 				 { }
 		};
 
-		// rekord  opisujacy krawedz dla wyszukiwania transhipmentow
 		/**\brief The input/output structure for edge in transhipment problem.
 		 *
 		 * The label stores both information on input and on output.*/
 		template< class DType, class CType = DType > struct TrsEdgeLabs
 		{
-			// typ liczbowy przepustowosci luku i objetosci przeplywu
 			typedef DType CapacType;/**<\brief Type of capacity, balance and flow variables.*/
-			// typ kosztu jednostkowego przeplywu przez luk i kosztu przeplywu
 			typedef CType CostType;/**<\brief Type of cost variables.*/
-			// wymagane gorne i dolne ograniczenie na wielkosc przeplywu przez ta krawedz.
+			// TODO: wymagane gorne i dolne ograniczenie na wielkosc przeplywu przez ta krawedz.
 			// TODO: sprawdzic, czy moga byc ujemne dla lukow
-			// trans. to uogolnienie przeplywu, w ktorym na wejsciu dla
-			//krawedzi podajemy max i min dopuszczalna wartosc przeplywu przez nia przechodzacego (np. w przeplywie hi=capac lo=0) oba >=0
-			//Te 2 pola sa wejsciowe Dla Undirected wymaga sie lo=0
 			CapacType hi/**\brief Maximal possible flow through edge.*/,lo/**\brief Minimal possible flow through edge.*/;
-			// wartosc znalezionego przeplywu (transship.) w kierunku getEdgeEnd1->getEdgeEnd2
 			CapacType flow;/**<\brief Actual flow through edge from getEdgeEnd1 to getEdgeEnd2 (output attribute) */
-			// koszt jednostkowy przeplywu dla luku, jesli wymagany to wymagany nieujemny z wyjatkiem petli
 			CostType cost;/**<\brief Cost of unit size flow. (input attribute), ignored in non-cost problems. */
 
 			/** \brief Empty constructor.*/
@@ -302,10 +252,6 @@ namespace Koala
 
     };
 
-	/* FlowPar
-	 * Algorytmy znajdowania przeplywu, najwiekszego przeplywu, najtanszego przeplywu, rozciec, transhipments itd.
-	 * DefaultStructs - wytyczne dla wewnetrznych procedur
-	 */
 	/** \brief Flow algorithms (parametrized).
 	 *
 	 *  The class provides the algorithms for finding flow, maximal flow, minimal cost flow, cuts and solutions for transshipment problem.
@@ -341,17 +287,17 @@ namespace Koala
 //			-costFlow
 //		-addFlow
 	protected:
-		// rekord pomocniczy opisujacy wierzcholek
+		// auxiliary record describing vertex
 		template< class GraphType, class CapacType > struct VertLabs
 		{
-			// do BFS w sieci tymczasowej
+			// BFS in auxiliary graph
 			int distance,backdist;
 			typename GraphType::PVertex vPrev;
 			typename GraphType::PEdge  ePrev;
 
-			// potencjaly przesylu (na uzytek maxFlowMKM)
+			// potentials (for maxFlowMKM)
 			CapacType mass,inPot,outPot;
-			// czy wierzcholek jest w sieci warstwowej (na uzytek maxFlowMKM)
+			// is a vertex in a layer (for maxFlowMKM)
 			bool used;
 
 			VertLabs( typename GraphType::PVertex pv = 0, typename GraphType::PEdge pe = 0,
@@ -364,7 +310,7 @@ namespace Koala
 			{ }
 		};
 
-		// pomocnicza etykieta wierzcholka na uzytek alg. Dijkstry w sieci tymczasowej
+		// auxiliary label for Dijkstry
 		template< class GraphType, class CostType > struct VertLabsCost
 		{
 			CostType distance;
@@ -378,90 +324,74 @@ namespace Koala
 		};
 
 
-		// przepustowosc uzyteczna krawedzi w sieci tymczasowej z danymi przeplywami
+		// capacity in auxiliary graph
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			usedCap( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PEdge e,
 				typename GraphType::PVertex v, bool out );
-		// zwiekszanie przeplywu przez krawedz e od delta w kierunku od v lub do v (zmienna out)
+		// increases flow by edge e by delta in the direction from v or to v
 		template< class GraphType, class EdgeContainer > static void
 			addFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PEdge e,
 				typename GraphType::PVertex v, typename EdgeContainer::ValType::CapacType delta, bool out );
-		// BFS w sieci tymczasowej przy danych przepustowosciach i przeplywie
-		// Sekwencja wyjsciowa wierzcholkow idzie na iter
-		// Poruszamy sie "do przodu" lub "do tylu" (out) odpowiednio uzywajac pol distance lub backdistance rekodru
+		// BFS in auxiliary graph
 		template< class GraphType, class VertContainer, class EdgeContainer, class Iter > static bool
 			BFSFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &visited,
 				typename GraphType::PVertex first, typename GraphType::PVertex last, bool out, Iter &iter );
-		// pomocnicza dla maxFlowMKM
-		// identyfikacja wierzcholkow warstw miedzy first a last sieci tymczasowej (pola used, distance, backdistane)
-		// zwraca: czy jest przejscie first->last
+		// identifies vertices between first and last sieci
 		template< class GraphType, class VertContainer, class EdgeContainer, class Iter > static bool
 			layers( const GraphType &g, EdgeContainer &edgeTab, VertContainer &visited,
 				typename GraphType::PVertex first, typename GraphType::PVertex last, Iter &iterout );
-		// pomocnicza dla maxFlowMKM
-		// wyznaczanie potencjalow przeplywu wierzcholkow w sieci warstwowej miedzy ends
+		// auxiliary for maxFlowMKM
+		// computes potentials 
 		template< class GraphType, class VertContainer, class EdgeContainer > static void
 			findPot( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
 				typename GraphType::PVertex fends,typename GraphType::PVertex sends,
 				typename GraphType::PVertex v, bool pin, bool pout );
-		// na uzytek maxFlowMKM
-		// przepchniecie przeplywu z wierzcholka v do przodu lub do tylu
+		// changes flow in v
 		template< class GraphType, class VertContainer, class EdgeContainer > static void
 			push( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab, typename GraphType::PVertex v,
 				bool front );
-		// na uzytek maxFlowMKM
+		// for maxFlowMKM
 		template< class GraphType, class VertContainer, class EdgeContainer > static
 			typename EdgeContainer::ValType::CapacType onevert( const GraphType &g, EdgeContainer &edgeTab,
 				VertContainer &vertTab, typename GraphType::PVertex *tab, int size,
 				typename EdgeContainer::ValType::CapacType limit );
-		// na uzytek MKM, znajduje maksymalny (ale nie przekraczajacy limit) przeplyw miedzy start a end
+		// for MKM, finds maximal (but not exceeding limit) flow between start and end
 		template< class GraphType, class EdgeContainer, class VertContainer > static
 			typename EdgeContainer::ValType::CapacType layerFlow( const GraphType &g, EdgeContainer &edgeTab,
 			VertContainer &vertTab, typename GraphType::PVertex start, typename GraphType::PVertex end,
 			typename EdgeContainer::ValType::CapacType limit );
-		// Znajdowanie maksymalnego (ale nie przekraczajacego limit) przeplywu miedzy start a end
-		// Algorytm MKM
-		// Zwraca wielkosc przeplywu
-		// Parametry: badany graf, tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol capac (wymagane nieujemne),
-		// wyniki zwracane do pol flow. gorny limit wielkosci znalezionego przeplywu
+		// Algorithm MKM - comp[utes maximal flow
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			maxFlowMKM( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
 				typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType limit );
-		// Znajdowanie maksymalnego (ale nie przekraczajacego limit) przeplywu miedzy start a end
-		// Algorytm FulkersonaFodra
-		// Zwraca wielkosc przeplywu. Parametry: badany graf, tablica asocjacyjna PEdge->EdgeLabs. Korzystamy z pol
-		// capac (wymagane nieujemne), wyniki zwracane do pol flow, gorny limit wielkosci znalezionego przeplywu
+		// Fulkerson-Ford
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			maxFlowFF( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
 				typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType limit );
-		// podobna do usedCap na uzytek przeplywow z kosztem
+		// like usedCap but for flows with costs
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			usedCapCost( const GraphType &g, EdgeContainer& edgeTab, typename GraphType::PEdge e,
 				typename GraphType::PVertex v );
-		// koszt jednostkowy przeplywu przez krawedz od danej koncowki w sieci tymczasowej
+		// unit cost of a flow
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CostType
 			costFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PEdge e,
 				typename GraphType::PVertex v );
 
-		// Bellman-Ford w sieci tymczasowej z kosztami lukow skorygowanymi przez potencjaly wierzcholkow
-		// Zwraca: czy istnieje przejscie start->end
+		// Bellman-Ford, checks and returns information about a path start->end
 		template< class GraphType, class VertContainer, class EdgeContainer > static bool
 			BellmanFordFlow( const GraphType &g, EdgeContainer &edgeTab, VertContainer &vertTab,
 				typename GraphType::PVertex start, typename GraphType::PVertex end );
-		// znajdowanie w sieci tymczasowej cyklu o najmniejszej sredniej dlugosci krawedzi
-		// pominiecie wierzcholka koncowego: liczymy odleglosci ze start do wszystkich wierzcholkow
+		// finds a cycle with minimal average edge length
 		// TODO: nie testowane, sprawdzic!
 		template< class GraphType, class EdgeContainer, class EIter, class VIter >
 			static int minMeanCycle( const GraphType &g, EdgeContainer &edgeTab, OutPath< VIter,EIter > iters );
-		// znajdowanie przeplywu start->end o maksymalnej objetosci (ale nie przekraczajacej limitu val) i najmniejszym koszcie
-		// procedura pseudowielomianowa (sciezki powiekszajace)
-		// zwraca pare wielkosc przeplywu
+		// computes flow start->end with maximal capacity (not exceeding val) and minimal cost
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			minCostFlowFF( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
 				typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val =
 				 NumberTypeBounds< typename EdgeContainer::ValType::CapacType >::plusInfty() );
 
-		// procedura o interfejsie j.w. ale wielomianowa
+		// procedure as above but polynomial
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			minCostFlowGT( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
 				typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val =
@@ -480,8 +410,6 @@ namespace Koala
         template< class GraphType, class EdgeContainer > static void
 			clearFlow( const GraphType &g, EdgeContainer &edgeTab);
 
-		// objetosc przeplywu przy wierzcholku v
-		// type=EdDirOut - objetosc wyplywajaca, type=EdDirIn - objetosc wplywajaca, type=EdUndir - bilans wyplywajacy
 		/** \brief Get flow through vertex.
 		 *
 		 *  The method extracts the size of flow (or any related problem) in a vertex from the associative container edgeTab.
@@ -499,7 +427,6 @@ namespace Koala
 			vertFlow( const GraphType &g, const EdgeContainer &edgeTab, typename GraphType::PVertex v,
 				EdgeDirection type = EdUndir );
 
-		// sprawdzanie poprawnosci przeplywu S->T
 		/** \brief Test flow.
 		 *
 		 *  The method test if the flow given by the associative container edgeTab is a proper flow from \a S to \a T for graph \a g.
@@ -520,8 +447,6 @@ namespace Koala
 			const EdgeContainer &edgeTab, const VertContainer &vertCont );
 
 
-		// znajduje maksymalny przeplyw start->end (ale nie wiekszy, niz limit)
-		// zwraca jego wielkosc
 		/** \brief Get maximal flow.
 		 *
 		 *  For a given graph, the method calculates the maximal flow from \a start to \a end.
@@ -557,7 +482,6 @@ namespace Koala
 			maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
 				typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType limit);
 
-		// zwraca koszt podanego przeplywu lub transship.
 		/** \brief Get cost of flow.
 		 *
 		 *  For a given flow \a edgeTab in graph \a g the method calculates the cost of this flow or transshipment.
@@ -568,8 +492,6 @@ namespace Koala
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CostType
 			flowCost( const GraphType &g, const EdgeContainer &edgeTab );
 
-		// znajduje najtanszy przeplyw start->end o maks. wielkosci (ale nie wiekszy, niz val)
-		// zwraca (jego koszt, wielkosc)
 		/** \brief Get minimal cost flow.
 		 *
 		 *  For graph \a g, the method gets the minimum cost flow among cost of maximal capacity.
@@ -612,7 +534,6 @@ namespace Koala
         template< class GraphType, class EdgeContainer > static bool
             testMinCost(const GraphType &g, const EdgeContainer &edgeTab);
 
-		// znajdowanie minimalnego (pod wzgledem objetosci) rozciecia krawedziowego start-end
 		/** \brief Get minimal weighted cut-set.
 		 *
 		 *  The method calculated the minimal (concerning total capacities) cut-set between vertices \a start and \a end.
@@ -627,7 +548,7 @@ namespace Koala
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
 			EdgeCut< typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g, EdgeContainer &edgeTab,
 				typename GraphType::PVertex start, typename GraphType::PVertex end, OutCut< VIter,EIter > iters )
-				// Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
+				// Implementation moved here due to errors in VS compilers
 				{
 					EdgeCut< typename EdgeContainer::ValType::CapacType > res;
 					typename DefaultStructs:: template AssocCont< typename GraphType::PVertex,
@@ -658,7 +579,6 @@ namespace Koala
 						}
 					return res;
 				}
-		// j.w. ale szuka najmniejszego rozciecia miedzy kazda para wierzcholkow (zwracane w polach first, second)
 		/** \brief Get minimal weighted cut-set.
 		 *
 		 *  The method calculated the minimal (concerning total capacities) cut-set of graph.
@@ -669,7 +589,7 @@ namespace Koala
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
 			EdgeCut2< GraphType,typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g,
 				EdgeContainer &edgeTab, OutCut< VIter,EIter > iters )
-				// Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
+				// Implementation moved here due to erros in VS compilers
 				{
 					int n,m;
 					koalaAssert( g.getVertNo() >= 2,AlgExcWrongArg );
@@ -742,8 +662,6 @@ namespace Koala
 					res2.second = b;
 					return res2;
 				}
-		// szuka transship. w grafie o podanych warunkach na wierzcholki i krawedzie
-		// zwraca false w razie braku
 		/** \brief Solve transshipment problem
 		 *
 		 *  The definition of Transshipment problem implemented in Koala may be found \wikipath{Flow_problems#transshipment, here}.
@@ -757,14 +675,11 @@ namespace Koala
 		template< class GraphType, class EdgeContainer, class VertContainer > static bool transship( GraphType &g,
 			EdgeContainer &edgeTab, const VertContainer &vertTab );
 
-        // wersja ogolniejsza, dla wierzcholkow o bilansie 0 mozna definiowac wymagania odnosnie przeplywu przez
-        // ten wierzcholek, analogicznie jak dla krawedzi tj. vertTab2: PVertex ->TrsEdgeLabs
         //WEN: to jest rozszerzona wersja transhipment:  dla wierzcholkow posiadajacych w vertTab
         //lo=hi=0 (czyli wierzch. nie gubiace i nie produkujace) w vertTab2 mozna podac lo i hi niezerowe
         //tj. dolne i gorne ograniczenie przeplywu przez wierzcholek. Ale sa tez dodatkowe ograniczenia:
 //            - w grafie krawedzie nieskierowane sa niedopuszczalne
 //            - dla wierzcholkow w vertTab musi byc hi>=lo>=0 lub 0>=hi>=lo
-        //Podobnie jest z minCostTraship
 		/** \brief Solve transshipment problem
 		 *
 		 *  The definition of Transshipment problem implemented in Koala may be found \wikipath{Flow_problems#transshipment, here}.
@@ -789,8 +704,6 @@ namespace Koala
 			EdgeContainer &edgeTab, const VertContainer &vertTab,  const VertContainer2 &vertTab2);
 
 
-		// szuka najtanszego transship. w grafie o podanych warunkach na wierzcholki i krawedzie
-		// zwraca jego koszt lub nieskonczonosc w razie braku
 		/** \brief Solve cost transshipment problem.
 		 * WEN: por. pierwszy transship tj. w wersji podstawowej
 		 *  The method finds minimum cost transshipment problem for a given graph and initial constraints (on edges and vertices).
@@ -820,7 +733,6 @@ namespace Koala
 			typename EdgeContainer::ValType::CostType minCostTransship(const GraphType &g, EdgeContainer &edgeTab,
 				const VertContainer &vertTab,  VertContainer2 &vertTab2 );
 
-		// znajduje drzewo Gomory-Hu grafu
 		/** \brief Get Gomory-Hu tree.
 		 *
 		 *  The method calculates the Gomory-Hu tree of undirected graph \a g.
@@ -835,7 +747,6 @@ namespace Koala
 
 	};
 
-	// wersja dzialajaca na DefaultStructs=FlowAlgsDefaultSettings
 	/** \brief Flow algorithms (default).
 	 *
 	 *  The class provides the algorithms for finding flow, maximal flow, minimal cost flow, cuts and solutions for transshipment problem.
@@ -849,7 +760,6 @@ namespace Koala
 	 *  \ingroup DMflow */
 	template< bool FF > class FlowPar2: public FlowPar< FlowAlgsDefaultSettings< FF > > { };
 
-	// i z domyslnyna flaga wyboru algorytmow
 	/** \brief Flow algorithms (default).
 	 *
 	 *  The class provides the algorithms for finding flow, maximal flow, minimal cost flow, cuts and sollutions for transshipment problem.
@@ -861,13 +771,10 @@ namespace Koala
 	/**\brief Auxiliary structure for ConectPar. */
 	struct ConnectStructs {
 
-		// rekord wyjsciowy opisujacy rozciecie krawedziowe w grafie
 		/** \brief The output structure for edge cut problem in graph.*/
 		template< class GraphType > struct EdgeCut
 		{
-			// dwa wierzcholki po obu stronach rozciecia
 			typename GraphType::PVertex first/**\brief Starting vertex on one side of cut */,second/**\brief Terminating vertex on the other side of cut.*/;
-			// liczba krawedzi
 			int edgeNo;/**<\brief The number of edges in the cut set.*/
 			/**\brief Constructor.*/
 			EdgeCut() : first(0), second(0), edgeNo(0)
@@ -876,10 +783,6 @@ namespace Koala
 
 	};
 
-	/* ConnectPar
-	 * Procedury badania spojnosci grafu (bez wag na wierz/kraw)
-	 * DefaultStructs - wytyczne dla wewnetrznych procedur
-	 */
 	/** \brief Connectivity testing algorithms (parametrized).
 	 *
 	 *  The class consists of some methods calculating and testing connectivity.
@@ -898,8 +801,6 @@ namespace Koala
 		};
 
 	public:
-		// znajduje najmniejsze rozciecie krawedziowe miedzy start->end
-		// zwraca jego wielkosc, krawedzie sa wypisywane na iter
 		/** \brief Get minimal cut-set.
 		 *
 		 *  The method gets the minimum cut-set between vertices \a star and \a end.
@@ -911,8 +812,6 @@ namespace Koala
 		template< class GraphType, class EIter > static int minEdgeCut( const GraphType &g,
 			typename GraphType::PVertex start, typename GraphType::PVertex end, EIter iter );
 
-		// znajduje najmniejsze rozciecie krawedziowe miedzy para roznych wierzcholkow
-		// krawedzie sa wypisywane na iter
 		/** \brief Get minimal cut-set.
 		 *
 		 *  The method gets the minimum cut-set in the graph.
@@ -920,7 +819,7 @@ namespace Koala
 		 *  \param[out] iter the insert iterator of the container with all the edges of the cut.
 		 *  \return the EdgeCut structure, which keeps the number of edges in the cut and one vertex on the first side of cut and another on the other side. */
 		template< class GraphType, class EIter > static EdgeCut< GraphType > minEdgeCut( const GraphType &g, EIter iter )
-		// Implementacja przeniesiona do czesci definicyjnej ze wzgledu na bledy kompilatorow VS <2010
+		// Implementation moved here due to errors in VS compilers
 		{
 			EdgeCut< GraphType > res;
 			typename DefaultStructs:: template AssocCont< typename GraphType::PEdge,
@@ -934,11 +833,6 @@ namespace Koala
 			res.second = res2.second;
 			return res;
 		}
-		// znajduje najwiekszy zbior krawedziowo rozlaczych sciezek start->end
-		// zwraca ich liczbe. Parametry: badany graf,
-		// iteratory wyjsciowe na kolejne wierz znalezionych sciezek
-		// iteratory wyjsciowe na kolejne kraw znalezionych sciezek
-		// zgodnie z tw. Mengele (czy jak mu tam bylo) ich liczba odpowiada wynikowi z odpowiedniego minEdgeCut
 		/** \brief Get set of edge disjointed paths.
 		 *
 		 *  The method gets the maximal set of edge disjoint paths between vertices \a start and \a end.
@@ -971,8 +865,6 @@ namespace Koala
         {   return edgeDisjPaths(g,start,end,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),CompStore< BlackHole,BlackHole>( blackHole,blackHole )); }
 
 
-		// znajduje najmniejsze rozciecie wierzcholkowe miedzy start->end
-		// zwraca jego wielkosc (-1 w razie braku), wierzcholki sa wypisywane na iter
 		/** \brief Find smallest vertex cut.
 		 *
 		 *  The method finds the smallest vertex cut separating vertices \a start and \a end. The cut does not consist of \a start and \a end.
@@ -984,8 +876,6 @@ namespace Koala
 		template< class GraphType, class VIter > static int minVertCut( const GraphType &g,
 			typename GraphType::PVertex start, typename GraphType::PVertex end, VIter iter );
 
-		// znajduje najmniejsze rozciecie wierzcholkowe w grafie
-		// zwraca jego wielkosc (-1 w razie braku), wierzcholki sa wypisywane na iter
 		/** \brief Find smallest vertex cut.
 		 *
 		 *  The method finds the smallest vertex cut. For each pair \a start, \a end, where start != end
@@ -994,8 +884,6 @@ namespace Koala
 		 *  \return the number of vertices in the cut or -1 if there isn't any.*/
 		template< class GraphType, class VIter > static int minVertCut( const GraphType &g, VIter iter );
 
-		// znajduje najwiekszy zbior wewnetrznie wierzcholkowo rozlaczych sciezek start->end
-		// zwraca ich liczbe
 		/** \brief Get set of vertex disjointed paths.
 		 * WEN: naruszamy tw. Mengele (czy jak mu tam bylo): tu zezwanamy na bezposrednie krawedzie start->end typu EdUndir|EdDirOut i kazda z nich rowniez zaliczamy
 		 jako wynikowa sciezke
@@ -1028,7 +916,6 @@ namespace Koala
 
 	};
 
-	// wersja dzialajaca na DefaultStructs=FlowAlgsDefaultSettings<false, true>
 	/** \brief Connectivity testing algorithms (default).
 	 *
 	 *  The class consists of some methods calculating connectivity.

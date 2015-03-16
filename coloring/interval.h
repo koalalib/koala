@@ -4,7 +4,7 @@
 /* ------------------------------------------------------------------------- *
  * interval.h
  *
- * Kolorowanie grafow wazonych interwalami
+ * Interval coloring of weighted graphs.
  * ------------------------------------------------------------------------- */
 
 #include "../base/defs.h"
@@ -13,11 +13,10 @@
 namespace Koala {
 
 
-//Uwaga! globalna!
-//Przede wszystkim: kolory - struktury Segment (simple.h)  o right >=0., mapa kolorow - czesciowe (lub calkowite - one z reszta jest szczegolnym przypadkiem czesciowego) pokolorowanie.
-//Tzn. pokolorowane (na wej/wyj) sa te wierzcholki, ktore sa kluczami w mapie, reszta nie.
-//Wagi (grubosci) wierzcholkow/krawedzi (obowiazkowo wszystkie ew. z wyjatkiem krawedzi petli)
-//to inty>0,
+// Warning!
+// First of all: colors - structures Segment (simple.h)  with right >=0., map of colors - partial coloring,
+// i.e. vertices that are keys in the map are on input/output.
+// Wwights of vertices/edges are ints
 
 /** \brief The methods for interval coloring of graphs (parametrized).
  *  \ingroup color */
@@ -207,7 +206,7 @@ public:
 	template<typename Graph, typename Weights, typename ColorMap>
 	static int greedy(const Graph &graph, const Weights &weights, ColorMap &colors);
 
-	//regula LF: podany zakres lub wszystkie niepokolorowane wierzcholki koloruj zachlannie wg. sekwencji nierosnacych wag
+	//LF rule: color given range (or all uncolored vertices) in order of nonincreasing weights
 	/** \brief Heuristic LF.
 	 * 
 	 *  The method extends interval coloring on edges from sequence given by iterators \a beg and \a end (repetitions allowed and ignored).
@@ -301,7 +300,6 @@ public:
 	template<typename Graph, typename ColorMap>
 	static int maxColor(const Graph &graph, const ColorMap &colors);
 
-	// - ekstremalne wartosci wazonego stopnia w grafie z wagami na krawedziach
 	/** \brief Get weighted degree.
 	 *
 	 *  The method gets the maximal weighted degree of graph. The weighted degree of a vertex is the sum of all the weights of edges incident to the vertex.

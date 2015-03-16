@@ -144,9 +144,9 @@ namespace IO {
  * - RG_EInfo = 4 - should edge info be read,
  * - RG_Info = 6 - should infos be read. */
 enum RG_Format {
-	RG_VertexLists=0, //podstawowe 2 rodzaje formatu
+	RG_VertexLists=0, 
 	RG_EdgeList=1,
-	RG_VInfo = 2,   //czy pisac/czytac infa verts/edges/obu
+	RG_VInfo = 2,   
 	RG_EInfo = 4,
 	RG_Info = 6
 	};
@@ -489,9 +489,6 @@ template<>  inline std::string PSCast<std::string, double>(const double &val)
 
 }
 
-// ParSet robil za typ inf wierzcholkow i krawedzi grafow latwo wymienialnych miedzy aplikacjiami
-//(serializacja do forat.teksotowych).Jest to taka tablica asocjacyjna, ktora pod roznymi kluczami(typ std::string) przechowuje
-//wartosci roznych typow ... rozwinac, przyklad
 /** \brief Parameter set.
  *
  * The class designed to keep properties of graph entities. It is an kind of associative array that under varius keys keeps various types.

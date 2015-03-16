@@ -25,10 +25,9 @@
 #include "../container/localarray.h"
 #include "../container/simple.h"
 #include "../container/set.h"
-/* */
+
 namespace Koala
 {
-	// Mozliwe typy krawędzi grafu ...
 	/** \brief Edge types.
 	 *
 	 *  Type used for variables storing basic information about edge type. Applied to masks with bit meaning as follows:
@@ -38,7 +37,6 @@ namespace Koala
 	 *  \ingroup DMgraph */
 	typedef unsigned char EdgeType;
 
-	// ... i ich orientacje względem wierzchołka.
 	/** \brief Edge direction.
 	 *
 	 *  The type used for variables storing the information about direction of edge.
@@ -52,8 +50,6 @@ namespace Koala
 	 *   \ingroup DMgraph */
 	typedef unsigned char EdgeDirection;
 
-	// Dopuszczalne wartości orientacji: brak, pętla, nieskierowana, wchodząca do wierzchołka, wychodząca z
-	// wierzchołka, wszystkie możliwe orientacje.
 	static const EdgeDirection EdNone   = 0x00;
 	static const EdgeDirection EdLoop   = 0x01;
 	static const EdgeDirection EdUndir  = 0x02;
@@ -66,13 +62,12 @@ namespace Koala
 	static const EdgeType Undirected = 0x2;
 	static const EdgeType Directed   = 0xC;
 
-	// Domyślne struktury (puste) z opisem krawędzi/wierzchołka.
 	/** \brief Structures for empty vertex info.
 	 *
 	 *  The empty structure often used as default value for info attributes in vertices.
 	 *  \ingroup DMdef*/
 	struct EmptyVertInfo { } ;
-	/**\brief Structures for empty edge info.
+	/** \brief Structures for empty edge info.
 	 *
 	 *  The empty structure often used as default value for info attributes in edges.
 	 *  \ingroup DMdef*/
@@ -84,8 +79,6 @@ namespace Koala
 	template< EdgeType mask, bool matr > class GrDefaultSettings;
 
 
-	// Specjalizacje dla wlasnych klas numerycznych (np. liczb wymiernych) pozwola uzywac ich jako danych w
-		// algorytmach (np. dlugosci krawedzi). Dlatego w kodach nawet zerowosc jakiejs etykiety sprawdzam metoda.
 	/** \brief Numeric types specialization.
 	 * 
 	 *  Class allows to choose own numeric types for data in internal Koala algorithms.
@@ -116,10 +109,6 @@ namespace Koala
             { return arg == zero(); }
     };
 
-	/* AlgsDefaultSettings
-	 * Wytyczne parametryzujace dzialanie algorytmow biblioteki. Z reguly klasy z procedurami maja postac
-	 * NazwaPar<DefaultStructs> oraz pochodna klase Nazwa dzialajaca z ustawieniem DefaultStructs=AlgsDefaultSettings
-	 */
 	/** \brief Default algorithms settings.
 	 *
 	 *  This is an useful plug-in that allows to parameterize some algorithms in this library with default values.
@@ -129,7 +118,6 @@ namespace Koala
 	class AlgsDefaultSettings
 	{
 	public:
-		// Typ klasy tablicy asocjacyjnej przypisującej np. wierzchołkowi/krawędzi wartości typu B.
 		/** \brief Type of associative container
 		 *
 		 *  The class is most often used to assign some values (colors weights priority etc.) to vertices (PVertex) or edges (PEdge).
@@ -146,18 +134,8 @@ namespace Koala
 			 * - typedef AssocTable < HashMap<A,B> > Type;
 			 * - typedef AssocTable < std::map<A,B> > Type;	 */
 			typedef AssocArray< A,B > Type;
-
-			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
-
-			//  typedef AssocTable < BiDiHashMap<A,B> > Type;
-
-            //  typedef AssocTable < HashMap<A,B> > Type;
-
-            //  typedef AssocTable < std::map<A,B> > Type;
 		};
 
-		// Typ 2-wymiarowej tablicy assocjacyjnej o kluczu A i wartości B. Kluczami są pary uporzadkowane lub
-		// nieuporzadkowane (por. assoctab.h).
 		/** \brief Two dimensional associative array.
 		 *
 		 *  \tparam A the key type.
@@ -168,27 +146,26 @@ namespace Koala
 		public:
 			typedef SimpleAssocMatrix< A,B,type > Type;/**<\brief Define own if intend to change.*/
 
-			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+			// Exemplary usage. Other possibilities:
 
             //  typedef SimpleAssocMatrix<A,B,type,std::vector< std::vector<typename Privates::SimpleAssocMatrixInternalTypes<A,B>::BlockType> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
             //  typedef SimpleAssocMatrix<A,B,type,std::vector< std::vector<typename Privates::SimpleAssocMatrixInternalTypes<A,B>::BlockType> >,Privates::PseudoAssocArray<A,int,AssocTable<HashMap<A,int> > > > Type;
-            // mozliwy ale nie zalecany - dostep logarytmiczny:
+            // possible, but access time is logarithmic
             //  typedef SimpleAssocMatrix<A,B,type,std::vector< std::vector<typename Privates::SimpleAssocMatrixInternalTypes<A,B>::BlockType> >,Privates::PseudoAssocArray<A,int,AssocTable<std::map<A,int> > > > Type;
 
 			// typedef AssocMatrix< A,B,type > Type;
 
 			//  typedef AssocMatrix<A,B,type,std::vector< Privates::BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
             //  typedef AssocMatrix<A,B,type,std::vector< Privates::BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<HashMap<A,int> > > > Type;
-            // mozliwy ale nie zalecany - dostep logarytmiczny:
+            // possible but not recommended - access time is logarithmic
             //  typedef AssocMatrix<A,B,type,std::vector< Privates::BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<std::map<A,int> > > > Type;
 
-            // to sa tak na prawde opakowania do map 2-wymiarowych zorganizowanych tak, jak pokazuje drugi param. szablonu:
+            // wrappers for 2-dimentional maps
             //  typedef  Assoc2DimTable< type, std::map<std::pair<A,A>, B > > Type;
             //  typedef  Assoc2DimTable< type, BiDiHashMap<std::pair<A,A>, B > > Type;
             //  typedef  Assoc2DimTable< type, HashMap<std::pair<A,A>, B > > Type;
 		};
 
-		// typ struktury kopca i jego wezla
 		/** \brief Heap container.
 		 *
 		 *  \tparam key the key class.
@@ -200,7 +177,7 @@ namespace Koala
 			typedef FibonHeap< Key,Compare > Type;/**<\brief Define own if intend to change.*/
             typedef FibonHeapNode< Key > NodeType;/**<\brief Define own if intend to change.*/
 
-			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+			//Exemplary usage. Other possibilities:
             //typedef BinomHeap< Key,Compare > Type;/**<\brief Define own if intend to change.*/
                     //typedef BinomHeapNode< Key > NodeType;/**<\brief Define own if intend to change.*/
 
@@ -208,7 +185,6 @@ namespace Koala
                     //typedef PairHeapNode< Key > NodeType;/**<\brief Define own if intend to change.*/
 		};
 
-		// Typ grafu pomocniczego stosowanego wewnątrz procedury.
 		/** \brief Auxiliary graph.
 		 *  
 		 *  The structure is used for internal purposes in various procedures.
@@ -222,11 +198,8 @@ namespace Koala
 			typedef Graph< A,B,GrDefaultSettings< mask,false > > Type;
 		};
 
-		// Czy dostosowywać rozmiar pamięci wyjściowych tablic asocjacyjnych?
-		
 		enum { ReserveOutAssocCont /**< \brief Should the out associative container be allocated at the beginning?*/ = true };
 
-		// Wybrany do użytku wewnętrznego algorytm sortowania tablic.
 		/**  \brief Container sorting algorithm
 		 *
 		 * The functions sorts elements in container given by iterators first last. Define own in order to introduce changes.
@@ -238,7 +211,6 @@ namespace Koala
             std::make_heap( first,last );
             std::sort_heap( first,last );
         }
-		// ... i to samo z funkcją porównującą.
 		/**  \brief Container sorting algorithm
 		*
 		* The functions sorts elements in container given by iterators first last. The object function comp is used for comparing elements.
@@ -254,7 +226,7 @@ namespace Koala
             std::sort_heap( first,last,comp );
         }
 
-        //inna mozliwosc: z std::sort
+        //other possibility, taken from std::sort
 //		template< class Iterator > static void sort( Iterator first, Iterator last )
 //		{
 //            std::sort( first,last );
@@ -267,11 +239,6 @@ namespace Koala
 	};
 
 
-	/* ConstFunctor
-	 *
-	 * Funktor domyślny przydatny tam, gdzie jakaś metoda chce dostać np. funktor generujacy info dla wierzchołka lub
-	 * krawędzi. Zwraca wartość podaną w argumencie konstruktora. Dziala dla od 0 do 6 argumentow.
-	 */
 	/** \brief Constant functor.
 	 *
 	 *  The default function object can be used if method requires the object function, generating for example
@@ -317,18 +284,12 @@ namespace Koala
 				{ return val; }
 	};
 
-	// Funkcja tworząca powyższy funktor.
 	/** \brief Generating function for constant functor.
 	 * \relates ConstFuctor
 	 * \ingroup def*/
 	template< class T > ConstFunctor< T > constFun( const T &a = T() )
 				{ return ConstFunctor< T >( a ); }
 
-	/* BlackHole
-	 * Jesli metoda chce dostac argument wyjsciowy (np. iterator do zapisu ciagu, tablice asocjacyjna) a nas te
-	 * wartosci nie interesuja, tylko inne efekty uboczne procedury. Uniwersalna zaślepka w wielu procedurach
-	 * biblioteki, pozwala uniknąć zbędnych przeciążeń nazw z różnymi zestawami parametrów.
-	 */
 	/** \brief Black hole.
 	 *
 	 *  Sometimes method does more than the user wants. Than the class succor. It can supersede \wikipath{insert iterators, Output_iterator}
@@ -353,12 +314,12 @@ namespace Koala
 		BlackHole()
 			{}
 
-		// BlackHole również może służyć jako zaślepka dla nie interesujacego nas kontenera asocjacyjnego wymaganego
-		// w procedurze; te metody nigdy nie powinny być wykonane, są potrzebne jedynie by kod się kompilował.
+		// BlackHole can be plugged as an associative array that we don't need but it necessary to compile
+		// Below methods should never be used.
 		template< class T > inline BlackHole &operator[]( T );
 		template< class T, class R > inline BlackHole &operator()( T,R );
 
-		// BlackHole potrafi przekonwertować się na dowolny typ - uwaga j.w.
+		// BlackHole can change type into any type
 		template< class T > inline operator T();
 
 		template< class T > inline bool hasKey(T) const;
@@ -382,7 +343,6 @@ namespace Koala
 
 	};
 
-	// Makra blackHole można używać jak zmiennej globalnej typu BlackHole.
 	/** \def blackHole 
 	 *  \brief BlackHole macro.
 	 *
@@ -391,7 +351,6 @@ namespace Koala
 	 *  \ingroup DMdef */
 	#define blackHole ((*((Koala::BlackHole*)( &std::cout ))))
 
-	// Test na to, czy argument jest typu BlackHole.
 	/** \brief Test if black hole.
 	 *
 	 *  The	method tests if type \a T is BlackHole. Although it always returns false,
@@ -409,18 +368,13 @@ namespace Koala
 	inline bool isBlackHole( const BlackHole & )
 		{ return true; }
 
-	/* BlackHoleSwitch
-	 * Jeśli szablon procedury dostal BlackHole zamiast argumentu (kontenera), a procedura potrzebuje do działania
-	 * tego kontenera - tworzy go sobie sama lokalnie. Ta klasa pozwala sprawdzić, czy taki przypadek zaszedł i
-	 * przełączyć kontener na odpowiednio: dostarczony lub lokalny (nie będący BlackHolem).
-	 */
 	/** \brief Switch blackHole to local container
 	 *
 	 *  If Cont1 is BlackHole method get delivers container of type Cont2 otherwise it returns object of type Cont1.
 	 *  \ingroup DMdef */
 	template< class Cont1, class Cont2 > struct BlackHoleSwitch
 	{
-		// Typ kontenera, na którym będziemy działać.
+		// Type of container we use
 		typedef Cont1 Type;
 
 		/** \brief Get container.
@@ -444,15 +398,11 @@ namespace Koala
 	};
 
 
-	// Choosery są strukturami funkcyjnymi zwracającymi true/false (poprzez operator()) dla wierzchołków/krawędzi
-	// grafu. Służą np. w procedurach wybierania podgrafow, kopiowania podgrafow... W kodzie powinno się je tworzyć
-	// ich "funkcjami tworzącymi".
+	// Choosers return true/false (by operator()) for vertices/edges. They cane be used to select subgraphs and should be
+    // created by their generating functions.
 
-	// Choosery uniwersalne, tj. można je stosować dla wierzchołków i krawędzi.
+	// Universal choosers - for edges and vertices
 
-	/* BoolChooser
-	 * zwraca ustalona wartosc true lub false
-	 */
 	/** \brief Fixed chooser
 	 *
 	 *  Function object class that always returns value true or false, depending on the value set in constructor.
@@ -463,7 +413,6 @@ namespace Koala
 	{
 		bool val;/**<\brief Logic value fixed in constructor returned by each call of function object. */
 
-		// Każdy chooser ma swój wlasny typ zdefiniowany jako ChoosersSelfType.
 		/** \brief Chooser obligatory type.
 		 *
 		 *  The type is obligatory for choosers in Koala. Logic operations (&&, ||, !, ^)  work properly as long as it is defined. */
@@ -474,7 +423,6 @@ namespace Koala
 		 *  Assigns value to field \a val. */
 		BoolChooser( bool arg = false ): val( arg ) { }
 
-		// Główny operator choosera, testujący prawdziwość jego predykatu.
 		/** \brief Overloaded operator()
 		 *
 		 *  Function call operator returning Boolean value \a val (the same in each call of operator).
@@ -485,7 +433,6 @@ namespace Koala
 	};
 
 
-	// Funkcja tworząca chooser typu BoolChooser.
 	// TODO: sprawdzic, czy rozne przeciazenia funkcji tworzacych nie wywoluja niejednoznacznosci w rozstrzyganiu przeciazen
 	/** \brief Generating  function of fixed chooser (BoolChooser).
 	 *
@@ -496,9 +443,6 @@ namespace Koala
 	 *  \related BoolChooser */
 	inline BoolChooser stdChoose( bool arg ) { return BoolChooser( arg ); }
 
-	/* ValChooser
-	 * sprawdza, czy testowany element to podana (ustalona) wartosc
-	 */
 	/** \brief Value chooser
 	 *
 	 *  Function object that compares the fixed value \a val defined in constructor to the one given by parameter \a elem in calls of overloaded operator().
@@ -539,9 +483,6 @@ namespace Koala
 	 *  \related ValChooser */
 	template< class Elem > ValChooser< Elem > stdValChoose( Elem arg ) { return ValChooser< Elem >( arg ); }
 
-	/* SetChooser
-	 * sprawdza, czy testowany element jest w podanym zbiorze (Koala::Set)
-	 */
 	/** \brief Set chooser
 	 *
 	 *  Function object that checks if \a elem (the parameter in call of overloaded operator()) belongs to the set defined in constructor.
@@ -582,9 +523,6 @@ namespace Koala
 	template< class Elem >
 		SetChooser< Elem > stdChoose( Koala::Set< Elem * > arg ) { return SetChooser< Elem >( arg ); }
 
-	/* ContainerChooser
-	 * sprawdza, czy testowany element jest w przedziale miedzy podanymi iteratorami - uzywa STLowego find
-	 */
 	/** \brief Container element chooser
 	 *
 	 *  Function object that checks if parameter \a elem in call of overloaded operator() belongs to the container defined in constructor.
@@ -635,9 +573,6 @@ namespace Koala
 	template< class Iter >
 		ContainerChooser< Iter > stdChoose( Iter begin, Iter end ) { return ContainerChooser< Iter >( begin,end ); }
 
-	/* ObjChooser
-	 * sprawdza wartosc podanego obiektu funkcyjnego dla testowanego elementu
-	 */
 	/** \brief Function object chooser.
 	 *
 	 *  Wraps self-made function object.
@@ -669,7 +604,6 @@ namespace Koala
 			bool operator()( Elem *elem, const Graph &graph ) const { return (bool)functor( elem,graph ); }
 	};
 
-	// liera F w nazwie - dla chooserow dzialajaych z funktorami
 	/** \brief Generating function of function object chooser (ObjChooser).
 	 *
 	 *  The function wraps object function \a arg and generates chooser object function.
@@ -680,11 +614,6 @@ namespace Koala
 	 *  \related ObjChooser*/
 	template< class Obj > ObjChooser< Obj > stdFChoose( Obj arg ) { return ObjChooser< Obj >( arg ); }
 
-	//te choosery juz zagladaja do konkretnych pol rekordow info wierz/krawedzi
-
-	/* FieldValChooser
-	 * test, czy pole w info ma podana wartosc
-	 */
 	/** \brief Info field value chooser
 	 *
 	 *  Function object that checks if the attribute \a val matches an element of info object field pointed by \a wsk.
@@ -732,9 +661,6 @@ namespace Koala
 	template< class Info, class T >
 		FieldValChooser< Info,T > fieldChoose( T Info:: *wsk, T arg ) { return FieldValChooser< Info,T >( wsk,arg ); }
 
-	/* FieldValChooserL
-	 * test, czy pole w info jest mniejsze od podanej wartosci
-	 */
 	/** \brief Less info field value chooser
 	 *
 	 *  Function object that chooses elements for which the attribute pointed by \a wsk in info object is
@@ -784,9 +710,6 @@ namespace Koala
 	template< class Info, class T > FieldValChooserL< Info,T >
 		fieldChooseL( T Info:: *wsk, T arg ) { return FieldValChooserL< Info,T >( wsk,arg ); }
 
-	/* FieldValChooserG
-	 * test, czy pole w info jest wieksze od podanej wartosci
-	 */
 	/** \brief Greater info field value chooser
 	 *
 	 *  Function object that chooses elements for which the attribute pointed by \a wsk in info object is
@@ -838,9 +761,6 @@ namespace Koala
 
 		fieldChooseG( T Info:: *wsk, T arg ) { return FieldValChooserG< Info,T >( wsk,arg ); }
 
-	/* FielBoolChooser
-	 * test, czy pole w info ma wartosc prawda (jego typ musi byc konwertowalny do bool)
-	 */
 	/** \brief Boolean info field chooser
 	 *
 	 *  Function object that checks if certain filed of element \a elem from
@@ -887,9 +807,6 @@ namespace Koala
 	template< class Info, class T >
 		FieldBoolChooser< Info,T > fieldChoose( T Info:: *wsk ) { return FieldBoolChooser< Info,T >(wsk); }
 
-	/* FielObjChooser
-	 * wlasny obiekt lub funkcja, ktora ma sie wykonywac dla konkretnego pola z info
-	 */
 	/** \brief Functor wrapper.
 	 *
 	 *  Function object that checks if the given \a functor returns value convertible to true for a certain (pointed by \a wsk) field of info object.
@@ -938,9 +855,6 @@ namespace Koala
 	template< class Info, class T, class Obj > FieldObjChooser< Info,T,Obj >
 		fieldFChoose( T Info::*wsk, Obj obj ) { return FieldObjChooser< Info,T,Obj >( wsk,obj ); }
 
-	/* FielSetChooser
-	 * test, czy podane pole w info ma wartosc z danego zbioru (Koala::Set)
-	 */
 	/** \brief Info field value belongs to set chooser.
 	 *
 	 *  Function object that checks if prespecified attribute of info object belongs to the set defined in constructor.
@@ -990,9 +904,6 @@ namespace Koala
 	template< class Info, class T, class Z > FieldSetChooser< Info,T,Z >
 		fieldChoose( T Info::*wsk, Koala::Set< Z > set ) { return FieldSetChooser< Info,T,Z >( wsk,set ); }
 
-	/* FielContainerChooser
-	 * sprawdza, czy testowany element jest w przedziale miedzy podanymi iteratorami - uzywa STLowego find
-	 */
 	/** \brief Info field value belong to container chooser.
 	 *
 	 *  Function object that checks if certain field of info object belongs to the container given by iterators.
@@ -1048,13 +959,6 @@ namespace Koala
 	template< class Info, class T, class Iter > FieldContainerChooser< Info,T,Iter >
 		fieldChoose( T Info::*wsk, Iter b, Iter e ) { return FieldContainerChooser< Info,T,Iter >( wsk,b,e ); }
 
-	// choosery decydujace na podstawie wartosci przypisanej elementowi w podanej tablicy asocjacyjnej
-
-	/* AssocHasChooser
-	 * test, czy element jest kluczem znajdujacym sie w tablicy
-	 * kontener asocjacyjny jest kopiowany do choosera: zaleta - nie zalezy od dalszego stanu kontenera,
-	 * wada - oczywiscie czas i pamiec. Istniejaca dalej specjalizacja posluguje sie natomiast wskaznikiem do zewnetrzengo kont.
-	 */
 	/** \brief Is key in associative container chooser.
 	 *
 	 *  Function object that checks if the element (pointer) is  a key in associative container defined in constructor.
@@ -1097,10 +1001,6 @@ namespace Koala
 	template< class Cont >
 		AssocHasChooser< Cont > assocKeyChoose( Cont arg ) { return AssocHasChooser< Cont >( arg ); }
 
-	/* AssocBoolChooser
-	 * test, czy element jest kluczem znajdujacym sie w tablicy, a przypisana w niej wartosc odpowiada true (typ
-	 * wartosci musi byc konwertowalny do bool)
-	 */
 	/** \brief Has true mapped value chooser.
 	 *
 	 *  Function object that checks if the element has a mapped value convertible to true in the associative container defined in constructor.
@@ -1143,9 +1043,6 @@ namespace Koala
 	template< class Cont >
 		AssocBoolChooser< Cont > assocChoose( Cont arg ) { return AssocBoolChooser< Cont >( arg ); }
 
-	/* AssocValChooser
-	 * test, czy element jest kluczem znajdujacym sie w tablicy, a przypisana w niej wartosc jest rowna zadanej
-	 * kontener asocjacyjny jest kopiowany do choosera: zaleta - nie zalezy od dalszego stanu kontenera, wada - oczywiscie czas i pamiec. Istniejaca dalej specjalizacja posluguje sie natomiast wskaznikiem do zewnetrzengo kont.*/
 	/** \brief Mapped value chooser.
 	 *
 	 *  The chooser is equipped with associative container. Each call of function call operator test if element mapped value matches the given value.
@@ -1193,9 +1090,6 @@ namespace Koala
 	template< class Cont > AssocValChooser< Cont >
 		assocChoose( Cont arg, typename Cont::ValType val ) { return AssocValChooser< Cont >( arg,val ); }
 
-    /* AssocValChooserL
-	 * test, czy element jest kluczem znajdujacym sie w tablicy, a przypisana w niej wartosc jest mniejsza od zadanej
-	 */
 	/** \brief Choose elements for which mapped value less then common value.
 	 *
 	 *  The functor is equipped with associative container. Each call of function call operator tests if element mapped value is smaller then prespcified value.
@@ -1245,10 +1139,6 @@ namespace Koala
 	template< class Cont > AssocValChooserL< Cont >
 		assocChooseL( Cont arg, typename Cont::ValType val ) { return AssocValChooserL< Cont >( arg,val ); }
 
-    // wszystko jak wyzej + Cont::ValType musi obsluzyc >
-	/* AssocValChooserG
-	 * test, czy element jest kluczem znajdujacym sie w tablicy, a przypisana w niej wartosc jest wieksza od zadanej
-	 */
 	/** \brief Choose elements for which mapped value greater then common value.
 	*
 	*  The functor is equipped with associative container. Each call of function call operator tests if element mapped value is greater then prespcified value.
@@ -1298,11 +1188,6 @@ namespace Koala
 	template< class Cont > AssocValChooserG< Cont >
 		assocChooseG( Cont arg, typename Cont::ValType val ) { return AssocValChooserG< Cont >( arg,val ); }
 
-    // wszystko jak wyzej
-	/* AssocSetChooser
-	 * test, czy element jest kluczem znajdujacym sie w tablicy, a przypisana w niej wartosc jest elementem podanego
-	 * zbioru (Koala::Set)
-	 */
 	/** \brief Choose if mapped value belongs to set.
 	 *
 	 *  Function object that checks if the element mapped value belongs to the prespecified set.
@@ -1353,12 +1238,6 @@ namespace Koala
 	template< class Cont > AssocSetChooser< Cont > assocChoose(Cont arg,
 		const Koala::Set< typename Cont::ValType > &set ) { return AssocSetChooser< Cont >( arg,set ); }
 
-    //chodzi o STL-like containers tj. obslugujace algorytm std::find
-    //jest odpowiedzialnoscia uzytkownika, by przedzial iteratorow byl wazny podczas uzywania choosera (kontener nie jest kopiowany)
-	/* AssocContainerChooser
-	 * test, czy element jest kluczem znajdujacym sie w tablicy, a przypisana w niej wartosc lezy w przedziale miedzy
-	 * podanymi iteratorami - uzywa STLowego find
-	 */
 	/** \brief Choose if mapped value belongs to container.
 	 *
 	 *  Function object that checks if the element mapped value belongs to the prespecified another container
@@ -1415,9 +1294,6 @@ namespace Koala
 	template< class Cont, class Iter > AssocContainerChooser< Cont, Iter >
 		assocChoose( Cont cont, Iter begin, Iter end ) { return AssocContainerChooser< Cont,Iter >( cont,begin,end ); }
 
-    /* AssocObjChooser
-	 * sprawdza wartosc podanemgo obiektu funkcyjnego przypisana w tablicy asocjacyjnej testowanemu elementowi
-	 */
 	/** \brief Choose if functor returns true for mapped value.
 	 *
 	 *  The function object is equipped with functor and associative container both set up in constructor.
@@ -1465,12 +1341,6 @@ namespace Koala
 	template< class Cont, class Obj > AssocObjChooser< Cont, Obj >
 		assocFChoose( Cont cont, Obj arg ) { return AssocObjChooser< Cont,Obj >( cont,arg ); }
 
-	// Wszystkie choosery operujace na tablicach asocjacyjnych maja wersje dzialajace z zewnetrzna tablica
-	// podawana przez wskaznik. Unikamy kopiowania tablic, uzywajac trzeba uwazac, by tablica wciaz zyla przez
-	// caly czas zycia choosera. Funkcje tworzace maja przedrostek ext i pobieraja adres tablicy
-	/* AssocHasChooser
-	 *
-	 */
 	/** \brief Is key in associative container chooser.
 	 *
 	 *  Function object that checks if the element (pointer) is  a key in associative container defined in constructor.
@@ -1561,9 +1431,6 @@ namespace Koala
 	template< class Cont >
 		AssocBoolChooser< Cont * > extAssocChoose( const Cont *arg ) { return AssocBoolChooser< Cont * >( arg ); }
 
-	/* AssocValChooser
-	 *
-	 */
 	/** \brief Mapped value chooser.
 	 *
 	 *  The chooser is equipped with associative container. Each call of function call operator test if element mapped value matches the given value.
@@ -1614,9 +1481,6 @@ namespace Koala
 	template< class Cont > AssocValChooser< Cont * >
 		extAssocChoose( const Cont *arg, typename Cont::ValType val ) { return AssocValChooser< Cont * >( arg,val ); }
 
-	/* AssocValChooserG
-	 *
-	 */
 	/** \brief Choose elements for which mapped value greater then common value.
 	 *
 	 *  The functor is equipped with associative container. Each call of function call operator tests if element mapped value is greater then prespcified value.
@@ -1668,9 +1532,6 @@ namespace Koala
 	template< class Cont > AssocValChooserG< Cont * >
 		extAssocChooseG( const Cont *arg, typename Cont::ValType val ) { return AssocValChooserG< Cont * >( arg,val ); }
 
-	/* AssocValChooserL
-	 *
-	 */
 	/** \brief Choose elements for which mapped value less then common value.
 	 *
 	 *  The functor is equipped with pointer to associative container. Each call of function call operator tests if element mapped value is smaller then prespcified value.
@@ -1833,9 +1694,6 @@ namespace Koala
 		extAssocChoose(const Cont *cont, Iter begin, Iter end )
 	{ return AssocContainerChooser< Cont *,Iter >( cont,begin,end ); }
 
-	/* AssocObjChooser
-	 *
-	 */
 	/** \brief Choose if functor returns true for mapped value.
 	 *
 	 *  The function object is equipped with functor and associative container both set up in constructor.
@@ -1887,8 +1745,6 @@ namespace Koala
 	template< class Cont, class Obj > AssocObjChooser< Cont *,Obj >
 		extAssocFChoose( const Cont *cont, Obj arg ) { return AssocObjChooser< Cont *,Obj >( cont,arg ); }
 
-	// Predykaty chooserow mozna laczyc operatorami logicznymi. Choosery operacji logicznych na prostszych chooserach
-
 	/** \brief Or chooser.
 	 *
 	 *  The function object that joins two choosers. It returns true value if and only if the first one or the second one return true.
@@ -1932,8 +1788,6 @@ namespace Koala
 	*  \ingroup DMchooser*/
 	template< class  Ch1, class Ch2 > OrChooser< Ch1, Ch2 >
 		orChoose( Ch1 a, Ch2 b ) { return OrChooser< Ch1,Ch2 >( a,b ); }
-
-	// w kodzie funkcje tworzace zlozonych chooserow mozna zastapic odpowiednimi operatorami logicznymi
 
 	/** \brief The overloaded operator||. Chooser alternative.
 	 *
@@ -2109,12 +1963,6 @@ namespace Koala
 	template< class  Ch1 > NotChooser< typename Ch1::ChoosersSelfType >
 		operator!( Ch1 a ) { return NotChooser< Ch1 >( a ); }
 
-	// choosery dow wybierania wierzcholkow
-
-	/* VertDegValChooser
-	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma podana
-	 * wartosc
-	 */
 	/** \brief Choose vertices of given degree.
 	 *
 	 *  The function object that checks if the vertex degree equals given common value.
@@ -2159,10 +2007,6 @@ namespace Koala
 	inline VertDegValChooser vertDegChoose( int adeg, Koala::EdgeDirection atype = Koala::EdAll )
 		{ return VertDegValChooser( adeg,atype ); }
 
-	/* VertDegValChooserL
-	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc
-	 * mniejsza od zadanej
-	 */
 	/** \brief Choose vertices of degree less then.
 	 *
 	 *  The function object that checks if the vertex degree is less then the prespecified value.
@@ -2207,10 +2051,6 @@ namespace Koala
 	inline VertDegValChooserL vertDegChooseL(int adeg, Koala::EdgeDirection atype = Koala::EdAll)
 		{ return VertDegValChooserL( adeg,atype ); }
 
-	/* VertDegValChooserG
-	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc
-	 * wieksza od zadanej
-	 */
 	/** \brief Choose vertices of degree greater then.
 	 *
 	 *  The function object that checks if the vertex degree is greater then the prespecified value.
@@ -2255,10 +2095,6 @@ namespace Koala
 	inline VertDegValChooserG vertDegChooseG(int adeg, Koala::EdgeDirection atype = Koala::EdAll)
 		{ return VertDegValChooserG( adeg,atype ); }
 
-	/* VertDegSetChooser
-	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc z
-	 * podanego zbioru
-	 */
 	/** \brief Choose vertices of degree from set.
 	 *
 	 *  The function object that checks if the vertex degree belongs the set prespecified in constructor.
@@ -2304,12 +2140,6 @@ namespace Koala
 	template< class Int > VertDegSetChooser< Int > vertDegChoose(Koala::Set< Int > aset,
 		Koala::EdgeDirection atype = Koala::EdAll ) { return VertDegSetChooser< Int >( aset,atype ); }
 
-    //chodzi o STL-like containers tj. obslugujace algorytm std::find
-    //jest odpowiedzialnoscia uzytkownika, by przedzial iteratorow byl wazny podczas uzywania choosera (kontener nie jest kopiowany)
-	/* VertDegContainerChooser
-	 * testuje, czy stopien wierzcholka (wyliczany z uwzglednieniem maski kierunku krawedzi sasiednich) ma wartosc
-	 * z zakresu miedzy podanymi iteratorami - uzywa STLowego find
-	 */
 	/** \brief Choose vertices of degree from container.
 	 *
 	 *  The function object that checks if the vertex degree is an element of the container prespecified in constructor.
@@ -2358,9 +2188,6 @@ namespace Koala
 	template< class Iter > VertDegContainerChooser< Iter > vertDegChoose(Iter begin, Iter end,
 		Koala::EdgeDirection atype = Koala::EdAll ) { return VertDegContainerChooser< Iter >( begin,end,atype ); }
 
-    /* VertDegFunctorChooser
-	 * decyzja podejmowana na podstawie wartosci obiektu funktora policzonego na stopniu wierzcholka
-	 */
 	/** \brief Choose vertices of degree accepted by functor.
 	 *
 	 *  The function object that for a given vertex tests if the vertex degree satisfy the functor defined in the constructor.
@@ -2408,11 +2235,6 @@ namespace Koala
 	template< class Obj > VertDegFunctorChooser< Obj > vertDegFChoose(Obj afun,
 		Koala::EdgeDirection atype = Koala::EdAll ) { return VertDegFunctorChooser< Obj >( afun,atype ); }
 
-	// choosery do wybierania krawedzi
-
-	/* EdgeTypeChooser
-	 * testuje, czy typ krawedzi spelnia podana maske
-	 */
 	/** \brief Choose edges of given type.
 	 *
 	 *  The function object chooses the edges of type congruent with the Koala::EdgeType mask defined in constructor.
@@ -2454,11 +2276,6 @@ namespace Koala
 	 *  \ingroup DMchooser*/
 	inline EdgeTypeChooser edgeTypeChoose( Koala::EdgeDirection mask ) { return EdgeTypeChooser( mask ); }
 
-	// choosery zlozone dla krawedzi, sprawdzajace warunkek definiowany dla wierzcholka sa prawda dla jej koncow
-
-	/* EdgeFirstEndChooser
-	 * test pierwszego konca krawedzi
-	 */
 	/** \brief Choose edges for which first end satisfy given chooser.
 	 *
 	 *  The function object chooses edges for which the first end satisfy a functor (ex. some vertex chooser)  defined in constructor.
@@ -2500,9 +2317,6 @@ namespace Koala
 	template< class Ch > EdgeFirstEndChooser< Ch >
 		edgeFirstEndChoose( Ch ch ) { return EdgeFirstEndChooser< Ch >( ch ); }
 
-	/* EdgeSecondEndChooser
-	 * test drugiego konca krawedzi
-	 */
 	/** \brief Choose edges for which second end satisfy given chooser.
 	 *
 	 *  The function object chooses edges for which the second end satisfy a functor (ex. some vertex chooser)  defined in constructor.
@@ -2544,9 +2358,6 @@ namespace Koala
 	template< class Ch > EdgeSecondEndChooser< Ch >
 		edgeSecondEndChoose( Ch ch ) { return EdgeSecondEndChooser< Ch >( ch ); }
 
-	/* Edge0EndChooser
-	 * test, czy zaden koniec nie spelnia warunku
-	 */
 	/** \brief Choose if none of edge ends satisfy functor.
 	 *
 	 *  The function object chooses the edges in with none of its ends satisfies a functor (ex. some vertex chooser)  defined in constructor.
@@ -2588,9 +2399,6 @@ namespace Koala
 	 *  \ingroup DMchooser*/
 	template< class Ch > Edge0EndChooser< Ch > edge0EndChoose(Ch ch) { return Edge0EndChooser< Ch >(ch); }
 
-	/* Edge1EndChooser
-	 * test, czy jeden koniec spelnia warunkek
-	 */
 	/** \brief Choose if one edge end satisfy functor.
 	 *
 	 *  The function object chooses the edges in with one of its ends satisfies a functor (ex. some vertex chooser)  defined in constructor.
@@ -2631,9 +2439,6 @@ namespace Koala
 	*  \ingroup DMchooser*/
 	template< class Ch > Edge1EndChooser< Ch > edge1EndChoose(Ch ch) { return Edge1EndChooser< Ch >(ch); }
 
-	/* Edge2EndChooser
-	 * test, czy oba konice spelniaja warunkek
-	 */
 	/** \brief Choose if both edge ends satisfy functor.
 	 *
 	 *  The function object chooses the edges in with both ends satisfy a functor (ex. some vertex chooser)  defined in constructor.
@@ -2674,8 +2479,8 @@ namespace Koala
 	*  \ingroup DMchooser*/
 	template< class Ch > Edge2EndChooser< Ch > edge2EndChoose(Ch ch) { return Edge2EndChooser< Ch >(ch); }
 
-	//Castery to funktory ustalajace wartosci pol info w nowych wierz/kraw tworzonych podczas np. kopiowania grafow.
-	// Wartosci te powstaja (w rozny sposob) na podstawie inf oryginalnych
+	// Casters are functors that set values for info fields in new vertices/edges created during e.g. copying of graphs.
+	// The values that are used base on original values.
 
     namespace Privates {
 
@@ -2738,9 +2543,6 @@ namespace Koala
 
 
 
-	/* StdCaster
-	 * caster zwyklego rzutowania miedzy dwoma strukturami
-	 */
 	/** \brief Standard caster.
 	 *
 	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges)
@@ -2782,8 +2584,6 @@ namespace Koala
 	 *  \ingroup DMcaster*/
 	inline StdCaster stdCast() { return StdCaster(); }
 
-    // stdCaster probuje przekonwertowac InfoSour->InfoDest, a jesli sie nie uda, inicjuje InfoDest wart. domyslna
-    //HardCaster bezposrednio rzutuje (InfoDest)InfoSour, co jesli jest nielegalne - wywola blad kompilacji
 	/** \brief Standard hard caster.
 	 *
 	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges)
@@ -2825,10 +2625,6 @@ namespace Koala
 	inline HardCaster hardCast() { return HardCaster(); }
 
 
-	/* NoCastCaster
-	 * caster ustawiajacy wartosc domyslna i ignorujacy oryginalny parametr wspolpracuje z produktami grafow (stad
-	 * takze operator 3-argumentowy)
-	 */
 	/** \brief No cast caster.
 	 *
 	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges)
@@ -2868,7 +2664,6 @@ namespace Koala
 			void operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) { dest = InfoDest(); }
 	};
 
-	// funkcja tworzaca - dopuszczalny jedynie argument false
 	/** \brief Generating function for NoCastCaster.
 	 *
 	 *  \wikipath{caster, Get more information about casters.}
@@ -2879,7 +2674,6 @@ namespace Koala
 	 *  \ingroup DMcaster*/
 	inline NoCastCaster stdCast( bool arg );
 
-	//alias dla powyzszego z arg=false
 	/** \brief Generating function for NoCastCaster.
 	 *
 	 *  \wikipath{caster, Get more information about casters.}
@@ -2889,10 +2683,6 @@ namespace Koala
 	 *  \ingroup DMcaster*/
 	inline NoCastCaster valCast() { return NoCastCaster(); }
 
-	/* ObjCaster
-	 * wyliczenie wartosci nowego info poprzez podany funktor wspolpracuje z produktami grafow (stad takze operator
-	 * 3-argumentowy) jesli funktor je obsluguje
-	 */
 	/** \brief Functor caster.
 	 *
 	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges)
@@ -2950,9 +2740,6 @@ namespace Koala
 	 *  \ingroup DMcaster*/
 	template< class Funktor > ObjCaster< Funktor > stdCast(Funktor f) { return ObjCaster< Funktor >(f); }
 
-	/* ValueCaster
-	 * Caster wpisujacy ustalona wartosc wspolpracuje z produktami grafow (stad takze operator 3-argumentowy)
-	 */
 	/** \brief Common value caster.
 	 *
 	 *  Casters are function objects that generate info objects for new-created elements (vertices or edges)
@@ -2994,7 +2781,6 @@ namespace Koala
 			void operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) { dest = (InfoDest)val; }
 	};
 
-	// funkcja tworzaca - podajemy stala wartosc
 	/** \brief Generating function for fixed value caster (ObjCaster).
 	 *
   	 *  \wikipath{caster, Get more information about casters.}
@@ -3005,14 +2791,6 @@ namespace Koala
 	 *  \ingroup DMcaster*/
 	template< class T > ValueCaster< T > valCast( T arg ) { return ValueCaster< T >( arg ); }
 
-	//Linkery dzialajace np. podczas kopiowania grafow, wiaza nowo tworzone wierzch/kraw. z ich oryginalami, przez co
-	// mozna latwo sprawdzic, ktory element odpowiada ktoremu
-
-	// polowki pelnego linkera, tworza powiazanie  w jedna strone
-
-	/* Std1NoLinker
-	 * tylko false jest dopuszczalne - brak polaczenia
-	 */
 	/** \brief No link.
 	 *
 	 *  Methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others generate new elements like edges and vertices.
@@ -3038,9 +2816,6 @@ namespace Koala
 		template< class Dest, class Sour > void operator()( Dest *wsk, Sour *w ) { }
 	};
 
-	/* Std1FieldLinker
-	 * ustawia wskaznik na dolaczany obiekt w srodku struktury info obiektu docelowego (o ile nie byl on NULLem)
-	 */
 	/** \brief Object info one direction linker.
 	 *
 	 *  Methods like Graph::copy, Graph::substitute or methods in class LineGraph, Product and others generate new elements like edges and vertices.
@@ -3069,10 +2844,6 @@ namespace Koala
 			{ if (pt && wsk) wsk->info.*pt = (T) w; }
 	};
 
-	/* Std1AssocLinker
-	 * dopisuje powiazania do zewnetrznej! tablicy asocjacyjnej podanej w funkcji tworzacej stdLink (o ile argument
-	 * nie byl NULLem)
-	 */
 	/** \brief Associative array one direction linker.
 	 *
 	 *  Methods like Graph::copy, Graph::substitute or methods in classes LineGraph, Product and others generate new elements edges or vertices.
@@ -3117,9 +2888,6 @@ namespace Privates {
 	};
 }
 
-	/* Std2Linker
-	 * pelny linker, zawiera obiekty laczace (polowki linkera - j.w.) nowy element ze starym i odwrotnie
-	 */
 	/** \brief Bidirectional linker .
 	 *
 	 *  This linker joins two linkers in order to create two way connection.
@@ -3149,7 +2917,6 @@ namespace Privates {
 		template< class Dest, class Sour > void operator()( Dest *wsk, Sour *w );
 	};
 
-	// funkcje tworzace polowki linkera - raczej do uzytku wewnetrznego
 	/** \brief Generating function of no linker (Std1NoLinker).
 	 *
 	 *  \param a1 always false
@@ -3178,9 +2945,6 @@ namespace Privates {
 	template< class Map1 >
 		Std1AssocLinker< Map1 > stdLink( Map1 &tab1 ) { return Std1AssocLinker< Map1 >( tab1 ); }
 
-	// funkcje tworzace pelny linker, argumenty podaja wymagany sposob polaczenia elementow nowych z oryginalami
-	// (pierwszy argument) i odwrotnie (drugi) argument bool moze byc tylko false (brak polaczenia)
-	//
 	/** \brief Generating function for no linker based on Std2Linker.
 	 *
 	 *  The function generates two directional link, however both links are dummy.
@@ -3285,7 +3049,6 @@ namespace Privates {
 	template< class Map1, class Map >
 		Std2Linker< Std1AssocLinker< Map1 >,Std1AssocLinker< Map > > stdLink( Map1 &tab1, Map &tab );
 
-	// wygodne laczenie chooserow, casterow i linkerow w pary za pomoca &
 	/**\brief Make pair of choosers.
 	 *
 	 * Overloaded operator& allows to create easily a std::pair of choosers \a a and \a b.*

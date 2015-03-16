@@ -160,11 +160,11 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	for( TaskIterator iterator = begin; iterator != end; ++iterator)
 		tasks[iterator->vertex] = Triple< Task< GraphType > >(*iterator);
 
-	// Wyznaczenie kolejnoci wierzcho³ków
+	// computes order of vertices
 	typename GraphType::PVertex LOCALARRAY( vertices,n );
 	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
-	// Wyznaczenie czasow najwczeniejszego startu
+	// computes times of earliest possible start
 	for( int i = 0; i < n; i++ )
 	{
 		Triple< Task< GraphType > > &element = tasks[vertices[i]];
@@ -185,7 +185,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 		if (time < stop) time = stop;
 	}
 
-	// Wyznaczenie czasow najpóniejszego koñca
+	// computes times of latest possible end
 	for( int i = 0; i < n; i++ ) tasks[vertices[i]].finish = time;
 
 	for( int i = n - 1, start; i >= 0; i-- )
@@ -217,13 +217,13 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	typedef std::pair< TaskPart,int > Pair;
 
 	int parts = 0, n = 0;
-	// D³ugoci zadañ s¹ nieujemne
+	// lengths of tasks are nonnegatve
 	for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ )
 		koalaAssert( iterator->length > 0,AlgExcWrongArg );
 
 	typename DefaultStructs::template AssocCont< typename GraphType::PVertex,TaskPart >::Type tasks( n );
 
-	// Dwa rózne zadania nie s¹ wykonywane jednoczenie na jednej maszynie
+	// Two different tasks are not executed simultaneously on one machine
 	for( typename Schedule::Type::const_iterator i = schedule.machines.begin();
 		i != schedule.machines.end(); parts += i->size(),++i )
 		if (!i->empty())
@@ -239,7 +239,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
     typename DefaultStructs::template
 		HeapCont< Pair,compareSecondFirst< Pair > >::Type pq(&available);
 
-	// To samo zadanie nie jest wykonywane jednoczenie na obu maszynach
+	// The same task is not processed simultaneously on two machines
 	for( typename Schedule::Type::const_iterator i = schedule.machines.begin(); i != schedule.machines.end(); ++i )
 		for( typename Schedule::Machine::const_iterator j = i->begin(); j != i->end(); ++j )
 			pq.push( Pair( *j,j->start ) );
@@ -259,12 +259,12 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	}
 
 	n = 0;
-	// Ka¿de zadanie jest wykonane w ca³oci
+	// Every task was processed in 100%
 	for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ )
 		if (iterator->release > result[n].start || iterator->length != result[n].task) return false;
 
 	n = 0;
-	// Zachowania jest relacja prec
+	// prec relation
 	for( TaskIterator iterator = begin; iterator != end; ++iterator,n++ ) tasks[iterator->vertex] = result[n];
 
 	for( typename GraphType::PVertex v = DAG.getVert(); v; v = DAG.getVertNext( v ) )
@@ -506,11 +506,11 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 		element.priority = 1 - iterator->duedate, element.degree = DAG.getEdgeNo( iterator->vertex,EdDirIn );
 	}
 
-	// Wyznaczenie kolejnoci wierzcho³ków
+	// Computes order of vertices
 	typename GraphType::PVertex LOCALARRAY( vertices,n );
 	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
-	// Aktualizacja terminów zakoñczenia zadañ, zgodnie z relacj¹ prec, i tworzenie kolejki priorytetowej zadañ dostêpnych
+	// Update of deadlines according to prec
 	SimplArrPool<typename DefaultStructs::template
         HeapCont< Pair,compareSecondLast< Pair > >::NodeType > alloc(n);
     typename DefaultStructs::template
@@ -537,7 +537,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	{
 		time++;
 
-		// Przydzia³ aktywnych zadañ do maszyn
+		// Assignment of tasks to machines
 		for( used = 0; used < schedule.getMachNo() && !active.empty(); used++ )
 		{
 			Element< Task< GraphType > > &element = tasks[current[used] = active.top().first];
@@ -545,7 +545,7 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 			out = std::max( time - element.task.duedate,out ), active.pop();
 		}
 
-		// Dodanie nowych zadañ do kolejki
+		// Adding of new task to queue
 		for( int i = 0; i < used; i++ )
 		{
 			typename GraphType::PVertex u, v = current[i];
@@ -578,11 +578,11 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 		element.priority = 0, element.degree = DAG.getEdgeNo( iterator->vertex,EdDirIn );
 	}
 
-	// Wyznaczenie kolejnoci wierzcho³ków
+	// computes order of vertices
 	typename GraphType::PVertex LOCALARRAY( vertices,n );
 	Koala::DAGAlgsPar<DefaultStructs>::topOrd( DAG,vertices );
 
-	// Odwzorowanie poziomów drzewa i tworzenie kolejki priorytetowej zadañ dostêpnych
+	// Priority queue
 	SimplArrPool<typename DefaultStructs::template
         HeapCont<  Pair,compareSecondLast< Pair > >::NodeType> alloc(n);
 	typename DefaultStructs::template
@@ -609,14 +609,14 @@ template< class DefaultStructs > template< typename GraphType, typename TaskIter
 	{
 		time++;
 
-		// Przydzia³ aktywnych zadañ do maszyn
+		// Assignment of tasks to machines
 		for( used = 0; used < schedule.getMachNo() && !active.empty(); used++ )
 		{
 			schedule.machines[used].push_back( TaskPart( tasks[current[used] = active.top().first].index,time - 1,time ) );
 			active.pop();
 		}
 
-		// Dodanie nowych zadañ do kolejki
+		// Adding of new tasks to queue
 		for( int i = 0; i < used; i++ )
 		{
 			typename GraphType::PVertex u, v = current[i];

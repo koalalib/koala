@@ -74,7 +74,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 		NumberTypeBounds< typename VertContainer::ValType::DistType >::plusInfty();
 
 	if (PlusInfty == vertTab[end].distance)
-		return -1; // wierzcholek end jest nieosiagalny
+		return -1; // vertex end is unreachable
 
 	return ShortPathStructs::getOutPath( g,vertTab,iters,end );
 }
@@ -261,7 +261,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 	typename GraphType::PEdge LOCALARRAY( tabE,g.getEdgeNo(Koala::EdDirOut | Koala::EdUndir) );
 	int m=g.getIncEdges(tabE,tabV,tabV+n,Koala::EdDirOut | Koala::EdUndir,EdLoop);
 
-	//sprawdzenie czy nie ma petli ujemnych
+	// test for negative cycles
 
     int iE;
 //    for(int i=0;i<n;i++) for( typename GraphType::PEdge E=g.getEdge(tabV[i],EdLoop);E;E=g.getEdgeNext(tabV[i],E,EdLoop))
@@ -283,7 +283,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 	//          d[v] <- d[u]+w(u,v) and vPrev[v] <- u and ePrev[v] <- (u,v)
 	for( int i = 1; i < n; i++ )
 	{   bool changed=false;
-		//relaksacja krawedzi nieskierowanych
+		// relaxation of undirected edges
 		for( typename GraphType::PEdge E = tabE[iE=0]; iE<m;E = tabE[++iE] ) if (g.getEdgeType(E)==Undirected)
 //		for( typename GraphType::PEdge E = g.getEdge( Koala::EdUndir ); E; E = g.getEdgeNext( E,Koala::EdUndir ) )
 		{
@@ -304,7 +304,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 				changed=true;
 			}
 		}
-		//relaksacja krawedzi (u,v) skierowanych u->v
+		// relaxation of edges (u,v), directed u->v
 		for( typename GraphType::PEdge E = tabE[iE=0]; iE<m;E = tabE[++iE] ) if (g.getEdgeType(E)==Directed)
 //		for( typename GraphType::PEdge E = g.getEdge( Koala::EdDirOut ); E; E = g.getEdgeNext( E,Koala::EdDirOut ) )
 			if ((vertTab[U = g.getEdgeEnd1( E )].distance) < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
@@ -318,7 +318,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
         if (!changed) break;
 	}
 
-	//sprawdzenie czy nie ma cykli ujemnych
+	// test for negative cycles
     for( typename GraphType::PEdge E = tabE[iE=0]; iE<m;E = tabE[++iE] ) if (g.getEdgeType(E)==Undirected)
 //	for( typename GraphType::PEdge E = g.getEdge( Koala::EdUndir ); E; E = g.getEdgeNext( E,Koala::EdUndir ) )
 		if ((vertTab[U = g.getEdgeEnd1( E )].distance) < inf && (nd = vertTab[U].distance + edgeTab[E].length) <
@@ -345,7 +345,7 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 			}
 
 	if (existNegCycle) return minusInf;
-	//jezeli nie ma cykli ujemnych to mozemy zwrocic wynik
+	// no negative cycles? return result
 	return end ? vertTab[end].distance : zero;
 }
 
@@ -355,9 +355,9 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 {
 	koalaAssert( end,AlgExcNullVert );
 	if (NumberTypeBounds< typename VertContainer::ValType::DistType >
-		::isPlusInfty(vertTab[end].distance)) return -1; // wierzcholek end jest nieosiagalny
+		::isPlusInfty(vertTab[end].distance)) return -1; // vertex end in unreachable
 	else if (NumberTypeBounds< typename VertContainer::ValType::DistType >
-		::isMinusInfty(vertTab[end].distance)) return -2; // w grafie jest cykl ujemny
+		::isMinusInfty(vertTab[end].distance)) return -2; // negative cycle
 	return ShortPathStructs::getOutPath( g,vertTab,iters,end );
 }
 
@@ -403,16 +403,16 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 		NumberTypeBounds< typename EdgeContainer::ValType::DistType >::plusInfty();
 	const typename EdgeContainer::ValType::DistType zero =
 		NumberTypeBounds< typename EdgeContainer::ValType::DistType >::zero();
-	bool existNegCycle = false; //jezeli existNegCycle jest ustawiona to w grafie istnieje cykl ujemny
+	bool existNegCycle = false; // if existNegCycle is set then there is a negative cycle
 
-	//sprawdzenie czy nie ma petli ujemnych
+	// test for negative loops
 	for( typename GraphType::PEdge E = g.getEdge( Koala::EdLoop | Koala::EdUndir ); E;
 		E = g.getEdgeNext( E,Koala::EdLoop | Koala::EdUndir ) )
 		if (edgeTab[E].length < zero) return false;
 
 	vertMatrix.reserve( g.getVertNo() );
 
-	//inicjalizacja - ustawiam wartosci poczatkowe odleglosci w tablicy asocjacyjnej
+	// setup
 	for( typename GraphType::PVertex U = g.getVert(); U; U = g.getVertNext( U ) )
 		for( typename GraphType::PVertex V = g.getVert(); V; V = g.getVertNext( V ) )
 			if (U == V) vertMatrix( U,U ).distance = zero;
@@ -451,12 +451,11 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 	}
 
 	//run Floyd()
-	//szukam min{vertMatrix[vi][vj].distance, vertMatrix[vi][vl].distance+vertMatrix[vl][vj].distance}
+	//find min{vertMatrix[vi][vj].distance, vertMatrix[vi][vl].distance+vertMatrix[vl][vj].distance}
 	typename EdgeContainer::ValType::DistType nd;
 	for( typename GraphType::PVertex Vl = g.getVert(); Vl && !existNegCycle; Vl = g.getVertNext( Vl ) )
 		for( typename GraphType::PVertex Vi = g.getVert(); Vi; Vi = g.getVertNext( Vi ) )
 		{
-			//if (vertMatrix(Vi,Vl).distance < inf) mozna tak albo tak jak ponizej
 			if (inf != vertMatrix(Vi,Vl).distance)
 				for( typename GraphType::PVertex Vj = g.getVert(); Vj; Vj = g.getVertNext( Vj ) )
 					if (inf > vertMatrix(Vl,Vj).distance &&
@@ -466,7 +465,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 						vertMatrix( Vi,Vj ).ePrev = vertMatrix( Vl,Vj ).ePrev;
 						vertMatrix( Vi,Vj ).vPrev = vertMatrix( Vl,Vj ).vPrev;
 					}
-			//sprawdzenie czy nie ma cykli ujemnych
+			//test for negative cycles
 			if (zero > vertMatrix( Vi,Vi ).distance)
 			{
 				existNegCycle = true;
@@ -492,7 +491,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
     int n=g.getVertNo();
     int mImage=g.getEdgeNo(Directed)+2*g.getEdgeNo(Undirected)+n;
 
-	//sprawdzenie czy nie ma petli ujemnych
+	//test for negative loops
 	for(typename GraphType::PEdge e = g.getEdge(Koala::EdLoop | Koala::EdUndir);
 		e; e = g.getEdgeNext(e, Koala::EdLoop | Koala::EdUndir))
 			if(edgeTab[e].length < zero)
@@ -558,7 +557,7 @@ template< class DefaultStructs > template< class GraphType, class TwoDimVertCont
 {
 	koalaAssert( start && end,AlgExcNullVert );
 	if (NumberTypeBounds< typename TwoDimVertContainer::ValType::DistType >
-		::isPlusInfty(vertMatrix( start,end ).distance)) return -1; // wierzcholek end jest nieosiagalny
+		::isPlusInfty(vertMatrix( start,end ).distance)) return -1; // vertex end is unreachable
 	return getOutPathFromMatrix( g,vertMatrix,iters,start,end );
 }
 

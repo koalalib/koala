@@ -293,7 +293,7 @@ template< class DefaultStructs >
 	// USR: directed graphs and loops are not allowed
 //	koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
-    MaxStableStrategy::Privates::WMin_Strategy_tag chtest=choose;//Wymuszony blad kompilacji w razie uzycia niewlasciwego choose
+    MaxStableStrategy::Privates::WMin_Strategy_tag chtest=choose;// forced error if improper choose used
 
 	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
 		ImageGraph;
@@ -323,7 +323,7 @@ template< class DefaultStructs >
 {
 	//koalaAssert( g.getEdgeNo( EdLoop ) == 0,AlgExcWrongConn );
 
-    MaxStableStrategy::Privates::WMax_Strategy_tag chtest=choose;//Wymuszony blad kompilacji w razie uzycia niewlasciwego choose
+    MaxStableStrategy::Privates::WMax_Strategy_tag chtest=choose;// forced error of improper choose used
 	typedef typename DefaultStructs::template LocalGraph< typename GraphType::PVertex,EmptyEdgeInfo,Undirected >::Type
 		ImageGraph;
 
@@ -754,7 +754,7 @@ template< class DefaultStructs > template< class GraphType, class InputIterator 
 				return false;
     return true;
 
-    //Nie usuwac komentarza: wersja alternatywna do testow efektywnosciowych
+    //Do not remove: alternative version for tests
 	/*
 	typedef typename GraphType::PVertex Vert;
 
@@ -783,7 +783,7 @@ template< class DefaultStructs > template< class GraphType > bool MaxStablePar< 
 	}
     return true;
 
-    //Nie usuwac komentarza: wersja alternatywna do testow efektywnosciowych
+    //Do not remove: alternative version for tests
 	/*
 	typedef typename GraphType::PVertex Vert;
 

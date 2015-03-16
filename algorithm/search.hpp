@@ -1431,7 +1431,7 @@ template< class DefaultStructs > template< class GraphType >
 	koalaAssert( u,AlgExcNullVert );
 	std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
 	_ends( g,EdUndir | EdLoop,res.first,res.second );
-//	return (res.first == u || res.second == u); //zmiana
+//	return (res.first == u || res.second == u); //change
     return res.first != res.second && (res.first == u || res.second == u);
 }
 
@@ -1441,7 +1441,7 @@ template< class DefaultStructs > template< class GraphType >
 	koalaAssert( u,AlgExcNullVert );
 	std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
 	_ends( g,EdDirOut | EdLoop,res.first,res.second );
-//	return res.first == u; //zmiana
+//	return res.first == u; //change
     return res.first != res.second && res.first == u;
 }
 
@@ -1449,7 +1449,7 @@ template< class DefaultStructs > template< class GraphType >
 	bool EulerPar< DefaultStructs >::hasCycle( const GraphType &g, typename GraphType::PVertex u )
 {
 	koalaAssert( u,AlgExcNullVert );
-//	return hasCycle( g ) && g.deg( u,EdUndir | EdLoop ); //zmiana
+//	return hasCycle( g ) && g.deg( u,EdUndir | EdLoop ); //change
     return hasCycle( g ) && (g.deg( u,EdUndir | EdLoop )>0 || g.getEdgeNo(EdUndir | EdLoop)==0);
 }
 
@@ -1457,8 +1457,8 @@ template< class DefaultStructs > template< class GraphType >
 	bool EulerPar< DefaultStructs >::hasDirCycle( const GraphType &g, typename GraphType::PVertex u )
 {
 	koalaAssert( u,AlgExcNullVert );
-//	return hasDirCycle( g ) && g.deg( u,EdDirOut | EdLoop ); //zmiana
-	return hasDirCycle( g ) && (g.deg( u,EdDirOut | EdLoop )>0 || g.getEdgeNo(Directed | EdLoop)==0); //zmiana
+//	return hasDirCycle( g ) && g.deg( u,EdDirOut | EdLoop ); //change
+	return hasDirCycle( g ) && (g.deg( u,EdDirOut | EdLoop )>0 || g.getEdgeNo(Directed | EdLoop)==0); //change
 }
 
 template< class DefaultStructs > template< class GraphType, class VertIter, class EdgeIter >

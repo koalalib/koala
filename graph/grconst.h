@@ -10,7 +10,6 @@ template< class GraphType > class ConstGraphMethods;
 
 namespace Privates {
 
-    // sprywatyzowano
     template< class GraphType > struct GraphInternalTypes;
 
     template< class GraphType > struct GraphInternalTypes< ConstGraphMethods< GraphType > >
@@ -30,10 +29,6 @@ namespace Privates {
 
 }
 
-/* ConstGraphMethods
- * Klasa wprowadzajaca poprzez mechanizm CRTP metody operujace na strukturze typu const GraphType do tejze struktury
- * Wykorzystywana do wzbogacania interfejsu Graph, Subgraph oraz widokow na graf
- */
 /** \brief Constant Graph Methods
  *
  *  Class inherited by Graph, Subgraph and views on graph. Set of basic constant method used by graph.
@@ -127,16 +122,14 @@ public:
 	ConstGraphMethods( const ConstGraphMethods & ): self( (const GraphType &)*this )
 		{ }
 
-	//Aby nie zaczelo pracowac na innym grafie
 	/* \brief Copy content operator.
 	 *
 	 *  Does nothing to prevent change of graphs.
 	 *  \return *this. */
 	ConstGraphMethods &operator=( const ConstGraphMethods & )
 		{ return *this; }
-// gdzies trzeba podac ponizszy koment, tj. ze szablon ConstGraphMethods korzystajac w wzorca CRTP wprowadza staly pakiet metod const grafu korzystajac tylko z ponizszych
-//jest to wykorzystane w glownej klasie grafu i wszystkich widokach view.h
-//    Uwaga: metody, ktore musza byc dostarczane przez GraphType:
+// this comment -- ConstGraphMethods uses CRTP template to introduce const methods to graph using only the following methods --
+// should be placed somewhere 
 //         int getVertNo() const;
 //         PVertex getVertNext( PVertex ) const;
 //         PVertex getVertPrev( PVertex ) const;
@@ -158,21 +151,19 @@ public:
 //          static bool allowedAdjMatrix()
 
 
-//    Uwaga: zasady ogolne obslugi zbiorow wierz/krawedzi struktury grafowej. Zestaw metod postaci:
-//    int get...No(... arg ...) - dlugosc listy
-//    template <class Iter> int get...(...) - zapis na podany iterator calej listy, zwraca jej dlugosc
-//    Set<Element> get...Set(...) - wszystkie elementy listy zwracane w formie zbioru
-//    Jesli te elementy struktury sa zorganizowane w liste, poruszamy sie po niej uzywajac dodatkowo
-//    Element get...(...) - pierwszy element listy, NULL w przypadku listy pustej
-//    Element get...Last(...) - ostatni element listy, NULL w przypadku listy pustej
-//    Element get...Next(... arg ...) - kolejny po arg element listy, NULL jesli arg byl ostatni
-//    Element get...Prev(... arg ...) - poprzedni po arg element listy, NULL jesli arg byl pierwszy
-//        Natomiast zbior wejsciowy pobieramy z zakresu miedzy dwoma iteratorami lub przez Set
+//    Warning: general rules for edges/vertices. 
+//    int get...No(... arg ...) - length of a list
+//    template <class Iter> int get...(...) - write to a given iterator, returns length
+//    Set<Element> get...Set(...) - returns elements of a list as a set
+//    To iterate over a list use
+//    Element get...(...) - first element, NULL if empty
+//    Element get...Last(...) - last element, NULL if empty
+//    Element get...Next(... arg ...) - next element, NULL if last
+//    Element get...Prev(... arg ...) - previous element, NULL if first
+//    Input data is read from iterators or Set.
 
 
 
-	// Lista wierzcholkow grafu
-	// Liczba wierzcholkow (rzad grafu).
 	/** \brief Get number of vertices.
 	 *
 	 *  The method gets the order of the graph i.e. the number of vertices in the graph.
@@ -243,7 +234,6 @@ public:
 	 *  [See example](examples/graph/graph_getVertSet.html). */
 	Set< PVertex > getVertSet() const;
 
-	// Liczba krawêdzi typu zawartego w podanej masce
 	/** \brief Get edge number.
 	 *
 	 *  The method gets the number of edges of the type determined by the parameter \a mask.
@@ -312,7 +302,6 @@ public:
 	PEdge getEdgeLast( EdgeType mask = EdAll ) const
 		{ return self.getEdgePrev( (PEdge)0,mask ); }
 
-	// lista krawedzi sasiednich do v o orientacji wzgledem v zawartej w masce
 	/** Get number of edges incident to vertex
 	 *  
 	 *  The method gets the number of edges of certain type incident to the vertex \a v (similar to degree).
@@ -387,9 +376,6 @@ public:
 	 *  [See example](examples/graph/graph_getEdgeSet.html). */
 	Set< PEdge > getEdgeSet( PVertex v, EdgeDirection direct = EdAll ) const;
 
-    // Poniewaz nie da sie latwo bez iteratorow przegladac listy kolejnych sasiadow wierzcholka w multigrafie
-    // (bo moga sie powtarzac via rozne krawedzie), wprowadzono liste rozszerzen powyzszych getEdge...(PVertex...), ktora wraz z krawedzia
-    //zwraca takze drugi (procz v) wierzcholek koncowy tejze krawedzi (lub (NULL,NULL) na koncu listy).
 	/** \brief Get next edge and its vertex.
 	*
 	*  The method allows to see through all the edges incident to \a v, of direction congruent with \a mask.
@@ -457,7 +443,6 @@ public:
     inline int getEdgeVertNo( PVertex v, EdgeDirection mask = EdAll) const
 		{ return self.getEdgeNo( v,mask ); }
 	
-	// tu OutputIterator przyjmuje pary std::pair<PEdge,PVertex>
 	/** \brief Get incident edges and their vertices.
 	*
 	*  The method returns the set of pairs (PEdge, PVertex) for all edges incident to \a v with direction congruent with mask \a direct. 
@@ -469,7 +454,6 @@ public:
 	*  \return the number of pairs in the set returned via \a iter.  */
 	template< class OutputIterator > int getEdgeVerts( OutputIterator, PVertex, EdgeDirection = EdAll ) const;
 
-	// lista krawedzi laczacych podane wierzcholki w sposob zawarty w masce
 	/** \brief Get number of parallel edges.
 	 *
 	 *  The method counts the number of edges between two vertices.
@@ -553,7 +537,6 @@ public:
 	 *  \return the number of parallel edges stored in return via container represented by \a iter.	 */
 	template< class OutputIterator > int getEdges( OutputIterator iter, PVertex vert1, PVertex vert2, EdgeDirection direct = EdAll ) const;
 
-	// zbior wierzcholkow/krawedzi spelniajacych podany chooser
 	/** \brief Get set of vertices.
 	 *
 	 *  The method gets the set of vertices defined by the chooser \a ch.
@@ -598,8 +581,6 @@ public:
 	template< class EChooser2 >
 	typename Privates::SecondTypeTest<typename EChooser2::ChoosersSelfType, Set< PEdge > >::Type getEdgeSet( EChooser2 ch ) const;
 
-	// podobnie, ale podajemy pare chooserow (dla wierzcholka i krawedzi). Parametr bool=true - krawedz ma spelniac
-	// nie tylko swoj chooser, ale takze oba konce chooser dla wierzcholkow
 	/** \brief Choose edges and vertices.
 	 *
 	 *  The method gets the pair of sets. The set of vertices and the set of edges. The pair of choosers defines which edges and vertices should be taken.
@@ -629,7 +610,6 @@ public:
 	template<class VChooser2,class EChooser2 >
 		std::pair< Set< PVertex >,Set< PEdge > > getChosenSets( std::pair< VChooser2,EChooser2 > chs, bool chosenends = true) const;
 
-	// Wierzcholek/krawedz o podanym numerze w grafie.
 	/** \brief Get vertex by number
 	 *
 	 *  The method returns the pointer of idx-th vertex on the list of vertices. We start indexing with 0.
@@ -650,7 +630,6 @@ public:
 	 *  [See example](examples/graph/graph_edgeByNo.html).	 */
 	PEdge edgeByNo( int idx ) const;
 
-	// Numer wierzcho³ka/krawedzi, -1 w razie braku
 	/** \brief Get index of vertex
 	 *
 	 *  The method returns the position (on the list) of vertex given by its pointer. We start indexing with 0.
@@ -671,7 +650,6 @@ public:
 	 *  [See example](examples/graph/graph_edgePos.html).	 */
 	int edgePos( PEdge edge ) const;
 
-	// czy graf zawiera dany element
 	/** \brief Test the existence of vertex.
 	 *
 	 *  The method searches the list of vertices, though it is slow.
@@ -686,7 +664,6 @@ public:
 	 *  \return true if \a e is a pointer to an existing edge in graph, false otherwise. */
 	bool has( PEdge e ) const;
 
-	// typ krawedzi
 	/** \brief Get edge type.
 	 *
 	 *  \param e the pointer to the considered edge.
@@ -699,7 +676,6 @@ public:
 	 *  [See example](examples/graph/graph_getEdgeType.html).	 */
 	inline EdgeType getEdgeType( PEdge e ) const
 		{ return self.getEdgeType( e ); }
-	// synonim poprzedniej
 	/** \brief Get edge type.
 	 *
 	 *  \param e the pointer to the considered edge.
@@ -713,7 +689,6 @@ public:
 	EdgeType getType( PEdge e ) const
 		{ return self.getEdgeType( e ); }
 
-	// wierzcholki koncowe krawedzi
 	/** \brief Get edge ends.
 	 *
 	 *  The method gets the pair of vertices on which \a edge is spanned.
@@ -724,7 +699,6 @@ public:
 	inline std::pair< PVertex,PVertex > getEdgeEnds( PEdge edge ) const
 		{ return self.getEdgeEnds( edge ); }
 	
-	// synonim poprzedniej
 	/** \copydoc getEdgeEnds(PEdge) const
 	 *
 	 *  [See example](examples/graph/graph_getEdgeEnds.html). */
@@ -749,7 +723,6 @@ public:
 	inline PVertex getEdgeEnd2( PEdge edge ) const
 		{ return self.getEdgeEnd2( edge ); }
 
-	// orientacja krawedzi wzgledem jej konca
 	/** \brief Get edge direction
 	 *
 	 *  The method gets direction of edge (with respect to \a v). Possible values of EdgeDirection are:
@@ -765,7 +738,6 @@ public:
 	inline EdgeDirection getEdgeDir( PEdge edge, PVertex v ) const
 		{ return self.getEdgeDir( edge,v ); }
 
-	// czy wierzcholek jest koncem krawedzi
 	/** \brief Test if edge consist of vertex.
 	 *
 	 *  \param edge the pointer to tested edge.
@@ -773,11 +745,9 @@ public:
 	 *  \return true if the vertex \a vert is one of the \a edge ends and false if \a vert is not \a edge end or \a edge is not a proper edge. */
 	bool isEdgeEnd( PEdge edge, PVertex vert ) const
 		{ return edge && edge->isEnd( vert ); }
-	// synonim
 	/** \copydoc isEdgeEnd(PEdge,PVertex) const */
 	bool isEnd( PEdge edge, PVertex vert ) const
 		{ return edge && edge->isEnd( vert ); }
-	// drugi koniec krawedzi
 	/** \brief Get another end.
 	 *
 	 *  For \a edge, the method returns the other (than \a vert) vertex.
@@ -787,13 +757,11 @@ public:
 	 *
 	 *  [See example](examples/graph/graph_getEdgeEnd.html). */
 	PVertex getEdgeEnd( PEdge edge, PVertex vert) const;
-	// synonim
 	/** \copydoc  getEdgeEnd( PEdge, PVertex) const
 	 *
 	 *  [See example](examples/graph/graph_getEnd.html). */
 	PVertex getEnd( PEdge edge, PVertex vert) const;
 
-	// czy krawedzie sa incydentne
 	/** \brief Test incidence
 	 *
 	 *  The method tests if two edges are incident i.e. have a common vertex.
@@ -802,7 +770,6 @@ public:
 	 *  \return true if edges share a vertex, false otherwise. */
 	inline bool incid( PEdge edge1, PEdge edge2 ) const;
 
-	// pobranie pol info
 	/** \brief Get vertex info
 	 *
 	 *  \param v the considered vertex.
@@ -815,7 +782,6 @@ public:
 	 *  \return the edge info of \a e. */
 	EdgeInfoType getEdgeInfo( PEdge e ) const;
 
-	// sasiedztwo "otwarte" tj. wierzcholki widoczne z danego v poprzez krawedzie o orientacji wzgledem v zgodnej z maska
 	/** \brief Get vertex neighborhood.
 	 *
 	 *  The set of all adjacent vertices is returned in a container via iterator \a out. 
@@ -849,7 +815,6 @@ public:
 	int getNeighNo( PVertex vert, EdgeDirection mask = EdAll ) const
 		{ return this->getNeighs( blackHole,vert,mask ); }
 
-	// sasiedztwo "domkniete" tj. jw. ale v jest zawsze dolaczany
 	/** \brief Get closed neighborhood of vertex.
 	 *
 	 *  The set of all adjacent vertices plus the vertex itself is returned. 
@@ -880,8 +845,6 @@ public:
 	int getClNeighNo( PVertex vert, EdgeDirection direct = EdAll ) const
 		{ return this->getClNeighs( blackHole,vert,direct ); }
 
-	// stopien wierzcholka, uwzgledniamy krawedzie wychodzace z vert w sposob okreslony maska. Roznica w porownaniu z
-	// getEdgeNo(vert,direct) - petle jesli zliczane, to podwojnie
 	/** \brief Get degree of vertex.
 	 *
 	 *  The method calculates the vertex degree. It works similarly to getEdgeNo(vert,direct), 
@@ -892,7 +855,6 @@ public:
 	inline int deg( PVertex vert, EdgeDirection direct = EdAll ) const
 		{ return self.getEdgeNo( vert,direct ) + ((direct & EdLoop) ? self.getEdgeNo( vert,EdLoop ): 0); }
 
-	// maks/min stopien
 	/** \brief Get maximum degree.
 	 *
 	 *  The method calculates the maximum degree over all vertices in the graph.
@@ -912,7 +874,6 @@ public:
 	 *  [See example](examples/graph/graph_Delta.html). */
 	inline int delta( EdgeDirection direct = EdAll ) const
 		{ return std::max( 0,this->minDeg( direct ).second );  }
-	// j.w. ale zwracany jest takze wierzcholek realizujacy ekstremum. (NULL,-1) przy braku wierzcholkow
 	/** \brief Get minimum degree and the vertex.
 	 *
 	 *  Method gets the minimum degree over all vertices in the graph and one vertex of such degree.
@@ -931,8 +892,6 @@ public:
 	 *  [See example](examples/graph/graph_maxDeg.html). */
 	std::pair< PVertex,int > maxDeg( EdgeDirection direct = EdAll ) const;
 
-	// zapis "macierzy sasiedztwa" z uwglednieniem krawedzi typu zawartego w masce do 2-wym. tablicy assocjacyjnej
-	// (PVertex,PVertex)-> cos konwertowalne z bool
 	/** \brief Get adjacency matrix
 	 *
 	 *  The method gets adjacency matrix and stores it in associative container \a cont of type \a Cont.
@@ -944,13 +903,6 @@ public:
 	 *  [See example](examples/graph/graph_getAdj.html). */
 	template< class Cont > void getAdj( Cont &cont, EdgeType mask = EdAll ) const;
 
-	// Informacja o tym, czy krawedzie sa rownolegle.
-	// rownoleglosc: 3 typy relacji rownowaznosci, okreslane maska bitowa
-	// zawsze krawedz jest rownolegla do tak samo skierowanej krawedzi tego samego typu
-	//reltype - dopuszczalne tylko jednobitowe: EdDirIn, EdDirOut lub EdUndir (taki jest sens parametru maski we wszystkich metodach dot. rownoleglosci)
-	//EdDirOut - luk nieskierowany jest rownolegly tylko do tak samo jak on skierowanego luku o tych samych koncach
-	//EdDirIn - jest on takze rownolegly do odwrotnie skierowanego luku o tych samych koncach
-	//EdUndir - jest on takze rownolegly do krawedzi nieskierowanej o tych samych koncach
 	/** \brief Test if parallel.
 	 *
 	 *  The method tests if two edges are parallel. Three types of parallelism are possible. Depending on \a reltype:
@@ -966,7 +918,6 @@ public:
 	 *  [See example](examples/graph/graph_areParallel.html).	 */
 	bool areParallel( PEdge ed1, PEdge ed2, EdgeDirection reltype = EdUndir ) const;
 
-	// zbior krawedzi rownoleglych do zadanej z wykluczeniem jej samej
 	/** \brief Get parallel edges.
 	 *
 	 *  The method gets edges parallel to \a ed. (\a ed itself is not included) The edges are stored in a container defined by \a iter. 
@@ -998,7 +949,6 @@ public:
 	 *  [See example](examples/graph/graph_getParalSet.html). */
 	Set< PEdge > getParalSet( PEdge ed, EdgeDirection reltype = EdUndir ) const;
 
-	// liczba krawedzi rownoleglych do danej wliczajac ja sama
 	/** \brief Number of parallel edges.
 	 *
 	 *  The method gets the number of edges parallel to \a ed including itself. Three types of parallelism are possible. Depending on \a reltype:
@@ -1014,7 +964,6 @@ public:
 	int mu( PEdge edge, EdgeDirection reltype = EdUndir ) const
 		{ return this->getParals( blackHole,edge,reltype ) + 1; }
 
-	// jej maks. wartosc po wszystkich krawedziach
 	/** \brief Maximum number of parallel edges.
 	 *
 	 *  The method gets the maximum number of parallel edges. Three types of parallelism are possible. Depending on \a reltype:
@@ -1027,7 +976,6 @@ public:
 	int mu( EdgeDirection reltype = EdUndir ) const
 		{ return maxMu( reltype ).second; }
 
-	// jw. wraz z krawedzia realizujaca to ekstremum
 	/** \brief Maximum number of parallel edges.
 	 *
 	 *  The method gets the maximum number of parallel edges and one of maximal edges. 
@@ -1042,8 +990,6 @@ public:
 	 *  [See example](examples/graph/graph_maxMu.html). */
 	std::pair< PEdge,int > maxMu( EdgeDirection reltype = EdUndir ) const;
 
-	// rozdziela dany zbior krawedzi na dwa. W pierwszym jest po jednym reprezentancie z kazdej klasy relacji
-	// rownoleglosci. Drugi to pozostale krawedzie z tego zbioru
 	/** \brief Find parallel edges.
 	 *
 	 *  The method splits the given set of edges into two sets and keeps them in two containers. 
@@ -1069,7 +1015,6 @@ public:
 	template< class IterOut1, class IterOut2, class Iterator >
 		std::pair< int,int > findParals( std::pair< IterOut1,IterOut2 > out, Iterator begin, Iterator end, EdgeType reltype = EdUndir ) const;
 
-	// wersja odporna na ew. powtorzenia - ignorowane w ciagu wejsciowym
 	/** \brief Find parallel edges.
 	 *
 	 *  The method splits the given set of edges into two sets and keeps them in two containers. 
@@ -1113,7 +1058,6 @@ public:
 		std::pair< int,int > findParals( std::pair< IterOut1,IterOut2 > out, const Set< PEdge > &eset,
 			EdgeType relType = EdUndir ) const
 			{ return this->findParals( out, eset.begin(),eset.end(),relType ); }
-	// zbiorem wejsciowym sa wszystkie krawedzie przy wierzcholku
 	/** \brief Find parallel edges.
 	 *
 	 *  The method splits the edges incident to vertex into two sets and keeps them in two containers. The first set consists of unique representatives of edges.
@@ -1133,7 +1077,6 @@ public:
 	template< class IterOut1, class IterOut2 >
 		std::pair< int,int > findParals( std::pair< IterOut1,IterOut2 > out, PVertex vert, EdgeType reltype = EdUndir ) const;
 
-	// zbiorem wejsciowym sa wszystkie krawedzie miedzy para wierzcholkow
 	/** \brief Find parallel edges.
 	 *
 	 *  The method splits the set of edges spanned on two vertices into two sets and keeps them in two containers. The first set consists of unique representatives of edges.
@@ -1154,7 +1097,6 @@ public:
 	template< class IterOut1, class IterOut2 >
 		std::pair< int,int > findParals( std::pair< IterOut1,IterOut2 > out, PVertex vert1, PVertex vert2, EdgeType reltype = EdUndir ) const;
 
-	// zbiorem wejsciowym sa wszystkie krawedzie
 	/** \brief Find parallel edges.
 	 *
 	 *  The method splits the set of all edges into two sets and keeps them in two containers. The first set consists of unique representatives of edges.
@@ -1174,9 +1116,6 @@ public:
 	template< class IterOut1, class IterOut2 >
 		std::pair< int,int > findParals( std::pair< IterOut1,IterOut2 > out, EdgeType reltype = EdUndir ) const;
 
-	// zbior krawedzi wychodzacych z ktoregos z wierzcholkow z podanego zbioru w sposob podany pierwsza maska
-	// druga maska filtruje, czy maja to byc krawedzie prowadzace do tego zbioru (Loop), poza ten zbior (ustawiony bit
-	// inny niz Loop), czy wszystkie (ustawiony Loop i ktorys inny)
 	/** \brief Get incident edges
 	 *
 	 *  The method gets the edges incident to the set of vertices defined by iterators \a beg and \a end. 
@@ -1250,7 +1189,6 @@ public:
 	 *  \return the set of incident edges. */
 	Set< PEdge > getIncEdgeSet( const Set< PVertex > &vset, EdgeDirection type = EdAll, EdgeType kind = Loop ) const;
 
-	// Podobnie j.w. ale tym razem pobieramy drugie konce (tj. wierzcholki) od takich krawedzi.
 	/** \brief Get adjacent vertices.
 	 * 
 	 *  The method gets vertices adjacent to vertices in the set defined by the iterators \a beg and \a end.

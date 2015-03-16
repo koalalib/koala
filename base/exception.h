@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <cstring>
 
-// dlugosc bufora wewnatrz wyjatku przeznaczonego na jego tekstowy opis
 /**\def KOALA_EXCEPTION_BUF_SIZE 
  * \brief Size of exception text buffer. 
  *  \ingroup DMexception */
@@ -17,8 +16,6 @@
 	#define KOALA_EXCEPTION_BUF_SIZE 150
 #endif
 
-// Stała KOALA_DONT_CHECK_ERRORS wyłącza sprawdzanie błędów i rzucanie wyjątków przez Koalę.
-// Wylaczenie standardowego assert przez NDEBUG automatycznie wylacza koalowa kontrole
 /** \def KOALA_DONT_CHECK_ERRORS 
  *  \brief Macro switching of exception testing.
  *  \ingroup DMexception */
@@ -26,8 +23,6 @@
 	#define KOALA_DONT_CHECK_ERRORS
 #endif
 
-// Makro koalaAssert() - pierwszy argument sprawdzany warunek, drugi typ rzucanego wyjątku. Automatycznie rzuca wyjatek z podanym w konstr. opisem zwracajacym jego typ i polozenie
-//To wlasnie to makro jest ew. wylaczane stala czasu kompilacji KOALA_DONT_CHECK_ERRORS
 /** \def koalaAssert( descr,type )
  *  \brief Koala macro for throwing exceptions.
  *  
@@ -44,8 +39,6 @@ namespace Koala
 	/** \brief Exceptions */
 	namespace Error
 	{
-	    //w opisie warto zwrocic uwage na 2-wymiarowa hierarchie klas wyjatkow Koali: sam typ wyjatku pokazuje, czy polecialo z metody kontenera, metody grafu, czy algorytmu
-		// Klasa bazowa dla wyjątków Koali.
 		/** \brief Exception base.
 		 *
 		 * The base class for Koala exceptions.
@@ -56,7 +49,6 @@ namespace Koala
 			int _line;
 
 		public:
-			// Parametry konstruktora określają, co mają zwracać metody line, descr i file.
 			/** \brief Constructor
 			 *
 			 * \param adesc Error description
@@ -70,19 +62,14 @@ namespace Koala
 			/**\brief Get exception description.*/
 			inline const char *descr() const
 				{ return buf; }
-			// Plik źrodłowy, w którym wystąpił błąd.
 			/**\brief Get source file name where the exception is thrown.*/
 			inline const char *file() const
 				{ return buf + std::strlen( buf ) + 1; }
-			// Nazwa typu wyjątku.
 			/**\brief Get exception type.*/
 			inline const char *type() const
 				{ return "ExcBase"; }
 		};
 
-		/* ExcWrongArg
-		 * Wyjątek typu "niepoprawny argument".
-		 */
 		/** \brief Wrong argument exception.
 		 *
 		 * \ingroup DMexception */
@@ -98,9 +85,6 @@ namespace Koala
 				{ return "ExcWrongArg"; }
 		};
 
-		/* ExcNullVert
-		 * Wyjątek typu "podano zerowy wierzchołek".
-		 */
 		/** \brief NULL vertex pointer exception.
 		 *
 		 * \ingroup DMexception */
@@ -116,9 +100,6 @@ namespace Koala
 				{ return "ExcNullVert"; }
 		};
 
-		/* ExcNullEdge
-		 * Wyjątek typu "podano zerową krawędź".
-		 */
 		/** \brief NULL edge pointer exception.
 		 *
 		 * \ingroup DMexception */
@@ -134,9 +115,6 @@ namespace Koala
 				{ return "ExcNullEdge"; }
 		};
 
-		/* ExcWrongConn
-		 * Wyjątek typu "błędne połączenie w grafie między wierzchołkami lub krawędziami".
-		 */
 		/** \brief Wrong vertex - edge connection exception.
 		 *
 		 * \ingroup DMexception */
@@ -152,9 +130,6 @@ namespace Koala
 				{ return "ExcWrongConn"; }
 		};
 
-		/* ExcWrongMask
-		 * Wyjątek typu "zła maska typu krawędzi".
-		 */
 		/** \brief Wrong edge type exception.
 		 *
 		 * \ingroup DMexception */
@@ -170,9 +145,6 @@ namespace Koala
 				{ return "ExcWrongMask"; }
 		};
 
-		/* ContExc
-		 * Klasa bazowa dla błędów struktury danych.
-		 */
 		/** \brief Base class for exceptions in containers.
 		 *
 		 * \ingroup DMexception */
@@ -188,9 +160,6 @@ namespace Koala
 				{ return "ContExc"; }
 		};
 
-		/* ContExcWrongArg
-		 * Wyjątek typu "zły argument metody kontenera".
-		 */
 		/** \brief  Container method incorrect argument exception.
 		 *
 		 * \ingroup DMexception */
@@ -206,9 +175,6 @@ namespace Koala
 				{ return "ContExcWrongArg"; }
 		};
 
-		/* ContExcFull
-		 * Wyjątek typu "przepełnienie kontenera".
-		 */
 		/** \brief  Container overflow exception.
 		 *
 		 * \ingroup DMexception */
@@ -240,9 +206,6 @@ namespace Koala
 		};
 
 
-		/* ContExcOutpass
-		 * Wyjątek typu "przekroczenie zakresu kontenera".
-		 */
 		/** \brief  Container rage outpass exception.
 		 *
 		 * \ingroup DMexception */
@@ -258,9 +221,6 @@ namespace Koala
 				{ return "ContExcOutpass"; }
 		};
 
-		/* GraphExc
-		 * Klasa bazowa dla blędów struktury grafu.
-		 */
 		/** \brief Base class for exceptions in graphs.
 		 *
 		 * \ingroup DMexception */
@@ -276,9 +236,6 @@ namespace Koala
 				{ return "GraphExc"; }
 		};
 
-		/* GraphExcWrongArg
-		 * Wyjątek typu "zły argument metody struktury grafu".
-		 */
 		/** \brief Wrong argument of graph structure method exception.
 		 *
 		 * \ingroup DMexception */
@@ -294,9 +251,6 @@ namespace Koala
 				{ return "GraphExcWrongArg"; }
 		};
 
-		/* GraphExcWrongConn
-		 * Wyjątek typu "zły argument metody struktury grafu, błędne połączenie".
-		 */
 		/** \brief Wrong argument of graph structure method (incorrect connection)  exception.
 		 *
 		 * \ingroup DMexception */
@@ -312,9 +266,6 @@ namespace Koala
 				{ return "GraphExcWrongConn"; }
 		};
 
-		/* GraphExcNullVert
-		 * Wyjątek typu "zły argument metody struktury grafu, podano zerowy wierzchołek".
-		 */
 		/** \brief Wrong argument of graph structure method (NULL pointer of vertex)  exception.
 		 *
 		 * \ingroup DMexception */
@@ -330,9 +281,6 @@ namespace Koala
 				{ return "GraphExcNullVert"; }
 		};
 
-		/* GraphExcNullEdge
-		 * Wyjątek typu "zły argument metody struktury grafu, podano zerową krawędź".
-		 */
 		/** \brief Wrong argument of graph structure method (NULL pointer of edge)  exception.
 		 *
 		 * \ingroup DMexception */
@@ -348,9 +296,6 @@ namespace Koala
 				{ return "GraphExcNullEdge"; }
 		};
 
-		/* GraphExcWrongMask
-		 * Wyjątek typu "zły argument metody struktury grafu, podano złą maskę typu".
-		 */
 		/** \brief Wrong argument of graph structure method (incorrect edge type)  exception.
 		 *
 		 * \ingroup DMexception */
@@ -366,9 +311,6 @@ namespace Koala
 				{ return "GraphExcWrongMask"; }
 		};
 
-		/* AlgExc
-		 * Klasa bazowa dla błędów algorytmów biblioteki.
-		 */
 		/** \brief Base class for exceptions in algorithms.
 		 *
 		 * \ingroup DMexception */
@@ -384,9 +326,6 @@ namespace Koala
 				{ return "AlgExc"; }
 		};
 
-		/* AlgExcWrongArg
-		 * Wyjątek typu "zły argument algorytmu biblioteki".
-		 */
 		/** \brief Wrong argument of algorithm exception.
 		 *
 		 * \ingroup DMexception */
@@ -402,9 +341,6 @@ namespace Koala
 				{ return "AlgExcWrongArg"; }
 		};
 
-		/* AlgExcNullVert
-		 * Wyjątek typu "zły argument algorytmu biblioteki, podano zerowy wierzchołek".
-		 */
 		/** \brief Wrong argument of algorithm exception (NULL vertex pointer).
 		 *
 		 * \ingroup DMexception */
@@ -420,9 +356,6 @@ namespace Koala
 				{ return "AlgExcNullVert"; }
 		};
 
-		/* AlgExcNullEdge
-		 * Wyjątek typu "zły argument algorytmu biblioteki, podano zerową krawędź".
-		 */
 		/** \brief Wrong argument of algorithm exception (NULL edge pointer).
 		 *
 		 * \ingroup DMexception */
@@ -438,9 +371,6 @@ namespace Koala
 				{ return "AlgExcNullEdge"; }
 		};
 
-		/* AlgExcWrongMask
-		 * Wyjątek typu "zły argument algorytmu biblioteki, podano zlą maskę typu".
-		 */
 		/** \brief Wrong argument of algorithm exception (incorrect edge type).
 		 *
 		 * \ingroup DMexception */
@@ -456,9 +386,6 @@ namespace Koala
 				{ return "AlgExcWrongMask"; }
 		};
 
-		/* AlgExcWrongConn
-		 * Wyjątek typu "zły argument metody struktury grafu, błędne połączenie".
-		 */
 		/** \brief Wrong argument of algorithm exception (incorrect connection).
 		 *
 		 * \ingroup DMexception */

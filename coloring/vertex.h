@@ -4,7 +4,7 @@
 /* ------------------------------------------------------------------------- *
  * vertex.h
  *
- * Klasyczne kolorowanie wierzcholkowe
+ * Classical vertex coloring
  * ------------------------------------------------------------------------- */
 
 #include "../base/defs.h"
@@ -669,7 +669,7 @@ class SeqVertColDefaultSettings: public AlgsDefaultSettings
 		{
 		public:
 			typedef Assoc2DimTable< type,std::map<std::pair<A,A>, B> > Type;/**<\brief Define own if intend to change.*/
-			// Nie usuwac komentarza (przykladowe uzycia)
+			// Exemplary usage:
 			// typedef AssocMatrix<A,B,type,std::vector< Privates::BlockOfAssocMatrix<B> >,Privates::PseudoAssocArray<A,int,AssocTable<BiDiHashMap<A,int> > > > Type;
 		};
 
@@ -736,9 +736,6 @@ class VertColoringPar: public VertColoringTest {
 		 * \return the maximal assigned color.*/
 		template<typename Graph, typename ColorMap>
 		static int color(const Graph &graph, ColorMap &colors);
-		// znajduje pokolorowanie o najwiekszym kolorze <=maxColor. Jesli w trakcie pracy
-		//wykryje, ze jest to niemozliwe, zwraca -1
-		// Wartosci poczatkowe w colors ignorowane Graf dowolny, nie koniecznie prosty.
 		/**\brief Get vertex coloring.
 		 *
 		 * The method colors \a graph using colors <= \a maxColor and saves the coloring in \a colors. Mind that the approach in non-polynomial.
