@@ -11,19 +11,12 @@
 #include "localarray.h"
 #include "privates.h"
 
-//Kontenery kolejek priorytetowych szybko zlaczalnych dla porownywalnych typow kluczy: dwumianowej i Fibonacziego.
-
-
-//rezygnacja z parametru Allocator szablonow kopcow - kopce lokalne uzywaja puli pamieci typu SimplArrPool (simple.h)
+// Binomial and Fibonacci heaps
+// heaps use pools of type SimplArrPool (simple.h)
 
 namespace Koala
 {
 
-	/* BinomHeapNode
-	 * Obiekt pomocniczy kolejki 2-mianowej przechowujacy pojedynczy klucz. Klucz wstawiony do kolejki dostaje
-	 * reprezentanta bedacego wskaznikiem na obiekt tego typu. Nie uzywany bezposrednio przez uzytkownika.
-	 * Reprezentant nie zmienia sie przez caly czas istnienia kolejki, bez wzgledu na jej ew. zmiany
-	 */
 	/** \brief Binominal heap node.
 	 *
 	 *  An auxiliary object representing (wrapping) single key (node) of binominal heap.
@@ -40,24 +33,16 @@ namespace Koala
 		bool check() const;
 
 	public:
-		/**\brief Constructor*/
+		/** \brief Constructor*/
 		BinomHeapNode( const Key &key = Key() ): parent( 0 ), child( 0 ), next( 0 ), degree( 0 ), key( key )
 			{ }
-		/**\brief Get key.
+		/** \brief Get key.
 		 *
-		 *  \return the value of kept object.
-		 */
+		 *  \return the value of kept object. */
 		Key get()
 			{ return key; }
 	};
 
-	/* BinomHeap
-	 *  Kolejka 2-mianowa dla kluczy typu Key porownywanych podanym kompartorem typu Compare. Domyslnie
-	 *  obiekty dla kluczy sa wewnatrz alokoawne przez new i delete. Mozna jednak uzyc wlasnego alokatora
-	 *  typu Allocator podajac w konstruktorze wskaznik na alokator (wartosc domyslna 0 - rowniez new i delete).
-	 *  Zewnetrzny alokator musi zyc przez caly czas istnienia kolejki a jego wskaznika w kontenerze nie mozna
-	 *  zmienic.
-	 */
 	/** \brief Binominal heap.
 	 *
 	 *  Standard binominal heap structure.
@@ -83,7 +68,6 @@ namespace Koala
 		Allocator* allocator;
 
 	public:
-		// podajemy komparator,
 		/** \brief Constructor.
 		 *
 		 *  The default constructor generates empty heap.
@@ -92,7 +76,6 @@ namespace Koala
 		inline BinomHeap( const Compare &function = Compare() ):
 			root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( 0 )
 				{ }
-		// podajemy komparator, kolejka powiazana z alokatorem zewnetrznym
 		/** \brief Constructor.
 		*
 		*   The version of constructor that generates empty heap and allows to use external memory. The memory should be already allocated using class SimplArrPool. Then it is impossible to reallocate the pool.
@@ -101,7 +84,6 @@ namespace Koala
 		inline BinomHeap( Allocator *all, const Compare &function = Compare() ):
 			root( 0 ), minimum( 0 ), nodes( 0 ), function( function ), allocator( all )
 				{ }
-		// konstruktor kopiujacy, obiekt wiaze sie z ta sama pula, co oryginal 
 		/** \brief Copy constructor.
 		 *
 		 *  Constructor copies the object. If the storage pool was used for the copied object, the copy will use the same pool.
@@ -118,14 +100,11 @@ namespace Koala
 		~BinomHeap()
 			{ clear(); }
 
-		// metody STLowego kopca maja to samo znaczenie
-		// najmniejszy klucz
 		/** \brief Get top key.
 		 *
 		 *  The method gets the top key of the heap. If default std::less functor is used the method gets the minimum key.
 		 *  \return the top key.*/
 		Key top() const;
-		// i jego reprezentant
 		/** \brief Get top node.
 		 *
 		 *  The method gets the top heap node. If default std::less functor is used the method gets one with the minimum key.
@@ -133,34 +112,29 @@ namespace Koala
 		 Node* topRepr() const
 			{ return minimum; }
 
-		// wstawienie klucza, zwracany wskaznik to jego reprezentant wewnatrz kolejki
 		/**\brief Insert key.
 		 *
 		 * The method inserts \a key on heap.
 		 * \param key the inserted element.
 		 * \return the pointer to the new-created node for a key.*/
 		Node* push( const Key &key );
-		// usun najmniejszy
 		/** \brief Remove top element.
 		 *
 		 *  The method removes the top element from the heap.*/
 		void pop();
 
-		 // zmniejszenie klucza danego wezla, podanie wiekszej wartosci rzuca blad
 		/** \brief Decrease top element.
 		 *
 		 *  The method decreases the key of the node \a A to \a key. The new key needs to be not greater than the previous one, if not an exception is thrown.
 		 *  \param A the modified node
 		 *  \param key the new key.*/
 		void decrease( Node *A, const Key &key );
-		// usun wezel z kluczem
 		/** \brief Delete node.
 		 *
 		 *  The node A is deleted from heap.
 		 *  \param A the pointer to the deleted node.*/
 		void del( Node *A );
 
-		// dopisuje klucze z drugiej kolejki, ktora jest czyszczona
 		/** \brief Merge heaps.
 		 *
 		 *  The keys from \a heap are moved to the current heap. All the keys from \a heap are deleted.

@@ -892,3 +892,100 @@ template< class Cont,class K,AssocMatrixType aType > std::ostream &Privates::pri
 	out << '}';
 	return out;
 }
+
+template< AssocMatrixType aType, class Container>
+Assoc2DimTable< aType,Container > &Assoc2DimTable< aType,Container >::operator=(const Assoc2DimTable< aType,Container > &X)
+{
+    if (this==&X) return *this;
+    acont=X.acont;
+    return *this;
+}
+
+template< AssocMatrixType aType, class Container> template< class MatrixContainer >
+Assoc2DimTable< aType,Container > &Assoc2DimTable< aType,Container >::operator=( const MatrixContainer &X )
+    {
+        Privates::Assoc2DimTabTag< KeyType,aType >::operator=( X );
+        this->clear();
+        int rozm;
+        std::pair<KeyType,KeyType> LOCALARRAY(tab,rozm=X.size());
+        X.getKeys(tab);
+        for( int i=0;i<rozm;i++ )
+            this->operator()( tab[i] )=X( tab[i] );
+        return *this;
+    }
+
+template< AssocMatrixType aType, class Container>
+bool Assoc2DimTable< aType,Container >::hasKey( typename Assoc2DimTable< aType,Container >::KeyType u,
+    typename Assoc2DimTable< aType,Container >::KeyType v ) const
+{
+    if (!u || !v) return false;
+    if (!Assoc2DimTabAddr< aType >::correctPos( u,v )) return false;
+    return interf.hasKey(Assoc2DimTabAddr< aType >::key(u,v));
+}
+
+template< AssocMatrixType aType, class Container>
+bool Assoc2DimTable< aType,Container >::delKey( typename Assoc2DimTable< aType,Container >::KeyType u,
+    typename Assoc2DimTable< aType,Container >::KeyType v)
+{
+    if (!u || !v) return false;
+    if (!Assoc2DimTabAddr< aType >::correctPos( u,v )) return false;
+    return interf.delKey(Assoc2DimTabAddr< aType >::key(u,v));
+}
+
+template< AssocMatrixType aType, class Container>
+std::pair< typename Assoc2DimTable< aType,Container >::KeyType,typename Assoc2DimTable< aType,Container >::KeyType >
+    Assoc2DimTable< aType,Container >::nextKey( typename Assoc2DimTable< aType,Container >::KeyType u,
+        typename Assoc2DimTable< aType,Container >::KeyType v) const
+{
+    if (!u || !v) return firstKey();
+    koalaAssert( Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+    return interf.nextKey(Assoc2DimTabAddr< aType >::key(u,v));
+}
+
+template< AssocMatrixType aType, class Container>
+std::pair< typename Assoc2DimTable< aType,Container >::KeyType,typename Assoc2DimTable< aType,Container >::KeyType >
+    Assoc2DimTable< aType,Container >::prevKey( typename Assoc2DimTable< aType,Container >::KeyType u,
+        typename Assoc2DimTable< aType,Container >::KeyType v) const
+{
+    if (!u || !v) return lastKey();
+    koalaAssert( Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
+    return interf.prevKey(Assoc2DimTabAddr< aType >::key(u,v));
+}
+
+template< AssocMatrixType aType, class Container>
+bool Assoc2DimTable< aType,Container >::hasInd( typename Assoc2DimTable< aType,Container >::KeyType v ) const
+{
+    for(std::pair< KeyType,KeyType> key=this->firstKey();
+        !Privates::ZeroAssocKey<std::pair< KeyType,KeyType> >::isZero(key);
+        key=this->nextKey(key)) if (key.first==v || key.second==v) return true;
+    return false;
+}
+
+template< AssocMatrixType aType, class Container>
+bool Assoc2DimTable< aType,Container >::delInd( typename Assoc2DimTable< aType,Container >::KeyType v )
+{
+    bool flag=false;
+    std::pair< KeyType,KeyType> key,key2;
+    for(std::pair< KeyType,KeyType> key=this->firstKey();
+        !Privates::ZeroAssocKey<std::pair< KeyType,KeyType> >::isZero(key);key=key2)
+    {
+        key2=this->nextKey(key);
+        if (key.first==v || key.second==v)
+        {
+            flag=true;
+            this->delKey(key);
+        }
+    }
+    return flag;
+}
+
+template< AssocMatrixType aType, class Container> template<class DefaultStructs, class Iterator >
+int Assoc2DimTable< aType,Container >::getInds( Iterator iter ) const
+{   typename DefaultStructs:: template AssocCont< KeyType, char >::Type inds(2*this->size());
+    for(std::pair< KeyType,KeyType> key=this->firstKey();
+        !Privates::ZeroAssocKey<std::pair< KeyType,KeyType> >::isZero(key);
+        key=this->nextKey(key))
+            inds[key.first]=inds[key.second]='A';
+    return inds.getKeys(iter);
+}
+

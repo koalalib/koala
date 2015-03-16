@@ -12,13 +12,6 @@
 namespace Koala
 {
 
-	/*
-	 * Set< Element >
-	 *     Zbiór realizujący podstawowe operacje teoriomnogościowe. Elementy po-
-	 * winny posiadać operatory ==, != i < (porządek liniowy).
-	 */
-
-	// wypisywanie zbioru do strumienia dziala dla typu Element obslugujacego wypisywanie przez <<
 	template< typename Element > std::ostream &operator<<( std::ostream &, const Set< Element > & );
 
 	/** \brief Set.
@@ -30,9 +23,9 @@ namespace Koala
 	 *  - The one working on the STL vector. This option is turned on if constant KOALA_SET_ON_VECTOR is defined.
 	 *  - The one working on hash sets is turned on if constant KOALA_SET_ON_HASHSET is defined.
 	 *
-	 *  In all those cases the interface remains the same WEN: no wlasnie nie bardzo, chocby dlatego, ze
-	    jeden z nich dziedziczy caly std::set, a inne nie
-	    and sets are expected to behave in the same way. The difference may occur if the order of the elements. That is why the methods searching through the elements returns elements in a different order. Also the complexity of some operations may vary. \n
+	 *  In all those cases the interface remains similar. 
+	 *  Notice that some differences may be implied by the fact that Set_Set inherits whole STL Set.
+	 *  and sets are expected to behave in the same way. The difference may occur if the order of the elements. That is why the methods searching through the elements returns elements in a different order. Also the complexity of some operations may vary. \n
 	 *
 	 *  The operator<< of output stream is overloaded, hence the sets can be easily printed.
 	 *  \ingroup cont
@@ -40,11 +33,8 @@ namespace Koala
 	template< typename Element > class Set: public std::set< Element >, public SetElemForbidValue< Element >
 	{
 	public:
-		// typ elementu zbioru
 		typedef Element ElemType; /**< \brief Type of set element.*/
 
-		// Konstruktory
-		// Konstruktor tworzący zbiór pusty.
 		/** \brief Empty constructor
 		 *
 		 *  The method create an empty set.
@@ -52,7 +42,7 @@ namespace Koala
 		 *  [See example](examples/set/setConstructors.html).
 		 */
 		Set(): std::set< Element >() { }
-		// Konstruktory tworzące zbiór składający się z podanych elementów.
+
 		/** \brief Copy constructor.
 		 *
 		 *  Creates a new set with a copy of the set \a s.
@@ -83,7 +73,7 @@ namespace Koala
 		 *
 		 *  Creates a new set and inserts the elements between the iterators \a b and \a e
 		 *  \param b the iterator pointing to the first element of the copied container.
-		 *  \param e the iterator pointing to the WEN: nie last (za-last) last element of the copied container.
+		 *  \param e the iterator pointing to past-the-last element of the copied container.
 		 *
 		 *  [See example](examples/set/setConstructors.html).
 		 */
@@ -97,7 +87,6 @@ namespace Koala
 		 */
 		Set( const std::vector< Element > &v ): std::set< Element >( v.begin(),v.end() ) { }
 
-		// Funkcje zastępujące zawartość zbioru podanym zakresem elementów.
 		/** \brief Assign set content.
 		 *
 		 *  The method assigns new content (from the table) to the set.
@@ -111,13 +100,12 @@ namespace Koala
 		 *
 		 *  The method assigns new content (from the container) to the set.
 		 *  \param b the iterator pointing to the first copied element .
-		 *  \param e the iterator pointing to the WEN: nie last (za-last) last copied element.
+		 *  \param e the iterator pointing to past-the-last copied element.
 		 *
 		 *  [See example](examples/set/setAssign.html).
 		 */
 		template< class Iter > void assign( Iter b, Iter e );
 
-		// Operator przypisania.
 		/** \brief Copy content of set.
 		 *
 		 *  Overloaded operator= assigns the element \a e as the single element of the set.
@@ -128,8 +116,6 @@ namespace Koala
 		 */
 		Set< Element > &operator=( const Element &e );
 
-		// Operator przypisania zbioru o elementach innego typu (dla elementow zachodza rzutowania wartosci
-		// typow T-> Element)
 		/** \brief Copy content of set.
 		 *
 		 *  Overloaded operator= copies the content of \a s to the set.
@@ -141,8 +127,6 @@ namespace Koala
 		template <class T>
 		Set< Element > &operator=( const Set<T> &s );
 
-		// Informacje odnośnie zbioru.
-		// czy zbior jest pusty
 		/** \brief Test if empty.
 		 *
 		 *  The overloaded operator!, tests if the set is empty.
@@ -152,7 +136,6 @@ namespace Koala
 		 */
 		bool operator!() const { return this->size() == 0; }
 
-		// Informacja o tym, czy jest podzbiorem podanego zbioru.
 		/** \brief Test if subset.
 		 *
 		 *  The method test if the set is a subset of \a s.
@@ -162,7 +145,6 @@ namespace Koala
 		 */
 		bool subsetOf( const Set< Element > &s ) const;
 
-		// Informacja o tym, czy jest nadzbiorem podanego zbioru.
 		/** \brief Test if superset.
 		 *
 		 *  The method test if the set is a superset of \a s.
@@ -172,8 +154,6 @@ namespace Koala
 		 */
 		bool supersetOf( const Set< Element > &s ) const { return s.subsetOf( *this ); }
 
-		// Operacje na pojedynczych elementach zbioru.
-		// Dodajemy element do zbioru, zwracając status operacji.
 		/** \brief Add element.
 		 *
 		 *  The method adds a new element to the set, however set does not allow for duplicate values
@@ -196,7 +176,6 @@ namespace Koala
 		 */
 		Set< Element > &operator+=( const Element &e );
 
-		// Usuwamy element ze zbioru, zwracając status operacji.
 		/** \brief Delete element.
 		 *
 		 *  The method deletes the element \a e from the set.
@@ -219,7 +198,6 @@ namespace Koala
 		 */
 		Set< Element > &operator-=( const Element &e );
 
-		// Sprawdzamy, czy element należy do zbioru.
 		/** \brief Test if element.
 		 *
 		 *  The methods tests if the element \a e belongs to the set.
@@ -230,8 +208,6 @@ namespace Koala
 		 */
 		bool isElement( const Element &e ) const { return this->find( e ) != this->end(); }
 
-		// Operacje na całych zbiorach.
-		// Suma zbiorów.
 		/** \brief Sum of sets.
 		 *
 		 *  The methods adds the set \a s to the set.
@@ -241,8 +217,8 @@ namespace Koala
 		 *  [See example](examples/set/setOperations.html).
 		 */
 		Set< Element > &operator+=( const Set< Element > &s );
-		// Część wspólna zbiorów.
-		/** \brief Intersection of sets.
+
+        /** \brief Intersection of sets.
 		 *
 		 *  The method calculates the intersection of the current set and the set \a s.
 		 *  All the element that are not in both sets are deleted from the current set.
@@ -252,8 +228,8 @@ namespace Koala
 		 *  [See example](examples/set/setOperations.html).
 		 */
 		Set< Element > &operator*=( const Set< Element > & );
-		// Różnica zbiorów.
-		/** \brief Set difference.
+
+        /** \brief Set difference.
 		 *
 		 *  The method calculates the difference of the current set and the set \a s.
 		 *  All the element that are in both sets are deleted from the current set.
@@ -264,8 +240,8 @@ namespace Koala
 		 */
 		Set< Element > &operator-=( const Set< Element > &s );
 
-		// Różnica symetryczna zbiorów.
-		/** \brief Symmetric difference.
+
+        /** \brief Symmetric difference.
 		 *
 		 *  The method calculates the symmetric difference of the current set and \a s.
 		 *  The result is kept it the current set.
@@ -276,8 +252,6 @@ namespace Koala
 		 */
 		Set< Element > &operator^=( const Set< Element > &s ) { return *this = *this ^ s; }
 
-		// Podzbiór elementów/usunięcie elementów spełniających/nie spełniających podanego
-		// predykatu.
 		/** \brief Get subset.
 		 *
 		 *  The method returns the set satisfying the predicate \a fun.
@@ -297,7 +271,6 @@ namespace Koala
 		 */
 		template< class Funktor > void truncate( Funktor fun ) { *this = subset( fun ); }
 
-		// zapis elementow zbioru na podany iterator
 		/** \brief Get elements.
 		 *
 		 *  The method writes all the elements to the container represented by the iterator \a out.
@@ -305,7 +278,6 @@ namespace Koala
 		 *  \return the number of elements in the set and in the container \a out. */
 		template< class Iter > int getElements( Iter out ) const;
 
-		// Metody iterujace po kolejnych elementach zbioru. Brak kolejnego elementu lub lista pusta - wartosc badValue()
 		/** \brief Get first.
 		 *
 		 *
@@ -320,34 +292,31 @@ namespace Koala
 		 * \return the last element of the set. */
 		Element last() const;
 
-		// zwracaja 0 gdy nie ma kolejnego elementu. Mozna podac 0, wowczas zwracaja element pierwszy/ostatni
 		/** \brief Get next.
-		 *  WEN: no wlasnie nie koniecznie 0 (np. zbiory liczbowe), tylko SetElemForbidValue::badValue(). Nizej to samo
-		 *  The method gets the next after \a a element of the set. If there is no element after \a a, 0 is returned.
-		 *  \param a the reference element. Also 0 is possible then the first element is returned.
-		 *  \return the next element of the set.  If there is no element after \a a, 0 is returned.
-		 *    If \a a == 0, the first element is returned.
+		 *
+		 *  The method gets the next after \a a element of the set. If there is no element after \a a,  SetElemForbidValue::badValue() is returned.
+		 *  \param a the reference element. Also SetElemForbidValue::badValue() is possible then the first element is returned.
+		 *  \return the next element of the set.  If there is no element after \a a, SetElemForbidValue::badValue() is returned.
+		 *    If \a a ==  SetElemForbidValue::badValue(), the first element is returned.
 		 *
 		 *  [See example](examples/set/setIterations.html)
 		 */
 		Element next( const Element &a ) const;
 
-
-		// zwracaja 0 gdy nie ma kolejnego elementu. Mozna podac 0, wowczas zwracaja element pierwszy/ostatni
 		/** \brief Get previous.
 		 *
-		 *  The method gets the prior to \a a element of the set. If there is no element before \a a, 0 is returned.
+		 *  The method gets the prior to \a a element of the set. If there is no element before \a a,  SetElemForbidValue::badValue() is returned.
 		 *  \param a the reference element. Also 0 is possible then the last element is returned.
-		 *  \return the previous element of the set.  If there is no element before \a a, 0 is returned.
-		 *    If \a a == 0, the last element is returned.
+		 *  \return the previous element of the set.  If there is no element before \a a,  SetElemForbidValue::badValue() is returned.
+		 *    If \a a ==  SetElemForbidValue::badValue(), the last element is returned.
 		 *
 		 *  [See example](examples/set/setIterations.html)
 		 */
 		Element prev( const Element &a ) const;
 
 		/** \brief Get minimum.
-		 *  WEN: zbior ma byc niepusty, inaczej leci wyjatek ContExcOutpass, to samo nizej
-		 *  The method returns the minimum value element of the set.
+		 *
+		 *  The method returns the minimum value element of the set. If the set is empty exception ContExcOutpass is thrown.
 		 *  \return the minimum element of the set.		 */
 		Element min() const
 		{
@@ -357,7 +326,7 @@ namespace Koala
 
 		/** \brief Get maximum.
 		 *
-		 *  The method returns the maximum value element of the set.
+		 *  The method returns the maximum value element of the set. If the set is empty exception ContExcOutpass is thrown.
 		 *  \return the maximum element of the set.		 */
 		Element max() const
 		{

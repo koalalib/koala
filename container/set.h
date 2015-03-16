@@ -3,17 +3,13 @@
 
 /* set.h
  *
+ * Set class is an implementation of a mathematical set. It has all set-theoretic operations included. It is not too effective
+ * so we don't use it, but it is very convenient. There are three implementations of sets: based on STL's set, based on STL's
+ * vector and based on a hashtable. Constants KOALA_SET_ON_VECTOR/KOALA_SET_ON_HASHSET can be used to select desired
+ * implementation.
  */
 
-// Set jest szablonem matematycznego zbioru z dostepnymi operacjami mnogosciowymi.
-//Z zalozenia nie jest zbyt efektywny, ale wygodny (przeznaczony dla uzytkownika), dlatego unikamy
-//jego stosowania we wlasnych procedurach
-//Sa trzy implementacje:
-//dziedziczaca publicznie stlowy set (domyslna), zawierajca vector (z wartosciami uporzadkowanymi)
-// oraz bazujaca na koalowej tablicy haszujacej
-//Wersje niedomyslne wlacza zdefiniowanie stalej czasu kompilacji KOALA_SET_ON_VECTOR lub KOALA_SET_ON_HASHSET
-
-// TODO: przebadac obie implementacje pod katem efektywnosci np. niepotrzebne kopiowanie kontenerow
+// TODO: test effectiveness
 
 #include <limits>
 
@@ -22,8 +18,6 @@
 
 namespace Koala
 {
-	// Pierwotnie Set dzialal tylko dla typow wskaznikowych
-    // Teraz mozna go uzywac takze z numerycznymi i innymi, jesli dopisze sie odpowiednia specjalizacje tej klasy
     /** \brief Auxiliary structure for Set.
      *
 	 *  The class is inherited by Set. It determines the forbidden values for elements (of type \a Element) of the set. Such values are used by algorithms in class Set.
@@ -32,7 +26,6 @@ namespace Koala
      */
     template< class Element > struct SetElemForbidValue
     {
-        // wartosc, ktora nie moze byc uzywana jako element zbioru - na uzytek metod next,prev,first,last w Set
 		/** \brief Forbidden value of \a Element type.
 		 *
 		 *  \return the value of forbidden element in type \a Element. */
@@ -47,7 +40,7 @@ namespace Koala
 
     template< class Element > struct SetElemForbidValue< Element * >
     {
-        // wartosc, ktora nie moze byc uzywana jako element zbioru - na uzytek metod next,prev,first,last w Set
+        // the value that can't be used as an element of a set
         static Element *badValue() { return 0; }
         static bool isBad( Element *arg ) { return arg == badValue(); }
     };
@@ -105,7 +98,6 @@ namespace Koala
 {
 
 	template< class Element > class SetInserter;
-	//Iterator wstawiajacy elementy do podanego przez adres zewnetrznego zbioru
 	/** \brief Set output iterator.
 	 *
 	 * The \wikipath{Output_iterator,output iterator} with ability to insert elements to set  given by reference.
@@ -122,18 +114,17 @@ namespace Koala
 
 	public:
 		typedef Set< Element > container_type;/**<\brief Type of container.*/
-		/**\brief Constructor.*/
+		/** \brief Constructor.*/
 		SetInserter( Set< Element > &x ): container( &x ) { }
-		/**\brief Assignment operator.*/
+		/** \brief Assignment operator.*/
 		SetInserter< Set< Element > > &operator= ( const Element &value );
-		/**\brief Dereference operator*/
+		/** \brief Dereference operator*/
 		SetInserter< Set< Element > > &operator*() { return *this; }
-		/**\brief Increment operator*/
+		/** \brief Increment operator*/
 		SetInserter< Set< Element > > &operator++() { return *this; }
 		SetInserter< Set<Element> > operator++( int ) { return *this; }
 	};
 
-	// funkcja tworzaca interator wstawiajacy do podanego zbioru
 	/** \brief Generating function for SetInserter.
 	 *
 	 *  The  \wikipath{Generating_function,generating function} for set  \wikipath{Output_iterator,output iterator}.
@@ -141,8 +132,6 @@ namespace Koala
 	template< class Element > SetInserter< Set< Element > > setInserter( Set< Element > &x )
 		{ return SetInserter< Set< Element > >( x ); }
 
-	// wylicza obraz zbioru w podanym przeksztalceniu
-	// niestety sama nie zajdzie dedukcja typu wyniku przy wywolaniu ( trzeba np. imageSet<double>(iset,kwadrat);)
 	/** \brief Image of set
 	 *
 	 * The method generate the image given by functor \a f of the set \a arg. The function is unable to guess the type of returned value so calls like <tt>imageSet<double>(iset,kwadrat);</tt> are obligatory.
@@ -159,8 +148,8 @@ namespace Koala
 	 */
 	template< class ValType, class ArgType, class Funktor >
 		Set< ValType > imageSet( const Set< ArgType > &arg, Funktor f );
-	// wylicza przeciwobraz zbioru w podanym przeksztalceniu i danej dziedzinie
-	/** \brief Preimage
+
+    /** \brief Preimage
 	 *
 	 * The method gets the preimage of a given set \a domain and a functor \a f.
 	 * \tparam ValType the type of function output elements.
@@ -178,7 +167,6 @@ namespace Koala
 	template< class ValType, class ArgType, class Funktor >
 		Set< ArgType > preimageSet( const Set< ValType > &arg, const Set< ArgType > &domain, Funktor f );
 
-// hashset ma implementacje operatorow inne niz te stl-owe
 #include "set.hpp"
 }
 

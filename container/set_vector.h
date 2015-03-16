@@ -13,96 +13,91 @@ namespace Koala
 {
 
 	/* Set< Element >
-	*     Zbiór realizujący podstawowe operacje teoriomnogościowe. Elementy po-
-	* winny posiadać operatory ==, != i < (porządek liniowy).
+	*     A mathematical set with basic set-theoretic operations builtin. Elements should have builtin operators ==, != and <
+    * (linear order).
 	*/
 
-	// wypisywanie zbioru do strumienia dziala dla typu Element obslugujacego wypisywanie przez <<
+	// Outputs elements of a set to a stream provided that elements of a set have << builtin.
 	template< typename Element > std::ostream& operator<<( std::ostream &, const Set< Element > & );
 
 	template< typename Element > class Set: protected std::vector< Element >, public SetElemForbidValue< Element >
 	{
 	public:
-		typedef Element ElemType; // typ elementu zbioru
+		typedef Element ElemType; // the type of elements
 
-		// Set udostepnia stale STL-owe iteratory do poruszania sie po elementach zbioru
+		// Set provides STL-like iterators that allow us to iterate over elements
 		typedef typename std::vector< Element >::const_iterator const_iterator;
 		const_iterator begin() const { return std::vector< Element >::begin(); }
 		const_iterator end() const { return std::vector< Element >::end(); }
 
-		// Konstruktory
-		// Konstruktor tworzący zbiór pusty.
+		// Constructors
+		// Constructor that creates the empty set.
 		Set(): std::vector< Element >() { }
-		// Konstruktory tworzące zbiór składający się z podanych elementów.
+		// Constructors that create sets containing given elements ...
 		Set( const Set< Element > &s ): std::vector< Element >( s ) { }
 		Set( const std::set< Element > &s ): std::vector< Element >( s.begin(),s.end() ) { }
-		// na podstawie tablicy o zadanym rozmiarze
 		Set( const Element *t, unsigned s ) { this->assign( t,t + s ); }
 		template< class Iter > Set( Iter b, Iter e ) { this->assign( b,e ); }
 		Set( const std::vector< Element > &v ) { this->assign( v.begin(),v.end() ); }
 
-		// Funkcje zastępujące zawartość zbioru podanym zakresem elementów.
+		// Functions that replace elements of a set by given range of elements
 		void assign( const Element *t, unsigned s ) { this->assign( t,t+s ); }
 		template< class Iter > void assign( Iter, Iter );
 
-		// dodanie do zbioru elementow z podanego zakresu
+		// Inserts a range of elements into a set
 		template< class Iter > void insert( Iter, Iter );
 
-		// Operator przypisania.
+		// Copy operator
 		Set< Element > &operator=( const Element & );
 
-		// Operator przypisania zbioru o elementach innego typu (dla elementow zachodza rzutowania wartosci
-		// typow T-> Element)
+		// Copy operator that works with a set containing elements of a different type T (castable to Element)
 		template <class T>
 		Set< Element > &operator=( const Set<T> &s );
 
-
-		// Informacje odnośnie zbioru.
-		// czy zbior jest pusty
+		// Informations about a set
+		// is empty?
 		bool operator!() const { return this->size() == 0; }
 		bool empty() const { return this->size() == 0; }
 
 		unsigned size() const { return std::vector< Element >::size(); }
 		void clear() { return std::vector< Element >::clear(); }
 
-		// Informacja o tym, czy jest podzbiorem podanego zbioru.
+		// is a subset of a given set?
 		bool subsetOf( const Set< Element > & ) const;
-		// Informacja o tym, czy jest nadzbiorem podanego zbioru.
+		// is a superset of a given set?
 		bool supersetOf( const Set< Element > &s ) const { return s.subsetOf( *this ); }
 
-		// Operacje na pojedynczych elementach zbioru.
-		// Dodajemy element do zbioru, zwracając status operacji.
+		// Operations concerning single elements
+		// Add element, return status
 		bool add( const Element & );
 		Set< Element > &operator+=( const Element & );
-		// Usuwamy element ze zbioru, zwracając status operacji.
+		// Delete element, return status
 		bool del( const Element & );
 		Set< Element > &operator-=( const Element & );
-		// Sprawdzamy, czy element należy do zbioru.
+		// is it an element of a set?
 		bool isElement( const Element & ) const;
 
-		// Operacje na całych zbiorach.
-		// Suma zbiorów.
+		// Operations concerning the whole set
+		// Union
 		Set< Element > &operator+=( const Set< Element > & );
-		// Część wspólna zbiorów.
+		// Intersection
 		Set< Element > &operator*=( const Set< Element > & );
-		// Różnica zbiorów.
+		// Difference
 		Set< Element > &operator-=( const Set< Element > & );
-		// Różnica symetryczna zbiorów.
+		// Symmetric difference
 		Set< Element > &operator^=( const Set< Element > &s ) { return *this = *this ^ s; }
-		// Podzbiór elementów/usunięcie elementów spełniających/nie spełniających podanego
-		// predykatu.
+		// The subset of elements that satisfy a given predicate
 		template< class Funktor > Set< Element > subset( Funktor ) const;
 		template< class Funktor > void truncate( Funktor fun ) { *this = subset( fun ); }
 
-		// zapis elementow zbioru na podany iterator
+		// Outputs elements to a given iterator
 		template< class Iter > int getElements( Iter ) const;
 
-		// Metody iterujace po kolejnych elementach zbioru. Brak kolejnego elementu lub lista pusta - wartosc badValue()
-		// - obie zwracaja 0 dla zbioru pustego
+		// The first and the last element (badValue() if empty)
 		Element first() const;
 		Element last() const;
 
-		// zwracaja 0 gdy nie ma kolejnego elementu. Mozna podac 0, wowczas zwracaja element pierwszy/ostatni
+		// Returns 0 if there is no next/previous element. If given 0, returns first/last element.
 		Element next( const Element & ) const;
 		Element prev( const Element & ) const;
 
