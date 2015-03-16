@@ -1,14 +1,7 @@
 #ifndef KOALA_SUBGRAPH_H
 #define KOALA_SUBGRAPH_H
 
-//Widoki na graf pozwalaja operowac na czesci danego grafu lub na jego przeksztalconej formie
-//jak na zwyklym grafie stalym (const) bez wykonywania jego kopii. Metody widoku odwoluja sie
-//do grafu macierzystego i dzialaja na jego wierz/kraw. Mozna tworzych hierarchicznie widoki
-//do widokow itd.
-// Widoki dzialaja poprawnie, o ile ich struktury nadrzedne nadal zyja.
-// Smierc ktorejs ze struktur nadrzednych powoduje odlaczenie od niej wszystkich dzieci,
-// niemniej nizsze hierarchiczne powiazania utworzone przez te obiekty pozostaja
-// (np. ich ponowne podlaczenie do innego grafu sprawi, ze nizej podpiete widoki beda dzialac).
+// Views that allow us to use a part of graph without copying it.
 
 #include "graph.h"
 
@@ -16,9 +9,6 @@ namespace Koala
 {
 
 
-	/* SubGraph
-	 *
-	 */
 	template< class Graph, class VChooser, class EChooser > class Subgraph;
 
 
@@ -41,7 +31,6 @@ namespace Koala
             }
         };
 
-        // sprywatyzowano, podobnie w dalszych widokach
         template< class GraphType > struct GraphInternalTypes;
 
         template< class Graph, class VChooser, class EChooser >
@@ -56,7 +45,7 @@ namespace Koala
             typedef typename Graph::GraphSettings GraphSettings;
         };
 
-        // widok nie moze tworzyc/usuwac macierzy sasiedztwa grafu podstawowego, ale musi miec metody, by kompilowaly sie kody algorytmow grafowych dla wejsciowego widoku
+        // view can't create/delete adjacency matrix but must have associated with it methods
         struct ViewAdjMatrixTool {
 
             bool makeAdjMatrix()
@@ -68,8 +57,6 @@ namespace Koala
 
 	}
 
-	// Klasa podgrafu struktury grafowej typu Graph, do podgrafu wybierane sa wierzcholki spelniajace
-	// chooser vchoose i krawedzie spelniajace echoose z obydwoma koncami spelniajacymi vchoose
 	/** \brief Subgraph (view).
 	 *
 	 *  Class allows to isolate and use only part of the graph without allocating new graph. The original graph is called and there is no need to create a copy.
@@ -82,7 +69,6 @@ namespace Koala
 		public SubgraphBase, public ConstGraphMethods< Subgraph< Graph, VChooser, EChooser> >, public Privates::ViewAdjMatrixTool
 	{
 	public:
-		// choosery predykatow definiujacych podgraf
 		/** \brief Chooser object for vertices.
 		 *
 		 *  The object function defines the vertices in graph. And only vertices that satisfy the chooser are visible in the subgraph.
@@ -93,7 +79,6 @@ namespace Koala
 		 *  The object function defines the edges in graph. And only edges that satisfy the chooser are visible in the subgraph. For more details about choosers see \ref DMchooser and \wikipath{Chooser}.*/
 		mutable EChooser echoose;
 
-		// te typy sa takie same, jak w grafie nadrzednym
 		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser> >::Vertex Vertex; /**< \brief Vertex of graph.*/
 		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::PVertex PVertex; /**< \brief Pointer to vertex of graph. Often used as vertex identifier.*/
 		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::Edge Edge; /**< \brief Edge of graph.*/
@@ -102,20 +87,10 @@ namespace Koala
 		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser > >::EdgeInfoType EdgeInfoType; /**< \brief Edge info type.*/
 		typedef typename Privates::GraphInternalTypes< Subgraph< Graph, VChooser, EChooser> >::GraphSettings GraphSettings; /**< \brief Graph settings taken from parent graph.*/
 
-		// typ tej struktury
 		typedef Subgraph< Graph,VChooser,EChooser > GraphType; /**< \brief The current graph type.*/
-		// typ najwyzszego wierzcholka hierarchii
 		typedef typename Graph::RootGrType RootGrType; /**< \brief Root (initial) graph type.*/
-		// typ grafu nadrzednego
 		typedef Graph ParentGrType; /**< \brief Superior (parent) graph type.*/
 
-		// Konstruktory
-		// tworzy podgraf nie podlaczony do zadnego grafu
-		// metody getVertNo() i getEdgeNo(type) dla podgrafow sa powolne - wymagaja przejzenia calej
-		// listy wierz/kraw. Wprowadzono wewnetrzne liczniki - mozemy zamrozic te wielkosci (first - licznik
-        // wierzcholkow, second - liczniki krawedzi roznych typow). Od zamrozenia po pierwszym wyliczeniu
-        // wartosci te sa zapamietane i uzywane ponownie. Jest to oczywiscie niebezpieczne, stosujemy
-        // gdy mamy pewnosc, ze liczby te nie zmienily sie.
 		/** \brief Constructor
 		 *
 		 *  New subgraph is created without any connection to a graph.	 
@@ -125,7 +100,6 @@ namespace Koala
 		 *    and frees them. Counters may be recalculated or unfrozen any time user decides so.*/
 		Subgraph(std::pair< bool,bool > fr= std::make_pair(false,false)) : counters(fr)
 			{ }
-		// tworzy podgraf danego grafu i ustawia wartosci obu chooserow
 		/** \brief Constructor
 		 *
 		 *  New subgraph of \a g is created. The method assigns the attributes \a vchoose and \a echoose that determine the vertices and edges of subgraph. 
@@ -139,7 +113,6 @@ namespace Koala
 		Subgraph( const Graph &g, std::pair< VChooser,EChooser > chs = std::make_pair( VChooser(),EChooser() ),
                 std::pair< bool,bool > fr= std::make_pair(false,false));
 
-		// ustawia wartosci obu chooserow, tworzy podgraf niepodlaczony
 		/** \brief Constructor
 		 *
 		 *  New unconnected subgraph is created. The method assigns the attributes \a vchoose and \a echoose that determine the vertices and edges of subgraph.
@@ -151,7 +124,6 @@ namespace Koala
 		 *    and frees them. Counters may be recalculated or unfrozen any time user decides so.*/
 		Subgraph( std::pair< VChooser,EChooser >, std::pair< bool,bool > fr= std::make_pair(false,false) );
 
-		// ustawienie wartosci chooserow
 		/** \brief Set choose.
 		 * 
 		 *  The method assigns the attributes \a vchoose and \a echoose which determine the vertices and edges of subgraph. 
@@ -160,14 +132,12 @@ namespace Koala
 		 *  \param chs standard pair of \wikipath{chooser,choosers} first of which chooses vertices second edges.*/
 		void setChoose( const std::pair< VChooser,EChooser > &chs );
 
-		// dopuszczalne typy krawedzi
 		/** \brief Check allowed edge types.
 		 *
 		 *  \returns allowed types (EdgeType) of edges in the root graph (concerning graph type). */
 		 static EdgeType allowedEdgeTypes()
 			{ return ParentGrType::allowedEdgeTypes(); }
 
-		// rozlacza sie od rodzica (jesli taki istnial) i podlacza do podanego grafu
 		/** \brief Plug to \a g
 		 * 
 		 * The method plugs the current graph as a child to \a g. If view was plugged it is unplugged thirst. 
@@ -175,27 +145,23 @@ namespace Koala
 		 * \param g new parent graph.*/
 		void plug( const Graph &g )
 			{ counters.reset(true,true); SubgraphBase::link( &g ); }
-		// sprawia, ze podgraf staje sie niepodlaczony do zadnego rodzica
 		/** \brief Unplug graph.
 		 *
 		 *  The method unplugs the current view (subgraph) from its parent.
 		 *  \return true if the parent existed, false otherwise.  */
 		bool unplug()
 			{ return SubgraphBase::unlink(); }
-		// adres najwyzszej struktury hierarchii lub NULL w razie braku
 		/** \brief Get root graph.
 		 *
 		 *  The method tests if the hierarchy of views is plugged and returns the root graph.
 		 *  \return the pointer to the root if it existed or NULL otherwise. */
 		const RootGrType *getRootPtr() const
 			{ return parent ? ((const ParentGrType*)parent)->getRootPtr() : NULL; }
-		// adres grafu, do ktorego obiekt jest bezposrednio podlaczony, lub NULL w razie braku
 		/** \brief Get parent graph.
 		 *
 		 *  \return the pointer to the parent if it existed or NULL otherwise. */
 		const ParentGrType *getParentPtr() const
 			{ return (const ParentGrType*)parent; }
-		// j.w. ale referencje
 		/** \brief Get root graph.
 		 *
 		 *  The method tests if the graph has any superior graph if true gets the top graph in hierarchy of graphs.
@@ -208,9 +174,6 @@ namespace Koala
 		 *  \return the reference to the parent if it existed, otherwise exception is thrown. */
 		const ParentGrType &up() const;
 
-		// Test przynaleznosci wierzcholka z rodzica do podgrafu. Dla NULL zawsze prawda.
-		// w przeciwnym razie sprawdzany jest predykat vchoose. Flaga true wymusza tez analogiczne sprawdzanie we
-		// wszystkich strukturach az do korzenia
 		/** \brief Check vertex presence.
 		 *  
 		 *  The method tests if vertex \a vert belongs to the current subgraph i.e. 
@@ -222,7 +185,6 @@ namespace Koala
 		 *  \return true if vertex belongs to subgraph, false otherwise.*/
 		bool good( PVertex vert, bool deep = false ) const;
 
-		// j.w. ale dla krawedzi - sprawdzany jest predykat echoose i vchoose dla obu koncow
 		/** \brief Check edge presence.
 		 *  
 		 *  The method tests if the edge belongs to the current subgraph i.e. if it satisfy the \a echoose of current subgraph
@@ -233,9 +195,7 @@ namespace Koala
 		 *  \return true if edge belongs to subgraph, false otherwise.*/
 		bool good( PEdge edge, bool deep = false ) const;
 
-		// metody dla ConstGraphMethods
 		//------------- Methods sent to ConstGraphMethods --------------------------------------
-        // do konca tej klasy - ew. te same komentarze, co w grconst.h przy tych samych metodach
 		/** \brief Get number of vertices.
 		 *
 		 *  Gets the order of the graph.
@@ -398,7 +358,6 @@ namespace Koala
 			{ return up().getEdgeDir( edge,v ); }
 
 		//-------------End of methods from ConstGraphMethods------------------------
-        //zamroz liczniki wierzcholkow, krawedzi lub oba. Dziala od ich nastepnego wyliczenia
 		/** \brief Freeze or unfreeze vertex and edge counter.
 		 *
 		 *  The method sets flags responsible for freezing counters of vertices and edges (there is a counter for each EdgeType). 
@@ -422,7 +381,6 @@ namespace Koala
             return std::pair<bool,bool>(counters.freezev, counters.freezee);
         }
 
-        //uniewaznia wybrane liczniki - trzeba je wyliczyc ponownie
 		/** \brief Reset counters.
 		 *
 		 *  The methods resets (invalidate) counters. Their values are set and frozen together with next recalculation.
@@ -462,7 +420,6 @@ namespace Koala
 
 	};
 
-	// zwraca podgraf danego grafu
 	/** \brief Subgraph generating function.
 	 *
 	 *  For a given graph \a g and a pair of choosers (vertex chooser and edge chooser) a view on graph is generated and returned.
@@ -492,9 +449,6 @@ namespace Koala
 
         }
 
-		/* UndirView
-		 * widok na graf typu Graph, przy czym wszystkie krawedzie rozne od petli sa widziane jako nieskierowane
-		 */
 	/** \brief Undirected view.
 	 *
 	 *  The class allows to create the view on graph in which all the edges (except loops) are undirected. 
@@ -503,7 +457,6 @@ namespace Koala
 	template< class Graph > class UndirView: public SubgraphBase, public ConstGraphMethods< UndirView< Graph> >, public Privates::ViewAdjMatrixTool
 	{
 	public:
-		// ten sam sens typow, co dla podgrafu
 		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::Vertex Vertex; /**< \brief Vertex of graph.*/
 		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::PVertex PVertex;/**< \brief Pointer to vertex of graph. Often used as vertex identifier.*/
 		typedef typename Privates::GraphInternalTypes< UndirView< Graph > >::Edge Edge;/**< \brief Edge of graph.*/
@@ -516,8 +469,6 @@ namespace Koala
 		typedef typename Graph::RootGrType RootGrType;  /**< \brief Root (initial) graph type.*/
 		typedef Graph ParentGrType; /**< \brief Superior (parent) graph type.*/
 
-		// Konstruktory
-		// tworzy widok niepodlaczony do zadnej struktury
 		/** \brief Constructor.
 		 *
 		 *  Undirected view on graph is created but it isn't connected to any graph.*/
@@ -558,14 +509,12 @@ namespace Koala
 		 *  The method gets the top graph in hierarchy of views.
 		 *  \return the reference to the root if it existed, otherwise exception is thrown. */
 		const RootGrType &root() const;
-		// rozlacza obiekt od jego rodzica (jesli taki istnial) i podlacza do podanego grafu
 		/** \brief Plug to \a g
 		 *
 		 *  The method plugs the current view as a child of \a g. If the view was plugged to another view it is unplugged first.
 		 *  \param g the new parent.*/
 		void plug( const Graph &g )
 			{ SubgraphBase::link( &g ); }
-		// sprawia, ze podgraf staje sie niepodlaczony do zadnego rodzica
 		/** \brief Unplug graph.
 		 *
 		 *  The method unplug the current view from the parent.
@@ -573,7 +522,6 @@ namespace Koala
 		bool unplug()
 			{ return SubgraphBase::unlink(); }
 
-		// do wspolpracy z podgrafami
 		/** \brief Check vertex presence.
 		 *
 		 *  The method tests if the vertex belongs to the current view.
@@ -593,7 +541,6 @@ namespace Koala
 		bool good( PEdge edge, bool deep = false ) const
 			{ if (deep) return up().good( edge,true ); else return true; }
 
-		// na uzytek ConstGraphMethods
 		//------------- Methods sent to ConstGraphMethods --------------------------------------
 		/** \brief Get number of vertices.
 		 *
@@ -745,7 +692,6 @@ namespace Koala
 		 *  \returns direction of edge \a edge. */
 		EdgeDirection getEdgeDir( PEdge edge, PVertex v ) const;
 
-       // widok przenosi pytanie o macierz sasiedztwa do korzenia, w razie niepodlaczenia: false
 		/** \brief Check the existence of adjacency matrix.
 		*
 		*  The method tests whether there exists the adjacency matrix in the root graph.
@@ -766,7 +712,6 @@ namespace Koala
 			{ return ((mask & EdLoop) ? EdLoop : 0) | ((mask & EdUndir) ? (Directed | Undirected) : 0); }
 	};
 
-	// Tworzy widok dla podanego grafu
 	/** \brief Undirected view (UndirView) generating function.
 	 *
 	 *  For a given graph \a g a view in which all the edges are undirected is generated.
@@ -793,8 +738,6 @@ namespace Koala
 
 	}
 
-	// widok grafu typy Graph z odwroconymi wszystkimi krawedziami skierowanymi
-
 	/** \brief Reversed view.
 	 *
 	 *  The class allows to create the view on graph in which all the arc are reversed while undirected edges remain the same.
@@ -815,7 +758,6 @@ namespace Koala
 		typedef typename Graph::RootGrType RootGrType; /**< \brief Root (initial) graph type.*/
 		typedef Graph ParentGrType; /**< \brief Superior (parent) graph type.*/
 
-		// Konstruktory
 		/** \brief Constructor.
 		 *
 		 *  The reversed view is created but it is not connected to any graph.*/
@@ -854,14 +796,12 @@ namespace Koala
 		 *  The method tests if the view has any superior graph (root). If true it gets the top graph in hierarchy of views.
 		 *  \return the reference to the root if it existed, otherwise exception is thrown.*/
 		const RootGrType &root() const;
-		// rozlacza obiekt od jego rodzica (jesli taki istnial) i podlacza do podanego grafu
 		/** \brief Plug to \a g
 		 *
 		 * The method plugs the current view as a child of \a g. If the view was plugged to another view it is unplugged first.
 		 *  \param g the new parent.*/
 		void plug( const Graph &g )
 			{ SubgraphBase::link( &g ); }
-		// sprawia, ze podgraf staje sie niepodlaczony do zadnego rodzica
 		/** \brief Unplug graph.
 		 *
 		 *  The method unplugs the current view from the parent.
@@ -869,7 +809,6 @@ namespace Koala
 		bool unplug()
 			{ return SubgraphBase::unlink(); }
 
-		// do wspolpracy z podgrafami
 		/** \brief Check vertex presence.
 		 *
 		 *  The method tests if the vertex belongs to the current view. 
@@ -887,7 +826,6 @@ namespace Koala
 		 * \return true if edge belongs to view, false otherwise.*/
         bool good( PEdge edge, bool deep = false ) const
 			{ if (deep) return up().good( edge,true ); else return true; }
-		// na uzytek ConstGraphMethods
 		//------------- Methods sent to ConstGraphMethods --------------------------------------
        /** \brief Get number of vertices.
 		 *
@@ -938,7 +876,7 @@ namespace Koala
 		PEdge getEdgePrev( PEdge e, EdgeDirection mask = EdAll ) const
 			{ return up().getEdgePrev( e,(mask) ); }
 
-		//          nie usuwac komentarza - waham sie co do wersji
+		//          do not remove this:
 		//        { return up().getEdgeNext(v,e,transl(mask)); }
 		/* \brief Get next edge.
 		 *
@@ -952,7 +890,7 @@ namespace Koala
 		 PEdge getEdgeNext( PVertex v, PEdge e, EdgeDirection mask = EdAll ) const
 			{ return getNext( v,e,transl( mask ) ); }
 
-		//          nie usuwac komentarza - waham sie co do wersji
+		//          do not remove this:
 		//        { return up().getEdgePrev(v,e,transl(mask)); }
 		/* \brief Get previous edge.
 		 *
@@ -974,7 +912,7 @@ namespace Koala
 		int getEdgeNo( PVertex v, EdgeDirection mask = EdAll) const
 			{ return up().getEdgeNo( v,transl( mask ) ); }
 
-		//          nie usuwac komentarza - waham sie co do wersji
+		//          do not remove this:
 		//        { return up().getEdgeNext(v,u,e,transl(mask)); }
 		/* \brief Get next parallel edges.
 		 *
@@ -987,7 +925,7 @@ namespace Koala
 		 *  \returns the pointer to the next parallel edge or NULL if \a e is the last. */
 		PEdge getEdgeNext( PVertex v, PVertex u, PEdge e, EdgeDirection mask = EdAll ) const
 			{ return getNext( v,u,e,transl( mask ) ); }
-		//          nie usuwac komentarza - waham sie co do wersji
+		//          do not remove this:
 		//        { return up().getEdgePrev(v,u,e,transl(mask)); }
 		/* \brief Get previous parallel edges.
 		 *
@@ -1046,7 +984,7 @@ namespace Koala
 		 *  \returns direction of edge \a edge. */
 		EdgeDirection getEdgeDir( PEdge edge, PVertex v ) const;
 
-       // widok przenosi pytanie o macierz sasiedztwa do korzenia, w razie niepodlaczenia: false
+       // view transfers question about adjacency matrix to the root, false if not connected
 		/**\copydoc UndirView::hasAdjMatrix() */
 		inline bool hasAdjMatrix() const
         {
@@ -1067,7 +1005,6 @@ namespace Koala
 		PEdge getNext( PVertex vert1, PVertex vert2, PEdge edge, EdgeDirection direct ) const;
 	};
 
-	// tworzy widok do podanego grafu
 	/** \brief Reversed view (RevView) generating function.
 	 *
 	 *  For a given graph \a g a view in which all the arcs have opposite direction, is generated and returned.
@@ -1078,8 +1015,6 @@ namespace Koala
 		{ return RevView< Graph>( g ); }
 
 
-    // widok na podgraf bez krawedzi rownoleglych tj. po jednej krawedzi z kazdej klasy rownoleglosci
-    // - analogicznie, jak w metodzie findParals, ale w postaci widoku podgrafu
 	/** \brief Simple graph view.
 	 *
 	 *  View on graph that reduces all the parallel edges to single representative. In a result user gets a view of a simple graph. 
@@ -1146,7 +1081,6 @@ namespace Koala
                 refresh();
             }
 
-            //rodzaj wybranej relacji rownoleglosci
             /** \brief Get parallelism relation type.
 			 *
 			 * \return EdgeType mask that represents the type of parallelism. \wikipath{EdgeType}*/
@@ -1154,7 +1088,6 @@ namespace Koala
             {
                 return relType;
             }
-            // ponowne wyliczenie krawedzi podgrafu, ew. zmiana typu relacji rownoleglosci
 			/** \brief Reset edges.
 			 *
 			 *  The method recalculates edges of subgraph (view) with new EdgeType mask. \wikipath{EdgeType} 

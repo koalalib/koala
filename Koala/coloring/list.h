@@ -4,7 +4,7 @@
 /* ------------------------------------------------------------------------- *
  * list.h
  *
- * Kolorowanie listowe grafow
+ * List coloring of graphs.
  * ------------------------------------------------------------------------- */
 
 #include "../base/defs.h"
@@ -17,15 +17,11 @@
 namespace Koala {
 
 
-//: Uwaga! globalna! Wszedzie
-//kolory - liczby int , mapa kolorow - czesciowe (lub calkowite - one z reszta jest szczegolnym przypadkiem czesciowego) pokolorowanie.
-//Tzn. pokolorowane (na wej/wyj) sa te krawedzie, ktore sa kluczami w mapie, reszta nie.
-//Listy dopuszczalnych kolorow colLists: zaklada sie,ze na wejsciu przypisuja wszystkim vert/edge (poza petlami) niepuste podzbiory int
-//a poczatkowe pokolorowania czesciowe (oraz wynikowe rzecz jasna) tez respektuja te listy
-//Wejsciowe przedzialy iteratorow na krawedzie nie powinny zawierac petli ani powtorzen (ostatnie takze dla verts)
-//(precyzyjniej: powtorzenie zostanie zignorowane przy kolorowaniu, ale zawyzy wynik return funkcji, podobnie z elementami prekolorowanymi
-//   - nie przebarwia sie, ale beda zliczone do ret).
-
+// Warning!
+// Colors are ints, maps of colors are partial colorings, i.e. 
+// edges that are keys in the map are on input/output
+// Lists of colors are given for all vertices/edges (except loops) and are nonempty.
+// Input iterators should not contain loops and repeated parts.
 
 /** \brief Methods for list coloring of graphs (parameterized).
  *  \ingroup color */
@@ -139,8 +135,6 @@ public:
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int color(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
-	/*Probuje przedluzyc kolorowanie czesci grafu zawarte w mapie colors na wierzcholki z zakresu iteratorow beg - end,
-	zwraca liczbe elementow, ktorym nadano kolor (tj.nie pokolorowanych wstepnie) lub - 1, gdy to niemozliwe.*/
 	/** \brief List vertex coloring for lists length at most 2.
 	 *
 	 *  For all uncolored vertices from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
@@ -155,8 +149,6 @@ public:
 	template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
 	static int color2ElemLists(const Graph &graph, const ColLists &colLists, ColorMap &colors, VIter beg, VIter end);
 
-	/*	Probuje przedluzyc kolorowanie czesci grafu zawarte w mapie colors na wszystkie niepokolorowane wierzcholki,
-	zwraca liczbe elementow, ktorym nadano kolor (tj.nie pokolorowanych wstepnie) lub - 1, gdy to niemozliwe.	*/
 	/**\brief List vertex coloring for list of length at most 2.
 	 *
 	 * For all uncolored vertices from \a graph, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
@@ -290,7 +282,6 @@ public:
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static bool color(const Graph &graph, const ColLists &colLists,
 			ColorMap &colors, typename Graph::PEdge edge);
-	//takie samo dzialanie, jakby z funktorem zwracajacym jakikolwiek element dozwolonego zbioru barw
 
 	//@return number of colored edges
 	/** \brief Choose colors.
@@ -359,7 +350,7 @@ public:
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int color(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
-    // algorytm Galvina, kazda lista musi miec >=Delta barw, dopuszczalne kraw. rownolegle
+    // Galvin's algorithm, every list must have >=Delta elements
 	/** \brief Color bipartite graph.
 	 *
 	 *  The method colors properly all the edges of bipartite \a graph. Colors are chosen from the lists of colors (of length >= Delta) given by \a colLists.
@@ -375,10 +366,6 @@ public:
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int colorBipartite(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
-	/*
-	Probuje przedluzyc kolorowanie czesci grafu zawarte w mapie colors na krawedzie z zakresu iteratorow beg - end,
-	zwraca liczbe elementow, ktorym nadano kolor (tj.nie pokolorowanych wstepnie) lub - 1, gdy to niemozliwe.
-	*/
 	/**\brief Extend coloring of edges with the list of colors of length at most 2.
 	 *
 	 *  For all uncolored edges from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
@@ -393,8 +380,6 @@ public:
 	template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
 	static int color2ElemLists(const Graph &graph, const ColLists &colLists, ColorMap &colors, VIter beg, VIter end);
 
-	/*	Probuje przedluzyc kolorowanie czesci grafu zawarte w mapie colors na wszystkie niepokolorowane krawedzie,
-	zwraca liczbe elementow, ktorym nadano kolor (tj.nie pokolorowanych wstepnie) lub - 1, gdy to niemozliwe.	*/
 	/** \brief Edge list coloring for lists of length at most 2.
 	 *
 	 *  The method colors  properly (concerning the partial coloring in map \a colors)  all the uncolored edges of \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].

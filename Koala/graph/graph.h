@@ -2,7 +2,7 @@
 #define KOALA_GRAPH_H
 
 /* graph.h
- * Moduł definujący graf oraz wszystkie podstawowe operacje wykonywane na grafach.
+ * Definition of a graph and all basic graph operations.
  */
 
 #include <algorithm>
@@ -83,12 +83,12 @@ namespace Koala
     };
 
 
-	// Domyslne wytyczne parametryzujace strukture i dzialanie metod klasy grafu
+	// Defaults
 	// TODO: przetestowac dzialanie grafu przy roznych ustawieniach
 
 	/* GrDefaultSettings
-	 * edAllow - maska okreslajaca dopuszczalne typy krawedzi
-	 * adjMatrixAllowed - czy jest dopuszczalne tworzenie macierzy sasiedztwa
+	 * edAllow - mask defining allowed types of edges
+	 * adjMatrixAllowed - should we create adjacency matrix
 	 */
 	/** \brief Default graph settings
 	 *
@@ -103,14 +103,10 @@ namespace Koala
 	template< EdgeType edAllow, bool adjMatrixAllowed > class GrDefaultSettings
 	{
 	public:
-		// maska okreslajaca dopuszczalne typy krawedzi
 		enum { EdAllow /**< \brief Mask determining allowed types of edges.*/ = edAllow };
-		// czy jest dopuszczalne tworzenie macierzy sasiedztwa
 		enum { AdjMatrixAllowed/**< \brief Flag decides if the adjacency matrix is generated.*/ = adjMatrixAllowed };
-        // ustawiona flaga wprowadza do wierzcholka i krawedzi metode getGraph() - wskaznik staly na macierzysty graf
 		enum { VertEdgeGraphPtr /**<\brief If the flag is set true, one can use method getGraph() which returns the pointer to the graph of origin.*/ = false };
 
-		// typ klasy tablicy asocjacyjnej uzywanej w metodach grafu przypisujacej wierzcholkom wartosci typu B
 		/** \brief Associative container type for vertices.
 		 *
 		 *  The type of association array for vertices is defined.
@@ -121,7 +117,7 @@ namespace Koala
 		public:
 			typedef AssocArray< A,B > Type;/**<\brief Defined type.*/
 
-			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+			// Exemplary usage. Other possibilities:
 
 			//  typedef AssocTable < BiDiHashMap<A,B> > Type;
 
@@ -131,8 +127,6 @@ namespace Koala
 		};
 
 
-		// typ klasy tablicy asocjacyjnej uzywanej w metodach grafu przypisujacej wierzcholkom innego grafu (np.
-		// innego typu) wartosci typu B
 		/** \brief Associative container type for vertices of other graphs.
 		 *
 		 *  The type of associative array for vertices is defined.
@@ -142,7 +136,7 @@ namespace Koala
 		{
 		public:
 			typedef AssocArray< A,B > Type;/**<\brief Defined type.*/
-			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+			// Exemplary usage. Other possibilities:
 
 			//  typedef AssocTable < BiDiHashMap<A,B> > Type;
 
@@ -151,7 +145,6 @@ namespace Koala
             //  typedef AssocTable < std::map<A,B> > Type;
 		};
 
-		// typ macierzy sasiedztwa dla krawedzi skierowanych - zbedne przy edAllow=false
 		/** \brief The type of container for adjacency matrix for directed edges.
 		 *
 		 *  The class is unnecessary if adAllow is false.
@@ -161,8 +154,8 @@ namespace Koala
 		{
 		public:
 			typedef SimpleAssocMatrix< K,V,AMatrNoDiag > Type;/**<\brief Defined type.*/
-			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
-			// por.  komentarze w defs.h klasa domyslnych wytycznych algorytmow AlgsDefaultSettings
+			// Exemplary usage. Other possibilities"
+			// see comments in defs.h concerning AlgsDefaultSettings
 
             //  typedef SimpleAssocMatrix<K,V,AMatrNoDiag,std::vector< std::vector<typename Privates::SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
             //  typedef SimpleAssocMatrix<K,V,AMatrNoDiag,std::vector< std::vector<typename Privates::SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<HashMap<K,int> > > > Type;
@@ -179,7 +172,6 @@ namespace Koala
             //  typedef  Assoc2DimTable< AMatrNoDiag, HashMap<std::pair<K,K>, V > > Type;
 		};
 
-		// typ macierzy sasiedztwa dla krawedzi nieskierowanych - zbedne przy edAllow=false
 		/** \brief The type of container for adjacency matrix for undirected edges.
 		 *
 		 *  The class is unnecessary if adAllow is false.
@@ -189,8 +181,7 @@ namespace Koala
 		{
 		public:
 			typedef SimpleAssocMatrix< K,V,AMatrTriangle > Type;/**<\brief Defined type.*/
-			// - przyklad uzycia, nie usuwac
-			//Nie usuwac komentarzy (przykladowe uzycia) Inne mozliwosci:
+			// Exemplary usage. Other possibilities:
 
             //  typedef SimpleAssocMatrix<K,V,AMatrTriangle,std::vector< std::vector<typename Privates::SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<BiDiHashMap<K,int> > > > Type;
             //  typedef SimpleAssocMatrix<K,V,AMatrTriangle,std::vector< std::vector<typename Privates::SimpleAssocMatrixInternalTypes<K,V>::BlockType> >,Privates::PseudoAssocArray<K,int,AssocTable<HashMap<K,int> > > > Type;
@@ -207,30 +198,24 @@ namespace Koala
             //  typedef  Assoc2DimTable< AMatrTriangle, HashMap<std::pair<K,K>, V > > Type;
 		};
 
-		// Dodatkowe pola (poza info) wprowadzane do obiektu wierzcholka
 		/** \brief Some additional data in vertices.
 		 * 
 		 * The structure stores some additional data that are kept in vertexes.*/
 		template< class VertInfo, class EdgeInfo, class Settings > struct VertAdditData
 		{
-			// - w tej wersji umozliwia korzystanie z AssocArray
 			AssocKeyContReg assocReg;/**<\brief AssocArray may be used if this attribute is declared.*/
 		};
 
-		// Dodatkowe pola (poza info) wprowadzane do obiektu krawedzi
 		/** \brief Some additional data in edges.
 		 * 
 		 * The structure stores some additional data that are kept in edges.*/
 		template< class VertInfo, class EdgeInfo, class Settings > struct EdgeAdditData
 		{
-			// - w tej wersji umozliwia korzystanie z AssocArray
 			AssocKeyContReg assocReg;/**<\brief AssocArray may be used if this attribute is declared.*/
 		};
 
-		// czy dostosowywac rozmiar pamieci wyjsciowych tablic asocjacyjnych
 		//enum { ReserveOutAssocCont = true };
 
-		// wybrany do uzytku wewnetrznego algorytm sortowania tablic
 		/** \brief Sorting function.
 		 *
 		 *  The function sorts the elements in container given by iterators \a begin, \a end.
@@ -241,7 +226,7 @@ namespace Koala
 		{
             std::make_heap( first,last );
             std::sort_heap( first,last );
-        }		// ... i to samo z dostarczonym porownywaczem
+        }
 		/** \copydoc sort( Iterator begin, Iterator end ) 
 		  *  \param comp comparison function.  */
 		template< class Iterator, class Comp > static void sort( Iterator first, Iterator last, Comp comp )
@@ -250,7 +235,7 @@ namespace Koala
             std::sort_heap( first,last,comp );
         }
 
-        //inna mozliwosc: z std::sort
+        // other possibility: std::sort
 //		template< class Iterator > static void sort( Iterator first, Iterator last )
 //		{
 //            std::sort( first,last );
@@ -260,14 +245,12 @@ namespace Koala
 //            std::sort( first,last,comp );
 //       }
 
-        // klasa usuwajaca ew. powtorzenia i wartosci zerowe z ciagow wejsciowych podanych miedzy iteratorami - filtruje
-        // wejscie w roznych metodach
 		/** \brief Class deleting repetitions.
 		 *
 		 *  The class delivers algorithm that remove multiple elements.*/
         template <class T,class Settings> class RepsDeleter
             : public AssocRepsDeleterBase<T, Settings>
-        //Inna mozliwosc
+        // other possibility:
         //  : public SortRepsDeleterBase<T, Settings>
         {};
 
@@ -301,8 +284,7 @@ namespace Koala
         };
 
 		/* DummyVar
-		 * Do uzytku wewnetrznego, typ zmiennej udajacej int lub wskaznik, przypisywalny z i konwertowalny do takiego
-		 * typu
+		 * Used internally. Type of variable that pretends to be int or pointer.
 		 */
 		template< class T > struct DummyVar
 		{
@@ -323,9 +305,6 @@ namespace Koala
  */
 namespace Koala
 {
-	/* SubgraphBase
-	 * Klasa pomocnicza, umozliwia tworzenie hierarchii podgrafow i widokow na graf
-	 */
 	/** \brief Subgraph auxiliary class.
 	 *
 	 *  Auxiliary class enabling the usage of views (f.e. subgraphs) without creating new graph.
@@ -337,20 +316,17 @@ namespace Koala
 	class SubgraphBase
 	{
 	public:
-		// tworzy pusty, niepowiazany obiekt
 		/** \brief Constructor
 		 *
 		 *  Creates empty subgraph. */
 		 SubgraphBase(): parent( NULL ), next( NULL ), child( NULL )
 		{ }
-		// przylacza sie jako obiekt podrzedny rodzica podanego obiektu
 		/** \brief Constructor
 		 *
 		 *  Create empty subgraph ancillary to parent \a x.
 		 *  \param x created object is ancillary to \a x. */
 		SubgraphBase( const SubgraphBase &x ): parent( NULL ), next( NULL ), child( NULL )
 		{ link( x.parent ); }
-		// j.w. przylacza jako podgraf rodzica x
 		/** \brief Connect.
 		 *
 		 *  Connect the subgraph to the parent \a x.
@@ -358,24 +334,21 @@ namespace Koala
 		 *  [See example](examples/graph/graph_operator_assignment.html). */
 		inline SubgraphBase &operator=( const SubgraphBase &x );
 
-		// odlacza sie od rodzica (jesli istnial) i odlacza od siebie wszystkie swoje dzieci
+		// disconnect
 		inline ~SubgraphBase();
 
 	protected:
 		mutable const SubgraphBase *parent,*next,*child;
 
-		// wypisuje sie z listy potomkow obiektu nadrzednego, jednak nie usuwa powiazan ze swoimi obiektami podrzednymi
+		// deletes itself from a list of sons of parent
 		inline bool unlink();
-		// dolacza sie jako obiekt podrzedny podanego obiektu
+		// connects as son to a given object
 		inline bool link(const SubgraphBase * = NULL );
 	};
 
 	namespace Privates
 	{
 
-		/* EdgeCounterLoop
-		 *
-		 */
 		template< EdgeType EdgeAllow > class EdgeCounterLoop
 		{
 		protected:
@@ -397,9 +370,6 @@ namespace Koala
 				{ return DummyVar< int >(); }
 		};
 
-		/* EdgeCounterDir
-		 *
-		 */
 		template< EdgeType EdgeAllow > class EdgeCounterDir;
 		template <> class EdgeCounterDir<EdDirIn|EdDirOut>
 		{
@@ -422,9 +392,6 @@ namespace Koala
 				{ return DummyVar< int >(); }
 		};
 
-		/* EdgeCounterUndir
-		 *
-		 */
 		template< EdgeType EdgeAllow > class EdgeCounterUndir
 		{
 		protected:
@@ -447,11 +414,9 @@ namespace Koala
 		};
 
 
-    // sprywatyzowano
 	/* Graph
-	 * Graf wraz z wszystkimi podstawowymi operacjami wykonywanymi na grafach. Parametry grafu to klasy, kt?h
-	 * instancje będą etykietami wierzchołków i krawędzi. Settings - wytyczne parametryzujace strukture i dzialanie
-	 * metod klasy grafu.
+	 * Graph with all basic operations. Parameters are classes used to store labels of edges and vertices. Settings define
+     * the structure of a graph and the way that operations work.
 	 */
         template< class GraphType > struct GraphInternalTypes;
         template< class VertInfo, class EdgeInfo, class Settings >
@@ -496,14 +461,9 @@ namespace Koala
 		typedef typename Privates::GraphInternalTypes< Graph< VertInfo,EdgeInfo,Settings > >::GraphSettings GraphSettings; /**< \brief Type of class with settings.*/
 		typedef Graph< VertInfo,EdgeInfo,Settings > GraphType; /**< \brief Current graph type. */
 
-		// Do wspolpracy z podgrafami
 		typedef Graph< VertInfo,EdgeInfo,Settings > RootGrType; /**< \brief Current graph type (used with subgraphs). */
 
 
-        // umozliwia oddelegowanie alokowania wierzcholkow/krawedzi do pul SimplArrPool o ograniczonej
-        //pojemnosci - na uzytek grafow lokalnych w procedurach
-		// Konstruktory
-		// Tworzy pusty graf, bez krawędzi i wierzchołków.
 		/** \brief Constructor
 		 *
 		 *  Creates a new graph without any edges or vertices. Also adjacency matrix is not created yet. It is created after using method makeAdjMatrix().
@@ -515,24 +475,20 @@ namespace Koala
 		Graph(SimplArrPool<Koala::Vertex< VertInfo,EdgeInfo,Settings > > *valloc=0,
             SimplArrPool<Koala::Edge< VertInfo,EdgeInfo,Settings > > *ealloc=0);
 
-		// Konstruktor kopiujący.
 		/** \brief Copy constructor
 		 * 
 		 *  Creates a new graph which is a copy of \a graph. Adjacency matrix is not created.
 		 *  \param graph reference to the copied graph.  */
 		Graph( const Graph &graph );
 
-		// Destruktor
 		~Graph();/**< \brief Destructor*/
 
-		// Usuwamy wszystkie wierzchołki i krawędzie grafu.
 		/** \brief Clear graph.
 		 *
 		 *  Deletes all the edges and vertices from the graph.
 		 *
 		 *  [See example](examples/graph/graph_clear.html). */
 		void clear();
-		// Usuwamy wszystkie wierzcho?ki grafu.
 		/** \brief Clear edges.
 		 *
 		 *  Deletes all the edges from the graph.
@@ -540,8 +496,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_clear.html). */
 		void clearEdges();
 
-		// Operacje na całym grafie
-		// Operator przypisania.
 		/** \brief Copy content operator
 		 *
 		 *  Overloaded operator = assigns the new graph copy of \a gr.
@@ -551,7 +505,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_operator_assignment.html). */
 		Graph< VertInfo,EdgeInfo,Settings > &operator=( const Graph< VertInfo,EdgeInfo,Settings > &gr );
 
-		// Dodanie kopii grafu do naszego grafu
 		/** \brief Add graph.
 		 * 
 		 *  Operator += allows to add a copy of the graph \a gr to the considered one as a new connected component. 
@@ -562,7 +515,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_operator_addition.html). */
 		Graph< VertInfo,EdgeInfo,Settings > &operator+=( const Graph< VertInfo,EdgeInfo,Settings > &gr );
 
-		// Przenosimy wszystkie wierzchołki i krawędzie do naszego grafu. Zwraca pierwszy wprowadzony wierzcholek
 		/** \brief Move vertices and edges.
 		 *  
 		 *  Edges and vertices from the graph \a gr are moved (without reallocation) to the considered graph as a new connected component. 
@@ -573,8 +525,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_move.html). */
 		typename GraphType::PVertex move( Graph< VertInfo,EdgeInfo,Settings > &gr );
 
-        //przenosi vert z innego grafu do naszego (bez zmiany identyfikatora). Drugi graf musi byc rozny od naszego, wszystkie styczne z nim
-        //krawedzie (nawet petle) sa usuwane.
 		/** \brief Move vertex.
 		 *
 		 *  The method moves vertex \a vert (without a change of identifier) from graph \a gr to current graph. 
@@ -585,10 +535,6 @@ namespace Koala
 		 *
 		 *  [See example](examples/graph/graph_move.html). */
 		bool move( Graph< VertInfo,EdgeInfo,Settings > &gr, PVertex vert );
-		//przenosi do naszego grafu wierzcholki z grafu gr podane w przedziale iteratorw. Wraz z nimi przenoszone
-		//sa krawedzie podgrafu indukowanego w gr przez te wierzcholki o typie zgodnym z mask. Inne krawedzie
-		//styczne z tymi wierzcholkami w gr sa kasowane. gr musi byc rozny od naszego grafu. Zwraca liczby
-		//wierz/kraw. ktore ulegly przeniesieniu.
 		/** \biref Move induced subgraph.
 		 *
 		 *  
@@ -608,14 +554,12 @@ namespace Koala
         template< class Iterator > std::pair<int,int>
             move2( Graph< VertInfo,EdgeInfo,Settings > &gr, Iterator beg, Iterator end, EdgeType mask=EdAll );
 
-		// dopuszczalne typy krawedzi grafu
 		/** \brief Check Edge types
 		 *  
 		 *  \return the mask representing all allowed types of edges (\wikipath{EdgeType}. */
 		static EdgeType allowedEdgeTypes()
 			{ return Settings::EdAllow ; }
 
-		// metody przekazywane do ConstGraphMethods
 		//------------- Methods sent to ConstGraphMethods -----------------------------------------
 
 		/** \brief Get number of vertices.
@@ -728,7 +672,7 @@ namespace Koala
 		 *  \returns the pointer to the next parallel edge or NULL if \a ed is the last.
 		 *
 		 *  [See example](examples/graph/graph_getEdgeNext.html).	 */
-		typfename GraphType::PEdge getEdgeNext( PVertex vert1, PVertex vert2, PEdge ed, EdgeDirection diretction = EdAll ) const;
+		typename GraphType::PEdge getEdgeNext( PVertex vert1, PVertex vert2, PEdge ed, EdgeDirection diretction = EdAll ) const;
 
 		/* \brief Get previous parallel edges.
 		 *
@@ -789,7 +733,6 @@ namespace Koala
 		 *  \returns direction of edge \a ed.*/
 		inline EdgeDirection getEdgeDir( PEdge ed ,PVertex vert ) const;
 
-		// ustawianie pol info
 		/** \brief Set vertex Information.
 		 *
 		 *  The method sets new value to attribute info in vertex \a vert.
@@ -808,8 +751,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_setEdgeInfo.html). */
 		inline void setEdgeInfo( PEdge ed, EdgeInfo info = EdgeInfo() ) const;
 
-		// Usuwamy wierzchołek z grafu.
-		// wersja z false skuteczna tylko dla wierzcholka izolowanego
 		/** \brief Delete vertex from graph.
 		 *
 		 *  Vertex \a vert is deleted form the graph. If the parameter \a force is set to false,
@@ -820,12 +761,10 @@ namespace Koala
 		 *  [See example](examples/graph/graph_del.html).	 */
 		inline void del( PVertex vert, bool force = true )
 			{ this->delVert( vert,force ); }
-		// synonim
 		/** \copydoc del(PVertex,bool)
 		*
 		*  [See example](examples/graph/graph_delVert.html).	 */
 		void delVert( PVertex vert , bool force = true );
-		// usuwanie zbioru wierzcholkow, zwraca ich liczbe
 		/** \brief Delete vertices.
 		 *
 		 *  Iterators \a begin and \a end define a set of vertices. All vertices from this set are to be deleted (no matter if the are incident with some edges).
@@ -838,7 +777,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_delVerts.html).	 */
 		template< class Iterator > int delVerts( Iterator begin, Iterator end );
 
-		// wersja odporna na powtorzenia, ktore sa pmijane
 		/** \brief Delete vertices
 		 *
 		 *  Iterators \a begin and \a end define a set of vertices. All vertices from this set are to be deleted (no matter if they are incident with some edges ).
@@ -862,7 +800,6 @@ namespace Koala
 		inline int delVerts( const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex > &s )
 			{ return delVerts( s.begin(),s.end() ); }
 
-		// Usuwamy wszystkie wierzchołki z grafu.
 		/** \brief Delete all vertices
 		 *
 		 *  All vertices are deleted from the graph. No matter if they are incident with edges or not.
@@ -872,7 +809,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_delVerts.html).	 */
 		inline int delVerts();
 
-		// Usuwamy krawędź z grafu.
 		/** \brief Delete edge
 		 *
 		 *  Deletes the edge form the graph.
@@ -881,15 +817,12 @@ namespace Koala
 		 *  [See example](examples/graph/graph_del.html).	 */
 		inline void del( PEdge ed);
 
-		// synonim
 		/** \copydoc delEdge(PEdge)
 		 *
 		 *  [See example](examples/graph/graph_delEdge.html).	 */
 		inline void delEdge( PEdge edge )
 			{ this->del( edge ); }
 
-		// usuwanie zbiorow krawedzi
-		// krawedzie przy danym wierzcholku o podanej orientacji wgledem niego
 		/** \brief Delete edges.
 		 *
 		 *  For a vertex \a vert, each edge incident to it is deleted as long as its direction is consistent with the mask \a direct.
@@ -901,7 +834,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_delEdges.html).	 */
 		int delEdges( PVertex vert, EdgeDirection direct = EdAll );
 
-		// krawedzie miedzy danymi wierzcholkami o podanej orientacji
 		/** \brief Delete edges
 		 *
 		 *  Deletes all the edges between \a vert1 and \a vert2 of direction consistent with the mask direct. 
@@ -913,7 +845,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_delEdges.html).	 */
 		int delEdges( PVertex vert1, PVertex vert2, EdgeDirection direct = EdAll );
 
-		// podajemy zbior do usuniecia, uwzglednia tylko krawedzie o typie zawartym w masce
 		/** \brief Delete set of edges.
 		 *
 		 *  Let us consider the container of edges defined by iterators begin and end. 
@@ -927,7 +858,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_delEdges.html).	 */
 		template< class Iterator > int delEdges( Iterator begin, Iterator end, EdgeType direct = EdAll );
 
-		// wersja odporna na powtorzenia, ktore sa pmijane
 		/** \brief Delete set of edges.
 		 *
 		 *  Let us consider the container of edges defined by iterators \a begin and \a end.
@@ -953,7 +883,6 @@ namespace Koala
 		inline int delEdges( const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> &s,
 			EdgeType direct = EdAll )
 			{ return delEdges( s.begin(),s.end(),direct ); }
-		// Usuwamy krawędzie z grafu o typie zawartym w masce
 		/** \brief Delete all edges
 		 *
 		 *  Ale the edges of prespecified type are deleted from the graph.
@@ -963,7 +892,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_delEdges.html).	 */
 		int delEdges( EdgeType direct = EdAll );
 
-		// Dodajemy nowy wierzchołek do grafu (z etykietą info). Zwraca jego wskaznik
 		/** \brief Add vertex.
 		 *
 		 *  A new vertex is created and added to the graph.
@@ -973,8 +901,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_clear.html).	 */
 		inline typename GraphType::PVertex addVert( VertInfo info = VertInfo() );
 
-		// Uwaga: proba dodania krawedzi typu niezawartego w allowedEdgeTypes() wywoluje blad
-		// Dodajemy nową krawędź do grafu (bez etykiety - wartosc domyslna typu EdgeInfo).
 		/** \brief Add edge.
 		 *
 		 *  A new edge (directed or not depending on \a direct) spanned on two vertices \a vert1 and \a vert2 is added to the graph. 
@@ -993,7 +919,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_clear.html).	 */
 		inline typename GraphType::PEdge addEdge( PVertex vert1, PVertex vert2, EdgeDirection direct = EdUndir );
 
-		// Dodajemy nową krawędź do grafu (z etykietą).
 		/** \brief Add edge.
 		 *
 		 *  A new edge (directed or not depending on direct) spanned on two vertices is added to the graph.
@@ -1023,7 +948,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_addLink.html).	 */
 		inline typename GraphType::PEdge addLink( PVertex u,PVertex v,EdgeInfo info= EdgeInfo() )
 			{   return addEdge(u,v,info,EdUndir); }
-		// Dodajemy nowy łuk do grafu (z etykietą).
 		/** \brief Add arc. 
 		 *
 		 *  \param vert1 the first vertex (tail) of the new-created arc.
@@ -1034,7 +958,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_clear.html).	 */
 		inline typename GraphType::PEdge addArc( PVertex vert1, PVertex vert2, EdgeInfo info = EdgeInfo() );
 
-		// Dodajemy nową pętlę do grafu (z etykietą)
 		/** \brief Add Loop.
 		 *
 		 *  Add a new loop that is the edge that connects the vertex to itself.
@@ -1045,7 +968,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_clear.html).	 */
 		inline typename GraphType::PEdge addLoop( PVertex vert, EdgeInfo info = EdgeInfo() );
 
-		// Przenosimy krawędź w inne miejsce z ew. zmiana typu
 		/** \brief Move edge
 		 *
 		 *  Edge is reconnected to new vertices.
@@ -1063,7 +985,6 @@ namespace Koala
 		 *  \warning The direction is not copied automatically, that is way the directed arc is changed to undirected if default value is used. */
 		inline bool moveEdge( PEdge ed, PVertex vert1,PVertex vert2, EdgeDirection direct = EdUndir );
 
-		// zmiana krawedzi skierowanej na nieskierowana, wynik false gdy krawedz nie byla nieskierowana
 		/** \brief Change to undirected.
 		 * 
 		 *  The type of the edge \a ed is changed to EdUndir i.e. The arc is changed to the undirected edge.
@@ -1074,8 +995,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2undir.html). */
 		bool ch2Undir( PEdge ed );
 
-		// zamiana na nieskierowane krawedzi z podanego zbioru, wynik - liczba udanych zmian
-		// podany jest zbior krawedzi
 		/** \brief Change to undirected.
 		 *
 		 *  The type of all the edges in the set is changed to undirected (the order of vertices in edge remain the same). 
@@ -1097,7 +1016,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2undir.html). */
 		inline int ch2Undir( const Set< typename GraphType::PEdge > &s )
 			{ return ch2Undir( s.begin(),s.end() ); }
-		// wszystkie krawedzie przy danym wierzcholku o podanej orientacji wzgledem niego
 		/** \brief Change to undirected
 		 *
 		 *  The direction of the edges incident to the vertex \a vert is changed to undirected, 
@@ -1110,7 +1028,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2undir.html). */
 		int ch2Undir( PVertex vert, EdgeDirection direct = EdDirIn|EdDirOut );
 
-		// wszystkie krawedzie miedzy danymi wierzcholkami o podanej orientacji
 		/** \brief Change to undirected.
 		 *  
 		 *  Direction of all edges spanned on two vertices is changed to undirected, if their direction is consistent with mask \a direct.
@@ -1123,7 +1040,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2undir.html).*/
 		int ch2Undir( PVertex vert1, PVertex vert2, EdgeDirection direct = EdDirIn|EdDirOut );
 
-		// wszystkie w grafie
 		/** \brief Change to undirected.
 		 * 
 		 *  The direction of all edges (arcs) in graph is changed to undirected. The order of vertices in edges 
@@ -1132,7 +1048,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2undir.html).	 */
 		int ch2Undir();
 
-		// Zmieniamy kierunek krawędzi skierowanej, wynik - czy z sukcesem
 		/** \brief Reverse arc.
 		 *
 		 *  The direction of the arc is changed to the opposite. The order of vertices in arc is reversed.
@@ -1142,8 +1057,6 @@ namespace Koala
 		 *
 		 *  [See example](examples/graph/graph_rev.html). */
 		inline bool rev( PEdge ed );
-		// Odwrocenie krawedzi skierowanych z podanego zbioru, wynik - liczba udanych zmian
-		// podany zbior krawedzi
 		/** \brief Reverse arcs.
 		 *
 		 *  The direction of all the arcs form the set defined by iterators \a begin and \a end is changed to opposite. 
@@ -1167,7 +1080,6 @@ namespace Koala
 		inline int rev( const Set< typename GraphType::PEdge > &s )
 			{ return rev( s.begin(),s.end() ); }
 
-		// wersja odporna na powtorzenia (ignorowane)
 		/** \brief Reverse arcs
 		 *
 		 *  The direction of all the arcs from the set defined by iterators begin and end is changed to the opposite. 
@@ -1181,7 +1093,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_rev2.html). */
 		 template< class Iterator > int rev2( Iterator begin, Iterator end );
 
-		// wszystkie krawedzie przy danym wierzcholku o podanej orientacji wzgledem niego
 		/** \brief Reverse arcs.
 		 *
 		 *  The direction of all arcs incident to \a vert and of direction (with respect to \a vert) defined by \a direct is changed to the opposite.
@@ -1193,7 +1104,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_rev.html). */
 		int rev( PVertex vert, EdgeDirection direct = EdDirIn|EdDirOut );
 
-		// wszystkie krawedzie miedzy danymi wierzcholkami o podanej orientacji
 		/** \brief Reverse arcs
 		 *
 		 *  All the arcs between two distinct vertices are reversed as long as they are consistent with mask \a direct. 
@@ -1206,7 +1116,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_rev.html). */
 		int rev( PVertex vert1, PVertex vert2, EdgeDirection direct = EdDirIn|EdDirOut );
 
-		// wszystkie w grafie
 		/** \brief Reverse edge.
 		 *
 		 *  All the arcs (and only arcs) in the graph (digraph) are reversed.
@@ -1215,8 +1124,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_rev.html). */
 		int rev();
 
-		// zmiana krawedzi nieskierowanej na luk o zadanej orientacji wzgledem jej podanej koncowki, wynik - czy
-		// skuteczne
 		/** \brief Change to directed.
 		 *
 		 *  The undirected edge is changed to directed. Direction (with respect to \a vert) is determined by \a direct.
@@ -1229,7 +1136,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2dir.html). */
 		inline bool ch2Dir( PEdge ed, PVertex vert, EdgeDirection direct = EdDirOut );
 
-		// jw. dla wszystkich krawedzi nieskierowanych przy danym wierzcholku, wynik - liczba zmian
 		/** \brief Change to directed.
 		 *
 		 *  All undirected and incident to vertex \vert edges are changed to directed.
@@ -1241,7 +1147,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2dir.html). */
 		int ch2Dir( PVertex vert, EdgeDirection direct = EdDirOut );
 
-		// jw. dla wszystkich krawedzi nieskierowanych miedzy wierzcholkami, wynik - liczba zmian
 		/** \brief Change to directed.
 		 *
 		 *  The type of all undirected and spanned on two prespecified vertices edges is changed to directed.
@@ -1254,8 +1159,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2dir.html). */
 		int ch2Dir( PVertex vert1, PVertex vert2, EdgeDirection direct = EdDirOut );
 
-		// Zmieniamy krawędź nieskierowana w dwa łuki. Nowa krawedz przejmuje info oryginalu i jest zwracana. 0
-		// w razie porazki
 		/** \brief Change to arcs.
 		 *
 		 *  The undirected edge is converted into two arcs. More precisely, the edge is changed to directed 
@@ -1267,7 +1170,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2Arcs.html). */
 		inline typename GraphType::PEdge ch2Arcs( PEdge ed );
 
-		// j.w.  dla wszystkich krawedzi z danego zbioru, zwraca liczbe sukcesow
 		/** \brief Change to arcs.
 		 * 
 		 *  All the undirected edges in the set are converted into two arcs. More precisely, each undirected edge is changed to directed 
@@ -1291,7 +1193,6 @@ namespace Koala
 		inline int ch2Arcs( const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> &s )
 			{ return ch2Arcs( s.begin(),s.end() ); }
 
-		// j.w. dla wszystkich w grafie
 		/** \brief Change to arcs.
 		 *
 		 *  All the undirected edges in the graph are converted into two arcs. 
@@ -1301,7 +1202,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2Arcs.html). */
 		int ch2Arcs();
 
-		// j.w. dla wszystkich nieskierowanych przy wierzcholku
 		/** \brief Change to arcs.
 		 *
 		 *  All the undirected edges incident to a certain vertex are converted into two arcs. 
@@ -1312,7 +1212,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2Arcs.html). */
 		int ch2Arcs( PVertex vert );
 
-		// j.w. dla wszystkich nieskierowanych przy miedzy wierzcholkami
 		/** \brief Change to arcs.
 		 *
 		 *  All the undirected edges spanned on two prespecified vertices are converted into two arcs.
@@ -1324,8 +1223,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_ch2Arcs.html). */
 		int ch2Arcs( PVertex vert1, PVertex vert2 );
 
-		// ustawienie nowego wierzcholka na srodku istniejacej krawedzi, ktora rozdziela sie na dwie. Podajemy info
-		// nowego wierzcholka, ktory jest zwracany
 		/** \brief Put vertex in edge.
 		 *
 		 *  The method puts one additional vertex on edge \a ed. In other word, edge is divided into two edges by one additional vertex, wile
@@ -1340,8 +1237,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_put.html). */
 		typename GraphType::PVertex putVert( PEdge ed, VertInfo info = VertInfo() );
 
-		// Dla wierzcholka o maks. 2 sasiadach - zdjecie wierzcholka , po czym pozostaje jedna nowa (zwracana)
-		// krawedz laczaca tych sasiadow
 		/** \brief Pick vertex.
 		 *
 		 *  If a vertex has at most two neighbors, it is deleted together with all the incident edges. 
@@ -1357,9 +1252,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_pick.html). */
 		typename GraphType::PEdge pickVert( PVertex vert, EdgeInfo info = EdgeInfo() );
 
-		// sklejanie grupy wierzcholkow w jeden wierzcholek docelowy (zwracany).
-		// Mozna wybrac ten wierzcholek sposrod sklejanej grupy. makeloops decyduje, czy krawedzie wewnatrz grupy
-		// maja byc usuwane, czy zamieniane w petle
 		/** \brief Merge vertices.
 		 *  
 		 *  The set of vertices is merged (shrink) into one. The target vertices in the set can be chosen.
@@ -1390,7 +1282,6 @@ namespace Koala
 				  PVertex res = NULL )
 				{ glue( s.begin(),s.end(),makeloops,res ); }
 
-		// wersja odporna na powtorzenia (ignorowane)
 		/** \brief Merge vertices.
 		 *
 		 *  The set of vertices is merged (shrink) into one. The target vertices in the set can be chosen.
@@ -1406,7 +1297,6 @@ namespace Koala
 		template< class Iterator > typename GraphType::PVertex
 			glue2( Iterator begin, Iterator end, bool makeloops = false, PVertex vert = NULL );
 
-		// jw. dla 2 wierzcholkow
 		/** \brief Merge vertices
 		 * 
 		 *  Two vertices are merged into one. Depending on \a makeloops edges between them can be converted into loops or deleted.
@@ -1420,8 +1310,6 @@ namespace Koala
 		 */
 		inline typename GraphType::PVertex glue( PVertex vert1, PVertex vert2, bool makeloops = false );
 
-		// usuwanie krawedzi z danego zbioru rownoleglych do podanej, maska okresla rodzaj relacji rownoleglosci.
-		// Wynik - liczba usuniec
 		/** \brief Delete paralel edges.
 		 *
 		 *  All the edges from certain set and parallel to predefined edge \a ed are deleted from graph. \a ed is not deleted.
@@ -1458,7 +1346,6 @@ namespace Koala
 		inline int delParals( const Set< typename GraphType::PEdge > &s, PEdge edge, EdgeDirection reltype = EdUndir )
 			{ return delParals( s.begin(),s.end(),edge,reltype ); }
 
-		// wersja odporna na powtorzenia (ignorowane)
 		/** \brief Delete parallel edges.
 		 *
 		 *  All the edges from a certain set and parallel to the predefined edge \a ed are deleted from the graph. \a ed is not deleted.
@@ -1478,7 +1365,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_delParals2.html). */
 		template< class Iterator > int delParals2( Iterator begin, Iterator end, PEdge ed, EdgeDirection reltype = EdUndir );
 
-		// wszystkie krawedzie rownolegle
 		/** \brief Delete parallel edges.
 		 *
 		 *  All the edges parallel to the predefined edge \a ed are deleted from the graph. \a ed is not deleted.  
@@ -1494,8 +1380,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_delParals.html). */
 		int delParals( PEdge ed, EdgeDirection reltype = EdUndir );
 
-		// z grupy krawedzi zostawia jedynie nierownoleglych wzgledem siebie reprezentantow. Znaczenie parametrow
-		// analogiczne jak w metodach findParals. Zwraca liczbe usuniec.
 		/** \brief Delete parallel edges.
 		 * 
 		 *  From the set of edges all the parallel edges are deleted and only unique representatives are left. 
@@ -1593,8 +1477,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_delAllParals.html). */
 		int delAllParals( EdgeType reltype = EdUndir );
 
-		// usuwa krawedzie, ktore przy tym samym ustawieniu parametrow zwracalyby metody getIncEdges. Zwraca liczbe
-		// usuniec
 		/** \brief Delete incident edges.
 		 * 
 		 *  Deletes edges incident to the vertices from the set defined by the iterators \a beg and \a end.
@@ -1630,10 +1512,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_delIncEdges.html). */
 		int delIncEdges( const Set< typename GraphType::PVertex > &s, EdgeDirection type = EdAll, EdgeType kind = Loop );
 
-		// dopelnienia podgrafu indukowanego na zadanych wierzcholkach. Dziala "osobno" na typach krawedzi zawartych
-		// w masce wesje z EdInfoGen - typ funktora wyliczajacego pola info nowych krawedzi, wywolanie: EdgeInfo
-		// operator()(const GraphType&,PVertex,PVertex,EdgeDirection) wersje z EdgeInfo nadaja tym polom ta sama
-		// podana wartosc
 		/** \brief Complement of graph.
 		*
 		*  A subgraph induced by the set of vertices is converted to its complement.
@@ -1701,8 +1579,6 @@ namespace Koala
 		*  [See example](examples/graph/graph_neg.html). */
 		void neg( const Set< PVertex > &vset, EdgeType direc = Settings::EdAllow, EdgeInfo infoGen = EdgeInfo() );
 
-		// ... i dopelnienie calego grafu
-		
 		/** \brief Complement of graph.
 		*
 		*  The method converts the graph into its complement.
@@ -1729,15 +1605,6 @@ namespace Koala
 		void neg(EdgeType type = Settings::EdAllow, EdgeInfo info = EdgeInfo())
 			{ neg( type,ConstFunctor< EdgeInfo >() ); }
 
-		// Kopiowanie do naszego innego grafu (np. innego typu). Wierzcholki dotychczasowe pozostaja na liscie
-		// przed skopiowanymi. W najogolniejszej wersji mozna podac
-		// - pare chooserow wybierajacych podgraf wierzcholkow i krawedzi do skopiowania (konce krawedzi takze musza
-		// spelniac chooser wierzcholkowy)
-		// - pare casterow wyliczajacych infa nowych wierzcholkow i krawedzi na podstawie oryginalow
-		// - pare linkerow (dla wierzcholkow i krawedzi) ustalajacych polaczenia miedzy oryginalami i kopiami.
-		// Elementy dotychczasowe tego grafu oraz nieskopiowane grafu kopiowanego sa linkowane z NULL
-		// Zwraca pierwszy wprowadzony wierzcholek
-
 		/** \brief Copy graph.
 		 *
 		 *  The method adds to the current graph a copy of the graph \a agraph. New vertices and edges are added at the end of lists.
@@ -1749,7 +1616,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_copy.html).	 */
 		template< class ExtGraph > typename GraphType::PVertex copy( const ExtGraph &agraph );
 
-        // wersja z HardCaster zamiast standadowego, podobnie w substitute,  rzutuje infa , moze nieskompilowa栳ie jesli nie mam rzutowania 
 		/** \brief Copy graph.
 		*
 		*  The method adds to the current graph a copy of the graph \a agraph. New vertices and edges are added at the end of lists.
@@ -1819,9 +1685,6 @@ namespace Koala
 			class ELinker > typename GraphType::PVertex copy( ExtGraph &, std::pair< VChooser,EChooser >,
 				std::pair< VCaster,ECaster >, std::pair< VLinker,ELinker > linkers );
 
-		// Podstawienie kopii drugiego grafu za dotychczasowy wierzcholek (ktory jest usuwany). Znaczenie parametrow
-		// parametry podobne jak w copy
-		// Zwraca pierwszy wprowadzony wierzcholek
 		/** \brief Substitute graph for vertex.
 		 * 
 		 *  The method substitute a copy of the graph \a graph for the vertex \a vert. The vertex \a vert is deleted form graph.
@@ -1932,8 +1795,6 @@ namespace Koala
 			class ELinker > typename GraphType::PVertex substitute( typename GraphType::PVertex vert, ExtGraph &graph,
 				std::pair< VChooser,EChooser > choosers, std::pair< VCaster,ECaster > casters, std::pair< VLinker,ELinker > linkers );
 
-		// Operacje na macierzy sąsiedztwa
-		// Tworzymy macierz sąsiedztwa.
 		/** \brief Make adjacency matrix.
 		 *
 		 *  The adjacency matrix is created. For some algorithmic purposes it is better to use the adjacency matrix. 
@@ -1943,7 +1804,6 @@ namespace Koala
 		 *  \return true if successful, false otherwise (if adjacency matrix is not allowed or already exists). */
 		bool makeAdjMatrix();
 
-		// Usuwamy macierz sąsiedztwa.
 		/** \brief Delete adjacency matrix.
 		 * 
 		 *  The adjacency matrix is deleted.
@@ -1952,7 +1812,6 @@ namespace Koala
 		 *  \return true if successful, false otherwise (if adjacency matrix does not exist). */
 		inline bool delAdjMatrix();
 
-		// Informacja o tym, czy graf ma macierz sąsiedztwa.
 		/** \brief Check the existence of adjacency matrix.
 		 *
 		 *  Test whether the adjacency matrix exists.
@@ -1961,7 +1820,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_adjmatrix.html). */
 		inline bool hasAdjMatrix() const;
 
-		// czy ten typ grafu obsluguje macierz sasiedztwa
 		/** \brief Check if adjacency matrix is allowed.
 		 *
 		 *  Test whether the adjacency matrix is allowed in graph type defined by Settings.
@@ -1971,7 +1829,6 @@ namespace Koala
 		static bool allowedAdjMatrix()
 			{ return Settings::AdjMatrixAllowed; }
 
-		// alokacja pamieci na podana liczbe wierzcholkow
 		/** \brief Reserve memory for adjacency matrix.
 		 * 
 		 *  The method allows to allocate sufficient memory area for adjacency matrix for size vertices, 
@@ -1982,7 +1839,6 @@ namespace Koala
 		 *  [See example](examples/graph/graph_adjmatrix.html). */
 		inline void reserveAdjMatrix( int size );
 
-		// do wspolpracy z hierarchia podgrafow i widokow.
 		/** \brief Get root graph
 		 *
 		 *  The method used by views.*/
@@ -2006,7 +1862,6 @@ namespace Koala
 		bool good( PEdge, bool = false ) const
 			{ return true; }
 
-        // adresy uzywanych alokatorow wierzcholkow/krawedzi - 0 przy ich braku
 		/** \brief Get allocators
 		 *
 		 *  \return standard pair of pointers to allocators for vertices and edges.

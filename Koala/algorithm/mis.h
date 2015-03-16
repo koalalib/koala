@@ -9,7 +9,6 @@
 namespace Koala
 {
 
-    // generalna zmiana nazw: MIS(Heuristic)(Par) -> MaxStable(Heur)(Par) oraz MISStrategy->MaxStableStrategy
 	/** \brief Vertex choosing strategies for maximal stable set, vertex cover and maximum clique heuristics. 
 	 *
 	 *  The namespace contains functors
@@ -62,9 +61,6 @@ namespace Koala
 				}
 		};
 
-//w ponizszych stragegiach Rand GMin GWMin GGWMin GWMin2 GMax GWMax GGWMax nowy parametr
-//szablonu klasy - typ wybranego generatora liczb losowych. Zewnetrzny obiekt uzywanego generatora
-// podaje sie w konstruktorze strategii
 		/* ----------------------------------------------------------------------
 		*
 		* Template:        N/A
@@ -320,10 +316,6 @@ namespace Koala
             private: RndGen* rgen;
 		};
 	}
-	//skierowane sa traktowane jak nieskierowane, 
-	// petle : w zbiorze niezaleznym nie moze byc wierzcholka z petla
-	//         w pokryciu vert.musza byc wszystkie wierzcholki z petlami
-	//         dla kliki petle sa ignorowane tj.zbior vert jest klika, jesli jego podgraf indukowany zawiera klike o tych wszystkich wierzcholkach.
 	/** \brief Maximal independent set heuristics (parametrized).
 	 *
 	 *  Class for max independent set.

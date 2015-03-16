@@ -6,9 +6,6 @@ namespace Koala
 	namespace Privates
 	{
 
-		/* NormalVertLink
-		 *
-		 */
 		template< class VertInfo, class EdgeInfo, class Settings > struct NormalVertLink
 		{
 			Edge< VertInfo,EdgeInfo,Settings > *first,*last;
@@ -26,9 +23,6 @@ namespace Koala
 				{ return degree; }
 		};
 
-		/* EmptyVertLink
-		 *
-		 */
 		template< class VertInfo, class EdgeInfo, class Settings > struct EmptyVertLink
 		{
 			EmptyVertLink()
@@ -42,9 +36,6 @@ namespace Koala
 		};
 
 
-		/* VertLinkEdDirIn
-		 *
-		 */
 		template< class VertInfo, class EdgeInfo, class Settings, EdgeType Present > struct VertLinkEdDirIn;
 		template< class VertInfo, class EdgeInfo, class Settings >
 			struct VertLinkEdDirIn< VertInfo,EdgeInfo,Settings,EdDirIn >:
@@ -53,9 +44,6 @@ namespace Koala
 			struct VertLinkEdDirIn< VertInfo,EdgeInfo,Settings,0 >:
 			public EmptyVertLink< VertInfo,EdgeInfo,Settings > { };
 
-		/* VertLinkEdDirOut
-		 *
-		 */
 		template< class VertInfo, class EdgeInfo, class Settings, EdgeType Present > struct VertLinkEdDirOut;
 		template< class VertInfo, class EdgeInfo, class Settings >
 			struct VertLinkEdDirOut< VertInfo,EdgeInfo,Settings,EdDirOut >:
@@ -64,9 +52,6 @@ namespace Koala
 			struct VertLinkEdDirOut< VertInfo,EdgeInfo,Settings,0 >:
 			public EmptyVertLink< VertInfo,EdgeInfo,Settings > { };
 
-		/* VertLinkEdUndir
-		 *
-		 */
 		template< class VertInfo, class EdgeInfo, class Settings, EdgeType Present > struct VertLinkEdUndir;
 		template< class VertInfo, class EdgeInfo, class Settings >
 			struct VertLinkEdUndir< VertInfo,EdgeInfo,Settings,EdUndir >:
@@ -75,9 +60,6 @@ namespace Koala
 			struct VertLinkEdUndir< VertInfo,EdgeInfo,Settings,0 >:
 			public EmptyVertLink< VertInfo,EdgeInfo,Settings > { };
 
-		/* VertLinkEdLoop
-		 *
-		 */
 		template< class VertInfo, class EdgeInfo, class Settings, EdgeType Present > struct VertLinkEdLoop;
 		template< class VertInfo, class EdgeInfo, class Settings >
 			struct VertLinkEdLoop< VertInfo,EdgeInfo,Settings,EdLoop >:
@@ -132,7 +114,7 @@ namespace Koala
 			{ this->info = info; }
 
 	private:
-		// klasa jest niekopiowalna, obiekty mozna tworzyc i usuwac jedynie z metod klas zaprzyjaznionych
+		// class is non-copyable
 		/* Standard constructor*/
 		Vertex(): info (), next( NULL ), prev( NULL )
 			{ }

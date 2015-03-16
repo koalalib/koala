@@ -11,15 +11,9 @@
 
 namespace Koala
 {
-	//Algorytmy rozpoznawania rodzin grafow. Dla rodziny family jest metoda rozpoznajaca bool family(const& graph).
-	//Jesli family ma sens takze dla multigrafow, bool family(const& graph, bool allowmulti) gdzie flaga bool podaje
-	//czy zezwalay na krawedzie rownolegle i petle. Jesli dla klasy family sa jakies szczegolne procedury (tylko dla grafow tego typu),
-	//wprowadza sie dodatkowo podklase Family z metodami realizujacymi te funkcje. Generalnie nie maja one obowiazku
-	// sprawdzania poprawnosci danych (tj. przynaleznosci grafu do tej rodziny), choc czasem tak czynia.
+	// Algorithms that recognize graph families. bool family(const& graph) is the method that recognizes given family (bool
+    // family(const& graph, bool allowmulti) in the case of multigraphs.
 
-	/* IsItPar
-	 * DefaultStructs - wytyczne dla wewnetrznych procedur
-	 */
 	/** \brief Test classes (parametrized).
 	 *
 	 *  The class delivers the range of methods which check if a graph belongs to various families of graphs. \n
@@ -32,8 +26,6 @@ namespace Koala
 	template< class DefaultStructs > class IsItPar: public SearchStructs
 	{
 	public:
-		// Generalnie zaklada sie, ze poprawny (dla IsItPar) graf wejsciowy nie ma petli ani lukow oraz n>0
-		// Ta metoda jest wyjatkiem, sprawdza czy n=0
 		/** \brief Test if empty vertex set.
 		 *
 		 *  The method tests if the graph has the empty vertex set. This is the only one method in this class that allow empty vertex set.
@@ -43,7 +35,6 @@ namespace Koala
 		template< class GraphType > static bool zero( const GraphType &g )
 			{ return !g.getVertNo(); }
 
-		// czy graf jest prosty (tj. nie ma krawedzi rownoleglych)
 		/** \brief Test if simple/multigraph.
 		 *
 		 *  The method tests if a graph has only unique undirected edges (simple graph). Or if \a allowmulti is true, the method tests if the graph is an undirected multigraph.
@@ -52,7 +43,6 @@ namespace Koala
 		 *  \return if \a allowmulti false returns true if and only if graph \a g is simple, if \a allowmulti set true returns true if and only if graph is undirected. */
 		template< class GraphType > static bool undir( const GraphType &g, bool allowmulti = false );
 
-		// czy spojny
 		/** \brief Test if connected
 		 *
 		 *  The method tests if the graph \a g is connected i.e. for each pair of vertices there exists a path between the vertices.
@@ -61,7 +51,6 @@ namespace Koala
 		 *  \return true if connected,  otherwise false. */
 		template< class GraphType > static bool connected( const GraphType &g, bool allowmulti = false );
 
-		// czy bezkrawedziowy
 		/** \brief Test if empty.
 		 *
 		 *  The method tests if the graph has no edges.
@@ -70,7 +59,6 @@ namespace Koala
 		template< class GraphType > static bool empty( const GraphType &g )
 			{ return g.getVertNo() && !g.getEdgeNo(); }
 
-		// drzewo
 		/** \brief Test if tree.
 		 *
 		 *  The method tests if the graph \a g is a tree i.e. if the graph is connected and the number of vertices equals  the number of edges plus one.
@@ -79,7 +67,6 @@ namespace Koala
 		template< class GraphType > static bool tree( const GraphType &g )
 			{ return connected( g,true ) && (g.getVertNo() - 1 == g.getEdgeNo()); }
 
-		// las
 		/** \brief Test if forest.
 		 *
 		 *  The method tests if the graph \a g is a forest, in other words, is it a set of separate trees.
@@ -88,7 +75,6 @@ namespace Koala
 		template< class GraphType > static bool forest( const GraphType &g )
 			{ return undir( g,true ) && !BFSPar< DefaultStructs >::cyclNo( g ); }
 
-		// klika
 		/** \brief Test if clique.
 		 *
 		 *  The method tests if the graph \a g is a clique. In other words, each pair of the set of vertices  forms an edge.
@@ -96,7 +82,6 @@ namespace Koala
 		 *  \return true if the graph is a clique, false otherwise. */
 		template< class GraphType > static bool clique( const GraphType &g );
 
-		// suma rozlacznych klik
 		/** \brief Test if union of disjoint cliques.
 		 *
 		 *  The method tests if the graph is a union of disjoint cliques.
@@ -104,7 +89,6 @@ namespace Koala
 		 *  \return true if the graph \a g is a union of disjoint cliques, false otherwise. */
 		template< class GraphType > static bool cliques( const GraphType &g );
 
-		// regularny
 		/** \brief Test if regular.
 		 *
 		 *  The method tests if each vertex of the graph has the same degree.
@@ -113,14 +97,10 @@ namespace Koala
 		 *  \return true if regular, otherwise false. */
 		template< class GraphType > static bool regular( const GraphType &g, bool allowmulti = false );
 
-		/* Path
-		 *
-		 */
 		/** \brief Methods for paths. */
 		class Path
 		{
 		public:
-			// Konce podanej sciezki, (NULL,NULL) w razie bledu
 			/** \brief Get ends.
 			 *
 			 *  The method gets the ends of the path.
@@ -130,7 +110,6 @@ namespace Koala
 				ends( const GraphType &g );
 		};
 
-		// sciezka
 		/** \brief Test if path.
 		 *
 		 *  The method tests if the graph \a g is a path.
@@ -139,14 +118,10 @@ namespace Koala
 		template< class GraphType > static bool path( const GraphType &g )
 			{ return Path::ends( g ).first; }
 
-		/* Caterpillar
-		 *
-		 */
 		/** \brief Methods for caterpillars. */
 		class Caterpillar
 		{
 		public:
-			// Konce grzbietu gasienicy, (NULL,NULL) w razie bledu
 			/** \brief Get central path ends.
 			 *
 			 *  The method gets the ends of the central path of the caterpillar \a g.
@@ -156,7 +131,6 @@ namespace Koala
 				spineEnds( const GraphType &g );
 		};
 
-		// gasienica
 		/** \brief Test if caterpillar.
 		 *
 		 *  The method tests if the graph \a g is a caterpillar.
@@ -166,7 +140,6 @@ namespace Koala
 		template< class GraphType > static bool caterpillar( const GraphType &g )
 			{ return Caterpillar::spineEnds( g ).first; }
 
-		// cykl,
 		/** \brief Test if cycle.
 		 *
 		 *  The method tests if the considered graph \a g is a cycle.
@@ -177,7 +150,6 @@ namespace Koala
 		template< class GraphType > static bool cycle( const GraphType &g, bool allowmulti = false )
 			{ return connected( g,allowmulti ) && g.deg( g.getVert() ) == 2 && regular( g,true ); }
 
-		// zbior niezalezny krawedzi
 		/** \brief Test if matching.
 		 *
 		 *  The method tests if the considered graph \a g is a matching (is of degree <= 1).
@@ -187,7 +159,6 @@ namespace Koala
 		template< class GraphType > static bool matching( const GraphType &g )
 			{ return undir( g,true ) && g.Delta() <= 1; }
 
-		// podkubiczny
 		/** \brief Test if subcubic.
 		 *
 		 *  The method tests if the considered graph \a g is subcubic (the maximum degree is not grater then three).
@@ -197,7 +168,6 @@ namespace Koala
 		template< class GraphType > static bool subcubic( const GraphType &g, bool allowmulti = false )
 			{ return undir( g,allowmulti ) && g.Delta() <= 3; }
 
-		// kubiczny
 		/** \brief Test if cubic.
 		 *
 		 *  The method tests if the considered graph \a g is cubic (the degree of each vertex is exactly three).
@@ -207,7 +177,6 @@ namespace Koala
 		template< class GraphType > static bool cubic( const GraphType &g, bool allowmulti = false )
 			{ return g.getVert() && g.deg( g.getVert() ) == 3 && regular( g,allowmulti ); }
 
-		// graf o wszystkich skladowych 2-spojnych bedacych klikami
 		/** \brief Test if block graph.
 		 *
 		 *  The method tests if every biconnected component of the graph \a g is a clique.
@@ -215,7 +184,6 @@ namespace Koala
 		 *  \return true if the graph \a g is a block graph, false  otherwise. */
 		template< class GraphType > static bool block( const GraphType &g );
 
-        // maks. liczba cyklomatyczna skladowej 2-spojnej grafu prostego. -1 w razie bledu.
 		/** \brief Test if almost K-tree.
 		 *
 		 *  The method checks for which smallest  \a K a graph is an almost K-tree.
@@ -224,17 +192,11 @@ namespace Koala
 		 *  \return the smallest \a K for which  the graph \a g is an almost K-tree.  If graph is not undirected -1 is returned.*/
 		template< class GraphType > static int almostTree( const GraphType &g, bool allowmulti=false );
 
-		/* Bipartite
-		 *
-		 */
 		/** \brief Methods for bipartite graphs. */
 		class Bipartite
 		{
 
 		public:
-			// wypisuje na iterator wierzcholki jednej partycji grafu dwudzielnego. Zwraca licznosc partycji (-1 w razie bledu)
-			// jest to tez kolorowania optymalne, jesli tym wierzcholkom nadac 0 a pozostalym 1 (ta partycja zawiera wszystkie z deg=0)
-			// Ponadto bezposrednie kolorowanie optymalne:trzeba tu odeslac, ze dla bipartite zapewnia je kolorowanie sekwen. SLF (odsylacz do procedury w Koali)
 			/** \brief Get partition.
 			 *
 			 *  The method gets a partition of \a g  and stores up in the container represented by output iterator \a out.
@@ -250,7 +212,6 @@ namespace Koala
 			template< class GraphType, class Iter >
 				static int getPart( const GraphType &g, Iter out, bool allowmulti = false );
 
-			// znajduje najwiekszy zbior niezalezny, zwraca jego rozmiar
 			/** \brief Get maximal independent set.
 			 *
 			 *  The method gets the maximal independent (stable) set of the graph \a g.
@@ -259,7 +220,6 @@ namespace Koala
 			 *  \return the number of vertices in the maximal stable set kept in the container \a out.*/
 			template< class GraphType, class Iter > static int maxStable( const GraphType &g, Iter out );
 
-			// znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
 			/** \brief Get minimal vertex cover.
 			 *
 			 *  The method gets the minimal vertex set such that each edge of the graph is incident to at least one vertex in the set.
@@ -270,7 +230,6 @@ namespace Koala
 
 		};
 
-		// czy dwudzielny
 		/** \brief Test if bipartite.
 		 *
 		 *  The method tests if vertices can be partitioned into two sets such that vertices in each set are independent.
@@ -280,14 +239,10 @@ namespace Koala
 		template< class GraphType > static bool bipartite( const GraphType &g, bool allowmulti = false )
 			{ return Bipartite::getPart( g,blackHole,allowmulti ) != -1; }
 
-		/* CompBipartite
-		 *
-		 */
 		/** \brief Methods for complete bipartite graphs. */
 		class CompBipartite
 		{
 		public:
-			// wypisuje na iterator wierzcholki jednej partycji grafu pelnego dwudzielnego. Zwraca licznosc partycji (-1 w razie bledu)
 			/** \brief Get partition.
 			 *
 			 *  The method gets the set of vertices that make a partition of \a g.
@@ -297,7 +252,6 @@ namespace Koala
 			template< class GraphType, class Iter > static int getPart( const GraphType &g, Iter out );
 		};
 
-		// czy pelny dwudzielny
 		/** \brief Test if complete bipartite graph.
 		 *
 		 *  The method tests if the graph is a complete bipartite graph.
@@ -306,15 +260,10 @@ namespace Koala
 		template< class GraphType > static bool compBipartite( const GraphType &g )
 			{ return CompBipartite::getPart( g,blackHole ) != -1; }
 
-		/* CompMPartite
-		 *
-		 */
 		/** \brief Methods for complete M-partite graph. */
 		class CompMPartite
 		{
 		public:
-			// wyrzuca na out ciagi wierzcholkow tworzacych partycje grafu pelnego M-dzielnego. Zwraca liczbe partycji M lub -1 w razie bledu
-			// argument w postaci kontenera wyjsciowego PVertex->int (tj. numer partycji). Wolno blackholizowac
 			/** \brief Get partitions.
 			 *
 			 *  The method gets all the partitions of graph and stores it up in the CompStore \a out.
@@ -333,7 +282,6 @@ namespace Koala
             {   return split(g,avertCont,CompStore< BlackHole,BlackHole>( blackHole,blackHole ));  }
 		};
 
-		// czy pelny M-dzielny dla pewnego M>0
 		/** \brief Test if complete M-partite.
 		 *
 		 *  The method tests if the graph is a complete M-partite graph.
@@ -342,12 +290,6 @@ namespace Koala
 		template< class GraphType > static bool compMPartite( const GraphType &g )
 			{ return CompMPartite::split( g,blackHole,compStore( blackHole,blackHole )) != -1; }
 
-		/* Chordal
-		 * M. Habib, R. McConnel, C. Paul, L.Viennot
-		 * Lex-BFS and Partition Refinement, with Applications to Transitive
-		 * Orientation, Interval Graph Recognition and Consecutive Ones Testing
-		 * Obsluga chordali
-		 */
 		/** \brief Methods for chordal graphs.
 		 *
 		 *  The algorithms are based on the article: M. Habib, R. McConnel, C. Paul, L.Viennot
@@ -358,17 +300,15 @@ namespace Koala
 		protected:
 			inline static void RadixSort( std::pair< int,int > *src, int size, int n, int *hints, int *out );
 
-			// porz¹dkuje wêz³y drzewa zdefiniowanego przez relacjê parent
-			// wszyscy potomkowie p wyst¹pi¹ przed wyst¹pieniem p, ale
-			// nie koniecznie bêdzie to kolejnoœæ wygenerowana przez DFSa na
-			// drzewie, np. dla:
+			// sorts nodes of a tree defined by relation parent
+			// all sons of p precede p, but it may be not a DFS order, e.g.
 			//     D
 			//    / \
 			//   C   E
 			//  / \
 			// A   B
-			// DFSPostorder da: A B C E D
-			// a poni¿sza funkcja mo¿e zwróciæ np.: A E B C D
+			// DFSPostorder gives: A B C E D
+			// and this function may give A E B C D
 
 			inline static void SemiPostOrderTree( int *parent, int n, int *out );
 
@@ -458,9 +398,6 @@ namespace Koala
 
 		public:
 
-			// kolorowania optymalnego nie ma, ale trzeba tu odeslac, ze dla chordali zapewnia je kolorowanie sekwen. (odsylacz do procedury) zgodne z wynikiem gettopOrd
-			// wyrzuca na iterator odwrotny perf. ellimination order chordal grafu tj. porzadek doklejania nowych wierzcholkow za podkliki
-			// false gdy graf nie byl chordal
 			/** \brief Get reversed perfect elimination order.
 			 *
 			 *  The method gets the reversed perfect elimination order of \a g, which exist if and only if \a g is chordal.
@@ -473,8 +410,6 @@ namespace Koala
 			 *  \return true if sucesfull, false if \a g is not a chordal graph.*/
 			template< class Graph, class VIter2 > static bool getOrder( const Graph &g, VIter2 riter );
 
-			// Tworzy reprezentacje chordala w postaci drzewa jego maksymalnych klik
-			// zwraca liczbe maksymalnych klik
 			/** \brief Get maximum cliques tree representation.
 			 *
 			 *  The method gets the maximum cliques tree representation basing on the perfect elimination order of \a g.
@@ -488,7 +423,6 @@ namespace Koala
 			template< class Graph, class VIter, class VIterOut, class QIter, class QTEIter >
 				static int maxCliques( const Graph &g, VIter begin, VIter end, CompStore< QIter,VIterOut > out, QTEIter qte );
 
-			// j.w. ale samodzielna. Pobiera tylko graf, jesli nie byl chordal, zwraca -1
 			/** \brief Get maximum cliques tree representation.
 			 *
 			 *  The method gets the maximum cliques tree representation.
@@ -501,7 +435,6 @@ namespace Koala
 			template< class Graph, class VIterOut, class QIter, class QTEIter >
 				static int maxCliques( const Graph &g, CompStore< QIter,VIterOut > out, QTEIter qte );
 
-            // znajduje najwieksza klike w grafie, zwraca jej rozmiar
 			/** \brief Get maximal clique.
 			 *
 			 *  The method gets the maximal clique of \a g basing on the perfect elimination order.
@@ -513,7 +446,6 @@ namespace Koala
 			template< class Graph, class VIter, class VIterOut >
 				static int maxClique( const Graph &g, VIter begin, VIter end, VIterOut out );
 
-			// j.w. ale samodzielna. Pobiera tylko graf, jesli nie byl chordal, zwraca -1
 			/** \brief Get maximal clique.
 			 *
 			 *  The method gets the maximal clique of \a g.
@@ -522,8 +454,6 @@ namespace Koala
 			 *  \return the maximal clique size or -1 if \a g is not chordal. */
 			template< class Graph, class VIterOut > static int maxClique( const Graph &g, VIterOut out );
 
-			// znajduje najwiekszy zbior niezalezny (wypuszczany na out), zwraca jego rozmiar
-			// korzysta z rozkladu na drzewo klik por. maxCliques
 			/** \brief Get maximal stable set.
 			 *
 			 *  The method gets the set of vertices that make a maximal stable (independent) set of \a g.
@@ -539,8 +469,6 @@ namespace Koala
 			template< class Graph, class QIter, class VIter, class QTEIter, class IterOut >
 				static int maxStable( const Graph &g, int qn, QIter begin, VIter vbegin, QTEIter ebegin, IterOut out );
 
-			// znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
-			// sens parametrow j.w.
 			/** \brief Get minimal vertex cover.
 			 *
 			 *  The method gets the set of vertices that make a minimal vertex cover of \a g.
@@ -555,8 +483,6 @@ namespace Koala
 			template< class Graph, class QIter, class VIter, class QTEIter, class IterOut >
 				static int minVertCover( const Graph &g, int qn, QIter begin, VIter vbegin, QTEIter ebegin, IterOut out );
 
-			// znajduje najwiekszy zbior niezalezny (wypuszczany na out), zwraca jego rozmiar lub -1 w razie bledu
-			// samodzielna
 			/** \brief Get  maximal stable set.
 			 *
 			 *  The method gets the set of vertices that make a maximal stable (independent) set  of \a g.
@@ -565,8 +491,6 @@ namespace Koala
 			 *  \return the number of element in the output set \a out or -1 if \a g is not chordal.*/
 			template< class Graph, class IterOut > static int maxStable( const Graph &g, IterOut out );
 
-			// znajduje najwieksze pokrycie wierzcholkowe (wypuszczane na out), zwraca jego rozmiar lub -1 w razie bledu
-			// samodzielna
 			/** \brief Get minimal vertex cover.
 			 *
 			 *  The method gets the set of vertices that make a minimal vertex cover of \a g.
@@ -584,7 +508,6 @@ namespace Koala
 		template< class GraphType > static bool chordal( const GraphType &g )
 		{ return Chordal::getOrder( g,blackHole ); }
 
-		// czy graf jest dopelnieniem chordala
 		/** \brief Test if chordal graph complement.
 		 *
 		 *  The method tests if \a g is a complement of a chordal graph.
@@ -592,7 +515,6 @@ namespace Koala
 		 *  \return true if the graph is a complement of a chordal graph, false otherwise.*/
 		template< class GraphType > static bool cochordal( const GraphType &g );
 
-		// czy splitgraph
 		/** \brief Test if split graph.
 		 *
 		 *  The method tests if the graph is a split graph.
@@ -601,9 +523,6 @@ namespace Koala
 		template< class GraphType > static bool split( const GraphType &g )
 		{ return chordal( g ) && cochordal( g ); }
 
-		/* Comparability
-		 *
-		 */
 		/** \brief Methods for comparability graphs*/
 		class Comparability
 		{
@@ -633,16 +552,6 @@ namespace Koala
 
 
 		public:
-			/* M.C. Golumbic
-			 * The Complexity of Comparability Graph Recognition and Coloring
-			 * Computing 18, 199-208 (1977)
-			 */
-			// Kompleksowa obsluga comparability grafu
-			// zwraca liczbe chromatyczna lub -1 jesli graf nie byl comparability
-			// dirmap - wysciowa tablica asocjacyjna PVertex->EdgeDirection z przykladowa comparability orientation krawedzi
-			// (kierunek krawedzi miedzy getEdgeEnd1 a getEdgeEnd2). Lub BlackHole.
-			// aheightmap- wysciowa tablica asocjacyjna PVertex->int z optymalnym pokolorowaniem wierzcholkowym. Lub BlackHole.
-			// cliqueiter - iterator wyjsciowy, na ktory zostaje zapisana najwieksza klika
 			/** \brief Comprehensive service for comparability graphs.
 			 *
 			 *  The method bases on <em> M.C. Golumbic, The Complexity of Comparability Graph Recognition and Coloring Computing 18, 199-208 (1977)\n
@@ -656,9 +565,6 @@ namespace Koala
 			template< class Graph, class DirMap, class OutMap, class OutIter >
 				static int explore( const Graph &g, DirMap &dirmap, OutMap &aheightmap, OutIter cliqueiter );
 
-			// sprawdza, czy graf byl comparability
-			// adirmap - wysciowa tablica asocjacyjna PVertex->EdgeDirection z przykladowa comparability orientation krawedzi
-			// (kierunek krawedzi miedzy getEdgeEnd1 a getEdgeEnd2). Lub BlackHole
 			/** \brief Test if comparability.
 			 *
 			 *  The method tests if the graph \a g is a comparability graph and finds the orientation of edges.
@@ -670,7 +576,6 @@ namespace Koala
 			template< class Graph, class DirMap > static bool getDirs( const Graph &g, DirMap& adirmap )
 				{ return explore( g,adirmap,blackHole,blackHole ) != -1; }
 
-			// sprawdza, czy graf byl comparability. Jesli tak, nadaje krawedziom wlasciwa orientacje
 			/** \brief Convert to partial order.
 			 *
 			 *  The method tests if the graph \a g is a comparability graph. If positive, converts all the edges to arcs
@@ -679,8 +584,6 @@ namespace Koala
 			 *  \return true if \a g is a comparability graph, false otherwise and the graph remains unchanged. */
 			template< class Graph > static bool getDirs( Graph &g );
 
-			// zwraca liczbe chromatyczna lub -1 jesli graf nie byl comparability
-			// avmap - wysciowa tablica asocjacyjna PVertex->int z optymalnym pokolorowaniem wierzcholkowym. Lub BlackHole.
 			//TODO: procedury z katalogu coloring zwracaja max. used colors tj. o 1 mniej, albo jawne ostrzezenie w dokumentacji, albo poprawiamy  albo tu przynajmniej zmiana nawy color->chi
 			/** \brief Get optimal coloring.
 			 *
@@ -698,10 +601,6 @@ namespace Koala
                 return chi(g,avmap);
             }
 
-            //Dilworth's theorem - rozbicie wierzcholkow comparability na najmniejsza liczbe podzbiorow bedacych klikami
-            // czyli liczba chromat. negacji. Dla comparability jest rowna maxStable.
-            // avmap - mapa PVertex->numer kliki (int) liczac od 0, wolno blacholizowac
-            //zwraca moc maxStable tj. liczbe klik lub -1 dla niecomparability
 			/**\brief Split vertex set into cliques. 
 			 *
 			 * According to Dilworth's theorem, the method splits the vertex set of comparability graph into minimum number of cliques. 
@@ -720,7 +619,6 @@ namespace Koala
 			template< class Graph, class OutIter > static int maxClique( const Graph &g, OutIter iter )
 				{ return explore( g,blackHole,blackHole,iter ); }
 
-			// znajduje najwiekszy zbior niezalezny, zwraca jego rozmiar
 			/** \brief Get maximal stable (independent) set.
 			 *
 			 *  The method gets the set of vertices that make a stable set of \a g.
@@ -729,7 +627,6 @@ namespace Koala
 			 *  \return the cardinality of stable set i.e. the number of element in the output set \a out.*/
 			template< class GraphType, class VIterOut > static int maxStable( const GraphType &g, VIterOut out );
 
-			// znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
 			/** \brief Get minimal vertex cover.
 			 *
 			 *  The method gets the set of vertices that make a minimal vertex cover of \a g.
@@ -747,7 +644,6 @@ namespace Koala
 		template< class GraphType > static bool comparability( const GraphType &g )
 			{ return Comparability::explore( g,blackHole,blackHole,blackHole ) != -1; }
 
-		// czy graf jest dopelnieniem comparability
 		/** \brief Test if complement of comparability graph.
 		 *
 		 *  \param g the considered graph.
@@ -755,21 +651,10 @@ namespace Koala
 		 *  \related Comparability */
 		template< class GraphType > static bool cocomparability( const GraphType &g );
 
-		/* Interval
-		 *
-		 */
 		/** \brief Methods for interval graphs.*/
 		class Interval: protected LexBFSPar< DefaultStructs >
 		{
 		public:
-		    // Segment i touch wylecialy do simple.h
-
-			// konwersja zbior przedzialow-> interval graph
-			// pobiera spomiedzy 2 iteratorow ciag przedzialow (struktur typu segment)
-			// dopisuje do danego grafu odpowiadajacy mu graf przeciec (zwraca pierwszy stworzony wierzcholek)
-			// pola info wierzcholkow i krawedzi tworzy funktorami vinfo(int), einfo(int,int) - argumenty to
-			// numery przedzialow w ciagu wejsciowym
-			// na iterator out zwraca sekwencje stworzonych wierzcholkow zgodna z cagiem przedzialow
 			/** \brief Convert intervals to graph.
 			 *
 			 *  The method adds to \a g an interval graph generated from the set of line segments kept in the container represented by iterators \a begin and \a end.
@@ -785,7 +670,6 @@ namespace Koala
 			template< class GraphType, class Iter, class IterOut, class VInfoGen, class EInfoGen >
 				static typename GraphType::PVertex segs2graph( GraphType &g, Iter begin, Iter end, IterOut out,
 					VInfoGen vinfo, EInfoGen einfo );
-			// j.w. ale polom info nadawane sa wartosci domyslne
 			/** \brief Convert intervals to graph.
 			 *
 			 *  The method adds to \a g an interval graph generated from the set of line segments kept in the container  represented by the iterators \a begin and \a end.
@@ -821,17 +705,17 @@ namespace Koala
 				Sets( std::pair< Entry,Privates::List_iterator< Elem> > *data, size_t n,
 					SimplArrPool< Privates::ListNode< Elem > > &a );
 
-				// dodaje trg do zbioru id
+				// adds trg to set id
 				inline void add( int id, int trg );
-				// usuwa id ze wszystkich zbiorów
+				// removes id from all sets
 				inline void remove( int id );
-				// iloœæ elementów w zbiorze id
+				// cardinality of id
 				inline int count( int id )
 					{ return m_data[id].first.size(); }
-				// czy zbiór id pusty
+				// is id empty?
 				inline bool empty( int id )
 					{ return m_data[id].first.empty(); };
-				// pierwszy element ze zbioru id (w praktyce -- dowolny)
+				// the first element of id (in practice -- arbitrary)
 				inline int first( int id )
 					{ return m_data[id].first.front().value; }
 
@@ -857,9 +741,9 @@ namespace Koala
 			template< class GraphType > struct OrderData
 			{
 				typename GraphType::PVertex v;
-				// kogo jest s¹siadem (numer s¹siada w porz¹dku)
+				// whose neighbour (number of its neighbour in order)
 				int vertId;
-				// numer w porz¹dku
+				// number in order
 				int orderId;
 			};
 
@@ -906,7 +790,6 @@ namespace Koala
 		template< class GraphType > static bool interval2(const GraphType &g)
 		     { return chordal( g ) && cocomparability( g ); }
 
-		// czy pierwszy
 		/** \brief Test if prime graph.
 		 *
 		 *  The method test if the graph \a g is a prime graph.
@@ -914,9 +797,6 @@ namespace Koala
 		 *  \return true if \a g is prime, false otherwise .*/
 		template< class GraphType > static bool prime( const GraphType &g );
 
-		/* Cograph
-		*
-		*/
 		/** \brief Methods for cographs.*/
 		class Cograph
 		{
@@ -937,7 +817,6 @@ namespace Koala
 			 *  \param out the iterator of the output container with all the vertices of the stable set.
 			 *  \return the number of element in the output set \a out i.e. the cardinality of the stable set of \a g.*/
 			template< class GraphType, class VIterOut > static int maxStable( const GraphType &g, VIterOut out );
-			// znajduje najmniejsze pokrycie wierzcholkowe, zwraca jego rozmiar
 			/** \brief Get the minimal vertex cover.
 			 *
 			 *  The method gets the set of vertices that make a vertex cover of \a g.
@@ -956,7 +835,6 @@ namespace Koala
 				static int maxStable2( const GraphType &ag, Assoc &subset, Iter& out );
 		};
 
-		// czy cograph
 		/** \brief Test if cograph.
 		 *
 		 *  The method tests if the graph \a g is a cograph.
@@ -967,7 +845,7 @@ namespace Koala
 
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
+	// version that works for DefaultStructs=AlgsDefaultSettings
 	class IsIt: public IsItPar< AlgsDefaultSettings > { };
 #include "detect.hpp"
 }

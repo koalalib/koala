@@ -16,10 +16,6 @@ namespace Koala
 	 *  Some auxiliary structures used by various algorithms, for example shortest path.*/
 	struct PathStructs
 	{
-		// Do odczytu sciezki miedzy wierzcholkiem a korzeniem, gdy droga wyznaczona jest w postaci
-		// tablicy asocjacyjnej PVertex -> rekord z polami vPrev, ePrev (wierzcholek poprzedni i krawedz do niego).
-		// Przydatne w roznych algorytmach najkrotszej sciezki
-		// Uzytkownik podaje, pare iteratorow, gdzie wpisac wierzcholki i krawedzie najkrotszej sciezki
 		/** \brief Path structure.
 		 *
 		 *  The structure used by various algorithms. It is designed to keep a path i.e. a sequence of vertices and edges.
@@ -40,8 +36,6 @@ namespace Koala
 			OutPath( VIter av, EIter ei ): vertIter( av ), edgeIter( ei ) { }
 		};
 
-		// funkcja tworzaca, analogia make_pair
-		// Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
 		/**\brief The generating function for OutPath.
 		 *
 		 *  The function takes two insert iterators and returns OutPath.
@@ -57,9 +51,6 @@ namespace Koala
         inline static OutPath< BlackHole,BlackHole> outPath( BlackHole )
             { return OutPath< BlackHole,BlackHole>( blackHole,blackHole ); }
 
-		// OutPath moze wspolpracowac z dowolnymi sekwencyjnymi kontenerami, ale ponizsza struktura
-		//  ulatwia obrobke takich danych
-		// drugi parametr (szablon kontenera) - moze takze byc std::vector
 		/** \brief  Path tool.
 		 *
 		 *  The container for paths that cooperates with OutPath in the insertion process simplifies manipulation on Paths.
@@ -90,26 +81,21 @@ namespace Koala
 				{ clear(); }
 			/** \brief Clear path.*/
 			void clear();
-			// dlugosc wpisanej sciezki, -1 w razie bledu (jeszcze zadnej nie wpisano)
 			/** \brief Get length of path
 			 *
 			 *  \return the number of vertices - 1 which equals the number of edges. */
 			int length() const
 				{ return verts.size() - 1; }
-			// i-ta krawedz
 			/** \brief Get i-th edge.
 			 *
 			 *  \param i the index of edge on the path.
 			 *  \return the pointer to i-th edge in path. Indexes start with 0. If the index excides the range exception is thrown.*/
 			PEdge edge( int i ) const;
-			// i-ta wierzcholek
 			/** \brief Get i-th vertex
 			 *
 			 *  \param i the index of vertex on the path.
 			 *  \return the pointer to i-th vertex in path. Indexes start with 0. If the index excides the range exception is thrown.*/
 			PVertex vertex( int i) const;
-			//Umiesczamy wywolanie funkcji w miejsu outPath a pozniej przetwarzamy zebrane ciagi
-			// czysci kontener
 			/** \brief Prepare OutPath.
 			 *
 			 *  The method clears container and creates input for a function that requires OutPath.
@@ -126,13 +112,6 @@ namespace Koala
 	 *  This class consist of methods that extract some useful data from such containers. */
 	struct ShortPathStructs: public PathStructs
 	{
-		// zwraca liczbe krawedzi sciezki
-		// vertTab, tablica asoc. przypisujaca wierzcholkom rekordy z ustawionymi
-		// wskaznikami do poprzedniego wierzcholka (vPrev) i krawedzi don prowadzacej (ePrev, NULL dla korzenia)
-		// W tej formie zwraca wynik wiele procedur tworzacych w grafie drzewo (las) skierowany do korzenia np. Dijkstra, BFS itp
-		// OutPath, miejsce gdzie sciezka zostanie zapisana
-		// sciezka prowadzi "pod prad" tj. od korzenia do tego wierzcholka
-		// ew. wczesniejszy punkt koncowy na sciezce miedzy end a korzeniem
 		/** \brief Extract path from in-tree.
 		 *
 		 * The method gets path from root of in-tree (\a stort) to vertex \a end. The path is saved in OutPath container.
@@ -147,7 +126,6 @@ namespace Koala
 			static int getOutPath( const GraphType &g, const VertContainer &vertTab, OutPath< VIter,EIter > iters,
 			typename GraphType::PVertex end, typename GraphType::PVertex start = 0 );
 
-        // jak wyzej, bez podawania OutPath (wynik jest zwracany tylko przez return ...)
         // specjalization for blackHole instead of OutPath iters
         template< class GraphType, class VertContainer >
 			static int getOutPath( const GraphType &g, const VertContainer &vertTab, BlackHole,
@@ -156,8 +134,6 @@ namespace Koala
 			    return getOutPath( g,vertTab, OutPath< BlackHole,BlackHole>(blackHole,blackHole),end, start );
 			}
 
-		// Zapisuje na podany iterator wszystkie krawedzie nalezace do drzewa (lasu) tj. uzyte jako wartosci pol ePrev
-		// Zwraca ich liczbe
 		/** \brief Get edges in in-tree.
 		 *
 		 * \param[in] g the considered graph.
@@ -166,7 +142,6 @@ namespace Koala
 		 *  \return the number of edges.*/
 		template< class GraphType, class VertContainer, class Iter > static int getUsedEdges( const GraphType &g,
 			const VertContainer &vertTab, Iter iter );
-		// jw. ale zwraca zbior krawedzi
 		/** \brief Get edges in in-tree.
  		 *
 		 * \param[in] g the considered graph.
@@ -183,8 +158,6 @@ namespace Koala
 	class SearchStructs
 	{
 	public:
-		// Struktura wartosci przypisywanej wierzcholkowi w procedurach przeszukiwania grafu
-		//chodzi o reprezentacje in-forest w grafie tj. etykieta przy wierzcholku pokazuje przejscie do rodzica
 		/** \brief Auxiliary visit vertex structure
 		 * 
 		 *  Structure used by search procedures. To represent in-forest the structure keeps the pointer to parent vertex and PEdge leading to it.
@@ -192,16 +165,13 @@ namespace Koala
 		 *  For example, it may be used as mapped value in associative container associated with vertex (PVert -> VisitVertLabs). */
 		template< class GraphType > struct VisitVertLabs
 		{
-			// rodzic danego wierzcholka w drzewie (lesie), NULL dla korzenia
 			/** \brief Parent 
 			 *
 			 *  The parent vertex in in-forest or NULL if current vertex is root.*/
 			typename GraphType::PVertex vPrev;
-			// krawedz prowadzaca do rodzica
 			/** \brief Edge leading to parent of vertex in in-forest, or NULL if current vertex is root.*/
 			typename GraphType::PEdge ePrev;
 
-			// odleglosc od korzenia (liczba krawedzi) i numer skladowej spojnosci (od 0)
 			int distance;/**< \brief Distance (number of edges) to root in in-forest.*/
 			int component;/**< \brief Index of connected component (in-tree) in in-forest.*/
 
@@ -234,11 +204,6 @@ namespace Koala
 				{ }
 		};
 
-		// Para iteratorow wyjsciowych do kodowania ciagu ciagow (zazwyczaj wierzcholki/kraw)
-		// kolejne elementy kolejnych ciagow wysylane sa na vertIter
-		// na compIter wyrzucane sa inty: pozycje (numeracja od 0) poczatkow kolejnych ciagow
-		// oraz na koniec sumaryczna dlugosc wszystkich ciagow
-		// (a wiec lacznie o 1 wiecej liczb, niz ilosc ciagow)
 		/** \brief Joined sequences container.
 		 *
 		 *  The structure consist of two insert iterators. 
@@ -256,8 +221,6 @@ namespace Koala
 				{ }
 		} ;
 
-		// Funkcja tworzaca, analogia make_pair
-		// Jesli wyniki nas nie interesuja, zawsze (chyba) mozna podawac BlackHole
 		/** \brief Generating function for CompStore.
 		 *
 		 *  \param ac  the insert iterator to the container with integers representing the positions of first elements of consecutive sequences.
@@ -274,14 +237,6 @@ namespace Koala
             { return CompStore< BlackHole,BlackHole>( blackHole,blackHole ); }
 
 
-		// Odwrotne mapowanie ciagu dlugosci size ciagow o elementach typu T o poczatkach w iteratorach
-		// begin (kolejne rozmiary) i sbegin (wartosci) - por. powyzszy format
-		// out, wyjsciowy ciag numerow (od 0) ciagow: i-ty ciag to numery
-		// w ktorych wystepuje i-ty element poslany na eout (w razie powtorzen ten sam numer ciagu powtarza sie
-		// odpowiednia ilosc razy.
-		// eout, iterator wyjsciowy na wszystkie elementy w wystepujace ciagach (kazdy jeden raz)
-		// zwraca ilosc elementow wystepujacych w ciagach (kazdy jeden raz) tj. dlugosc sekwencji poslanej na eout
-		// uwaga: przy wywolaniach nie dedukuje typu elementow ciagow T (tzreba podac jawnie)
 		/**\brief Reverse CompStore.
 		 *
 		 * Each CompStore is a sequence of sequences. Some elements may appear in many sequences.
@@ -299,8 +254,6 @@ namespace Koala
 		template< class T, class InputIter, class VertInputIter, class CIter, class IntIter, class ElemIter >
 			static int revCompStore( InputIter begin, VertInputIter sbegin, int size, CompStore< CIter,IntIter > out,
 				ElemIter eout );
-		// j.w., ale zakladamy, ze elementy ciagow (a wiec sbegin) sa przechowywane w tablicy, ktorej wskaznik
-		// poczatku dostarczamy do procedury (wowczas typ T jest dedukowany).
 		/**\brief Reverse CompStore.
 		 *
 		 * Each CompStore is a sequence of sequences. Some elements may appear in many sequences.
@@ -323,9 +276,6 @@ namespace Koala
 				return revCompStore< T,InputIter,const T *,CIter,IntIter,ElemIter >( begin,sbegin,size,out,eout );
 			}
 
-		// CompStore moze wspolpracowac z dowolnymi sekwencyjnymi kontenerami, ale ponizsza struktura
-		// ulatwia obrobke takich danych
-		// T typ elementu ciagow skladowych
 		/**\brief Sequence of sequences managing class. 
 		 *
 		 *  The class is designed to simplify operations of CompStore. It delivers method input that returns CompStore
@@ -354,38 +304,28 @@ namespace Koala
 				{ clear(); }
 			/**\brief Clear containers. */
 			void clear();
-			 // liczba zebranych ciagow
 			/**\brief The number of sequences.*/
 			int size() const;
-			 // dlugosc i-tego ciagu
 			/**\brief The number of elements in i-th sequence.*/
 			int size( int i ) const;
-			 // laczna dlugosc wszystkich ciagow
 			/**\brief The number of elements in all sequences (size of container with elements). */
 			int length() const;
-			// wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
 			/**\brief Access i-th element. 
 			 *
 			 * \return the pointer to beginning of i-th sequence or 0 if the sequence is empty. */
 			T *operator[]( int i );
-			// wskaznik poczatku i-tego ciagu lub 0 gdy ten ciag jest pusty
 			/**\brief Get i-th sequence beginning.
 			 *
 			 * \return the pointer to beginning of i-th sequence or 0 if the sequence is empty. */
 			const T *operator[]( int i ) const;
-			// umieszcza nowy ciag pusty na pozycji i.
 			/**\brief Insert new empty sequence on i-th position. */
 			void insert( int i );
-			// kasuje ciag na pozycji i
 			/**\brief Delete i-th sequence.*/
 			void del( int i );
-			// zmienia dlugosc i-tego ciagu.
 			/**\brief Resize i-th sequence
 			 *
 			 *  The method changes the size of i-th sequence to \a size.*/
 			void resize( int i, int asize );
-			//Umiesczamy wywolanie funkcji w miejsu compStore a pozniej przetwarzamy zebrane ciagi
-			// czysci kontener
 			/**\brief Generate CompStore
 			 *
 			 * The method generates CompStore object associated with current CompStoreTool. 
@@ -736,12 +676,6 @@ namespace Koala
 		};
 	};
 
-	/* GraphSearchBase
-	 * Ogolna implementacja przeszukiwania grafu roznymi strategiami (DFS, BFS, LexBFS)
-	 * Strategie dostarcza metoda visitBase z klasy SearchImpl, ktora odwiedza wierzcholki stosownie do swojej klasy
-	 * DefaultStructs dostarcza wytycznych dla wewnetrznych procedur por. np. AlgsDefaultSettings z def_struct.h
-	 *
-	 */
 	/** \brief Basic graph search algorithms (parameterized).
 	 *
 	 *  The general implementation of graph search strategies (DFS, BFS, LexBFS). 
@@ -755,13 +689,13 @@ namespace Koala
 	template< class SearchImpl, class DefaultStructs > class GraphSearchBase: public ShortPathStructs, public SearchStructs
 	{
 	protected:
-		// Typowy kontener dla wsierzcholkow uzyteczny w tych procedurach
-		// mapa PVertex -> VisitVertLabs< GraphType >
+		// Typical container for vertices
+		// map PVertex -> VisitVertLabs< GraphType >
 		template< class GraphType > class VisitedMap: public DefaultStructs:: template AssocCont<
 			typename GraphType::PVertex,VisitVertLabs< GraphType > >::Type
 			{
 			public:
-				// inicjujemy przewidywanym potrzebnym rozmiarem
+				// initialized with predicted size
 				VisitedMap( int asize ): DefaultStructs:: template
 					AssocCont< typename GraphType::PVertex,VisitVertLabs< GraphType > >::Type( asize ) { }
 			};
@@ -785,7 +719,6 @@ namespace Koala
 		template< class GraphType, class VertContainer, class Visitor >
 			static int visitAllBase( const GraphType &g, VertContainer &visited, Visitor visitor, EdgeDirection dir );
 
-		//Po wykonaniu postac drzewa przeszukiwania opisuja pola vPrev, ePrev przypisane wierzcholkom, distance = odleglosc od korzenia, component=0
 		/** \brief Visit attainable.
 		 * 
 		 *  Visit all vertices attainable from a given vertex in order given by the strategy SearchImpl.
@@ -835,7 +768,6 @@ namespace Koala
 		template< class GraphType, class VertIter > static int scan( const GraphType &g,
 			BlackHole,VertIter out, EdgeDirection dir= EdDirOut | EdUndir | EdDirIn, bool sym = true );
 
-		/* Liczba cyklomatyczna podgrafu zlozonego z krawedzi zgodnych z maska */
 		/** \brief Cyclomatic number of graph.
 		 *
 		 *  The method gets the \wikipath{Reachability#Cyclomatic-number,cyclomatic number} of graph, concerning only edges congruent with \a mask.
@@ -857,8 +789,6 @@ namespace Koala
 			typename GraphType::PVertex src, EdgeDirection dir = EdDirOut | EdUndir );
 
 
-        // ponizsze 2 - przeglad podobny do ScanAttainable wybrana strategia, ale tylko na glebokosc radius w poddrzewie o korzeniu  src
-        // W kontenerze wpisuje (odwiedza) odwiedzone wierzcholki. Zwraca ich liczbe.tylko wartosci dla wierzcholkow odwiedzonych w czasie poszukiwania start sa ustawiane w tej mapie
 		/** \brief Visit near attainable.
 		*
 		*  Visit all vertices attainable from vertex \a src in distance \a radius.
@@ -898,7 +828,6 @@ namespace Koala
 			typename GraphType::PVertex src, typename GraphType::PVertex dest, OutPath< VertIter,EdgeIter > path,
 			EdgeDirection dir = EdUndir | EdDirOut );
 
-        // wersja bez podawania iteratorow
 		template< class GraphType > static int findPath( const GraphType &g,
 			typename GraphType::PVertex src, typename GraphType::PVertex dest, BlackHole=blackHole,
 			EdgeDirection dir = EdUndir | EdDirOut )
@@ -947,10 +876,6 @@ namespace Koala
 	};
 
 
-	/*
-	* DFSBase
-	* DefaultStructs - wytyczne dla wewnetrznych procedur
-	*/
 	template< class SearchImpl, class DefaultStructs > class DFSBase: public GraphSearchBase< SearchImpl,DefaultStructs >
 	{
 
@@ -990,11 +915,6 @@ namespace Koala
 			Visitors::simple_visitor_tag & );
 
 	public:
-	    //opis tej nieistniejacej metody powinien znalezc sie przy GraphSearchBase (jako wymog dla kazdej stategii), a tu  link do niego
-	    //ale uwaga KO: W zasadzie dokumentacja do visitBase jest trochę myląca. Powinno być to
-        //coś w stylu "zastosuj visitor do każdego wierzchołka i krawędzi w kolejności
-        //zdefiniowanej przez algorytm przeszukiwania; zwraca liczbę wierzchołków
-        //dla których zostało wywołane visitVertexPost".
 		/** \brief Visit all vertexes connected to \a src.
 		*
 		*  The method visits all the vertices connected to \a src.
@@ -1019,7 +939,6 @@ namespace Koala
 			typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
 	} ;
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Preorder Depth-First-Search (default).
 	 *
 	 *  By default DefaultStructs = AlgsDefaultSettings.
@@ -1046,7 +965,6 @@ namespace Koala
 			typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Postorder Depth-First-Search (default)
 	 *
 	 *  By default DefaultStructs = AlgsDefaultSettings.
@@ -1071,16 +989,12 @@ namespace Koala
 			typename GraphType::PVertex src, VertContainer &visited, Visitor visitor, EdgeDirection dir, int compid );
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Breadth-First-Search (default).
 	 *
 	 *  By default DefaultStructs = AlgsDefaultSettings.
 	 *  \ingroup search */
 	class BFS: public BFSPar< AlgsDefaultSettings > { };
 
-	/*
-	* lexicographical Breadth-First-Search
-	*/
 	/** \brief Lexicographical Breadth-First-Search (parametrized).
 	 *
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
@@ -1143,9 +1057,9 @@ namespace Koala
 		template< class GraphType > struct OrderData
 		{
 			typename GraphType::PVertex v;
-			// kogo jest s¹siadem (numer s¹siada w porz¹dku)
+			// whose neighbour
 			int vertId;
-			// numer w porz¹dku
+			// number in order
 			int orderId;
 		};
 
@@ -1175,17 +1089,12 @@ namespace Koala
 
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Lexicographical Breadth-First-Search (default)
 	 *
 	 *  By default DefaultStructs = AlgsDefaultSettings.
 	 *  \ingroup search   */
 	class LexBFS: public LexBFSPar< AlgsDefaultSettings > { };
 
-	/*
-	 * Cheriyan/Mehlhorn/Gabow algorithm
-	 * Wyszukiwanie skladowych silnie spojnych grafu skierowanego
-	 */
 	/** \brief Cheriyan/Mehlhorn/Gabow algorithm (parametrized).
 	 *
 	 *  The algorithm for searching strongly connected components of directed graph.
@@ -1254,14 +1163,10 @@ namespace Koala
 		template< class GraphType, class CompIter, class VertIter, class CompMap > static int
 			split( const GraphType &g, CompStore< CompIter,VertIter > out, CompMap & vtoc );
 
-        //wersja bez out
 		template< class GraphType, class CompMap > static int
 			split( const GraphType &g,BlackHole, CompMap & vtoc )
         {   return split(g,CompStore< BlackHole,BlackHole>( blackHole,blackHole ),vtoc);  }
 
-		//    Korzysta z mapy CompMap z poprzedniej procedury. Wyrzuca na iterator wartosci std::pair<int,int> - wszystkie
-		//    pary numerow skladowych silnie spojnych, ktore sa polaczone choc jednym bezposrednim lukiem. Zwraca dlugos
-		//    ciagu wynikowego
 		/** \brief Get connections between components.
 		 *
 		 *  The method gets directed connections between strongly connected components and writes it down to the container \a iter
@@ -1275,7 +1180,6 @@ namespace Koala
 			static int connections(const GraphType &g, CompMap &comp, PairIter iter );
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings (default)
 	/** \brief Cheriyan/Mehlhorn/Gabow algorithm
 	 *
 	 *  The algorithm for searching strongly connected components of directed graph.
@@ -1284,7 +1188,6 @@ namespace Koala
 	 */
 	class SCC: public SCCPar< AlgsDefaultSettings > { };
 
-	//Procedury na digrafach acykliczych
 	/** \brief Procedures for directed acyclic graphs (DAG).
 	 *
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
@@ -1293,7 +1196,6 @@ namespace Koala
 	template< class DefaultStructs > class DAGAlgsPar: protected SearchStructs
 	{
 	public:
-		// wyrzuca na iterator wierzcholki grafu w porzadku topologicznym
 		/** \brief Get topological order.
 		 *
 		 *  The method searches the graph \a g in postorder DFS with mask EdDirIn. The result is written to iterator out. The container consists of all vertices.
@@ -1304,7 +1206,6 @@ namespace Koala
 		 *  [See example](examples/search/dagalgs/dagalgs.html). */
 		template< class GraphType, class VertIter > static void topOrd( const GraphType &g, VertIter out );
 
-		// sprawdza, czy graf jest DAGiem korzystajac z podanego para iteratorow ciagu wierzcholkow z wyjscia poprzedniej procedury
 		/** \brief Test if directed acyclic graph.
 		 *
 		 *  The method uses the sequence of vertices achieved by the above topOrd function to test if the graph \a g is a directed acyclic graph.
@@ -1316,7 +1217,6 @@ namespace Koala
 		 *  [See example](examples/search/dagalgs/dagalgs.html). */
 		template< class GraphType, class Iter > static bool isDAG( const GraphType &g, Iter beg, Iter end );
 
-		// sprawdza, czy graf jest DAGiem, samodzielna
 		/** \brief Test if directed acyclic graph.
 		 *
 		 *  The method test if the graph \a g is a directed acyclic graph.
@@ -1326,7 +1226,6 @@ namespace Koala
 		 *  [See example](examples/search/dagalgs/dagalgs.html). */
 		template< class GraphType > static bool isDAG( const GraphType &g );
 
-		// wyrzuca na iterator wszystkie luki przechodnie DAGa, zwraca dlugosc ciagu
 		/** \brief Get transitive edges.
 		 *
 		 *  The method gets all transitive edges (arc for which there is a directed path from the first vertex to the second vertex that skips the arc) and saves them to the iterator \a out.
@@ -1335,7 +1234,6 @@ namespace Koala
 		 *  \return the number of transitive edges.*/
 		template< class GraphType, class Iter > static int transEdges(const GraphType &g, Iter out);
 
-		// usuwa luki przechodnie DAGa
 		/** \brief Make Hasse diagram.
 		 *
 		 *  The method deletes all the transitive edges (arc for which there is a directed path from the first vertex to the second vertex that skips the arc) from graph.
@@ -1347,7 +1245,6 @@ namespace Koala
 		template< class GraphType > static void makeHasse( GraphType &g );
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Procedures for directed acyclic graphs (DAG) (default).
 	 *
 	 *  The simpler default  version of DAGAlgsPar.
@@ -1355,10 +1252,8 @@ namespace Koala
 	 *  \ingroup search    */
 	class DAGAlgs: public DAGAlgsPar< AlgsDefaultSettings > { };
 
-	//typy zagniezdzone przeniesione z BlocksPar
 	/** \brief Auxiliary structure for BlockPar class */
 	struct BlocksStructs {
-		// wynikowa etykieta wierzcholka
 		/**\brief Vertex data used to represent blocks. */
 		struct VertData {
 			
@@ -1368,7 +1263,6 @@ namespace Koala
 			 *
 			 *  The position of the first block the vertex belongs to in the sequence \a viter in \p split method. (indexes start with 0) */
 			int firstBlock;
-			// ten wierzcholek (jego pozostale bloki wystepuja kolejno za nim)
 			/**\brief Constructor
 			 *
 			 * The initialization of \a blockNo and \a firstBlock*/
@@ -1522,8 +1416,6 @@ namespace Koala
             EdgeDataMap & edgeMap,BlackHole, VertBlockIter viter )
         {   return splitComp(g,src,vertMap,edgeMap,CompStore< BlackHole,BlackHole>( blackHole,blackHole ), viter);  }
 
-		// wyrzuca na iterator ciag wierzcholkow tworzacych rdzen grafu tj. podgraf pozostajacy po sukcesywnym
-		// usuwaniu wierzcholkow stopnia < 2. Zwraca dlugosc sekwencji. zatem  mozemy (dla grafu acyklicznego) dostac strukture pusta tj. n==0
 		/** \brief Get core.
 		 *
 		 *  The method writes to \a out a sequence of vertex that make a core of graph i.e. remains after recursive deletions of vertices of deg < 2.
@@ -1535,12 +1427,6 @@ namespace Koala
 		template< class GraphType,class Iterator > static int core( const GraphType &g, Iterator out );
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
-
-	/** \brief Searching blocks = biconnected components (default).
-	 *
-	 *  
-	 *  \ingroup search    */
 	/** \brief Searching blocks = biconnected components (default).
 	*
 	*  The simpler default  version of BlocksPar in which DefaultStructs = AlgsDefaultSettings, 
@@ -1589,11 +1475,6 @@ namespace Koala
 			_ends( const GraphType &g, EdgeType mask, typename GraphType::PVertex &,typename GraphType::PVertex &);
 
 	public:
-		// Uwaga: wersje bez dir uwzgledniaja jedynie podgraf zlozony z petli i krawedzi nieskierowanych ignorujac reszte
-		// Wersje z dir uwzgledniaja jedynie podgraf zlozony z petli i lukow ignorujac reszte
-		// para zawierajaca 2 razy ten sam wierzcholek - jesli graf ma nieskierowany cykl Eulera
-		// para zawierajaca 2 rozne wierzcholki - konce nieskierowanej sciezki Eulera - jesli ta istnieje
-		// (NULL,NULL) w przciwnym razie
 		/** \brief Get Eulerian path end.
 		 *  
 		 *  The method gets the ends of Eulerian path and returns it as standard pair (u,v) of vertices belonging to path. If there exists an Eulerian cycle u == v.
@@ -1609,9 +1490,6 @@ namespace Koala
 				return res;
 			}
 
-		// para zawierajaca 2 razy ten sam wierzcholek - jesli graf ma skierowany cykl Eulera
-		// para zawierajaca 2 rozne wierzcholki - konce skierowanej sciezki Eulera - jesli ta istnieje
-		// (NULL,NULL) w przciwnym razie
 		/** \brief Get directed Eulerian path end.
 		 *
 		 *  The method gets the ends of an directed Eulerian path and returns it as standard pair (u,v) of vertices belonging to path. If there exists an Eulerian cycle u == v.
@@ -1786,8 +1664,6 @@ namespace Koala
 			const GraphType &g, typename GraphType::PVertex prefstart, OutPath<VertIter, EdgeIter> out );
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
-
 	/** Algorithms for Eulerian cycle and path. (default)
 	 *
 	 *  The simpler default  version of EulerPar in which DefaultStructs = AlgsDefaultSettings. Tested graphs may by of any type. 
@@ -1795,11 +1671,6 @@ namespace Koala
 	 *  \ingroup search */
 	class Euler: public EulerPar< AlgsDefaultSettings > { };
 
-	// Typ najwyzszego wezla drzewa dekompozycji modulowej grafu
-	// graf 1-wierzcholkowy
-	// graf spojny o niespojnym dopelnieniu
-	// graf niespojny
-	// strong modules rozpinaja graf pierwszy
 	/** \brief Enumeration type representing the type of highest node in graph modular decomposition
 	 *
 	 *  - mpTrivial - single vertex,
@@ -1811,14 +1682,11 @@ namespace Koala
 
 	/**\brief Auxiliary modules structure.*/
 	struct ModulesStructs {
-		// opis najwyzszego wezla drzewa dekompozycji modulowej grafu
 		/** \brief The top node in modular decomposition tree.*/
 		struct Partition
 		{
-			// size ile maksymalnych silnych modulow zawiera graf
 			/**\brief the number of maximum strong modules in graph. */
 			int size;
-			// j.w.
 			/** \brief Type of top node.
 			 *
 			 *  Possible values:
@@ -1836,7 +1704,6 @@ namespace Koala
 
 	};
 
-	// Znajdowanie robicia grafow na maksymalne silne moduly
 	/** \brief Maximal strong modules decomposition (parametrized).
 	 *
 	 *  \tparam DefaultStructs the class decides about the basic structures and algorithm. Can be used to parametrize algorithms.
@@ -1845,13 +1712,6 @@ namespace Koala
 	{
 	public:
 
-		// znajduje rozbicie grafu na maksymalne silne moduly
-		// g, badany graf, powinien byc prosty, nieskierowany
-		// out,  iteratory wyjsciowe z zawartoscia analogiczna jak w getComponents
-		// tyle ze chodzi o rozbicie na moduly, a nie skladowe spojnosci
-		// avmap, wyjsciowa tablica asocjacyjna PVertex->int do ktorej zapisuje sie numery modulow,
-		// do ktorych naleza wierzcholki (lub BlackHole)
-		// skipifprime, pomija badanie modulow jesli wynik ma type=mpPrime???
 		/** \brief Get modular decomposithon of graph. 
 		 *
 		 *  The method splits the vertices of \a g into maximal strong modules. Modules are indexed from 0.
@@ -1871,7 +1731,6 @@ namespace Koala
 
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Maximal strong modules decomposition (default).
 	 *
 	 *  Version of ModulesPar with default settings.

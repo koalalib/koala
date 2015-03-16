@@ -894,7 +894,6 @@ namespace Privates {
 		template< class RndGen, class GraphType >
 		static typename GraphType::PVertex barAlb(RndGen& rgen, GraphType &g, int n, int k, EdgeDirection type = Undirected, bool shuffle = false);
 
-        // wytyczne dla modeli Watts–Strogatz - mozna zmienic wewnetrzne domyslne hashSet/Map (o kluczach int lub pair<int,int>) na stlowe
         /** \brief Parameters for Watts–Strogatz model.
 		 *
 		 *  The class parameterize internal structures in Watts–Strogatz random graph generation model. */
@@ -906,7 +905,7 @@ namespace Privates {
                 {
                     public:
                     typedef Koala::HashSet< A> Type;
-                    //Druga mozliwosc
+                    // Other possibility:
                     //typedef std::set< A> Type;
                 };
 				/**\brief Memory allocation for set*/
@@ -923,7 +922,7 @@ namespace Privates {
                 {
                     public:
                         //typedef Koala::HashMap<A, B> Type;
-                        //Druga mozliwosc
+                        //Other possibility:
                         typedef Privates::StdMapWithDefault<A, B> Type;
                 };
         };
@@ -1229,10 +1228,6 @@ namespace Privates {
         inline static void remove(std::pair<Map *, int> & replaceInfo, int r);
 	};
 
-	// Operacje na grafie traktowanym jak diagram relacji w zbiorze wierzcholkow
-	/* RelDiagramPar
-	 * DefaultStructs - wytyczne dla wewnetrznych procedur
-	 */
 	/** \brief Binary relation operations (parameterized).
 	 *
 	 *  The set of methods which consider a graph as a binary relation on the set of vertices.  
@@ -1243,7 +1238,6 @@ namespace Privates {
 	{ 	    
 	public:
 
-		// doprowadza diagram do zwyklej postaci, bez krawedzi nieskierowanych ani rownoleglych
 		/** \brief Normalize.
 		 *
 		 *  Method allows to normalize graph i.e. it replaces undirected with arcs and deletes all the parallel edges.
@@ -1252,14 +1246,12 @@ namespace Privates {
 		 *  \param g the reference to modified graph. */
 		template< class Graph > static void repair( Graph &g );
 
-		// wpisz relacje pusta na istniejacych wierzcholkach
 		/** \brief Create empty relation.
 		 *
 		 *  All the edges are deleted from graph in order to create empty relation.
 		 *  \param g the modified graph. */
 		template< class Graph > static void empty( Graph &g ) { g.clearEdges(); }
 
-		// wpisz relacje kazdy z kazdym na istniejacych wierzcholkach. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Create total relation.
 		 *
 		 *  A directed graph which represents the total relation is created on the same set of vertexes. 
@@ -1269,7 +1261,6 @@ namespace Privates {
 		template< class Graph > static void
 			total( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
-		// zamienia w relacje odwrotna
 		/** \brief Inverse
 		 *
 		 *  Each arc in graph is inversed. In the effect, the graph represents inversed relation.
@@ -1277,7 +1268,6 @@ namespace Privates {
 		 *  \param g the reference to the modified graph. */
 		template< class Graph > static void inv( Graph &g ) { g.rev(); }
 
-		// przeprowadza domkniecie zwrotne. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Reflexive closure.
 		 *
 		 *  The function adds the minimal number of loops in order to make the relation (represented by the graph \a g) reflexive.
@@ -1287,7 +1277,6 @@ namespace Privates {
 		template< class Graph > static void
 			reflClosure( Graph &g, const typename Graph::EdgeInfoType &einfo= typename Graph::EdgeInfoType() );
 
-		// przeprowadza domkniecie symetryczne. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Symmetric closure.
 		 *
 		 *  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) symmetric.
@@ -1307,7 +1296,6 @@ namespace Privates {
 			symmClosure( Graph &g, const typename Graph::EdgeInfoType &einfo);
 //			symmClosure( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
 
-		// przeprowadza domkniecie przechodnie. Mozna podac pole info wprowadzanych krawedzi
 		/** \brief Transitive closure.
 		 *
 		 *  The function adds the minimal number of arc and loops in order to make the relation (represented by the graph \a g) transitive.
@@ -1349,11 +1337,6 @@ namespace Privates {
 			{ pow(g,wyk,typename Graph::EdgeInfoType(),true); }
 
 
-		//    Oferuje te same operacje na relacjach reprezentowanych inaczej niz przez graf.
-		//    Wersje 2-argumentowe: kontener obslugiwany jak tablica 2-wymiarowa o wartosciach konwertowalnych z bool
-		//        indeksowana od 0 kolejnymi liczbami. Parametr size podaje liczbe elementow
-		//    Wersje 3-argumentowe: kontener o wartosciach konwertowalnych z bool i dostepie przez 2-argumentowy
-		//        operator(), iteratory podaja zakres przedzialu elementow
 		/** \brief Methods for matrix representation.
 		 *
 		 *  Matrix representation is another approach to relations and operation on them. 
@@ -1391,7 +1374,6 @@ namespace Privates {
 		};
 	} ;
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Binary relation operations.
 	 *
 	 *  The set of methods which consider a graph as a binary relation.
@@ -1399,10 +1381,6 @@ namespace Privates {
 	 *  \ingroup detect	 */
 	class RelDiagram: public RelDiagramPar< AlgsDefaultSettings > { };
 
-	/* LineGraphPar
-	 * Kreator linegrafow
-	 * DefaultStructs - wytyczne dla wewnetrznych procedur
-	 */
 	/** \brief Linegraph creator (parametrized).
 	 *
 	 *  The class allows to generate the line graph of directed and undirected a graph.
@@ -1418,12 +1396,6 @@ namespace Privates {
 			static bool openDir( const Graph &g, typename Graph::PEdge e, typename Graph::PVertex v, typename Graph::PEdge f);
 
 	public:
-		//        Dopisuje do lg nieskierowany graf krawedziowy tworzony na podstawie g.
-		//        Para casterow wyznacza infa nowych wierzcholkow na podstawie inf oryginalnych krawedzi
-		//        i infa nowych krawedzi na podstawie inf wierzcholkow, w ktorych stykaly sie oryginalne krawedzie
-		//        Pierwszy Linker laczy krawedzie g z odpowiadajacymi im wierzcholkami w lg
-		//         Drugi laczy wierzcholki g z polaczeniami wierzcholkow w lg (ktore zachodza w tych wierzcholkach)
-		//      Zwraca pierwszy utworzony wierzcholek
 		/** \brief Create undirected linegraph.
 		 *
 		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.) \n
@@ -1440,7 +1412,6 @@ namespace Privates {
 		template< class GraphIn, class GraphOut, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg, std::pair< VCaster,ECaster > casters,
 				std::pair< VLinker,ELinker > linkers );
-		// jw. bez linkerow
 		/** \brief Create undirected linegraph.
 		 *
 		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.) \n
@@ -1454,7 +1425,6 @@ namespace Privates {
 		template< class GraphIn, class GraphOut, class VCaster, class ECaster >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg, std::pair< VCaster,ECaster > casters );
 
-		// jw. ale tylko tworzy linegraph
 		/** \brief Create undirected linegraph.
 		 *
 		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.) \n
@@ -1466,7 +1436,6 @@ namespace Privates {
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg );
 
-		//to samo z hardCast
 		/** \brief Create undirected linegraph.
 		 *
 		 *  A linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.) \n
@@ -1480,12 +1449,6 @@ namespace Privates {
 
 
 
-		//        Dopisuje do lg skierowany graf krawedziowy tworzony na podstawie g.
-		//        Para casterow wyznacza infa nowych wierzcholkow na podstawie inf oryginalnych krawedzi
-		//        i infa nowych lukow na podstawie inf wierzcholkow, w ktorych stykaly sie oryginalne krawedzie
-		//        Pierwszy Linker laczy krawedzie g z odpowiadajacymi im wierzcholkami w lg
-		//         Drugi laczy wierzcholki g z polaczeniami wierzcholkow w lg (ktore zachodza w tych wierzcholkach)
-		//      Zwraca pierwszy utworzony wierzcholek
 		/** \brief Create directed linegraph.
 		 *  
 		 *  A directed linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
@@ -1501,7 +1464,6 @@ namespace Privates {
 		template< class GraphIn, class GraphOut, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename GraphOut::PVertex dir( const GraphIn &g, GraphOut &lg, std::pair< VCaster,ECaster > casters,
 				std::pair< VLinker,ELinker > linkers );
-		// jw. bez linkerow
 		/** \brief Create directed linegraph.
 		 *  
 		 *  A directed linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
@@ -1516,7 +1478,6 @@ namespace Privates {
 			{
 				return dir( g,lg,casters,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
-		// jw. ale tylko tworzy linegraph
 		/** \brief Create directed linegraph.
 		 *  
 		 *  A directed linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
@@ -1531,7 +1492,6 @@ namespace Privates {
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
-        //to samo z hardCast
 		/** \brief Create directed linegraph.
 		 *  
 		 *  A directed linegraph of the graph \a g is created and added to the graph \a lg. (\a g and \a lg shouldn't refer to the same object.)
@@ -1548,7 +1508,6 @@ namespace Privates {
 
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Linegraph creator.
 	 *
 	 *  The class allows to generate the line graph of a graph.
@@ -1559,9 +1518,6 @@ namespace Privates {
 	 *  [See example](examples/create/example_LineGraph.html). */
 	class LineGraph: public LineGraphPar< AlgsDefaultSettings > { };
 
-	/* ComplexCaster
-	 * Caster zlozony z jednego castera 3-argumentowego i dwoch 2-argumentowych
-	 */
 	/* \brief Complex caster for products.
 	 *
 	 * Useful if some entities are generated from one source and other need two sources. Which is the case is some products  of graphs for edges.
@@ -1594,9 +1550,6 @@ namespace Privates {
 
 	 }
 
-    // 4-ty argument szablonu. int=0 - jak bylo, int =1 to twoarg jest 3-argumentowy, a w wywolaniu
-    // operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 ) rzutuje z sour1, int =2 tj. ale z sour2
-    //Dzieki temu mozna tworzyc ComplexCaster poslugujac sie tylko casterami 2-argumentowymi
     /** \brief Complex caster for products.
 	 *
 	 * Useful if some entities are generated from one source and other need two sources. 
@@ -1626,19 +1579,16 @@ namespace Privates {
 			twoarg( t ), firstarg( f ), secondarg( s )
 			{ }
 
-		// jesli podano oba argumenty, zastosuj twoarg
 		/**\brief Cast two sources to one destination. */
 		template< class InfoDest, class InfoSour1, class InfoSour2 >
 			void operator()( InfoDest &dest, InfoSour1 sour1, InfoSour2 sour2 )
 			{ Privates::ComplexCastTwoArgCaster<TwoArg,ver>().cast(twoarg, dest,sour1,sour2 ); }
 
-		// jesli podano pierwszy argument, zastosuj firstarg
 		/**\brief Cast first source (second BlackHole) to destination.*/
 		template< class InfoDest, class InfoSour1 >
 			void operator()( InfoDest &dest, InfoSour1 sour1, Koala::BlackHole b )
 			{ firstarg( dest,sour1 ); }
 
-		// jesli podano drugi argument, zastosuj secondarg
 		/**\brief Cast second source (first BlackHole) to destination.*/
 		template< class InfoDest, class InfoSour1 >
 			void operator()( InfoDest &dest, Koala::BlackHole b, InfoSour1 sour2 )
@@ -1646,7 +1596,6 @@ namespace Privates {
 	};
 
 
-	// funkcja tworzaca - podajemy castery skladowe
 	/**\brief Generating function for ComplexCaster
 	 *
 	 * The function generates ComplexCaster with ver == 0.
@@ -1658,8 +1607,6 @@ namespace Privates {
 		{ return ComplexCaster< TwoArg,FirstArg,SecondArg,0 >( t,f,s ); }
 
 
-    //for ver=1
-	// funkcja tworzaca - podajemy castery skladowe
 	/**\brief Generating function for ComplexCaster
 	 *
 	 * The function generates ComplexCaster with ver == 1. In this version TwoArg caster is replaced with FiersArg caster.
@@ -1671,8 +1618,6 @@ namespace Privates {
 		{ return ComplexCaster< TwoArg,FirstArg,SecondArg,1 >( t,f,s ); }
 
 
-    //for ver=2
-	// funkcja tworzaca - podajemy castery skladowe
 	/**\brief Generating function for ComplexCaster
 	 *
 	 * The function generates ComplexCaster with ver == 2. In this version TwoArg caster is replaced with SecondArg caster.
@@ -1684,10 +1629,6 @@ namespace Privates {
 		{ return ComplexCaster< TwoArg,FirstArg,SecondArg,2 >( t,f,s ); }
 
 
-	/* ProductPar
-	 * Kreator iloczynow grafow
-	 * DefaultStructs - wytyczne dla wewnetrznych procedur
-	 */
 	/** \brief Product creator (parametrized).
 	 *
 	 *  The class allows to generate different versions of the product of two graphs.
@@ -1698,17 +1639,6 @@ namespace Privates {
 	template< class DefaultStructs > class ProductPar
 	{
 	public:
-		//    Dopisuje iloczyn    kartezjanski
-		//    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. cast to para casterow 3-argumentowych.
-		//    cast.first tworzy obiekt info nowego wierzcholka na podstawie dwoch inf wierzcholkow zrodlowych
-		//    cast.second tworzy obiekt info nowej krawedzi na podstawie dwoch inf krawedzi zrodlowych
-		//    (w przypadku braku odpowiedniego argumentu w wywolaniu wstawiany jest blackHole)
-		//    link to para linkerow laczacych elementy grafow zrodlowych z wynikiem
-		//    link.first.first - przywiazuje do wierzcholka wynikowego wierzcholek pierwszego grafu lub NULL w razie braku
-		//    link.first.second - przywiazuje do wierzcholka wynikowego wierzcholek drugiego grafu lub NULL w razie braku
-		//    link.second.first - przywiazuje do krawedzi wynikowej krawedz pierwszego grafu lub NULL w razie braku
-		//    link.second.second - przywiazuje do krawedzi wynikowej krawedz drugiego grafu lub NULL w razie braku
-
 		/** \brief Generate Cartesian product.
 		 *
 		 *  The Cartesian product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1727,7 +1657,6 @@ namespace Privates {
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link );
-		// j.w. ale bez linkerow
 		/** \brief Generate Cartesian product.
 		 *
 		 *  The Cartesian product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1744,7 +1673,6 @@ namespace Privates {
 			{
 				return cart( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
-		// j.w. ale tylko tworzy iloczyn
 		/** \brief Generate Cartesian product.
 		 *
 		 *  The Cartesian product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1759,8 +1687,6 @@ namespace Privates {
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
-		//    Dopisuje iloczyn    leksykograficzny
-		//    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
 		/** \brief Generate lexicographic product.
 		 *
 		 *  The lexicographic product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1779,7 +1705,6 @@ namespace Privates {
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename Graph::PVertex lex( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link );
-		// j.w. ale bez linkerow
 		/** \brief Generate lexicographic product.
 		 *
 		 *  The lexicographic product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1796,7 +1721,6 @@ namespace Privates {
 			{
 				return lex( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
-		// j.w. ale tylko tworzy iloczyn
 		/** \brief Generate lexicographic product.
 		 *
 		 *  The lexicographic product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1811,8 +1735,6 @@ namespace Privates {
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
-		//    Dopisuje iloczyn    tensorowy
-		//    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
 		/** \brief Generate tensor product.
 		 *
 		 *  The tensor product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1831,7 +1753,6 @@ namespace Privates {
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename Graph::PVertex tensor( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link );
-		// j.w. ale bez linkerow
 		/** \brief Generate tensor product.
 		 *
 		 *  The tensor product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1848,7 +1769,6 @@ namespace Privates {
 			{
 				return tensor( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
-		// j.w. ale tylko tworzy iloczyn
 		/** \brief Generate tensor product.
 		 *
 		 *  The tensor product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1863,8 +1783,6 @@ namespace Privates {
 				std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
 
-		//    Dopisuje strong
-		//    grafow g1 i g2 do g. Zwraca pierwszy wprowadzony wierzcholek. Sens parametrow - j.w.
 		/** \brief Generate strong product.
 		 *
 		 *  The strong product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1883,7 +1801,6 @@ namespace Privates {
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename Graph::PVertex strong( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link );
-		// j.w. ale bez linkerow
 		/** \brief Generate strong product.
 		 *
 		 *  The strong product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1900,7 +1817,6 @@ namespace Privates {
 			{
 				return strong( g1,g2,g,cast,std::make_pair( stdLink( false,false ),stdLink( false,false ) ) );
 			}
-		// j.w. ale tylko tworzy iloczyn
 		/** \brief Generate strong product.
 		 *
 		 *  The strong product of graphs \a g1 and \a g2 is created and added to the graph \a g. (\a g shouldn't refer to the same object as \a g1 or \a g2.)
@@ -1916,7 +1832,6 @@ namespace Privates {
 			}
 	};
 
-	// wersja dzialajaca na DefaultStructs=AlgsDefaultSettings
 	/** \brief Product creator (default).
 	 *
 	 *  The class allows to generate different versions of the product of two graphs.

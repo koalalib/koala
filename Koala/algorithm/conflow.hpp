@@ -439,8 +439,8 @@ template< class DefaultStructs > template< class GraphType, class VertContainer,
 	typename EdgeContainer::ValType::CostType nd;
 	typename GraphType::PVertex U,V;
 
-	//inicjalizacja
-	//for each v: d[v] <- INF (to jest zrealizowane juz przy tworzeniu vertTab)
+	//initialization
+	//for each v: d[v] <- INF (it is made when creating vertTab)
 	//f[s] <- NIL
 	vertTab[start].vPrev = 0;
 	vertTab[start].ePrev = 0;
@@ -910,12 +910,12 @@ template< class DefaultStructs > template< class GraphType, class EdgeContainer 
 	if (DefaultStructs::useCostAugmPath) res.second = minCostFlowFF( g,edgeTab,start,end,val );
 	else res.second = minCostFlowGT( g,edgeTab,start,end,val );
 
-	// dla petli o ujemnym koszcie przeplyw jest ustalany na przepustowosc
+	// for loops with negative cost, set flow = capacity
 	for( typename GraphType::PEdge e = g.getEdge( EdLoop ); e; e = g.getEdgeNext( e,EdLoop ) )
 		if (edgeTab[e].cost < NumberTypeBounds
 			< typename EdgeContainer::ValType::CostType >::zero())
 			edgeTab[e].flow = edgeTab[e].capac;
-	// wyliczanie kosztu
+	// computeing cost
 	res.first = flowCost(g,edgeTab);
 	return res;
 }
@@ -1499,8 +1499,8 @@ template< class DefaultStructs > template< class GraphType, class VIter, class E
 		*eoutiter.compIter = epos;
 		++eoutiter.compIter;
 	}
-	// wszystkie krawedzie start->end sa tez traktowane jako szukane sciezki
-	// - niezgodnie z Menger's theorem!
+	// all edges start->end are treated like required paths
+	// - contrary to Menger's theorem!
 	res += g.getEdgeNo( start,end,EdDirOut | EdUndir );
 	for( typename GraphType::PEdge e = g.getEdge( start,end,EdDirOut | EdUndir ); e;
 		e = g.getEdgeNext( start,end,e,EdDirOut | EdUndir ))

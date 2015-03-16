@@ -1,4 +1,4 @@
-// Funktory pozwalajace na wygodny zapis/odczyt grafow z VertInfo=EdgeInfo=ParSet przez modul graphml
+// Functors that allow us conveniently read/write graph with VertInfo=EdgeInfo=ParSet and graphml
 
 #ifndef KOALA_PARSET_GML_H
 #define KOALA_PARSET_GML_H

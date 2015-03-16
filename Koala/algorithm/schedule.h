@@ -104,11 +104,6 @@ namespace Koala
 			typedef std::vector< TaskPart > Machine;/**<\brief Type of vector of TaskParts associated with machine*/
 			typedef std::vector< Machine > Type;/**<\brief Type of vector of vectors (for each machine single vector of TaskParts).*/
 
-			// Dane wejsciowe algorytmow szeregowania: ciag (zakresu iteratorow od poz 0 do n-1) zadan Task + DAG z wierzcholkami odpowiadajacyhmi
-			//zadaniom + pusty schedule z ustawiona liczba maszyn.
-			//	Najwczesniejszy mozliwy moment uruchomienia to 0 (chyba ze release jest ostrzejszy), starty / endy / przerwania tylko w punktach calkowitych.
-			//	To wszystko musi byc wylozone gdzies : w doxy lub ebooku.
-
 			/** \brief Vector of vectors of TaskPart structures.
 			 *    
              *  This an output structure that assigns to each machine (indexes from 0) a vector of TaskPart structures that represents parts of tasks executed on this machine.
@@ -266,7 +261,6 @@ namespace Koala
 		template< typename GraphType, typename TaskIterator, typename TaskWindowIterator >
 			static int critPath( TaskIterator begin, TaskIterator end, const GraphType &DAG, TaskWindowIterator schedule );
 
-		//P|prec|- - szeregowanie listowe przy zadanej liście
 		/** \brief P|prec|- heuristic.
 		 *  
 		 *  The list scheduling algorithm which for task order given by input list inserts them into schedule.
@@ -281,7 +275,6 @@ namespace Koala
 		template< typename GraphType, typename TaskIterator >
 			static int ls( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
-		//P2|UET,prec|Cmax - algorytm Coffmana-Grahama
 		/** \brief Solve P2|UET,prec|C<sub>max</sub>.
 		 *
 		 *  The problem is solved with Coffman-Graham algorithm.
@@ -297,7 +290,6 @@ namespace Koala
 		template< typename GraphType, typename TaskIterator >
 			static int coffmanGraham( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
-		//1|pmtn,prec,ri|Lmax - zmodyfikowany algorytm Liu
 		/** \brief Solve 1|pmtn,prec,r<sub>i</sub>|L<sub>max</sub>.
 		 *
 		 *  The problem is solved with Liu algorithm.
@@ -313,7 +305,6 @@ namespace Koala
 		template< typename GraphType, typename TaskIterator >
 			static int precLiu( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
-		//P|UET,in-tree|Lmax - algorytm Bruckera
 		/** \brief Solve P|UET,in-tree|L<sub>max</sub>.
 		 *
 		 *  The problem is solved with Brucker algorithm. It works for unit length tasks. Release dates are ignored. 
@@ -329,7 +320,6 @@ namespace Koala
 		template< typename GraphType, typename TaskIterator >
 			static int brucker( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
-		//P|UET,in-tree|Cmax - procedura Hu
 		/** \brief Solve P|UET,in-tree|C<sub>max</sub>.
 		 *
 		 *  The problem is solved with Hu algorithm. 
@@ -346,7 +336,6 @@ namespace Koala
 		template< typename GraphType, typename TaskIterator >
 			static int hu( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
-		//P||SigmaCi
 		/** \brief Solve P||ΣC<sub>i</sub>.
 		 *
 		 *  Release and due dates are ignored.
@@ -357,7 +346,6 @@ namespace Koala
 		 *  \return the minimal sum of completion times for P||ΣC<sub>i</sub>*/
 		template< typename TaskIterator > static int spt( TaskIterator begin, TaskIterator end, Schedule &schedule );
 
-		//1||SigmaUi - algorytm Hodgsona
 		/** \brief Solve 1||ΣU<sub>i</sub>.
 		 *
 		 *  The method solves the problem using the Hodgson algorithm. The release dates are ignored.

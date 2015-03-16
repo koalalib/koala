@@ -127,7 +127,7 @@ int ListVertColoringPar<DefaultStructs>::color2ElemLists(
 	{
 		Vert vv = *it;
 		bool isInMap = colors.hasKey(vv);
-		if (!isInMap) //KG: bylo: if (!isInMap || (isInMap && colors[vv] < 0))
+		if (!isInMap) //there was if (!isInMap || (isInMap && colors[vv] < 0))
 		{
 			//found uncolored element
 			koalaAssert(colLists.hasKey(vv), AlgExcWrongArg);
@@ -212,7 +212,7 @@ int ListVertColoringPar<DefaultStructs>::color2ElemLists(
 			}
 			else
 			{
-				if (colors.hasKey(u)) //KG: bylo: if (colors.hasKey(u) && colors[u] >= 0)
+				if (colors.hasKey(u)) //there was if (colors.hasKey(u) && colors[u] >= 0)
 				{
 					//u - colored vertex
 					int usedCol = colors[u];
@@ -619,7 +619,7 @@ int ListEdgeColoringPar<DefaultStructs>::color2ElemLists(
 		koalaAssert(graph.getEdgeType(edge) != EdLoop, AlgExcWrongArg);
 
 		bool isInMap = colors.hasKey(edge);
-		if (!isInMap) //KG: bylo: if (!isInMap || (isInMap && colors[edge] < 0))
+		if (!isInMap) //there was if (!isInMap || (isInMap && colors[edge] < 0))
 		{
 			//found uncolored element
 			koalaAssert(colLists.hasKey(edge), AlgExcWrongArg);

@@ -5,9 +5,6 @@ namespace Koala
 {
 	namespace Privates
 	{
-		/* AdjMatrixParals
-		 *
-		 */
 		template< class VertInfo, class EdgeInfo, class Settings > struct AdjMatrixParals
 		{
 			typename Koala::Edge< VertInfo,EdgeInfo,Settings > *first,*last;
@@ -17,9 +14,6 @@ namespace Koala
 				{ }
 		};
 
-	/* AdjMatrix
-	 *
-	 */
 	template< class VertInfo, class EdgeInfo, class Settings, bool Flag > class AdjMatrix;
 	template< class VertInfo, class EdgeInfo, class Settings > class AdjMatrix< VertInfo,EdgeInfo,Settings,true >
 	{

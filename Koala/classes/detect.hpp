@@ -288,7 +288,7 @@ template< class DefaultStructs > void
 
 	for( i = 0; i < n; i++) bucket[i] = -1;
 
-	// podzia³ na kube³ki wg. .second
+	// divides by .second
 	for( i = 0; i < size; i++)
 	{
 		j = src[i].second;
@@ -296,10 +296,10 @@ template< class DefaultStructs > void
 		bucket[j] = i;
 	}
 
-	// policzenie pocz¹tku ka¿dego zbioru RN w tablicy out
+	// computes beginning of each RN set in out array
 	for( i = 0; i < n; i++ ) pos[i] = hints[i];
 
-	// wpisanie kube³ków do tablicy
+	// writes to array
 	for( i = 0; i < n; i++ )
 		for( j = bucket[i]; j >= 0; j = next[j] )
 			out[pos[src[j].first]++] = src[j].second;
