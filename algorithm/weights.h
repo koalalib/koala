@@ -309,7 +309,11 @@ namespace Koala
     //NEW: metoda sciezki krytycznej domyslnie szuka najdluzszych drog w DAGu, ale rownie dobrze mozna ja stosowac dla najkrotszych w DAG
     //Stad nowy paramtetr bool longest=true. Dla false szuka najkrotszych sciezek, a w razie bledow, nieosiagalnosci itp.
     //sytuacjach, gdy przy longest=true pojawialo sie -infty, tym razem bedzie +infty. Reszta bez zmian.
-	/** \brief Get the longest path in directed acyclic graph (parametrized)
+	/** \brief Get the longest (shortest) path in directed acyclic graph (parametrized)
+	 * 
+	 * The class gives methods for critical path in DAG (directed acyclic graph).
+	 * However, template parameter \a longest set to false lets to find shortest path in DAG.
+	 * 
 	 *  \ingroup DMweight */
 	template< class DefaultStructs,bool longest=true > class DAGCritPathPar: public DAGCritPathStructs<longest>, public ShortPathStructs
 	{
@@ -403,6 +407,12 @@ namespace Koala
 	};
 
 	//NEW: dziala na domyslnych wytycznych, ale z mozliwoscia wyboru najdl/najkr. sciezka
+	/** \brief Get the longest (shortest) path in directed acyclic graph (default)
+	 * 
+	 * The class gives methods for critical path in DAG (directed acyclic graph).
+	 * However, template parameter \a longest set to false lets to find shortest path in DAG.
+	 * 
+	 *  \ingroup DMweight */
 	template<bool longest>
 	class DAGCritPathPar2: public DAGCritPathPar< AlgsDefaultSettings, longest> { };
 

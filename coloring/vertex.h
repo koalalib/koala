@@ -720,7 +720,6 @@ public:
  *  \ingroup color*/
 class GisVertColoring: public GisVertColoringPar<AlgsDefaultSettings> {};
 
-//NEW: kolorowanie wierzcholkowe klasyczne - procedury niewielomianowe
 /**\brief Optimla (non-polynomial) vertex coloring.
  *  \ingroup color*/
 template<class DefaultStructs>

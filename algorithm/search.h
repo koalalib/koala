@@ -545,7 +545,7 @@ namespace Koala
 			void *ptr;
 		};
 
-        //NEW: wyzytor przegladajacy graf tylko na podana glebokosc
+        /**\brief Visitor searches graph only to given depth.*/
 		class NearVertsVisitor: public complex_visitor_tag, public no_component_visitor_tag
 		{
 		public:

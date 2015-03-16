@@ -191,8 +191,9 @@ namespace Koala
 		};
 
 
-		//NEW: blad destruktora puli obiektow SimplArrPool (simple.h), gdy nie wszystkie zaalokowane
-		//obiekty zostaly zdealokowane
+		/**\brief Pool SimplArrPool Destructor exception. Not all object were deallocated.
+		 *
+		 * \ingroup DMexception*/
 		class ContExcPoolNotEmpty: public ContExc
 		{
 		public:

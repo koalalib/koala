@@ -45,7 +45,7 @@ template <class Int = int> class StdRandGen
 namespace Privates {
 
 
-//NEW: ??? W srodku procedur Koali odwolujemy sie do generatorow tylko przy pomocy tych 3 funkcji:
+//Inside Koala procedures, we only using the following three functions to refer to random numbers generator:
 
 // the biggest number that can be generated
 template <class Gen> int getMaxRandom(Gen& g) { return std::numeric_limits< int >::max()-1; }
