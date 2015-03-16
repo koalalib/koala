@@ -22,9 +22,6 @@ namespace Koala
 
 	namespace Privates
 	{
-		/* BlockOfBlockList
-		 *
-		 */
 		template< class Element > struct BlockOfBlockList
 		{
 		public:
@@ -36,8 +33,7 @@ namespace Koala
 
 
 		/* BlockList
-		 * Struktura alokatora wolnych blokow (lista) typu Element zorganizowanych w kontenerze w rodzaju tablicy
-		 * Pomocna w AssocArray i alokatorach
+		 * The list of free blocks (of type Element), contained in a container (of type Container) used in allocator.
 		 */
 		template< class Element, class Container = std::vector< BlockOfBlockList< Element > > > class BlockList
 		{
@@ -90,9 +86,6 @@ namespace Koala
 			T elem;
 		};
 
-		/*
-		* List_iterator
-		*/
 		template<class T>
 		struct List_iterator
 		{
@@ -127,9 +120,6 @@ namespace Koala
 			ListNode< T > *ptr;
 		};
 
-		/*
-		* List_const_iterator
-		*/
 		template< class T > struct List_const_iterator
 		{
 			typedef std::bidirectional_iterator_tag iterator_category;
@@ -166,15 +156,11 @@ namespace Koala
 
 		/*
 		* List
-		* lista podobna do stl-owej
-		* size ma zÂ³oÂ¿onoÅ“Ã¦ O(1) (std::list ma O(n))
-		* interfejs jest uboÂ¿szy (nie z przyczyn technicznych -- czÃªÅ“Ã¦ metod nie
-		* byÂ³a potrzebna)
-		* dodatkowe metody:
+        * A list similar to STL's list with better size() complexity. It has also some new methods:
 		* insert_after(iterator, value)
 		* insert_before(iterator, value)
-		* move_after(iterator, iterator) -- przeniesienie wewnÂ¹trz jednej listy
-		* move_before(iterator, iterator) -- przeniesienie wewnÂ¹trz jednej listy
+		* move_after(iterator, iterator)
+		* move_before(iterator, iterator)
 		*
 		*/
 		template< class T > class List
@@ -184,7 +170,7 @@ namespace Koala
 			typedef List_iterator< T > iterator;
 			typedef List_const_iterator< T > const_iterator;
 
-			 // niebezpieczny, do tworzenia tablic list, nalezy natychmiast wykonac init
+			 // Dangerous, used to create arrays of lists, initialize immediately
 			List(): allocator(0)	{ Zero(); }
 
 			void init( SimplArrPool<ListNode< T > > *a ) { allocator = a; }
@@ -236,7 +222,7 @@ namespace Koala
 
 			void sort();
 
-			// czyÅ“ci zawartoÅ“Ã¦ o
+			// clears contents
 			void merge( List &o );
 
 			friend struct List_iterator< T >;

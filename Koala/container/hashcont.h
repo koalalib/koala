@@ -30,7 +30,7 @@ namespace Koala
 #define COLLISION()
 #endif
 
-// domyslny rozmiar map asocjacyjnych (jesli w konstruktorze pominiemy rozmiar)
+// default size of maps
 #ifndef HASHMAPDEFAULTSIZE
 #define HASHMAPDEFAULTSIZE 1021
 #endif
@@ -57,18 +57,12 @@ namespace Koala
 
 	namespace Privates {
 
-		/*
-		* HSNode
-		*/
 		template< class KeyType > struct HSNode
 		{
 			KeyType key;
 			HSNode *next;
 		};
 
-		/*
-		 * HashSetTableList
-		 */
 		template< class KeyType > class HashSetTableList
 		{
 		public:
@@ -78,9 +72,6 @@ namespace Koala
 		};
 	}
 
-	/*
-	* HashSet_const_iterator
-	*/
 	template< class KeyType, class HashFunction, class Allocator > class HashSet_const_iterator:
 		public std::forward_iterator_tag
 	{
@@ -213,7 +204,7 @@ namespace Koala
 	template<class U, class V>
 	class DefaultHashFunction< std::pair<U, V> >: public Privates::PairHash<U, V> { };
 
-	/** \brief Set on hash table.
+	/** \brief Set on hash array.
 	 *
 	 *  \tparam KeyType - type of element
 	 *  \tparam HashFunction - hash functor; it should implement either\n
@@ -492,9 +483,6 @@ namespace Koala
 
 	namespace Privates
 	{
-		/*
-		* BiDiHashMapPair
-		*/
 		template< class KeyType, class ValueType > class BiDiHashMapPair
 		{
 		public:
@@ -525,9 +513,6 @@ namespace Koala
 		};
 	}
 
-	/*
-	* BiDiHashMap_const_iterator
-	*/
 	template< class KeyType, class ValueType, class HashFunction, class Allocator > class BiDiHashMap_const_iterator:
 		public std::bidirectional_iterator_tag
 	{

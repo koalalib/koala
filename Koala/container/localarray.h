@@ -19,29 +19,26 @@
  *      accept int LOCALARRAY(table, 3 * n) )
  *   - as fast as stack-based local arrays (small creation & destruction
  *     overhead)
- *   - safer than stack-based local arrays (int table[n] will overflow the
+ *   - array generation is completed in constant compilation time and depends of  *     macro constants. *   - safer than stack-based local arrays (int table[n] will overflow the
  *     stack for large n, LOCALARRAY will use heap-allocated memory for
  *     large arrays; see KOALA_STACK_THRESHOLD)
  *   - will work for anonymous structures (UNDER GCC WILL NOT CALL IT'S CONSTRUCTOR):
  *     eg. struct {int a, b;} LOCALARRAY(table, 10);
  *
- WEN: trzeba jawnie napisac o stalych czasu kompilacji, ktorych def przed wlaczeniem naglowka zmienia dzialanie
- WEN: brakuje opisu stalej KOALA_FORCE_VLARRAY, por. tez TODO: nizej
  * KOALA_STACK_THRESHOLD
  *   the maximum size of a single table allocated on stack
  *   this value should not exceed the stack size (usually 1MB on Windows
- *   system, about 10MB on Linux system)
+ *   system, about 10MB on Linux system). By default it is 8192 B. 
  *
  * KOALA_USES_ALLOCA
  *   define this symbol to force Koala to use alloca function
- WEN: jawnie napisac, przy jakich pojemnosicach LOCALARRAY uzyje stosu, a kiedy pamieci dynamiczej w kontekscie wystepowania lub braku KOALA_USES_ALLOCA i wartosci KOALA_STACK_THRESHOLD
-  */
+ * 
+ * KOALA_FORCE_VLARRAY
+ *    define this macro to force usage stack array.
+ */
 
 //#define KOALA_USES_ALLOCA
 //#define KOALA_FORCE_VLARRAY
-
-//NEW: teraz alloca powinna wlaczac stala KOALA_USES_ALLOCA
-
 
 #ifndef KOALA_STACK_THRESHOLD
 #define KOALA_STACK_THRESHOLD       8192
@@ -115,10 +112,17 @@ namespace Koala
 #else
 #define LA_SETTONULL    = NULL
 #endif
-
-#if defined(KOALA_FORCE_VLARRAY)
-/** \brief LOCALARRAY
- */
+/**\def LOCALARRAY(name, size) * \brief LOCALARRAY macro. * * Macro allocates memory. For small amount (size <= KOALA_STACK_THRESHOLD) it uses stack  in need of larger capacity (size > KOALA_STACK_THRESHOLD) it uses heap.  * It should be called <type> LOCALARRAY(<name>, <size>). Then <size> element of type <type> array is generated under name <name>. * 
+ * Macro is controlled by macros:
+ * - KOALA_STACK_THRESHOLD
+ *   the maximum size of a single table allocated on stack
+ *   this value should not exceed the stack size (usually 1MB on Windows
+ *   system, about 10MB on Linux system). By default it is 8192 B. 
+ * - KOALA_USES_ALLOCA
+ *   define this symbol to force Koala to use alloca function
+ * - KOALA_FORCE_VLARRAY
+ *    define this macro to force usage stack array.
+ * * \wikipath{LOCALARRAY} * \ingroup cont*/#if defined(KOALA_FORCE_VLARRAY)
 #define LOCALARRAY(name, size)                          \
 	name[size];
 	//TODO: jesli uzycie alloca jest warunkowane pojemnoscia KOALA_STACK_THRESHOLD, to VLArraye chyba tez tak poinny funkcjonowac
@@ -127,8 +131,6 @@ namespace Koala
 #elif defined(KOALA_USES_ALLOCA) && \
 	(defined(_MSC_VER) || defined(__INTEL_COMPILER) || defined(__GNUC__))
 //TODO: chyba drugi warunek jest zbednyu, nie wiemy jakie komp. dostarczaja alloca, a jesli gdzies jej nie ma to po prostu kod sie nie skompluje z usawionym KOALA_USES_ALLOCA
-// name = NULL a dopiero potem name = cast ... ç¸ by uniknè§„ warningu
-// od VS o wykorzystaniu niezainicjowanej zmiennej
 #define LOCALARRAY(name, size)                          \
 	*name LA_SETTONULL;                         \
 	*(void **)&name = ((size) * sizeof(*name) < KOALA_STACK_THRESHOLD)  \

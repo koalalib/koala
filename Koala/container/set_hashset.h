@@ -13,13 +13,6 @@
 namespace Koala
 {
 
-	/*
-	 * Set< Element >
-	 *     Zbiór realizujący podstawowe operacje teoriomnogościowe. Elementy po-
-	 * winny posiadać operatory ==, != i < (porządek liniowy).
-	 */
-
-	// wypisywanie zbioru do strumienia dziala dla typu Element obslugujacego wypisywanie przez <<
 	/** \brief Insert formatted output 
 	 *
 	 *  Overloaded operator<< applied to output stream inserts a formatted set. 
@@ -40,9 +33,6 @@ template< typename Element >
 template< typename Element >
 	Set< Element > operator^( const Set< Element > &, const Set< Element > & );
 
-// Uwaga: w przeciwienstwie do pozostalych implementacji Seta, tutaj obrobka elementow zbioru przez metody
-// first(), last(), next(), prev(), getElements() nie musi przebiegac w kolejnosci zgodnej z porzadkiem
-// < okreslonym na typie Element
 /** \brief Set.
  *
  *  The class of set is intended to behave like the mathematical set.
@@ -52,7 +42,8 @@ template< typename Element >
  *  - The one working on the STL vector. This option is turned on if constant KOALA_SET_ON_VECTOR is defined.
  *  - The one working on hash sets is turned on if constant KOALA_SET_ON_HASHSET is defined.
  *
- *  In all those cases the interface remains the same and sets are expected to behave in the same way. 
+ *  In all those cases the interface remains similar and sets are expected to behave in the same way. 
+ *  Notice that some differences may be implied by the fact that Set_Set inherits whole STL Set.
  *  The difference may occur if the order of the elements. That is why the methods searching through the elements returns elements in a different order.
  *  Also complexity and practical computations time of some operations may vary.
  *
@@ -60,16 +51,13 @@ template< typename Element >
  *  \ingroup cont */
 template< typename Element > class Set: public Koala::HashSet< Element >, public SetElemForbidValue<Element> {
 	public:
-		// typ elementu zbioru
 		typedef Element ElemType; /**< \brief Type of set element.*/
-	// Konstruktory
-		// Konstruktor tworzący zbiór pusty.
+
 		/** \brief Empty constructor
 		 *
 		 *  The method create an empty set. */
 		Set(): Koala::HashSet< Element >() { }
 
-		// Konstruktory tworzące zbiór składający się z podanych elementów.
 		/** \brief Copy constructor.
 		 *
 		 *  Creates a new set with a copy of the set \a s.
@@ -87,7 +75,7 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  Creates a new set and inserts \a s elements from the table \a t.
 		 *  \param t the copied table.
 		 *  \param s the number of copied elements. */
-		Set( const Element *, unsigned ); // na podstawie tablicy o zadanym rozmiarze
+		Set( const Element *, unsigned );
 
 		 /** \brief Constructor.
 		 *
@@ -109,7 +97,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  \param s the copied HashSet. */
 		Set( const Koala::HashSet< Element > &s );
 
-	// Funkcje zastępujące zawartość zbioru podanym zakresem elementów.
 		 /** \brief Assign set content.
 		 *
 		 *  The method assigns new content (from the table) to the set.
@@ -125,7 +112,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		template <class Iter>
 			void assign( Iter, Iter );
 
-	// Operator przypisania.
 		/** \brief Copy content of set.
 		 *
 		 *  Overloaded operator= assigns the element \a e as the single element of the set.
@@ -133,8 +119,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  \return the reference to the current set. */
 		Set<Element> &operator=( const Element &e );
 
-	// Operator przypisania zbioru o elementach innego typu (dla elementow zachodza rzutowania wartosci
-	// typow T-> Element)
 		/** \brief Copy content of set.
 		 *
 		 *  Overloaded operator= copies the content of \a s to the set.
@@ -143,30 +127,24 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		template <class T>
 		Set< Element > &operator=( const Set<T> &s );
 
-	// Informacje odnośnie zbioru.
 		/** \brief Test if empty.
 		 *
 		 *  The overloaded operator!, tests if the set is empty.
 		 *  \return the boolean value, true if the set has no elements, false otherwise.	 */
 		bool operator!() const; // czy zbior jest pusty
 
-		// Informacja o tym, czy jest podzbiorem podanego zbioru.
 		/** \brief Test if subset.
 		 *
 		 *  The method test if the set is a subset of \a s.
 		 *  \return the boolean value, true if the set is a subset of \a s, false otherwise. */
 		bool subsetOf( const Set<Element> & ) const;
 
-		// Informacja o tym, czy jest nadzbiorem podanego zbioru.
 		 /** \brief Test if superset.
 		 *
 		 *  The method test if the set is a superset of \a s.
 		 *  \return the boolean value, true if the set is a superset of \a s, false otherwise.	 */
 		bool supersetOf( const Set<Element> & ) const;
-		// Czy zbiory są identyczne/różne.
 
-	// Operacje na pojedynczych elementach zbioru.
-		// Dodajemy element do zbioru, zwracając status operacji.
 		/** \brief Add element.
 		 *
 		 *  The method adds a new element to the set, however set does not allow for duplicate values,
@@ -183,7 +161,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  \return true if a new element was inserted or false if an element with the same value existed.*/
 		Set<Element> &operator+=( const Element & );
 
-		// Usuwamy element ze zbioru, zwracając status operacji.
 		/** \brief Delete element.
 		 *
 		 *  The method deletes the element \a e from the set.
@@ -200,7 +177,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  \return true if the element \a e existed in the set, false otherwise.*/
 		Set<Element> &operator-=( const Element & );
 
-		// Sprawdzamy, czy element należy do zbioru.
 		/** \brief Test if element.
 		 *
 		 *  The methods tests if the element \a e belongs to the set.
@@ -208,8 +184,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  \return true if \a e belongs to the set, false otherwise.*/
 		bool isElement( const Element & ) const;
 
-	// Operacje na całych zbiorach.
-		// Suma zbiorów.
 		/** \brief Sum of sets.
 		 *
 		 *  The methods adds the set \a s to the set.
@@ -217,7 +191,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  \return the reference to the current set.*/
 		Set<Element> &operator+=( const Set<Element> & );
 
-		// Część wspólna zbiorów.
 		/** \brief Intersection of sets.
 		 *
 		 *  The method calculates the intersection of the current set and the set \a s.
@@ -226,7 +199,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  \return the reference to the current set. */
 		Set<Element> &operator*=( const Set<Element> & );
 
-		// Różnica zbiorów.
 		/** \brief Set difference.
 		 *
 		 *  The method calculates the difference of the current set and the set \a s.
@@ -235,7 +207,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  \return the reference to the current (modified) set. */
 		Set<Element> &operator-=( const Set<Element> & );
 
-		// Różnica symetryczna zbiorów.
 		 /** \brief Symmetric difference.
 		 *
 		 *  The method calculates the symmetric difference of the current set and \a s.
@@ -244,8 +215,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  \return the reference to the current (modified) set. */
 		Set<Element> &operator^=( const Set<Element> & );
 
-		// Podzbiór elementów/usunięcie elementów spełniających/nie spełniających podanego
-		// predykatu.
 		/** \brief Get subset.
 		 *
 		 *  The method returns the set satisfying the predicate \a fun.
@@ -261,7 +230,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		template <class Funktor>
 			void truncate( Funktor );
 
-		// zapis elementow zbioru na podany iterator
 		 /** \brief Get elements.
 		 *
 		 *  The method writes all the elements to the container represented by the iterator \a out.
@@ -270,7 +238,6 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		template <class Iter>
 			int getElements( Iter ) const;
 
-		// Metody iterujace po kolejnych elementach zbioru. Brak kolejnego elementu lub lista pusta - wartosc badValue()
 		 /** \brief Get first.
 		 *
 		 *  \return the first element of the set. */
@@ -285,7 +252,7 @@ template< typename Element > class Set: public Koala::HashSet< Element >, public
 		 *  \param a the reference element. Also 0 is possible then the first element is returned.
 		 *  \return the next element of the set.  If there is no element after \a a, 0 is returned.
 		 *    If \a a == 0, the first element is returned. */
-		Element next( const Element & ) const; // zwracaja 0 gdy nie ma kolejnego elementu. Mozna podac 0, wowczas zwracaja element pierwszy/ostatni
+		Element next( const Element & ) const;
 		/** \brief Get previous.
 		 *
 		 *  The method gets the prior to \a a element of the set. If there is no element before \a a, 0 is returned.

@@ -16,10 +16,7 @@ namespace Koala
 {
 
 
-	/* JSPartDesrc
-	 * struktura pomocnicza dla zbiorow zlaczalnych o elementach typu Klucz
-	 */
-	/**\brief Auxiliary structure for joinable sets.
+	/** \brief Auxiliary structure for joinable sets.
 	 *
 	 * The structure represents joinable set. */
 	template< class Klucz > class JSPartDesrc
@@ -84,11 +81,6 @@ namespace Koala
     }
 
 
-	/* JoinableSets.
-	 * Klasa zbioru rozlacznych zbiorow zlaczalnych o elementach typu wskaznikowego ITEM
-	 * AssocContainer to typ wewnetrznej tablicy asoc. ITEM->JSPartDesrc< ITEM > *
-	 * jesli jest to AssocArray, klucze powinny wskazywac obiekty zawierajace pole AssocKeyContReg assocReg
-	 */
 	/** \brief Joinable Sets.
 	 *
 	 *  Class of disjoint sets. Useful when:
@@ -111,12 +103,9 @@ namespace Koala
 		size_t siz,part_no,maxsize;
 
 	public:
-		// typ reprezentanta pojedynczego zbioru
 		typedef JSPartDesrc< ITEM > *Repr; /**<\brief Identifier of set.*/ 
-		// typ elementow zbiorow
 		typedef ITEM ElemType; /**<\brief Element of set.*/
 
-		// pierwszy argument - maks. liczba elementow wszystkich zbiorow, pozostale arg. ignorowane
 		/** \brief Constructor.
 		 *
 		 *  \param n the minimal capacity of the set of all elements.*/
@@ -127,32 +116,29 @@ namespace Koala
 		JoinableSets &operator=( const JoinableSets< ITEM,AssocContainer > & );
 		~JoinableSets() { resize( 0 ); }
 
-        // czysci kontener i zmienia maks. liczbe elementow wszystkich zbiorow
 		/** \brief Resize.
 		 *
 		 *  The method clears the set and change the maximal number of elements.
 		 *  \param n the new number of elements.*/
 		void resize( unsigned int n );
 
-		// liczba wszystkich elementow w kontenerze
 		/** \brief Get number of elements.
 		 *
 		 *  \return the number of all elements in the container (in all sets). */
 		int size() const { return siz; }
-		// liczba elementow w zbiorze o podanym reprezentancie
+
 		/** \brief Get number of elements in set identified by \a s.
 		 *
 		 *  \param s identifier of set.
 		 *  \return the number of elements in set identified by \a s. */
 		int size( typename JoinableSets< ITEM >::Repr s) const;
-		// liczba elementow zbioru zawierajacego argument, 0 jesli argument nie byl jeszcze wprowadzony
-		/** \brief Get number of elements in set element \a i is in.
+
+        /** \brief Get number of elements in set element \a i is in.
 		 *
 		 *  \param i the reference to the element the tested set is in.
 		 *  \return the number of elements in the set that includes \a i or 0 if there is no such element. */
 		int size( const ITEM &i ) const;
 
-		// sprawdzenie, czy kontener jest pusty
 		/** \brief Test if empty.
 		 *
 		 * \return true if the container is empty, false otherwise. */
@@ -160,17 +146,15 @@ namespace Koala
 		/** \copydoc empty */
 		bool operator!() const { return empty(); }
 
-		// a pojemnosc staje sie 0, 
 		/** \brief Delete all elements.
 		 *
 		 * The method deletes all the elements from container, the capacity becomes 0. */
 		void clear() { resize( 0 ); }
-		// liczba zbiorow
 		/** \brief Get the number of parts.
 		 *
 		 *  \return the number of sets in container. */
 		int getSetNo() const { return part_no; }
-		// wpisuje elementy wszystkich zbiorow na podany iterator, zwraca size()
+
 		/** \brief Get elements.
 		 *
 		 *  The method gets all the elements from and writes them down in \a iter.
@@ -179,7 +163,6 @@ namespace Koala
 		 *  \return the number of elements.*/
 		template< class Iter > int getElements( Iter iter ) const;
 
-		// wypisuje na podany iterator reprezentatow wszystkich zbiorow
 		/** \brief Get identifiers.
 		 *
 		 *  The method puts the identifiers of sets to \a iter.
@@ -187,8 +170,8 @@ namespace Koala
 		 *  \tparam Iter the type of iterator
 		 *  \return the number of parts.*/
 		template< class Iter > int getSetIds( Iter iter) const;
-		// wypisuje na podany iterator elementy zbioru o podanym reprezencie
-		/** \brief Get elements of part.
+
+        /** \brief Get elements of part.
 		 *
 		 *  The method gets all the elements of part identifier \a s. The result is kept in container \a iter.
 		 *  \param s the identifier (representative) of set part (subset).
@@ -196,7 +179,6 @@ namespace Koala
 		 *  \tparam Iter the type of iterator.
 		 *  \return the number of elements in the part.*/
 		template< class Iter > int getSet( typename JoinableSets< ITEM >::Repr s, Iter iter ) const;
-		// wypisuje na podany iterator elementy zbioru zawierajaccego podany element
 		/** \brief Get elements of part.
 		 *
 		 *  The method gets all the elements of part containing the element \a i. The result is kept in container \a iter.
@@ -206,8 +188,6 @@ namespace Koala
 		 *  \return the number of elements in the part.*/
 		template< class Iter > int getSet( const ITEM &i, Iter iter ) const { return getSet( getSetId( i ),iter ); }
 
-		// tworzy nowy 1-elementowy zbior, zwraca jego reprezentanta lub 0 jesli element juz byl w jakims zbiorze
-		// Jedyna metoda wprowadzajaca  zbiory z nowymi elementami do przechowywanej rodziny
 		/** \brief Make single element.
 		 *
 		 *  The method creates new part with new single element. This is the only method of adding new elements to joinable set.
@@ -215,14 +195,12 @@ namespace Koala
 		 *  \return the identifier of the new created part or 0 if the element \a i already belongs to any part. */
 		inline typename JoinableSets< ITEM >::Repr makeSinglet( const ITEM &i );
 
-		// zwraca reprezentanta zbioru zawierajacego dany element, lub 0 w razie jego braku
 		/** \brief Get set identifier.
 		 *
 		 *  The method gets the identifier of part the element \a i belongs to.
 		 *  \param i the considered element.
 		 *  \return the identifier of part the element belongs to or 0 if there is no such element in set like \a i.*/
 		inline typename JoinableSets<ITEM>::Repr getSetId( const ITEM &i ) const;
-		// zwraca reprezentanta zbioru zawierajacego zbior o danym reprezentancie np. z wczesniejszego etapu scalania
 		/** \brief Get set identifier.
 		 *
 		 *  The method gets the current identifier of the set, for which the subset represented by identifier \a s now belongs to.
@@ -230,8 +208,6 @@ namespace Koala
 		 *  \return the identifier of part, the block \a s is subset of.*/
 		inline typename JoinableSets<ITEM>::Repr getSetId( typename JoinableSets< ITEM >::Repr s ) const;
 
-		// zlacznia dwoch zbiorow podanych przez zadanie reprezentanta lub ktoregos z elementow
-		// zwracaja reprezentanta wynikowego scalonego zbioru lub 0 w razie porazki (np. brak zbioru do scalenia, albo scalamy ze soba ten sam zbior)
 		/** \brief Join parts.
 		 *
 		 *  The method joins two parts represented by the identifiers \a a and \a b. The method does nothing if \a a = \a b.
@@ -263,7 +239,6 @@ namespace Koala
 		inline typename JoinableSets< ITEM >::Repr join( const ITEM &a, typename JoinableSets< ITEM >::Repr b );
 	};
 
-	// wypisywanie zawartosci zbiorow zlaczalnych do strumienia
 	/** \brief Overloaded output operator.
 	 *
 	 *  The overloaded shift operator for std::ostream and JoinableSets. Allows to print easily all the elements of JoinalbeSets .

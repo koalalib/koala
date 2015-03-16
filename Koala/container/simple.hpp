@@ -108,5 +108,46 @@ template< class T > template< class InputIterator >
 	for( ; first != last; first++ ) push( *first );
 }
 
+template< class Elem > SimplArrPool< Elem >::SimplArrPool( int n ):
+    siz( n ), used( 0 ), first( 0 ), throwIfFull( true ), throwIfNotEmpty( true )
+{
+    buf = new char[n * sizeof( Block )];
+    for( int i = 0; i < siz - 1; i++ ) blocks()[i].next = i + 1;
+    if (n) blocks()[siz - 1].next = -1;
+}
 
+template< class Elem > SimplArrPool< Elem >::~SimplArrPool()
+{
+    koalaAssert( used == 0 || !throwIfNotEmpty,ContExcPoolNotEmpty );
+    if (used)
+        for( int i = 0; i < siz; i++ )
+            if (blocks()[i].next == -2) blocks()[i].elem.~Elem();
+    delete [] buf;
+}
 
+template< class Elem > void *SimplArrPool< Elem >::alloc()
+{
+    koalaAssert( used < siz || !throwIfFull,ContExcFull );
+    if (used == siz) return 0;
+    used++;
+    Block* ptr = blocks() + first;
+    first = ptr->next;
+    ptr->next = -2;
+    return &(ptr->elem);
+}
+
+template <class Elem> void SimplArrPool< Elem >::dealloc( Elem *wsk )
+{
+    char* chwsk = (char*) wsk;
+    bool good = chwsk >= buf && chwsk < buf + siz * sizeof( Block );
+    koalaAssert( good,ContExcWrongArg );
+    if (!good) return;
+    int pos = (chwsk - buf) / sizeof( Block );
+    good = (chwsk == (char*)(&blocks()[pos].elem) && blocks()[pos].next == -2);
+    koalaAssert( good,ContExcWrongArg );
+    if (!good) return;
+    blocks()[pos].next = first;
+    first = pos;
+    used--;
+    blocks()[pos].elem.~Elem();
+}
