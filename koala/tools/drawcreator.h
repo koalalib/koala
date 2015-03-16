@@ -11,7 +11,7 @@
 
 namespace Koala
 {
-	//NEW: Graph<ParSet, ParSet> generators
+	// Graph<ParSet, ParSet> generators
 	/* The utility class for creating different types of graphs that can be visualized in Zgred.
 	   Methods of the class assume that the info objects related to vertices and edges 
 	   are of type Koala::IO::ParSet. The methods create infos for vertices containing

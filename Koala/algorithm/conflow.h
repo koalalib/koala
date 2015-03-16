@@ -515,7 +515,7 @@ namespace Koala
 		 *
 		 *  The method gets the minimum cost flow for the graph \a g .
 		 *  \param[in] g the reference graph.
-		 *  \param[out] edgeTab the the associative table (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge.
+		 *  \param[out] edgeTab the the associative array (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge.
 		 *  Array provides both input (capacity) and output (flow) data.
 		 *	There are also other label structures available: FlowStructs::UnitEdgeLabs and FlowStructs::TrsEdgeLabs.
 		 *  \param[in] start the starting vertex.
@@ -528,8 +528,13 @@ namespace Koala
 			minCostFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
 				typename GraphType::PVertex end, typename EdgeContainer::ValType::CapacType val);
 
-        //NEW: edgeTab:PEdge->EdgeLabs, sprawdza czy wpisany flow jest najtanszy sposrod wszystkich
-        //flowow o tym samym: (start,end) oraz objetosci. Poprawnosc flowa nie jest testowana: to zalozenie wejsciowe.
+        /**\brief Test if minimal cost flow.
+		 *
+		 * The method tests if the flow given by \a edgeTab has minimal cost among all the flows with the same start and end and the same capacity.
+		 * The flow correctness is not tested.
+		 * \param[in] g the tested graph.
+		 * \param[in] edgeTab the the associative array (PEdge -> EdgeLabs) with tested flow.
+		 * \return true if minimum, false otherwise.*/
         template< class GraphType, class EdgeContainer > static bool
             testMinCost(const GraphType &g, const EdgeContainer &edgeTab);
 
@@ -689,19 +694,24 @@ namespace Koala
 		 *  This is both input and output data structure.
 		 *  \param[in] vertTab the associative array (PVert -> TrsVertLoss) which assigns TrsVertLoss structure (keeping: maximal and minimal imbalance) to each vertex.
 		 *  \param[in] vertTab2 the associative array (PVert -> TrsEdgeLabs), that keeps minimal and maximal flow through.
-		 *   However, this time TrsVertLoss represent minimal and maximal possible flow through vertex.
+		 *   However, this time TrsEdgeLoss represent minimal and maximal possible flow through vertex.
 		 *  \return true if transshipment was found, false otherwise.
 		 *  \sa FlowAlgsDefaultSettings */
 		template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2  >
             static bool transship(const GraphType &g,
 			EdgeContainer &edgeTab, const VertContainer &vertTab,  VertContainer2 &vertTab2);
 
-        //NEW: test czy podany przeplyw jest rozwiazaniem transshipmentu w wersji rozszerzonej.
-        //Def. i ograniczenia (zalozenia) co do wejscia - jw.
-        template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2  >
+        /**\brief Test if flow is extended transshipment.
+		 *
+		 *  \param[in] g the considered graph.
+		 *  \param edgeTab the associative array (PEdge -> TrsEdgeLabs) with tested flow.
+		 *  \param[in] vertTab the associative array (PVert -> TrsVertLoss) which assigns TrsVertLoss structure (keeping: maximal and minimal imbalance) to each vertex.
+		 *  \param[in] vertTab2 the associative array (PVert -> TrsEdgeLabs), that keeps minimal and maximal flow through.
+		 *   However, this time TrsEdgeLoss represent minimal and maximal possible flow through vertex.
+		 *  \return true if proper transshipment false otherwise. */
+		template< class GraphType, class EdgeContainer, class VertContainer, class VertContainer2  >
             static bool testTransship(const GraphType &g,
 			EdgeContainer &edgeTab, const VertContainer &vertTab,  const VertContainer2 &vertTab2);
-
 
 		/** \brief Solve cost transshipment problem.
 		 * 
