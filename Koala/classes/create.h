@@ -301,7 +301,10 @@ namespace Privates {
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param dir - edges direction mask.
-		 *  \return a pair of pointers. The pointers indicate the first vertices in the partitions.  */
+		 *  \return a pair of pointers. The pointers indicate the first vertices in the partitions.
+		 *
+		 *  [See example](examples/create/example_Bipartite.html).
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen >
 			static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 			compBipartite( GraphType &g, int n1, int n2, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection dir = EdUndir );
@@ -342,7 +345,10 @@ namespace Privates {
 		 *  \param vInfoGen generator for info objects for vertices,
 		 *  \param  eInfoGen generator for info objects for edges,
 		 *  \param dir edges direction mask.
-		 *  \retrun the pointer to the first added vertex.*/
+		 *  \retrun the pointer to the first added vertex.
+		 *
+		 *  [See example](examples/create/example_Kpartite.html).
+		 */
 		template< class GraphType, class  VInfoGen, class  EInfoGen, class IterInsert>
 			static typename GraphType::PVertex compKPartite( GraphType &g, int K, int k, IterInsert itIns, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeDirection dir = EdUndir);
@@ -365,7 +371,10 @@ namespace Privates {
 		 *  \param[out] itIns insert iterator, the function uses it to return K pairs of pointers; the first pointer in each pair indicate the first
 		 *    vertex in a particular partition of the created graph, the second pointer indicates the last vertex in the partition,
 		 *  \param dir edges direction mask.
-		 *  \retrun the pointer to the first added vertex. */
+		 *  \retrun the pointer to the first added vertex.
+		 *
+		 *  [See example](examples/create/example_Kpartite.html).
+		 */
 		template< class GraphType, class IterInsert >
 			static typename GraphType::PVertex compKPartite( GraphType &g, int K, int k, IterInsert itIns,
 				EdgeDirection dir = EdUndir );
@@ -392,7 +401,10 @@ namespace Privates {
 		 *  \param vInfoGen generator for info objects for vertices,
 		 *  \param eInfoGen generator for info objects for edges,
 		 *  \param dir edges direction mask.
-		 *  \retrun the pointer to the first added vertex.*/
+		 *  \retrun the pointer to the first added vertex.
+		 *
+		 *  [See example](examples/create/example_Kpartite.html).li
+		 */
 		template< class GraphType, class VInfoGen, class EInfoGen, class Iter, class IterInsert >
 			static typename GraphType::PVertex compKPartite( GraphType &g, Iter begin, Iter end, IterInsert itIns,
 				VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection dir = EdUndir );
@@ -418,7 +430,10 @@ namespace Privates {
 		 *  \param[out] itIns insert iterator, the function uses it to return K pairs of pointers; the first pointer in each pair indicate the first
 		 *    vertex in a particular partition of the created graph, the second pointer indicates the last vertex in the partition,
 		 *  \param dir edges direction mask.
-		 *  \retrun the pointer to the first added vertex. */
+		 *  \retrun the pointer to the first added vertex.
+		 *
+		 *  [See example](examples/create/example_Kpartite.html).
+		 */
 		template< class GraphType, class Iter, class IterInsert > static typename GraphType::PVertex
 			compKPartite( GraphType &g, Iter begin, Iter end, IterInsert itIns, EdgeDirection dir = EdUndir );
 
@@ -769,7 +784,10 @@ namespace Privates {
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param type - the type of edges in the graph, i.e., directed or undirected.
-		 *  \retrun the pointer to the first added vertex.*/
+		 *  \retrun the pointer to the first added vertex.
+		 *
+		 *  [See example](examples/create/example_Random.html).
+		 */
 		template< class RndGen,class GraphType, class VInfoGen, class EInfoGen >
 			static typename GraphType::PVertex erdRen1( RndGen& rgen,GraphType &g, int n, double p, VInfoGen vInfoGen,
 				EInfoGen eInfoGen, EdgeType type = Undirected );
@@ -806,7 +824,10 @@ namespace Privates {
 		 *  \param vInfoGen - generator for info objects for vertices,
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param type - the type of edges in the graph, i.e., directed or undirected.
-		 *  \retrun the pointer to the first added vertex.*/
+		 *  \retrun the pointer to the first added vertex.
+		 *
+		 *  [See example](examples/create/example_Random.html).
+		 */
 		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen > static typename GraphType::PVertex
 			erdRen2( RndGen& rgen,GraphType &g, int n, int m, VInfoGen vInfoGen, EInfoGen eInfoGen,
 				EdgeType type = Undirected);
@@ -858,7 +879,10 @@ namespace Privates {
 		 *  - EdDirIn - direction older numbers to younger numbers
 		 *  - EdDirOut - direction numbers numbers to younger older
 		 * \param shuffle - determines whether the vertices should be introduced to the graph in random order.
-		 * \return the pointer to the first vertex.*/
+		 * \return the pointer to the first vertex.
+		 *
+		 *  [See example](examples/create/example_Random.html).
+		 */
 		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen  >
 		static typename GraphType::PVertex barAlb(RndGen& rgen, GraphType &g, int n, int k, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeDirection type = Undirected, bool shuffle = false);
 
@@ -959,7 +983,10 @@ namespace Privates {
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
 		 *  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
-		 *  \returns the pointer to the first vertex.*/
+		 *  \returns the pointer to the first vertex.
+		 *
+		 *  [See example](examples/create/example_Random.html).
+		 */
         template< class Settings, class RndGen, class GraphType, class VInfoGen, class EInfoGen >
 		static typename GraphType::PVertex wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false);
 
@@ -994,7 +1021,10 @@ namespace Privates {
 		*  \param eInfoGen - generator for info objects for edges,
 		*  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
 		*  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
-		*  \returns the pointer to the first vertex.*/
+		*  \returns the pointer to the first vertex.
+		*
+		*  [See example](examples/create/example_Random.html).
+	    */
 		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen >
 		static typename GraphType::PVertex wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false)
         {
@@ -1031,7 +1061,10 @@ namespace Privates {
 		*  \param beta - the probability 0<= beta <=1 of rewiring initial edges,
 		*  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
 		*  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
-		*  \returns the pointer to the first vertex.*/
+		*  \returns the pointer to the first vertex.
+		*
+		*  [See example](examples/create/example_Random.html).
+		*/
 		template< class RndGen, class GraphType >
 		static typename GraphType::PVertex wattStrog1(RndGen& rgen, GraphType &g, int n, int k, double beta, EdgeType type = Undirected, bool shuffle = false);
 
@@ -1059,7 +1092,10 @@ namespace Privates {
 		 *  \param eInfoGen - generator for info objects for edges,
 		 *  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
 		 *  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
-		 *  \returns the pointer to the first vertex. */
+		 *  \returns the pointer to the first vertex.
+		 *
+		 *  [See example](examples/create/example_Random.html).
+		 */
 		template< class Settings, class RndGen, class GraphType, class VInfoGen, class EInfoGen >
 		static typename GraphType::PVertex wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false);
 
@@ -1087,7 +1123,10 @@ namespace Privates {
 		*  \param eInfoGen - generator for info objects for edges,
 		*  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
 		*  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
-		*  \returns the pointer to the first vertex. */
+		*  \returns the pointer to the first vertex.
+		*
+		*  [See example](examples/create/example_Random.html).
+		*/
 		template< class RndGen, class GraphType, class VInfoGen, class EInfoGen >
 		static typename GraphType::PVertex wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, VInfoGen vInfoGen, EInfoGen eInfoGen, EdgeType type = Undirected, bool shuffle = false)
         {
@@ -1117,7 +1156,10 @@ namespace Privates {
 		*  \param beta - the probability 0<= beta <=1 of rewiring initial edges,
 		*  \param type - the type of edges in the graph, i.e., undirected or directed (direction is set uniformly randomly).
 		*  \param shuffle - determines whether the vertices should be introduced to the graph in random order.
-		*  \returns the pointer to the first vertex. */
+		*  \returns the pointer to the first vertex.
+		*
+		*  [See example](examples/create/example_Random.html).
+		*/
 		template< class RndGen, class GraphType >
 		static typename GraphType::PVertex wattStrog2(RndGen& rgen, GraphType &g, int n, int k, double beta, EdgeType type = Undirected, bool shuffle = false);
 
@@ -1249,7 +1291,10 @@ namespace Privates {
 		 *  Method allows to normalize graph i.e. it replaces undirected with arcs and deletes all the parallel edges.
 		 *  Graph is modified in a way to create a representation of relation.
 		 *  Infos of remaining arcs are left untouched.
-		 *  \param g the reference to modified graph. */
+		 *  \param g the reference to modified graph.
+		 *
+		 *  [See example](examples/create/example_RelDiagram.html).
+		 */
 		template< class Graph > static void repair( Graph &g );
 
 		// wpisz relacje pusta na istniejacych wierzcholkach
@@ -1274,7 +1319,10 @@ namespace Privates {
 		 *
 		 *  Each arc in graph is inversed. In the effect, the graph represents inversed relation.
 		 *  Infos of arcs are left untouched.
-		 *  \param g the reference to the modified graph. */
+		 *  \param g the reference to the modified graph.
+		 *
+		 *  [See example](examples/create/example_RelDiagram.html).
+		 */
 		template< class Graph > static void inv( Graph &g ) { g.rev(); }
 
 		// przeprowadza domkniecie zwrotne. Mozna podac pole info wprowadzanych krawedzi
@@ -1283,7 +1331,10 @@ namespace Privates {
 		 *  The function adds the minimal number of loops in order to make the relation (represented by the graph \a g) reflexive.
 		 *  Infos of remaining arcs are left untouched.
 		 *  \param g the reference to the modified graph.
-		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
+		 *  \param info the EdgeInfoType object copied to the info of each new-created edge.
+		 *
+		 *  [See example](examples/create/example_RelDiagram.html).
+		 */
 		template< class Graph > static void
 			reflClosure( Graph &g, const typename Graph::EdgeInfoType &einfo= typename Graph::EdgeInfoType() );
 
@@ -1292,7 +1343,10 @@ namespace Privates {
 		 *
 		 *  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) symmetric.
 		 *  Edge infos of new-created edges are set to its type default value. Infos of remaining arcs are left untouched.
-		 *  \param g the modified graph. */
+		 *  \param g the modified graph.
+		 *
+		 *  [See example](examples/create/example_RelDiagram.html).
+		 */
 		template< class Graph > static void
 			symmClosure( Graph &g)
 			{ symmClosure(g, typename Graph::EdgeInfoType()); };
@@ -1302,7 +1356,10 @@ namespace Privates {
 		*  The function adds the minimal number of arc in order to make the relation (represented by the graph \a g) symmetric.
 		*  Infos of remaining arcs are left untouched.
 		*  \param g the modified graph.
-		*  \param info the EdgeInfoType object copied to the info of each new-created edge.*/
+		*  \param info the EdgeInfoType object copied to the info of each new-created edge.
+		*
+		*  [See example](examples/create/example_RelDiagram.html).
+		*/
 		template< class Graph > static void
 			symmClosure( Graph &g, const typename Graph::EdgeInfoType &einfo);
 //			symmClosure( Graph &g, const typename Graph::EdgeInfoType &einfo = typename Graph::EdgeInfoType() );
@@ -1312,7 +1369,10 @@ namespace Privates {
 		 *
 		 *  The function adds the minimal number of arc and loops in order to make the relation (represented by the graph \a g) transitive.
 		 *  New-created arc infos are set to default info type value. Infos of initial arcs are left untouched.
-		 *  \param g the modified graph. */
+		 *  \param g the modified graph.
+		 *
+		 *  [See example](examples/create/example_RelDiagram.html).
+		 */
 		template< class Graph > static void
 			transClosure( Graph &g)
 			{ transClosure(g, typename Graph::EdgeInfoType()); };
@@ -1322,7 +1382,10 @@ namespace Privates {
 		 *  The function adds the minimal number of arc and loops in order to make the relation (represented by the graph \a g) transitive.
 		 *  New-created arc infos are set to \a einfo. Infos of initial arcs are left untouched.
 		 *  \param g the modified graph.
-		 *  \param info the EdgeInfoType object copied to the info of each new-created edge. */
+		 *  \param info the EdgeInfoType object copied to the info of each new-created edge.
+		 *
+		 *  [See example](examples/create/example_RelDiagram.html).
+		 */
 		template< class Graph > static void
 			transClosure( Graph &g, const typename Graph::EdgeInfoType &einfo);
 
@@ -1436,7 +1499,10 @@ namespace Privates {
 		 *  \param linkers a standard pair of linkers. \wikipath{linker, See wiki page for linkers.} \n
 		 *  - The first one links the edges of \a g with the vertices of \a lg. Vertices of \a lg that were there before the operation are linked with NULL.
 		 *  - The second on links the vertices of \a g with the edges of \a lg. Edges of \a lg that were there before the operation are linked with NULL.
-		 *  \return the first created vertex of \a lg. */
+		 *  \return the first created vertex of \a lg.
+		 *
+		 *  [See example](examples/create/example_LineGraph.html).
+		 */
 		template< class GraphIn, class GraphOut, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg, std::pair< VCaster,ECaster > casters,
 				std::pair< VLinker,ELinker > linkers );
@@ -1450,7 +1516,10 @@ namespace Privates {
 		 *  \param casters a standard pair of casters. \wikipath{caster, See wiki page for casters} \n
 		 *  - The first one create information for the linegraph vertices basing on edges of origin in \a g.\n
 		 *  - The second caster generates information for the linegraph edges basing on one of vertices of origin in \a g. 
-		 *  \return the first created vertex of \a lg. */
+		 *  \return the first created vertex of \a lg.
+		 *
+		 *  [See example](examples/create/example_LineGraph.html).
+		 */
 		template< class GraphIn, class GraphOut, class VCaster, class ECaster >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg, std::pair< VCaster,ECaster > casters );
 
@@ -1462,7 +1531,10 @@ namespace Privates {
 		 *  \wikipath{Graph_transformations#Line-graph}
 		 *  \param g an initial graph.
 		 *  \param[out] lg the linegraph of \a g is added here.
-		 *  \return the first created vertex of \a lg. */
+		 *  \return the first created vertex of \a lg.
+		 *
+		 *  [See example](examples/create/example_LineGraph.html).
+		 */
 		template< class GraphIn, class GraphOut >
 			static typename GraphOut::PVertex undir( const GraphIn &g, GraphOut &lg );
 
@@ -1723,7 +1795,10 @@ namespace Privates {
 		 *  - link.first.second - links vertex of output graph with related vertex of the second input graph or with NULL in case of absence.
 		 *  - link.second.first - links edge of output graph with related edge of the first input graph or with NULL in case of absence.
 		 *  - link.second.second - links edge of output graph with related edge of the second input graph or with NULL in case of absence.
-		 *  \return the first created vertex. */
+		 *  \return the first created vertex.
+		 *
+  		 *  [See example](examples/create/example_Product.html).
+		 */
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster, class VLinker, class ELinker >
 			static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast, std::pair< VLinker,ELinker > link );
@@ -1737,7 +1812,10 @@ namespace Privates {
 		 *  \param cast a standard pair of casters used for generating info members. \wikipath{caster, See wiki page for casters}
 		 *  - The first caster creates \a info for a new vertex basing on the two original vertices.
 		 *  - The second caster creates \a info for an edge basing on two initial edges.
-		 *  \return the first created vertex. */
+		 *  \return the first created vertex.
+		 *
+  		 *  [See example](examples/create/example_Product.html).
+		 */
 		template< class Graph1, class Graph2, class Graph, class VCaster, class ECaster >
 			static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g,
 				std::pair< VCaster,ECaster > cast )
@@ -1751,7 +1829,10 @@ namespace Privates {
 		 *  \param[in] g1 the first reference graph.
 		 *  \param[in] g2 the second reference graph.
 		 *  \param[out] g the product of \a g1 and \a g2 is added here.
-		 *  \return the first created vertex. */
+		 *  \return the first created vertex.
+		 *
+  		 *  [See example](examples/create/example_Product.html).
+		 */
 		template< class Graph1, class Graph2, class Graph >
 			static typename Graph::PVertex cart( const Graph1 &g1, const Graph2 &g2, Graph &g )
 			{
