@@ -471,14 +471,18 @@ namespace Koala
 		 *  \param valloc allocation pool for vertices
 		 *  \param ealloc allocation pool for edges.
 		 *
-		 *  [See example](examples/graph/graph_clear.html). */
+		 *  [See example](examples/graph/graph_clear.html).
+		 */
 		Graph(SimplArrPool<Koala::Vertex< VertInfo,EdgeInfo,Settings > > *valloc=0,
             SimplArrPool<Koala::Edge< VertInfo,EdgeInfo,Settings > > *ealloc=0);
 
 		/** \brief Copy constructor
-		 * 
+		 *
 		 *  Creates a new graph which is a copy of \a graph. Adjacency matrix is not created.
-		 *  \param graph reference to the copied graph.  */
+		 *  \param graph reference to the copied graph.
+		 *
+		 *  [See example](examples/graph/graph_clear.html).
+		 */
 		Graph( const Graph &graph );
 
 		~Graph();/**< \brief Destructor*/
@@ -487,13 +491,15 @@ namespace Koala
 		 *
 		 *  Deletes all the edges and vertices from the graph.
 		 *
-		 *  [See example](examples/graph/graph_clear.html). */
+		 *  [See example](examples/graph/graph_clear.html).
+		 */
 		void clear();
 		/** \brief Clear edges.
 		 *
 		 *  Deletes all the edges from the graph.
 		 *
-		 *  [See example](examples/graph/graph_clear.html). */
+		 *  [See example](examples/graph/graph_clear.html).
+		 */
 		void clearEdges();
 
 		/** \brief Copy content operator
@@ -502,7 +508,8 @@ namespace Koala
 		 *  \param gr the graph assigned to the base graph.
 		 *  \return reference to the assigned graph.
 		 *
-		 *  [See example](examples/graph/graph_operator_assignment.html). */
+		 *  [See example](examples/graph/graph_operator_assignment.html).
+		 */
 		Graph< VertInfo,EdgeInfo,Settings > &operator=( const Graph< VertInfo,EdgeInfo,Settings > &gr );
 
 		/** \brief Add graph.
@@ -512,7 +519,8 @@ namespace Koala
 		 *  \param gr the added graph.
 		 *  \returns the reference to the extended graph (sum of graphs).
 		 *
-		 *  [See example](examples/graph/graph_operator_addition.html). */
+		 *  [See example](examples/graph/graph_operator_addition.html).
+		 */
 		Graph< VertInfo,EdgeInfo,Settings > &operator+=( const Graph< VertInfo,EdgeInfo,Settings > &gr );
 
 		/** \brief Move vertices and edges.
@@ -522,7 +530,8 @@ namespace Koala
 		 *  \param gr the moved graph.
 		 *  \returns Pointer to the first inserted vertex.
 		 *
-		 *  [See example](examples/graph/graph_move.html). */
+		 *  [See example](examples/graph/graph_move.html).
+		 */
 		typename GraphType::PVertex move( Graph< VertInfo,EdgeInfo,Settings > &gr );
 
 		/** \brief Move vertex.
@@ -533,7 +542,8 @@ namespace Koala
 		 *  \param vert the pointer to the moved vertex.
 		 *  \return true if successful.
 		 *
-		 *  [See example](examples/graph/graph_move.html). */
+		 *  [See example](examples/graph/graph_move.html).
+		 */
 		bool move( Graph< VertInfo,EdgeInfo,Settings > &gr, PVertex vert );
 		/** \biref Move induced subgraph.
 		 *
@@ -546,17 +556,22 @@ namespace Koala
 		 *
 		 *  The method moves all the vertices from graph \a gr together with whole \wikipath{induced_subgraph,induced subgraph}
 		 *  as long as edges are congruent with \a mask (remaining edges are deleted).  
-		 *  Vertices are given by \wikipath{Iterator,iterators} \a beg and \a end. Current graph and \a gr must not be the same graph. */
+		 *  Vertices are given by \wikipath{Iterator,iterators} \a beg and \a end. Current graph and \a gr must not be the same graph.
+		 *
+		 *  [See example](examples/graph/graph_move.html).
+		 */
 		template< class Iterator > std::pair<int,int>
             move( Graph< VertInfo,EdgeInfo,Settings > &gr, Iterator beg, Iterator end, EdgeType mask=EdAll );
 		/** \copydoc move( Graph< VertInfo,EdgeInfo,Settings > &gr, Iterator beg, Iterator end, EdgeType mask=EdAll )
-		 *  This version of move method is resistant to repetitions of vertices in container.*/
+		 *  This version of move method is resistant to repetitions of vertices in container.
+		 */
         template< class Iterator > std::pair<int,int>
             move2( Graph< VertInfo,EdgeInfo,Settings > &gr, Iterator beg, Iterator end, EdgeType mask=EdAll );
 
 		/** \brief Check Edge types
 		 *  
-		 *  \return the mask representing all allowed types of edges (\wikipath{EdgeType}. */
+		 *  \return the mask representing all allowed types of edges \wikipath{EdgeType}.
+		 */
 		static EdgeType allowedEdgeTypes()
 			{ return Settings::EdAllow ; }
 
@@ -567,7 +582,8 @@ namespace Koala
 		 *  Gets the \wikipath{Graph_order,order of the graph}.
 		 *  \return the number of vertices in graph.
 		 *
-		 *  [See example](examples/graph/graph_clear.html). */
+		 *  [See example](examples/graph/graph_getVertNo.html).
+		 */
 		int getVertNo() const
 			{ return this->no_vert; }
 
@@ -576,7 +592,10 @@ namespace Koala
 		 *  Since the vertex set is organized as a list, it is necessary to include a method returning the next vertex on the list.
 		 *  If parameter \a vert is set to NULL then the first vertex on the list will be taken.
 		 *  \param vert the pointer to the reference vertex.
-		 *  \returns a pointer to the next vertex on the vertex list or NULL if the vertex was last. */
+		 *  \returns a pointer to the next vertex on the vertex list or NULL if the vertex was last.
+		 *
+		 *  [See example](examples/graph/graph_getVertNext.html).
+		 */
 		inline typename GraphType::PVertex getVertNext( PVertex vert ) const;
 
 		/* \brief Get previous vertex.
@@ -584,7 +603,10 @@ namespace Koala
 		 *  Since the vertex set is organized as a list, it is necessary to include a method returning the vertex prior to the one pointed by PVertex.
 		 *  If parameter \a vert is set to NULL then the last vertex on the list will be taken.
 		 *  \param vert the pointer to the reference vertex.
-		 *  \returns a pointer to the previous vertex on the vertex list or NULL if the vertex was the first. */
+		 *  \returns a pointer to the previous vertex on the vertex list or NULL if the vertex was the first.
+		 *
+		 *  [See example](examples/graph/graph_getVertPrev.html).
+		 */
 		inline typename GraphType::PVertex getVertPrev( PVertex vert ) const;
 
 		/** \brief Get edge number.
@@ -593,7 +615,7 @@ namespace Koala
 		 *  \param direct the mask representing all types of the considered edges.
 		 *  \returns the number of edges of type congruent with mask \a direct. 
 		 *
-		 *  [See example](examples/graph/graph_clear.html).
+		 *  [See example](examples/graph/graph_getEdgeNo.html).
 		 */
 		int getEdgeNo( EdgeType direct = EdAll ) const;
 
@@ -605,7 +627,8 @@ namespace Koala
 		 *  \param direct the Koala::EdgeType mask representing all the types of considered edges. \wikipath{EdgeType}
 		 *  \returns pointer to the next edge or if \a e is the last edge then NULL.
 		 *
-		 *  [See example](examples/graph/graph_getEdgeNext.html).	 */
+		 *  [See example](examples/graph/graph_getEdgeNext.html).
+		 */
 		inline typename GraphType::PEdge getEdgeNext( PEdge e, EdgeType direct = EdAll ) const;
 
 		/* \brief Get previous edge.
@@ -616,7 +639,8 @@ namespace Koala
 		 *  \param direct the Koala::EdgeType mask representing all the types of considered edges. \wikipath{EdgeType}
 		 *  \returns pointer to the previous edge or if edge is the first edge then NULL.
 		 *
-		 *  [See example](examples/graph/graph_getEdgePrev.html).	 */
+		 *  [See example](examples/graph/graph_getEdgePrev.html).
+		 */
 		inline typename GraphType::PEdge getEdgePrev( PEdge edge, EdgeType direct = EdAll ) const;
 
 		/* \brief Get vertex degree.
@@ -624,7 +648,10 @@ namespace Koala
 		 *  Gets the number of edges incident to the vertex of direction (with respect to the vertex \a vert) prespecified by the mask direct.
 		 *  \param vert the pointer to the considered vertex.
 		 *  \param direct  determines the direction of edges concerned. \wikipath{EdgeType,See more details about EdgeType.}
-		 *  \returns the number of edges directed as required in \a direct. */
+		 *  \returns the number of edges directed as required in \a direct.
+		 *
+		 *  [See example](examples/graph/graph_getEdgeNo.html).
+		 */
 		inline int getEdgeNo( PVertex vert, EdgeDirection direct = EdAll ) const;
 
 		/* \brief Get next edge.
@@ -637,7 +664,8 @@ namespace Koala
 		 *  \param direct the mask decides which edges are considered as adjacent. \wikipath{EdgeDirection, Get more information about EdgeDirection.}
 		 *  \returns the pointer to the next edge or if the edge is the last edge then NULL.
 		 *
-		 *  [See example](examples/graph/graph_getEdgeNext.html).	 */
+		 *  [See example](examples/graph/graph_getEdgeNext.html).
+		 */
 		inline typename GraphType::PEdge getEdgeNext( PVertex vert, PEdge e, EdgeDirection direct = EdAll ) const;
 
 		/* \brief Get previous edge
@@ -649,7 +677,8 @@ namespace Koala
 		 *  \param direct the mask decides which edges are considered as adjacent. \wikipath{EdgeDirection, Get more information about EdgeDirection.}
 		 *  \returns Pointer to the previous edge or if the edge is the first then NULL.
 		 *
-		 *  [See example](examples/graph/graph_getEdgePrev.html).	 */
+		 *  [See example](examples/graph/graph_getEdgePrev.html).
+		 */
 		inline typename GraphType::PEdge getEdgePrev( PVertex vert, PEdge ed, EdgeDirection direct = EdAll ) const;
 
 		/* \brief Get number of parallel edges.
@@ -658,7 +687,10 @@ namespace Koala
 		 *  \param vert1 the first vertex
 		 *  \param vert2 the second vertex
 		 *  \param direct the mask representing the type and direction of edges taken into account.
-		 *  \returns the number of edges between \a vert1 and \a vert2. */
+		 *  \returns the number of edges between \a vert1 and \a vert2.
+		 *
+		 *  [See example](examples/graph/graph_getEdgeNo.html).
+		 */
 		int getEdgeNo( PVertex vert1, PVertex vert2, EdgeDirection direct = EdAll ) const;
 
 		/* \brief Get next parallel edges.
@@ -671,7 +703,8 @@ namespace Koala
 		 *  \param direct the mask representing the type and direction (for directed) of edges taken into account.
 		 *  \returns the pointer to the next parallel edge or NULL if \a ed is the last.
 		 *
-		 *  [See example](examples/graph/graph_getEdgeNext.html).	 */
+		 *  [See example](examples/graph/graph_getEdgeNext.html).
+		 */
 		typename GraphType::PEdge getEdgeNext( PVertex vert1, PVertex vert2, PEdge ed, EdgeDirection diretction = EdAll ) const;
 
 		/* \brief Get previous parallel edges.
@@ -684,7 +717,8 @@ namespace Koala
 		 *  \param direct the mask representing the type and direction (for directed) of edges taken into account.
 		 *  \returns the pointer to the previous parallel edge or NULL if \a ed is the first edge.
 		 *
-		 *  [See example](examples/graph/graph_getEdgePrev.html).	 */
+		 *  [See example](examples/graph/graph_getEdgePrev.html).
+		 */
 		typename GraphType::PEdge getEdgePrev( PVertex vert1, PVertex vert2, PEdge ed, EdgeDirection direct = EdAll ) const;
 
 		/* \brief Get edge type.
@@ -696,7 +730,8 @@ namespace Koala
 		 *  - Directed   = 0xC
 		 *  \sa Koala::EdgeType
 		 *
-		 *  [See example](examples/graph/graph_getEdgeType.html).	 */
+		 *  [See example](examples/graph/graph_getEdgeType.html).
+		 */
 		inline EdgeType getEdgeType( PEdge e ) const;
 
 		/* \brief Get edge ends
@@ -711,6 +746,8 @@ namespace Koala
 		 *
 		 *  \param ed the considered edge.
 		 *  \returns the pointer to the first vertex of \a ed.
+		 *
+		 *  [See example](examples/graph/graph_getEdgeEnd1.html).
 		 */
 		inline typename GraphType::PVertex getEdgeEnd1( PEdge ed ) const;
 
@@ -718,6 +755,8 @@ namespace Koala
 		 *
 		 *  \param ed the considered edge
 		 *  \returns the pointer to the second vertex of \a ed.
+		 *
+		 *  [See example](examples/graph/graph_getEdgeEnd2.html).
 		 */
 		inline typename GraphType::PVertex getEdgeEnd2( PEdge ed ) const;
 
@@ -730,7 +769,10 @@ namespace Koala
 		 *  - EdDirOut = 0x08 if ed is directed and vert is the first vertex of ed.
 		 *  \param ed considered edge.
 		 *  \param vert reference vertex.
-		 *  \returns direction of edge \a ed.*/
+		 *  \returns direction of edge \a ed.
+		 *
+		 *  [See example](examples/graph/graph_getEdgeDir.html).
+		 */
 		inline EdgeDirection getEdgeDir( PEdge ed ,PVertex vert ) const;
 
 		/** \brief Set vertex Information.
@@ -739,7 +781,8 @@ namespace Koala
 		 *  \param vert the vertex whose info is going to be changed.
 		 *  \param info the object representing new information.
 		 *
-		 *  [See example](examples/graph/graph_setVertInfo.html). */
+		 *  [See example](examples/graph/graph_setVertInfo.html).
+		 */
 		inline void setVertInfo( PVertex vert, VertInfo info = VertInfo() ) const;
 
 		/** \brief Set edge information.
@@ -748,7 +791,8 @@ namespace Koala
 		 *  \param ed the edge whose info is going to be changed.
 		 *  \param info the object representing new information.
 		 *
-		 *  [See example](examples/graph/graph_setEdgeInfo.html). */
+		 *  [See example](examples/graph/graph_setEdgeInfo.html).
+		 */
 		inline void setEdgeInfo( PEdge ed, EdgeInfo info = EdgeInfo() ) const;
 
 		/** \brief Delete vertex from graph.
@@ -758,12 +802,12 @@ namespace Koala
 		 *  \param vert the deleted vertex.
 		 *  \param force the Boolean flag saying that deletion should be forced, even if there are some edges incident to \a vert.
 		 *
-		 *  [See example](examples/graph/graph_del.html).	 */
+		 *  [See example](examples/graph/graph_del.html).
+		 */
 		inline void del( PVertex vert, bool force = true )
 			{ this->delVert( vert,force ); }
-		/** \copydoc del(PVertex,bool)
-		*
-		*  [See example](examples/graph/graph_delVert.html).	 */
+		// synonim
+		/** \copydoc del(PVertex,bool)		*/
 		void delVert( PVertex vert , bool force = true );
 		/** \brief Delete vertices.
 		 *
@@ -774,7 +818,8 @@ namespace Koala
 		 *  \param end the iterator pointing to the next element after the  last deleted vertex.
 		 *  \returns the number of deleted vertices.
 		 *
-		 *  [See example](examples/graph/graph_delVerts.html).	 */
+		 *  [See example](examples/graph/graph_delVerts.html).
+		 */
 		template< class Iterator > int delVerts( Iterator begin, Iterator end );
 
 		/** \brief Delete vertices
@@ -787,7 +832,8 @@ namespace Koala
 		 *  \param end the iterator pointing to the next element after the last deleted vertex.
 		 *  \returns the number of unique and deleted vertices.
 		 *
-		 *  [See example](examples/graph/graph_delVerts2.html).	 */
+		 *  [See example](examples/graph/graph_delVerts2.html).
+		 */
 		template< class Iterator > int delVerts2( Iterator begin, Iterator end );
 
 		/** \brief Delete vertices
@@ -796,7 +842,8 @@ namespace Koala
 		 *  \param s the set of vertices which are to be deleted.
 		 *  \returns the number of deleted vertices.
 		 *
-		 *  [See example](examples/graph/graph_delVerts.html).	 */
+		 *  [See example](examples/graph/graph_delVerts.html).
+		 */
 		inline int delVerts( const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex > &s )
 			{ return delVerts( s.begin(),s.end() ); }
 
@@ -806,7 +853,8 @@ namespace Koala
 		 *  The method works similarly to clear(), the only difference is that it returns the number of vertices.
 		 *  \return the number of vertices.
 		 *
-		 *  [See example](examples/graph/graph_delVerts.html).	 */
+		 *  [See example](examples/graph/graph_delVerts.html).
+		 */
 		inline int delVerts();
 
 		/** \brief Delete edge
@@ -814,12 +862,12 @@ namespace Koala
 		 *  Deletes the edge form the graph.
 		 *  \param ed the deleted edge.
 		 *
-		 *  [See example](examples/graph/graph_del.html).	 */
+		 *  [See example](examples/graph/graph_del.html).
+		 */
 		inline void del( PEdge ed);
 
-		/** \copydoc delEdge(PEdge)
-		 *
-		 *  [See example](examples/graph/graph_delEdge.html).	 */
+		// synonim
+		/** \copydoc del(PEdge)  */
 		inline void delEdge( PEdge edge )
 			{ this->del( edge ); }
 
@@ -831,7 +879,8 @@ namespace Koala
 		 *   Default value EdAll. \wikipath{EdgeDirection, Get more information about EdgeDirection.}
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delEdges.html).	 */
+		 *  [See example](examples/graph/graph_delEdges.html).
+		 */
 		int delEdges( PVertex vert, EdgeDirection direct = EdAll );
 
 		/** \brief Delete edges
@@ -842,7 +891,8 @@ namespace Koala
 		 *  \param direct the mask determining the direction of the deleted edges. By default all edges are deleted. \wikipath{EdgeDirection, Get more information about EdgeDirection.}
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delEdges.html).	 */
+		 *  [See example](examples/graph/graph_delEdges.html).
+		 */
 		int delEdges( PVertex vert1, PVertex vert2, EdgeDirection direct = EdAll );
 
 		/** \brief Delete set of edges.
@@ -855,7 +905,8 @@ namespace Koala
 		 *  \param direct the mask determining the type of deleted edges. \wikipath{EdgeType, Get more information about EdgeType}
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delEdges.html).	 */
+		 *  [See example](examples/graph/graph_delEdges.html).
+		 */
 		template< class Iterator > int delEdges( Iterator begin, Iterator end, EdgeType direct = EdAll );
 
 		/** \brief Delete set of edges.
@@ -869,7 +920,8 @@ namespace Koala
 		 *  \param direct the mask determining the direction of the deleted edges.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delEdges2.html).	 */
+		 *  [See example](examples/graph/graph_delEdges2.html).
+		 */
 		template< class Iterator > int delEdges2( Iterator begin, Iterator end, EdgeType direct = EdAll );
 
 		/** \brief Delete set of edges
@@ -879,7 +931,8 @@ namespace Koala
 		 *  \param direct the mask determining the type of deleted edges.  \wikipath{EdgeType, Get more information about EdgeType}
 		 *  \return number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delEdges.html).	 */
+		 *  [See example](examples/graph/graph_delEdges.html).
+		 */
 		inline int delEdges( const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> &s,
 			EdgeType direct = EdAll )
 			{ return delEdges( s.begin(),s.end(),direct ); }
@@ -889,7 +942,8 @@ namespace Koala
 		 *  \param direct the mask determining the type of the deleted edges.  \wikipath{EdgeType, Get more information about EdgeType}
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delEdges.html).	 */
+		 *  [See example](examples/graph/graph_delEdges.html).
+		 */
 		int delEdges( EdgeType direct = EdAll );
 
 		/** \brief Add vertex.
@@ -898,7 +952,8 @@ namespace Koala
 		 *  \param info the info attribute value for new-created vertex. 
 		 *  \return the pointer to the created vertex.
 		 *
-		 *  [See example](examples/graph/graph_clear.html).	 */
+		 *  [See example](examples/graph/graph_clear.html).
+		 */
 		inline typename GraphType::PVertex addVert( VertInfo info = VertInfo() );
 
 		/** \brief Add edge.
@@ -916,7 +971,8 @@ namespace Koala
 		 *   If the edge is directed, the parameter is obligatory regardless of the type of graph.
 		 *  \return pointer to the new-created edge.
 		 *  
-		 *  [See example](examples/graph/graph_clear.html).	 */
+		 *  [See example](examples/graph/graph_clear.html).
+		 */
 		inline typename GraphType::PEdge addEdge( PVertex vert1, PVertex vert2, EdgeDirection direct = EdUndir );
 
 		/** \brief Add edge.
@@ -935,7 +991,8 @@ namespace Koala
 		 *   If the edge is directed, the parameter is obligatory regardless of the type of graph.
 		 *  \return pointer to the new-created edge.
 		 *
-		 *  [See example](examples/graph/graph_clear.html).	 */
+		 *  [See example](examples/graph/graph_clear.html).
+		 */
 		inline typename GraphType::PEdge addEdge( PVertex vert1, PVertex vert2, EdgeInfo info, EdgeDirection direct= EdUndir );
 		/** \brief Add undirected edge.
 		 *
@@ -945,7 +1002,8 @@ namespace Koala
 		 *  \param info value stored in info attribute of new edge.
 		 *  \return pointer the new-created edge.
 		 *
-		 *  [See example](examples/graph/graph_addLink.html).	 */
+		 *  [See example](examples/graph/graph_addLink.html).
+		 */
 		inline typename GraphType::PEdge addLink( PVertex u,PVertex v,EdgeInfo info= EdgeInfo() )
 			{   return addEdge(u,v,info,EdUndir); }
 		/** \brief Add arc. 
@@ -955,7 +1013,8 @@ namespace Koala
 		 *  \param info  value stored in info attribute of new edge.
 		 *  \return the pointer the new-created arc.
 		 *
-		 *  [See example](examples/graph/graph_clear.html).	 */
+		 *  [See example](examples/graph/graph_clear.html).
+		 */
 		inline typename GraphType::PEdge addArc( PVertex vert1, PVertex vert2, EdgeInfo info = EdgeInfo() );
 
 		/** \brief Add Loop.
@@ -965,7 +1024,8 @@ namespace Koala
 		 *  \param info  value stored in info attribute of new loop.
 		 *  \return the pointer to the new-created edge.
 		 *
-		 *  [See example](examples/graph/graph_clear.html).	 */
+		 *  [See example](examples/graph/graph_clear.html).
+		 */
 		inline typename GraphType::PEdge addLoop( PVertex vert, EdgeInfo info = EdgeInfo() );
 
 		/** \brief Move edge
@@ -982,7 +1042,10 @@ namespace Koala
 		 *  \param vert2 the pointer to the second vertex to which the edge will be connected.
 		 *  \param direct the target direction of the reconnected edge. Default value EdUndir.
 		 *  \return true if success, false otherwise.
-		 *  \warning The direction is not copied automatically, that is way the directed arc is changed to undirected if default value is used. */
+		 *  \warning The direction is not copied automatically, that is way the directed arc is changed to undirected if default value is used.
+		 *
+		 *  [See example](examples/graph/graph_moveEdge.html).
+		 */
 		inline bool moveEdge( PEdge ed, PVertex vert1,PVertex vert2, EdgeDirection direct = EdUndir );
 
 		/** \brief Change to undirected.
@@ -992,7 +1055,8 @@ namespace Koala
 		 *  \param ed the pointer to the reversed edge.
 		 *  \return true if change is accomplished, false if it was not possible or necessary.
 		 *
-		 *  [See example](examples/graph/graph_ch2undir.html). */
+		 *  [See example](examples/graph/graph_ch2undir.html).
+		 */
 		bool ch2Undir( PEdge ed );
 
 		/** \brief Change to undirected.
@@ -1004,7 +1068,8 @@ namespace Koala
 		 *  \param end past the last element of the set.
 		 *  \return the number of successfully changed directions. Already undirected edges or loops are not counted.
 		 *
-		 *  [See example](examples/graph/graph_ch2undir.html).*/
+		 *  [See example](examples/graph/graph_ch2undir.html).
+		 */
 		template< class Iterator > int ch2Undir( Iterator begin, Iterator end );
 
 		/** \brief Change to undirected
@@ -1013,7 +1078,8 @@ namespace Koala
 		 *  \param s the set of edges whose direction is going to be changed to undirected.
 		 *  \return the number of successfully changed directions. Already undirected edges or loops are not counted.
 		 *
-		 *  [See example](examples/graph/graph_ch2undir.html). */
+		 *  [See example](examples/graph/graph_ch2undir.html).
+		 */
 		inline int ch2Undir( const Set< typename GraphType::PEdge > &s )
 			{ return ch2Undir( s.begin(),s.end() ); }
 		/** \brief Change to undirected
@@ -1025,7 +1091,8 @@ namespace Koala
 		 *  \param direct the mask determining the direction (related to vert) of edges which are to be changed to undirected.
 		 *  \return the number of successfully changed directions.  Already undirected edges or loops are not counted.
 		 *
-		 *  [See example](examples/graph/graph_ch2undir.html). */
+		 *  [See example](examples/graph/graph_ch2undir.html).
+		 */
 		int ch2Undir( PVertex vert, EdgeDirection direct = EdDirIn|EdDirOut );
 
 		/** \brief Change to undirected.
@@ -1037,7 +1104,8 @@ namespace Koala
 		 *  \param direct the mask determining the initial direction of the changed edges.  \wikipath{EdgeDirection, Get more information about EdgeDirection}
 		 *  \return the number of successfully changed directions. Already undirected edges or loops are not counted.
 		 *
-		 *  [See example](examples/graph/graph_ch2undir.html).*/
+		 *  [See example](examples/graph/graph_ch2undir.html).
+		 */
 		int ch2Undir( PVertex vert1, PVertex vert2, EdgeDirection direct = EdDirIn|EdDirOut );
 
 		/** \brief Change to undirected.
@@ -1045,7 +1113,8 @@ namespace Koala
 		 *  The direction of all edges (arcs) in graph is changed to undirected. The order of vertices in edges 
 		 *  \return the number of successfully changed directions. Already undirected edges or loops are not counted.
 		 *
-		 *  [See example](examples/graph/graph_ch2undir.html).	 */
+		 *  [See example](examples/graph/graph_ch2undir.html).
+		 */
 		int ch2Undir();
 
 		/** \brief Reverse arc.
@@ -1055,7 +1124,8 @@ namespace Koala
 		 *  \param ed the considered edge.
 		 *  \return true if successful, false otherwise.
 		 *
-		 *  [See example](examples/graph/graph_rev.html). */
+		 *  [See example](examples/graph/graph_rev.html).
+		 */
 		inline bool rev( PEdge ed );
 		/** \brief Reverse arcs.
 		 *
@@ -1066,7 +1136,8 @@ namespace Koala
 		 *  \param end the iterator of past the last element of the set of arcs.
 		 *  \return the number of successfully reversed arcs.
 		 *
-		 *  [See example](examples/graph/graph_rev.html). */
+		 *  [See example](examples/graph/graph_rev.html).
+		 */
 		template< class Iterator > int rev( Iterator begin, Iterator end );
 
 		/** \brief Reverse arcs.
@@ -1076,7 +1147,8 @@ namespace Koala
 		 *  \param s the set of arcs.
 		 *  \return the number of successfully reversed arcs.
 		 *
-		 *  [See example](examples/graph/graph_rev.html). */
+		 *  [See example](examples/graph/graph_rev.html).
+		 */
 		inline int rev( const Set< typename GraphType::PEdge > &s )
 			{ return rev( s.begin(),s.end() ); }
 
@@ -1090,7 +1162,8 @@ namespace Koala
 		 *  \param end the iterator of past the last element of the set of arcs.
 		 *  \return the number of successfully reversed arcs.
 		 *
-		 *  [See example](examples/graph/graph_rev2.html). */
+		 *  [See example](examples/graph/graph_rev2.html).
+		 */
 		 template< class Iterator > int rev2( Iterator begin, Iterator end );
 
 		/** \brief Reverse arcs.
@@ -1101,7 +1174,8 @@ namespace Koala
 		 *  \param direct the mask defining the relative direction of arcs which are to be reversed. \wikipath{EdgeDirection,Get more information about EdgeDirection}.
 		 *  \return the number of successfully reversed arcs.
 		 *
-		 *  [See example](examples/graph/graph_rev.html). */
+		 *  [See example](examples/graph/graph_rev.html).
+		 */
 		int rev( PVertex vert, EdgeDirection direct = EdDirIn|EdDirOut );
 
 		/** \brief Reverse arcs
@@ -1113,7 +1187,8 @@ namespace Koala
 		 *  \param direct the mask determining the type and direction of edges that are to be reversed.
 		 *  \return the number of successfully reversed arcs.
 		 *
-		 *  [See example](examples/graph/graph_rev.html). */
+		 *  [See example](examples/graph/graph_rev.html).
+		 */
 		int rev( PVertex vert1, PVertex vert2, EdgeDirection direct = EdDirIn|EdDirOut );
 
 		/** \brief Reverse edge.
@@ -1121,7 +1196,8 @@ namespace Koala
 		 *  All the arcs (and only arcs) in the graph (digraph) are reversed.
 		 *  \return the number of successfully reversed arcs.
 		 *
-		 *  [See example](examples/graph/graph_rev.html). */
+		 *  [See example](examples/graph/graph_rev.html).
+		 */
 		int rev();
 
 		/** \brief Change to directed.
@@ -1133,7 +1209,8 @@ namespace Koala
 		 *  \param direct determines the direction of the arc. Only options EdDirIn and EdDirOut are allowed.
 		 *  \return true if change is successful, false otherwise.
 		 *
-		 *  [See example](examples/graph/graph_ch2dir.html). */
+		 *  [See example](examples/graph/graph_ch2dir.html).
+		 */
 		inline bool ch2Dir( PEdge ed, PVertex vert, EdgeDirection direct = EdDirOut );
 
 		/** \brief Change to directed.
@@ -1144,7 +1221,8 @@ namespace Koala
 		 *   Only options EdDirIn and EdDirOut are allowed.
 		 *  \return the number of preformed changes.
 		 *
-		 *  [See example](examples/graph/graph_ch2dir.html). */
+		 *  [See example](examples/graph/graph_ch2dir.html).
+		 */
 		int ch2Dir( PVertex vert, EdgeDirection direct = EdDirOut );
 
 		/** \brief Change to directed.
@@ -1156,7 +1234,8 @@ namespace Koala
 		 *  Only options EdDirIn and EdDirOut are allowed.
 		 *  \return the number of changes.
 		 *
-		 *  [See example](examples/graph/graph_ch2dir.html). */
+		 *  [See example](examples/graph/graph_ch2dir.html).
+		 */
 		int ch2Dir( PVertex vert1, PVertex vert2, EdgeDirection direct = EdDirOut );
 
 		/** \brief Change to arcs.
@@ -1167,7 +1246,8 @@ namespace Koala
 		 *  \param ed the changed edge.
 		 *  \return the pointer to the new arc or NULL if \a ed was directed or loop.
 		 *
-		 *  [See example](examples/graph/graph_ch2Arcs.html). */
+		 *  [See example](examples/graph/graph_ch2Arcs.html).
+		 */
 		inline typename GraphType::PEdge ch2Arcs( PEdge ed );
 
 		/** \brief Change to arcs.
@@ -1179,7 +1259,8 @@ namespace Koala
 		 *  \param end past the last edge in the container.
 		 *  \return the number of changed edges.
 		 *
-		 *  [See example](examples/graph/graph_ch2Arcs.html). */
+		 *  [See example](examples/graph/graph_ch2Arcs.html).
+		 */
 		template< class Iterator > int ch2Arcs( Iterator begin, Iterator end );
 
 		/** \brief Change to arcs.
@@ -1189,7 +1270,8 @@ namespace Koala
 		 *  \param s the reference to the set of edges.
 		 *  \return the number of changed edges.
 		 *
-		 *  [See example](examples/graph/graph_ch2Arcs.html). */
+		 *  [See example](examples/graph/graph_ch2Arcs.html).
+		 */
 		inline int ch2Arcs( const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PEdge> &s )
 			{ return ch2Arcs( s.begin(),s.end() ); }
 
@@ -1199,7 +1281,8 @@ namespace Koala
 		 *  More precisely, each edge is changed to directed and a new arc with opposite direction (with copied info attribute).
 		 *  \return the number of changed edges.
 		 *
-		 *  [See example](examples/graph/graph_ch2Arcs.html). */
+		 *  [See example](examples/graph/graph_ch2Arcs.html).
+		 */
 		int ch2Arcs();
 
 		/** \brief Change to arcs.
@@ -1209,7 +1292,8 @@ namespace Koala
 		 *  \param vert the vertex of reference.
 		 *  \return the number of changed edges.
 		 *
-		 *  [See example](examples/graph/graph_ch2Arcs.html). */
+		 *  [See example](examples/graph/graph_ch2Arcs.html).
+		 */
 		int ch2Arcs( PVertex vert );
 
 		/** \brief Change to arcs.
@@ -1220,7 +1304,8 @@ namespace Koala
 		 *  \param vert2 the second vertex of reference.
 		 *  \return the number of changed edges.
 		 *
-		 *  [See example](examples/graph/graph_ch2Arcs.html). */
+		 *  [See example](examples/graph/graph_ch2Arcs.html).
+		 */
 		int ch2Arcs( PVertex vert1, PVertex vert2 );
 
 		/** \brief Put vertex in edge.
@@ -1234,7 +1319,8 @@ namespace Koala
 		 *  \param info vertex information stored in the new-created vertex.
 		 *  \return the pointer to the new-created vertex
 		 *
-		 *  [See example](examples/graph/graph_put.html). */
+		 *  [See example](examples/graph/graph_put.html).
+		 */
 		typename GraphType::PVertex putVert( PEdge ed, VertInfo info = VertInfo() );
 
 		/** \brief Pick vertex.
@@ -1249,7 +1335,8 @@ namespace Koala
 		 *  \param info the information for the new-created edge.
 		 *  \return the pointer to the new-created edge or NULL if any error occurs.
 		 *
-		 *  [See example](examples/graph/graph_pick.html). */
+		 *  [See example](examples/graph/graph_pick.html).
+		 */
 		typename GraphType::PEdge pickVert( PVertex vert, EdgeInfo info = EdgeInfo() );
 
 		/** \brief Merge vertices.
@@ -1263,7 +1350,8 @@ namespace Koala
 		 *  \param vert the vertex with which all the others will be unified. If NULL any vertex is chosen. The info attribute of this vertex is kept. 
 		 *  \return the pointer to the target vertex.
 		 *
-		 *  [See example](examples/graph/graph_glue.html). */
+		 *  [See example](examples/graph/graph_glue.html).
+		 */
 		template< class Iterator > typename GraphType::PVertex
 			glue( Iterator begin, Iterator end, bool makeloops = false, PVertex vert = NULL );
 
@@ -1276,7 +1364,8 @@ namespace Koala
 		 *  \param vert the vertex with which all the others will be unified. If NULL any vertex is chosen. The info attribute of this vertex is kept. 
 		 *  \return the pointer to the target vertex.
 		 *
-		 *  [See example](examples/graph/graph_glue.html). */
+		 *  [See example](examples/graph/graph_glue.html).
+		 */
 		inline typename GraphType::PVertex
 			glue( const Set< typename Graph< VertInfo,EdgeInfo,Settings >::PVertex > &s, bool makeloops = false,
 				  PVertex res = NULL )
@@ -1293,7 +1382,8 @@ namespace Koala
 		 *  \param vert the vertex with which all the others will be unified. If NULL any vertex is chosen. The info attribute of this vertex is kept.
 		 *  \return the pointer to the target vertex.
 		 * 
-		 *  [See example](examples/graph/graph_glue2.html).	 */
+		 *  [See example](examples/graph/graph_glue2.html).
+		 */
 		template< class Iterator > typename GraphType::PVertex
 			glue2( Iterator begin, Iterator end, bool makeloops = false, PVertex vert = NULL );
 
@@ -1326,7 +1416,8 @@ namespace Koala
 		 *  \param reltype detrmines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delParals.html). */
+		 *  [See example](examples/graph/graph_delParals.html).
+		 */
 		template< class Iterator > int delParals( Iterator begin, Iterator end, PEdge ed, EdgeDirection reltype = EdUndir );
 
 		/** \brief Delete parallel edges.
@@ -1342,7 +1433,8 @@ namespace Koala
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delParals.html). */
+		 *  [See example](examples/graph/graph_delParals.html).
+		 */
 		inline int delParals( const Set< typename GraphType::PEdge > &s, PEdge edge, EdgeDirection reltype = EdUndir )
 			{ return delParals( s.begin(),s.end(),edge,reltype ); }
 
@@ -1362,7 +1454,8 @@ namespace Koala
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delParals2.html). */
+		 *  [See example](examples/graph/graph_delParals2.html).
+		 */
 		template< class Iterator > int delParals2( Iterator begin, Iterator end, PEdge ed, EdgeDirection reltype = EdUndir );
 
 		/** \brief Delete parallel edges.
@@ -1377,7 +1470,8 @@ namespace Koala
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delParals.html). */
+		 *  [See example](examples/graph/graph_delParals.html).
+		 */
 		int delParals( PEdge ed, EdgeDirection reltype = EdUndir );
 
 		/** \brief Delete parallel edges.
@@ -1395,7 +1489,8 @@ namespace Koala
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delAllParals.html). */
+		 *  [See example](examples/graph/graph_delAllParals.html).
+		 */
 		template< class Iterator > int delAllParals( Iterator begin, Iterator end, EdgeType reltype = EdUndir );
 
 		/** \brief Delete parallel edges.
@@ -1413,7 +1508,8 @@ namespace Koala
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delAllParals2.html). */
+		 *  [See example](examples/graph/graph_delAllParals2.html). 
+		 */
 		template< class Iterator > int delAllParals2( Iterator begin, Iterator end, EdgeType reltype = EdUndir );
 
 		/** \brief Delete parallel edges.
@@ -1428,7 +1524,8 @@ namespace Koala
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delAllParals.html). */
+		 *  [See example](examples/graph/graph_delAllParals.html).
+		 */
 		int delAllParals( const Set< typename GraphType::PEdge > &eset, EdgeType relType = EdUndir )
 			{ return delAllParals( eset.begin(),eset.end(),relType ); }
 
@@ -1444,7 +1541,8 @@ namespace Koala
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delAllParals.html). */
+		 *  [See example](examples/graph/graph_delAllParals.html).
+		 */
 		int delAllParals( PVertex vert, EdgeType reltype = EdUndir );
 
 		/** \brief Delete parallel edges.
@@ -1460,7 +1558,8 @@ namespace Koala
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delAllParals.html). */
+		 *  [See example](examples/graph/graph_delAllParals.html).
+		 */
 		int delAllParals( PVertex vert1, PVertex vert2, EdgeType reltype = EdUndir );
 
 		/** \brief Delete parallel edges.
@@ -1474,7 +1573,8 @@ namespace Koala
 		 *  \param reltype determines the type of parallelism.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delAllParals.html). */
+		 *  [See example](examples/graph/graph_delAllParals.html).
+		 */
 		int delAllParals( EdgeType reltype = EdUndir );
 
 		/** \brief Delete incident edges.
@@ -1492,7 +1592,8 @@ namespace Koala
 		 *  \param kind the mask determining the mode.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delIncEdges.html). */
+		 *  [See example](examples/graph/graph_delIncEdges.html).
+		 */
 		template< class Iterator > int delIncEdges( Iterator beg, Iterator end, EdgeDirection type = EdAll, EdgeType kind = Loop );
 
 		/** \brief Delete incident edges.
@@ -1509,7 +1610,8 @@ namespace Koala
 		 *  \param kind the maks determining the mode.
 		 *  \return the number of deleted edges.
 		 *
-		 *  [See example](examples/graph/graph_delIncEdges.html). */
+		 *  [See example](examples/graph/graph_delIncEdges.html).
+		 */
 		int delIncEdges( const Set< typename GraphType::PVertex > &s, EdgeDirection type = EdAll, EdgeType kind = Loop );
 
 		/** \brief Complement of graph.
@@ -1528,7 +1630,8 @@ namespace Koala
 		*   Separately for directed undirected and loop.	 
 		*  \param inforGen the automatic EdgeInfo generator for new edges.
 		*
-		*  [See example](examples/graph/graph_neg.html). */
+		*  [See example](examples/graph/graph_neg.html).
+		*/
 		template< class Iterator, class EdInfoGen > void neg( Iterator begin, Iterator end, EdgeType direct, EdInfoGen infoGen);
 
 		/** \brief Complement of graph.
@@ -1544,7 +1647,8 @@ namespace Koala
 		*   Separately for directed undirected and loop.
 		*  \param info the value of info attribute for new-created edges.
 		*
-		*  [See example](examples/graph/graph_neg.html). */
+		*  [See example](examples/graph/graph_neg.html).
+		*/
 		template< class Iterator > void neg( Iterator beg, Iterator end, EdgeType type = Settings::EdAllow,
 			EdgeInfo info = EdgeInfo() )
 			{ neg( beg,end,type,ConstFunctor< EdgeInfo >( info ) ); }
@@ -1561,7 +1665,8 @@ namespace Koala
 		*   Separately for directed undirected and loop.
 		*  \param inforGen the automatic EdgeInfo generator for new edges.
 		*
-		*  [See example](examples/graph/graph_neg.html). */
+		*  [See example](examples/graph/graph_neg.html).
+		*/
 		template< class EdInfoGen > void neg(const Set< PVertex > &vset, EdgeType type, EdInfoGen infoGen)
 			{ neg( vset.begin(),vset.end(),type,infoGen ); }
 
@@ -1576,7 +1681,8 @@ namespace Koala
 		*   Separately for directed undirected and loop.
 		*  \param info the value of info attribute for new-created edges.
 		*
-		*  [See example](examples/graph/graph_neg.html). */
+		*  [See example](examples/graph/graph_neg.html).
+		*/
 		void neg( const Set< PVertex > &vset, EdgeType direc = Settings::EdAllow, EdgeInfo infoGen = EdgeInfo() );
 
 		/** \brief Complement of graph.
@@ -1590,7 +1696,8 @@ namespace Koala
 		*   Separately for directed undirected and loop.
 		*  \param inforGen the automatic EdgeInfo generator for new edges.
 		*
-		*  [See example](examples/graph/graph_neg.html). */
+		*  [See example](examples/graph/graph_neg.html).
+		*/
 		template< class EdInfoGen > void neg(EdgeType type, EdInfoGen infoGen);
 
 		/** \brief Complement of graph.
@@ -1601,7 +1708,8 @@ namespace Koala
 		*   Separately for directed undirected and loop.
 		*  \param info value for info attribute of new-created edges.
 		*
-		*  [See example](examples/graph/graph_neg.html). */
+		*  [See example](examples/graph/graph_neg.html).
+		*/
 		void neg(EdgeType type = Settings::EdAllow, EdgeInfo info = EdgeInfo())
 			{ neg( type,ConstFunctor< EdgeInfo >() ); }
 
@@ -1613,7 +1721,8 @@ namespace Koala
 		 *  \param agraph the copied graph.
 		 *  \return the pointer to the first new-created vertex.
 		 *
-		 *  [See example](examples/graph/graph_copy.html).	 */
+		 *  [See example](examples/graph/graph_copy.html).
+		 */
 		template< class ExtGraph > typename GraphType::PVertex copy( const ExtGraph &agraph );
 
 		/** \brief Copy graph.
@@ -1624,7 +1733,8 @@ namespace Koala
 		*  \param agraph the copied graph.
 		*  \return the pointer to the first new-created vertex.
 		*
-		*  [See example](examples/graph/graph_copy.html).	 */
+		*  [See example](examples/graph/graph_copy.html).
+		*/
 		template< class ExtGraph > typename GraphType::PVertex copy2( const ExtGraph &agraph );
 
 		/** \brief Copy graph.
@@ -1637,7 +1747,8 @@ namespace Koala
 		 *  Additionally both ends of each copied edge need to satisfy the VChooser. \wikipath{chooser, See more about choosers.}
 		 *  \return the pointer to the first new-created vertex.
 		 *
-		 *  [See example](examples/graph/graph_copy.html).	 */
+		 *  [See example](examples/graph/graph_copy.html).
+		 */
 		template< class ExtGraph, class VChooser, class EChooser >
 			typename GraphType::PVertex copy( const ExtGraph &agraph, std::pair< VChooser,EChooser > choosers );
 		
@@ -1650,7 +1761,8 @@ namespace Koala
 		 *  \param choosers the standard pair of choosers which allow to choose vertices and edges to copy.
 		 *  \return the pointer to the first new-created vertex.
 		 *
-		 *  [See example](examples/graph/graph_copy.html).	 */
+		 *  [See example](examples/graph/graph_copy.html).
+		 */
 		template< class ExtGraph, class VChooser, class EChooser >
 			typename GraphType::PVertex copy2( const ExtGraph &agraph, std::pair< VChooser,EChooser > choosers );
 
@@ -1663,7 +1775,10 @@ namespace Koala
 		 *  Additionally both ends of each copied edge need to satisfy the VChooser. See \ref DMchooser or \wikipath{chooser,wiki}.
 		 *  \param casters the standard pair of methods allowing to generate a vertex info and an edge info automatically
 		 *  basing on the infos in the added graph \a agraph. See \ref DMcaster or \wikipath{caster, wiki}.
-		 *  \return the pointer to the first new-created vertex. */
+		 *  \return the pointer to the first new-created vertex.
+		 *
+		 *  [See example](examples/graph/graph_copy.html).
+		 */
 		template< class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster >
 			typename GraphType::PVertex copy( const ExtGraph &agraph, std::pair< VChooser,EChooser > choosers,
 				std::pair< VCaster,ECaster > casters );
@@ -1680,7 +1795,10 @@ namespace Koala
 		 *  an edge info automatically basing on the infos in the added graph \a agraph. See \ref DMcaster or \wikipath{caster, wiki}.
 		 *  \param linkers the standard pair of linkers, which are the objects that define the way of joining the initial entities 
 		 *  with the copied ones. For more details see \ref DMlinker or \wikipath{linker, wiki}.
-		 *  \return the pointer to the first new-created vertex.		 */
+		 *  \return the pointer to the first new-created vertex.
+		 *
+		 *  [See example](examples/graph/graph_copy.html).
+		 */
 		template< class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster, class VLinker,
 			class ELinker > typename GraphType::PVertex copy( ExtGraph &, std::pair< VChooser,EChooser >,
 				std::pair< VCaster,ECaster >, std::pair< VLinker,ELinker > linkers );
@@ -1697,7 +1815,8 @@ namespace Koala
 		 *  \param graph the copied graph. Must not be the same as current graph.
 		 *  \return the pointer to the first new-created vertex.
 		 *
-		 *  [See example](examples/graph/graph_substitute.html). */
+		 *  [See example](examples/graph/graph_substitute.html).
+		 */
 		template< class ExtGraph > typename GraphType::PVertex substitute( typename GraphType::PVertex, const ExtGraph & );
 		
 		/** \brief Substitute graph for vertex.
@@ -1712,7 +1831,8 @@ namespace Koala
 		 *  \param graph the copied graph. Must not be the same as current graph.
 		 *  \return the pointer to the first new-created vertex.
 		 *
-		 *  [See example](examples/graph/graph_substitute2.html). */
+		 *  [See example](examples/graph/graph_substitute.html).
+		 */
 		template< class ExtGraph > typename GraphType::PVertex substitute2(typename GraphType::PVertex, const ExtGraph &);
 
 		/** \brief Substitute graph for vertex.
@@ -1729,7 +1849,8 @@ namespace Koala
 		 *  Additionally both ends of each copied edge need to satisfy the VChooser. See \ref DMchooser or \wikipath{chooser, wiki}.
 		 *  \return the pointer to the first new-created vertex.
 		 *
-		 *  [See example](examples/graph/graph_substitute.html). */
+		 *  [See example](examples/graph/graph_substitute.html).
+		 */
 		template< class ExtGraph, class VChooser, class EChooser >
 			typename GraphType::PVertex substitute( PVertex, const ExtGraph &, std::pair< VChooser,EChooser > );
 
@@ -1748,7 +1869,8 @@ namespace Koala
 		 *  Additionally both ends of each copied edge need to satisfy the VChooser. See \ref DMchooser or \wikipath{chooser, wiki}.
 		 *  \return the pointer to the first new-created vertex.
 		 *
-		 *  [See example](examples/graph/graph_substitute2.html). */
+		 *  [See example](examples/graph/graph_substitute.html).
+		 */
 		template< class ExtGraph, class VChooser, class EChooser >
 			typename GraphType::PVertex substitute2( PVertex, const ExtGraph &, std::pair< VChooser,EChooser > );
 
@@ -1768,7 +1890,8 @@ namespace Koala
 		 *  an edge info automatically basing on the infos in the copied graph \a agraph. See \ref DMcaster or \wikipath{caster, wiki}.
 		 *  \return the pointer to the first new-created vertex.
 		 *
-		 *  [See example](examples/graph/graph_substitute.html). */
+		 *  [See example](examples/graph/graph_substitute.html).
+		 */
 		template< class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster >
 			typename GraphType::PVertex substitute( PVertex, const ExtGraph &, std::pair< VChooser,EChooser >,
 				std::pair< VCaster,ECaster > );
@@ -1790,7 +1913,8 @@ namespace Koala
 		 *  For more details see \ref DMlinker or \wikipath{linker, wiki}.
 		 *  \return the pointer to the first new-created vertex.
 		 *
-		 *  [See example](examples/graph/graph_substitute.html). */
+		 *  [See example](examples/graph/graph_substitute.html).
+		 */
 		template< class ExtGraph, class VChooser, class EChooser, class VCaster, class ECaster, class VLinker,
 			class ELinker > typename GraphType::PVertex substitute( typename GraphType::PVertex vert, ExtGraph &graph,
 				std::pair< VChooser,EChooser > choosers, std::pair< VCaster,ECaster > casters, std::pair< VLinker,ELinker > linkers );
@@ -1801,7 +1925,10 @@ namespace Koala
 		 *  For example testing the neighborhood. 
 		 *
 		 *  This is the only method that generates adjacency matrix. On the other hand method delAdjMatrix() is the only method that invalidates it.
-		 *  \return true if successful, false otherwise (if adjacency matrix is not allowed or already exists). */
+		 *  \return true if successful, false otherwise (if adjacency matrix is not allowed or already exists).
+		 *
+		 *  [See example](examples/graph/graph_adjmatrix.html).
+		 */
 		bool makeAdjMatrix();
 
 		/** \brief Delete adjacency matrix.
@@ -1809,7 +1936,10 @@ namespace Koala
 		 *  The adjacency matrix is deleted.
 		 *
 		 *  This is the only method that deletes adjacency matrix, while method makeAdjMatrix() is the only method that generates it.
-		 *  \return true if successful, false otherwise (if adjacency matrix does not exist). */
+		 *  \return true if successful, false otherwise (if adjacency matrix does not exist).
+		 *
+		 *  [See example](examples/graph/graph_adjmatrix.html).
+		 */
 		inline bool delAdjMatrix();
 
 		/** \brief Check the existence of adjacency matrix.
@@ -1825,7 +1955,8 @@ namespace Koala
 		 *  Test whether the adjacency matrix is allowed in graph type defined by Settings.
 		 *  \return true if an adjacency matrix is allowed, false otherwise.
 		 *
-		 *  [See example](examples/graph/graph_adjmatrix.html).	 */
+		 *  [See example](examples/graph/graph_adjmatrix.html).
+		 */
 		static bool allowedAdjMatrix()
 			{ return Settings::AdjMatrixAllowed; }
 
@@ -1836,7 +1967,8 @@ namespace Koala
 		 *  If adjacency matrix is not created the method wont allocate the memory.
 		 *  \param size possible dimension of matrix which fits into reserved area.
 		 *
-		 *  [See example](examples/graph/graph_adjmatrix.html). */
+		 *  [See example](examples/graph/graph_adjmatrix.html).
+		 */
 		inline void reserveAdjMatrix( int size );
 
 		/** \brief Get root graph

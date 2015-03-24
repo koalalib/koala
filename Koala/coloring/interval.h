@@ -106,7 +106,7 @@ public:
 	//testing if graph is properly colored
 	/** \brief Test partial coloring
 	 *
-	 *  The method tests if the partial coloring from the associative table \a colors is a prober interval coloring of \a graph induced by colored vertices.
+	 *  The method tests if the partial coloring from the associative table \a colors is a proper interval coloring of \a graph induced by colored vertices.
 	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
 	 *  \param weights the map (PVertex->int) which assigns the  expected size of interval.
 	 *  \param colors the associative container (PVert->Segment)
@@ -123,7 +123,10 @@ public:
 	 *  \param weights the map (PVertex->int) which assigns the expected size of interval.
 	 *  \param colors the associative container (PVert->Segment)
 	 *     which assigns a structure \a Segment to the vertex.
-	 *  \return true if the coloring is proper and complete, false otherwise.	 */
+	 *  \return true if the coloring is proper and complete, false otherwise.
+	 *
+	 *  [See example](examples/coloring/edgeIntervalColor.html).
+  	 */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static bool test(const Graph &graph, const Weights &weights,
 			const ColorMap &colors);
@@ -286,7 +289,10 @@ public:
 	 *  \param weights the map (PEdge->int) which assigns the expected size of interval.
 	 *  \param colors the associative container (PEdge->Segment)
 	 *     which assigns a structure \a Segment to the edge.
-	 *  \return true if the edge coloring is proper, false otherwise.	 */
+	 *  \return true if the edge coloring is proper, false otherwise.
+	 *
+	 *  [See example](examples/coloring/edgeIntervalColor.html).
+  	 */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static bool test(const Graph &graph, const Weights &weights, const ColorMap &colors);
 
