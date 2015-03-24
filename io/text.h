@@ -183,7 +183,7 @@ public:
  *  For edges the situation is analogical.
  *  \param vertexMap - associative array int -> PVertex that keeps vertex under its index derived from \a s (as long as such index exist). blackHole available.
  *  \param edgeMap	- associative array int -> PEdge that keeps edge under its index derived from \a s (as long as such index exist). blackHole available.
- *  \return true.
+ *  \return true as long as read properly.
  *  \ingroup iotxt
  *
  *  [See example](examples/text/text.html)*/
@@ -202,7 +202,7 @@ bool readGraphText(Graph &g, std::istream &s, int format,
  *  For edges the situation is analogical.
  *  \param vertexMap	- associative array int -> PVertex that writes vertex to its index derived from \a s (as long as such index exist). blackHole available.
  *  \param edgeMap	- associative array int -> PEdge that keeps edge under its index derived from \a s (as long as such index exist). blackHole available.
- *  \return true.
+ *  \return true as long as read properly.
  *  \ingroup iotxt
  *
  *  [See example](examples/text/text.html) */
@@ -225,7 +225,7 @@ bool readGraphText(Graph &g, const std::string &desc, int format,
  *  For edges the situation is analogical.
  *  \param vertexMap	- associative array int -> PVertex that writes vertex to its index derived from \a s (as long as such index exist). blackHole available.
  *  \param edgeMap	- associative array int -> PEdge that keeps edge under its index derived from \a s (as long as such index exist). blackHole available.
- *  \return true.
+ *  \return true as long as read properly.
  *  \ingroup iotxt
  *
  *  [See example](examples/text/text.html)*/
@@ -246,7 +246,7 @@ bool readGraphText(Graph &g, const char *desc, int format,
  *  If flag RG_VInfo is turned of or if VertInfoType in not capable of reading from std::istream via operator>>
  *  infos from \a s are ignored and vertices get default info values. Also if vertices lacks of infos in \a s vertex infos get default value.
  *  For edges the situation is analogical.
- *  \return true.
+ *  \return true as long as read properly.
  *  \ingroup iotxt
  *
  *  [See example](examples/text/text.html) */
@@ -307,8 +307,7 @@ bool readGraphText(Graph &g, const char *desc, int format) {
  *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
  *  \param vertexMap - associative array PVertex->int which keeps vertex indexes (for chosen elements) that are printed in output. (blackHole available)
  *  \param edgeMap	-  associative array PEdge->int which keeps edge indexes (for chosen elements) that are printed in output. (blackHole available)
- *  \return true.
-  //TODO: To chyba nie dobrze ....
+ *  \return true as long as wrote properly.
  *  \ingroup iotxt
  *
  *  [See example](examples/text/text.html)*/
@@ -323,7 +322,7 @@ bool writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vm
  *  \param format	- see \ref DMiotxtformat. 
  *   - bit RG_VInfo is ignored if VertInfoType is not capable of writing on std::ostream via operator<<.
  *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
- *  \return true.
+ *  \return true  as long as wrote properly.
  *  \ingroup iotxt
  *
  *  [See example](examples/text/text.html) */
@@ -345,7 +344,7 @@ bool writeGraphText(const Graph &g, std::ostream &out, int format)
  *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
  *  \param vmap	-  associative array PVertex->int which keeps vertex indexes (for chosen elements) that are printed in output. (blackHole available)
  *  \param emap	-  associative array PEdge->int which keeps edge indexes (for chosen elements) that are printed in output. (blackHole available)
- *  \return true.
+ *  \return true as long as wrote properly.
  *  \ingroup iotxt
  *
  *  [See example](examples/text/text.html)*/
@@ -367,7 +366,7 @@ bool writeGraphText(const Graph &g, std::string &out, int format,
  *  \param format	- see \ref DMiotxtformat. 
  *   - bit RG_VInfo is ignored if VertInfoType is not capable of writing on std::ostream via operator<<.
  *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
- *  \return true.
+ *  \return true as long as wrote properly.
  *  \ingroup iotxt
  *
  *  [See example](examples/text/text.html) */
