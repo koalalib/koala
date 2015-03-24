@@ -1,10 +1,7 @@
 #ifndef KOALA_DEFS_H
 #define KOALA_DEFS_H
 
-/* \file defs.h \brief Auxiliary definitons
- *
- *  File consists of many useful baisic structures.
- */
+/** \file defs.h \brief Auxiliary definitions*/
 
 #include <algorithm>
 #include <cstdlib>
@@ -802,7 +799,7 @@ namespace Koala
 	 *  \tparam T the type of compared field.
 	 *  \param wsk pointer to tested member in \a Info object.
 	 *  \wikipath{chooser, Get more information about choosers.}
-	 *  \related FielBoolChooser
+	 *  \related FieldBoolChooser
 	 *  \ingroup DMchooser*/
 	template< class Info, class T >
 		FieldBoolChooser< Info,T > fieldChoose( T Info:: *wsk ) { return FieldBoolChooser< Info,T >(wsk); }
