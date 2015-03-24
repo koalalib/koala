@@ -1106,7 +1106,7 @@ namespace Koala
 
 	/** \brief Associative matrix.
 	 *
-	 *  Two-dimensional associative container. That assigns an element to the pair of keys.
+	 *  Two-dimensional associative container. That assigns an element to a pair of keys.
 	 *  \tparam aType decides over the type of matrix (AssocMatrixType).
 	 *  \tparam Container the type of internal container used to store mapped values.
 	 *  \tparam IndexContainer the type of internal associative table used to assign various data (numbers) to single keys.
@@ -1805,7 +1805,17 @@ namespace Koala
         };
     }
 
-
+	/**\brief Lighter version of associative matrix
+	 *
+	 *  Two-dimensional associative container. That assigns an element to a pair of keys.
+	 *  \tparam aType decides over the type of matrix (AssocMatrixType).
+	 *  \tparam Container the type of internal container used to store mapped values.
+	 *  \tparam IndexContainer the type of internal associative table used to assign various data (numbers) to single keys.
+	 *  by default it is AssocArray. Mind that in such situation the Klucz need public attribute AssocKeyContReg assocReg.
+	 *  If Klucz does not have such a attribute it is advisable to use PseudoAssocArray, which is indexed in a similar way, 
+	 *  however has other organization.
+	 *  \sa Koala::AssocMatrixType
+	 *  \ingroup cont*/
 	template< class Klucz, class Elem, AssocMatrixType aType, class Container =
 		std::vector< std::vector<typename Privates::SimpleAssocMatrixInternalTypes<Klucz,Elem>::BlockType> >, class IndexContainer =
 			AssocArray< Klucz,int,std::vector< typename Privates::SimpleAssocMatrixInternalTypes< Klucz,Elem >::IndexBlockType > > >
@@ -1895,6 +1905,9 @@ namespace Koala
 		typedef IndexContainer IndexContainerType; /**<\brief The type of internal associative.*/
 		enum { shape = aType };/**< \brief Matrix type \sa AssocMatrixType*/
 
+		/** \brief Constructor.
+		*
+		*  Creates the associative matrix and allocates memory for \a asize elements.*/
 		SimpleAssocMatrix( int asize= 0) :	index( asize ), siz( 0 )
         {
             reserve(asize);
@@ -1920,7 +1933,12 @@ namespace Koala
             index.owner = this;
             return *this;
         }
-
+		/** \brief Copy content operator.
+		 *
+		 *  Overloaded assignment operator. Allows to make a copy of any type of two dimensional associative container as long as the types of keys match and mapped values can be copied.
+		 *  \tparam MatrixContainer the type of copied container.
+		 *  \param X the copied matrix.
+		 *  \return the reference to the current container. */
 		template< class MatrixContainer > SimpleAssocMatrix &operator=( const MatrixContainer &X )
         {
             Privates::Assoc2DimTabTag< Klucz,aType >::operator=( X );
@@ -1932,17 +1950,20 @@ namespace Koala
                 this->operator()( tab[i] )=X( tab[i] );
             return *this;
         }
-
+		/**\copydoc AssocMatrix::size*/
         int size()  const { return siz; }
+		/**\copydoc AssocMatrix::empty*/
         bool empty()  const { return !siz; }
-        bool operator!() const { return empty(); }
-        void reserve( int asize )
+		/**\copydoc AssocMatrix:: operator!*/
+		bool operator!() const { return empty(); }
+		/**\copydoc AssocMatrix::reserve*/
+		void reserve( int asize )
         {
             index.reserve( asize );
             bufor.resize( asize=std::max((int)bufor.size(),asize ));
             for(int i=0;i<asize;i++) bufor.operator[](i).reserve( Assoc2DimTabAddr< aType >::colSize( i,asize ) );
         }
-
+		/**\copydoc AssocMatrix::clear*/
         void clear()
         {
             index.clear();
@@ -1952,13 +1973,19 @@ namespace Koala
             siz = 0;
         }
 
-        bool hasInd( Klucz v ) const { return index.hasKey( v ); }
+		/**\copydoc AssocMatrix::hasInd( Klucz v ) const */
+		bool hasInd( Klucz v ) const { return index.hasKey( v ); }
+		/**\copydoc AssocMatrix::firstInd*/
 		Klucz firstInd() const { return index.firstKey(); }
+		/**\copydoc AssocMatrix::lastInd*/
 		Klucz lastInd() const { return index.lastKey(); }
+		/**\copydoc AssocMatrix::nextInd*/
 		Klucz nextInd( Klucz v )const  { return index.nextKey( v ); }
-		Klucz prevInd( Klucz v ) const { return index.prevKey( v ); }
+		/**\copydoc AssocMatrix::prevInd*/
+		Klucz prevInd(Klucz v) const { return index.prevKey(v); }
+		/**\copydoc AssocMatrix::indSize*/
 		int indSize() const { return index.size(); }
-
+		/**\copydoc AssocMatrix::slice1( Klucz v, ExtCont &tab ) const*/
         template <class ExtCont> int slice1( Klucz v, ExtCont &tab ) const
         {
             if (!index.hasKey( v )) return 0;
@@ -1971,7 +1998,7 @@ namespace Koala
                 }
             return licz;
         }
-
+		/**\copydoc AssocMatrix::slice2( Klucz v, ExtCont &tab ) const*/
         template <class ExtCont> int slice2( Klucz v, ExtCont &tab ) const
         {
             if (!index.hasKey( v )) return 0;
@@ -1984,8 +2011,10 @@ namespace Koala
                 }
             return licz;
         }
-
+		/**\copydoc AssocMatrix::getInds( Iterator iter )*/
         template< class Iterator > int getInds( Iterator iter ) const {   return index.getKeys(iter); }
+		
+		/**\copydoc AssocMatrix::delInd( Klucz v )*/
 		bool delInd( Klucz v )
         {
             if (!hasInd( v )) return false;
@@ -2001,7 +2030,7 @@ namespace Koala
             index.delKey( v );
             return true;
         }
-
+		/**\copydoc AssocMatrix::hasKey( Klucz u, Klucz v ) const*/
 		bool hasKey( Klucz u, Klucz v ) const
         {
             if (!u || !v) return false;
@@ -2011,8 +2040,9 @@ namespace Koala
             wsp=Assoc2DimTabAddr< aType >::wsp2pos2( wsp );
             return bufor.operator[](wsp.first).operator[](wsp.second).present;
         }
+		/**\copydoc AssocMatrix::hasKey( std::pair< Klucz,Klucz > k ) const*/
 		bool hasKey( std::pair< Klucz,Klucz > k ) const { return hasKey( k.first,k.second ); }
-
+		/**\copydoc AssocMatrix::delKey( Klucz u, Klucz v)*/
 		bool delKey( Klucz u, Klucz v)
         {
             if (!u || !v) return false;
@@ -2030,8 +2060,9 @@ namespace Koala
             }
             return false;
         }
+		/**\copydoc AssocMatrix::delKey( std::pair< Klucz,Klucz > k )*/
 		bool delKey( std::pair< Klucz,Klucz > k ) { return delKey( k.first,k.second ); }
-
+		/**\copydoc AssocMatrix::operator()( Klucz u, Klucz v )*/
 		Elem &operator()( Klucz u, Klucz v )
         {
             koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
@@ -2058,8 +2089,9 @@ namespace Koala
             }
             return bufor.operator[](x.first).operator[](x.second).val;
         }
+		/**\copydoc AssocMatrix::operator()( std::pair< Klucz,Klucz > k )*/
 		Elem &operator()( std::pair< Klucz,Klucz > k ) { return operator()( k.first,k.second ); }
-
+		/**\copydoc AssocMatrix::operator()( Klucz u, Klucz v)*/
 		Elem operator()( Klucz u, Klucz v) const
         {
             koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
@@ -2069,8 +2101,10 @@ namespace Koala
             if (!bufor.operator[](x.first).operator[](x.second).present) return Elem();
             return bufor.operator[](x.first).operator[](x.second).val;
         }
+		/**\copydoc AssocMatrix::operator()( std::pair< Klucz,Klucz > k ) const*/
 		Elem operator()( std::pair< Klucz,Klucz > k ) const { return operator()( k.first,k.second ); }
-		Elem* valPtr( Klucz u, Klucz v)
+		/**\copydoc AssocMatrix::valPtr(Klucz u, Klucz v)*/
+		Elem* valPtr(Klucz u, Klucz v)
         {
             koalaAssert( u && v && Assoc2DimTabAddr< aType >::correctPos( u,v ),ContExcWrongArg );
             std::pair< int,int > wsp = std::pair< int,int >( index.klucz2pos( u ),index.klucz2pos( v ) );
@@ -2079,8 +2113,9 @@ namespace Koala
             if (!bufor.operator[](pos.first).operator[](pos.second).present) return NULL;
             return &bufor.operator[](pos.first).operator[](pos.second).val;
         }
+		/**\copydoc AssocMatrix::valPtr( std::pair< Klucz,Klucz > k )*/
 		Elem* valPtr( std::pair< Klucz,Klucz > k ) { return valPtr(k.first,k.second); }
-
+		/**\copydoc AssocMatrix::getKeys( Iterator iter )*/
 		template< class Iterator > int getKeys( Iterator iter ) const
 		{
 		    for(Klucz x=this->firstInd();x;x=this->nextInd(x))
@@ -2093,7 +2128,7 @@ namespace Koala
                 }
             return siz;
 		}
-
+		/**\copydoc AssocMatrix::defrag*/
 		void defrag()
 		{
 		    int n;
