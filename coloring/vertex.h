@@ -35,7 +35,10 @@ public:
 	 *  The method finds the maximal used color.
 	 *  \param[in] graph the tested graph. The graph may be of any type, directed edges are regarded as undirected and loops are ignored.
 	 *  \param[in] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
-	 *  \return the maximal used color or -1 for empty coloring*/
+	 *  \return the maximal used color or -1 for empty coloring
+	 *
+  	 *  [See example](examples/coloring/example_coloring_VertColoring.html).
+	 */
 	template< typename Graph, typename ColorMap >
 	static int maxColor(const Graph &graph, const ColorMap &colors);
 
@@ -44,7 +47,10 @@ public:
 	 *  The method tests if the partial coloring given by the map \a colors is proper for the subgraph graph induced by colored vertices.\a g.
 	 *  \param[in] g the considered graph. The graph may be of any type, directed edges are regarded as undirected and loops are ignored.
 	 *  \param[in] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
-	 *  \return true if the partial coloring is proper, false otherwise. */
+	 *  \return true if the partial coloring is proper, false otherwise.
+	 *
+  	 *  [See example](examples/coloring/example_coloring_VertColoring.html).
+	 */
 	template<typename Graph, typename ColorMap>
 	static bool testPart(const Graph &g, const ColorMap &colors);
 
@@ -53,7 +59,10 @@ public:
 	 *  The method test of the coloring given by the map \a colors is proper and complete for the graph \a g.
 	 *  \param[in] g the considered graph. The graph may be of any type, directed edges are regarded as undirected and loops are ignored.
 	 *  \param[in] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
-	 *  \return true if the coloring is proper and complete, false otherwise. */
+	 *  \return true if the coloring is proper and complete, false otherwise.
+	 *
+  	 *  [See example](examples/coloring/example_coloring_VertColoring.html).
+	 */
 	template<typename Graph, typename ColorMap>
 	static bool test(const Graph &g, const ColorMap &colors);
 };
@@ -700,7 +709,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color.
 	 *
-	 *  [See example](examples/coloring/coloring_GIS.html). */
+	 *  [See example](examples/coloring/coloring_GIS.html).
+	 */
 	template<typename Graph, typename ColorMap, typename VIter>
 	static int color(const Graph &g, ColorMap &colors, VIter beg, VIter end);
 
@@ -712,7 +722,8 @@ public:
 	 *  \param[out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color.
 	 *
-	 *  [See example](examples/coloring/coloring_GIS.html).*/
+	 *  [See example](examples/coloring/coloring_GIS.html).
+	 */
 	template<typename Graph, typename ColorMap>
 	static int color(const Graph &g, ColorMap &colors);
 };
@@ -732,7 +743,10 @@ class VertColoringPar: public VertColoringTest {
 		 * Initial values in array \a colors are ignored.
 		 * \param graph the graph to color. The graph may be of any type, directed edges are regarded as undirected and loops are ignored. 
 		 * \param colors the associative array PVert->(nonnegative integer) that keeps the output coloring.
-		 * \return the maximal assigned color.*/
+		 * \return the maximal assigned color.
+		 *
+  		 *  [See example](examples/coloring/example_coloring_VertColoring.html).
+		 */
 		template<typename Graph, typename ColorMap>
 		static int color(const Graph &graph, ColorMap &colors);
 		/**\brief Get vertex coloring.
@@ -741,7 +755,10 @@ class VertColoringPar: public VertColoringTest {
 		 * Initial values in array \a colors are ignored.
 		 * \param graph the graph to color. The graph may be of any type, directed edges are regarded as undirected and loops are ignored.
 		 * \param colors the associative array PVert->(nonnegative integer) that keeps the output coloring.
-		 * \return the maximal assigned color or -1 if method recognizes that coloring with colors <0,\a maxColor > is impossible.*/
+		 * \return the maximal assigned color or -1 if method recognizes that coloring with colors <0,\a maxColor > is impossible.
+		 *
+  		 *  [See example](examples/coloring/example_coloring_VertColoring.html).
+		 */
 		template<typename Graph, typename ColorMap>
 		static int color(const Graph &graph, ColorMap &colors, int maxColor);
 	private:
