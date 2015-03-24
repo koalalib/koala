@@ -151,7 +151,10 @@ public:
 	 *   The array stores both input and output.
 	 *  \param beg the iterator to the first element of the container with vertices that are to be colored. The container should be free of repetitions.
 	 *  \param end the iterator to the past-the-end element of the container with vertices that are to be colored. The container should be free of repetitions.
-	 *  \return the number of colored vertices or -1 if none was possible. */
+	 *  \return the number of colored vertices or -1 if none was possible.
+	 *
+	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
+	 */
 	template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
 	static int color2ElemLists(const Graph &graph, const ColLists &colLists, ColorMap &colors, VIter beg, VIter end);
 
@@ -165,7 +168,10 @@ public:
 	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
 	 *  \param colors the associative container (PVert->int) which assigns a color (integer number) to the vertex.
 	 *   The array stores both input and output.
-	 *  \return the number of colored vertices or -1 if none was possible. */
+	 *  \return the number of colored vertices or -1 if none was possible.
+	 *
+	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
+	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int color2ElemLists(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
@@ -355,7 +361,8 @@ public:
 	 *   The array stores both input and output.
 	 *  \return the number of properly colored edges. Mind that the method breaks after meeting the first unchoosable vertex.
 	 *
-	 *  [See example](examples/coloring/edgeListColor.html).*/
+	 *  [See example](examples/coloring/edgeListColor.html).
+	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int color(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
@@ -371,7 +378,10 @@ public:
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (integers) to the edges.
-	 *  \return the number of properly colored edges, which is the number of edges in graph. */
+	 *  \return the number of properly colored edges, which is the number of edges in graph.
+	 *
+	 *  [See example](examples/coloring/edgeListColor_colorBipartite.html).
+	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int colorBipartite(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
@@ -389,7 +399,10 @@ public:
 	 *     which assigns a colors (integers) to the edges.
 	 *  \param beg the iterator to the first element  of the container with the edges that are to be colored. The container should be free of loops and repetitions.
 	 *  \param end the iterator to the past-the-end element of the container with the edges that are to be colored. The container should be free of loops and repetitions.
-	 *  \return the number of properly colored edges or -1 if none was possible.	 */
+	 *  \return the number of properly colored edges or -1 if none was possible.
+	 *
+	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
+	 */
 	template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
 	static int color2ElemLists(const Graph &graph, const ColLists &colLists, ColorMap &colors, VIter beg, VIter end);
 
@@ -403,7 +416,10 @@ public:
 	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
 	 *  \param colors the associative container (PEdge->int)
 	 *     which assigns a colors (integers) to the edges.
-	 *  \return the number of properly colored edges or -1 if none was possible.	 */
+	 *  \return the number of properly colored edges or -1 if none was possible.
+	 *
+	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
+	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int color2ElemLists(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 

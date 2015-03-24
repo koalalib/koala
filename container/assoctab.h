@@ -183,8 +183,6 @@ namespace Koala
 		 *
 		 *	The method gets the container capacity i.e. the number of elements which fit in the container without reallocation.
 		 *  \return the capacity of the container.
-		 *
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_capacity.html">See example</a>.
 		 */
 		int capacity () const { return std::numeric_limits< int >::max(); }
 
@@ -545,8 +543,6 @@ namespace Koala
 		 *  The method gets the container capacity i.e. the number of elements which fit in the container without reallocation.
 		 *  For some types of containers \a T the method dose nothing.
 		 *  \return the capacity of the container.
-		 *
-		 *  <a href="examples/assoctab/assocTable/assocTable_capacity.html">See example</a>.
 		 */
 		int capacity() const { return inter.capacity(); }
 
@@ -787,8 +783,6 @@ namespace Koala
 		 *
 		 *  The method gets the container capacity i.e. the number of elements which fit in the container without reallocation.
 		 *  \return the capacity of the container.
-		 *
-		 *  <a href="examples/assoctab/assocArray/assocArray_capacity.html">See example</a>.
 		 */
 		int capacity() const
 			{ return tab.capacity(); }
@@ -1356,7 +1350,7 @@ namespace Koala
 		 *  \param[out] tab the output table (Key->ValType) that associates the second Key with element.
 		 *  \return the number of elements in the output container \a out.
 		 *
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_slice1.html">See example</a>.
+		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_slice.html">See example</a>.
 		 */
 		template< class ExtCont > int slice1( Klucz, ExtCont & ) const;
 
@@ -1369,7 +1363,7 @@ namespace Koala
 		 *  \param[out] tab the output table (Key->ValType) that associates the first Key with element.
 		 *  \return the number of elements in the output container \a out.
 		 *
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_slice2.html">See example</a>.
+		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_slice.html">See example</a>.
 		 */
 		template<class ExtCont > int slice2( Klucz, ExtCont & ) const;
 
