@@ -600,12 +600,12 @@ namespace Koala
                 return chi(g,avmap);
             }
 
-			/**\brief Split vertex set into cliques. 
+			/**\brief Split vertex set into cliques.
 			 *
-			 * According to Dilworth's theorem, the method splits the vertex set of comparability graph into minimum number of cliques. 
+			 * According to Dilworth's theorem, the method splits the vertex set of comparability graph into minimum number of cliques.
 			 * Not that it gives maximal stable set of \a g and the chromatic number of graph \a g complement.
 			 * \param g the considered graph.
-			 * \param avmap output associative array PVerte->(clique index). Cliques are indexed from 0. BlackHole available. 
+			 * \param avmap output associative array PVerte->(clique index). Cliques are indexed from 0. BlackHole available.
 			 * \return the number of cliques or -1 if the graph was not comparability.*/
 			template< class Graph, class OutMap > static int coChi( const Graph &g, OutMap &avmap );
 
@@ -777,15 +777,6 @@ namespace Koala
 		 *  @return true if \a g is interval, false otherwise. */
 		template< class GraphType > static bool interval( const GraphType &g )
 			{ return Interval::graph2segs(g, blackHole); }
-
-		//TODO: trzeba sie bedzie zdecydowac na wersje
-		/** \brief Test if interval graph
-		*
-		*  The method tests if the graph \a g is an interval graph.
-		*  @param[in] g graph
-		*  @return true if \a g is interval, false otherwise. */
-		template< class GraphType > static bool interval2(const GraphType &g)
-		     { return chordal( g ) && cocomparability( g ); }
 
 		/** \brief Test if prime graph.
 		 *

@@ -9,25 +9,25 @@
 namespace Koala
 {
 
-	/** \brief Vertex choosing strategies for maximal stable set, vertex cover and maximum clique heuristics. 
+	/** \brief Vertex choosing strategies for maximal stable set, vertex cover and maximum clique heuristics.
 	 *
 	 *  The namespace contains functors
 	 *  that chooses a vertex basing on some specific rules.
-	 *  Such rules could be: 
-	 *  - first vertex, 
-	 *  - random vertex, 
+	 *  Such rules could be:
+	 *  - first vertex,
+	 *  - random vertex,
 	 *  - vertex that meets specific requirements (has the largest degree for example).
 	 *
-	 *  These function objects may be used for example within \a getWMin and \a getWMax methods in Koala::MaxStableHeurPar 
-	 *  to choose one vertex in each algorithm step. 
-	 *  
+	 *  These function objects may be used for example within \a getWMin and \a getWMax methods in Koala::MaxStableHeurPar
+	 *  to choose one vertex in each algorithm step.
+	 *
 	 *  They should be used with simple undirected graphs.
 	 *
 	 *  Each object function overload two parameter call function operator that takes
-	 *  - \a g the copy of considered graph 
+	 *  - \a g the copy of considered graph
 	 *  - associative container \a vertTab, which assigns integer weight to each vertex. However some strategies (First, Rand, GMin, GMax) ignore this parameter.
 	 *
-	 *  The functor returns one chosen vertex. 
+	 *  The functor returns one chosen vertex.
 	 *  \ingroup DMmis */
 	namespace MaxStableStrategy
 	{
@@ -79,7 +79,7 @@ namespace Koala
 
 			/** \brief Constructor
 			 *
-			 * Constructor that initializes random numbers generator. 
+			 * Constructor that initializes random numbers generator.
 			 * Use one of generators from header random or Koala::StdRandGen for lower c++ standards.*/
 		    Rand(RndGen& rg) : rgen(&rg) {}
 
@@ -206,7 +206,7 @@ namespace Koala
 		public:
 		    /** \brief Constructor
 			 *
-			 * Constructor that initializes random numbers generator. 
+			 * Constructor that initializes random numbers generator.
 			 * Use one of generators from header random or Koala::StdRandGen for lower c++ standards.*/
 		    GWMin2(RndGen& rg) : rgen(&rg) {}
 
@@ -239,13 +239,13 @@ namespace Koala
 		public:
 		    /** \brief Constructor
 			 *
-			 * Constructor that initializes random numbers generator. 
+			 * Constructor that initializes random numbers generator.
 			 * Use one of generators from header random or Koala::StdRandGen for lower c++ standards.*/
 		    GMax(RndGen& rg) : rgen(&rg) {}
 
 			/* \brief Call function operator.
 			 *
-			 *  \param g the copy of considered graph with pointer of original vertices in info field. 
+			 *  \param g the copy of considered graph with pointer of original vertices in info field.
 			 *  \param vertTab the associative array that assigns weights to vertices (ignored).*/
 			template< class GraphType, class VertContainer > typename GraphType::PVertex
 				operator()( const GraphType &g, const VertContainer& vertTab );
@@ -302,7 +302,7 @@ namespace Koala
 		public:
 		    /** \brief Constructor
 			 *
-			 * Constructor that initializes random numbers generator. 
+			 * Constructor that initializes random numbers generator.
 			 * Use one of generators from header random or Koala::StdRandGen for lower c++ standards.*/
 		    GGWMax(RndGen& rg) : rgen(&rg) {}
 
@@ -337,8 +337,8 @@ namespace Koala
 		 *   - removes the closed neighborhood of this vertex.
 		 *
 		 *  Since only heuristic is applied here the result may be suboptimal.
-		 *  \param g the considered graph. Any type of graph is allowed. 
-		 *   Mind that arcs are treated as undirected edges and vertices with loops may not belong to stable set. 
+		 *  \param g the considered graph. Any type of graph is allowed.
+		 *   Mind that arcs are treated as undirected edges and vertices with loops may not belong to stable set.
 		 *  \param out the iterator to the container with the output set of vertices.
 		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
@@ -350,7 +350,7 @@ namespace Koala
 				const VertContainer & vertTab );
 
 		/** \brief Search maximal independent set (heuristic, WMax technique).
-		 * 
+		 *
 		 *  The method searches for maximal independent set using the following heuristic,
 		 *  In each step (until the graph has no more edges):
 		 *   - chooses a vertex according to the choice function (\ref Koala::MaxStableStrategy) ,
@@ -358,8 +358,8 @@ namespace Koala
 		 *
 		 *  Since only heuristic is applied here the result may be suboptimal.
 		 *  The method outputs the remaining independent vertices.
-		 *  \param g the considered graph. Any type of graph is allowed. 
-		 *   Mind that arcs are treated as undirected edges and vertices with loops may not belong to stable set. 
+		 *  \param g the considered graph. Any type of graph is allowed.
+		 *   Mind that arcs are treated as undirected edges and vertices with loops may not belong to stable set.
 		 *  \param out the iterator to the container with the output set of vertices.
 		 *  \param choose the strategy (\ref Koala::MaxStableStrategy)  of choosing vertices (one in each step).
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
@@ -382,12 +382,12 @@ namespace Koala
 
 		/**\brief Test if max stable.
 		 *
-		 * Determinate if a set of vertices is maximal (in the sense of inclusion) i.e. if there is no vertices to add without spoiling stability. 
-		 * If \a stabilitytest set true, the method also tests if the set is independent. 
+		 * Determinate if a set of vertices is maximal (in the sense of inclusion) i.e. if there is no vertices to add without spoiling stability.
+		 * If \a stabilitytest set true, the method also tests if the set is independent.
 		 * \param  g     - graph to process
 		 * \param first - first vertex from the potentially independent set
 		 * \param last  - past-the-last vertex from the potentially independent set.
-		 * \param stabilitytest if set true the independence is tested. 
+		 * \param stabilitytest if set true the independence is tested.
 		 * \retrun true is the given set is maximal (in the sense of inclusion) independent, false otherwise.*/
 		template< class GraphType, typename Iterator >
 			static bool testMax( const GraphType &g, Iterator first, Iterator last, bool stabilitytest=true );
@@ -506,17 +506,17 @@ namespace Koala
 	 *  Based on: F. V. Fomin, F. Grandoni, D. Kratsch: Measure & conquer: A simple O(2^0.288n) independent set algorithm.
      *  ACM-SIAM Symposium on Discrete Algorithms (SODA), 18–25, 2006.
 	 * \sa MaxStablePar */
-    class MaxStable: public MaxStablePar< Koala::LocalGrAdjMatrSettings > {};
-    //class MaxStable: public MaxStablePar< Koala::AlgsDefaultSettings > {};
+    //class MaxStable: public MaxStablePar< Koala::LocalGrAdjMatrSettings > {};
+    class MaxStable: public MaxStablePar< Koala::AlgsDefaultSettings > {};
 
 
     /** \brief Maximum clique heuristics (parametrized).
 	 *
 	 *  Class provides heuristic approach to maximum clique problem.
 	 *
-	 *  Contains methods for two main templates: WMIN and WMAX. 
+	 *  Contains methods for two main templates: WMIN and WMAX.
 	 *  Both use algorithm for stable set delivered by MaxStablePar.
-	 *  
+	 *
 	 *  \ingroup DMmis */
 	template< class DefaultStructs > class MaxCliqueHeurPar
 	{
@@ -524,10 +524,10 @@ namespace Koala
 
 		/** \brief Search maximum clique (heuristic, WMin technique).
 		 *
-		 *  The method searches for maximum clique by searching maximal independent set with method MaxStablePar::getWMin in negated graph. 
+		 *  The method searches for maximum clique by searching maximal independent set with method MaxStablePar::getWMin in negated graph.
 		 *  Since only heuristic is applied here the result may be suboptimal.
-		 *  \param g the considered graph. Any type of graph is allowed. 
-		 *   Mind that arcs are treated as undirected edges and loops are ignored. 
+		 *  \param g the considered graph. Any type of graph is allowed.
+		 *   Mind that arcs are treated as undirected edges and loops are ignored.
 		 *  \param out the iterator to the container with the output set of vertices (clique).
 		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
@@ -535,13 +535,13 @@ namespace Koala
 		template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
 			static unsigned getWMin( const GraphType &g, OutputIterator out, ChoiceFunction choose,
 				const VertContainer & vertTab );
-		
+
 		/** \brief Search maximum clique (heuristic, WMin technique).
 		 *
-		 *  The method searches for maximum clique by searching maximal independent set with method MaxStablePar::getWMax in negated graph. 
+		 *  The method searches for maximum clique by searching maximal independent set with method MaxStablePar::getWMax in negated graph.
 		 *  Since only heuristic is applied here the result may be suboptimal.
-		 *  \param g the considered graph. Any type of graph is allowed. 
-		 *   Mind that arcs are treated as undirected edges and loops are ignored. 
+		 *  \param g the considered graph. Any type of graph is allowed.
+		 *   Mind that arcs are treated as undirected edges and loops are ignored.
 		 *  \param out the iterator to the container with the output set of vertices (clique).
 		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
@@ -562,12 +562,12 @@ namespace Koala
 
 		/** \brief Test if maximal clique.
 		 *
-		 *  The method tests if the vertices form container given by iterators \a first and \a last are maximal clique. 
+		 *  The method tests if the vertices form container given by iterators \a first and \a last are maximal clique.
 		 *  I.e. if there exists a vertex outside the container that is incident with all vertices from container.
-		 *  If \a stabilitytest is set false, it is assumed that vertices form container  form clique and the method only test if that set 
+		 *  If \a stabilitytest is set false, it is assumed that vertices form container  form clique and the method only test if that set
 		 *  can be extended.
 		 *  \param g     - graph to process
-		 *  \param first - first vertex from the container 
+		 *  \param first - first vertex from the container
 		 *  \param last  - past-the-last element of the container.
 		 *  \param stablilitytest - Boolean flag that decides if vertices from container are tested for being clique.
 		 *  \return true is the given set is a maximal clique, false otherwise. */
@@ -601,13 +601,13 @@ namespace Koala
 	 *
 	 *  Contains methods for two main templates: WMIN and WMAX.
 	 *  Both use algorithm for stable set delivered by MaxStablePar.
-	 *  
+	 *
 	 *  \ingroup DMmis */
 	class MaxCliqueHeur: public MaxCliqueHeurPar< Koala::LocalGrAdjMatrSettings > {};
 
 	/**\brief Maximum clique exact algorithm (parameterized).
 	 *
-	 * The class provides non-polynomial exact algorithm for maximum clique problem.  
+	 * The class provides non-polynomial exact algorithm for maximum clique problem.
 	 * The used approach searches maximum stable set (See MaxStablePar) in negated graph.
 	 * \sa MaxStablePar*/
     template< class DefaultStructs > class MaxCliquePar : private MaxCliqueHeurPar<DefaultStructs>
@@ -616,7 +616,7 @@ namespace Koala
 
 		/**\brief Find maximum clique.
 		 *
-		 * The method determines maximum clique by searching independent set in negated graph. 
+		 * The method determines maximum clique by searching independent set in negated graph.
 		 * Maximum stable set is found with method MaxStablePar::findMax. Mind that method is non-polynomial.
 		 *  \param g  graph to process
 		 *  \param out insert iterator to the output clique.
@@ -639,34 +639,34 @@ namespace Koala
             using MaxCliqueHeurPar<DefaultStructs>::testMax;
     };
 
-    
+
 	/**\brief Maximum clique exact algorithm (default algorithm settings).
 	 *
-	 * The class provides non-polynomial exact algorithm for maximum clique problem.  
+	 * The class provides non-polynomial exact algorithm for maximum clique problem.
 	 * The used approach searches maximum stable set (See MaxStablePar) in negated graph.
 	 * \sa MaxStablePar*/
-	class MaxClique: public MaxCliquePar< Koala::LocalGrAdjMatrSettings > {};
-    //class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
+	//class MaxClique: public MaxCliquePar< Koala::LocalGrAdjMatrSettings > {};
+    class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
 
-    
+
     /** \brief Minimum vertex cover heuristics (parametrized).
 	 *
 	 *  Class provides heuristic approach for minimum vertex cover problem.
 	 *
-	 *  Contains methods for two main templates: WMIN and WMAX. 
+	 *  Contains methods for two main templates: WMIN and WMAX.
 	 *  Both use algorithm for stable set delivered by MaxStablePar.
-	 *  
+	 *
 	 *  \ingroup DMmis */
 	template< class DefaultStructs > class MinVertCoverHeurPar
 	{
 	public:
-		
+
 		/** \brief Search minimum vertex cover (heuristic, WMin technique).
 		 *
 		 *  The method searches for minimum vertex cover by searching maximal independent set with method MaxStablePar::getWMin.
 		 *  Since only heuristic is applied here the result may be suboptimal.
-		 *  \param g the considered graph. Any type of graph is allowed. 
-		 *   Mind that arcs are treated as undirected edges and each vertex with loop is in the vertex cover. 
+		 *  \param g the considered graph. Any type of graph is allowed.
+		 *   Mind that arcs are treated as undirected edges and each vertex with loop is in the vertex cover.
 		 *  \param out the \wikipath{insert iterator} to the container with the output set of vertices (vertex cover.).
 		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
@@ -679,8 +679,8 @@ namespace Koala
 		 *
 		 *  The method searches for minimum vertex cover by searching maximal independent set with method MaxStablePar::getWMax.
 		 *  Since only heuristic is applied here the result may be suboptimal.
-		 *  \param g the considered graph. Any type of graph is allowed. 
-		 *   Mind that arcs are treated as undirected edges and each vertex with loop is in the vertex cover. 
+		 *  \param g the considered graph. Any type of graph is allowed.
+		 *   Mind that arcs are treated as undirected edges and each vertex with loop is in the vertex cover.
 		 *  \param out the \wikipath{insert iterator} to the container with the output set of vertices (vertex cover.).
 		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
@@ -701,12 +701,12 @@ namespace Koala
 
 		/** \brief Test if minimal vertex cover.
 		 *
-		 *  The method tests if the vertices form container given by iterators \a first and \a last are minimal vertex cover. 
+		 *  The method tests if the vertices form container given by iterators \a first and \a last are minimal vertex cover.
 		 *  I.e. if there exists a vertex in the container that may be removed and the set still covers all the graph vertices.
-		 *  If \a stabilitytest is set false, it is assumed that vertices from container cover all graph vertices and the method only test if that set 
+		 *  If \a stabilitytest is set false, it is assumed that vertices from container cover all graph vertices and the method only test if that set
 		 *  can be reduced.
 		 *  \param g     - graph to process
-		 *  \param first - first vertex from the container 
+		 *  \param first - first vertex from the container
 		 *  \param last  - past-the-last element of the container.
 		 *  \param stablilitytest - Boolean flag that decides if vertices form container are tested for covering all graph vertices.
 		 *  \return true is the given set is a minimal (in sense of inclusion) vertex cover, false otherwise. */
@@ -725,17 +725,17 @@ namespace Koala
 	 *
 	 *  Class provides heuristic approach for minimum vertex cover problem.
 	 *
-	 *  Contains methods for two main templates: WMIN and WMAX. 
+	 *  Contains methods for two main templates: WMIN and WMAX.
 	 *  Both use algorithm for stable set delivered by MaxStablePar.
-	 *  
+	 *
 	 *  \ingroup DMmis */
 	class MinVertCoverHeur: public MinVertCoverHeurPar< Koala::LocalGrAdjMatrSettings > {};
 
     /**\brief Minimum vertex cover exact algorithm (parameterized).
 	 *
-	 * The class provides non-polynomial exact algorithm for minimum vertex cover problem.  
+	 * The class provides non-polynomial exact algorithm for minimum vertex cover problem.
 	 * The used approach searches maximum stable set (See MaxStablePar).
-	 * \sa MaxStablePar  
+	 * \sa MaxStablePar
 	 * \ingroup DMmis */
     template< class DefaultStructs > class MinVertCoverPar : private MinVertCoverHeurPar<DefaultStructs>
     {
@@ -743,7 +743,7 @@ namespace Koala
 
         /**\brief Find minimum vertex cover (exact, non-polynomial).
 		 *
-		 * The method determines minimal vertex cover by searching independent set. 
+		 * The method determines minimal vertex cover by searching independent set.
 		 * Maximum stable set is found with method MaxStablePar::findMax. Mind that method is non-polynomial.
 		 *  \param g  graph to process
 		 *  \param out \wikipath{insert iterator, output iterator} to the output clique.
@@ -768,12 +768,12 @@ namespace Koala
 
     /**\brief Minimum vertex cover exact algorithm (default algorithm settings).
 	 *
-	 * The class provides non-polynomial exact algorithm for minimum vertex cover problem.  
+	 * The class provides non-polynomial exact algorithm for minimum vertex cover problem.
 	 * The used approach searches maximum stable set (See MaxStablePar).
-	 * \sa MaxStablePar  
+	 * \sa MaxStablePar
 	 * \ingroup DMmis */
-    class MinVertCover: public MinVertCoverPar< Koala::LocalGrAdjMatrSettings > {};
-    //class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
+    //class MinVertCover: public MinVertCoverPar< Koala::LocalGrAdjMatrSettings > {};
+    class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
 
 #include "mis.hpp"
 }
