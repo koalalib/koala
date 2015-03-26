@@ -673,7 +673,7 @@ namespace Koala
 		template< class T > class AssocTabTag;
 		template< class Key> struct ZeroAssocKey;
 	}
-	/**\brief Associative array based on BiDiHashMap 
+	/**\brief Associative array based on BiDiHashMap
 	 *
 	 *  This interface delivers the standard constant methods for containers in Koala.
 	 *  \tparam K the class for keys, usually pointers to objects.
@@ -734,6 +734,12 @@ namespace Koala
 		*  \return the boolean value, true if the container has no elements, false otherwise.*/
 		bool empty() const
 			{ return this->size() == 0; }
+		/** \brief Test if empty.
+		 *
+		 *  The overloaded operator!, tests if the container is empty.
+		 *  \return the boolean value, true if the container has no elements, false otherwise.
+		 */
+		bool operator!() const { return empty(); }
 		/** \brief Get keys.
 		*
 		*  All the keys in the container are stored in another container with a defined iterator.
@@ -825,6 +831,13 @@ namespace Koala
 			{ return this->size() == 0; }
 //		int capacity () const
 //			{ return std::numeric_limits< int >::max(); }
+		/** \brief Test if empty.
+		 *
+		 *  The overloaded operator!, tests if the container is empty.
+		 *  \return the boolean value, true if the container has no elements, false otherwise.
+		 */
+		bool operator!() const { return empty(); }
+
 		/** \brief Get keys.
 		 *
 		 *  All the keys in the container are stored in another container with a defined iterator.
