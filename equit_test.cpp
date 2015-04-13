@@ -1,4 +1,4 @@
-#define KOALA_SET_ON_VECTOR 1
+//#define KOALA_SET_ON_VECTOR 1
 
 #include<stdio.h>
 #include<iostream>
@@ -7,7 +7,7 @@
 #include"Koala/graph/graph.h"
 #include"Koala/coloring/vertex.h"
 #include"Koala/coloring/edge.h"
-#include"Koala/coloring/equitable.h"
+//#include"Koala/coloring/equitable.h"
 #include"Koala/io/text.h"
 
 using namespace std;

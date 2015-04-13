@@ -127,7 +127,7 @@ using namespace std;
     g.clear();g.addVert();g.addVert();g.addEdge(g.getVert(),g.getVertLast());
 //    g.addVert();
     SearchStructs::CompStoreTool<Graph<int, int>::PVertex> out;
-    cout << "\n" << boolalpha << IsIt::CompMPartite::split(g,blackHole,out.input()) << "\n" << IsIt::compMPartite(g);
+    cout << "\n" << boolalpha << IsIt::CompKPartite::split(g,blackHole,out.input()) << "\n" << IsIt::compKPartite(g);
     cout << "\n" << out.size() << ' ' << out.size(0);
     cout  << ' ' << out.size(1);
 

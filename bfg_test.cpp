@@ -399,7 +399,7 @@ int main() {
 		TEST(17, XXX, block, 0, 0, 0);
 		TEST(18, XXX, almostTree, 0, 0, 0);
 		TEST(19, XXX, compBipartite, 0, 0, 0);
-		TEST(20, XXX, compMPartite, 0, 0, 0);
+		TEST(20, XXX, compKPartite, 0, 0, 0);
 		TEST(21, XXX, cochordal, 0, 0, 0);
 		TEST(22, XXX, split, 0, 0, 0);
 		TEST(23, XXX, interval, 0, 0, 0);

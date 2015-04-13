@@ -10,6 +10,7 @@
 #include "Koala/algorithm/weights.h"
 #include "Koala/algorithm/matching.h"
 #include "Koala/algorithm/schedule.h"
+#include "Koala/algorithm/conflow.h"
 #include "Koala/coloring/vertex.h"
 #include "Koala/coloring/edge.h"
 #include "Koala/classes/detect.h"
@@ -1267,7 +1268,7 @@ void blockMain()
 
 int compMPartiteExamp(const MyGraph& g, AssocArray<PVertex,int >&  comps, SearchStructs::CompStoreTool<PVertex>::InputType compout)
 {
-    return IsIt::CompMPartite::split(g,comps,compout);
+    return IsIt::CompKPartite::split(g,comps,compout);
 }
 
 

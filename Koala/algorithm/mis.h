@@ -773,7 +773,7 @@ namespace Koala
 	 * \sa MaxStablePar
 	 * \ingroup DMmis */
     //class MinVertCover: public MinVertCoverPar< Koala::LocalGrAdjMatrSettings > {};
-    class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
+    class MinVertCover: public MinVertCoverPar< Koala::AlgsDefaultSettings > {};
 
 #include "mis.hpp"
 }

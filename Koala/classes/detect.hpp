@@ -225,7 +225,7 @@ template< class DefaultStructs > template< class GraphType, class Iter >
 }
 
 template< class DefaultStructs > template< class GraphType, class VMap, class Iter, class VIter >
-	int IsItPar< DefaultStructs >::CompMPartite::split( const GraphType &g, VMap& avertCont,CompStore< Iter,VIter > out )
+	int IsItPar< DefaultStructs >::CompKPartite::split( const GraphType &g, VMap& avertCont,CompStore< Iter,VIter > out )
 {
 	if (!undir( g,false )) return -1;
 	int n= g.getVertNo();
@@ -236,6 +236,7 @@ template< class DefaultStructs > template< class GraphType, class VMap, class It
 			int >::Type >::get( avertCont,localVertCont );
 
     //if (DefaultStructs::ReserveOutAssocCont || isBlackHole( avertCont ))
+    //colors.clear();
     colors.reserve( n );
 
 	int LOCALARRAY( tabC,n );
