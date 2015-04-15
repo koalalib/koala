@@ -26,7 +26,7 @@ namespace Koala
 			int length/**\brief Length*/,release/**\brief Release time*/,duedate/**\brief Due date*/;
 			typename GraphType::PVertex vertex;/**<\brief Pointer to vertex in graph of conflicts or digraph of precedence constraints.*/
 
-			/** \brief Constructor 
+			/** \brief Constructor
 			 *
 			 * \param _vertex the value for vertex, i.e. the corresponding vertex in graph of conflicts.
 			 * \param _length the length of new-created task.*/
@@ -79,7 +79,7 @@ namespace Koala
 
 		/** \brief Task window.
 		 *
-		 *  The output structure used by critical path algorithm. It represents  the time windows in which a task can be executed 
+		 *  The output structure used by critical path algorithm. It represents  the time windows in which a task can be executed
 		 *  and the optimal schedule is feasible. */
 		struct TaskWindow
 		{
@@ -105,11 +105,11 @@ namespace Koala
 			typedef std::vector< Machine > Type;/**<\brief Type of vector of vectors (for each machine single vector of TaskParts).*/
 
 			/** \brief Vector of vectors of TaskPart structures.
-			 *    
+			 *
              *  This an output structure that assigns to each machine (indexes from 0) a vector of TaskPart structures that represents parts of tasks executed on this machine.
-			 *  Hence this is an STL vector of vectors of TaskParts. 
+			 *  Hence this is an STL vector of vectors of TaskParts.
 			 *  Idle blocks are not represented in this structure.*/
-			Type machines; 
+			Type machines;
 
 			/**\brief Constructor.
 			 *
@@ -134,7 +134,7 @@ namespace Koala
 			/**\brief Get part index in vector.
 			 *
 			 *  The method returns the index of TaskPart executed in \a time slot on machine \a machNo*/
-			int part( int machNo, int time );
+			inline int part( int machNo, int time );
 
 			/**\brief Get Sequence of TaskParts sequences associated with tasks.*/
 			template< typename IntInserter, typename STDPairOfIntInserter >
@@ -156,7 +156,7 @@ namespace Koala
 	public:
 
 		/** \brief Sort by Longest Processing Time (LPT)
-		 * 
+		 *
 		 *  \param[in] begin the iterator to first element of the container with tasks (Task).
 		 *  \param[in] end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param[out] out the iterator to the output container with numbers that stand for the position of consecutive tasks from input in LPT sequence.
@@ -168,7 +168,7 @@ namespace Koala
 			}
 
 		/** \brief Sort by Shortest Processing Time SPT
-		 *  
+		 *
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param[out]  out the iterator to the output container with numbers that stand for the position of consecutive tasks from input in SPT sequence.
@@ -180,7 +180,7 @@ namespace Koala
 			}
 
 		/** \brief Sort by Earliest Due Date EDD.
-		 *  
+		 *
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param[out]  out the iterator to the output container with numbers that stand for the position of consecutive tasks from input in EDD sequence.
@@ -195,7 +195,7 @@ namespace Koala
 		 *
 		 *  \param[in] begin the iterator to first element of the container with tasks (Task).
 		 *  \param[in] end the iterator to past-the-end element of the container with tasks (Task).
-		 *  \param[out] schedule the reference to the achieved Schedule for tasks from the container. 
+		 *  \param[out] schedule the reference to the achieved Schedule for tasks from the container.
 		 *  \return the makespan of the \a schedule.*/
 		template< typename TaskIterator >
 			static int CMax( TaskIterator begin, TaskIterator end, const Schedule &schedule );
@@ -238,7 +238,7 @@ namespace Koala
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned vertex
-		 *  and precedence is determined by arcs. 
+		 *  and precedence is determined by arcs.
 		 *  \param schedule the reference to the tested Schedule object.
 		 *  \param nonPmtn if true, tasks are non-preemptible. If false, tasks are preemptible.
 		 *  \return true if \a schedule is correct, false if any kind of conflict arise. */
@@ -252,8 +252,8 @@ namespace Koala
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned vertex
-		 *  and precedence is determined by arcs. 
-		 *  \param[out] schedule the iterator to the container with SchedulingStructs::TaskWindow, that gives output schedule i.e. 
+		 *  and precedence is determined by arcs.
+		 *  \param[out] schedule the iterator to the container with SchedulingStructs::TaskWindow, that gives output schedule i.e.
 		 *  The container on i-th position stores i-th task possible time of execution.
 		 *  \return the makespan.
 		 *
@@ -262,14 +262,14 @@ namespace Koala
 			static int critPath( TaskIterator begin, TaskIterator end, const GraphType &DAG, TaskWindowIterator schedule );
 
 		/** \brief P|prec|- heuristic.
-		 *  
+		 *
 		 *  The list scheduling algorithm which for task order given by input list inserts them into schedule.
-		 *  Release dates are taken into account while due dates are ignored. 
+		 *  Release dates are taken into account while due dates are ignored.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned a vertex
-		 *  and precedence is determined by arcs. 
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. 
+		 *  and precedence is determined by arcs.
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
 		 *   Should be empty. Mind that this structure determine the number of processors.
 		 *  \return the makespan of achieved schedule.	*/
 		template< typename GraphType, typename TaskIterator >
@@ -281,8 +281,8 @@ namespace Koala
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task). Task must be unit-length, release and due dates are ignored.
 		 *  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned a vertex
-		 *  and precedence is determined by arcs. 
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. 
+		 *  and precedence is determined by arcs.
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
 		 *  Should be empty on entrance and defined for two processors.
 		 *  \return the makespan for P2|UET,prec|C<sub>max</sub>.
 		 *
@@ -296,8 +296,8 @@ namespace Koala
 		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned a vertex
-		 *  and precedence is determined by arcs. 
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. 
+		 *  and precedence is determined by arcs.
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
 		 *  Should be empty on entrance and defined for single processor.
 		 *  \return the minimal possible L<sub>max</sub> (maximal lateness).
 		 *
@@ -307,12 +307,12 @@ namespace Koala
 
 		/** \brief Solve P|UET,in-tree|L<sub>max</sub>.
 		 *
-		 *  The problem is solved with Brucker algorithm. It works for unit length tasks. Release dates are ignored. 
-		 *  \param begin the iterator to first element of the container with tasks (Task). 
+		 *  The problem is solved with Brucker algorithm. It works for unit length tasks. Release dates are ignored.
+		 *  \param begin the iterator to first element of the container with tasks (Task).
 		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned a vertex
 		 *  and precedence is determined by arcs. The graph must be an in-forest.
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. 
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
 		 *   Should be empty. Mind that this structure determine the number of processors.
 		 *  \return the minimal possible L<sub>max</sub> (maximal lateness).
 		 *
@@ -322,12 +322,12 @@ namespace Koala
 
 		/** \brief Solve P|UET,in-tree|C<sub>max</sub>.
 		 *
-		 *  The problem is solved with Hu algorithm. 
+		 *  The problem is solved with Hu algorithm.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
-		 *  \param end the iterator to past-the-end element of the container with tasks (Task). 
+		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param DAG an directed acyclic graph representing the precedence constraints  Where each task is assigned a vertex
 		 *  and precedence is determined by arcs. The graph must be an in-forest.
-		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written. 
+		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
 		 *   Should be empty on entrance. Mind that this structure determine the number of processors.
 		 *  \return the makespan of optimal schedule.
 		 *
@@ -340,7 +340,7 @@ namespace Koala
 		 *
 		 *  Release and due dates are ignored.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
-		 *  \param end the iterator to past-the-end element of the container with tasks (Task). 
+		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
 		 *  \param[out] schedule the reference to the Schedule object to which the schedule is written.
 		 *   Should be empty on entrance. Mind that this structure determine the number of processors.
 		 *  \return the minimal sum of completion times for P||ΣC<sub>i</sub>*/
@@ -350,8 +350,8 @@ namespace Koala
 		 *
 		 *  The method solves the problem using the Hodgson algorithm. The release dates are ignored.
 		 *  \param begin the iterator to first element of the container with tasks (Task).
-		 *  \param end the iterator to past-the-end element of the container with tasks (Task). 
-		 *  \param[out] schedule the reference to the Schedule object to which the optimal schedule is written. 
+		 *  \param end the iterator to past-the-end element of the container with tasks (Task).
+		 *  \param[out] schedule the reference to the Schedule object to which the optimal schedule is written.
 		 *  Should be empty on entrance. And defined for single processor.
 		 *  \return the minimal number of late tasks.
 		 *

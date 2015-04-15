@@ -389,7 +389,7 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 	if (first == NULL) first = g.getVert();
 
 	int t, retVal = 0;
-	typename GraphType::PEdge e;
+	typename GraphType::PEdge e, ne;
 	typename GraphType::PVertex u, v;
 	std::pair<typename GraphType::PVertex,
 		  typename GraphType::PEdge> LOCALARRAY(stk, g.getVertNo() + 1);
@@ -399,32 +399,40 @@ template< class SearchImpl, class DefaultStructs > template< class GraphType, cl
 	if(!Visitors::visitVertexPre(g, visitor, first, visited[first], visitor)) return 0;
 	retVal++;
 
-	stk[++sp] = std::make_pair(first, g.getEdge(first, mask));
+	stk[++sp] = std::make_pair(first, (typename GraphType::PEdge)NULL);
 
 	while(sp >= 0) {
 		u = stk[sp].first;
-		if(stk[sp].second == NULL) {
-			sp--;
+		e = stk[sp].second;
+
+		if(e == NULL) e = g.getEdge(u, mask);
+		else {
+			if(!Visitors::visitEdgePost(g, visitor, e, u, visitor)) return -retVal;
+			e = g.getEdgeNext(u, e, mask);
+			};
+
+		while(e != NULL) {
+			if(Visitors::visitEdgePre(g, visitor, e, u, visitor)) {
+				v = g.getEdgeEnd(e, u);
+				if(!visited.hasKey(v)) break;
+				};
+			e = g.getEdgeNext(u, e, mask);
+			};
+
+		if(e == NULL) {
 			if(!Visitors::visitVertexPost(g, visitor, u, visited[u], visitor)) return -retVal;
+			sp--;
 			continue;
 			};
 
-		e = stk[sp].second;
-		stk[sp].second = g.getEdgeNext(u, e, mask);
+		stk[sp].second = e;
 
-		if(!Visitors::visitEdgePre(g, visitor, e, u, visitor)) continue;
+		SearchStructs::VisitVertLabs<GraphType>(u, e, visited[u].distance + 1, component).copy(visited[v]);
+		retVal++;
+		if(!Visitors::visitVertexPre(g, visitor, v, visited[v], visitor)) continue;
+		stk[++sp] = std::make_pair(v, (typename GraphType::PEdge)NULL);
 
-		v = g.getEdgeEnd(e, u);
-
-		if(!visited.hasKey(v)) {
-			SearchStructs::VisitVertLabs<GraphType>(u, e, visited[u].distance + 1, component).copy(visited[v]);
-			if(!Visitors::visitVertexPre(g, visitor, v, visited[v], visitor)) continue;
-			stk[++sp] = std::make_pair(v, g.getEdge(v, mask));
-			retVal++;
-			};
-
-		if(!Visitors::visitEdgePost(g, visitor, e, u, visitor)) return -retVal;
-		}; // while(!stk.empty()
+		}; // while(!stk.empty())
 
 	return retVal;
 }
@@ -1143,7 +1151,6 @@ template< class DefaultStructs > template< class GraphType, class CompIter, clas
 	v = g.getEdgeEnd( e,u );
 
 	state.vmap[u].lowpoint = std::min( state.vmap[u].lowpoint,state.vmap[v].lowpoint );
-
 	if ((state.vmap[v].lowpoint >= state.vmap[u].depth && state.vmap[u].depth > 0)
 		|| (state.vmap[u].depth == 0 && state.vmap[u].sons > 1))
 	{
@@ -1431,7 +1438,6 @@ template< class DefaultStructs > template< class GraphType >
 	koalaAssert( u,AlgExcNullVert );
 	std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
 	_ends( g,EdUndir | EdLoop,res.first,res.second );
-//	return (res.first == u || res.second == u); //change
     return res.first != res.second && (res.first == u || res.second == u);
 }
 
@@ -1441,7 +1447,6 @@ template< class DefaultStructs > template< class GraphType >
 	koalaAssert( u,AlgExcNullVert );
 	std::pair< typename GraphType::PVertex,typename GraphType::PVertex > res;
 	_ends( g,EdDirOut | EdLoop,res.first,res.second );
-//	return res.first == u; //change
     return res.first != res.second && res.first == u;
 }
 
@@ -1449,7 +1454,6 @@ template< class DefaultStructs > template< class GraphType >
 	bool EulerPar< DefaultStructs >::hasCycle( const GraphType &g, typename GraphType::PVertex u )
 {
 	koalaAssert( u,AlgExcNullVert );
-//	return hasCycle( g ) && g.deg( u,EdUndir | EdLoop ); //change
     return hasCycle( g ) && (g.deg( u,EdUndir | EdLoop )>0 || g.getEdgeNo(EdUndir | EdLoop)==0);
 }
 
@@ -1457,8 +1461,7 @@ template< class DefaultStructs > template< class GraphType >
 	bool EulerPar< DefaultStructs >::hasDirCycle( const GraphType &g, typename GraphType::PVertex u )
 {
 	koalaAssert( u,AlgExcNullVert );
-//	return hasDirCycle( g ) && g.deg( u,EdDirOut | EdLoop ); //change
-	return hasDirCycle( g ) && (g.deg( u,EdDirOut | EdLoop )>0 || g.getEdgeNo(Directed | EdLoop)==0); //change
+	return hasDirCycle( g ) && (g.deg( u,EdDirOut | EdLoop )>0 || g.getEdgeNo(Directed | EdLoop)==0);
 }
 
 template< class DefaultStructs > template< class GraphType, class VertIter, class EdgeIter >
