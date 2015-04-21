@@ -304,7 +304,8 @@ private:
 	 *  @param[out] matching the insert iterator to the container with list of edges in found matching, .
 	 *  @return the actual number of edges in found matching.
 	 *
-	 *  [See example](examples/matching/matching_findMax.html). */
+	 *   @example Matching::Matching_findMax
+ *  [See example](examples/matching/matching_findMax.html). */
 	template< class GraphType, class EIterOut >
 	static int findMax( const GraphType &g, EIterOut matching)
 	{
@@ -321,7 +322,8 @@ private:
 	 *  @param[in] matchSize the desired size of a matching, leave out, set -1 or big (greater then maximal) for a maximum.
 	 *  @return the actual number of edges in found matching
 	 *
-	 *  [See example](examples/matching/matching_findMax.html). */
+	 *   @example Matching::findMax
+ *  [See example](examples/matching/matching_findMax.html). */
 	template< class GraphType, class VertContainer, class EIterOut >
 	static int findMax( const GraphType &g,
 				VertContainer &vertTab,
@@ -346,7 +348,8 @@ private:
 	 *  If mathSize>=0, it should be greater or equal to the size of initial matching.
 	 *  @return  the actual number of edges in found matching. Additionally, the method can return -1 if initial matching is invalid.
 	 *
-	 *  [See example](examples/matching/matching_findMax.html). */
+	 *   @example Matching::findMax
+ *  [See example](examples/matching/matching_findMax.html). */
 	template< class GraphType, class VertContainer, class EIterIn, class EIterOut >
 	static int findMax( const GraphType &g,
 				VertContainer &vertTab,
@@ -365,7 +368,8 @@ private:
 	 *  @param[out] cover the insert iterator to the container with the list of edges of found cover.
 	 *  @return the actual number of edges in found cover.
 	 *
-	 *  [See example](examples/matching/matching_minEdgeCover.html). */
+	 *   @example Matching::minEdgeCover
+ *  [See example](examples/matching/matching_minEdgeCover.html). */
 	template< class GraphType, class EIterOut >
 	static int minEdgeCover( const GraphType &g, EIterOut cover)
 	{
@@ -382,7 +386,8 @@ private:
 	 *  @param[in] matchSize the desired size of a matching, leave out or -1 for a maximum.
 	 *  @return  the size of found matching.
 	 *
-	 *  [See example](examples/matching/matching_greedy.html). */
+	 *   @example Matching::greedy
+ *  [See example](examples/matching/matching_greedy.html). */
 	template< class GraphType, class VertContainer, class EIterOut > static int greedy( const GraphType &g,
 		VertContainer &avertTab, EIterOut edgeIterOut, int matchSize = -1 );
 	/**\brief Greedy matching.
@@ -396,7 +401,8 @@ private:
 	 *  @param[in] matchSize the desired size of a matching, leave out or set to -1 for a maximum.
 	 *  @return  the size of found matching.
 	 *
-	 *  [See example](examples/matching/matching_greedy.html). */
+	 *   @example Matching::greedy
+ *  [See example](examples/matching/matching_greedy.html). */
 	template< class GraphType, class VertContainer, class EIterIn, class EIterOut > static int greedy(
 		const GraphType &g, VertContainer &avertTab, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd,
 		EIterOut edgeIterOut, int matchSize = -1 );
@@ -409,7 +415,8 @@ private:
 	 *  \param edgeIterInEnd the iterator to the past-the-end element of the container with the edges of tested set.
 	 *  \return true if the edge set form a matching, false otherwise.
 	 *
-	 *  [See example](examples/matching/matching_test.html). */
+	 *   @example Matching::test
+ *  [See example](examples/matching/matching_test.html). */
 	template< class GraphType, class EIterIn > static bool test( const GraphType &g, EIterIn edgeIterInBegin,
 		EIterIn edgeIterInEnd );
 };

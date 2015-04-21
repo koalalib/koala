@@ -147,6 +147,7 @@ public:
 	 *  \param end the iterator to the past-the-end element of the container with vertices that are to be colored. The container should be free of repetitions.
 	 *  \return the number of colored vertices or -1 if none was possible.
 	 *
+	 *   @example ListEdgeColoring::color2ElemLists
 	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
@@ -162,6 +163,7 @@ public:
 	 *   The array stores both input and output.
 	 *  \return the number of colored vertices or -1 if none was possible.
 	 *
+	 *   @example ListEdgeColoring::color2ElemLists
 	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
@@ -352,6 +354,7 @@ public:
 	 *   The array stores both input and output.
 	 *  \return the number of properly colored edges. Mind that the method breaks after meeting the first unchoosable vertex.
 	 *
+	 *   @example ListEdgeColoring::color
 	 *  [See example](examples/coloring/edgeListColor.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
@@ -371,6 +374,7 @@ public:
 	 *     which assigns a colors (integers) to the edges.
 	 *  \return the number of properly colored edges, which is the number of edges in graph.
 	 *
+	 *   @example ListEdgeColoring::colorBipartite
 	 *  [See example](examples/coloring/edgeListColor_colorBipartite.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
@@ -388,6 +392,7 @@ public:
 	 *  \param end the iterator to the past-the-end element of the container with the edges that are to be colored. The container should be free of loops and repetitions.
 	 *  \return the number of properly colored edges or -1 if none was possible.
 	 *
+	 *   @example ListEdgeColoring::color2ElemLists
 	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
@@ -403,6 +408,7 @@ public:
 	 *     which assigns a colors (integers) to the edges.
 	 *  \return the number of properly colored edges or -1 if none was possible.
 	 *
+	 *   @example ListEdgeColoring::color2ElemLists
 	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap>

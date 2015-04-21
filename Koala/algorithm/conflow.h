@@ -156,7 +156,8 @@ namespace Koala
 		 *  \tparam EIter the type of insert iterator to container with edges.
 		 *  \param av the insert iterator to container with vertices.
 		 *  \tparam ei the insert iterator to container with edges.
-		 *  [See example](examples/flow/example_Flow.html). */
+		 *   @example Flow::outCut
+ *  [See example](examples/flow/example_Flow.html). */
 		template< class VIter, class EIter > static OutCut< VIter,EIter > outCut( VIter av, EIter ei )
 			{ return OutCut< VIter,EIter >( av,ei ); }
 
@@ -457,7 +458,8 @@ namespace Koala
 		 *  \param[in] end the terminal vertex.
 		 *  \return the size of the achieved flow.
 		 *
-		 *  [See example](examples/flow/example_Flow.html). */
+		 *   @example Flow::maxFlow
+ *  [See example](examples/flow/example_Flow.html). */
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CapacType
 			maxFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
 				typename GraphType::PVertex end)
@@ -502,7 +504,8 @@ namespace Koala
 		 *  \param[in] end the terminal vertex.
 		 *  \return the standard pair (cost, size) of the achieved flow.
 		 *
-		 *  [See example](examples/flow/example_Flow.html). */
+		 *   @example Flow::minCostFlow
+ *  [See example](examples/flow/example_Flow.html). */
 		template< class GraphType, class EdgeContainer > static
 			std::pair< typename EdgeContainer::ValType::CostType,typename EdgeContainer::ValType::CapacType >
 			minCostFlow( const GraphType &g, EdgeContainer &edgeTab, typename GraphType::PVertex start,
@@ -548,7 +551,8 @@ namespace Koala
 		 *  \param[out] iters the pair of insert iterators to the containers with the reachable (from start) vertices (after subtraction of cut) and the edges of output  cut-set.
 		 *  \return the EdgeCut structure, which keeps the size of cut set, its minimal possible capacity and the number of reachable vertices.
 		 *
-		 *  [See example](examples/flow/example_Flow.html). */
+		 *   @example Flow::minEdgeCut
+ *  [See example](examples/flow/example_Flow.html). */
 		template< class GraphType, class EdgeContainer, class VIter, class EIter > static
 			EdgeCut< typename EdgeContainer::ValType::CapacType > minEdgeCut( const GraphType &g, EdgeContainer &edgeTab,
 				typename GraphType::PVertex start, typename GraphType::PVertex end, OutCut< VIter,EIter > iters )

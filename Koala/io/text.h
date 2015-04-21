@@ -186,6 +186,7 @@ public:
  *  \return true.
  *  \ingroup iotxt
  *
+ *   @example IO::readGraphText
  *  [See example](examples/text/text.html)*/
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, std::istream &s, int format,
@@ -205,6 +206,7 @@ bool readGraphText(Graph &g, std::istream &s, int format,
  *  \return true.
  *  \ingroup iotxt
  *
+ *   @example IO::readGraphText
  *  [See example](examples/text/text.html) */
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, const std::string &desc, int format,
@@ -228,6 +230,7 @@ bool readGraphText(Graph &g, const std::string &desc, int format,
  *  \return true.
  *  \ingroup iotxt
  *
+ *   @example IO::readGraphText
  *  [See example](examples/text/text.html)*/
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, const char *desc, int format,
@@ -249,6 +252,7 @@ bool readGraphText(Graph &g, const char *desc, int format,
  *  \return true.
  *  \ingroup iotxt
  *
+ *   @example IO::readGraphText
  *  [See example](examples/text/text.html) */
 template<class Graph>
 bool readGraphText(Graph &g, std::istream &s, int format) {
@@ -269,6 +273,7 @@ bool readGraphText(Graph &g, std::istream &s, int format) {
  *  \return true.
  *  \ingroup iotxt
  *
+ *   @example IO::readGraphText
  *  [See example](examples/text/text.html)*/
 template<class Graph>
 bool readGraphText(Graph &g, const std::string &desc, int format) {
@@ -289,6 +294,7 @@ bool readGraphText(Graph &g, const std::string &desc, int format) {
  *  \return true.
  *  \ingroup iotxt
  *
+ *   @example IO::readGraphText
  *  [See example](examples/text/text.html) */
 template<class Graph>
 bool readGraphText(Graph &g, const char *desc, int format) {
@@ -311,6 +317,7 @@ bool readGraphText(Graph &g, const char *desc, int format) {
   //TODO: To chyba nie dobrze ....
  *  \ingroup iotxt
  *
+ *   @example IO::writeGraphText
  *  [See example](examples/text/text.html)*/
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vmap,const EMap& emap);
@@ -326,6 +333,7 @@ bool writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vm
  *  \return true.
  *  \ingroup iotxt
  *
+ *   @example IO::writeGraphText
  *  [See example](examples/text/text.html) */
 template<class Graph>
 bool writeGraphText(const Graph &g, std::ostream &out, int format)
@@ -348,6 +356,7 @@ bool writeGraphText(const Graph &g, std::ostream &out, int format)
  *  \return true.
  *  \ingroup iotxt
  *
+ *   @example IO::writeGraphText
  *  [See example](examples/text/text.html)*/
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::string &out, int format,
@@ -370,6 +379,7 @@ bool writeGraphText(const Graph &g, std::string &out, int format,
  *  \return true.
  *  \ingroup iotxt
  *
+ *   @example IO::writeGraphText
  *  [See example](examples/text/text.html) */
 template<class Graph>
 bool writeGraphText(const Graph &g, std::string &out, int format)
@@ -393,6 +403,7 @@ bool writeGraphText(const Graph &g, std::string &out, int format)
  *  \return true if everything worked as planed. False if out=0 or maxlength=0
  * \ingroup iotxt
  *
+ *   @example IO::writeGraphText
  *  [See example](examples/text/text.html)*/
 template<class Graph,class VMap, class EMap>
 bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int format,
@@ -429,6 +440,7 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int forma
  *  \return true if everything worked as planed. False if out=0 or maxlength=0
  *  \ingroup iotxt
  *
+ *   @example IO::writeGraphText
  *  [See example](examples/text/text.html)
  */
 template<class Graph>

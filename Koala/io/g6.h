@@ -28,6 +28,7 @@ namespace IO {
  *  \return true if graph was properly read, false if any error occur (graph may consist of some residues of unsuccessful read).
  *  \ingroup DMiog6
  *
+ *   @example IO::readG6
  *  [See example](examples/g6/g6.html).
  */
 template< class Graph > bool readG6( Graph &graph, const char *str );
@@ -39,6 +40,7 @@ template< class Graph > bool readG6( Graph &graph, const char *str );
  *  \return true if graph was properly read, false if any error occur (graph may consist of some residues of unsuccessful read).
  *  \ingroup DMiog6
  *
+ *   @example IO::readG6
  *  [See example](examples/g6/g6.html).
  */
 template< class Graph > bool readG6( Graph &graph, std::string str);
@@ -51,6 +53,7 @@ template< class Graph > bool readG6( Graph &graph, std::string str);
  *  \param str the output string in which the graph is stored. Previous content is deleted.
  *  \ingroup DMiog6
  *
+ *   @example IO::writeG6
  *  [See example](examples/g6/g6.html).
  */
 template< class Graph > void writeG6( const Graph &graph, std::string &str );
@@ -63,6 +66,7 @@ template< class Graph > void writeG6( const Graph &graph, std::string &str );
  *  \return the number of written chars (together with the ending '\0').
  *  \ingroup DMiog6
  *
+ *   @example IO::writeG6
  *  [See example](examples/g6/g6.html). */
 template< class Graph > int writeG6( const Graph &graph, char *str, int maxlength); //@return number of used chars
 

@@ -399,7 +399,7 @@ int xxx=0;
         m(A,B)="\nWpis wspolny";
         m(A,A)="\nWpis pojedynczy";
         m(C,C)="\nWpis";
-        m.slice1(C,vec);
+		m.slice1(C, vec);
         t(vec);
     }
 //    unordered_set<std::string> haset;

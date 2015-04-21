@@ -37,7 +37,8 @@ public:
 	 *  \param[in] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal used color or -1 for empty coloring
 	 *
-  	 *  [See example](examples/coloring/example_coloring_VertColoring.html).
+  	 *   @example VertColoring::maxColor
+	 *  [See example](examples/coloring/example_coloring_VertColoring.html).
 	 */
 	template< typename Graph, typename ColorMap >
 	static int maxColor(const Graph &graph, const ColorMap &colors);
@@ -49,7 +50,8 @@ public:
 	 *  \param[in] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return true if the partial coloring is proper, false otherwise.
 	 *
-  	 *  [See example](examples/coloring/example_coloring_VertColoring.html).
+  	 *   @example VertColoring::testPart
+	 *  [See example](examples/coloring/example_coloring_VertColoring.html).
 	 */
 	template<typename Graph, typename ColorMap>
 	static bool testPart(const Graph &g, const ColorMap &colors);
@@ -61,7 +63,8 @@ public:
 	 *  \param[in] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return true if the coloring is proper and complete, false otherwise.
 	 *
-  	 *  [See example](examples/coloring/example_coloring_VertColoring.html).
+  	 *   @example VertColoring::test
+	 *  [See example](examples/coloring/example_coloring_VertColoring.html).
 	 */
 	template<typename Graph, typename ColorMap>
 	static bool test(const Graph &g, const ColorMap &colors);
@@ -179,6 +182,7 @@ public:
 	 *  \param[in] vert the vertex to color.
 	 *  \return the assigned color or -1 if the vertex was already colored.
 	 *
+	 *   @example VertColoring::greedy
 	 *  [See example](examples/coloring/coloring_greedy.html).*/
 	template< typename Graph, typename ColorMap >
 	static int greedy(const Graph &g, ColorMap &colors,
@@ -196,7 +200,8 @@ public:
 	 *  \param[in] vert the vertex to color.
 	 *  \return the assigned color or -1 if the vertex was already colored. 
 	 *
-	 *  [See example](examples/coloring/coloring_greedyinter.html). */
+	 *   @example VertColoring::greedyInter
+ *  [See example](examples/coloring/coloring_greedyinter.html). */
 	template<typename Graph, typename ColorMap>
 	static int greedyInter(const Graph &g, ColorMap &colors,
 		typename Graph::PVertex vert);
@@ -216,7 +221,8 @@ public:
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the assigned color or -1 if the vertex was already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_greedyinter.html).*/
+	 *   @example VertColoring::greedyInter
+ *  [See example](examples/coloring/coloring_greedyinter.html).*/
 	template< typename Graph, typename ColorMap >
 	static int greedyInter(const Graph &g, ColorMap &colors,
 		typename Graph::PVertex vert, int maxCol);
@@ -232,7 +238,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if all the vertices in sequence were already colored or the sequence was empty.
 	 *
-	 *  [See example](examples/coloring/coloring_greedy.html). */
+	 *   @example VertColoring::greedy
+ *  [See example](examples/coloring/coloring_greedy.html). */
 	template< typename Graph, typename ColorMap, typename VInIter >
 	static int greedy(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -250,7 +257,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_greedyinter.html).
+	 *   @example VertColoring::greedyInter
+ *  [See example](examples/coloring/coloring_greedyinter.html).
 	 */
 	template< typename Graph, typename ColorMap, typename VInIter >
 	static int greedyInter(const Graph &g, ColorMap &colors,
@@ -270,7 +278,8 @@ public:
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_greedyinter.html).
+	 *   @example VertColoring::greedyInter
+ *  [See example](examples/coloring/coloring_greedyinter.html).
 	 */
 	template< typename Graph, typename ColorMap, typename VInIter >
 	static int greedyInter(const Graph &g, ColorMap &colors,
@@ -284,7 +293,8 @@ public:
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_greedy.html).
+	 *   @example VertColoring::greedy
+ *  [See example](examples/coloring/coloring_greedy.html).
 	 */
 	template< typename Graph, typename ColorMap >
 	static int greedy(const Graph &graph, ColorMap &colors);
@@ -300,7 +310,8 @@ public:
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_greedyinter.html).
+	 *   @example VertColoring::greedyInter
+ *  [See example](examples/coloring/coloring_greedyinter.html).
 	 */
 	template< typename Graph, typename ColorMap >
 	static int greedyInter(const Graph &g, ColorMap &colors);
@@ -317,7 +328,8 @@ public:
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_LF.html).
+	 *   @example VertColoring::greedyInter
+ *  [See example](examples/coloring/coloring_greedyinter.html).
 	 */
 	template< typename Graph, typename ColorMap >
 	static int greedyInter(const Graph &g, ColorMap &colors,
@@ -331,7 +343,8 @@ public:
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_greedyinter.html).
+	 *   @example VertColoring::lf
+ *  [See example](examples/coloring/coloring_LF.html).
 	 */
 	template< typename Graph, typename ColorMap >
 	static int lf(const Graph &graph, ColorMap &colors);
@@ -347,7 +360,8 @@ public:
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_LF.html).
+	 *   @example VertColoring::lfInter
+ *  [See example](examples/coloring/coloring_LF.html).
 	 */
 	template< typename Graph, typename ColorMap >
 	static int lfInter(const Graph &g, ColorMap &colors);
@@ -365,7 +379,8 @@ public:
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_LFI.html).
+	 *   @example VertColoring::lfInter
+ *  [See example](examples/coloring/coloring_LFI.html).
 	 */
 	template< typename Graph, typename ColorMap >
 	static int lfInter(const Graph &graph, ColorMap &colors,
@@ -381,7 +396,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_LF.html).
+	 *   @example VertColoring::lf
+ *  [See example](examples/coloring/coloring_LF.html).
 	 */
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int lf(const Graph &g, ColorMap &colors,
@@ -401,7 +417,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_LFI.html).*/
+	 *   @example VertColoring::lfInter
+ *  [See example](examples/coloring/coloring_LFI.html).*/
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int lfInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -422,7 +439,8 @@ public:
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_LFI.html).*/
+	 *   @example VertColoring::lfInter
+ *  [See example](examples/coloring/coloring_LFI.html).*/
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int lfInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end, int maxCol);
@@ -450,7 +468,8 @@ public:
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color of -1 it the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SL.html). */
+	 *   @example VertColoring::sl
+ *  [See example](examples/coloring/coloring_SL.html). */
 	template<typename Graph, typename ColorMap>
 	static int sl(const Graph &g, ColorMap &colors);
 
@@ -465,7 +484,8 @@ public:
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLI.html). */
+	 *   @example VertColoring::slInter
+ *  [See example](examples/coloring/coloring_SLI.html). */
 	template< typename Graph, typename ColorMap >
 	static int slInter(const Graph &g, ColorMap &colors);
 
@@ -482,7 +502,8 @@ public:
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLI.html).*/
+	 *   @example VertColoring::slInter
+ *  [See example](examples/coloring/coloring_SLI.html).*/
 	template< typename Graph, typename ColorMap >
 	static int slInter(const Graph &g,
 		ColorMap &colors, int maxCol);
@@ -498,7 +519,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SL.html).*/
+	 *   @example VertColoring::sl
+ *  [See example](examples/coloring/coloring_SL.html).*/
 	template<typename Graph, typename ColorMap, typename VInIter>
 	static int sl(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -517,7 +539,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLI.html). */
+	 *   @example VertColoring::slInter
+ *  [See example](examples/coloring/coloring_SLI.html). */
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int slInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -538,7 +561,8 @@ public:
 	 *  \param maxCol the maximal expected color.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLI.html). */
+	 *   @example VertColoring::slInter
+ *  [See example](examples/coloring/coloring_SLI.html). */
 	template< typename Graph, typename ColorMap, typename VInIter >
 	static int slInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end, int maxCol);
@@ -565,7 +589,8 @@ public:
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLF.html).*/
+	 *   @example VertColoring::slf
+ *  [See example](examples/coloring/coloring_SLF.html).*/
 	template< typename Graph, typename ColorMap >
 	static int slf(const Graph &g, ColorMap &colors);
 
@@ -580,7 +605,8 @@ public:
 	 *  \param[in,out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLFI.html). */
+	 *   @example VertColoring::slfInter
+ *  [See example](examples/coloring/coloring_SLFI.html). */
 	template< typename Graph, typename ColorMap >
 	static int slfInter(const Graph &g, ColorMap &colors);
 
@@ -597,7 +623,8 @@ public:
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLFI.html). */
+	 *   @example VertColoring::slfInter
+ *  [See example](examples/coloring/coloring_SLFI.html). */
 	template< typename Graph, typename ColorMap >
 	static int slfInter(const Graph &g, ColorMap &colors, int maxCol);
 
@@ -611,7 +638,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 
-	 *  [See example](examples/coloring/coloring_SLF.html). */
+	 *   @example VertColoring::slf
+ *  [See example](examples/coloring/coloring_SLF.html). */
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int slf(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -631,7 +659,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLFI.html). */
+	 *   @example VertColoring::slfInter
+ *  [See example](examples/coloring/coloring_SLFI.html). */
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int slfInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end);
@@ -652,7 +681,8 @@ public:
 	 *  \param maxCol threshold for the interchange feature.
 	 *  \return the maximal assigned color or -1 if the vertices were already colored.
 	 *
-	 *  [See example](examples/coloring/coloring_SLFI.html).*/
+	 *   @example VertColoring::slfInter
+ *  [See example](examples/coloring/coloring_SLFI.html).*/
 	template < typename Graph, typename ColorMap, typename VInIter >
 	static int slfInter(const Graph &g, ColorMap &colors,
 		VInIter beg, VInIter end, int maxCol);
@@ -665,7 +695,8 @@ public:
 	 *  \param[out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color.
 	 *
-	 *  [See example](examples/coloring/coloring_brooks.html).*/
+	 *   @example VertColoring::brooks
+ *  [See example](examples/coloring/coloring_brooks.html).*/
 	template<typename Graph, typename ColorMap>
 	static int brooks(const Graph &g, ColorMap &colors);
 };
@@ -709,7 +740,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of vertices.
 	 *  \return the maximal assigned color.
 	 *
-	 *  [See example](examples/coloring/coloring_GIS.html).
+	 *   @example GisVertColoring::color
+ *  [See example](examples/coloring/coloring_GIS.html).
 	 */
 	template<typename Graph, typename ColorMap, typename VIter>
 	static int color(const Graph &g, ColorMap &colors, VIter beg, VIter end);
@@ -722,7 +754,8 @@ public:
 	 *  \param[out] colors the associative container (PVert->int) that associates vertices with colors (nonnegative integer).
 	 *  \return the maximal assigned color.
 	 *
-	 *  [See example](examples/coloring/coloring_GIS.html).
+	 *   @example GisVertColoring::color
+ *  [See example](examples/coloring/coloring_GIS.html).
 	 */
 	template<typename Graph, typename ColorMap>
 	static int color(const Graph &g, ColorMap &colors);
@@ -745,7 +778,8 @@ class VertColoringPar: public VertColoringTest {
 		 * \param colors the associative array PVert->(nonnegative integer) that keeps the output coloring.
 		 * \return the maximal assigned color.
 		 *
-  		 *  [See example](examples/coloring/example_coloring_VertColoring.html).
+  		 *   @example VertColoring::color
+		 *  [See example](examples/coloring/example_coloring_VertColoring.html).
 		 */
 		template<typename Graph, typename ColorMap>
 		static int color(const Graph &graph, ColorMap &colors);
@@ -757,7 +791,8 @@ class VertColoringPar: public VertColoringTest {
 		 * \param colors the associative array PVert->(nonnegative integer) that keeps the output coloring.
 		 * \return the maximal assigned color or -1 if method recognizes that coloring with colors <0,\a maxColor > is impossible.
 		 *
-  		 *  [See example](examples/coloring/example_coloring_VertColoring.html).
+  		 *   @example VertColoring::color
+		 *  [See example](examples/coloring/example_coloring_VertColoring.html).
 		 */
 		template<typename Graph, typename ColorMap>
 		static int color(const Graph &graph, ColorMap &colors, int maxColor);
