@@ -67,6 +67,7 @@ public:
 	 *  \param fileName the name of read file.
 	 *  \return true if file was successfully read, false if any error occur.
 	 *
+	 *   @example IO::readFile
 	 *  [See example](examples/text/graphml.html).
 	 */
 	inline bool readFile( const char *fileName );
@@ -77,7 +78,8 @@ public:
 	 *  \param fileName the name of written file.
 	 *  \return true if file was successfully written, false otherwise.
 	 *
-	 *  [See example](examples/text/graphml.html).
+	 *   @example IO::writeFile
+ *  [See example](examples/text/graphml.html).
 	 */
 	inline bool writeFile( const char *fileName );
 
@@ -150,7 +152,8 @@ public:
 	 *  \param name the name of searched graph.
 	 *  \return the pointer to GraphMLGraph object with the name \a name.
 	 *
-	 *  [See example](examples/text/graphml.html).
+	 *   @example IO::createGraph
+ *  [See example](examples/text/graphml.html).
 	 */
 	inline GraphMLGraph* createGraph(const char *name);
 
@@ -170,7 +173,8 @@ public:
 	 *  \param n the index of searched graph.
 	 *  \return the pointer to GraphMLGraph object with the name \a name, or NULL if there is no such graph.
 	 *
-	 *  [See example](examples/text/graphml.html).
+	 *   @example IO::getGraph
+ *  [See example](examples/text/graphml.html).
 	 */
 	inline GraphMLGraph* getGraph(int n); //get nth graph
 	/** \brief Delete graph named \a name.
@@ -195,7 +199,8 @@ public:
 	 *  \param name the name of read graph.
 	 *  \return true if graph was successfully read, false otherwise.
 	 *
-	 *  [See example](examples/text/graphml.html).
+	 *   @example IO::readGraph
+ *  [See example](examples/text/graphml.html).
 	 */
 	template< class Graph >
 	bool readGraph( Graph &graph, const char *name);
@@ -231,7 +236,8 @@ public:
 	 *  \param name the name of written graph.
 	 *  \return true if graph was successfully written, false otherwise.
 	 *
-	 *  [See example](examples/text/graphml.html).
+	 *   @example IO::writeGraph
+ *  [See example](examples/text/graphml.html).
 	 */
 	template< class Graph >
 	bool writeGraph(const Graph &graph, const char *name); //@return false if there is no graph named name

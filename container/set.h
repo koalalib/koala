@@ -105,7 +105,11 @@ namespace Koala
 	 * \tparam Element the type of element in set.
 	 * \ingroup cont
 	 *
-	 *   \wikipath{Output_iterator} [See example](examples/set/setInserter.html)	 */
+	 *   \wikipath{Output_iterator}
+	 *
+	 * @example SetInserter
+	 * [See example](examples/set/setInserter.html)
+	 */
 	template< class Element > class SetInserter< Set< Element > >:
 		public std::iterator< std::output_iterator_tag,void,void,void,void >
 	{
@@ -144,6 +148,7 @@ namespace Koala
 	 * \relates Set
 	 * \ingroup cont
 	 *
+	 *   @example Set::imageSet
 	 *  [See example](examples/set/setFunction.html)
 	 */
 	template< class ValType, class ArgType, class Funktor >
@@ -162,6 +167,7 @@ namespace Koala
 	 * \relates Set
 	 * \ingroup cont
 	 *
+	 *   @example Set::preimageSet
 	 *  [See example](examples/set/setFunction.html)
 	 */
 	template< class ValType, class ArgType, class Funktor >

@@ -46,7 +46,8 @@ public:
 	 *  \param colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
 	 *  \return true if the coloring is proper and complete, false otherwise.
 	 *
-	 *  [See example](examples/coloring/edgeColorGreedy.html).*/
+	 *   @example SeqEdgeColoring::test
+ *  [See example](examples/coloring/edgeColorGreedy.html).*/
 	template <typename Graph, typename ColorMap>
 	static bool test(const Graph &graph, const ColorMap &colors);
 };
@@ -112,7 +113,8 @@ public:
 	 *  \param colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the edges were already colored.
 	 *
-	 *  [See example](examples/coloring/edgeColorVizing.html). */
+	 *   @example SeqEdgeColoring::vizingSimple
+ *  [See example](examples/coloring/edgeColorVizing.html). */
 	template<typename Graph, typename ColorMap>
 	static int vizingSimple(const Graph &g, ColorMap &colors);
 
@@ -126,7 +128,8 @@ public:
 	 *   is taken into account as long as used color belongs to <0, &Delta; + &mu;>.
 	 *  \return the number of the highest used color.
 	 *
-	 *  [See example](examples/coloring/edgeColorVizing.html).*/
+	 *   @example SeqEdgeColoring::vizing
+ *  [See example](examples/coloring/edgeColorVizing.html).*/
 	template<typename Graph, typename ColorMap>
 	static int vizing(const Graph &graph, ColorMap &colors);
 
@@ -195,7 +198,8 @@ public:
 	 *  \param edge the colored edge.
 	 *  \return the assigned color or -1 if the edge was already colored.
 	 *
-	 *  [See example](examples/coloring/edgeColorGreedy.html).	 */
+	 *   @example SeqEdgeColoring::greedy
+ *  [See example](examples/coloring/edgeColorGreedy.html).	 */
 	template< typename Graph, typename ColorMap >
 	static int greedy(const Graph &g, ColorMap &colors,
 		typename Graph::PEdge edge);
@@ -239,7 +243,8 @@ public:
 	 *  \param end the past-the-end element in the sequence of edges.
 	 *  \return the maximal assigned color or -1 if the edges were already colored or if the sequence was empty.
 	 *
-	 *  [See example](examples/coloring/edgeColorGreedy.html). */
+	 *   @example SeqEdgeColoring::greedy
+ *  [See example](examples/coloring/edgeColorGreedy.html). */
 	template< typename Graph, typename ColorMap, typename EInIter >
 	static int greedy(const Graph &g, ColorMap &colors,
 		EInIter beg, EInIter end);
@@ -284,7 +289,8 @@ public:
 	 *  \param[in,out] colors the associative container (PEdge->int) that associates edges with colors (nonnegative integer).
 	 *  \return the maximal assigned color or -1 if the edges were already colored.
 	 *
-	 *  [See example](examples/coloring/edgeColorGreedy.html). */
+	 *   @example SeqEdgeColoring::greedy
+ *  [See example](examples/coloring/edgeColorGreedy.html). */
 	template< typename Graph, typename ColorMap >
 	static int greedy(const Graph &graph, ColorMap &colors);
 
