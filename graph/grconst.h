@@ -224,7 +224,7 @@ public:
 	 *  Pointers to all the vertices from graph are written to the container defined by \wikipath{Iterator, iterator} \a iter. 
 	 *  Any container with a defined output iterator (ex. table) can be used.
 	 *  \tparam OutputIterator Iterator type to the container in which the method stores up vertices.
-	 *  \param[out] iter the iterator of the container to which the pointers to all vertices form the graph are written.
+	 *  \param[out] iter the iterator of the container to which the pointers to all vertices form the graph are written. \wikipath{Read about iterator, iterator}
 	 *  \return the number of vertices.
 	 *
 	 *  [See example](examples/graph/graph_getVerts.html).
@@ -282,7 +282,7 @@ public:
 	 *  The method puts pointers to all the edges consistent with mask to the container defined by the iterator. 
 	 *  Any container with a defined iterator that stores types PEdge can be taken.
 	 *  \tparam OutputIterator The iterator type for the container in which the output edges are to be stored up.
-	 *  \param[out] iter the iterator of the container in which edges are to be stored.
+	 *  \param[out] iter the iterator of the container in which edges are to be stored. \wikipath{Read about iterator, iterator}
 	 *  \param mask the type of edges which are to be taken. \wikipath{EdgeType,See more details about EdgeType.}
 	 *  \return the number of stored edges.
 	 *
@@ -398,7 +398,7 @@ public:
 	 *
 	 *  The method returns the set of all edges incident to \a v with direction congruent with mask \a direct.
 	 *  \tparam OutpoutIterator the type of iterator for the container of the output set of pointers to edges (PEdge).
-	 *  \param[out] iter the iterator of the container of output edges.
+	 *  \param[out] iter the iterator of the container of output edges. \wikipath{Read about iterator, iterator}
 	 *  \param v the reference vertex.
 	 *  \param direct the mask defining the returned edges direction (with respect to \a v). \wikipath{EdgeDirection,See more details about EdgeDirection.}
 	 *  \return the number of edges in the set given by \a iter.
@@ -502,7 +502,7 @@ public:
 	*  The method returns the set of pairs (PEdge, PVertex) for all edges incident to \a v with direction congruent with mask \a direct. 
 	*  PVertex points to the other end of edge \a e.
 	*  \tparam OutpoutIterator the type of iterator for the container of the output set of pairs.
-	*  \param[out] iter the iterator of the container of output pairs.
+	*  \param[out] iter the iterator of the container of output pairs. \wikipath{Read about iterator, iterator}
 	*  \param v the reference vertex.
 	*  \param direct the mask defining the returned edges direction (with respect to \a v). \wikipath{EdgeDirection,See more details about EdgeDirection.}
 	*  \return the number of pairs in the set returned via \a iter.
@@ -603,7 +603,7 @@ public:
 	 *  The method gets a set of edges spanned on the vertices \a vert1 and \a vert2. Only edges with direction congruent with \a direct are considered.
 	 *  Any container with a defined iterator may by used.
 	 *  \tparam OutputIterator Type of iterator for the container of the output set of edges.
-	 *  \param[out] iter the output iterator of the container with pointers to edges.
+	 *  \param[out] iter the output iterator of the container with pointers to edges. \wikipath{Read about iterator, iterator}
 	 *  \param vert1 the first reference vertex.
 	 *  \param vert2 the second reference vertex.
 	 *  \param direct the mask defining the considered edges types and direction. \wikipath{EdgeDirection,See more details about EdgeDirection.}
@@ -618,7 +618,7 @@ public:
 	 *  The method gets the set of vertices defined by the chooser \a ch.
 	 *  \tparam OutputIterator iterator class of a container used to store the set of vertices pointers (PVertex).
 	 *  \tparam VChooser2 Class allowing to choose vertices automatically.
-	 *  \param out the iterator of the container used to store up the pointers to vertices chosen by the chooser \a ch.
+	 *  \param out the iterator of the container used to store up the pointers to vertices chosen by the chooser \a ch. \wikipath{Read about iterator, iterator}
 	 *  \param ch the chooser object allowing to choose vertices automatically. \wikipath{chooser}.
 	 *  \return the number of vertices in the output container.
 	 *
@@ -642,7 +642,7 @@ public:
 	 *  The method gets the set of edges defined by the chooser object \a ch.
 	 *  \tparam OutputIterator the iterator class of the container used to store the set of edges returned via reference (iterator).
 	 *  \tparam EChooser2 the class allowing to choose edges automatically.
-	 *  \param[out] out the iterator of the container used to store up the edges chosen by the chooser \a ch.
+	 *  \param[out] out the iterator of the container used to store up the edges chosen by the chooser \a ch. \wikipath{Read about iterator, iterator}
 	 *  \param ch the chooser object allowing to choose edges automatically. \wikipath{chooser}.
 	 *  \return the number of edges in out container.
 	 *
@@ -670,7 +670,7 @@ public:
 	 *  \tparam OutputE the iterator class of a container used to keep output edges.
 	 *  \tparam EChooser2 the class allowing to choose edges automatically.
 	 *  \tparam VChooser2 the class allowing to choose vertices automatically.
-	 *  \param out the standard pair of iterators used to return the containers of vertices and edges.
+	 *  \param out the standard pair of iterators used to return the containers of vertices and edges. \wikipath{Read about iterator, iterator}
 	 *  \param chs the pair of chooser objects allowing to choose vertices and edges automatically. \wikipath{chooser}.
 	 *  \param chooseends if true for each edge not only the edge chooser must be satisfied but also both ends need to satisfy the vertex chooser.
 	 *  \return the standard pair of integers that are respectively the number of chosen vertices and the number of edges.
@@ -901,7 +901,7 @@ public:
 	 *  Only edges with direction consistent with the mask \a direct make adjacency.
 	 *  The vertex itself is not included, unless mask \a direct is consistent with \a EdLoop.
 	 *  \tparam OutputIterator the iterator class of container in which the target set of vertices is stored.
-	 *  \param out the iterator of the output container.
+	 *  \param out the iterator of the output container. \wikipath{iterator}
 	 *  \param vert the vertex of reference.
 	 *  \param direct the mask defining the direction of edges that make adjacency. \wikipath{EdgeDirection}.
 	 *  \return the number of vertices in the returned set.
@@ -955,7 +955,7 @@ public:
 	 *  To store vertices any container for elements of type PVertex with an iterator may be used.
 	 *  Only edges with direction consistent with the mask \a direct make adjacency.
 	 *  \tparam OutputIterator the iterator class of container in which the target set of vertices is stored.
-	 *  \param out the iterator of the output container.
+	 *  \param out the iterator of the output container. \wikipath{Read about iterator, iterator}
 	 *  \param vert the reference vertex.
 	 *  \param direct the mask defining the direction of edges that make adjacency. \wikipath{EdgeDirection}.
 	 *  \return the number of vertices in output container \a out.
@@ -1069,7 +1069,7 @@ public:
 	 *  - EdUndir - edges are considered to be parallel if they are spanned on the same vertices.
 	 *
 	 *  \tparam OutputIterator the iterator class of the container used to store edges received by the method.
-	 *  \param[out] iter the iterator of container used to store output edges.
+	 *  \param[out] iter the iterator of container used to store output edges. \wikipath{Read about iterator, iterator}
 	 *  \param ed the considered edge.
 	 *  \param reltype determines the type of parallelism.
 	 *  \return the number of parallel edges stored in the container.
@@ -1152,10 +1152,10 @@ public:
 	 *  \tparam IterOut1 the iterator class of the container for the first output set (unique edges).
 	 *  \tparam IterOut2 the iterator class of the container for the second output set (residue).
 	 *  \tparam Iterator the iterator class of the container for the input set of edges.
-	 *  \param out the standard pair of iterators:\n
+	 *  \param out the standard pair of \wikipath{iterators, iterator}:\n
 	 *      The first is bound with the container consisting of unique edges representatives.\n
 	 *      The second is bound with the container holding the residue.
-	 *  \param begin iterator to the first element of the input container.
+	 *  \param begin iterator to the first element of the input container. \wikipath{Read about iterator, iterator}
 	 *  \param end iterator to past the last element of the input container.
 	 *  \param reltype determines the type of parallelism.
 	 *  \return the standard pair of integers, which corresponds with the size of the first and second output container.
@@ -1182,7 +1182,7 @@ public:
 	 *      The first is bound with the container consisting of unique edges representatives.\n
 	 *      The second is bound with the container holding the residue.
 	 *  \param begin the iterator to the first element of the input container.
-	 *  \param end the iterator to past the last element of the input container.
+	 *  \param end the iterator to past the last element of the input container. \wikipath{Read about iterator, iterator}
 	 *  \param reltype determines the type of parallelism.
 	 *  \return the standard pair of integers which corresponds with the size of the first and second output container. */
 	template< class IterOut1, class IterOut2, class Iterator >
@@ -1198,7 +1198,7 @@ public:
 	 *
 	 *  \tparam IterOut1 the iterator class of the container for the first output set (unique edges).
 	 *  \tparam IterOut2 the iterator class of the container for the second output set (residue).
-	 *  \param out the standard pair of iterators:\n
+	 *  \param out the standard pair of \wikipath{iterators, iterator}:\n
 	 *      The first is bound with the container consisting of unique edges representatives.\n
 	 *      The second is bound with the container holding the residue.
 	 *  \param eset the reference to the set of edges.
@@ -1221,7 +1221,7 @@ public:
 	 *
 	 *  \tparam IterOut1 the iterator class of the container for first output set (unique edges).
 	 *  \tparam IterOut2 the iterator class of the container for second output set (residue).
-	 *  \param out the standard pair of iterators:\n
+	 *  \param out the standard pair of \wikipath{iterators, iterator}:\n
 	 *      The first is bound with the container consisting of unique edges representatives.\n
 	 *      The second is bound with the container holding the residue.
 	 *  \param vert the reference vertex.
@@ -1243,7 +1243,7 @@ public:
 	 *
 	 *  \tparam IterOut1 the iterator class of the container for the first output set (unique edges).
 	 *  \tparam IterOut2 the iterator class of the container for the second output set (residue).
-	 *  \param out the standard pair of iterators:\n
+	 *  \param out the standard pair of \wikipath{iterators, iterator}:\n
 	 *      The first is bound with the container consisting of unique edges representatives.\n
 	 *      The second is bound with the container holding the residue.
 	 *  \param vert1 the first reference vertex.
@@ -1266,7 +1266,7 @@ public:
 	 *
 	 *  \tparam IterOut1 iterator the class of the container for the first output set (unique edges).
 	 *  \tparam IterOut2 iterator the class of the container for the second output set (residue).
-	 *  \param out the standard pair of iterators:\n
+	 *  \param out the standard pair of \wikipath{iterators, iterator}:\n
 	 *      The first is bound with the container consisting of unique edges representatives.\n
 	 *      The second is bound with the container holding the residue.
 	 *  \param reltype determines the type of parallelism.
@@ -1290,7 +1290,7 @@ public:
 	 *  \tparam OutIter class of iterator of the set of returned edges.
 	 *  \param[out] out the iterator of the container storing edges
 	 *  \param beg the iterator of the first vertex of the vertex set.
-	 *  \param end the iterator of the past the last vertex of the vertex set.
+	 *  \param end the iterator of the past the last vertex of the vertex set. \wikipath{Read about iterator, iterator}
 	 *  \param type the mask determining the type of direction (with respect to vertex inside input set) of considered edges.
 	 *  \param kind determines the mode.
 	 *  \return the number of incident edges returned via the parameter \a out.
@@ -1311,7 +1311,7 @@ public:
 	 *
 	 *  \tparam Iterator the iterator class of the container for input vertices.
 	 *  \param beg the iterator of the first vertex of the vertex set.
-	 *  \param end the iterator of past the last vertex of the vertex set.
+	 *  \param end the iterator of past the last vertex of the vertex set. \wikipath{Read about iterator, iterator}
 	 *  \param type the mask determining the type of direction (with respect to vertex inside input set) of considered edges.
 	 *  \param kind determines the mode.
 	 *  \return the set of incident edges.
@@ -1327,7 +1327,7 @@ public:
 	 *  - if \a kind is equal to Loop, the edges with both vertices inside the vertex set are taken.
 	 *  - the option in which the mask \a kind is congruent with both the above-mentioned is also available.
 	 *
-	 *  \param out the iterator of the container storing output vertices.
+	 *  \param out the iterator of the container storing output vertices. \wikipath{Read about iterator, iterator}
 	 *  \param vset the set of vertices.
 	 *  \param type the mask determining the type of direction (with respect to vertex inside input set) of considered edges.
 	 *  \param kind determines the mode.
@@ -1365,7 +1365,7 @@ public:
 	 *
 	 *  \tparam Iterator the iterator class of the container for input vertices.
 	 *  \tparam OutIter the iterator class of the set of output vertices.
-	 *  \param out the iterator of the container storing output vertices.
+	 *  \param out the iterator of the container storing output vertices. \wikipath{Read about iterator, iterator}
 	 *  \param beg the iterator of the first vertex of the vertex set.
 	 *  \param end the iterator of past the last vertex of the vertex set.
 	 *  \param type mask determining the type of direction (with respect to vertex inside input set) of considered edges.
@@ -1386,7 +1386,7 @@ public:
 	 *
 	 *  \tparam Iterator the iterator class for the container for input vertices.
 	 *  \param beg the iterator of the first vertex of the vertex set.
-	 *  \param end the iterator of past the last vertex of the vertex set.
+	 *  \param end the iterator of past the last vertex of the vertex set. \wikipath{Read about iterator, iterator}
 	 *  \param type the mask determining the type of direction (with respect to vertex inside input set) of considered edges.
 	 *  \param kind determines the mode.
 	 *  \return the set of adjacent vertices.
@@ -1404,7 +1404,7 @@ public:
 	 *  - the option in which mask \a kind is congruent with both the above-mentioned is also available.
 	 *
 	 *  \tparam OutIter class of iterator of the set of the output vertices.
-	 *  \param out the iterator of the container storing the output vertices.
+	 *  \param out the iterator of the container storing the output vertices. \wikipath{Read about iterator, iterator}
 	 *  \param vset the set of input vertices.
 	 *  \param type the mask determining the type of direction (with respect to vertex inside input set) of the considered edges.
 	 *  \param kind determines the mode.

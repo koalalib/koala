@@ -579,7 +579,7 @@ namespace Koala
 
 		/** \brief Get number of vertices.
 		 *
-		 *  Gets the \wikipath{Graph_order,order of the graph}.
+		 *  Gets the order of the graph.
 		 *  \return the number of vertices in graph.
 		 *
 		 *  [See example](examples/graph/graph_getVertNo.html).
@@ -1006,7 +1006,7 @@ namespace Koala
 		 */
 		inline typename GraphType::PEdge addLink( PVertex u,PVertex v,EdgeInfo info= EdgeInfo() )
 			{   return addEdge(u,v,info,EdUndir); }
-		/** \brief Add arc. 
+		/** \brief Add directed edge. 
 		 *
 		 *  \param vert1 the first vertex (tail) of the new-created arc.
 		 *  \param vert2 the second vertex (head) of the new-created arc.
