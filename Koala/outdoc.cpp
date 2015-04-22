@@ -91,7 +91,7 @@
  *   
  */
 
-/** \defgroup DMmis Minimum independent set
+/** \defgroup DMmis Maximal independent set
  *   
  *    \ingroup algor
  *   
