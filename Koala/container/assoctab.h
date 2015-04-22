@@ -998,6 +998,7 @@ namespace Koala
 	// A class that helps with keys in 2-dimentional arrays
 	template< AssocMatrixType > class Assoc2DimTabAddr;
 
+	/**\brief Auxiliary class for associative matrices.*/
 	template<> class Assoc2DimTabAddr< AMatrFull >
 	{
 	protected:
@@ -1012,15 +1013,18 @@ namespace Koala
 		inline std::pair< int,int > wsp2pos2(std::pair< int,int > arg) const { return arg; }
 		// tests if the arrays accepts a key
     public:
+		/**\brief Test if keys are accepted by array.*/
 		template< class T > bool correctPos( T, T ) const
 			{ return true; }
 		// changes 2-dimensional key into a standard form for this array
+		/**\brief Makes 2-dimensional key suitable for container out of two keys.*/
 		template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz u, Klucz v ) const
 			{ return std::pair< Klucz,Klucz >( u,v ); }
-		template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > k ) const
+		/**\brief Makes 2-dimensional key suitable for container out of standard pair.*/
+		template< class Klucz > inline std::pair< Klucz, Klucz > key(std::pair< Klucz, Klucz > k) const
 			{ return k; }
 	};
-
+	/**\brief Auxiliary class for associative matrices.*/
 	template<> class Assoc2DimTabAddr< AMatrNoDiag >
 	{
 		protected:
@@ -1033,13 +1037,14 @@ namespace Koala
 		{ return std::pair< int,int >(arg.first,arg.second -(arg.second>arg.first)); }
 
         public:
-			template< class T > bool correctPos( T u, T v )  const  { return u != v; }
+			/**\brief Test if keys are accepted by array.*/
+			template< class T > bool correctPos(T u, T v)  const  { return u != v; }
 			template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz u, Klucz v ) const
 				{ return std::pair< Klucz,Klucz >( u,v ); }
 			template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > k ) const
 				{ return k; }
 	};
-
+	/**\brief Auxiliary class for associative matrices.*/
 	template<> class Assoc2DimTabAddr< AMatrClTriangle >
 	{
 	protected:
@@ -1051,13 +1056,15 @@ namespace Koala
 		inline std::pair< int,int > wsp2pos2(std::pair< int,int > arg) const { return pairMaxMin(arg); }
 
     public:
-		template< class T > bool correctPos( T, T ) const  { return true; }
+		/**\brief Test if keys are accepted by array.*/
+		template< class T > bool correctPos(T, T) const  { return true; }
 		template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz u, Klucz v ) const
 			{ return pairMinMax( u,v ); }
 		template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > k ) const
 			{ return pairMinMax( k.first,k.second ); }
 	};
 
+	/**\brief Auxiliary class for associative matrices.*/
 	template <> class Assoc2DimTabAddr< AMatrTriangle >
 	{
 	protected:
@@ -1069,7 +1076,8 @@ namespace Koala
 		inline std::pair< int,int > wsp2pos2(std::pair< int,int > arg) const { return pairMaxMin(arg); }
 
     public:
-		template< class T > bool correctPos( T u, T v )  const { return u != v; }
+		/**\brief Test if keys are accepted by array.*/
+		template< class T > bool correctPos(T u, T v)  const { return u != v; }
 		template< class Klucz > inline std::pair< Klucz,Klucz > key( Klucz u, Klucz v ) const
 			{ return pairMinMax( u,v ); }
 		template< class Klucz > inline std::pair< Klucz,Klucz > key( std::pair< Klucz,Klucz > k ) const
