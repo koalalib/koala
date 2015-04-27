@@ -134,7 +134,7 @@ namespace Koala
 			/**\brief Get part index in vector.
 			 *
 			 *  The method returns the index of TaskPart executed in \a time slot on machine \a machNo*/
-			int part( int machNo, int time );
+			inline int part( int machNo, int time );
 
 			/**\brief Get Sequence of TaskParts sequences associated with tasks.*/
 			template< typename IntInserter, typename STDPairOfIntInserter >
