@@ -230,8 +230,8 @@ template< class GraphType, class VInfoGen, class EInfoGen >
 	typename GraphType::PVertex LOCALARRAY( vTab1,n1 );
 	typename GraphType::PVertex LOCALARRAY( vTab2,n2 );
 
-	addVertices2Tab( g,vTab1,n1,0,dir,vInfoGen,eInfoGen );
-	addVertices2Tab( g,vTab2,n2,n1,dir,vInfoGen,eInfoGen );
+	p1Vertex=addVertices2Tab( g,vTab1,n1,0,dir,vInfoGen,eInfoGen ).first;
+	p2Vertex=addVertices2Tab( g,vTab2,n2,n1,dir,vInfoGen,eInfoGen ).first;
 
 	for ( int i = 0; i < n1; i++ )
 		for ( int j = 0; j < n2; j++ )

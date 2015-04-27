@@ -508,8 +508,8 @@ namespace Koala
 	 *  Based on: F. V. Fomin, F. Grandoni, D. Kratsch: Measure & conquer: A simple O(2^0.288n) independent set algorithm.
      *  ACM-SIAM Symposium on Discrete Algorithms (SODA), 18–25, 2006.
 	 * \sa MaxStablePar */
-    class MaxStable: public MaxStablePar< Koala::LocalGrAdjMatrSettings > {};
-    //class MaxStable: public MaxStablePar< Koala::AlgsDefaultSettings > {};
+    //class MaxStable: public MaxStablePar< Koala::LocalGrAdjMatrSettings > {};
+    class MaxStable: public MaxStablePar< Koala::AlgsDefaultSettings > {};
 
 
     /** \brief Maximum clique heuristics (parametrized).
@@ -647,8 +647,8 @@ namespace Koala
 	 * The class provides non-polynomial exact algorithm for maximum clique problem.  
 	 * The used approach searches maximum stable set (See MaxStablePar) in negated graph.
 	 * \sa MaxStablePar*/
-	class MaxClique: public MaxCliquePar< Koala::LocalGrAdjMatrSettings > {};
-    //class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
+	//class MaxClique: public MaxCliquePar< Koala::LocalGrAdjMatrSettings > {};
+    class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
 
     
     /** \brief Minimum vertex cover heuristics (parametrized).
@@ -774,8 +774,8 @@ namespace Koala
 	 * The used approach searches maximum stable set (See MaxStablePar).
 	 * \sa MaxStablePar  
 	 * \ingroup DMmis */
-    class MinVertCover: public MinVertCoverPar< Koala::LocalGrAdjMatrSettings > {};
-    //class MaxClique: public MaxCliquePar< Koala::AlgsDefaultSettings > {};
+    //class MinVertCover: public MinVertCoverPar< Koala::LocalGrAdjMatrSettings > {};
+    class MinVertCover: public MinVertCoverPar< Koala::AlgsDefaultSettings > {};
 
 #include "mis.hpp"
 }

@@ -131,6 +131,7 @@ int xxx=0;
     AssocTabInterface<BiDiHashMap<int,std::string> > hamap=hmapa;
 
 
+
     AssocTable< BiDiHashMap<Vert*,std::string> > ha(10);
 
  AssocTable< BiDiHashMap<Vert*,std::string> > hha;
@@ -322,6 +323,7 @@ int xxx=0;
     cout << "\n" << pairMinMax(5,5).first << ' ' << pairMinMax(4,5).second;
 
     AssocTable<HashMap<int,std::string> > hmp;
+    !hmp;
     hmp[3]="A";hmp[6]="B";;hmp[7]="C";
     cout << endl << hmp[3] << hmp.size();
     hmp.reserve(200000);

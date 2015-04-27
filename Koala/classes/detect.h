@@ -290,7 +290,8 @@ namespace Koala
 			{ return CompBipartite::getPart( g,blackHole ) != -1; }
 
 		/** \brief Methods for complete M-partite graph. */
-		class CompMPartite
+		class CompKPartite
+		//NEW: zmiana nazwy z CompMPartite
 		{
 		public:
 			/** \brief Get partitions.
@@ -300,7 +301,7 @@ namespace Koala
 			 *  \param avertCont associative container (PVertex->int) that assigns partition number to vertex (blackHole possible).
 			 *  \param[out] out the CompStore iterator of a container with the partitions (blackHole possible).
 			 *   \wikipath{Graph search algorithms#Sequence of sequences, See wiki for CompStore}
-			 *  \return the number of partitions or -1 if \a g is not a compMPartite.
+			 *  \return the number of partitions or -1 if \a g is not a compKPartite.
 			 *  \sa CompStore
 			 *
 			 *   @example IsIt::CompBipartite::split
@@ -324,8 +325,8 @@ namespace Koala
 		 *   @example IsIt::CompBipartite::split
  *  [See example](examples/detect/example_IsItCompMPartite.html).
 		 */
-		template< class GraphType > static bool compMPartite( const GraphType &g )
-			{ return CompMPartite::split( g,blackHole,compStore( blackHole,blackHole )) != -1; }
+		template< class GraphType > static bool compKPartite( const GraphType &g )
+			{ return CompKPartite::split( g,blackHole,compStore( blackHole,blackHole )) != -1; }
 
 		/** \brief Methods for chordal graphs.
 		 *
@@ -881,15 +882,6 @@ namespace Koala
 		 */
 		template< class GraphType > static bool interval( const GraphType &g )
 			{ return Interval::graph2segs(g, blackHole); }
-
-		//TODO: trzeba sie bedzie zdecydowac na wersje
-		/** \brief Test if interval graph
-		*
-		*  The method tests if the graph \a g is an interval graph.
-		*  @param[in] g graph
-		*  @return true if \a g is interval, false otherwise. */
-		template< class GraphType > static bool interval2(const GraphType &g)
-		     { return chordal( g ) && cocomparability( g ); }
 
 		/** \brief Test if prime graph.
 		 *
