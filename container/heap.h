@@ -33,10 +33,10 @@ namespace Koala
 		bool check() const;
 
 	public:
-		/** \brief Constructor*/
+		/**\brief Constructor*/
 		BinomHeapNode( const Key &key = Key() ): parent( 0 ), child( 0 ), next( 0 ), degree( 0 ), key( key )
 			{ }
-		/** \brief Get key.
+		/**\brief Get key.
 		 *
 		 *  \return the value of kept object. */
 		Key get()
@@ -52,7 +52,9 @@ namespace Koala
 	 *
 	 *  \wikipath{Binominal_heap}
 	 *
-	 *  [See example](examples/heap/example_BinomHeap.html). */
+	 *   @example BinomHeap
+	 *  [See example](examples/heap/example_BinomHeap.html).
+	 */
 	template< class Key, class Compare = std::less< Key > >
 		class BinomHeap
 	{
@@ -215,6 +217,7 @@ namespace Koala
 	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>.
 	 *  \ingroup cont
 	 *
+	 *   @example FibonHeap
 	 *  [See example](examples/heap/example_FibonHeap.html).
 	 */
 	template< class Key, class Compare = std::less< Key > >
@@ -369,6 +372,7 @@ namespace Koala
 	 *  \tparam Allocator the class allows to use own memory allocator.
 	 *  \ingroup cont
 	 *
+	 *   @example PairHeap
 	 *  [See example](examples/heap/example_FibonHeap.html).
 	 */
 	template <class Key, class Compare = std::less<Key> >
