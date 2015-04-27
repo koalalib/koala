@@ -257,7 +257,8 @@ namespace Koala
 		 *  The container on i-th position stores i-th task possible time of execution.
 		 *  \return the makespan.
 		 *
-		 *  [See example](examples/schedule/scheduling_critical.html).*/
+		 *   @example Scheduling::critPath
+ *  [See example](examples/schedule/scheduling_critical.html).*/
 		template< typename GraphType, typename TaskIterator, typename TaskWindowIterator >
 			static int critPath( TaskIterator begin, TaskIterator end, const GraphType &DAG, TaskWindowIterator schedule );
 
@@ -286,7 +287,8 @@ namespace Koala
 		 *  Should be empty on entrance and defined for two processors.
 		 *  \return the makespan for P2|UET,prec|C<sub>max</sub>.
 		 *
-		 *  [See example](examples/schedule/scheduling_coffman.html). */
+		 *   @example Scheduling::coffmanGraham
+ *  [See example](examples/schedule/scheduling_coffman.html). */
 		template< typename GraphType, typename TaskIterator >
 			static int coffmanGraham( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
@@ -301,7 +303,8 @@ namespace Koala
 		 *  Should be empty on entrance and defined for single processor.
 		 *  \return the minimal possible L<sub>max</sub> (maximal lateness).
 		 *
-		 *  [See example](examples/schedule/scheduling_precliu.html).*/
+		 *   @example Scheduling::precLiu
+ *  [See example](examples/schedule/scheduling_precliu.html).*/
 		template< typename GraphType, typename TaskIterator >
 			static int precLiu( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
@@ -316,7 +319,8 @@ namespace Koala
 		 *   Should be empty. Mind that this structure determine the number of processors.
 		 *  \return the minimal possible L<sub>max</sub> (maximal lateness).
 		 *
-		 *  [See example](examples/schedule/scheduling_brucker.html). */
+		 *   @example Scheduling::brucker
+ *  [See example](examples/schedule/scheduling_brucker.html). */
 		template< typename GraphType, typename TaskIterator >
 			static int brucker( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
@@ -331,7 +335,8 @@ namespace Koala
 		 *   Should be empty on entrance. Mind that this structure determine the number of processors.
 		 *  \return the makespan of optimal schedule.
 		 *
-		 *  [See example](examples/schedule/scheduling_hu.html).
+		 *   @example Scheduling::hu
+ *  [See example](examples/schedule/scheduling_hu.html).
 		 */
 		template< typename GraphType, typename TaskIterator >
 			static int hu( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
@@ -355,7 +360,8 @@ namespace Koala
 		 *  Should be empty on entrance. And defined for single processor.
 		 *  \return the minimal number of late tasks.
 		 *
-		 *  [See example](examples/schedule/scheduling_hodgson.html).
+		 *   @example Scheduling::hodgson
+ *  [See example](examples/schedule/scheduling_hodgson.html).
 		 */
 		template< typename TaskIterator > static int hodgson( TaskIterator begin, TaskIterator end, Schedule &schedule );
 

@@ -125,7 +125,8 @@ public:
 	 *     which assigns a structure \a Segment to the vertex.
 	 *  \return true if the coloring is proper and complete, false otherwise.
 	 *
-	 *  [See example](examples/coloring/edgeIntervalColor.html).
+	 *   @example IntervalEdgeColoring::test
+ *  [See example](examples/coloring/edgeIntervalColor.html).
   	 */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static bool test(const Graph &graph, const Weights &weights,
@@ -204,7 +205,8 @@ public:
 	 *     which assigns a structure \a Segment to the edge.
 	 *  \return the largest added color i.e. the maximal \a max field in an added interval or -1 if the whole graph had been already colored.
 	 *
-	 *  [See example](examples/coloring/edgeIntervalColor.html).
+	 *   @example IntervalEdgeColoring::greedy
+ *  [See example](examples/coloring/edgeIntervalColor.html).
 	 */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static int greedy(const Graph &graph, const Weights &weights, ColorMap &colors);
@@ -238,7 +240,8 @@ public:
 	 *     which assigns a structure \a Segment to the edge.
 	 *  \return the largest added color i.e. the maximal \a max field in an added interval. If none of edges was colored -1 is returned.
 	 *
-	 *  [See example](examples/coloring/edgeIntervalColor.html). */
+	 *   @example IntervalEdgeColoring::lf
+ *  [See example](examples/coloring/edgeIntervalColor.html). */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static int lf(const Graph &graph, const Weights &weights, ColorMap &colors);
 
@@ -266,7 +269,8 @@ public:
 	 *   Any initial coloring from this container is taken into account. 
 	 *  \return the largest color used.
 	 *
-	 *  [See example](examples/coloring/edgeIntervalColor.html).*/
+	 *   @example IntervalEdgeColoring::li
+ *  [See example](examples/coloring/edgeIntervalColor.html).*/
 	template<typename Graph, typename Weights, typename ColorMap>
 	static int li(const Graph &graph, const Weights &weights, ColorMap &colors);
 
@@ -291,7 +295,8 @@ public:
 	 *     which assigns a structure \a Segment to the edge.
 	 *  \return true if the edge coloring is proper, false otherwise.
 	 *
-	 *  [See example](examples/coloring/edgeIntervalColor.html).
+	 *   @example IntervalEdgeColoring::test
+ *  [See example](examples/coloring/edgeIntervalColor.html).
   	 */
 	template<typename Graph, typename Weights, typename ColorMap>
 	static bool test(const Graph &graph, const Weights &weights, const ColorMap &colors);

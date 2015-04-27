@@ -26,7 +26,8 @@ namespace Koala
 		 *  edges are stored in edge container in the order ({v_0,v_1},{v_1,v_2},...{v_{n-2},v_{n-1}}).
 		 *  \wikipath{Graph_search_algorithms#Search-path-structure, For wider outlook see wiki.}
 		 *
-		 *  [See example](examples/search/euler/euler.html). */
+		 *   @example Euler::OutPath
+ *  [See example](examples/search/euler/euler.html). */
 		template< class VIter, class EIter > struct OutPath
 		{
 			VIter vertIter;/**<\brief the insert iterator to the container with vertices. */
@@ -734,7 +735,8 @@ namespace Koala
 		 *  @return the number of visited vertices.
 		 *  \sa SearchStructs::VisitVertLabs
 		 *
-		 * [See example](examples/search/search/search.html). */
+		 *  @example search::scanAttainable
+ * [See example](examples/search/search/search.html). */
 		template< class GraphType, class VertContainer, class Iter > static int scanAttainable( const GraphType &g,
 			typename GraphType::PVertex src, VertContainer &visited, Iter out, EdgeDirection dir = EdUndir | EdDirOut );
 
@@ -804,8 +806,7 @@ namespace Koala
 		*  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
 		*  @return the number of visited vertices.
 		*  \sa SearchStructs::VisitVertLabs
-		*
-		* [See example](examples/search/search/search.html). */
+		*/
 		template< class GraphType, class VertContainer> static int scanNear(const GraphType &,
 			typename GraphType::PVertex, int radius, VertContainer &, EdgeDirection dir = EdUndir | EdDirOut );
 
@@ -866,7 +867,8 @@ namespace Koala
 		 *  \sa CompStore
 		 *  \sa Visitors
 		 *
-		 * [See example](examples/search/search/search.html). */
+		 *  @example search::split
+ * [See example](examples/search/search/search.html). */
 		template< class GraphType, class VertContainer, class CompIter, class VertIter > static int split(
 			const GraphType &g, VertContainer &visited, CompStore< CompIter,VertIter > out, EdgeDirection dir= EdUndir | EdDirOut | EdDirIn );
 
@@ -1159,7 +1161,8 @@ namespace Koala
 		 *  @return the number of components.
 		 *  \sa CompStore
 		 *
-		 *  [See example](examples/search/scc/scc.html). */
+		 *   @example search::split
+ *  [See example](examples/search/scc/scc.html). */
 		template< class GraphType, class CompIter, class VertIter, class CompMap > static int
 			split( const GraphType &g, CompStore< CompIter,VertIter > out, CompMap & vtoc );
 
@@ -1203,7 +1206,8 @@ namespace Koala
 		 *  \param g the considered graph. Parallel and all types of edges are allowed.
 		 *  \param out the iterator of container with output sequence of vertices.
 		 *
-		 *  [See example](examples/search/dagalgs/dagalgs.html). */
+		 *   @example DAGAlgs::topOrd
+ *  [See example](examples/search/dagalgs/dagalgs.html). */
 		template< class GraphType, class VertIter > static void topOrd( const GraphType &g, VertIter out );
 
 		/** \brief Test if directed acyclic graph.
@@ -1214,7 +1218,8 @@ namespace Koala
 		 *  \param end the iterator to the past-the-end element of the container delivered by topOrd.
 		 *  \return true if \a g is directed acyclic graph, false otherwise.
 		 *
-		 *  [See example](examples/search/dagalgs/dagalgs.html). */
+		 *   @example DAGAlgs::isDAG
+ *  [See example](examples/search/dagalgs/dagalgs.html). */
 		template< class GraphType, class Iter > static bool isDAG( const GraphType &g, Iter beg, Iter end );
 
 		/** \brief Test if directed acyclic graph.
@@ -1223,7 +1228,8 @@ namespace Koala
 		 *  \param g the tested graph. Parallel and all types of edges are allowed.
 		 *  \return true if \a g is directed acyclic graph, false otherwise.
 		 *
-		 *  [See example](examples/search/dagalgs/dagalgs.html). */
+		 *   @example DAGAlgs::isDAG
+ *  [See example](examples/search/dagalgs/dagalgs.html). */
 		template< class GraphType > static bool isDAG( const GraphType &g );
 
 		/** \brief Get transitive edges.
@@ -1240,7 +1246,8 @@ namespace Koala
 		 *  \param g the considered graph. Must be DAG. Parallel edges are allowed.
 		 *  \n
 		 *
-		 *  [See example](examples/search/dagalgs/dagalgs.html).
+		 *   @example DAGAlgs::makeHasse
+ *  [See example](examples/search/dagalgs/dagalgs.html).
 		 */
 		template< class GraphType > static void makeHasse( GraphType &g );
 	};
@@ -1405,7 +1412,8 @@ namespace Koala
 		 *  @return the number of biconnected components in the connected component given by vertex \a src.
 		 *  \sa CompStore
 		 *
-		 *  [See example](examples/search/blocks/blocks.html). */
+		 *   @example Blocks::splitComp
+ *  [See example](examples/search/blocks/blocks.html). */
 		template< class GraphType, class VertDataMap, class EdgeDataMap, class CompIter, class VertIter,
 			class VertBlockIter > static int splitComp( const GraphType &g, typename GraphType::PVertex src,
 			VertDataMap &vmap, EdgeDataMap &emap, CompStore< CompIter,VertIter > out, VertBlockIter viter );
@@ -1511,7 +1519,8 @@ namespace Koala
 		 *  @param[in] g the tested graph.
 		 *  @return true if it has Eulerian cycle, false otherwise.
 		 *
-		 *  [See example](examples/search/euler/euler.html). */
+		 *   @example Euler::hasCycle
+ *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType > static bool hasCycle( const GraphType &g );
 
 		/** \brief Test if directed Eulerian.
@@ -1520,7 +1529,8 @@ namespace Koala
 		 *  @param[in] g the considered graph.
 		 *  @return true if it has a directed Eulerian cycle, false otherwise.
 		 *
-		 *  [See example](examples/search/euler/euler.html).*/
+		 *   @example Euler::hasDirCycle
+ *  [See example](examples/search/euler/euler.html).*/
 		template< class GraphType > static bool hasDirCycle( const GraphType &g );
 
 		/** \brief Test if semi-Eulerian.
@@ -1529,7 +1539,8 @@ namespace Koala
 		* @param[in] g the considered graph.
 		* @return true if it has an undirected Eulerian path, false otherwise
 		*
-		* [See example](examples/search/euler/euler.html).*/
+		*  @example Euler::hasPath
+* [See example](examples/search/euler/euler.html).*/
 		template< class GraphType > static bool hasPath( const GraphType &g );
 
 		/** \brief Test if directed semi-Eulerian.
@@ -1539,7 +1550,8 @@ namespace Koala
 		 *  @param[in] g graph
 		 *  @return true if it has a directed Eulerian path, false otherwise.
 		 *
-		 *  [See example](examples/search/euler/euler.html).*/
+		 *   @example Euler::hasDirPath
+ *  [See example](examples/search/euler/euler.html).*/
 		template< class GraphType > static bool hasDirPath( const GraphType &g );
 
 		/** \brief Test the beginning of  undirected Eulerian path. 
@@ -1587,7 +1599,8 @@ namespace Koala
 		 *  @return true if the graph has an Eulerian cycle, false otherwise.
 		 *  \sa SearchStructs::OutPath
 		 *
-		 *  [See example](examples/search/euler/euler.html). */
+		 *   @example Euler::getCycle
+ *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getCycle( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
@@ -1599,7 +1612,8 @@ namespace Koala
 		 *  @return true if the graph has an Eulerian cycle, false otherwise.
 		 *  \sa SearchStructs::OutPath
 		 *
-		 *  [See example](examples/search/euler/euler.html). */
+		 *   @example Euler::getDirCycle
+ *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getDirCycle( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
@@ -1633,7 +1647,8 @@ namespace Koala
 		 *  @return true if graph has an Eulerian path, false otherwise
 		 *  \sa SearchStructs::OutPath
 		 *
-		 *  [See example](examples/search/euler/euler.html).
+		 *   @example Euler::getPath
+ *  [See example](examples/search/euler/euler.html).
 		 */
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getPath( const GraphType &g, OutPath< VertIter,EdgeIter > out );
@@ -1646,7 +1661,8 @@ namespace Koala
 		 *  @return true if graph has an Eulerian path, false otherwise
 		 *  \sa SearchStructs::OutPath
 		 *
-		 *  [See example](examples/search/euler/euler.html).
+		 *   @example Euler::getDirPath
+ *  [See example](examples/search/euler/euler.html).
 		 */
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getDirPath( const GraphType &g, OutPath< VertIter,EdgeIter > out );
@@ -1721,7 +1737,8 @@ namespace Koala
 		 *  \param skipifprine if true the modules with the outcome type mpPrime are not searched.
 		 *  \return a Partition object.
 		 *
-		 *  [See example](examples/search/modules/modules.html).*/
+		 *   @example Modules::modules
+ *  [See example](examples/search/modules/modules.html).*/
 		template< class GraphType, class CompIter, class VertIter, class CompMap > static Partition split(
 			const GraphType &g, CompStore< CompIter,VertIter > out, CompMap &avmap, bool skipifprime = false );
 

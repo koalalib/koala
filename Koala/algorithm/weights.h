@@ -254,7 +254,8 @@ namespace Koala
 	 *  The class implements the Dijkstra algorithm using simple heap for keeping achievable vertices. 
 	 *  There is also another approach in Dijkstra that uses simple table.
 	 *
-	 *  [See example](examples/weights/dijkstra_h/dijkstra_h.html) 
+	 *   @example DijkstraHeap
+ *  [See example](examples/weights/dijkstra_h/dijkstra_h.html) 
 	 *  \ingroup DMweight */
 	class DijkstraHeap: public DijkstraHeapPar< AlgsDefaultSettings > { };
 
@@ -415,8 +416,9 @@ namespace Koala
 	/**\brief Longest path in directed acyclic graph (default)
 	 *  \ingroup DMweight
 	 *
-	 *  The class gives methods for critical path in DAG (directed acyclic graph).*  \n
-	 *  [See example](examples/weights/dagcrit/dagcritpath.html) */
+	 *  The class gives methods for critical path in DAG (directed acyclic graph).*
+	 *   @example DAGCritPath
+ *  [See example](examples/weights/dagcrit/dagcritpath.html) */
 	class DAGCritPath: public DAGCritPathPar< AlgsDefaultSettings > { };
 
 	/** \brief Bellman-Ford shortest path algorithm (parametrized).
@@ -492,7 +494,8 @@ namespace Koala
 	/** \brief Bellman-Ford shortest path algorithm (default).
 	 *  \ingroup DMweight
 	 *
-	 *  \n
+	 * 
+	 *   @example BellmanFord
 	 *  [See example](examples/weights/bellman_ford/bellman_ford.html) */
 	class BellmanFord: public BellmanFordPar< AlgsDefaultSettings > { };
 
@@ -554,7 +557,8 @@ namespace Koala
 	/** \brief Shortest paths all to all (default).
 	 *
 	 *  The class consists of Floyd and Johnsona algorithms for shortest paths between any two vertices in graph.
-	 *  [See example](examples/weights/floyd/floyd.html)
+	 *   @example All2AllDists
+ *  [See example](examples/weights/floyd/floyd.html)
 	 *  \ingroup DMweight */
 	class All2AllDists : public All2AllDistsPar< AlgsDefaultSettings > { };
 
@@ -698,7 +702,8 @@ namespace Koala
 	 *  
 	 *  Using Kruskal technique, the class solves minimum/maximum weight spanning forest problem or forest of given number of edges.
 	 *  \ingroup DMweight 
-	 *  [See example](examples/weights/kruskal/kruskal.html)*/
+	 *   @example Kruskal
+ *  [See example](examples/weights/kruskal/kruskal.html)*/
 	class Kruskal: public KruskalPar< AlgsDefaultSettings > { };
 #include "weights.hpp"
 }

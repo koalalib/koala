@@ -344,7 +344,8 @@ namespace Koala
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
 		 *  \return the number of vertices in the output set \a out.
 		 *
-		 *  [See example](examples/mis/example_mis_getWMin.html). */
+		 *   @example MaxStableHeur::getWMin
+ *  [See example](examples/mis/example_mis_getWMin.html). */
 		template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
 			static unsigned getWMin( const GraphType &g, OutputIterator out, ChoiceFunction choose,
 				const VertContainer & vertTab );
@@ -365,7 +366,8 @@ namespace Koala
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
 		 *  \return the number of vertices in the output set \a out.
 		 *
-		 *  [See example](examples/mis/example_mis_getWMax.html).*/
+		 *   @example MaxStableHeur::getWMax
+ *  [See example](examples/mis/example_mis_getWMax.html).*/
 		template< class GraphType, class OutputIterator, class ChoiceFunction, class VertContainer >
 			static unsigned getWMax( const GraphType &g, OutputIterator out, ChoiceFunction choose,
 				const VertContainer &vertTab );

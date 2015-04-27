@@ -128,7 +128,8 @@ namespace Koala
 			 *  \param g the considered graph.
 			 *  \return the standard pair of vertices, which are the ends of the central path. If graph \a g is not a caterpillar, a pair (NULL,NULL) is returned.
 			 *
-			 *  [See example](examples/graph/example_IsItCaterpillar.html).
+			 *   @example IsIt::Caterpillar::spineEnds
+			 *  [See example](examples/detect/example_IsItCaterpillar.html).
 			 */
 			template< class GraphType > static std::pair< typename GraphType::PVertex,typename GraphType::PVertex >
 				spineEnds( const GraphType &g );
@@ -214,7 +215,8 @@ namespace Koala
 			 *  - number of vertices in set \a out
 			 *  - -1 if graph is not bipartite or if \a allowmulti is false and graph \a g is not simple
 			 *
-			 *  [See example](examples/detect/example_IsItBipartite.html).
+			 *   @example IsIt::Bipartite::getPart
+ *  [See example](examples/detect/example_IsItBipartite.html).
 			 */
 			template< class GraphType, class Iter >
 				static int getPart( const GraphType &g, Iter out, bool allowmulti = false );
@@ -226,7 +228,8 @@ namespace Koala
 			 *  \param out the insert iterator of the container keeping the output set (partition). \wikipath{iterator}
 			 *  \return the number of vertices in the maximal stable set kept in the container \a out.
 			 *
-			 *  [See example](examples/detect/example_IsItBipartite.html).
+			 *   @example IsIt::Bipartite::maxStable
+ *  [See example](examples/detect/example_IsItBipartite.html).
 			 */
 			template< class GraphType, class Iter > static int maxStable( const GraphType &g, Iter out );
 
@@ -237,7 +240,8 @@ namespace Koala
 			 *  \param out the iterator of the container keeping the output minimal vertex cover.
 			 *  \return the number of vertices in the output set.
 			 *
-			 *  [See example](examples/detect/example_IsItBipartite.html).
+			 *   @example IsIt::Bipartite::minVertCover
+ *  [See example](examples/detect/example_IsItBipartite.html).
 			 */
 			template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
 
@@ -250,7 +254,8 @@ namespace Koala
 		 *  \param allowmulti the flag allowing or disabling multiple edges and loops.
 		 *  \return true if the graph \a g is bipartite, false  otherwise.
 		 *
-		 *  [See example](examples/detect/example_IsItBipartite.html).
+		 *   @example IsIt::Bipartite::bipartite
+ *  [See example](examples/detect/example_IsItBipartite.html).
 		 */
 		template< class GraphType > static bool bipartite( const GraphType &g, bool allowmulti = false )
 			{ return Bipartite::getPart( g,blackHole,allowmulti ) != -1; }
@@ -266,7 +271,8 @@ namespace Koala
 			 *  \param out the iterator of a container with all the vertices of the partition.
 			 *  \return the number of element in the output set \a out or -1 if graph is not complete bipartite.
 			 *
-			 *  [See example](examples/detect/example_IsItCompBipartite.html).
+			 *   @example IsIt::CompBipartite::getPart
+ *  [See example](examples/detect/example_IsItCompBipartite.html).
 			 */
 			template< class GraphType, class Iter > static int getPart( const GraphType &g, Iter out );
 		};
@@ -277,7 +283,8 @@ namespace Koala
 		 *  \param g the tested graph.
 		 *  \return true if the graph is a complete bipartite graph, false otherwise.
 		 *
-		 *  [See example](examples/detect/example_IsItCompBipartite.html).
+		 *   @example IsIt::compBipartite
+ *  [See example](examples/detect/example_IsItCompBipartite.html).
 		 */
 		template< class GraphType > static bool compBipartite( const GraphType &g )
 			{ return CompBipartite::getPart( g,blackHole ) != -1; }
@@ -296,7 +303,8 @@ namespace Koala
 			 *  \return the number of partitions or -1 if \a g is not a compMPartite.
 			 *  \sa CompStore
 			 *
-			 *  [See example](examples/detect/example_IsItCompMPartite.html).
+			 *   @example IsIt::CompBipartite::split
+ *  [See example](examples/detect/example_IsItCompMPartite.html).
 			 */
 			template< class GraphType, class VMap, class Iter, class VIter >
 				static int split( const GraphType &g, VMap& avertCont, CompStore< Iter,VIter > out );
@@ -313,7 +321,8 @@ namespace Koala
 		 *  \param g the considered graph.
 		 *  \return true if the graph \a g is a complete M-partite, false  otherwise.
 		 *
-		 *  [See example](examples/detect/example_IsItCompMPartite.html).
+		 *   @example IsIt::CompBipartite::split
+ *  [See example](examples/detect/example_IsItCompMPartite.html).
 		 */
 		template< class GraphType > static bool compMPartite( const GraphType &g )
 			{ return CompMPartite::split( g,blackHole,compStore( blackHole,blackHole )) != -1; }
@@ -437,7 +446,8 @@ namespace Koala
 			 *  \param riter the iterator of a container with the reversed perfect elimination order.
 			 *  \return true if sucesfull, false if \a g is not a chordal graph.
 			 *
-			 *  [See example](examples/detect/example_IsItChordal.html).
+			 *   @example IsIt::Chordal::getOrder
+ *  [See example](examples/detect/example_IsItChordal.html).
 			 */
 			template< class Graph, class VIter2 > static bool getOrder( const Graph &g, VIter2 riter );
 
@@ -452,7 +462,8 @@ namespace Koala
 			 The pair (\a i , \a j ) stands for the connection between \a i-th and \a j-th clique. \a i and \a j are the positions of clique in  \a out. Indexes starts with 0.
 			 *  \return the number of cliques.
 			 *
-			 *  [See example](examples/detect/example_IsItChordal.html).
+			 *   @example IsIt::Chordal::maxCliques
+ *  [See example](examples/detect/example_IsItChordal.html).
 			 */
 			template< class Graph, class VIter, class VIterOut, class QIter, class QTEIter >
 				static int maxCliques( const Graph &g, VIter begin, VIter end, CompStore< QIter,VIterOut > out, QTEIter qte );
@@ -467,7 +478,8 @@ namespace Koala
 			 *   \a i and \a j are the positions of clique in \a out.  Note that cliques indexes start with 0.
 			 *  \return the number of cliques or -1 if \a g is not chordal.
 			 *
-			 *  [See example](examples/detect/example_IsItChordal.html).
+			 *   @example IsIt::Chordal::maxCliques
+ *  [See example](examples/detect/example_IsItChordal.html).
 			 */
 			template< class Graph, class VIterOut, class QIter, class QTEIter >
 				static int maxCliques( const Graph &g, CompStore< QIter,VIterOut > out, QTEIter qte );
@@ -481,7 +493,8 @@ namespace Koala
 			 *  \param out the iterator of a container with all the vertices of clique.
 			 *  \return the maximal clique size
 			 *
-			 *  [See example](examples/detect/example_IsItChordal.html).
+			 *   @example IsIt::Chordal::maxClique
+ *  [See example](examples/detect/example_IsItChordal.html).
 			 */
 			template< class Graph, class VIter, class VIterOut >
 				static int maxClique( const Graph &g, VIter begin, VIter end, VIterOut out );
@@ -493,7 +506,8 @@ namespace Koala
 			 *  \param out the iterator of a container with all the vertices of the clique.
 			 *  \return the maximal clique size or -1 if \a g is not chordal.
 			 *
-			 *  [See example](examples/detect/example_IsItChordal.html).
+			 *   @example IsIt::Chordal::maxClique
+ *  [See example](examples/detect/example_IsItChordal.html).
 			 */
 			template< class Graph, class VIterOut > static int maxClique( const Graph &g, VIterOut out );
 
@@ -549,7 +563,8 @@ namespace Koala
 		 *  @param[in] g the graph to test.
 		 *  @return true if the graph is chordal, false otherwise.
 		 *
-		 *  [See example](examples/detect/example_IsItChordal.html).
+		 *   @example IsIt::chordal
+ *  [See example](examples/detect/example_IsItChordal.html).
 		 */
 		template< class GraphType > static bool chordal( const GraphType &g )
 		{ return Chordal::getOrder( g,blackHole ); }
@@ -609,7 +624,8 @@ namespace Koala
 			 *  \param[out] cliqueiter the iterator of the container with the vertices of the maximal clique.
 			 *  \return the chromatic number of \a g or -1 if graph was not comparability.
 			 *
-			 *  [See example](examples/detect/example_IsItComparability.html).
+			 *   @example IsIt::Comparability::explore
+ *  [See example](examples/detect/example_IsItComparability.html).
 			 */
 			template< class Graph, class DirMap, class OutMap, class OutIter >
 				static int explore( const Graph &g, DirMap &dirmap, OutMap &aheightmap, OutIter cliqueiter );
@@ -623,7 +639,8 @@ namespace Koala
 			 *  The map together with graph represent relation (transitive and irreflexive). (blackHole possible)
 			 *  \return true if \a g is a comparability graph, false otherwise.
 			 *
-			 *  [See example](examples/detect/example_IsItComparability.html).
+			 *   @example IsIt::Comparability::explore
+ *  [See example](examples/detect/example_IsItComparability.html).
 			 */
 			template< class Graph, class DirMap > static bool getDirs( const Graph &g, DirMap& adirmap )
 				{ return explore( g,adirmap,blackHole,blackHole ) != -1; }
@@ -636,7 +653,8 @@ namespace Koala
 			 *  \param g the considered graph.
 			 *  \return true if \a g is a comparability graph, false otherwise and the graph remains unchanged.
 			 *
-			 *  [See example](examples/detect/example_IsItComparability.html).
+			 *   @example IsIt::Comparability::getDirs
+ *  [See example](examples/detect/example_IsItComparability.html).
 			 */
 			template< class Graph > static bool getDirs( Graph &g );
 
@@ -648,7 +666,8 @@ namespace Koala
 			 *  \param[out] avmap the associative container (PVert -> int) with the optimal coloring of \a g. The colors start with 0. (blackHole possible)
 			 *  \return the maximal used color or -1 if \a g is not a comparability graph. (chromatic number of \g -1)
 			 *
-			 *  [See example](examples/detect/example_IsItComparability.html).
+			 *   @example IsIt::Comparability::chi
+ *  [See example](examples/detect/example_IsItComparability.html).
 			 */
 			template< class Graph, class OutMap > static int chi( const Graph &g, OutMap &avmap )
 				{ return explore( g,blackHole,avmap,blackHole ); }
@@ -676,7 +695,8 @@ namespace Koala
 			 *  @param[out] iter the iterator to write the vertices of clique or BlackHole.
 			 *  @return the number of vertices in the maximal clique or -1 if graph was not comparability.
 			 *
-			 *  [See example](examples/detect/example_IsItComparability.html).
+			 *   @example IsIt::Comparability::maxClique
+ *  [See example](examples/detect/example_IsItComparability.html).
 			 */
 			template< class Graph, class OutIter > static int maxClique( const Graph &g, OutIter iter )
 				{ return explore( g,blackHole,blackHole,iter ); }
@@ -688,7 +708,8 @@ namespace Koala
 			 *  \param[out] out the iterator of a container with all the vertices of the stable set.
 			 *  \return the cardinality of stable set i.e. the number of element in the output set \a out.
 			 *
-			 *  [See example](examples/detect/example_IsItComparability.html).
+			 *   @example IsIt::Comparability::maxStable
+ *  [See example](examples/detect/example_IsItComparability.html).
 			 */
 			template< class GraphType, class VIterOut > static int maxStable( const GraphType &g, VIterOut out );
 
@@ -699,7 +720,8 @@ namespace Koala
 			 *  \param[out] out the iterator of a container with all the vertices of the cover.
 			 *  \return the size of minimal vertex cover i.e. the number of element in the output set \a out.
 			 *
-			 *  [See example](examples/detect/example_IsItComparability.html).
+			 *   @example IsIt::Comparability::minVertCover
+ *  [See example](examples/detect/example_IsItComparability.html).
 			 */
 			template< class GraphType, class Iter > static int minVertCover( const GraphType &g, Iter out );
 		};
@@ -710,7 +732,8 @@ namespace Koala
 		 *  @return true if the graph is a comparability graph, false otherwise.
 		 *  \related Comparability
 		 *
-		 *  [See example](examples/detect/example_IsItComparability.html).
+		 *   @example IsIt::Comparability::comparability
+ *  [See example](examples/detect/example_IsItComparability.html).
 		 */
 		template< class GraphType > static bool comparability( const GraphType &g )
 			{ return Comparability::explore( g,blackHole,blackHole,blackHole ) != -1; }
@@ -758,7 +781,8 @@ namespace Koala
 			 *  @param[out] outmap map (PVertex -> Segment) (blackHole possible).
 			 *  @return true if \a g is interval, false otherwise
 			 *
-			 *  [See example](examples/detect/example_IsItInterval.html).
+			 *   @example IsIt::ItInterval::graph2segs
+ *  [See example](examples/detect/example_IsItInterval.html).
 			 */
 			template< class GraphType, class IntMap > static bool graph2segs( const GraphType &g, IntMap &outmap );
 
@@ -852,7 +876,8 @@ namespace Koala
 		 *  @param[in] g graph
 		 *  @return true if \a g is interval, false otherwise.
 		 *
-		 *  [See example](examples/detect/example_IsItInterval.html).
+		 *   @example IsIt::interval
+ *  [See example](examples/detect/example_IsItInterval.html).
 		 */
 		template< class GraphType > static bool interval( const GraphType &g )
 			{ return Interval::graph2segs(g, blackHole); }
