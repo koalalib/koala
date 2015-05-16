@@ -249,13 +249,18 @@ namespace Koala
 	 *  \ingroup DMweight */
 	class Dijkstra: public DijkstraPar< AlgsDefaultSettings > { };
 
+	/** \brief Dijkstra algorithm (heap) (default).\n\n
+	 *  The class implements the Dijkstra algorithm using simple heap for keeping achievable vertices.\n
+	 *  There is also another approach in Dijkstra that uses simple table.
+	 *
+	 *  @example DijkstraHeap
+	 *  [See example](examples/weights/dijkstra_h/dijkstra_h.html) */
 	/** \brief Dijkstra algorithm (heap) (default).
 	 *
 	 *  The class implements the Dijkstra algorithm using simple heap for keeping achievable vertices. 
 	 *  There is also another approach in Dijkstra that uses simple table.
 	 *
-	 *   @example DijkstraHeap
- *  [See example](examples/weights/dijkstra_h/dijkstra_h.html) 
+	 *  [See example](examples/weights/dijkstra_h/dijkstra_h.html)
 	 *  \ingroup DMweight */
 	class DijkstraHeap: public DijkstraHeapPar< AlgsDefaultSettings > { };
 
@@ -413,12 +418,16 @@ namespace Koala
 	template<bool longest>
 	class DAGCritPathPar2: public DAGCritPathPar< AlgsDefaultSettings, longest> { };
 
+	/**\brief Longest path in directed acyclic graph (default)\n\n
+	 *  The class gives methods for critical path in DAG (directed acyclic graph).
+	 *
+	 *  @example DAGCritPath
+	 *  [See example](examples/weights/dagcrit/dagcritpath.html) */
 	/**\brief Longest path in directed acyclic graph (default)
 	 *  \ingroup DMweight
 	 *
-	 *  The class gives methods for critical path in DAG (directed acyclic graph).*
-	 *   @example DAGCritPath
- *  [See example](examples/weights/dagcrit/dagcritpath.html) */
+	 *  The class gives methods for critical path in DAG (directed acyclic graph).
+	 *  [See example](examples/weights/dagcrit/dagcritpath.html) */
 	class DAGCritPath: public DAGCritPathPar< AlgsDefaultSettings > { };
 
 	/** \brief Bellman-Ford shortest path algorithm (parametrized).
@@ -491,11 +500,13 @@ namespace Koala
 				}
 	};
 
+	/** \brief Bellman-Ford shortest path algorithm (default).\n\n
+	 *
+	 *  @example BellmanFord
+	 *  [See example](examples/weights/bellman_ford/bellman_ford.html) */
 	/** \brief Bellman-Ford shortest path algorithm (default).
 	 *  \ingroup DMweight
 	 *
-	 * 
-	 *   @example BellmanFord
 	 *  [See example](examples/weights/bellman_ford/bellman_ford.html) */
 	class BellmanFord: public BellmanFordPar< AlgsDefaultSettings > { };
 
@@ -554,11 +565,16 @@ namespace Koala
 			typename GraphType::PVertex end, PathStructs::OutPath< VIter,EIter > iters );
 	};
 
+	/** \brief Shortest paths all to all (default).\n\n
+	 *  The class consists of Floyd and Johnsona algorithms for shortest paths between any two vertices in graph.
+	 *
+	 *  @example All2AllDists
+	 *  [See example](examples/weights/floyd/floyd.html)
+	 */
 	/** \brief Shortest paths all to all (default).
 	 *
 	 *  The class consists of Floyd and Johnsona algorithms for shortest paths between any two vertices in graph.
-	 *   @example All2AllDists
- *  [See example](examples/weights/floyd/floyd.html)
+	 *  [See example](examples/weights/floyd/floyd.html)
 	 *  \ingroup DMweight */
 	class All2AllDists : public All2AllDistsPar< AlgsDefaultSettings > { };
 
@@ -698,12 +714,16 @@ namespace Koala
 
 	};
 
+	/** \brief Minimum/maximum weight spanning forest algorithm (default).\n\n 
+	 *  Using Kruskal technique, the class solves minimum/maximum weight spanning forest problem or forest of given number of edges.
+	 *
+	 *  @example Kruskal
+	 *  [See example](examples/weights/kruskal/kruskal.html) */
 	/** \brief Minimum/maximum weight spanning forest algorithm (default).
 	 *  
 	 *  Using Kruskal technique, the class solves minimum/maximum weight spanning forest problem or forest of given number of edges.
-	 *  \ingroup DMweight 
-	 *   @example Kruskal
- *  [See example](examples/weights/kruskal/kruskal.html)*/
+	 *  \ingroup DMweight
+	 *  [See example](examples/weights/kruskal/kruskal.html) */
 	class Kruskal: public KruskalPar< AlgsDefaultSettings > { };
 #include "weights.hpp"
 }

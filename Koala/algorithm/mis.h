@@ -328,6 +328,24 @@ namespace Koala
 	template< class DefaultStructs > class MaxStableHeurPar
 	{
 	public:
+
+		/** \brief Search maximal independent set (heuristic, WMin technique).\n\n
+		 *  The method searches for maximal independent set using the following heuristic,
+		 *  In each step (until the graph has no more vertices):
+		 *   - chooses a vertex according to the choice function (Koala::MaxStableStrategy),
+		 *   - adds this vertex to the independent set,
+		 *   - removes the closed neighborhood of this vertex.
+		 *
+		 *  Since only heuristic is applied here the result may be suboptimal.
+		 *  \param g the considered graph. Any type of graph is allowed.
+		 *   Mind that arcs are treated as undirected edges and vertices with loops may not belong to stable set.
+		 *  \param out the iterator to the container with the output set of vertices.
+		 *  \param choose the strategy (\ref Koala::MaxStableStrategy) of choosing vertices (one in each step) .
+		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
+		 *  \return the number of vertices in the output set \a out.
+		 *
+		 *   @example MaxStableHeur::getWMin
+		 *  [See example](examples/mis/example_mis_getWMin.html). */
 		/** \brief Search maximal independent set (heuristic, WMin technique).
 		 *
 		 *  The method searches for maximal independent set using the following heuristic,
@@ -344,12 +362,28 @@ namespace Koala
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
 		 *  \return the number of vertices in the output set \a out.
 		 *
-		 *   @example MaxStableHeur::getWMin
- *  [See example](examples/mis/example_mis_getWMin.html). */
+		 *  [See example](examples/mis/example_mis_getWMin.html). */
 		template< class GraphType, class ChoiceFunction, class OutputIterator, class VertContainer >
 			static unsigned getWMin( const GraphType &g, OutputIterator out, ChoiceFunction choose,
 				const VertContainer & vertTab );
 
+		/** \brief Search maximal independent set (heuristic, WMax technique).\n\n
+		 *  The method searches for maximal independent set using the following heuristic,
+		 *  In each step (until the graph has no more edges):
+		 *   - chooses a vertex according to the choice function (\ref Koala::MaxStableStrategy) ,
+		 *   - removes the chosen vertex with adjacent edges.
+		 *
+		 *  Since only heuristic is applied here the result may be suboptimal.
+		 *  The method outputs the remaining independent vertices.
+		 *  \param g the considered graph. Any type of graph is allowed.
+		 *   Mind that arcs are treated as undirected edges and vertices with loops may not belong to stable set.
+		 *  \param out the iterator to the container with the output set of vertices.
+		 *  \param choose the strategy (\ref Koala::MaxStableStrategy)  of choosing vertices (one in each step).
+		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
+		 *  \return the number of vertices in the output set \a out.
+		 *
+		 *   @example MaxStableHeur::getWMax
+		 *  [See example](examples/mis/example_mis_getWMax.html). */
 		/** \brief Search maximal independent set (heuristic, WMax technique).
 		 * 
 		 *  The method searches for maximal independent set using the following heuristic,
@@ -366,8 +400,7 @@ namespace Koala
 		 *  \param vertTab the associative container that assigns weight to each vertex. blackHole possible if the funtcor is not using weights.
 		 *  \return the number of vertices in the output set \a out.
 		 *
-		 *   @example MaxStableHeur::getWMax
- *  [See example](examples/mis/example_mis_getWMax.html).*/
+		 *  [See example](examples/mis/example_mis_getWMax.html). */
 		template< class GraphType, class OutputIterator, class ChoiceFunction, class VertContainer >
 			static unsigned getWMax( const GraphType &g, OutputIterator out, ChoiceFunction choose,
 				const VertContainer &vertTab );

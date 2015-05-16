@@ -297,6 +297,14 @@ private:
 
 	public:
 
+		/** \brief Find maximum matching.\n\n
+		*  The method finds maximum matching in a given \a g.
+		*  @param[in] g the considered graph of any type. Edges and arc are treated all like undirected. Parallel edges are allowed.
+		*  @param[out] matching the insert iterator to the container with list of edges in found matching, .
+		*  @return the actual number of edges in found matching.
+		*
+		*   @example Matching::Matching_findMax
+		*  [See example](examples/matching/matching_findMax.html). */
 	/** \brief Find maximum matching.
 	 *
 	 *  The method finds maximum matching in a given \a g.
@@ -304,15 +312,25 @@ private:
 	 *  @param[out] matching the insert iterator to the container with list of edges in found matching, .
 	 *  @return the actual number of edges in found matching.
 	 *
-	 *   @example Matching::Matching_findMax
- *  [See example](examples/matching/matching_findMax.html). */
+	 *  [See example](examples/matching/matching_findMax.html). */
 	template< class GraphType, class EIterOut >
 	static int findMax( const GraphType &g, EIterOut matching)
 	{
 		return findMax( g,blackHole,matching );
 	}
 
-	/** \brief Find maximum matching .
+	/** \brief Find maximum matching.\n\n
+	*  In graph \a g the matching of given size is found. If \a matchSize greater then maximal or default value (-1) the maximum matching is found.
+	*  @param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
+	*  @param[out] vertTab an associative container from PVertex to VertLabs, which keep matched edges and vertices.
+	*  If vertex is unmatched it is assumed that it is matched with NULLs. (BlackHole possible).
+	*  @param[out] matching the insert iterator to the container with list of edges in found matching.
+	*  @param[in] matchSize the desired size of a matching, leave out, set -1 or big (greater then maximal) for a maximum.
+	*  @return the actual number of edges in found matching
+	*
+	*   @example Matching::findMax
+	*  [See example](examples/matching/matching_findMax.html). */
+	/** \brief Find maximum matching.
 	 *
 	 *  In graph \a g the matching of given size is found. If \a matchSize greater then maximal or default value (-1) the maximum matching is found.
 	 *  @param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
@@ -322,8 +340,7 @@ private:
 	 *  @param[in] matchSize the desired size of a matching, leave out, set -1 or big (greater then maximal) for a maximum.
 	 *  @return the actual number of edges in found matching
 	 *
-	 *   @example Matching::findMax
- *  [See example](examples/matching/matching_findMax.html). */
+	 *  [See example](examples/matching/matching_findMax.html). */
 	template< class GraphType, class VertContainer, class EIterOut >
 	static int findMax( const GraphType &g,
 				VertContainer &vertTab,
@@ -348,8 +365,7 @@ private:
 	 *  If mathSize>=0, it should be greater or equal to the size of initial matching.
 	 *  @return  the actual number of edges in found matching. Additionally, the method can return -1 if initial matching is invalid.
 	 *
-	 *   @example Matching::findMax
- *  [See example](examples/matching/matching_findMax.html). */
+	 *  [See example](examples/matching/matching_findMax.html). */
 	template< class GraphType, class VertContainer, class EIterIn, class EIterOut >
 	static int findMax( const GraphType &g,
 				VertContainer &vertTab,
@@ -360,6 +376,15 @@ private:
 		return matchingTool(g, vertTab, initialBegin, initialEnd, matching, matchSize, false);
 	}
 
+	/** \brief Find minimal edge cover.\n\n
+	*  The method finds a minimal edge cover of a given \a g.
+	*  This the only functon from this module that allows loops in output.
+	*  @param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
+	*  @param[out] cover the insert iterator to the container with the list of edges of found cover.
+	*  @return the actual number of edges in found cover.
+	*
+	*   @example Matching::minEdgeCover
+	*  [See example](examples/matching/matching_minEdgeCover.html). */
 	/** \brief Find minimal edge cover.
 	 * 
 	 *  The method finds a minimal edge cover of a given \a g. 
@@ -368,8 +393,7 @@ private:
 	 *  @param[out] cover the insert iterator to the container with the list of edges of found cover.
 	 *  @return the actual number of edges in found cover.
 	 *
-	 *   @example Matching::minEdgeCover
- *  [See example](examples/matching/matching_minEdgeCover.html). */
+	 *  [See example](examples/matching/matching_minEdgeCover.html). */
 	template< class GraphType, class EIterOut >
 	static int minEdgeCover( const GraphType &g, EIterOut cover)
 	{
@@ -377,6 +401,16 @@ private:
 		return matchingTool(g, blackHole, edges, edges, cover, -1, true);
 	}
 
+	/** \brief Greedy matching.\n\n
+	*  Fast but inaccurate procedure searches greedily for a maximum (in the sense of inclusion) matching. May be used for example as a first for augmenting paths algorithm.
+	*  \param[in] g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
+	*  \param[out] avertTab an associative container from PVertex to VertLabs which keep matched edges and vertices. It is assumed that unmatched vertices match NULLs. (BlackHole possible).
+	*  @param[out] edgeIterOut the insert iterator to the container with the edges of found matching.
+	*  @param[in] matchSize the desired size of a matching, leave out or -1 for a maximum.
+	*  @return  the size of found matching.
+	*
+	*   @example Matching::greedy
+	*  [See example](examples/matching/matching_greedy.html). */
 	/** \brief Greedy matching.
 	 *
 	 *  Fast but inaccurate procedure searches greedily for a maximum (in the sense of inclusion) matching. May be used for example as a first for augmenting paths algorithm.
@@ -386,10 +420,10 @@ private:
 	 *  @param[in] matchSize the desired size of a matching, leave out or -1 for a maximum.
 	 *  @return  the size of found matching.
 	 *
-	 *   @example Matching::greedy
- *  [See example](examples/matching/matching_greedy.html). */
+	 *  [See example](examples/matching/matching_greedy.html). */
 	template< class GraphType, class VertContainer, class EIterOut > static int greedy( const GraphType &g,
 		VertContainer &avertTab, EIterOut edgeIterOut, int matchSize = -1 );
+
 	/**\brief Greedy matching.
 	 *
 	 *  The method searches greedily for a matching in the graph \a g. The edges are taken form the sequence given by iterators \a edgeIterInBegin and \a edgesiIterInEnd.
@@ -401,12 +435,20 @@ private:
 	 *  @param[in] matchSize the desired size of a matching, leave out or set to -1 for a maximum.
 	 *  @return  the size of found matching.
 	 *
-	 *   @example Matching::greedy
- *  [See example](examples/matching/matching_greedy.html). */
+	 *  [See example](examples/matching/matching_greedy.html). */
 	template< class GraphType, class VertContainer, class EIterIn, class EIterOut > static int greedy(
 		const GraphType &g, VertContainer &avertTab, EIterIn edgeIterInBegin, EIterIn edgeIterInEnd,
 		EIterOut edgeIterOut, int matchSize = -1 );
 
+	/** \brief Test if matching.\n\n
+	*  The method tests if the given set of edges is a matching in a graph.
+	*  \param g the considered graph of any type. Edges and arc are treated all like undirected.  Parallel edges are allowed.
+	*  \param edgeIterInBegin the iterator to the first element of the container with the edges of tested set.
+	*  \param edgeIterInEnd the iterator to the past-the-end element of the container with the edges of tested set.
+	*  \return true if the edge set form a matching, false otherwise.
+	*
+	*   @example Matching::test
+	*  [See example](examples/matching/matching_test.html). */
 	/** \brief Test if matching.
 	 *
 	 *  The method tests if the given set of edges is a matching in a graph.
@@ -415,8 +457,7 @@ private:
 	 *  \param edgeIterInEnd the iterator to the past-the-end element of the container with the edges of tested set.
 	 *  \return true if the edge set form a matching, false otherwise.
 	 *
-	 *   @example Matching::test
- *  [See example](examples/matching/matching_test.html). */
+	 *  [See example](examples/matching/matching_test.html). */
 	template< class GraphType, class EIterIn > static bool test( const GraphType &g, EIterIn edgeIterInBegin,
 		EIterIn edgeIterInEnd );
 };
