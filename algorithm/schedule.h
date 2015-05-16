@@ -246,6 +246,18 @@ namespace Koala
 			static bool test( TaskIterator begin, TaskIterator end, const GraphType &DAG, const Schedule &schedule, bool nonPmtn = true );
 
 		//-|prec|Cmax - czyli szeregowanie ścieżką krytyczną z zadaniami w wierzchołkach
+			/** \brief Solve -|prec|C<sub>max</sub>.\n\n
+			*  For a given sequence of task and precenence constraints (directed acyclic graph) the method finds the schedule using critical path method.
+			*  \param begin the iterator to first element of the container with tasks (Task).
+			*  \param end the iterator to past-the-end element of the container with tasks (Task).
+			*  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned vertex
+			*  and precedence is determined by arcs.
+			*  \param[out] schedule the iterator to the container with SchedulingStructs::TaskWindow, that gives output schedule i.e.
+			*  The container on i-th position stores i-th task possible time of execution.
+			*  \return the makespan.
+			*
+			*   @example Scheduling::critPath
+			*  [See example](examples/schedule/scheduling_critical.html). */
 		/** \brief Solve -|prec|C<sub>max</sub>.
 		 *
 		 *  For a given sequence of task and precenence constraints (directed acyclic graph) the method finds the schedule using critical path method.
@@ -257,8 +269,7 @@ namespace Koala
 		 *  The container on i-th position stores i-th task possible time of execution.
 		 *  \return the makespan.
 		 *
-		 *   @example Scheduling::critPath
- *  [See example](examples/schedule/scheduling_critical.html).*/
+		 *  [See example](examples/schedule/scheduling_critical.html). */
 		template< typename GraphType, typename TaskIterator, typename TaskWindowIterator >
 			static int critPath( TaskIterator begin, TaskIterator end, const GraphType &DAG, TaskWindowIterator schedule );
 
@@ -276,6 +287,18 @@ namespace Koala
 		template< typename GraphType, typename TaskIterator >
 			static int ls( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
+			/** \brief Solve P2|UET,prec|C<sub>max</sub>.\n\n
+			*  The problem is solved with Coffman-Graham algorithm.
+			*  \param begin the iterator to first element of the container with tasks (Task).
+			*  \param end the iterator to past-the-end element of the container with tasks (Task). Task must be unit-length, release and due dates are ignored.
+			*  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned a vertex
+			*  and precedence is determined by arcs.
+			*  \param[out] schedule the reference to the Schedule object to which the schedule is written.
+			*  Should be empty on entrance and defined for two processors.
+			*  \return the makespan for P2|UET,prec|C<sub>max</sub>.
+			*
+			*   @example Scheduling::coffmanGraham
+			*  [See example](examples/schedule/scheduling_coffman.html). */
 		/** \brief Solve P2|UET,prec|C<sub>max</sub>.
 		 *
 		 *  The problem is solved with Coffman-Graham algorithm.
@@ -287,11 +310,22 @@ namespace Koala
 		 *  Should be empty on entrance and defined for two processors.
 		 *  \return the makespan for P2|UET,prec|C<sub>max</sub>.
 		 *
-		 *   @example Scheduling::coffmanGraham
  *  [See example](examples/schedule/scheduling_coffman.html). */
 		template< typename GraphType, typename TaskIterator >
 			static int coffmanGraham( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
+			/** \brief Solve 1|pmtn,prec,r<sub>i</sub>|L<sub>max</sub>.\n\n
+			*  The problem is solved with Liu algorithm.
+			*  \param begin the iterator to first element of the container with tasks (Task).
+			*  \param end the iterator to past-the-end element of the container with tasks (Task).
+			*  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned a vertex
+			*  and precedence is determined by arcs.
+			*  \param[out] schedule the reference to the Schedule object to which the schedule is written.
+			*  Should be empty on entrance and defined for single processor.
+			*  \return the minimal possible L<sub>max</sub> (maximal lateness).
+			*
+			*   @example Scheduling::precLiu
+			*  [See example](examples/schedule/scheduling_precliu.html). */
 		/** \brief Solve 1|pmtn,prec,r<sub>i</sub>|L<sub>max</sub>.
 		 *
 		 *  The problem is solved with Liu algorithm.
@@ -303,11 +337,22 @@ namespace Koala
 		 *  Should be empty on entrance and defined for single processor.
 		 *  \return the minimal possible L<sub>max</sub> (maximal lateness).
 		 *
-		 *   @example Scheduling::precLiu
- *  [See example](examples/schedule/scheduling_precliu.html).*/
+		 *  [See example](examples/schedule/scheduling_precliu.html). */
 		template< typename GraphType, typename TaskIterator >
 			static int precLiu( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
+			/** \brief Solve P|UET,in-tree|L<sub>max</sub>.\n\n
+			*  The problem is solved with Brucker algorithm. It works for unit length tasks. Release dates are ignored.
+			*  \param begin the iterator to first element of the container with tasks (Task).
+			*  \param end the iterator to past-the-end element of the container with tasks (Task).
+			*  \param DAG an directed acyclic graph representing the precedence constraints. Where each task is assigned a vertex
+			*  and precedence is determined by arcs. The graph must be an in-forest.
+			*  \param[out] schedule the reference to the Schedule object to which the schedule is written.
+			*   Should be empty. Mind that this structure determine the number of processors.
+			*  \return the minimal possible L<sub>max</sub> (maximal lateness).
+			*
+			*   @example Scheduling::brucker
+			*  [See example](examples/schedule/scheduling_brucker.html). */
 		/** \brief Solve P|UET,in-tree|L<sub>max</sub>.
 		 *
 		 *  The problem is solved with Brucker algorithm. It works for unit length tasks. Release dates are ignored. 
@@ -319,11 +364,22 @@ namespace Koala
 		 *   Should be empty. Mind that this structure determine the number of processors.
 		 *  \return the minimal possible L<sub>max</sub> (maximal lateness).
 		 *
-		 *   @example Scheduling::brucker
- *  [See example](examples/schedule/scheduling_brucker.html). */
+		 *  [See example](examples/schedule/scheduling_brucker.html). */
 		template< typename GraphType, typename TaskIterator >
 			static int brucker( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
+			/** \brief Solve P|UET,in-tree|C<sub>max</sub>.\n\n
+			*  The problem is solved with Hu algorithm.
+			*  \param begin the iterator to first element of the container with tasks (Task).
+			*  \param end the iterator to past-the-end element of the container with tasks (Task).
+			*  \param DAG an directed acyclic graph representing the precedence constraints  Where each task is assigned a vertex
+			*  and precedence is determined by arcs. The graph must be an in-forest.
+			*  \param[out] schedule the reference to the Schedule object to which the schedule is written.
+			*   Should be empty on entrance. Mind that this structure determine the number of processors.
+			*  \return the makespan of optimal schedule.
+			*
+			*   @example Scheduling::hu
+			*  [See example](examples/schedule/scheduling_hu.html). */
 		/** \brief Solve P|UET,in-tree|C<sub>max</sub>.
 		 *
 		 *  The problem is solved with Hu algorithm. 
@@ -335,9 +391,7 @@ namespace Koala
 		 *   Should be empty on entrance. Mind that this structure determine the number of processors.
 		 *  \return the makespan of optimal schedule.
 		 *
-		 *   @example Scheduling::hu
- *  [See example](examples/schedule/scheduling_hu.html).
-		 */
+		 *  [See example](examples/schedule/scheduling_hu.html). */
 		template< typename GraphType, typename TaskIterator >
 			static int hu( TaskIterator begin, TaskIterator end, const GraphType &DAG, Schedule &schedule );
 
@@ -351,6 +405,16 @@ namespace Koala
 		 *  \return the minimal sum of completion times for P||ΣC<sub>i</sub>*/
 		template< typename TaskIterator > static int spt( TaskIterator begin, TaskIterator end, Schedule &schedule );
 
+		/** \brief Solve 1||ΣU<sub>i</sub>.\n\n
+		*  The method solves the problem using the Hodgson algorithm. The release dates are ignored.
+		*  \param begin the iterator to first element of the container with tasks (Task).
+		*  \param end the iterator to past-the-end element of the container with tasks (Task).
+		*  \param[out] schedule the reference to the Schedule object to which the optimal schedule is written.
+		*  Should be empty on entrance. And defined for single processor.
+		*  \return the minimal number of late tasks.
+		*
+		*   @example Scheduling::hodgson
+		*  [See example](examples/schedule/scheduling_hodgson.html). */
 		/** \brief Solve 1||ΣU<sub>i</sub>.
 		 *
 		 *  The method solves the problem using the Hodgson algorithm. The release dates are ignored.
@@ -360,9 +424,7 @@ namespace Koala
 		 *  Should be empty on entrance. And defined for single processor.
 		 *  \return the minimal number of late tasks.
 		 *
-		 *   @example Scheduling::hodgson
- *  [See example](examples/schedule/scheduling_hodgson.html).
-		 */
+		 *  [See example](examples/schedule/scheduling_hodgson.html). */
 		template< typename TaskIterator > static int hodgson( TaskIterator begin, TaskIterator end, Schedule &schedule );
 
 	protected:

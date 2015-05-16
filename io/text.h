@@ -171,6 +171,21 @@ public:
 
 }
 
+/** \brief Read graph from stream.\n\n
+ *  The template method reads graph from text in a given format.
+ *  \param g	- graph to read to (not be cleared before reading).
+ *  \param s	- std::stream with encoded graph.
+ *  \param format	- RG_Format, see \ref DMiotxtformat.
+ *  If flag RG_VInfo is turned of or if VertInfoType in not capable of reading from std::istream via operator>>
+ *  infos from \a s are ignored and vertices get default info values. Also if vertices lacks of infos in \a s vertex infos get default value.
+ *  For edges the situation is analogical.
+ *  \param vertexMap - associative array int -> PVertex that keeps vertex under its index derived from \a s (as long as such index exist). blackHole available.
+ *  \param edgeMap	- associative array int -> PEdge that keeps edge under its index derived from \a s (as long as such index exist). blackHole available.
+ *  \return true.
+ *  \ingroup iotxt
+ *
+ *  [See example](examples/io/text.html)
+ */
 //TODO: To chyba nie dobrze .... ¿e return true
 /** \brief Read graph from stream.
  *
@@ -187,7 +202,8 @@ public:
  *  \ingroup iotxt
  *
  *   @example IO::readGraphText
- *  [See example](examples/text/text.html)*/
+ *  [See example](examples/io/text.html)
+ */
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, std::istream &s, int format,
 		   VMap &vertexMap, EMap &edgeMap);
@@ -206,8 +222,8 @@ bool readGraphText(Graph &g, std::istream &s, int format,
  *  \return true.
  *  \ingroup iotxt
  *
- *   @example IO::readGraphText
- *  [See example](examples/text/text.html) */
+ *  [See example](examples/io/text.html)
+ */
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, const std::string &desc, int format,
 		   VMap &vertexMap, EMap &edgeMap) {
@@ -230,8 +246,8 @@ bool readGraphText(Graph &g, const std::string &desc, int format,
  *  \return true.
  *  \ingroup iotxt
  *
- *   @example IO::readGraphText
- *  [See example](examples/text/text.html)*/
+ *  [See example](examples/io/text.html)
+ */
 template<class Graph, class VMap, class EMap>
 bool readGraphText(Graph &g, const char *desc, int format,
 		   VMap &vertexMap, EMap &edgeMap) {
@@ -252,8 +268,8 @@ bool readGraphText(Graph &g, const char *desc, int format,
  *  \return true.
  *  \ingroup iotxt
  *
- *   @example IO::readGraphText
- *  [See example](examples/text/text.html) */
+ *  [See example](examples/io/text.html)
+ */
 template<class Graph>
 bool readGraphText(Graph &g, std::istream &s, int format) {
 	Privates::EmptyMap<typename Graph::PVertex> tv;
@@ -273,8 +289,9 @@ bool readGraphText(Graph &g, std::istream &s, int format) {
  *  \return true.
  *  \ingroup iotxt
  *
- *   @example IO::readGraphText
- *  [See example](examples/text/text.html)*/
+ *  [See example](examples/io/text.html)
+ */
+
 template<class Graph>
 bool readGraphText(Graph &g, const std::string &desc, int format) {
 	std::istringstream s;
@@ -294,8 +311,8 @@ bool readGraphText(Graph &g, const std::string &desc, int format) {
  *  \return true.
  *  \ingroup iotxt
  *
- *   @example IO::readGraphText
- *  [See example](examples/text/text.html) */
+ *  [See example](examples/io/text.html)
+ */
 template<class Graph>
 bool readGraphText(Graph &g, const char *desc, int format) {
 	std::istringstream s;
@@ -317,11 +334,27 @@ bool readGraphText(Graph &g, const char *desc, int format) {
   //TODO: To chyba nie dobrze ....
  *  \ingroup iotxt
  *
- *   @example IO::writeGraphText
- *  [See example](examples/text/text.html)*/
+ *  [See example](examples/io/text.html)
+ */
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vmap,const EMap& emap);
 
+/** \brief Write graph as text to std::ostream.\n\n
+ *  The method writes graph in a given format (RG_*) to text.
+ *  \param graph	- graph to write
+ *  \param out - output buffer (std::ostream)
+ *  \param format	- see \ref DMiotxtformat. 
+ *   - bit RG_VInfo is ignored if VertInfoType is not capable of writing on std::ostream via operator<<.
+ *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
+ *  \return true.
+ *  \ingroup iotxt
+ *
+ *  @example IO::writeGraphText
+ *  [1](examples/io/graphml.html),
+ *  [2](examples/io/example_graphml1.html).
+ *  [3](examples/io/example_graphml2.html).
+ *  [4](examples/io/example_graphml3.html).
+ */
 /** \brief Write graph as text to std::ostream.
  *
  *  The method writes graph in a given format (RG_*) to text.
@@ -333,8 +366,11 @@ bool writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vm
  *  \return true.
  *  \ingroup iotxt
  *
- *   @example IO::writeGraphText
- *  [See example](examples/text/text.html) */
+ *  [1](examples/io/graphml.html),
+ *  [2](examples/io/example_graphml1.html).
+ *  [3](examples/io/example_graphml2.html).
+ *  [4](examples/io/example_graphml3.html).
+ */
 template<class Graph>
 bool writeGraphText(const Graph &g, std::ostream &out, int format)
 {
@@ -356,8 +392,7 @@ bool writeGraphText(const Graph &g, std::ostream &out, int format)
  *  \return true.
  *  \ingroup iotxt
  *
- *   @example IO::writeGraphText
- *  [See example](examples/text/text.html)*/
+ *  [See example](examples/io/text.html)*/
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::string &out, int format,
 					const VMap& vmap,const EMap& emap) {
@@ -379,8 +414,7 @@ bool writeGraphText(const Graph &g, std::string &out, int format,
  *  \return true.
  *  \ingroup iotxt
  *
- *   @example IO::writeGraphText
- *  [See example](examples/text/text.html) */
+ *  [See example](examples/io/text.html) */
 template<class Graph>
 bool writeGraphText(const Graph &g, std::string &out, int format)
 {
@@ -403,8 +437,7 @@ bool writeGraphText(const Graph &g, std::string &out, int format)
  *  \return true if everything worked as planed. False if out=0 or maxlength=0
  * \ingroup iotxt
  *
- *   @example IO::writeGraphText
- *  [See example](examples/text/text.html)*/
+ *  [See example](examples/io/text.html)*/
 template<class Graph,class VMap, class EMap>
 bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int format,
 					const VMap& vmap,const EMap& emap)
@@ -440,8 +473,7 @@ bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int forma
  *  \return true if everything worked as planed. False if out=0 or maxlength=0
  *  \ingroup iotxt
  *
- *   @example IO::writeGraphText
- *  [See example](examples/text/text.html)
+ *  [See example](examples/io/text.html)
  */
 template<class Graph>
 bool writeGraphText(const Graph &g, char *out, unsigned int maxlength, int format)
