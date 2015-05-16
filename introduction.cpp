@@ -1,16 +1,14 @@
 /** \mainpage KOALA Library
  *  \ref description
  *  
- *  \ref wiki
+ *  \wikipath{,Koala wiki}
  *
- * <a href = "../koala.zip"> KOALA sources </a> 
+ * <a href = "http://koala.os.niwa.gda.pl/koala.zip"> KOALA sources </a> 
  *
  * <a href = "modules.html">Documentation</a> of the KOALA library and <a href = "examples/index.html">examples</a> of the codes using it
  *
- * <a class="el" href = "http://www.kaims.pl/koala/zgred/">Graph editor Zgred</a>
- *
- * <a href = "../GraphEditor.zip">Program GraphEditor</a>
- * 
+ * <a class="el" href = "http://koala.os.niwa.gda.pl/zgred">Graph editor Zgred</a>
+ *  
  *  \ref authors
  */
 /** \page description Introduction and general description
@@ -93,9 +91,8 @@ Majority of the above procedures appear also in the version adapted for multigra
  * -# The structure of the quickly-joinable partitions (the module %container/joinsets.h). </li></ol>
  * 
  * \section sec5 Graph visualization and editing
- * In KOALA, two tool programs are available for the multigraph visualization and editing with the possibility of assigning different types of attributes of vertices and edges, operating the above mentioned text formats, and also allowing the visualization of the performance of the algorithm and acting as the GUI for programs using KOALA library (the communication with another process on the same computer or in the form of a client-server web application).
- * 1.	Working in a web browser, multifunctional graph editor <a href = "http://www.kaims.pl/koala/zgred/">Zgred</a> (web application, JavaScript).
- * 2.	Stationary program designed for editing graph databases GraphEditor (Java NetBeans 7 project).
+ * In KOALA, a tool program is available for the multigraph visualization and editing with the possibility of assigning different types of attributes of vertices and edges, operating the above mentioned text formats, and also allowing the visualization of the performance of the algorithm and acting as the GUI for programs using KOALA library (the communication with another process on the same computer or in the form of a client-server web application).
+ * Working in a web browser, multifunctional graph editor <a href = "http://www.kaims.pl/koala/zgred/">Zgred</a> (web application, JavaScript).
  * 
  * \section sec6 Summary
  * KOALA is one of the widest, open source platforms for analyzing graph and network structures, serviceable for direct applying in practice, or as a research tool. The package was developed within the research project of the Polish National Science Centre N N519 405837.
@@ -109,10 +106,9 @@ Majority of the above procedures appear also in the version adapted for multigra
 
 /** \page links Links
  * 
- * - <a href = "../koala.zip"> KOALA sources </a>
+ * - <a href = "http://koala.os.niwa.gda.pl/koala.zip"> KOALA sources </a>
  * - <a href = "modules.html">Documentation</a> of the KOALA library and <a href = "examples/index.html">examples</a> of the codes using it
- * - <a href = "http://www.kaims.pl/koala/zgred/">Graph editor Zgred</a>
- * - <a href = "../GraphEditor.zip">Program GraphEditor</a>
+ * - <a href = "http://koala.os.niwa.gda.pl/zgred">Graph editor Zgred</a>
  * 
  * ·	Contact (email): koala@kaims.pl
  */
