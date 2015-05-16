@@ -98,6 +98,18 @@ namespace Koala
 {
 
 	template< class Element > class SetInserter;
+
+	/** \brief Set output iterator.\n\n
+	 * The \wikipath{Output_iterator,output iterator} with ability to insert elements to set  given by reference.
+	 * Be aware that the assignment operator inserts an element at suitable place, regardless of iterator increment.
+	 * \tparam Element the type of element in set.
+	 * \ingroup cont
+	 *
+	 *   \wikipath{Output_iterator}
+	 *
+	 * @example SetInserter
+	 * [See example](examples/set/setInserter.html)
+	 */
 	/** \brief Set output iterator.
 	 *
 	 * The \wikipath{Output_iterator,output iterator} with ability to insert elements to set  given by reference.
@@ -107,7 +119,6 @@ namespace Koala
 	 *
 	 *   \wikipath{Output_iterator}
 	 *
-	 * @example SetInserter
 	 * [See example](examples/set/setInserter.html)
 	 */
 	template< class Element > class SetInserter< Set< Element > >:
@@ -136,8 +147,7 @@ namespace Koala
 	template< class Element > SetInserter< Set< Element > > setInserter( Set< Element > &x )
 		{ return SetInserter< Set< Element > >( x ); }
 
-	/** \brief Image of set
-	 *
+	/** \brief Image of set\n\n
 	 * The method generate the image given by functor \a f of the set \a arg. The function is unable to guess the type of returned value so calls like <tt>imageSet<double>(iset,kwadrat);</tt> are obligatory.
 	 * \tparam ValType the type of output elements.
 	 * \tparam ArgType the type of the elements form domain.
@@ -151,9 +161,38 @@ namespace Koala
 	 *   @example Set::imageSet
 	 *  [See example](examples/set/setFunction.html)
 	 */
+	/** \brief Image of set
+	 *
+	 * The method generate the image given by functor \a f of the set \a arg. The function is unable to guess the type of returned value so calls like <tt>imageSet<double>(iset,kwadrat);</tt> are obligatory.
+	 * \tparam ValType the type of output elements.
+	 * \tparam ArgType the type of the elements form domain.
+	 * \tparam Funktor Functor class.
+	 * \param arg the reference to the domain (input set).
+	 * \param f function object determining the function for which the image is calculated.
+	 * \return the Set object that consists of all the elements of set image.
+	 * \relates Set
+	 * \ingroup cont
+	 *
+	 *  [See example](examples/set/setFunction.html)
+	 */
 	template< class ValType, class ArgType, class Funktor >
 		Set< ValType > imageSet( const Set< ArgType > &arg, Funktor f );
 
+    /** \brief Preimage\n\n
+	 * The method gets the preimage of a given set \a domain and a functor \a f.
+	 * \tparam ValType the type of function output elements.
+	 * \tparam ArgType the type of the elements form domain.
+	 * \tparam Funktor the functor class.
+	 * \param arg the reference to the function output set.
+	 * \param domain the reference to the domain.
+	 * \param f function object determining the function for which the image and preimage is considered.
+	 * \return the Set object that consists of all the elements of set preimage.
+	 * \relates Set
+	 * \ingroup cont
+	 *
+	 *   @example Set::preimageSet
+	 *  [See example](examples/set/setFunction.html)
+	 */
     /** \brief Preimage
 	 *
 	 * The method gets the preimage of a given set \a domain and a functor \a f.
@@ -167,7 +206,6 @@ namespace Koala
 	 * \relates Set
 	 * \ingroup cont
 	 *
-	 *   @example Set::preimageSet
 	 *  [See example](examples/set/setFunction.html)
 	 */
 	template< class ValType, class ArgType, class Funktor >
