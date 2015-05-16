@@ -59,6 +59,20 @@ public:
 	 *  Clear current GraphML object. */
 	inline void clearGraphML();
 
+	/** \brief Read from file.\n\n
+	 *  The method reads the [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
+	 *  from the file to the current GraphML object.
+	 *  \param fileName the name of read file.
+	 *  \return true if file was successfully read, false if any error occur.
+	 *
+	 *   @example IO::GraphML::readFile
+	 *  See example:
+	 *  [1](examples/io/graphml.html),
+	 *  [2](examples/io/example_graphml1.html),
+	 *  [3](examples/io/example_graphml2.html),
+	 *  [4](examples/io/example_graphml3.html),
+	 *  [5](examples/io/example_graphml4.html).
+	 */
 	//GraphML read/write
 	/** \brief Read from file.
 	 *
@@ -67,10 +81,27 @@ public:
 	 *  \param fileName the name of read file.
 	 *  \return true if file was successfully read, false if any error occur.
 	 *
-	 *   @example IO::readFile
-	 *  [See example](examples/text/graphml.html).
+	 *  See example:
+	 *  [1](examples/io/graphml.html),
+	 *  [2](examples/io/example_graphml1.html),
+	 *  [3](examples/io/example_graphml2.html),
+	 *  [4](examples/io/example_graphml3.html),
+	 *  [5](examples/io/example_graphml4.html).
 	 */
 	inline bool readFile( const char *fileName );
+
+	/** \brief Write to file.\n\n
+	 *  The method writes the current [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
+	 *  to a file.
+	 *  \param fileName the name of written file.
+	 *  \return true if file was successfully written, false otherwise.
+	 *
+	 *   @example IO::GraphML::writeFile
+	 *  See example:
+	 *  [1](examples/io/graphml.html),
+	 *  [2](examples/io/example_graphml3.html),
+	 *  [3](examples/io/example_graphml4.html).
+	 */
 	/** \brief Write to file.
 	 *
 	 *  The method writes the current [sequence of graphs](http://graphml.graphdrawing.org/primer/graphml-primer.html)
@@ -78,8 +109,10 @@ public:
 	 *  \param fileName the name of written file.
 	 *  \return true if file was successfully written, false otherwise.
 	 *
-	 *   @example IO::writeFile
- *  [See example](examples/text/graphml.html).
+	 *  See example:
+	 *  [1](examples/io/graphml.html),
+	 *  [2](examples/io/example_graphml3.html),
+	 *  [3](examples/io/example_graphml4.html).
 	 */
 	inline bool writeFile( const char *fileName );
 
@@ -110,9 +143,18 @@ public:
 	 *  \return the string with [GraphML](http://graphml.graphdrawing.org/primer/graphml-primer.html).*/
 	inline std::string writeString();
 
+	/** \brief Get number of graphs\n\n
+	 *  The method gets the number of graphs in the current GraphML object.
+	 *
+	 *   @example IO::GraphML::graphNo
+	 *  [See example](examples/io/example_graphml1.html).
+	 */
 	/** \brief Get number of graphs
 	 *
-	 *  The method gets the number of graphs in the current GraphML object.*/
+	 *  The method gets the number of graphs in the current GraphML object.
+	 *
+	 *  [See example](examples/io/example_graphml1.html).
+	 */
 	inline int graphNo();
 
 	/** \brief Get i-th graph name.
@@ -144,6 +186,17 @@ public:
 	 *  [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>"),
 	 *  false otherwise.*/
 	inline bool isGraphName(const char *name);
+
+	/** \brief Create graph named \a name.\n\n
+	 *  The method gets a [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>")
+	 *  with proper [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>")
+	 *  or create new if there was no such graph.
+	 *  \param name the name of searched graph.
+	 *  \return the pointer to GraphMLGraph object with the name \a name.
+	 *
+	 *   @example IO::GraphML::createGraph
+     *  [See example](examples/io/graphml.html).
+	 */
 	/** \brief Create graph named \a name.
 	 *
 	 *  The method gets a [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>")
@@ -152,8 +205,7 @@ public:
 	 *  \param name the name of searched graph.
 	 *  \return the pointer to GraphMLGraph object with the name \a name.
 	 *
-	 *   @example IO::createGraph
- *  [See example](examples/text/graphml.html).
+     *  [See example](examples/io/graphml.html).
 	 */
 	inline GraphMLGraph* createGraph(const char *name);
 
@@ -166,6 +218,21 @@ public:
 	 *  \param name the name of searched graph.
 	 *  \return the pointer to GraphMLGraph object with the name \a name, or NULL if there is no such graph.*/
 	inline GraphMLGraph* getGraph(const char *name); //is there is no graph with id==name then it returns NULL
+
+	/** \brief Get n-th graph.\n\n
+	 *  The method gets the n-th [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>").
+	 *  If there was no such graph, NULL is returned.
+	 *  \param n the index of searched graph.
+	 *  \return the pointer to GraphMLGraph object with the name \a name, or NULL if there is no such graph.
+	 *
+	 *  @example IO::GraphML::getGraph
+	 *  See example: 
+	 *  [1](examples/io/graphml.html),
+	 *  [2](examples/io/example_graphml1.html),
+	 *  [3](examples/io/example_graphml2.html),
+	 *  [4](examples/io/example_graphml3.html),
+	 *  [5](examples/io/example_graphml4.html).
+	 */
 	/** \brief Get n-th graph.
 	 *
 	 *  The method gets the n-th [graph](http://graphml.graphdrawing.org/primer/graphml-primer.html "<graph ...>").
@@ -173,8 +240,12 @@ public:
 	 *  \param n the index of searched graph.
 	 *  \return the pointer to GraphMLGraph object with the name \a name, or NULL if there is no such graph.
 	 *
-	 *   @example IO::getGraph
- *  [See example](examples/text/graphml.html).
+	 *  See example: 
+	 *  [1](examples/io/graphml.html),
+	 *  [2](examples/io/example_graphml1.html),
+	 *  [3](examples/io/example_graphml2.html),
+	 *  [4](examples/io/example_graphml3.html),
+	 *  [5](examples/io/example_graphml4.html).
 	 */
 	inline GraphMLGraph* getGraph(int n); //get nth graph
 	/** \brief Delete graph named \a name.
@@ -186,6 +257,21 @@ public:
 	 *  \return true if graph is deleted, false if there was no such graph.*/
 	inline bool deleteGraph(const char *name);
 
+	/** \brief Read graph.\n\n
+	 *  The method reads graph with proper
+	 *  [name](http://graphml.graphdrawing.org/primer/graphml-primer.html "see <graph id='...'>")
+	 *  and adds it directly to the graph.\n
+	 *  It is shortes version of \code{.cpp}
+	 *  GraphML gml;
+	 *  GraphMLGraph *gmlg = gml.getGraph(name);
+	 *  gmlg->readGraph(graph);\endcode
+	 *  \param graph the target graph object.
+	 *  \param name the name of read graph.
+	 *  \return true if graph was successfully read, false otherwise.
+	 *
+	 *   @example IO::GraphML::readGraph
+     *  [See example](examples/io/graphml.html).
+	 */
 	/** \brief Read graph.
 	 *
 	 *  The method reads graph with proper
@@ -199,8 +285,7 @@ public:
 	 *  \param name the name of read graph.
 	 *  \return true if graph was successfully read, false otherwise.
 	 *
-	 *   @example IO::readGraph
- *  [See example](examples/text/graphml.html).
+     *  [See example](examples/io/graphml.html).
 	 */
 	template< class Graph >
 	bool readGraph( Graph &graph, const char *name);
@@ -236,8 +321,10 @@ public:
 	 *  \param name the name of written graph.
 	 *  \return true if graph was successfully written, false otherwise.
 	 *
-	 *   @example IO::writeGraph
- *  [See example](examples/text/graphml.html).
+	 *  See example:
+	 *  [1](examples/io/graphml.html),
+	 *  [2](examples/io/example_graphml3.html),
+	 *  [3](examples/io/example_graphml4.html).
 	 */
 	template< class Graph >
 	bool writeGraph(const Graph &graph, const char *name); //@return false if there is no graph named name
@@ -477,11 +564,29 @@ private:
 class GraphMLGraph {
 	friend class GraphML;
 public:
+
+	/** \brief Get name.\n\n
+	 *  The method gets [the name](http://graphml.graphdrawing.org/primer/graphml-primer.html#Graph "see <graph id='...'")
+	 *  of current graph.
+	 *  \return the string with the name of current graph.
+	 *
+	 *   @example IO::GraphMLGraph::getName
+	 *  [1](examples/io/graphml.html),
+	 *  [2](examples/io/example_graphml1.html).
+	 *  [3](examples/io/example_graphml2.html).
+	 *  [4](examples/io/example_graphml3.html).
+	 */
 	/** \brief Get name.
 	 *
 	 *  The method gets [the name](http://graphml.graphdrawing.org/primer/graphml-primer.html#Graph "see <graph id='...'")
 	 *  of current graph.
-	 *  \return the string with the name of current graph.*/
+	 *  \return the string with the name of current graph.
+	 *
+	 *  [1](examples/io/graphml.html),
+	 *  [2](examples/io/example_graphml1.html).
+	 *  [3](examples/io/example_graphml2.html).
+	 *  [4](examples/io/example_graphml3.html).
+	 */
 	inline std::string getName();
 
 	/** \brief Read graph.
@@ -1198,6 +1303,20 @@ inline Privates::GMLBoolFieldPlain
 gmlBoolField(std::string name) {
 	return Privates::GMLBoolFieldPlain(name);
 }
+
+
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.\n\n
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set bool value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA
+ *   
+ *   @example IO::gmlBoolField
+ *  [See example](examples/io/graphml.html).
+ */
 /** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
  *
  *  The function can be used instead of own written InfoVertex/InfoEdge functors.
@@ -1206,7 +1325,10 @@ gmlBoolField(std::string name) {
  *  \param wsk pointer to member of InfoVert/InfoEdge struct
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
- *  \ingroup DMiographmlA */
+ *  \ingroup DMiographmlA
+ * 
+ *  [See example](examples/io/graphml.html).
+ */
 template <class Info, class FieldType>
 Privates::GMLBoolField<Info,FieldType>
 gmlBoolField(FieldType Info::*wsk,std::string name) {
@@ -1224,6 +1346,19 @@ inline Privates::GMLIntFieldPlain
 gmlIntField(std::string name) {
 	return Privates::GMLIntFieldPlain(name);
 }
+
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.\n\n
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set int value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA 
+ *
+ *  @example IO::gmlIntField
+ *  [See example](examples/io/graphml.html).
+ */
 /** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
  *
  *  The function can be used instead of own written InfoVertex/InfoEdge functors.
@@ -1232,7 +1367,10 @@ gmlIntField(std::string name) {
  *  \param wsk pointer to member of InfoVert/InfoEdge struct
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
- *  \ingroup DMiographmlA */
+ *  \ingroup DMiographmlA 
+ *
+ *  [See example](examples/io/graphml.html).
+ */
 template <class Info, class FieldType>
 Privates::GMLIntField<Info,FieldType>
 gmlIntField(FieldType Info::*wsk,std::string name) {
@@ -1250,6 +1388,19 @@ inline Privates::GMLDoubleFieldPlain
 gmlDoubleField(std::string name) {
 	return Privates::GMLDoubleFieldPlain(name);
 }
+
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.\n\n
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set double value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA
+ *
+ *  @example IO::gmlDoubleField
+ *  [See example](examples/io/graphml.html).
+ */
 /** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
  *
  *  The function can be used instead of own written InfoVertex/InfoEdge functors.
@@ -1258,7 +1409,10 @@ gmlDoubleField(std::string name) {
  *  \param wsk pointer to member of InfoVert/InfoEdge struct
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
- *  \ingroup DMiographmlA */
+ *  \ingroup DMiographmlA
+ *
+ *  [See example](examples/io/graphml.html).
+ */
 template <class Info, class FieldType>
 Privates::GMLDoubleField<Info,FieldType>
 gmlDoubleField(FieldType Info::*wsk,std::string name) {
@@ -1276,6 +1430,19 @@ inline Privates::GMLLongFieldPlain
 gmlLongField(std::string name) {
 	return Privates::GMLLongFieldPlain(name);
 }
+
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.\n\n
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set long(64-bit) value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA
+ *
+ *   @example IO::gmlLongField
+ *  [See example](examples/io/graphml.html).
+ */
 /** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
  *
  *  The function can be used instead of own written InfoVertex/InfoEdge functors.
@@ -1284,7 +1451,10 @@ gmlLongField(std::string name) {
  *  \param wsk pointer to member of InfoVert/InfoEdge struct
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
- *  \ingroup DMiographmlA */
+ *  \ingroup DMiographmlA
+ *
+ *  [See example](examples/io/graphml.html).
+ */
 template <class Info, class FieldType>
 Privates::GMLLongField<Info,FieldType>
 gmlLongField(FieldType Info::*wsk,std::string name) {
@@ -1302,6 +1472,21 @@ inline Privates::GMLStringFieldPlain
 gmlStringField(std::string name) {
 	return Privates::GMLStringFieldPlain(name);
 }
+
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.\n\n
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set string value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA
+ *
+ *  @example IO::gmlStringField
+ *  See example:
+ *  [1](examples/io/graphml.html),
+ *  [2](examples/io/example_graphml3.html).
+ */
 /** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
  *
  *  The function can be used instead of own written InfoVertex/InfoEdge functors.
@@ -1310,12 +1495,30 @@ gmlStringField(std::string name) {
  *  \param wsk pointer to member of InfoVert/InfoEdge struct
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
- *  \ingroup DMiographmlA */
+ *  \ingroup DMiographmlA
+ *
+ *  See example:
+ *  [1](examples/io/graphml.html),
+ *  [2](examples/io/example_graphml3.html).
+ */
 template <class Info, class FieldType>
 Privates::GMLStringField<Info,FieldType>
 gmlStringField(FieldType Info::*wsk,std::string name) {
 	return Privates::GMLStringField<Info,FieldType>(wsk,name);
 }
+
+/** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.\n\n
+ *  The function can be used instead of own written InfoVertex/InfoEdge functors.
+ *  Get/set string value of graphs InfoVert/InfoEdge struct member to GraphML's value named \a name.
+ *  Result can be combined with other gml__Field(__) by | operator.
+ *  \param wsk pointer to member of InfoVert/InfoEdge struct
+ *  \param name name of GraphML's value.
+ *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
+ *  \ingroup DMiographmlA
+ *
+ *   @example IO::gmlStringField
+ *  [See example](examples/io/graphml.html).
+ */
 /** \brief Auxiliary function for writeGraph and readGraph methods at GraphMLGraph class.
  *
  *  The function can be used instead of own written InfoVertex/InfoEdge functors.
@@ -1324,7 +1527,10 @@ gmlStringField(FieldType Info::*wsk,std::string name) {
  *  \param wsk pointer to member of InfoVert/InfoEdge struct
  *  \param name name of GraphML's value.
  *  \return the functor for writeGraph or readGraph method (attribute infoVert or infoEdge).
- *  \ingroup DMiographmlA */
+ *  \ingroup DMiographmlA
+ *
+ *  [See example](examples/io/graphml.html).
+ */
 template <class Info,int N>
 Privates::GMLStringField<Info,char[N]>
 gmlStringField(char (Info::*wsk)[N],std::string name) {

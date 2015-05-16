@@ -135,6 +135,20 @@ public:
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int color(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
+	/** \brief List vertex coloring for lists length at most 2.\n\n
+	 *  For all uncolored vertices from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
+	 *  The result is saved in the map \a colors.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
+	 *  \param colLists the associative array (PVert->Set<int>) that assigns a set of available colors to each vertex.
+	 *  \param colors the associative container (PVert->int) which assigns a color (integer number) to the vertex.
+	 *   The array stores both input and output.
+	 *  \param beg the iterator to the first element of the container with vertices that are to be colored. The container should be free of repetitions.
+	 *  \param end the iterator to the past-the-end element of the container with vertices that are to be colored. The container should be free of repetitions.
+	 *  \return the number of colored vertices or -1 if none was possible.
+	 *
+	 *   @example ListEdgeColoring::color2ElemLists
+	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
+	 */
 	/** \brief List vertex coloring for lists length at most 2.
 	 *
 	 *  For all uncolored vertices from the sequence \a beg, \a end, the method chooses proper colors (concerning the partial coloring in map \a colors) from the list of colors \t colList[vert].
@@ -147,7 +161,6 @@ public:
 	 *  \param end the iterator to the past-the-end element of the container with vertices that are to be colored. The container should be free of repetitions.
 	 *  \return the number of colored vertices or -1 if none was possible.
 	 *
-	 *   @example ListEdgeColoring::color2ElemLists
 	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
@@ -163,7 +176,6 @@ public:
 	 *   The array stores both input and output.
 	 *  \return the number of colored vertices or -1 if none was possible.
 	 *
-	 *   @example ListEdgeColoring::color2ElemLists
 	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
@@ -342,9 +354,7 @@ public:
 	static int colorChoose(const Graph &graph, const ColLists &colLists,
 			ColorMap &colors, ColorChooser chooser);
 
-	//@return number of colored edges
-	/** \brief Choose colors.
-	 *  
+	/** \brief Choose colors.\n\n 
 	 *  The method colors  properly (concerning the partial coloring in map \a colors)  all the uncolored edges of \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].
 	 *  I.e. the method extends the coloring on whole grapy and saves the reslt in the map \a colors.
 	 *  The FirstFit method for choosing the proper color from the list \p colLists[edge] is used here.
@@ -357,9 +367,38 @@ public:
 	 *   @example ListEdgeColoring::color
 	 *  [See example](examples/coloring/edgeListColor.html).
 	 */
+	//@return number of colored edges
+	/** \brief Choose colors.
+	 *  
+	 *  The method colors  properly (concerning the partial coloring in map \a colors)  all the uncolored edges of \a graph. Colors are chosen from the lists of colors, respectively \t colList[edge].
+	 *  I.e. the method extends the coloring on whole grapy and saves the reslt in the map \a colors.
+	 *  The FirstFit method for choosing the proper color from the list \p colLists[edge] is used here.
+	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
+	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
+	 *  \param colors the associative container (PEdge->int) which assigns a colors (integers) to the edges.
+	 *   The array stores both input and output.
+	 *  \return the number of properly colored edges. Mind that the method breaks after meeting the first unchoosable vertex.
+	 *
+	 *  [See example](examples/coloring/edgeListColor.html).
+	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
 	static int color(const Graph &graph, const ColLists &colLists, ColorMap &colors);
 
+	/** \brief Color bipartite graph.\n\n
+	 *  The method colors properly all the edges of bipartite \a graph. Colors are chosen from the lists of colors (of length >= Delta) given by \a colLists.
+	 *  The result is saved in the map \a colors. The method applies Galvin algorithm.
+	 *
+	 *  For all vertices the number of available colors is greater or equal the graph degree.
+	 *
+	 *  \param graph the considered bipartite graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
+	 *  \param colLists the associative array (PEdge->Set<int>) that assigns a set of available colors to each edge.
+	 *  \param colors the associative container (PEdge->int)
+	 *     which assigns a colors (integers) to the edges.
+	 *  \return the number of properly colored edges, which is the number of edges in graph.
+	 *
+	 *   @example ListEdgeColoring::colorBipartite
+	 *  [See example](examples/coloring/edgeListColor_colorBipartite.html).
+	 */
     // Galvin's algorithm, every list must have >=Delta elements
 	/** \brief Color bipartite graph.
 	 *
@@ -374,7 +413,6 @@ public:
 	 *     which assigns a colors (integers) to the edges.
 	 *  \return the number of properly colored edges, which is the number of edges in graph.
 	 *
-	 *   @example ListEdgeColoring::colorBipartite
 	 *  [See example](examples/coloring/edgeListColor_colorBipartite.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
@@ -392,7 +430,6 @@ public:
 	 *  \param end the iterator to the past-the-end element of the container with the edges that are to be colored. The container should be free of loops and repetitions.
 	 *  \return the number of properly colored edges or -1 if none was possible.
 	 *
-	 *   @example ListEdgeColoring::color2ElemLists
 	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap, typename VIter>
@@ -408,7 +445,6 @@ public:
 	 *     which assigns a colors (integers) to the edges.
 	 *  \return the number of properly colored edges or -1 if none was possible.
 	 *
-	 *   @example ListEdgeColoring::color2ElemLists
 	 *  [See example](examples/coloring/edgeListColor_color2ElemLists.html).
 	 */
 	template<typename Graph, typename ColLists, typename ColorMap>
