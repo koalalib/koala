@@ -43,17 +43,6 @@ namespace Koala
 			{ return key; }
 	};
 
-	/** \brief Binominal heap.\n\n
-	 *  Standard binominal heap structure.
-	 *  \tparam Key the class of stored objects.
-	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>. The function should generate strict weak ordering.
-	 *  \ingroup cont
-	 *
-	 *  \wikipath{Binominal_heap}
-	 *
-	 *   @example BinomHeap
-	 *  [See example](examples/heap/example_BinomHeap.html).
-	 */
 	/** \brief Binominal heap.
 	 *
 	 *  Standard binominal heap structure.
@@ -220,15 +209,6 @@ namespace Koala
 			{ init( _key ); }
 	};
 
-	/**  \brief Fibonacci heap.\n\n
-	 *  Standard Fibonacci heap structure.
-	 *  \tparam Key the class of stored objects.
-	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>.
-	 *  \ingroup cont
-	 *
-	 *   @example FibonHeap
-	 *  [See example](examples/heap/example_FibonHeap.html).
-	 */
 	/**  \brief Fibonacci heap.
 	 *
 	 *  Standard Fibonacci heap structure.
@@ -382,16 +362,6 @@ namespace Koala
 			{ init( _key ); }
 	};
 
-	/** \brief Pairing heap.\n\n
-	 *  Standard pairing heap structure.
-	 *  \tparam Key the class of stored objects.
-	 *  \tparam Compare the comparator, the class allowing to compare two objects of Key type, by default std::less<Key>.
-	 *  \tparam Allocator the class allows to use own memory allocator.
-	 *  \ingroup cont
-	 *
-	 *   @example PairHeap
-	 *  [See example](examples/heap/example_FibonHeap.html).
-	 */
 	/** \brief Pairing heap.
 	 *
 	 *  Standard pairing heap structure.

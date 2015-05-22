@@ -201,7 +201,6 @@ public:
  *  \return true as long as read properly.
  *  \ingroup iotxt
  *
- *   @example IO::readGraphText
  *  [See example](examples/io/text.html)
  */
 template<class Graph, class VMap, class EMap>
@@ -338,22 +337,6 @@ bool readGraphText(Graph &g, const char *desc, int format) {
 template<class Graph, class VMap, class EMap>
 bool writeGraphText(const Graph &g, std::ostream &out, int format,const VMap& vmap,const EMap& emap);
 
-/** \brief Write graph as text to std::ostream.\n\n
- *  The method writes graph in a given format (RG_*) to text.
- *  \param graph	- graph to write
- *  \param out - output buffer (std::ostream)
- *  \param format	- see \ref DMiotxtformat. 
- *   - bit RG_VInfo is ignored if VertInfoType is not capable of writing on std::ostream via operator<<.
- *   - bit RG_EInfo is ignored if EdgeInfoType is not capable of writing on std::ostream via operator<<.
- *  \return true.
- *  \ingroup iotxt
- *
- *  @example IO::writeGraphText
- *  [1](examples/io/graphml.html),
- *  [2](examples/io/example_graphml1.html).
- *  [3](examples/io/example_graphml2.html).
- *  [4](examples/io/example_graphml3.html).
- */
 /** \brief Write graph as text to std::ostream.
  *
  *  The method writes graph in a given format (RG_*) to text.
