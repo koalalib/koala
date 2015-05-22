@@ -249,12 +249,6 @@ namespace Koala
 	 *  \ingroup DMweight */
 	class Dijkstra: public DijkstraPar< AlgsDefaultSettings > { };
 
-	/** \brief Dijkstra algorithm (heap) (default).\n\n
-	 *  The class implements the Dijkstra algorithm using simple heap for keeping achievable vertices.\n
-	 *  There is also another approach in Dijkstra that uses simple table.
-	 *
-	 *  @example DijkstraHeap
-	 *  [See example](examples/weights/dijkstra_h/dijkstra_h.html) */
 	/** \brief Dijkstra algorithm (heap) (default).
 	 *
 	 *  The class implements the Dijkstra algorithm using simple heap for keeping achievable vertices. 
@@ -418,11 +412,6 @@ namespace Koala
 	template<bool longest>
 	class DAGCritPathPar2: public DAGCritPathPar< AlgsDefaultSettings, longest> { };
 
-	/**\brief Longest path in directed acyclic graph (default)\n\n
-	 *  The class gives methods for critical path in DAG (directed acyclic graph).
-	 *
-	 *  @example DAGCritPath
-	 *  [See example](examples/weights/dagcrit/dagcritpath.html) */
 	/**\brief Longest path in directed acyclic graph (default)
 	 *  \ingroup DMweight
 	 *
@@ -500,10 +489,6 @@ namespace Koala
 				}
 	};
 
-	/** \brief Bellman-Ford shortest path algorithm (default).\n\n
-	 *
-	 *  @example BellmanFord
-	 *  [See example](examples/weights/bellman_ford/bellman_ford.html) */
 	/** \brief Bellman-Ford shortest path algorithm (default).
 	 *  \ingroup DMweight
 	 *
@@ -565,12 +550,6 @@ namespace Koala
 			typename GraphType::PVertex end, PathStructs::OutPath< VIter,EIter > iters );
 	};
 
-	/** \brief Shortest paths all to all (default).\n\n
-	 *  The class consists of Floyd and Johnsona algorithms for shortest paths between any two vertices in graph.
-	 *
-	 *  @example All2AllDists
-	 *  [See example](examples/weights/floyd/floyd.html)
-	 */
 	/** \brief Shortest paths all to all (default).
 	 *
 	 *  The class consists of Floyd and Johnsona algorithms for shortest paths between any two vertices in graph.
@@ -714,11 +693,6 @@ namespace Koala
 
 	};
 
-	/** \brief Minimum/maximum weight spanning forest algorithm (default).\n\n 
-	 *  Using Kruskal technique, the class solves minimum/maximum weight spanning forest problem or forest of given number of edges.
-	 *
-	 *  @example Kruskal
-	 *  [See example](examples/weights/kruskal/kruskal.html) */
 	/** \brief Minimum/maximum weight spanning forest algorithm (default).
 	 *  
 	 *  Using Kruskal technique, the class solves minimum/maximum weight spanning forest problem or forest of given number of edges.

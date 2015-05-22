@@ -57,13 +57,6 @@ namespace Koala
 	{
 	public:
 
-		/** \brief Constructor\n\n
-		 *  Assigns STL map container \a acont to the member \a cont.
-		 *  \param acont the original container.
-		 *
-		 *   @example AssocTabConstInterface
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_constructor.html">See example</a>.
-		 */
 		/** \brief Constructor
 		 *
 		 *  Assigns STL map container \a acont to the member \a cont.
@@ -77,13 +70,6 @@ namespace Koala
 		typedef V ValType; /**< \brief Type of mapped value.*/
 		typedef std::map< K,V > OriginalType; /**< \brief Type of wrapped container.*/
 
-		/** \brief Test existence of key.\n\n
-		 *  \param arg the tested key.
-		 *  \return true if the key exists in the container, false otherwise.
-		 *
-		 *   @example AssocTabConstInterface::hasKey
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_hasKey.html">See example</a>.
-		 */
 		/** \brief Test existence of key.
 		 *
 		 *  \param arg the tested key.
@@ -93,12 +79,6 @@ namespace Koala
 		 */
 		bool hasKey( K arg ) const { return cont.find( arg ) != cont.end(); }
 
-		/** \brief Get the first key.\n\n
-		 *  \return the key of the first element in the container or 0 if empty.
-		 *
-		 *   @example AssocTabConstInterface::firstKey
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_firstKey.html">See example</a>.
-		 */
 		/** \brief Get the first key.
 		 *
 		 *  \return the key of the first element in the container or 0 if empty.
@@ -107,12 +87,6 @@ namespace Koala
 		 */
 		K firstKey() const;
 
-		/** \brief Get the last key.\n\n
-		 *  \return the key of the last element in the container or 0 if empty.
-		 *
-		 *   @example AssocTabConstInterface::lastKey
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_lastKey.html">See example</a>.
-		 */
 		/** \brief Get the last key.
 		 *
 		 *  \return the key of the last element in the container or 0 if empty.
@@ -121,13 +95,6 @@ namespace Koala
 		 */
 		K lastKey() const;
 
-		/** \brief Get previous key.\n\n
-		 *  \param arg the reference key.
-		 *  \return the key prior to \a arg.  If \a arg == 0, the last key is returned.
-		 *
-		 *   @example AssocTabConstInterface::prevKey
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_prevKey.html">See example</a>.
-		 */
 		/** \brief Get previous key.
 		 *
 		 *  \param arg the reference key.
@@ -137,13 +104,6 @@ namespace Koala
 		 */
 		K prevKey( K arg ) const;
 
-		/** \brief Get next key.\n\n
-		 *  \param arg the reference key.
-		 *  \return the key next to \a arg. If \a arg == 0, the first key is returned.
-		 *
-		 *   @example AssocTabConstInterface::nextKey
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_nextKey.html">See example</a>.
-		 */
 		/** \brief Get next key.
 		 *
 		 *  \param arg the reference key.
@@ -153,14 +113,6 @@ namespace Koala
 		 */
 		K nextKey( K arg ) const;
 
-		/** \brief Get element.\n\n
-		 *	If \a arg matches any key in the container, the matched value is returned, otherwise the empty constructor of \a ValType is called.
-		 *  \param arg the searched key.
-		 *  \return the mapped value associated with key \a arg.
-		 *
-		 *   @example AssocTabConstInterface::operator_brackets
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_operator_brackets.html">See example</a>.
-		 */
 		/** \brief Get element.
 		 *
 		 *	If \a arg matches any key in the container, the matched value is returned, otherwise the empty constructor of \a ValType is called.
@@ -171,12 +123,6 @@ namespace Koala
 		 */
 		V operator[]( K arg ) const;
 
-		/** \brief Get size.\n\n
-		 *	\return the number of elements in the container.
-		 *
-		 *   @example AssocTabConstInterface::size
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_size.html">See example</a>.
-		 */
 		/** \brief Get size.
 		 *
 		 *	\return the number of elements in the container.
@@ -185,12 +131,6 @@ namespace Koala
 		 */
 		unsigned size() const { return cont.size(); }
 
-		/** \brief Test if empty.\n\n
-		 *  \return the boolean value, true if the container has no elements, false otherwise.
-		 *
-		 *   @example AssocTabConstInterface::empty
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_empty.html">See example</a>.
-		 */
 		/** \brief Test if empty.
 		 *
 		 *  \return the boolean value, true if the container has no elements, false otherwise.
@@ -199,13 +139,6 @@ namespace Koala
 		 */
 		bool empty() const { return this->size() == 0; }
 
-		/** \brief Test if empty.\n\n
-		 *  The overloaded operator!, tests if the container is empty.
-		 *  \return the boolean value, true if the container has no elements, false otherwise.
-		 *
-		 *   @example AssocTabConstInterface::operator_negation
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_operator_negation.html">See example</a>.
-		 */
 		/** \brief Test if empty.
 		 *
 		 *  The overloaded operator!, tests if the container is empty.
@@ -215,15 +148,6 @@ namespace Koala
 		 */
 		bool operator!() const { return empty(); }
 
-		/** \brief Get keys.\n\n
-		 *  All the keys in the container are stored in another container with a defined iterator.
-		 *  \tparam Iterator the class of iterator for the container storing the output set keys.
-		 *  \param[out] iter the iterator connected with the container of output keys.
-		 *  \return the number of keys.
-		 *
-		 *   @example AssocTabConstInterface::getKeys
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_getKeys.html">See example</a>.
-		 */
 		/** \brief Get keys.
 		 *
 		 *  All the keys in the container are stored in another container with a defined iterator.
@@ -235,12 +159,6 @@ namespace Koala
 		 */
 		template< class Iterator > int getKeys( Iterator iter ) const;
 
-		/** \brief Reference to the original container.\n\n
-		 *	The reference to the original container. The one the class wraps.
-		 *
-		 *   @example AssocTabConstInterface::cont
-		 *  <a href="examples/assoctab/assocTabConstInterface/assocTabConstInterface_cont.html">See example</a>.
-		 */
 		/** \brief Reference to the original container.
 		 *
 		 *	The reference to the original container. The one the class wraps.
@@ -300,13 +218,6 @@ namespace Koala
 		 */
 		T &cont;
 
-		/** \brief Constructor.\n\n
-		 *  Assigns the original container \a acont (for example STL map) to the reference variable \a cont.
-		 *	\param acont the original container.
-		 *
-		 *   @example AssocTabInterface
-		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_constructor.html">See example</a>.
-		 */
 		/** \brief Constructor.
 		 *
 		 *  Assigns the original container \a acont (for example STL map) to the reference variable \a cont.
@@ -316,14 +227,6 @@ namespace Koala
 		 */
 		AssocTabInterface( T &acont ): AssocTabConstInterface< T >( acont ), cont( acont ) { }
 
-		/** \brief Copy content of container.\n\n
-		 *  Overloaded operator= copies the content of \a arg to the current container.
-		 *  \param arg  the copied container.
-		 *  \return the reference to the current object.
-		 *
-		 *   @example AssocTabInterface::operator_assignment
-		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_operator_assignment.html">See example</a>.
-		 */
 		/** \brief Copy content of container.
 		 *
 		 *  Overloaded operator= copies the content of \a arg to the current container.
@@ -355,14 +258,6 @@ namespace Koala
 		 */
 		template< class AssocCont > AssocTabInterface< T > &operator=( const AssocCont &arg );
 
-		/** \brief Reserve memory.\n\n
-		 *  The method reserves the amount of memory sufficient for \a arg elements.
-		 *  As long as the number of elements is not grater than \a arg, reallocation is not necessary. It is recommended to use when beginning the work with the object. However, for some types \a T  the method does nothing.
-		 *  \param arg the number of elements for which memory is allocated.
-		 *
-		 *   @example AssocTabInterface::reserve
-		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_reserve.html">See example</a>.
-		 */
 		/** \brief Reserve memory.
 		 *
 		 *  The method reserves the amount of memory sufficient for \a arg elements.
@@ -373,12 +268,6 @@ namespace Koala
 		 */
 		void reserve( int arg ) { AssocTabConstInterface< T >::reserve( arg ); }
 
-		/** \brief Clear container.\n\n
-		 *  The method deletes all the elements from the container.
-		 *
-		 *   @example AssocTabInterface::clear
-		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_clear.html">See example</a>.
-		 */
 		/** \brief Clear container.
 		 *
 		 *  The method deletes all the elements from the container.
@@ -387,14 +276,6 @@ namespace Koala
 		 */
 		void clear() { AssocTabConstInterface< T >::clear(); }
 
-		/** \brief Delete element.\n\n
-		 *  The method deletes the element associated with the key \a arg.
-		 *  \param arg the key of the considered element.
-		 *  \return true if the element existed.
-		 *
-		 *   @example AssocTabInterface::delKey
-		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_delKey.html">See example</a>.
-		 */
 		/** \brief Delete element.
 		 *
 		 *  The method deletes the element associated with the key \a arg.
@@ -405,14 +286,6 @@ namespace Koala
 		 */
 		bool delKey( KeyType arg) { return AssocTabConstInterface< T >::delKey( arg ); }
 
-		/** \brief Get pointer to value.\n\n
-		 *	The method gets the pointer to the value associated with the key \a arg.
-		 *  \param arg the key of the searched element.
-		 *  \return the pointer to the mapped value associated with the key \a arg. NULL if the key does not match the key of any element in the container.
-		 *
-		 *   @example AssocTabInterface::valPtr
-		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_valPtr.html">See example</a>.
-		 */
 		/** \brief Get pointer to value.
 		 *
 		 *	The method gets the pointer to the value associated with the key \a arg.
@@ -423,14 +296,6 @@ namespace Koala
 		 */
 		ValType* valPtr( KeyType arg ) { return AssocTabConstInterface< T >::valPtr( arg ); }
 
-		/** \brief Get value.\n\n
-		 * The constant method gets the value associated with \a arg.
-		 *  \param arg the key of the searched element.
-		 *  \return the mapped value of type \a ValType associated with key \a arg or default value if the key does not match the key of any element in the container.
-		 *
-		 *   @example AssocTabInterface::operator_brackets
-		 *  <a href="examples/assoctab/assocTabInterface/assocTabInterface_operator_brackets.html">See example</a>.
-		 */
 		/** \brief Get value.
 		 *
 		 * The constant method gets the value associated with \a arg.
@@ -472,12 +337,6 @@ namespace Koala
 		/** \brief Wrapped container.*/
 		T cont;
 
-		/** \brief Constructor\n\n
-		 *  Runs the empty constructor of \a cont.
-		 *
-		 *   @example AssocTable
-		 *  <a href="examples/assoctab/assocTable/assocTable_constructor.html">See example</a>.
-		 */
 		/** \brief Constructor
 		 *
 		 *  Runs the empty constructor of \a cont.
@@ -504,14 +363,6 @@ namespace Koala
 		 */
 		AssocTable( const AssocTable< T > &X ): cont( X.cont ), inter( cont ) {}
 
-		/** \brief Copy content of container.\n\n
-		 *  Overloaded operator= copies the content of AssocCont \a X to the current container.
-		 *  \param X  the copied container.
-		 *  \return the reference to the current container.
-		 *
-		 *   @example AssocTable::operator_assignment
-		 *  <a href="examples/assoctab/assocTable/assocTable_operator_assignment.html">See example</a>.
-		 *
 		/** \brief Copy content of container.
 		 *
 		 *  Overloaded operator= copies the content of AssocCont \a X to the current container.
@@ -547,13 +398,6 @@ namespace Koala
 		typedef typename AssocTabInterface< T >::ValType ValType;/**< \brief Type of mapped value.*/
 		typedef typename AssocTabInterface< T >::OriginalType OriginalType;/**< \brief Type of wrapped container.*/
 
-		/** \brief Test existence of key.\n\n
-		 *  \param arg the tested key.
-		 *  \return true if the key exists in the container, false otherwise.
-		 *
-		 *   @example AssocTable::hasKey
-		 *  <a href="examples/assoctab/assocTable/assocTable_hasKey.html">See example</a>.
-		 */
 		/** \brief Test existence of key.
 		 *
 		 *  \param arg the tested key.
@@ -563,14 +407,6 @@ namespace Koala
 		 */
 		bool hasKey( KeyType arg ) const { return inter.hasKey( arg ); }
 
-		/** \brief Get pointer to value.\n\n
-		 *  The method gets the pointer to the object associated with the key \a arg.
-		 *  \param arg the key of the searched element.
-		 *  \return the pointer to the mapped value associated with the key \a arg or NULL if \a arg does not math the key in element from the container.
-		 *
-		 *   @example AssocTable::valPtr
-		 *  <a href="examples/assoctab/assocTable/assocTable_valPtr.html">See example</a>.
-		 */
 		/** \brief Get pointer to value.
 		 *
 		 *  The method gets the pointer to the object associated with the key \a arg.
@@ -581,14 +417,6 @@ namespace Koala
 		 */
 		ValType* valPtr( KeyType arg ) { return inter.valPtr( arg ); }
 
-		/** \brief Delete element.\n\n
-		 *  The method deletes the element associated with the key \a arg.
-		 *  \param arg the key of the considered element.
-		 *  \return true if the element existed, false otherwise.
-		 *
-		 *   @example AssocTable::delKey
-		 *  <a href="examples/assoctab/assocTable/assocTable_delKey.html">See example</a>.
-		 */
 		/** \brief Delete element.
 		 *
 		 *  The method deletes the element associated with the key \a arg.
@@ -599,12 +427,6 @@ namespace Koala
 		 */
 		bool delKey( KeyType arg ) { return inter.delKey( arg ); }
 
-		/** \brief Get the first key.\n\n
-		 *  \return the key of the first element in the container of 0 if container is empty.
-		 *
-		 *   @example AssocTable::firstKey
-		 *  <a href="examples/assoctab/assocTable/assocTable_firstKey.html">See example</a>.
-		 */
 		/** \brief Get the first key.
 		 *
 		 *  \return the key of the first element in the container of 0 if container is empty.
@@ -613,12 +435,6 @@ namespace Koala
 		 */
 		KeyType firstKey() const { return inter.firstKey(); }
 
-		/** \brief Get the last key.\n\n
-		 *  \return the key of the last element in the container or 0 if the container is empty.
-		 *
-		 *   @example AssocTable::lastKey
-		 *  <a href="examples/assoctab/assocTable/assocTable_lastKey.html">See example</a>.
-		 */
 		/** \brief Get the last key.
 		 *
 		 *  \return the key of the last element in the container or 0 if the container is empty.
@@ -627,13 +443,6 @@ namespace Koala
 		 */
 		KeyType lastKey() const { return inter.lastKey(); }
 
-		/** \brief Get previous key.\n\n
-		 *  \param arg the reference key.
-		 *  \return the key prior to \a arg.  If \a arg == 0, the last key is returned.
-		 *
-		 *   @example AssocTable::prevKey
-		 *  <a href="examples/assoctab/assocTable/assocTable_prevKey.html">See example</a>.
-		 */
 		/** \brief Get previous key.
 		 *
 		 *  \param arg the reference key.
@@ -643,13 +452,6 @@ namespace Koala
 		 */
 		KeyType prevKey( KeyType arg ) const { return inter.prevKey( arg ); }
 
-		/** \brief Get next key.\n\n
-		 *  \param arg the reference key.
-		 *  \return the key next to \a arg. If \a arg == 0, the first key is returned.
-		 *
-		 *   @example AssocTable::nextKey
-		 *  <a href="examples/assoctab/assocTable/assocTable_nextKey.html">See example</a>.
-		 */
 		/** \brief Get next key.
 		 *
 		 *  \param arg the reference key.
@@ -659,14 +461,6 @@ namespace Koala
 		 */
 		KeyType nextKey( KeyType arg ) const { return inter.nextKey( arg ); }
 
-		/** \brief Access element.\n\n
-		 *  If the key \a arg exists the reference to the mapped value is returned, otherwise a new element associated with the \a arg is created with default mapped value gained from the call of the empty constructor of ValType.
-		 *  \param arg the considered key.
-		 *  \return the reference to the mapped value associated with the key \a arg or if the key does not exist the reference to the new-created element.
-		 *
-		 *   @example AssocTable::operator_brackets
-		 *  <a href="examples/assoctab/assocTable/assocTable_operator_brackets.html">See example</a>.
-		 */
 		/** \brief Access element.
 		 *
 		 *  If the key \a arg exists the reference to the mapped value is returned, otherwise a new element associated with the \a arg is created with default mapped value gained from the call of the empty constructor of ValType.
@@ -687,12 +481,6 @@ namespace Koala
 		 */
 		ValType operator[]( KeyType arg ) const { return ((AssocTabConstInterface< T >&)inter).operator[]( arg ); }
 
-		/** \brief Get size.\n\n
-		 *  \return the number of elements in the container.
-		 *
-		 *   @example AssocTable::size
-		 *  <a href="examples/assoctab/assocTable/assocTable_size.html">See example</a>.
-		 */
 		/** \brief Get size.
 		 *
 		 *  \return the number of elements in the container.
@@ -701,12 +489,6 @@ namespace Koala
 		 */
 		unsigned size() const { return inter.size(); }
 
-		/** \brief Test if empty.\n\n
-		 *  \return the boolean value, true if the container has no elements, false otherwise.
-		 *
-		 *   @example AssocTable::empty
-		 *  <a href="examples/assoctab/assocTable/assocTable_empty.html">See example</a>.
-		 */
 		/** \brief Test if empty.
 		 *
 		 *  \return the boolean value, true if the container has no elements, false otherwise.
@@ -715,13 +497,6 @@ namespace Koala
 		 */
 		bool empty() const { return inter.empty(); }
 
-		/** \brief Test if empty.\n\n
-		 *  The overloaded operator!, tests if the container is empty.
-		 *  \return the boolean value, true if the container has no elements, false otherwise.
-		 *
-		 *   @example AssocTable::operator_negation
-		 *  <a href="examples/assoctab/assocTable/assocTable_operator_negation.html">See example</a>.
-		 */
 		/** \brief Test if empty.
 		 *
 		 *  The overloaded operator!, tests if the container is empty.
@@ -731,12 +506,6 @@ namespace Koala
 		 */
 		bool operator!() const { return empty(); }
 
-		/** \brief Clear container.\n\n
-		 *  The method deletes all the elements from the container.
-		 *
-		 *   @example AssocTable::clear
-		 *  <a href="examples/assoctab/assocTable/assocTable_clear.html">See example</a>.
-		 */
 		/** \brief Clear container.
 		 *
 		 *  The method deletes all the elements from the container.
@@ -745,15 +514,6 @@ namespace Koala
 		 */
 		void clear() { inter.clear(); }
 
-		/** \brief Get keys.\n\n
-		 *  All the keys in the container are stored in another container with a defined iterator.
-		 *  \tparam Iterator the class of iterator for the container storing the output set of keys.
-		 *  \param[out] iter the iterator connected with the container of output keys.
-		 *  \return the number of keys.
-		 *
-		 *   @example AssocTable::getKeys
-		 *  <a href="examples/assoctab/assocTable/assocTable_getKeys.html">See example</a>.
-		 */
 		/** \brief Get keys.
 		 *
 		 *  All the keys in the container are stored in another container with a defined iterator.
@@ -773,15 +533,6 @@ namespace Koala
 		 */
 		int capacity() const { return inter.capacity(); }
 
-		/** \brief Reserve memory.\n\n
-		 *  The method reserves the amount of memory sufficient for \a arg elements.
-		 *  As long as the number of elements is not grater than \a arg, reallocation is not necessary. It is recommended to use when beginning the work with the object.
-		 *  For some types of containers \a T the method dose nothing.
-		 *  \param arg the number of elements for which memory is allocated.
-		 *
-		 *   @example AssocTable::reserve
-		 *  <a href="examples/assoctab/assocTable/assocTable_reserve.html">See example</a>.
-		 */
 		/** \brief Reserve memory.
 		 *
 		 *  The method reserves the amount of memory sufficient for \a arg elements.
@@ -793,12 +544,6 @@ namespace Koala
 		 */
 		void reserve( int n ) { inter.reserve( n ); }
 
-		/** \brief Constructor\n\n
-		 *  Runs the empty constructor of \a cont and reserves memory for \a n elements.
-		 *
-		 *   @example AssocTable
-		 *  <a href="examples/assoctab/assocTable/assocTable_constructor.html">See example</a>.
-		 */
 		/** \brief Constructor
 		 *
 		 *  Runs the empty constructor of \a cont and reserves memory for \a n elements.
@@ -912,13 +657,6 @@ namespace Koala
 
 		typedef Container ContainerType;/**< \brief Type of container.*/
 
-		/** \brief Constructor\n\n
-		 *  Reserves memory necessary for \a asize elements.
-		 *  \param asize the size of allocated memory.
-		 *
-		 *   @example AssocArray
-		 *  <a href="examples/assoctab/assocArray/assocArray_constructor.html">See example</a>.
-		 */
 		/** \brief Constructor
 		 *
 		 *  Reserves memory necessary for \a asize elements.
@@ -937,15 +675,6 @@ namespace Koala
 		 */
 		AssocArray( const AssocArray< Klucz,Elem,Container > & );
 
-
-		/** \brief Copy content of container.\n\n
-		 *  Overloaded operator= copies the content of AssocArray \a X to the current container.
-		 *  \param X  the copied container.
-		 *  \return reference to current object.
-		 *
-		 *   @example AssocArray::operator_assignment
-		 *  <a href="examples/assoctab/assocArray/assocArray_operator_assignment.html">See example</a>.
-		 */
 		/** \brief Copy content of container.
 		 *
 		 *  Overloaded operator= copies the content of AssocArray \a X to the current container.
@@ -968,12 +697,6 @@ namespace Koala
 		 */
 		template< class AssocCont > AssocArray &operator=( const AssocCont &arg );
 
-		/** \brief Get the size of container.\n\n
-		 *  \return the number of elements in container.
-		 *
-		 *   @example AssocArray::size
-		 *  <a href="examples/assoctab/assocArray/assocArray_size.html">See example</a>.
-		 */
 		/** \brief Get the size of container.
 		 *
 		 *  \return the number of elements in container.
@@ -988,12 +711,6 @@ namespace Koala
 		int contSize() const
                 { return tab.contSize(); }
 
-		/** \brief Test if empty.\n\n
-		 *  \return the boolean value, true if the container has no elements, false otherwise.
-		 *
-		 *   @example AssocArray::empty
-		 *  <a href="examples/assoctab/assocArray/assocArray_empty.html">See example</a>.
-		 */
 		/** \brief Test if empty.
 		 *
 		 *  \return the boolean value, true if the container has no elements, false otherwise.
@@ -1003,13 +720,6 @@ namespace Koala
 		bool empty() const
 			{ return tab.empty(); }
 
-		/** \brief Test if empty.\n\n
-		 *  The overloaded operator!, tests if the container is empty.
-		 *  \return the boolean value, true if the container has no elements, false otherwise.
-		 *
-		 *   @example AssocArray::operator_negation
-		 *  <a href="examples/assoctab/assocArray/assocArray_operator_negation.html">See example</a>.
-		 */
 		/** \brief Test if empty.
 		 *
 		 *  The overloaded operator!, tests if the container is empty.
@@ -1020,14 +730,6 @@ namespace Koala
 		bool operator!() const
 			{ return empty(); }
 
-		/** \brief Reserve memory.\n\n
-		 *  The method reserves the amount of memory sufficient for \a arg elements.
-		 *  As long as the number of elements is not grater than \a arg, reallocation is not necessary. It is recommended to use when beginning the work with the object.
-		 *  \param arg the number of elements for which memory is allocated.
-		 *
-		 *   @example AssocArray::reserve
-		 *  <a href="examples/assoctab/assocArray/assocArray_reserve.html">See example</a>.
-		 */
 		/** \brief Reserve memory.
 		 *
 		 *  The method reserves the amount of memory sufficient for \a arg elements.
@@ -1046,14 +748,7 @@ namespace Koala
 		int capacity() const
 			{ return tab.capacity(); }
 
-		/** \brief Test if the key exist.\n\n
-		 *  The method if the key \a v match the key of any element int array.
-		 *  \param v the key of the searched element.
-		 *  \return true if the key exists false otherwise.
-		 *
-		 *   @example AssocArray::hasKey
-		 *  <a href="examples/assoctab/assocArray/assocArray_hasKey.html">See example</a>.
-		 */
+
 		/** \brief Test if the key exist.
 		 *
 		 *  The method if the key \a v match the key of any element int array.
@@ -1064,24 +759,17 @@ namespace Koala
 		 */
 		bool hasKey( Klucz v ) const
 			{ return keyPos( v ) != -1; }
+
 		/** \brief Get pointer to value.
 		 *
 		 *  The method gets the pointer to the value associated with the key \a v.
 		 *  \param v the key of the searched element.
 		 *  \return the pointer to the mapped value associated with the key \a v or NULL if the key does not match the key of any element from array.
 		 *
-		 *   @example AssocArray::valPtr
 		 *  <a href="examples/assoctab/assocArray/assocArray_valPtr.html">See example</a>.
 		 */
 		Elem *valPtr( Klucz v );
 
-		/** \brief Get position of key.\n\n
-		 *  \param v the key for which the position is calculated.
-		 *  \return the position of the key \a v in the container or -1 if any error occurs.
-		 *
-		 *   @example AssocArray::keyPos
-		 *  <a href="examples/assoctab/assocArray/assocArray_keyPos.html">See example</a>.
-		 */
 		/** \brief Get position of key.
 		 *
 		 *  \param v the key for which the position is calculated.
@@ -1091,14 +779,6 @@ namespace Koala
 		 */
 		inline int keyPos( Klucz v ) const;
 
-		/** \brief Delete element.\n\n
-		 *  The method deletes the element associated with the key \a v.
-		 *  \param v the key of the considered element.
-		 *  \return true if the element existed.
-		 *
-		 *   @example AssocArray::delKey
-		 *  <a href="examples/assoctab/assocArray/assocArray_delKey.html">See example</a>.
-		 */
 		/** \brief Delete element.
 		 *
 		 *  The method deletes the element associated with the key \a v.
@@ -1109,13 +789,6 @@ namespace Koala
 		 */
 		bool delKey( Klucz v );
 
-
-		/** \brief Get the first key.\n\n
-		 *  \return the key of the first element in the container.
-		 *
-		 *   @example AssocArray::firstKey
-		 *  <a href="examples/assoctab/assocArray/assocArray_firstKey.html">See example</a>.
-		 */
 		/** \brief Get the first key.
 		 *
 		 *  \return the key of the first element in the container.
@@ -1124,12 +797,6 @@ namespace Koala
 		 */
 		Klucz firstKey() const;
 
-		/** \brief Get the last key.\n\n
-		 *  \return the key of the last element in the container.
-		 *
-		 *   @example AssocArray::lastKey
-		 *  <a href="examples/assoctab/assocArray/assocArray_lastKey.html">See example</a>.
-		 */
 		/** \brief Get the last key.
 		 *
 		 *  \return the key of the last element in the container.
@@ -1138,13 +805,6 @@ namespace Koala
 		 */
 		Klucz lastKey() const;
 
-		/** \brief Get next key.\n\n
-		 *  \param v the reference key.
-		 *  \return the key next to \a v. If \a v == 0, the first key is returned. If \a v is the last element the method returns 0.
-		 *
-		 *   @example AssocArray::nextKey
-		 *  <a href="examples/assoctab/assocArray/assocArray_nextKey.html">See example</a>.
-		 */
 		/** \brief Get next key.
 		 *
 		 *  \param v the reference key.
@@ -1154,13 +814,6 @@ namespace Koala
 		 */
 		Klucz nextKey( Klucz v ) const;
 
-		/** \brief Get previous key.\n\n
-		 *  \param v the reference key.
-		 *  \return the key prior to \a v.  If \a v == 0, the last key is returned.  If \a v is the first element the method returns 0.
-		 *
-		 *   @example AssocArray::prevKey
-		 *  <a href="examples/assoctab/assocArray/assocArray_prevKey.html">See example</a>.
-		 */
 		/** \brief Get previous key.
 		 *
 		 *  \param v the reference key.
@@ -1170,14 +823,6 @@ namespace Koala
 		 */
 		Klucz prevKey( Klucz v ) const;
 
-		/** \brief Access element.\n\n
-		 *  If the key \a v exists the reference to the mapped value is returned, otherwise a new element associated with the \a v is created with default mapped value gained from the call of the empty constructor of ValType.
-		 *  \param v the considered key.
-		 *  \return the reference to the mapped value associated with the key \a v or if the key does not exist the reference to the new-created element.
-		 *
-		 *   @example AssocArray::operator_brackets
-		 *  <a href="examples/assoctab/assocArray/assocArray_operator_brackets.html">See example</a>.
-		 */
 		/** \brief Access element.
 		 *
 		 *  If the key \a v exists the reference to the mapped value is returned, otherwise a new element associated with the \a v is created with default mapped value gained from the call of the empty constructor of ValType.
@@ -1198,12 +843,6 @@ namespace Koala
 		 */
 		inline Elem operator[]( Klucz v ) const;
 
-		/** \brief Reorder the numbers.\n\n
-		 *  All the keys obtain consecutive numbers. The method is useful after multiple deletions.
-		 *
-		 *   @example AssocArray::defrag
-		 *  <a href="examples/assoctab/assocArray/assocArray_defrag.html">See example</a>.
-		 */
 		/** \brief Reorder the numbers.
 		 *
 		 *  All the keys obtain consecutive numbers. The method is useful after multiple deletions.
@@ -1212,12 +851,6 @@ namespace Koala
 		 */
 		void defrag();
 
-		/** \brief Clear container.\n\n
-		 *  The method deletes all the elements from the container.
-		 *
-		 *   @example AssocArray::clear
-		 *  <a href="examples/assoctab/assocArray/assocArray_clear.html">See example</a>.
-		 */
 		/** \brief Clear container.
 		 *
 		 *  The method deletes all the elements from the container.
@@ -1226,15 +859,6 @@ namespace Koala
 		 */
 		void clear();
 
-		/** \brief Get keys.\n\n
-		 *  All the keys in the container are stored in another container with a defined iterator.
-		 *  \tparam Iterator the class of iterator for the container storing the output set keys.
-		 *  \param[out] iter the iterator connected with the container of output keys.
-		 *  \return the number of keys.
-		 *
-		 *   @example AssocArray::getKeys
-		 *  <a href="examples/assoctab/assocArray/assocArray_getKeys.html">See example</a>.
-		 */
 		/** \brief Get keys.
 		 *
 		 *  All the keys in the container are stored in another container with a defined iterator.
@@ -1572,13 +1196,6 @@ namespace Koala
 		typedef IndexContainer IndexContainerType; /**<\brief The type of internal associative.*/
 		enum { shape = aType };/**< \brief Matrix type \sa AssocMatrixType*/
 
-		/** \brief Constructor.\n\n
-		 *  Creates the associative matrix and allocates memory for \a asize elements.
-		 *  \param asize the number of element that can be added to matrix without reallocation.
-		 *
-		 *   @example AssocMatrix
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_constructor_AMatrClTriangle.html">See example</a>.
-		 */
 		/** \brief Constructor.
 		 *
 		 *  Creates the associative matrix and allocates memory for \a asize elements.
@@ -1608,15 +1225,6 @@ namespace Koala
 		 */
 		template< class MatrixContainer > AssocMatrix &operator=( const MatrixContainer &X );
 
-
-		/** \brief Test whether key appear in the matrix.\n\n
-		 *  The method test whether the single key \a v appears in any pair of keys.
-		 *  \param v the tested key.
-		 *  \return true if there exist an element for which \a v is one of keys, false otherwise.
-		 *
-		 *   @example AssocMatrix::hasInd
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_hasInd.html">See example</a>.
-		 */
 		/** \brief Test whether key appear in the matrix.
 		 *
 		 *  The method test whether the single key \a v appears in any pair of keys.
@@ -1627,14 +1235,6 @@ namespace Koala
 		 */
 		bool hasInd( Klucz v ) const { return index.hasKey( v ); }
 
-		/** \brief Delete single key.\n\n
-		 *  The method deletes all the elements for which one of the keys is \a v.
-		 *  \param the eliminated key.
-		 *  \return true if at least one element was deleted.
-		 *
-		 *   @example AssocMatrix::delInd
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_delInd.html">See example</a>.
-		 */
 		/** \brief Delete single key.
 		 *
 		 *  The method deletes all the elements for which one of the keys is \a v.
@@ -1645,13 +1245,6 @@ namespace Koala
 		 */
 		bool delInd( Klucz v );
 
-		/** \brief Get first key.\n\n
-		 *  The method allows to get to the first element on the list of single keys that appear in associative matrix.
-		 *  \return  the first key on the list of all single keys or 0 if the container is empty.
-		 *
-		 *   @example AssocMatrix::firstInd
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_firstInd.html">See example</a>.
-		 */
 		/** \brief Get first key.
 		 *
 		 *  The method allows to get to the first element on the list of single keys that appear in associative matrix.
@@ -1661,13 +1254,6 @@ namespace Koala
 		 */
 		Klucz firstInd() const { return index.firstKey(); }
 
-		/** \brief Get last key.\n\n
-		 *  The method allows to get to the last element on the list of single keys that appear in associative matrix.
-		 *  \return  the last key on the list of all single keys or 0 if the container is empty.
-		 *
-		 *   @example AssocMatrix::lastInd
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_lastInd.html">See example</a>.
-		 */
 		/** \brief Get last key.
 		 *
 		 *  The method allows to get to the last element on the list of single keys that appear in associative matrix.
@@ -1677,14 +1263,6 @@ namespace Koala
 		 */
 		Klucz lastInd() const { return index.lastKey(); }
 
-		/** \brief Get next key.\n\n
-		 *  The method allows to get to the next element after \a v from the list of single keys that appear in associative matrix.
-		 *  \param v the reference key.
-		 *  \return  the next key on the list of all single keys or the first key if \a v == 0. If \a v is the last key, 0 is returned.
-		 *
-		 *   @example AssocMatrix::nextInd
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_nextInd.html">See example</a>.
-		 */
 		/** \brief Get next key.
 		 *
 		 *  The method allows to get to the next element after \a v from the list of single keys that appear in associative matrix.
@@ -1695,13 +1273,6 @@ namespace Koala
 		 */
 		Klucz nextInd( Klucz v )const  { return index.nextKey( v ); }
 
-		/** \brief Get previous key.\n\n
-		 *  The method allows to get to the element previous to \a v from the list of single keys that appear in associative matrix.
-		 *  \return  the previous key on the list of all single keys or the last key if \a v == 0. If \a v is the first key, 0 is returned.
-		 *
-		 *   @example AssocMatrix::prevInd
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_prevInd.html">See example</a>.
-		 */
 		/** \brief Get previous key.
 		 *
 		 *  The method allows to get to the element previous to \a v from the list of single keys that appear in associative matrix.
@@ -1711,12 +1282,6 @@ namespace Koala
 		 */
 		Klucz prevInd( Klucz v ) const { return index.prevKey( v ); }
 
-		/** \brief Get size of single keys list.\n\n
-		 *  \return  the number of single keys that appear in the matrix.
-		 *
-		 *   @example AssocMatrix::indSize
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_indSize.html">See example</a>.
-		 */
 		/** \brief Get size of single keys list.
 		 *
 		 *  \return  the number of single keys that appear in the matrix.
@@ -1732,16 +1297,6 @@ namespace Koala
 		 *  \return the number of keys. */
 		template< class Iterator > int getInds( Iterator iter ) const {   return index.getKeys(iter); }
 
-		/** \brief Slice by first key.\n\n
-		 *  The method stores up the elements of the matrix such that the first coordinate of element is \a v ("gets v-th row").
-		 *  The result is kept in one dimension associative table (Key->ValType) that associates the second Key with element.
-		 *  \param v the distinguished key.
-		 *  \param[out] tab the output table (Key->ValType) that associates the second Key with element.
-		 *  \return the number of elements in the output container \a out.
-		 *
-		 *   @example AssocMatrix::slice
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_slice.html">See example</a>.
-		 */
 		/** \brief Slice by first key.
 		 *
 		 *  The method stores up the elements of the matrix such that the first coordinate of element is \a v ("gets v-th row").
@@ -1766,14 +1321,6 @@ namespace Koala
 		 */
 		template<class ExtCont > int slice2( Klucz, ExtCont & ) const;
 
-		/** \brief Test whether a pair of keys associate an element in matrix.\n\n
-		 *  \param u the first key of the searched pair.
-		 *  \param v the second key of the searched pair.
-		 *  \return true if there is an element associated with the pair of keys \a u and \a v, false otherwise.
-		 *
-		 *   @example AssocMatrix::hasKey
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_hasKey.html">See example</a>.
-		 */
 		/** \brief Test whether a pair of keys associate an element in matrix.
 		 *
 		 *  \param u the first key of the searched pair.
@@ -1793,14 +1340,6 @@ namespace Koala
 		 */
 		bool hasKey( std::pair< Klucz,Klucz > k ) const { return hasKey( k.first,k.second ); }
 
-		/** \brief Delete element.\n\n
-		 *  \param u the first key of the deleted pair.
-		 *  \param v the second key of the deleted pair.
-		 *  \return true if there was an element associated with the pair of keys \a u and \a v, false otherwise.
-		 *
-		 *   @example AssocMatrix::delKey
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_delKey.html">See example</a>.
-		 */
 		/** \brief Delete element.
 		 *
 		 *  \param u the first key of the deleted pair.
@@ -1820,16 +1359,6 @@ namespace Koala
 		 */
 		bool delKey( std::pair< Klucz,Klucz > k ) { return delKey( k.first,k.second ); }
 
-		/** \brief Access element.\n\n
-		 *  The method gets the reference of the element associated with the pair \p (u,v). If there wasn't any new element is created.
-		 *  The mapped value of the element is assigned by the empty constructor of ValType.
-		 *  \param u the first key of the key pair of element.
-		 *  \param v the second key of the key pair of element.
-		 *  \return the reference to the element associated with pair \p (u,v).
-		 *
-		 *   @example AssocMatrix::operator_brackets
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_operator_brackets.html">See example</a>.
-		 */
 		/** \brief Access element.
 		 *
 		 *  The method gets the reference of the element associated with the pair \p (u,v). If there wasn't any new element is created.
@@ -1873,15 +1402,6 @@ namespace Koala
 		 */
 		Elem operator()( std::pair< Klucz,Klucz > k ) const { return operator()( k.first,k.second ); }
 
-		/** \brief Get element.\n\n
-		 *  The method gets the pointer to the element associated with the pair \p (u,v).
-		 *  \param u the first key of the key pair of element.
-		 *  \param v the second key of the key pair of element.
-		 *  \return the pointer to the element associated with pair \p (u,v) or NULL if there is no such an element.
-		 *
-		 *   @example AssocMatrix::valPtr
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_valPtr.html">See example</a>.
-		 */
 		/** \brief Get element.
 		 *
 		 *  The method gets the pointer to the element associated with the pair \p (u,v).
@@ -1902,13 +1422,6 @@ namespace Koala
 		 */
 		Elem* valPtr( std::pair< Klucz,Klucz > k ) { return valPtr(k.first,k.second); }
 
-		/** \brief Get the first element.\n\n
-		 *  The method gets the first element of the matrix.
-		 *  \return the standard pair representing the keys of the first element, or (0,0) if matrix is empty.
-		 *
-		 *   @example AssocMatrix::firstKey
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_firstKey.html">See example</a>.
-		 */
 		/** \brief Get the first element.
 		 *
 		 *  The method gets the first element of the matrix.
@@ -1918,13 +1431,6 @@ namespace Koala
 		 */
 		std::pair< Klucz,Klucz > firstKey() const ; // dla tablicy pustej zwraca dwa zera
 
-		/** \brief Get the last element.\n\n
-		 *  The method gets the last element of the matrix.
-		 *  \return the standartd pair representing the keys of the last element, or (0,0) if matrix is empty.
-		 *
-		 *   @example AssocMatrix::lastKey
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_lastKey.html">See example</a>.
-		 */
 		/** \brief Get the last element.
 		 *
 		 *  The method gets the last element of the matrix.
@@ -1934,16 +1440,6 @@ namespace Koala
 		 */
 		std::pair< Klucz,Klucz > lastKey() const ;  // dla tablicy pustej zwraca dwa zera
 
-		/** \brief Get next element.\n\n
-		 *  The method gets the keys of the element next to the one associated with \p (u,v).
-		 *  \param u the reference element first key.
-		 *  \param v the reference element second key.
-		 *  \return the standard pair representing the keys of element next after \p (u,v), or (0,0) if element \p (u,v) was last.
-		 *    If \a u == 0 and \a v == 0 the first element key is returned.
-		 *
-		 *   @example AssocMatrix::nextKey
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_nextKey.html">See example</a>.
-		 */
 		/** \brief Get next element.
 		 *
 		 *  The method gets the keys of the element next to the one associated with \p (u,v).
@@ -1966,16 +1462,6 @@ namespace Koala
 		 */
 		std::pair< Klucz,Klucz > nextKey( std::pair< Klucz,Klucz > k ) const { return nextKey( k.first,k.second ); }
 
-		/** \brief Get previous element.\n\n
-		 *  The method gets the keys of the element prior to the one associated with \p (u,v).
-		 *  \param u the reference element first key.
-		 *  \param v the reference element second key.
-		 *  \return the standard pair representing the keys of element prior to \p (u,v), or (0,0) if element \p (u,v) is first.
-		 *    If \a u == 0 and \a v == 0 the last element key is returned.
-		 *
-		 *   @example AssocMatrix::prevKey
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_prevKey.html">See example</a>.
-		 */
 		/** \brief Get previous element.
 		 *
 		 *  The method gets the keys of the element prior to the one associated with \p (u,v).
@@ -1998,12 +1484,6 @@ namespace Koala
 		 */
 		std::pair< Klucz,Klucz > prevKey( std::pair< Klucz,Klucz > k ) const { return prevKey( k.first,k.second ); }
 
-		/** \brief Get size.\n\n
-		 *  \return the number of elements if the matrix.
-		 *
-		 *   @example AssocMatrix::size
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_size.html">See example</a>.
-		 */
 		/** \brief Get size.
 		 *
 		 *  \return the number of elements if the matrix.
@@ -2012,13 +1492,6 @@ namespace Koala
 		 */
 		int size()  const { return siz; }
 
-		/** \brief Test if empty.\n\n
-		 *  The method test if the matrix is empty. The matrix remains untouched.
-		 *  \return true of the matrix is empty, false if there is at least one element.
-		 *
-		 *   @example AssocMatrix::empty
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_empty.html">See example</a>.
-		 */
 		/** \brief Test if empty.
 		 *
 		 *  The method test if the matrix is empty. The matrix remains untouched.
@@ -2028,13 +1501,6 @@ namespace Koala
 		 */
 		bool empty()  const { return !siz; }
 
-		/** \brief Test if empty.\n\n
-		 *  The the overloaded operator! test if the matrix is empty.
-		 *  \return true of the matrix is empty, false if there is at least one element.
-		 *
-		 *   @example AssocMatrix::operator_negation
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_operator_negation.html">See example</a>.
-		 */
 		/** \brief Test if empty.
 		 *
 		 *  The the overloaded operator! test if the matrix is empty.
@@ -2044,12 +1510,6 @@ namespace Koala
 		 */
 		bool operator!() const { return empty(); }
 
-		/** \brief Clear.\n\n
-		 * The method deletes all the elements form the associative matrix.
-		 *
-		 *   @example AssocMatrix::clear
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_clear.html">See example</a>.
-		 */
 		/** \brief Clear.
 		 *
 		 * The method deletes all the elements form the associative matrix.
@@ -2072,14 +1532,6 @@ namespace Koala
 		 */
 		void defrag();
 
-		/** \brief Get keys.\n\n
-		 *  The method gets all the pairs of keys in the matrix and writes it down to the iterator \a iter.
-		 *  \param[out] iter the iterator to the container with all the pairs of keys. Note that the container must store elements of type std::pair< Klucz,Klucz >.
-		 *  \return the number of pairs.
-		 *
-		 *   @example AssocMatrix::getKeys
-		 *  <a href="examples/assoctab/assocMatrix/assocMatrix_getKeys.html">See example</a>.
-		 */
 		/** \brief Get keys.
 		 *
 		 *  The method gets all the pairs of keys in the matrix and writes it down to the iterator \a iter.

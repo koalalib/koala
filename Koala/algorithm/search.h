@@ -16,17 +16,6 @@ namespace Koala
 	 *  Some auxiliary structures used by various algorithms, for example shortest path.*/
 	struct PathStructs
 	{
-		/** \brief Path structure.\n\n
-		 *  The structure used by various algorithms. It is designed to keep a path i.e. a sequence of vertices and edges.
-		 *  Both vertices and edges are represented by pointers.
-		 *  Mind that edges and vertices may be repeated, though from theoretical point of view it is a walk.
-		 *  The sequences of vertices and of edges must be arrange in proper order.
-		 *  If the vertex container consists of sequence of vertices (v_0, v_1, v_2, ..., v_{n-1}) then obviously
-		 *  edges are stored in edge container in the order ({v_0,v_1},{v_1,v_2},...{v_{n-2},v_{n-1}}).
-		 *  \wikipath{Graph_search_algorithms#Search-path-structure, For wider outlook see wiki.}
-		 *
-		 *  @example Euler::OutPath
-		 *  [See example](examples/search/euler/euler.html). */
 		/** \brief Path structure.
 		 *
 		 *  The structure used by various algorithms. It is designed to keep a path i.e. a sequence of vertices and edges.
@@ -730,22 +719,6 @@ namespace Koala
 		template< class GraphType, class VertContainer, class Visitor >
 			static int visitAllBase( const GraphType &g, VertContainer &visited, Visitor visitor, EdgeDirection dir );
 
-		/** \brief Visit attainable.\n\n
-		 *  Visit all vertices attainable from a given vertex in order given by the strategy SearchImpl.
-		 *  Note that vertex is attainable if it is in the same connected component but also the direction of edges if included in mask \a dir may influence the relation.
-		 *  @param[in] g the graph containing vertices to visit. Any graph may be used.
-		 *  @param[in] src the given vertex
-		 *  @param[out] visited the container to store data (map PVertex -> VisitVertLabs) , BlackHole allowed.
-		 *   After the execution of the method, the associative container represent the search in-tree rooted in \a src.
-		 *   where fields \p vPrev and \p ePrev keep the previous vertex and edge, and the field \p distance keeps the distance from the root.
-		 *   finally \p field component = 0. The vertices that are not attainable from \a src are not keys in this map.
-		 *  @param[out] out the output iterator to write visited vertices in order given by the strategy  SearchImpl.
-		 *  @param[in] dir the Koala::EdgeDirection mask that determines the direction in which an edge may be traversed. \wikipath{EdgeDirection}
-		 *  @return the number of visited vertices.
-		 *  \sa SearchStructs::VisitVertLabs
-		 *
-		 *  @example search::scanAttainable
-		 *  [See example](examples/search/search/search.html). */
 		/** \brief Visit attainable.
 		 * 
 		 *  Visit all vertices attainable from a given vertex in order given by the strategy SearchImpl.
@@ -877,21 +850,6 @@ namespace Koala
 			    return findPath(g,src,dest,blackHole,dir);
 			}
 
-		/** \brief Split into components.\n\n
-		*  The method splits graph into connected components.
-		*  @param[in] g the graph to split.
-		*  @param[out] visited container to store data (map PVertex -> VisitVertLabs). BlackHole allowed.
-		*   After the execution of the method, the associative container represent the search tree (forst)
-		*   where fields vPrev and ePrev keep the previous vertex and edge, and field distance keeps the distance from the root.
-		*   finally field component keeps the index of the connected component of graph.
-		*  @param[out] out CompStore object that is a pair of output iterators. See CompStore, and \wikipath{Graph_search_algorithms#Sequence-of-sequences, Related wiki page.}
-		*  @param[in] dir the types of edges to consider, loops are ignored.
-		*  @return the number of components.
-		*  \sa CompStore
-		*  \sa Visitors
-		*
-		*  @example search::split
-		* [See example](examples/search/search/search.html). */
 		/** \brief Split into components.
 		 *
 		 *  The method splits graph into connected components.
@@ -1237,14 +1195,7 @@ namespace Koala
 	template< class DefaultStructs > class DAGAlgsPar: protected SearchStructs
 	{
 	public:
-		/** \brief Get topological order.\n\n
-		*  The method searches the graph \a g in postorder DFS with mask EdDirIn. The result is written to iterator out. The container consists of all vertices.
-		*  If \a g is DAG permutation \a out represents topological order.
-		*  \param g the considered graph. Parallel and all types of edges are allowed.
-		*  \param out the iterator of container with output sequence of vertices.
-		*
-		*   @example DAGAlgs::topOrd
-		*  [See example](examples/search/dagalgs/dagalgs.html). */
+
 		/** \brief Get topological order.
 		 *
 		 *  The method searches the graph \a g in postorder DFS with mask EdDirIn. The result is written to iterator out. The container consists of all vertices.
@@ -1255,15 +1206,6 @@ namespace Koala
 		 *  [See example](examples/search/dagalgs/dagalgs.html). */
 		template< class GraphType, class VertIter > static void topOrd( const GraphType &g, VertIter out );
 
-		/** \brief Test if directed acyclic graph.\n\n
-		*  The method uses the sequence of vertices achieved by the above topOrd function to test if the graph \a g is a directed acyclic graph.
-		*  \param g the tested graph. Parallel and all types of edges are allowed.
-		*  \param beg the iterator to the first element of the container delivered by topOrd.
-		*  \param end the iterator to the past-the-end element of the container delivered by topOrd.
-		*  \return true if \a g is directed acyclic graph, false otherwise.
-		*
-		*   @example DAGAlgs::isDAG
-		*  [See example](examples/search/dagalgs/dagalgs.html). */
 		/** \brief Test if directed acyclic graph.
 		 *
 		 *  The method uses the sequence of vertices achieved by the above topOrd function to test if the graph \a g is a directed acyclic graph.
@@ -1292,12 +1234,6 @@ namespace Koala
 		 *  \return the number of transitive edges.*/
 		template< class GraphType, class Iter > static int transEdges(const GraphType &g, Iter out);
 
-		/** \brief Make Hasse diagram.\n\n
-		*  The method deletes all the transitive edges (arc for which there is a directed path from the first vertex to the second vertex that skips the arc) from graph.
-		*  \param g the considered graph. Must be DAG. Parallel edges are allowed.
-		*
-		*  @example DAGAlgs::makeHasse
-		*  [See example](examples/search/dagalgs/dagalgs.html). */
 		/** \brief Make Hasse diagram.
 		 *
 		 *  The method deletes all the transitive edges (arc for which there is a directed path from the first vertex to the second vertex that skips the arc) from graph.
@@ -1453,21 +1389,6 @@ namespace Koala
 				BlackHole, VertBlockIter viter )
         {   return split(g,vertMap,edgeMap,CompStore< BlackHole,BlackHole>( blackHole,blackHole ), viter);  }
 
-			/** \brief Get blocks of connected component identified by vertex.\n\n
-			*  The method splits a component containing a given vertex into blocks. All the edges are treated as undirected (except loops). Blocks are numbered from 0.
-			*  @param[in] g the graph to split.
-			*  @param[in] src the reference vertex.
-			*  @param[out] vmap the map PVertex->BlocksStructs::VertData should be considered together with sequence \a viter (BlackHole possible).
-			*   Vertices that are not in the considered connected component are not keys in this map.
-			*  @param[out] emap the map PEdge->int associating each edge with a block number (BlackHole possible). Edges that are not in the considered connected component are not keys in this map.
-			*  @param[out] out the CompStore object with a pair of output iterators (elements of first iterator will point to first vertex in component in second iterator) (BlackHole possible).
-			*  @param[out] viter the iterator to the container with concatenated sequences of blocks to which the each vertex belongs to.
-			*   For each vertex the starting point of sequence of blocks is given by \a vmap in the BlocksStructs::VertData field firstBlock.
-			*  @return the number of biconnected components in the connected component given by vertex \a src.
-			*  \sa CompStore
-			*
-			*   @example Blocks::splitComp
-			*  [See example](examples/search/blocks/blocks.html). */
 		/** \brief Get blocks of connected component identified by vertex.
 		 *
 		 *  The method splits a component containing a given vertex into blocks. All the edges are treated as undirected (except loops). Blocks are numbered from 0.
@@ -1582,13 +1503,6 @@ namespace Koala
 				return res;
 			}
 
-			/** \brief Test if Eulerian.\n\n
-			*  The method tests if the graph has an undirected Eulerian cycle. The method considered only undirected edges and loops, directed edges are ignored.
-			*  @param[in] g the tested graph.
-			*  @return true if it has Eulerian cycle, false otherwise.
-			*
-			*   @example Euler::hasCycle
-			*  [See example](examples/search/euler/euler.html). */
 		/** \brief Test if Eulerian.
 		 *
 		 *  The method tests if the graph has an undirected Eulerian cycle. The method considered only undirected edges and loops, directed edges are ignored.
@@ -1598,13 +1512,6 @@ namespace Koala
 		 *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType > static bool hasCycle( const GraphType &g );
 
-		/** \brief Test if directed Eulerian.\n\n
-		*  The method tests if the graph has a directed Eulerian cycle. The method considered only directed edges and loops, undirected edges are ignored.
-		*  @param[in] g the considered graph.
-		*  @return true if it has a directed Eulerian cycle, false otherwise.
-		*
-		*   @example Euler::hasDirCycle
-		*  [See example](examples/search/euler/euler.html). */
 		/** \brief Test if directed Eulerian.
 		 *
 		 *  The method tests if the graph has a directed Eulerian cycle. The method considered only directed edges and loops, undirected edges are ignored.
@@ -1614,13 +1521,6 @@ namespace Koala
 		 *  [See example](examples/search/euler/euler.html). */
 		template< class GraphType > static bool hasDirCycle( const GraphType &g );
 
-		/** \brief Test if semi-Eulerian.\n\n
-		* The method tests if the graph \a g has an undirected Eulerian path. The method considered only undirected edges and loops, directed edges are ignored.
-		* @param[in] g the considered graph.
-		* @return true if it has an undirected Eulerian path, false otherwise
-		*
-		*  @example Euler::hasPath
-		* [See example](examples/search/euler/euler.html). */
 		/** \brief Test if semi-Eulerian.
 		*
 		* The method tests if the graph \a g has an undirected Eulerian path. The method considered only undirected edges and loops, directed edges are ignored.
@@ -1630,14 +1530,6 @@ namespace Koala
 		* [See example](examples/search/euler/euler.html). */
 		template< class GraphType > static bool hasPath( const GraphType &g );
 
-		/** \brief Test if directed semi-Eulerian.\n\n
-		*  The method tests if graph has a directed Eulerian path.
-		*  The method considered only directed edges and loops, undirected edges are ignored.
-		*  @param[in] g graph
-		*  @return true if it has a directed Eulerian path, false otherwise.
-		*
-		*   @example Euler::hasDirPath
-		*  [See example](examples/search/euler/euler.html).*/
 		/** \brief Test if directed semi-Eulerian.
 		 *
 		 *  The method tests if graph has a directed Eulerian path.
@@ -1684,16 +1576,6 @@ namespace Koala
 		 *  @return true if it has an directed Eulerian cycle containing the vertex \a u, false otherwise */
 		template< class GraphType > static bool hasDirCycle( const GraphType &g, typename GraphType::PVertex u );
 
-		/** \brief Get undirected Eulerian cycle.\n\n
-		*  The method gets an undirected Eulerian cycle of the graph \a g.
-		*  The method considered only undirected edges and loops, directed edges are ignored.
-		*  @param[in] g the considered graph.
-		*  @param[out] out the OutPath object with found cycle.
-		*  @return true if the graph has an Eulerian cycle, false otherwise.
-		*  \sa SearchStructs::OutPath
-		*
-		*   @example Euler::getCycle
-		*  [See example](examples/search/euler/euler.html). */
 		/** \brief Get undirected Eulerian cycle.
 		 *
 		 *  The method gets an undirected Eulerian cycle of the graph \a g.
@@ -1707,15 +1589,6 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getCycle( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
-			/** \brief Get directed Eulerian cycle.\n\n
-			*  The method considered only directed edges and loops, undirected edges are ignored.
-			*  @param[in] g the considered graph
-			*  @param[out] out the OutPath object with found cycle.
-			*  @return true if the graph has an Eulerian cycle, false otherwise.
-			*  \sa SearchStructs::OutPath
-			*
-			*   @example Euler::getDirCycle
-			*  [See example](examples/search/euler/euler.html). */
 		/** \brief Get directed Eulerian cycle.
 		 *
 		 *  The method considered only directed edges and loops, undirected edges are ignored.
@@ -1750,15 +1623,6 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter > static bool getDirCycle( const GraphType &g,
 			typename GraphType::PVertex prefstart, OutPath< VertIter,EdgeIter > out);
 
-		/** \brief Get undirected Eulerian path.\n\n
-		*  The method considered only undirected edges and loops, directed edges are ignored.
-		*  @param[in] g the considered graph
-		*  @param[out] out the OutPath object with found path.
-		*  @return true if graph has an Eulerian path, false otherwise
-		*  \sa SearchStructs::OutPath
-		*
-		*   @example Euler::getPath
-		*  [See example](examples/search/euler/euler.html). */
 		/** \brief Get undirected Eulerian path. 
 		 *
 		 *  The method considered only undirected edges and loops, directed edges are ignored.
@@ -1771,15 +1635,6 @@ namespace Koala
 		template< class GraphType, class VertIter, class EdgeIter >
 			static bool getPath( const GraphType &g, OutPath< VertIter,EdgeIter > out );
 
-			/** \brief Get directed Eulerian path.\n\n
-			*  The method considered only directed edges and loops, undirected edges are ignored.
-			*  @param[in] g the considered graph.
-			*  @param[out] out the OutPath object with found path.
-			*  @return true if graph has an Eulerian path, false otherwise
-			*  \sa SearchStructs::OutPath
-			*
-			*   @example Euler::getDirPath
-			*  [See example](examples/search/euler/euler.html). */
 		/** \brief Get directed Eulerian path. 
 		 *
 		 *  The method considered only directed edges and loops, undirected edges are ignored.
@@ -1853,16 +1708,6 @@ namespace Koala
 	{
 	public:
 
-		/** \brief Get modular decomposithon of graph.\n\n
-		*  The method splits the vertices of \a g into maximal strong modules. Modules are indexed from 0.
-		*  \param g the teste graph, should be simple and undirected.
-		*  \param[out] out an CompStore object storing the modular decomposition (BlackHole possible).
-		*  \param[out] avmap the associative table PVertex->int, where integers represent the index of module to which vertex belongs to. (BlackHole possible)
-		*  \param skipifprine if true the modules with the outcome type mpPrime are not searched.
-		*  \return a Partition object.
-		*
-		*   @example Modules::modules
-		*  [See example](examples/search/modules/modules.html). */
 		/** \brief Get modular decomposithon of graph. 
 		 *
 		 *  The method splits the vertices of \a g into maximal strong modules. Modules are indexed from 0.

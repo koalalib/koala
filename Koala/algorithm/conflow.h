@@ -150,14 +150,6 @@ namespace Koala
 			OutCut( VIter av, EIter ei ): vertIter( av ), edgeIter( ei ) { }
 		};
 
-		/**\brief Generating function for the OutCut object.\n\n
-		*  \tparam VIter the type of insert iterator to container with vertices.
-		*  \tparam EIter the type of insert iterator to container with edges.
-		*  \param av the insert iterator to container with vertices.
-		*  \tparam ei the insert iterator to container with edges.
-		*
-		*   @example Flow::outCut
-		*  [See example](examples/flow/example_Flow.html). */
 		/**\brief Generating function for the OutCut object.
 		 *
 		 *  \tparam VIter the type of insert iterator to container with vertices.
@@ -455,18 +447,6 @@ namespace Koala
 		template< class GraphType, class EdgeContainer, class VertContainer > static bool testTransship( const GraphType &g,
 			const EdgeContainer &edgeTab, const VertContainer &vertCont );
 
-		/** \brief Get maximal flow.\n\n
-		*  For a given graph, the method calculates the maximal flow from \a start to \a end.
-		*  \param[in] g the considered graph.
-		*  \param[out] edgeTab  the associative table (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost)
-		*  to each edge. Array provides both input (capacity) and output (flow) data.\n
-		*	There are also other label structures available: FlowStructs::UnitEdgeLabs and FlowStructs::TrsEdgeLabs.
-		*  \param[in] start the starting vertex.
-		*  \param[in] end the terminal vertex.
-		*  \return the size of the achieved flow.
-		*
-		*   @example Flow::maxFlow
-		*  [See example](examples/flow/example_Flow.html). */
 		/** \brief Get maximal flow.
 		 *
 		 *  For a given graph, the method calculates the maximal flow from \a start to \a end.
@@ -512,18 +492,6 @@ namespace Koala
 		template< class GraphType, class EdgeContainer > static typename EdgeContainer::ValType::CostType
 			flowCost( const GraphType &g, const EdgeContainer &edgeTab );
 
-		/** \brief Get minimal cost flow.\n\n
-		*  For graph \a g, the method gets the minimum cost flow among cost of maximal capacity.
-		*  \param[in] g the reference graph.
-		*  \param[out] edgeTab the the associative table (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge.
-		*  Array provides both input (capacity) and output (flow) data.
-		*	There are also other label structures available: FlowStructs::UnitEdgeLabs and FlowStructs::TrsEdgeLabs.
-		*  \param[in] start the starting vertex.
-		*  \param[in] end the terminal vertex.
-		*  \return the standard pair (cost, size) of the achieved flow.
-		*
-		*   @example Flow::minCostFlow
-		*  [See example](examples/flow/example_Flow.html). */
 		/** \brief Get minimal cost flow.
 		 *
 		 *  For graph \a g, the method gets the minimum cost flow among cost of maximal capacity.
@@ -571,17 +539,6 @@ namespace Koala
         template< class GraphType, class EdgeContainer > static bool
             testMinCost(const GraphType &g, const EdgeContainer &edgeTab);
 
-		/** \brief Get minimal weighted cut-set.\n\n
-		*  The method calculated the minimal (concerning total capacities) cut-set between vertices \a start and \a end.
-		*  \param[in] g the reference graph.
-		*  \param[in] edgeTab the the associative table (PEdge -> EdgeLabs) which assigns EdgeLabs structure (keeping: capacity, flow and cost) to each edge.
-		*  \param[in] start the starting vertex.
-		*  \param[in] end the terminal vertex.
-		*  \param[out] iters the pair of insert iterators to the containers with the reachable (from start) vertices (after subtraction of cut) and the edges of output  cut-set.
-		*  \return the EdgeCut structure, which keeps the size of cut set, its minimal possible capacity and the number of reachable vertices.
-		*
-		*   @example Flow::minEdgeCut
-		*  [See example](examples/flow/example_Flow.html). */
 		/** \brief Get minimal weighted cut-set.
 		 *
 		 *  The method calculated the minimal (concerning total capacities) cut-set between vertices \a start and \a end.
