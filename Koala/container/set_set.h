@@ -35,12 +35,6 @@ namespace Koala
 	public:
 		typedef Element ElemType; /**< \brief Type of set element.*/
 
-		/** \brief Empty constructor\n\n
-		 *  The method create an empty set.
-		 *
-		 *   @example Set
-		 *  [See example](examples/set/setConstructors.html).
-		 */
 		/** \brief Empty constructor
 		 *
 		 *  The method create an empty set.
@@ -94,14 +88,6 @@ namespace Koala
 		 */
 		Set( const std::vector< Element > &v ): std::set< Element >( v.begin(),v.end() ) { }
 
-		/** \brief Assign set content.\n\n
-		 *  The method assigns new content (from the table) to the set.
-		 *  \param t the copied table.
-		 *  \param s the number of copied elements.
-		 *
-		 *   @example Set::assign
-		 *  [See example](examples/set/setAssign.html).
-		 */
 		/** \brief Assign set content.
 		 *
 		 *  The method assigns new content (from the table) to the set.
@@ -121,14 +107,6 @@ namespace Koala
 		 */
 		template< class Iter > void assign( Iter b, Iter e );
 
-		/** \brief Copy content of set.\n\n
-		 *  Overloaded operator= assigns the element \a e as the single element of the set.
-		 *  \param e the new element of the set.
-		 *  \return the reference to the current set.
-		 *
-		 *   @example Set::operator_equality
-		 *  [See example](examples/set/setEquality.html).
-		 */
 		/** \brief Copy content of set.
 		 *
 		 *  Overloaded operator= assigns the element \a e as the single element of the set.
@@ -150,13 +128,6 @@ namespace Koala
 		template <class T>
 		Set< Element > &operator=( const Set<T> &s );
 
-		/** \brief Test if empty.\n\n
-		 *  The overloaded operator!, tests if the set is empty.
-		 *  \return the boolean value, true if the set has no elements, false otherwise.
-		 *
-		 *   @example Set::information
-		 *  [See example](examples/set/setInformation.html).
-		 */
 		/** \brief Test if empty.
 		 *
 		 *  The overloaded operator!, tests if the set is empty.
@@ -184,15 +155,6 @@ namespace Koala
 		 */
 		bool supersetOf( const Set< Element > &s ) const { return s.subsetOf( *this ); }
 
-		/** \brief Add element.\n\n
-		 *  The method adds a new element to the set, however set does not allow for duplicate values
-		 *  if the value already exists in the set the method returns false.
-		 *  \param e the inserted element value.
-		 *  \return true if a new element was inserted or false if an element with the same value existed.
-		 *
-		 *   @example Set::elementOperations
-		 *  [See example](examples/set/setElementOperations.html).
-		 */
 		/** \brief Add element.
 		 *
 		 *  The method adds a new element to the set, however set does not allow for duplicate values
@@ -247,14 +209,6 @@ namespace Koala
 		 */
 		bool isElement( const Element &e ) const { return this->find( e ) != this->end(); }
 
-		/** \brief Sum of sets.\n\n
-		 *  The methods adds the set \a s to the set.
-		 *  \param s the added set.
-		 *  \return the reference to the current set.
-		 *
-		 *   @example Set::operations
-		 *  [See example](examples/set/setOperations.html).
-		 */
 		/** \brief Sum of sets.
 		 *
 		 *  The methods adds the set \a s to the set.
@@ -299,14 +253,6 @@ namespace Koala
 		 */
 		Set< Element > &operator^=( const Set< Element > &s ) { return *this = *this ^ s; }
 
-		/** \brief Get subset.\n\n
-		 *  The method returns the set satisfying the predicate \a fun.
-		 *  \param fun the function object that for element of the set returns boolean value.
-		 *  \return the set of elements satisfying the functor \a fun.
-		 *
-		 *   @example Set::function
-		 *  [See example](examples/set/setFunction.html)
-		 */
 		/** \brief Get subset.
 		 *
 		 *  The method returns the set satisfying the predicate \a fun.
@@ -333,12 +279,6 @@ namespace Koala
 		 *  \return the number of elements in the set and in the container \a out. */
 		template< class Iter > int getElements( Iter out ) const;
 
-		/** \brief Get first.\n\n
-		 *  \return the first element of the set.
-		 *
-		 *   @example Set::iterations
-		 *  [See example](examples/set/setIterations.html)
-		 */
 		/** \brief Get first.
 		 *
 		 *  \return the first element of the set.
