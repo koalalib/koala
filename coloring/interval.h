@@ -116,17 +116,6 @@ public:
 	static bool testPart(const Graph &graph, const Weights &weights,
 			const ColorMap &colors);
 
-	/** \brief Test coloring\n\n
-	 *  The method tests if the coloring form associative table \a colors is a proper and complete interval coloring of \a graph.
-	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
-	 *  \param weights the map (PVertex->int) which assigns the expected size of interval.
-	 *  \param colors the associative container (PVert->Segment)
-	 *     which assigns a structure \a Segment to the vertex.
-	 *  \return true if the coloring is proper and complete, false otherwise.
-	 *
-	 *   @example IntervalEdgeColoring::test
-	 *  [See example](examples/coloring/edgeIntervalColor.html).
-  	 */
 	/** \brief Test coloring
 	 *
 	 *  The method tests if the coloring form associative table \a colors is a proper and complete interval coloring of \a graph.
@@ -204,18 +193,6 @@ public:
 	static int greedy(const Graph &graph, const Weights &weights,
 			ColorMap &colors, EIter beg, EIter end);
 
-	/** \brief Color graph edges greedily.\n\n
-	 *  The method greedily extends the interval coloring of graph. The result is stored up in the map \a colors.
-	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
-	 *  \param weights the associative container (PEdge->int),
-	 *     which assigns the expected size of interval to the edge.
-	 *  \param colors the associative container (PEdge->Segment)
-	 *     which assigns a structure \a Segment to the edge.
-	 *  \return the largest added color i.e. the maximal \a max field in an added interval or -1 if the whole graph had been already colored.
-	 *
-	 *   @example IntervalEdgeColoring::greedy
-	 *  [See example](examples/coloring/edgeIntervalColor.html).
-	 */
 	//@return largest integer contained in added color
 	/** \brief Color graph edges greedily.
 	 *
@@ -250,18 +227,6 @@ public:
 	static int lf(const Graph &graph, const Weights &weights,
 			ColorMap &colors, EIter beg, EIter end);
 
-	/** \brief Heuristic LF.\n\n  
-	 *  The method extends interval coloring on uncolored edges of graph.
-	 *  The result is stored up in the map \a colors.
-	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
-	 *  \param weights the associative container (PEdge->int),
-	 *     which assigns the expected size of interval to the edge.
-	 *  \param colors the associative container (PEdge->Segment)
-	 *     which assigns a structure \a Segment to the edge.
-	 *  \return the largest added color i.e. the maximal \a max field in an added interval. If none of edges was colored -1 is returned.
-	 *
-	 *   @example IntervalEdgeColoring::lf
-	 *  [See example](examples/coloring/edgeIntervalColor.html). */
 	/** \brief Heuristic LF.
 	 *  
 	 *  The method extends interval coloring on uncolored edges of graph.
@@ -292,16 +257,6 @@ public:
 	static int li(const Graph &graph, const Weights &weights,
 			ColorMap &colors, EIter beg, EIter end);
 
-	/** \brief Heuristic LI\n\n 
-	 *  The method intervally colors all the uncolored edges of the graph. The heuristic LI is used.  The result is stored up in the map \a colors.
-	 *  \param graph the considered graph. It may be of any type. Directed edges are regarded as undirected. Parallel edges are allowed. Loops are ignored.
-	 *  \param weights the map (PEdge->int) which assigns the expected size of interval to edge.
-	 *  \param colors the associative container (PEdge->Segment) which assigns a structure \a Segment to the edge.
-	 *   Any initial coloring from this container is taken into account. 
-	 *  \return the largest color used.
-	 *
-	 *   @example IntervalEdgeColoring::li
-	 *  [See example](examples/coloring/edgeIntervalColor.html). */
 	/** \brief Heuristic LI
 	 *  
 	 *  The method intervally colors all the uncolored edges of the graph. The heuristic LI is used.  The result is stored up in the map \a colors.
