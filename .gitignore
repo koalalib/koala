@@ -1,3 +1,12 @@
+.vs
+test/test
+test/ipch
+test/Debug
+test/Release
+test/*.db
+test/*.user
+make/*.o
+make/*.a
 *.obj
 *.exe
 *.o
