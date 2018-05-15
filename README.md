@@ -1,5 +1,5 @@
-# googletest-circleci
-[![Circle CI](https://circleci.com/gh/koalalib/koala.svg?style=svg)](https://circleci.com/gh/koalalib/koala)
+# KOALA library
+[![CircleCI](https://circleci.com/gh/koalalib/koala/tree/test.svg?style=svg)](https://circleci.com/gh/koalalib/koala/tree/test)
 
 
 KOALA is a library of C++ templates, implementing a broad set of procedures in the fields of algorithmic graph theory and network problems in discrete optimization. In its construction, KOALA is based on paradigms of object-oriented programming and generic programming. The base project assumptions are:

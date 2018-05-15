@@ -2,10 +2,10 @@ dependencies:
   pre:
     - cd extsrc/googletest/; mkdir build; cd build; cmake ..; make
   override:
-    - cd make; make; make test
+    - cd test/make; make
 test:
   override:
-    - cd bin; ./test/algorithm/mis/mis_unittest
+    - cd test/make; ./assocarray_unittest; ./assocmatrix_unittest; ./assocTabConstInterface_unittest
 checkout:
   post:
     - git submodule init
