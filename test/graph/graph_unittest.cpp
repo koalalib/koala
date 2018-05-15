@@ -1,8 +1,6 @@
-#define _CRT_SECURE_NO_WARNINGS
-
 // This header file defines the public API for Google Test.
 //It should be included by any test program that uses Google Test.
-#include "gtest/gtest-spi.h"
+#include "gtest/gtest.h"
 
 #include "koala/graph/graph.h"
 

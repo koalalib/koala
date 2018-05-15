@@ -3,6 +3,12 @@ test/test
 test/ipch
 test/Debug
 test/Release
+test/gtest/*.user
+test/gtest/Debug
+test/gtest/Release
+test/gtest_main/*.user
+test/gtest_main/Debug
+test/gtest_main/Release
 test/*.db
 test/*.user
 make/*.o

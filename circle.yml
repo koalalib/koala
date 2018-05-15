@@ -1,0 +1,12 @@
+dependencies:
+  pre:
+    - cd extsrc/googletest/; mkdir build; cd build; cmake ..; make
+  override:
+    - cd make; make; make test
+test:
+  override:
+    - cd bin; ./test/algorithm/mis/mis_unittest
+checkout:
+  post:
+    - git submodule init
+    - git submodule update
