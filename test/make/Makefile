@@ -14,12 +14,12 @@
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
-GTEST_DIR = ../extsrc/googletest/googletest
+PROJ_DIR = ../..
+GTEST_DIR = $(PROJ_DIR)/extsrc/googletest/googletest
 
 # Where to find user code.
-PROJ_DIR = ..
-TEST_DIR = ../test
-KOALA_DIR = ../koala
+TEST_DIR = $(PROJ_DIR)/test
+KOALA_DIR = $(PROJ_DIR)/koala
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
