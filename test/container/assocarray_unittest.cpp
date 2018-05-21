@@ -18,7 +18,7 @@ or if the test crashes, the entire test fails. Otherwise, it succeeds.
 using namespace std;
 using namespace Koala;
 
-class AssocArrayTest : public ::testing::Test {
+class All2AllDistsTest : public ::testing::Test {
 
 public:
 
@@ -45,7 +45,7 @@ public:
 	// virtual void TearDown() {}
 };
 
-TEST_F(AssocArrayTest, MethodCapacityTest)
+TEST_F(All2AllDistsTest, MethodCapacityTest)
 {
 	fillMyArrayWith4ConsecutiveInts();
 	myArray.delKey(B);
@@ -54,7 +54,7 @@ TEST_F(AssocArrayTest, MethodCapacityTest)
 	EXPECT_EQ(4, (int)(myArray.capacity()));
 }
 
-TEST_F(AssocArrayTest, MethodClearTest)
+TEST_F(All2AllDistsTest, MethodClearTest)
 {
 	fillMyArrayWith4ConsecutiveInts();
 	myArray.clear();
@@ -65,7 +65,7 @@ TEST_F(AssocArrayTest, MethodClearTest)
 	EXPECT_EQ(4, (int)(myArray.capacity()));
 }
 
-TEST_F(AssocArrayTest, MethodDefragTest)
+TEST_F(All2AllDistsTest, MethodDefragTest)
 {
 	fillMyArrayWith4ConsecutiveInts();
 
@@ -100,7 +100,7 @@ TEST_F(AssocArrayTest, MethodDefragTest)
 	EXPECT_EQ(2, myArray.keyPos(k));
 }
 
-TEST_F(AssocArrayTest, MethodDelKeyTest)
+TEST_F(All2AllDistsTest, MethodDelKeyTest)
 {
 	fillMyArrayWith4ConsecutiveInts();
 
@@ -118,7 +118,7 @@ TEST_F(AssocArrayTest, MethodDelKeyTest)
 	EXPECT_EQ(4, myArray[k]);
 }
 
-TEST_F(AssocArrayTest, MethodEmptyTest)
+TEST_F(All2AllDistsTest, MethodEmptyTest)
 {
 	fillMyArrayWith4ConsecutiveInts();
 	
@@ -133,7 +133,7 @@ TEST_F(AssocArrayTest, MethodEmptyTest)
 	EXPECT_TRUE(myArray.empty());
 }
 
-TEST_F(AssocArrayTest, MethodGetKeysTest)
+TEST_F(All2AllDistsTest, MethodGetKeysTest)
 {
 	fillMyArrayWith4ConsecutiveInts();
 
@@ -146,7 +146,7 @@ TEST_F(AssocArrayTest, MethodGetKeysTest)
 	EXPECT_EQ('D', keysTab[3]->info);
 }
 
-TEST_F(AssocArrayTest, MethodHasKeyTest)
+TEST_F(All2AllDistsTest, MethodHasKeyTest)
 {
 	fillMyArrayWith4ConsecutiveInts();
 
@@ -157,7 +157,7 @@ TEST_F(AssocArrayTest, MethodHasKeyTest)
 	EXPECT_FALSE(myArray.hasKey(B));
 }
 
-TEST_F(AssocArrayTest, OperatorAssignmentTest)
+TEST_F(All2AllDistsTest, OperatorAssignmentTest)
 {
 	AssocArray<GVert, int> myArraySecond;
 
@@ -170,7 +170,7 @@ TEST_F(AssocArrayTest, OperatorAssignmentTest)
 	EXPECT_EQ(4, myArraySecond.size());
 }
 
-TEST_F(AssocArrayTest, OperatorNegationTest)
+TEST_F(All2AllDistsTest, OperatorNegationTest)
 {
 	EXPECT_TRUE(!myArray);
 
@@ -179,7 +179,7 @@ TEST_F(AssocArrayTest, OperatorNegationTest)
 	EXPECT_FALSE(!myArray);
 }
 
-TEST_F(AssocArrayTest, MethodPrevKeyTest)
+TEST_F(All2AllDistsTest, MethodPrevKeyTest)
 {
 	fillMyArrayWith4ConsecutiveInts();
 
@@ -197,7 +197,7 @@ TEST_F(AssocArrayTest, MethodPrevKeyTest)
 	EXPECT_EQ(1, myArray[k]);
 }
 
-TEST_F(AssocArrayTest, MethodReserveTest)
+TEST_F(All2AllDistsTest, MethodReserveTest)
 {
 	int AssocArraySize = 100;
 
@@ -206,7 +206,7 @@ TEST_F(AssocArrayTest, MethodReserveTest)
 	EXPECT_EQ(100, (int)myArray.capacity());
 }
 
-TEST_F(AssocArrayTest, MethodValPtrTest)
+TEST_F(All2AllDistsTest, MethodValPtrTest)
 {
 	fillMyArrayWith4ConsecutiveInts();
 

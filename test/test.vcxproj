@@ -118,6 +118,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="algorithm\mis\mis_unittest.cpp" />
+    <ClCompile Include="All2AllDists_unittest.cpp" />
     <ClCompile Include="coloring\interval\interval_unittest.cpp" />
     <ClCompile Include="coloring\vertex\brooks_unittest.cpp" />
     <ClCompile Include="coloring\vertex\gis_unittest.cpp" />
