@@ -25,26 +25,29 @@ public:
 	typedef Graph<char, string> MyGraph;
 	typedef MyGraph::PVertex GVert;
 
+	AssocArray<GVert, int> myArray;
+
+	// constructing Graph
+	MyGraph g;
+	GVert A, B, C, D;
+
+	virtual void fillMyArrayWith4ConsecutiveInts() {
+		myArray[A] = 1;
+		myArray[B] = 2;
+		myArray[C] = 3;
+		myArray[D] = 4;
+	}
+
 	virtual void SetUp() {
 		A = g.addVert('A'); B = g.addVert('B'); C = g.addVert('C'); D = g.addVert('D');
 	}
 
 	// virtual void TearDown() {}
-
-	// constructing Graph
-	MyGraph g;
-	GVert A, B, C, D;
 };
 
 TEST_F(AssocArrayTest, MethodCapacityTest)
 {
-	AssocArray<GVert, int> myArray;
-
-	myArray[A] = 1;
-	myArray[B] = 2;
-	myArray[C] = 3;
-	myArray[D] = 4;
-
+	fillMyArrayWith4ConsecutiveInts();
 	myArray.delKey(B);
 
 	EXPECT_EQ(3, (int)(myArray.size()));
@@ -53,12 +56,7 @@ TEST_F(AssocArrayTest, MethodCapacityTest)
 
 TEST_F(AssocArrayTest, MethodClearTest)
 {
-	AssocArray<GVert, int> myArray;
-
-	myArray[A] = 1;
-	myArray[B] = 2;
-	myArray[C] = 3;
-	myArray[D] = 4;
+	fillMyArrayWith4ConsecutiveInts();
 	myArray.clear();
 	myArray[A] = 5;
 	myArray[B] = 6;
@@ -69,12 +67,7 @@ TEST_F(AssocArrayTest, MethodClearTest)
 
 TEST_F(AssocArrayTest, MethodDefragTest)
 {
-	AssocArray<GVert, int> myArray;
-
-	myArray[A] = 1;
-	myArray[B] = 2;
-	myArray[C] = 3;
-	myArray[D] = 4;
+	fillMyArrayWith4ConsecutiveInts();
 
 	myArray.delKey(B);
 
@@ -109,12 +102,7 @@ TEST_F(AssocArrayTest, MethodDefragTest)
 
 TEST_F(AssocArrayTest, MethodDelKeyTest)
 {
-	AssocArray<GVert, int> myArray;
-
-	myArray[A] = 1;
-	myArray[B] = 2;
-	myArray[C] = 3;
-	myArray[D] = 4;
+	fillMyArrayWith4ConsecutiveInts();
 
 	EXPECT_TRUE(myArray.delKey(B));
 	EXPECT_FALSE(myArray.delKey(B));
@@ -132,12 +120,7 @@ TEST_F(AssocArrayTest, MethodDelKeyTest)
 
 TEST_F(AssocArrayTest, MethodEmptyTest)
 {
-	AssocArray<GVert, int> myArray;
-
-	myArray[A] = 1;
-	myArray[B] = 2;
-	myArray[C] = 3;
-	myArray[D] = 4;
+	fillMyArrayWith4ConsecutiveInts();
 	
 	EXPECT_FALSE(myArray.empty());
 	myArray.delKey(myArray.firstKey());
@@ -148,17 +131,11 @@ TEST_F(AssocArrayTest, MethodEmptyTest)
 	EXPECT_FALSE(myArray.empty());
 	myArray.delKey(myArray.firstKey());
 	EXPECT_TRUE(myArray.empty());
-
 }
 
 TEST_F(AssocArrayTest, MethodGetKeysTest)
 {
-	AssocArray<GVert, int> myArray;
-
-	myArray[A] = 1;
-	myArray[B] = 2;
-	myArray[C] = 3;
-	myArray[D] = 4;
+	fillMyArrayWith4ConsecutiveInts();
 
 	GVert *keysTab = new GVert[myArray.size()];
 	int size = myArray.getKeys(keysTab);
@@ -171,63 +148,40 @@ TEST_F(AssocArrayTest, MethodGetKeysTest)
 
 TEST_F(AssocArrayTest, MethodHasKeyTest)
 {
-	AssocArray<GVert, int> myArray;
-
-	myArray[A] = 1;
-	myArray[B] = 2;
-	myArray[C] = 3;
-	myArray[D] = 4;
+	fillMyArrayWith4ConsecutiveInts();
 
 	EXPECT_TRUE(myArray.hasKey(B));
 
 	myArray.delKey(B);
 
 	EXPECT_FALSE(myArray.hasKey(B));
-
 }
 
 TEST_F(AssocArrayTest, OperatorAssignmentTest)
 {
-	AssocArray<GVert, int> first;
-	AssocArray<GVert, int> second;
+	AssocArray<GVert, int> myArraySecond;
 
-	first[A] = 1;
-	first[B] = 2;
-	first[C] = 3;
-	first[D] = 4;
+	fillMyArrayWith4ConsecutiveInts();
 
-	second = first;	// second now contains 4 verticles
-	first = AssocArray<GVert, int>();	// and first is now empty
+	myArraySecond = myArray;	// second now contains 4 verticles
+	myArray = AssocArray<GVert, int>();	// and first is now empty
 
-	EXPECT_EQ(0, first.size());
-	EXPECT_EQ(4, second.size());
-
+	EXPECT_EQ(0, myArray.size());
+	EXPECT_EQ(4, myArraySecond.size());
 }
 
 TEST_F(AssocArrayTest, OperatorNegationTest)
 {
-	AssocArray<GVert, int> myArray;
-
-
 	EXPECT_TRUE(!myArray);
 
-	myArray[A] = 1;
-	myArray[B] = 2;
-	myArray[C] = 3;
-	myArray[D] = 4;
+	fillMyArrayWith4ConsecutiveInts();
 
 	EXPECT_FALSE(!myArray);
-
 }
 
 TEST_F(AssocArrayTest, MethodPrevKeyTest)
 {
-	AssocArray<GVert, int> myArray;
-
-	myArray[A] = 1;
-	myArray[B] = 2;
-	myArray[C] = 3;
-	myArray[D] = 4;
+	fillMyArrayWith4ConsecutiveInts();
 
 	GVert k = myArray.lastKey();
 	EXPECT_EQ('D', k->info);
@@ -246,7 +200,6 @@ TEST_F(AssocArrayTest, MethodPrevKeyTest)
 TEST_F(AssocArrayTest, MethodReserveTest)
 {
 	int AssocArraySize = 100;
-	AssocArray<GVert, int> myArray;
 
 	myArray.reserve(AssocArraySize);
 
@@ -255,12 +208,7 @@ TEST_F(AssocArrayTest, MethodReserveTest)
 
 TEST_F(AssocArrayTest, MethodValPtrTest)
 {
-	AssocArray<GVert, int> myArray;
-
-	myArray[A] = 1;
-	myArray[B] = 2;
-	myArray[C] = 3;
-	myArray[D] = 4;
+	fillMyArrayWith4ConsecutiveInts();
 
 	GVert k = myArray.firstKey();
 	EXPECT_EQ('A', k->info);

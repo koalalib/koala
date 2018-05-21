@@ -25,6 +25,19 @@ public:
 	typedef Graph<char, string> MyGraph;
 	typedef MyGraph::PVertex GVert;
 
+	AssocMatrix<GVert, int, AMatrFull> myMatrix;
+
+	virtual void fillmyMatrixWith8ConsecutiveInts() {
+		myMatrix(A, A) = 1;
+		myMatrix(A, B) = 2;
+		myMatrix(A, C) = 3;
+		myMatrix(A, D) = 4;
+		myMatrix(B, A) = 5;
+		myMatrix(B, B) = 6;
+		myMatrix(C, D) = 7;
+		myMatrix(D, C) = 8;
+	}
+
 	virtual void SetUp() {
 		A = g.addVert('A'); B = g.addVert('B'); C = g.addVert('C'); D = g.addVert('D');
 	}
@@ -38,16 +51,7 @@ public:
 
 TEST_F(AssocMatrixTest, MethodClearTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	std::pair<GVert, GVert>k = myMatrix.firstKey();
 	EXPECT_EQ('A', k.first->info);
@@ -117,21 +121,12 @@ TEST_F(AssocMatrixTest, ConstructorAMatrClTriangleTest)
 
 TEST_F(AssocMatrixTest, ConstructorAMatrFullTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> first;
+	fillmyMatrixWith8ConsecutiveInts();
 
-	first(A, A) = 1;
-	first(A, B) = 2;
-	first(A, C) = 3;
-	first(A, D) = 4;
-	first(B, A) = 5;
-	first(B, B) = 6;
-	first(C, D) = 7;
-	first(D, C) = 8;
+	AssocMatrix<GVert, int, AMatrFull> myMatrixSecond(myMatrix);
 
-	AssocMatrix<GVert, int, AMatrFull> second(first);
-
-	EXPECT_EQ(8, first.size());
-	EXPECT_EQ(8, second.size());
+	EXPECT_EQ(8, myMatrix.size());
+	EXPECT_EQ(8, myMatrixSecond.size());
 }
 
 TEST_F(AssocMatrixTest, ConstructorAMatrNoDiagTest)
@@ -198,16 +193,7 @@ TEST_F(AssocMatrixTest, MethodCorrectPosTest)
 
 TEST_F(AssocMatrixTest, MethodDefragTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	myMatrix.delKey(A, B);
 	myMatrix.defrag();
@@ -244,16 +230,7 @@ TEST_F(AssocMatrixTest, MethodDefragTest)
 
 TEST_F(AssocMatrixTest, MethodDelIndTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	EXPECT_TRUE(myMatrix.delInd(B));
 	EXPECT_FALSE(myMatrix.delInd(B));
@@ -283,16 +260,7 @@ TEST_F(AssocMatrixTest, MethodDelIndTest)
 
 TEST_F(AssocMatrixTest, MethodDelKeyTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	EXPECT_TRUE(myMatrix.delKey(A, B));
 	EXPECT_FALSE(myMatrix.delKey(A, B));
@@ -329,16 +297,7 @@ TEST_F(AssocMatrixTest, MethodDelKeyTest)
 
 TEST_F(AssocMatrixTest, MethodEmptyTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 	
 	EXPECT_FALSE(myMatrix.empty());
 	myMatrix.delKey(myMatrix.firstKey());
@@ -361,8 +320,6 @@ TEST_F(AssocMatrixTest, MethodEmptyTest)
 
 TEST_F(AssocMatrixTest, MethodFirstIndTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
 	myMatrix(A, A) = 1;
 	myMatrix(A, B) = 2;
 	myMatrix(C, D) = 3;
@@ -380,16 +337,7 @@ TEST_F(AssocMatrixTest, MethodFirstIndTest)
 
 TEST_F(AssocMatrixTest, MethodGetKeysTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	std::pair<GVert, GVert> *keysTab = new std::pair<GVert, GVert>[myMatrix.size()];
 	EXPECT_EQ(8, myMatrix.getKeys(keysTab));
@@ -414,16 +362,7 @@ TEST_F(AssocMatrixTest, MethodGetKeysTest)
 
 TEST_F(AssocMatrixTest, MethodHasIndTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	EXPECT_TRUE(myMatrix.hasInd(A));
 
@@ -435,16 +374,7 @@ TEST_F(AssocMatrixTest, MethodHasIndTest)
 
 TEST_F(AssocMatrixTest, MethodHasKeyTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	EXPECT_TRUE(myMatrix.hasKey(A, B));
 
@@ -455,16 +385,7 @@ TEST_F(AssocMatrixTest, MethodHasKeyTest)
 
 TEST_F(AssocMatrixTest, MethodIndSizeTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	EXPECT_EQ(4, (int)myMatrix.indSize());
 }
@@ -472,16 +393,8 @@ TEST_F(AssocMatrixTest, MethodIndSizeTest)
 TEST_F(AssocMatrixTest, MethodKeyTest)
 {
 	pair<GVert, GVert> k = pair<GVert, GVert>(A, B);
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	
+	fillmyMatrixWith8ConsecutiveInts();
 
 	EXPECT_EQ('A', myMatrix.key(k).first->info);
 	EXPECT_EQ('B', myMatrix.key(k).second->info);
@@ -490,8 +403,6 @@ TEST_F(AssocMatrixTest, MethodKeyTest)
 
 TEST_F(AssocMatrixTest, MethodLastIndTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
 	myMatrix(A, A) = 1;
 	myMatrix(A, B) = 2;
 	myMatrix(C, D) = 3;
@@ -510,16 +421,7 @@ TEST_F(AssocMatrixTest, MethodLastIndTest)
 
 TEST_F(AssocMatrixTest, MethodLastKeyTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	std::pair<GVert, GVert>k = myMatrix.lastKey();
 	EXPECT_EQ('D', k.first->info);
@@ -588,7 +490,6 @@ TEST_F(AssocMatrixTest, OperatorAssignmentTest)
 
 TEST_F(AssocMatrixTest, OperatorBracketsTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
 	myMatrix(A, A) = 1;
 	myMatrix(A, B) = myMatrix(A, A);
 	EXPECT_EQ(1, myMatrix(A, A));
@@ -599,8 +500,6 @@ TEST_F(AssocMatrixTest, OperatorBracketsTest)
 
 TEST_F(AssocMatrixTest, OperatorBracketsTest2)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
 	myMatrix(A, A) = 1;
 	myMatrix(A, B) = 2;
 	myMatrix(A, C) = 3;
@@ -616,8 +515,6 @@ TEST_F(AssocMatrixTest, OperatorBracketsTest2)
 
 TEST_F(AssocMatrixTest, OperatorNegationTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
 	EXPECT_TRUE(!myMatrix);
 
 	myMatrix(A, A) = 1;
@@ -648,16 +545,7 @@ TEST_F(AssocMatrixTest, MethodShapeTest)
 
 TEST_F(AssocMatrixTest, MethodSizeTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	EXPECT_EQ(8, (int)myMatrix.size());
 }
@@ -688,18 +576,10 @@ void check(map<Graph<char, string>::PVertex, int>::iterator it, bool* keyExist)
 
 //TEST_F(AssocMatrixTest, MethodSlice1)
 //{
-//	AssocMatrix<GVert, int, AMatrFull> myMatrix;
 //	map<GVert, int> slice1;
 //	map<GVert, int>::iterator it;
 //
-//	myMatrix(A, A) = 1;
-//	myMatrix(A, B) = 2;
-//	myMatrix(A, C) = 3;
-//	myMatrix(A, D) = 4;
-//	myMatrix(B, A) = 5;
-//	myMatrix(B, B) = 6;
-//	myMatrix(C, D) = 7;
-//	myMatrix(D, C) = 8;
+//	fillmyMatrixWith8ConsecutiveInts();
 //
 //	myMatrix.slice1<GVert, map<GVert, int>>(A, slice1);
 //
@@ -716,21 +596,13 @@ void check(map<Graph<char, string>::PVertex, int>::iterator it, bool* keyExist)
 //	check(it, keyExist);
 //	
 //}
-//
+
 //TEST_F(AssocMatrixTest, MethodSlice2)
 //{
-//	AssocMatrix<GVert, int, AMatrFull> myMatrix;
 //	map<GVert, int> slice2;
 //	map<GVert, int>::iterator it;
 //
-//	myMatrix(A, A) = 1;
-//	myMatrix(A, B) = 2;
-//	myMatrix(A, C) = 3;
-//	myMatrix(A, D) = 4;
-//	myMatrix(B, A) = 5;
-//	myMatrix(B, B) = 6;
-//	myMatrix(C, D) = 7;
-//	myMatrix(D, C) = 8;
+//	fillmyMatrixWith8ConsecutiveInts();
 //
 //	myMatrix.slice1<GVert, map<GVert, int>>(A, slice2);
 //
@@ -749,16 +621,7 @@ void check(map<Graph<char, string>::PVertex, int>::iterator it, bool* keyExist)
 
 TEST_F(AssocMatrixTest, MethodValPtrTest)
 {
-	AssocMatrix<GVert, int, AMatrFull> myMatrix;
-
-	myMatrix(A, A) = 1;
-	myMatrix(A, B) = 2;
-	myMatrix(A, C) = 3;
-	myMatrix(A, D) = 4;
-	myMatrix(B, A) = 5;
-	myMatrix(B, B) = 6;
-	myMatrix(C, D) = 7;
-	myMatrix(D, C) = 8;
+	fillmyMatrixWith8ConsecutiveInts();
 
 	std::pair<GVert, GVert>k = myMatrix.firstKey();
 	EXPECT_EQ('A', k.first->info);
