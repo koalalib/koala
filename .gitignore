@@ -1,4 +1,5 @@
 .vs
+koala/x64/*
 test/*.TMP
 test/*.db
 test/*.opendb
