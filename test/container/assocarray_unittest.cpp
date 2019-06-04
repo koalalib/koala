@@ -46,7 +46,7 @@ public:
 };
 
 TEST_F(All2AllDistsTest, MethodCapacityTest)
-{
+{	
 	fillMyArrayWith4ConsecutiveInts();
 	myArray.delKey(B);
 

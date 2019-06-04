@@ -93,5 +93,8 @@
     <ClCompile Include="All2AllDists_unittest.cpp">
       <Filter>Source Files\algorithm_unittest\weighted</Filter>
     </ClCompile>
+    <ClCompile Include="text_unittest.cpp">
+      <Filter>Source Files\io_unittest</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

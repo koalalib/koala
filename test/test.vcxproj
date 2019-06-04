@@ -19,7 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -130,6 +130,7 @@
     <ClCompile Include="container\heap_unittest.cpp" />
     <ClCompile Include="container\set_unittest.cpp" />
     <ClCompile Include="graph\graph_unittest.cpp" />
+    <ClCompile Include="text_unittest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="gtest_main\gtest_main.vcxproj">

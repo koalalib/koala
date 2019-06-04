@@ -2,6 +2,10 @@
 test/*.db
 test/*.opendb
 test/*.user
+test/*.user
+test/*.sdf
+test/*.suo
+test/info.txt
 test/ipch
 test/Debug
 test/Release
