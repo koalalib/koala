@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3C871280-F115-47EF-ADBA-20E4E8AA3DF7}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>koala</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="algorithm\conflow.h" />
+    <ClInclude Include="algorithm\conflow.hpp" />
+    <ClInclude Include="algorithm\matching.h" />
+    <ClInclude Include="algorithm\matching.hpp" />
+    <ClInclude Include="algorithm\mis.h" />
+    <ClInclude Include="algorithm\mis.hpp" />
+    <ClInclude Include="algorithm\sat2cnf.h" />
+    <ClInclude Include="algorithm\sat2cnf.hpp" />
+    <ClInclude Include="algorithm\schedule.h" />
+    <ClInclude Include="algorithm\schedule.hpp" />
+    <ClInclude Include="algorithm\search.h" />
+    <ClInclude Include="algorithm\search.hpp" />
+    <ClInclude Include="algorithm\weights.h" />
+    <ClInclude Include="algorithm\weights.hpp" />
+    <ClInclude Include="base\defs.h" />
+    <ClInclude Include="base\defs.hpp" />
+    <ClInclude Include="base\exception.h" />
+    <ClInclude Include="base\exception.hpp" />
+    <ClInclude Include="base\rnd.h" />
+    <ClInclude Include="base\rnd.hpp" />
+    <ClInclude Include="classes\create.h" />
+    <ClInclude Include="classes\create.hpp" />
+    <ClInclude Include="classes\detect.h" />
+    <ClInclude Include="classes\detect.hpp" />
+    <ClInclude Include="coloring\edge.h" />
+    <ClInclude Include="coloring\edge.hpp" />
+    <ClInclude Include="coloring\interval.h" />
+    <ClInclude Include="coloring\interval.hpp" />
+    <ClInclude Include="coloring\list.h" />
+    <ClInclude Include="coloring\list.hpp" />
+    <ClInclude Include="coloring\vertex.h" />
+    <ClInclude Include="coloring\vertex.hpp" />
+    <ClInclude Include="container\assoctab.h" />
+    <ClInclude Include="container\assoctab.hpp" />
+    <ClInclude Include="container\hashcont.h" />
+    <ClInclude Include="container\hashcont.hpp" />
+    <ClInclude Include="container\heap.h" />
+    <ClInclude Include="container\heap.hpp" />
+    <ClInclude Include="container\joinsets.h" />
+    <ClInclude Include="container\joinsets.hpp" />
+    <ClInclude Include="container\localarray.h" />
+    <ClInclude Include="container\localarray.hpp" />
+    <ClInclude Include="container\privates.h" />
+    <ClInclude Include="container\privates.hpp" />
+    <ClInclude Include="container\set.h" />
+    <ClInclude Include="container\set.hpp" />
+    <ClInclude Include="container\set_hashset.h" />
+    <ClInclude Include="container\set_hashset.hpp" />
+    <ClInclude Include="container\set_set.h" />
+    <ClInclude Include="container\set_set.hpp" />
+    <ClInclude Include="container\set_vector.h" />
+    <ClInclude Include="container\set_vector.hpp" />
+    <ClInclude Include="container\simple.h" />
+    <ClInclude Include="container\simple.hpp" />
+    <ClInclude Include="graph\adjmatrix.h" />
+    <ClInclude Include="graph\adjmatrix.hpp" />
+    <ClInclude Include="graph\edge.h" />
+    <ClInclude Include="graph\edge.hpp" />
+    <ClInclude Include="graph\graph.h" />
+    <ClInclude Include="graph\graph.hpp" />
+    <ClInclude Include="graph\grconst.h" />
+    <ClInclude Include="graph\grconst.hpp" />
+    <ClInclude Include="graph\vertex.h" />
+    <ClInclude Include="graph\view.h" />
+    <ClInclude Include="graph\view.hpp" />
+    <ClInclude Include="io\g6.h" />
+    <ClInclude Include="io\g6.hpp" />
+    <ClInclude Include="io\graphml.h" />
+    <ClInclude Include="io\graphml.hpp" />
+    <ClInclude Include="io\parsetgml.h" />
+    <ClInclude Include="io\text.h" />
+    <ClInclude Include="io\text.hpp" />
+    <ClInclude Include="tinyxml\tinystr.h" />
+    <ClInclude Include="tinyxml\tinyxml.h" />
+    <ClInclude Include="tools\drawcreator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="tinyxml\tinystr.cpp" />
+    <ClCompile Include="tinyxml\tinyxml.cpp" />
+    <ClCompile Include="tinyxml\tinyxmlerror.cpp" />
+    <ClCompile Include="tinyxml\tinyxmlparser.cpp" />
+    <ClCompile Include="tinyxml\xmltest.cpp" />
+    <ClCompile Include="tools\drawcreator.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,321 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\algorithm">
+      <UniqueIdentifier>{407341a4-c313-4857-91c4-cb65df83df2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\base">
+      <UniqueIdentifier>{02972778-5677-4cdb-8d7d-b7c6447d07ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\classes">
+      <UniqueIdentifier>{3e54708c-d394-430f-b4d2-834deb59f816}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\coloring">
+      <UniqueIdentifier>{c910021e-5b9e-45ed-b8dc-ffab0d1e3bb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\container">
+      <UniqueIdentifier>{277b4106-cb6b-4322-8dd6-ab195bcac909}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\graph">
+      <UniqueIdentifier>{3354db64-9780-49ff-a006-9140a0a01ddc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\io">
+      <UniqueIdentifier>{d6641f03-3fae-46fa-a4ed-23dc021ca08c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tinyxml">
+      <UniqueIdentifier>{c1d0ce42-ff3d-45d6-8209-6f056b23e097}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tools">
+      <UniqueIdentifier>{95a085a6-02cd-4641-bdc1-e2db28ba2153}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\algorithm">
+      <UniqueIdentifier>{9e046911-ea8c-46ab-83e5-55052a816c6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\base">
+      <UniqueIdentifier>{e1cd1f6e-0880-4bd3-85e8-4060ebd2f2bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\classes">
+      <UniqueIdentifier>{48c6c4d9-afed-45a7-a5c5-54b6b9ba11ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\coloring">
+      <UniqueIdentifier>{ef67a4cf-0e0d-47af-99ca-f0bdc2b8ed09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\container">
+      <UniqueIdentifier>{053bc48e-a47f-41aa-8d21-792971d1f5c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graph">
+      <UniqueIdentifier>{28e52719-55cb-44e0-9375-356ee9d758e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\io">
+      <UniqueIdentifier>{1fa12570-0856-49b5-8436-2c804e6e1a1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tinyxml">
+      <UniqueIdentifier>{d65b2781-5317-4bc9-8f73-3f9db7bd6698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tools">
+      <UniqueIdentifier>{5384efc9-6f44-4c97-baff-c449a18df6e7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="algorithm\conflow.h">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\matching.h">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\mis.h">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\sat2cnf.h">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\schedule.h">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\search.h">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\weights.h">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="base\defs.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\exception.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\rnd.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="classes\create.h">
+      <Filter>Header Files\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="classes\detect.h">
+      <Filter>Header Files\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="container\assoctab.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\hashcont.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\heap.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\joinsets.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\localarray.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\privates.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\set.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\set_hashset.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\set_set.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\set_vector.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\simple.h">
+      <Filter>Header Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="coloring\edge.h">
+      <Filter>Header Files\coloring</Filter>
+    </ClInclude>
+    <ClInclude Include="coloring\interval.h">
+      <Filter>Header Files\coloring</Filter>
+    </ClInclude>
+    <ClInclude Include="coloring\list.h">
+      <Filter>Header Files\coloring</Filter>
+    </ClInclude>
+    <ClInclude Include="coloring\vertex.h">
+      <Filter>Header Files\coloring</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\adjmatrix.h">
+      <Filter>Header Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\edge.h">
+      <Filter>Header Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\graph.h">
+      <Filter>Header Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\grconst.h">
+      <Filter>Header Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\vertex.h">
+      <Filter>Header Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\view.h">
+      <Filter>Header Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="io\g6.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\graphml.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\parsetgml.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\text.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="tools\drawcreator.h">
+      <Filter>Header Files\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml\tinystr.h">
+      <Filter>Header Files\tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml\tinyxml.h">
+      <Filter>Header Files\tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\conflow.hpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\matching.hpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\mis.hpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\sat2cnf.hpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\schedule.hpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\search.hpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm\weights.hpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="base\defs.hpp">
+      <Filter>Source Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\exception.hpp">
+      <Filter>Source Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\rnd.hpp">
+      <Filter>Source Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="classes\create.hpp">
+      <Filter>Source Files\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="classes\detect.hpp">
+      <Filter>Source Files\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="coloring\edge.hpp">
+      <Filter>Source Files\coloring</Filter>
+    </ClInclude>
+    <ClInclude Include="coloring\interval.hpp">
+      <Filter>Source Files\coloring</Filter>
+    </ClInclude>
+    <ClInclude Include="coloring\list.hpp">
+      <Filter>Source Files\coloring</Filter>
+    </ClInclude>
+    <ClInclude Include="coloring\vertex.hpp">
+      <Filter>Source Files\coloring</Filter>
+    </ClInclude>
+    <ClInclude Include="container\assoctab.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\hashcont.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\heap.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\joinsets.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\localarray.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\privates.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\set.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\set_hashset.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\set_set.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\set_vector.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="container\simple.hpp">
+      <Filter>Source Files\container</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\adjmatrix.hpp">
+      <Filter>Source Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\edge.hpp">
+      <Filter>Source Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\graph.hpp">
+      <Filter>Source Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\grconst.hpp">
+      <Filter>Source Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="graph\view.hpp">
+      <Filter>Source Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="io\g6.hpp">
+      <Filter>Source Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\graphml.hpp">
+      <Filter>Source Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\text.hpp">
+      <Filter>Source Files\io</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="tools\drawcreator.cpp">
+      <Filter>Source Files\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinystr.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinyxml.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinyxmlerror.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinyxmlparser.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\xmltest.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

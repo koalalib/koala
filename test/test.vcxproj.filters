@@ -90,7 +90,7 @@
     <ClCompile Include="graph\graph_unittest.cpp">
       <Filter>Source Files\graph_unittest</Filter>
     </ClCompile>
-    <ClCompile Include="All2AllDists_unittest.cpp">
+    <ClCompile Include="algorithm\weights\All2AllDists_unittest.cpp">
       <Filter>Source Files\algorithm_unittest\weighted</Filter>
     </ClCompile>
     <ClCompile Include="text_unittest.cpp">
